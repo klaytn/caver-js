@@ -1,0 +1,18 @@
+{
+  "name": "caver-cli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "cli.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Klaytn Team",
+  "license": "LGPL",
+  "dependencies": {
+    "chalk": "^2.4.1",
+    "figlet": "^1.2.0",
+    "inquirer": "^6.0.0",
+    "json-format": "^1.0.1",
+    "underscore": "^1.9.1"
+  }
+}

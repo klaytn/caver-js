@@ -1,0 +1,441 @@
+[
+	{
+		"name": "getNodeInfo",
+		"call": "klay_clientVersion"
+	},
+	{
+		"name": "getProtocolVersion",
+		"call": "klay_protocolVersion",
+		"params": 0
+	},
+	{
+		"name": "getCoinbase",
+		"call": "klay_coinbase",
+		"params": 0
+	},
+	{
+		"name": "isMining",
+		"call": "klay_mining",
+		"params": 0
+	},
+	{
+		"name": "getHashrate",
+		"call": "klay_hashrate",
+		"params": 0,
+		"outputFormatter": "hexToNumber"
+	},
+	{
+		"name": "isSyncing",
+		"call": "klay_syncing",
+		"params": 0,
+		"outputFormatter": "outputSyncingFormatter"
+	},
+	{
+		"name": "getGasPrice",
+		"call": "klay_gasPrice",
+		"params": 0,
+		"outputFormatter": "outputBigNumberFormatter"
+	},
+	{
+		"name": "getAccounts",
+		"call": "klay_accounts",
+		"params": 0,
+		"outputFormatter": "toChecksumAddress"
+	},
+	{
+		"name": "getBlockNumber",
+		"call": "klay_blockNumber",
+		"params": 0,
+		"outputFormatter": "hexToNumber"
+	},
+	{
+		"name": "getBalance",
+		"call": "klay_getBalance",
+		"params": 2,
+		"inputFormatter": ["inputAddressFormatter", "inputDefaultBlockNumberFormatter"],
+    "outputFormatter": "outputBigNumberFormatter"
+	},
+	{
+		"name": "getStorageAt",
+		"call": "klay_getStorageAt",
+		"params": 3,
+		"inputFormatter": ["inputAddressFormatter", "numberToHex", "inputDefaultBlockNumberFormatter"]
+	},
+	{
+		"name": "getCode",
+		"call": "klay_getCode",
+		"params": 2,
+		"inputFormatter": ["inputAddressFormatter", "inputDefaultBlockNumberFormatter"]
+	},
+	{
+		"name": "getTransaction",
+		"call": "klay_getTransactionByHash",
+		"outputFormatter": "outputTransactionFormatter",
+		"params": 1
+	},
+	{
+		"name": "getTransactionReceipt",
+		"call": "klay_getTransactionReceipt",
+		"params": 1,
+		"outputFormatter": "outputTransactionReceiptFormatter"
+	},
+	{
+		"name": "getTransactionCount",
+		"call": "klay_getTransactionCount",
+		"params": 2,
+		"inputFormatter": ["inputAddressFormatter", "inputDefaultBlockNumberFormatter"],
+		"outputFormatter": "hexToNumber"
+	},
+	{
+		"name": "sendSignedTransaction",
+		"call": "klay_sendRawTransaction",
+		"params": 1
+	},
+	{
+		"name": "signTransaction",
+		"call": "klay_signTransaction",
+		"params": 1,
+		"inputFormatter": ["inputTransactionFormatter"]
+	},
+	{
+		"name": "sendTransaction",
+		"call": "klay_sendTransaction",
+		"params": 1,
+		"inputFormatter": ["inputTransactionFormatter"]
+	},
+	{
+		"name": "call",
+		"call": "klay_call",
+		"params": 2,
+		"inputFormatter": ["inputCallFormatter", "inputDefaultBlockNumberFormatter"]
+	},
+	{
+		"name": "estimateGas",
+		"call": "klay_estimateGas",
+		"params": 1,
+		"inputFormatter": ["inputCallFormatter"],
+		"outputFormatter": "hexToNumber"
+	},
+	{
+		"name": "getCompilers",
+		"call": "klay_getCompilers",
+		"params": 0
+	},
+	{
+		"name": "compile.solidity",
+		"call": "klay_compileSolidity",
+		"params": 1
+	},
+	{
+		"name": "compile.lll",
+		"call": "klay_compileLLL",
+		"params": 1
+	},
+	{
+		"name": "compile.serpent",
+		"call": "klay_compileSerpent",
+		"params": 1
+	},
+	{
+		"name": "submitWork",
+		"call": "klay_submitWork",
+		"params": 3
+	},
+	{
+		"name": "getWork",
+		"call": "klay_getWork",
+		"params": 0
+	},
+	{
+		"name": "getPastLogs",
+		"call": "klay_getLogs",
+		"params": 1,
+		"inputFormatter": ["inputLogFormatter"],
+		"outputFormatter": "outputLogFormatter"
+	},
+	{
+		"name": "sign",
+		"call": "klay_sign",
+		"params": 2,
+		"inputFormatter": ["inputSignFormatter", "inputAddressFormatter"],
+		"transformPayload": "reversePayload"
+	},
+	{
+		"name": "getBlock",
+		"call": "klay_getBlockByNumber",
+		"hexCall": "klay_getBlockByHash",
+		"params": 2,
+		"inputFormatter": ["inputBlockNumberFormatter", "toBoolean"]
+	},
+	{
+		"name": "getBlockTransactionCount",
+		"call": "klay_getBlockTransactionCountByNumber",
+		"hexCall": "klay_getBlockTransactionCountByHash",
+		"params": 1,
+		"inputFormatter": ["inputBlockNumberFormatter"],
+    "outputFormatter": "hexToNumber"
+	},
+	{
+		"name": "getTransactionFromBlock",
+		"call": "klay_getTransactionByBlockNumberAndIndex",
+		"hexCall": "klay_getTransactionByBlockHashAndIndex",
+		"params": 2,
+		"inputFormatter": ["inputBlockNumberFormatter", "numberToHex"],
+		"outputFormatter": "outputTransactionFormatter"
+	},
+	{
+		"name": "getId",
+		"call": "net_networkID",
+		"params": 0,
+		"outputFormatter": "hexToNumber"
+	},
+	{
+		"name": "isListening",
+		"call": "net_listening",
+		"params": 0
+	},
+	{
+		"name": "getPeerCount",
+		"call": "net_peerCount",
+		"params": 0,
+		"outputFormatter": "hexToNumber"
+	},
+	{
+		"name": "getChainId",
+		"call": "klay_chainID",
+		"outputFormatter": "hexToNumber"
+	},
+	{
+		"name": "getAccounts",
+		"call": "personal_listAccounts",
+		"params": 0,
+		"outputFormatter": "toChecksumAddress"
+	},
+	{
+		"name": "newAccount",
+		"call": "personal_newAccount",
+		"params": 1,
+		"outputFormatter": "toChecksumAddress"
+	},
+	{
+		"name": "unlockAccount",
+		"call": "personal_unlockAccount",
+		"params": 3,
+		"inputFormatter": ["inputAddressFormatter", null, null]
+	},
+	{
+		"name": "lockAccount",
+		"call": "personal_lockAccount",
+		"params": 1,
+		"inputFormatter": ["inputAddressFormatter"]
+	},
+	{
+		"name": "importRawKey",
+		"call": "personal_importRawKey",
+		"params": 2,
+		"inputFormatter": ["inputRawKeyFormatter", null]
+	},
+	{
+		"name": "sendTransaction",
+		"call": "personal_sendTransaction",
+		"params": 2,
+		"inputFormatter": ["inputTransactionFormatter", null]
+	},
+	{
+		"name": "signTransaction",
+		"call": "personal_signTransaction",
+		"params": 2,
+		"inputFormatter": ["inputTransactionFormatter", null]
+	},
+	{
+		"name": "sign",
+		"call": "personal_sign",
+		"params": 3,
+		"inputFormatter": ["inputSignFormatter", "inputAddressFormatter", null]
+	},
+	{
+		"name": "ecRecover",
+		"call": "personal_ecRecover",
+		"params": 2,
+		"inputFormatter": ["inputSignFormatter", null]
+	},
+	{
+		"name": "getBlockWithConsensusInfo",
+		"call": "klay_getBlockWithConsensusInfoByNumber",
+		"hexCall": "klay_getBlockWithConsensusInfoByHash",
+		"params": 1,
+		"inputFormatter": ["inputDefaultBlockNumberFormatter"]
+	},
+	{
+		"name": "debugTraceTransaction",
+		"call": "debug_traceTransaction",
+		"params": 1
+	},
+	{
+		"name": "accountCreated",
+		"call": "klay_accountCreated",
+		"params": 2,
+		"inputFormatter": ["inputAddressFormatter", "inputDefaultBlockNumberFormatter"]
+	},
+	{
+		"name": "getAccountKey",
+		"call": "klay_getAccountKey",
+		"params": 2,
+		"inputFormatter": ["inputAddressFormatter", "inputDefaultBlockNumberFormatter"]
+	},
+	{
+		"name": "isContractAccount",
+		"call": "klay_isContractAccount",
+		"params": 2,
+		"inputFormatter": ["inputAddressFormatter", "inputDefaultBlockNumberFormatter"]
+	},
+	{
+		"name": "getCommittee",
+		"call": "klay_getCommittee",
+		"params": 1,
+		"inputFormatter": ["inputDefaultBlockNumberFormatter"]
+	},
+	{
+		"name": "getCommitteeSize",
+		"call": "klay_getCommitteeSize",
+		"params": 1,
+		"inputFormatter": ["inputDefaultBlockNumberFormatter"]
+	},
+	{
+		"name": "getCouncil",
+		"call": "klay_getCouncil",
+		"params": 1,
+		"inputFormatter": ["inputDefaultBlockNumberFormatter"]
+	},
+	{
+		"name": "getCouncilSize",
+		"call": "klay_getCouncilSize",
+		"params": 1,
+		"inputFormatter": ["inputDefaultBlockNumberFormatter"]
+	},
+	{
+		"name": "getCypressCredit",
+		"call": "klay_getCypressCredit",
+		"params": 1,
+		"inputFormatter": ["inputDefaultBlockNumberFormatter"]
+	},
+	{
+		"name": "sha3",
+		"call": "klay_sha3",
+		"params": 1
+	},
+	{
+		"name": "getAccount",
+		"call": "klay_getAccount",
+		"params": 2,
+		"inputFormatter": ["inputAddressFormatter", "inputDefaultBlockNumberFormatter"]
+	},
+	{
+		"name": "getTransactionBySenderTxHash",
+		"call": "klay_getTransactionBySenderTxHash",
+		"outputFormatter": "outputTransactionFormatter",
+		"params": 1
+	},
+	{
+		"name": "getTransactionReceiptBySenderTxHash",
+		"call": "klay_getTransactionReceiptBySenderTxHash",
+		"params": 1,
+		"outputFormatter": "outputTransactionReceiptFormatter"
+	},
+	{
+		"name": "gasPriceAt",
+		"call": "klay_gasPriceAt",
+		"params": 1,
+		"inputFormatter": ["inputDefaultBlockNumberFormatter"]
+	},
+	{
+		"name": "isSenderTxHashIndexingEnabled",
+		"call": "klay_isSenderTxHashIndexingEnabled",
+		"params": 0
+	},
+	{
+		"name": "isParallelDBWrite",
+		"call": "klay_isParallelDBWrite",
+		"params": 0
+	},
+	{
+		"name": "rewardbase",
+		"call": "klay_rewardbase",
+		"params": 0
+	},
+	{
+		"name": "writeThroughCaching",
+		"call": "klay_writeThroughCaching",
+		"params": 0
+	},
+	{
+		"name": "getFilterChanges",
+		"call": "klay_getFilterChanges",
+		"params": 1,
+		"inputFormatter": ["numberToHex"],
+		"outputFormatter": "outputLogFormatter"
+	},
+	{
+		"name": "getFilterLogs",
+		"call": "klay_getFilterLogs",
+		"params": 1,
+		"inputFormatter": ["numberToHex"],
+		"outputFormatter": "outputLogFormatter"
+	},
+	{
+		"name": "newBlockFilter",
+		"call": "klay_newBlockFilter",
+		"params": 0
+	},
+	{
+		"name": "newFilter",
+		"call": "klay_newFilter",
+		"params": 1,
+		"inputFormatter": ["inputLogFormatter"]
+	},
+	{
+		"name": "newPendingTransactionFilter",
+		"call": "klay_newPendingTransactionFilter",
+		"params": 0
+	},
+	{
+		"name": "uninstallFilter",
+		"call": "klay_uninstallFilter",
+		"params": 1,
+		"inputFormatter": ["numberToHex"]
+	},
+	{
+		"name": "getBlockReceipts",
+		"call": "klay_getBlockReceipts",
+		"params": 1
+	},
+	{
+		"name": "peerCountByType",
+		"call": "net_peerCountByType",
+		"params": 0
+	},
+	{
+		"name": "estimateComputationCost",
+		"call": "klay_estimateComputationCost",
+		"params": 2,
+		"inputFormatter": ["inputCallFormatter", "inputDefaultBlockNumberFormatter"]
+	},
+	{
+		"name": "replaceRawKey",
+		"call": "personal_replaceRawKey",
+		"params": 3,
+		"inputFormatter": ["inputRawKeyFormatter", null, null]
+	},
+	{
+		"name": "sendValueTransfer",
+		"call": "personal_sendValueTransfer",
+		"params": 2,
+		"inputFormatter": ["inputPersonalTransactionFormatter", null]
+	},
+	{
+		"name": "sendAccountUpdate",
+		"call": "personal_sendAccountUpdate",
+		"params": 2,
+		"inputFormatter": ["inputPersonalTransactionFormatter", null]
+	}
+]

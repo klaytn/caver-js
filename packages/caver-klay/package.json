@@ -1,0 +1,11 @@
+{
+  "name": "caver-klay",
+  "version": "1.0.0",
+  "description": "This is a sub package of [caver-js][repo]",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Klaytn Team",
+  "license": "LGPL"
+}
