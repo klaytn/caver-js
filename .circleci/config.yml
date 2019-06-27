@@ -1,0 +1,69 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2
+
+defaults: &defaults
+  working_directory: ~/repo
+  docker:
+    - image: kjhman21/node:10.15.3-mocha
+
+jobs:
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - run: npm install
+      - run: npm test
+
+  publish:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Authenticate with registry
+          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/repo/.npmrc
+      - run:
+          name: Update version in package.json
+          command: |
+            tag=$CIRCLE_TAG
+            sed -i "s/\"version\": \".*\",/\"version\": \"${tag}\",/" package.json
+      - run:
+          name: Publish package with tag rc
+          command: |
+            tag=$CIRCLE_TAG
+            if [[ $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$ ]]; then
+              echo "Publishing a release candidate! version=$tag"
+              npm publish --tag rc
+            elif [[ $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+-redistributed\.[0-9]+$ ]]; then
+              echo "Publishing a redistributed version! version=$tag"
+              npm publish --tag redistributed
+            elif [[ $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "Publishing a major release! version=$tag"
+              npm publish
+            else
+              echo "Undefined version: $tag"
+              echo "Supported version strings: v1.0.0, v1.0.0-rc.1, v1.0.0-redistributed.1, etc"
+              exit 1
+            fi
+
+workflows:
+  version: 2
+  workflow_test:
+    jobs:
+      - test
+  workflow_publish:
+    jobs:
+      - test
+      - publish:
+          requires:
+            - test
+          filters:
+            tags:
+              only:
+                - /v[0-9]+\.[0-9]+\.[0-9]+/
+                - /v[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+/
+                - /v[0-9]+\.[0-9]+\.[0-9]+-redistributed\.[0-9]+/
+            branches:
+              ignore: /.*/
