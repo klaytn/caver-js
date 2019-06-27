@@ -63,8 +63,8 @@ Klaytn/vX.X.X/linux-amd64/goX.X.X
 
 ## Using caver-js account/wallet
 You can easily manage your account by using the account / wallet packages provided by caver-js.
-[caver.klay.accounts](https://docs.klaytn.com/caverjs/caver.klay.accounts) package provides functions related to accounts, such as create, signTransaction, and privateKeyToAccount.
-[caver.klay.accounts.wallet](https://docs.klaytn.com/caverjs/caver.klay.accounts#wallet) provides the **in-memory wallet** for easy account management in caver-js.
+[caver.klay.accounts](https://docs.klaytn.com/sdk/caverjs/caver.klay.accounts) package provides functions related to accounts, such as create, signTransaction, and privateKeyToAccount.
+[caver.klay.accounts.wallet](https://docs.klaytn.com/sdk/caverjs/caver.klay.accounts#wallet) provides the **in-memory wallet** for easy account management in caver-js.
 
 **Note** Functions associated with wallet and account provided by caver-js have no effect on the actual Klaytn network.
 
@@ -111,7 +111,7 @@ The private key that matches a specific account stored in the wallet instance ca
 ```
 
 ## Submitting a Transaction
-You can use caver-js to submit various types of transactions to a node. Please refer to the [caver.klay.sendTransaction](https://docs.klaytn.com/caverjs/caver.klay/transaction#sendtransaction) to see how to send a transaction of each type.
+You can use caver-js to submit various types of transactions to a node. Please refer to the [caver.klay.sendTransaction](https://docs.klaytn.com/sdk/caverjs/caver.klay/transaction#sendtransaction) to see how to send a transaction of each type.
 
 You can submit the transaction as shown below, and the result can be confirmed by the returned receipt:
 ```
@@ -197,19 +197,19 @@ caver-js provides the caver.utils.toPeb function for unit conversion. Please ref
 Documentation
 =================
 
-Documentation can be found at [Klaytn Docs-caver-js](https://docs.klaytn.com/caverjs).
+Documentation can be found at [Klaytn Docs-caver-js](https://docs.klaytn.com/sdk/caverjs).
 
 API Specification
 =================
 
 The API lists of caver-js are described in folloinwg links:
 
-* [caver.klay](https://docs.klaytn.com/caverjs/caver.klay)
-* [caver.klay.accounts](https://docs.klaytn.com/caverjs/caver.klay.accounts)
-* [caver.klay.contract](https://docs.klaytn.com/caverjs/caver.klay.contract)
-* [caver.klay.net](https://docs.klaytn.com/caverjs/caver.klay.net)
-* [caver.klay.abi](https://docs.klaytn.com/caverjs/caver.klay.abi)
-* [caver.utils](https://docs.klaytn.com/caverjs/caver.utils)
+* [caver.klay](https://docs.klaytn.com/sdk/caverjs/caver.klay)
+* [caver.klay.accounts](https://docs.klaytn.com/sdk/caverjs/caver.klay.accounts)
+* [caver.klay.contract](https://docs.klaytn.com/sdk/caverjs/caver.klay.contract)
+* [caver.klay.net](https://docs.klaytn.com/sdk/caverjs/caver.klay.net)
+* [caver.klay.abi](https://docs.klaytn.com/sdk/caverjs/caver.klay.abi)
+* [caver.utils](https://docs.klaytn.com/sdk/caverjs/caver.utils)
 
 
 Web3.js Similarity
