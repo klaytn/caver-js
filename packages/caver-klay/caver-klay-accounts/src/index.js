@@ -315,7 +315,16 @@ Accounts.prototype.signTransactionWithSignature = function signTransactionWithSi
  */
 Accounts.prototype.recoverTransaction = function recoverTransaction(rawTx) {
     var values = RLP.decode(rawTx);
-    var signature = Account.encodeSignature(values.slice(6,9));
+
+    // If the leading zero is trimmed, it will be filled with a valid length of '0'.
+    const arr = values.slice(7,9).map((sig) => {
+      sig = sig.replace('0x', '')
+      while (sig.length < 64) { sig = '0'+ sig } 
+      return '0x' + sig
+    })
+    arr.unshift(values[6])
+
+    var signature = Account.encodeSignature(arr);
     var recovery = Bytes.toNumber(values[6]);
     var extraData = recovery < 35 ? [] : [Bytes.fromNumber((recovery - 35) >> 1), "0x", "0x"];
     var signingData = values.slice(0,6).concat(extraData);

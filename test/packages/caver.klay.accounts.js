@@ -311,6 +311,30 @@ describe('caver.klay.accounts.recoverTransaction', () => {
       expect(result).to.not.equal(account.addrss)
     })
   })
+
+  context('CAVERJS-UNIT-WALLET-104 : rawTransaction:made by signature trimed leading zero', () => {
+    it('should equal to account.address', async () => {
+      const transaction = {
+        from: '0x13b0d8316F0c3cE0C3C51Ebb586A14d7d90112fD',
+        nonce: '0x0',
+        to: '0x30d8d4217145ba3f6cde24ec28c64c9120f2bdfb',
+        gas: 900000,
+        gasPrice: 25000000000,
+        value: '0x1',
+        chainId: 10000,
+      }
+      account.address = '0x13b0d8316F0c3cE0C3C51Ebb586A14d7d90112fD'
+      account.privateKey = '0x72d72a46401220f08ccb1b17b550feb816840f2f8ce86361e7ee54ac7a9ee6d8'
+
+      const signed = await caver.klay.accounts.signTransaction(transaction, account.privateKey)
+
+      const rlpDecoded = caver.utils.rlpDecode(signed.rawTransaction)
+      expect(rlpDecoded[7].length).not.to.equals(rlpDecoded[8].length)
+
+      const result = caver.klay.accounts.recoverTransaction(signed.rawTransaction)
+      expect(result).to.not.equal(account.addrss)
+    })
+  })
 })
 
 describe('caver.klay.accounts.hashMessage', () => {
