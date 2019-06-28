@@ -312,7 +312,7 @@ describe('caver.klay.accounts.recoverTransaction', () => {
     })
   })
 
-  context('CAVERJS-UNIT-WALLET-104 : rawTransaction:made by signature trimed leading zero', () => {
+  context('CAVERJS-UNIT-WALLET-104 : rawTransaction: leading zeroes of the signature are trimmed', () => {
     it('should equal to account.address', async () => {
       const transaction = {
         from: '0x13b0d8316F0c3cE0C3C51Ebb586A14d7d90112fD',
