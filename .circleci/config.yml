@@ -17,7 +17,7 @@ jobs:
       - run: npm install
       - run: npm test
 
-  publish:
+  job_publish:
     <<: *defaults
     steps:
       - checkout
@@ -55,15 +55,17 @@ workflows:
       - test
   workflow_publish:
     jobs:
-      - test
-      - publish:
+      - test:
+          filters:
+            tags:
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+.*/
+            branches:
+              ignore: /.*/
+      - job_publish:
           requires:
             - test
           filters:
             tags:
-              only:
-                - /v[0-9]+\.[0-9]+\.[0-9]+/
-                - /v[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+/
-                - /v[0-9]+\.[0-9]+\.[0-9]+-redistributed\.[0-9]+/
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+.*/
             branches:
               ignore: /.*/
