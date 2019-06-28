@@ -314,6 +314,10 @@ Accounts.prototype.signTransactionWithSignature = function signTransactionWithSi
  * > "0xF0109fC8DF283027b6285cc889F5aA624EaC1F55"
  */
 Accounts.prototype.recoverTransaction = function recoverTransaction(rawTx) {
+    if (utils.getTxTypeStringFromRawTransaction(rawTx) !== undefined) {
+      throw new Error('recoverTransaction only supports transactions of type "LEGACY".')
+    }
+
     var values = RLP.decode(rawTx);
 
     // If the leading zero is trimmed, it will be filled with a valid length of '0'.

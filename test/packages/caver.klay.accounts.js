@@ -335,6 +335,28 @@ describe('caver.klay.accounts.recoverTransaction', () => {
       expect(result).to.not.equal(account.addrss)
     })
   })
+
+  context('CAVERJS-UNIT-WALLET-105 : rawTransaction: Non-LEGACY transactions.', () => {
+    it('should throw error', async () => {
+      const transaction = {
+        type: 'VALUE_TRANSFER',
+        from: '0x13b0d8316F0c3cE0C3C51Ebb586A14d7d90112fD',
+        nonce: '0x0',
+        to: '0x30d8d4217145ba3f6cde24ec28c64c9120f2bdfb',
+        gas: 900000,
+        gasPrice: 25000000000,
+        value: '0x1',
+        chainId: 10000,
+      }
+      account.address = '0x13b0d8316F0c3cE0C3C51Ebb586A14d7d90112fD'
+      account.privateKey = '0x72d72a46401220f08ccb1b17b550feb816840f2f8ce86361e7ee54ac7a9ee6d8'
+
+      const signed = await caver.klay.accounts.signTransaction(transaction, account.privateKey)
+
+      const errorMessage = 'recoverTransaction only supports transactions of type "LEGACY".'
+      expect(()=>caver.klay.accounts.recoverTransaction(signed.rawTransaction)).to.throws(errorMessage)
+    })
+  })
 })
 
 describe('caver.klay.accounts.hashMessage', () => {
