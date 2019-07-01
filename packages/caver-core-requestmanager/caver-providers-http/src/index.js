@@ -92,17 +92,22 @@ HttpProvider.prototype.send = function(payload, callback) {
         clearTimeout(timer)
       }
       
-      if (request.readyState === 4 && request.timeout !== 1 && request.response !== null) {
+      if (request.readyState === 4 && request.timeout !== 1) {
           var result = request.responseText;
           var error = null;
 
-          try {
-              result = JSON.parse(result);
-          } catch(e) {
-              console.error(`Invalid JSON RPC response: ${JSON.stringify(request.responseText)}`)
-              error = errors.InvalidResponse(request.responseText);
+          if (request.response === null) {
+            error = errors.InvalidResponse(request.response)
+            clearTimeout(timer)
+          } else {
+            try {
+                result = JSON.parse(result);
+            } catch(e) {
+                console.error(`Invalid JSON RPC response: ${JSON.stringify(request.responseText)}`)
+                error = errors.InvalidResponse(request.responseText);
+            }
           }
-
+          
           _this.connected = true;
           callback(error, result);
       }
