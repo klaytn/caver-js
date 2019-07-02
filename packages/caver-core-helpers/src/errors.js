@@ -42,6 +42,7 @@ module.exports = {
     return new Error(`Returned error: ${message}`)
   },
   InvalidResponse: (result) => {
+    if (result === null) return new Error(`Invalid response: null`)
     const message = hasErrorMessage(result)
       ? result.error.message
       : `Invalid JSON RPC response: ${JSON.stringify(result)}`
