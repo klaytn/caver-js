@@ -40,25 +40,11 @@ var getNetworkType = function (callback) {
         .then(function (genesis) {
             var returnValue = 'private';
 
-            if (genesis.hash === '0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3' &&
-                id === 1) {
-                returnValue = 'main';
+            if (genesis.hash === '0x2c4e9c507f8481b02c60e1f7b4a018c6a0b0681c61da917cde2450490ac21205' && id === 1001) {
+                returnValue = 'baobab';
             }
-            if (genesis.hash === '0cd786a2425d16f152c658316c423e6ce1181e15c3295826d7c9904cba9ce303' &&
-                id === 2) {
-                returnValue = 'morden';
-            }
-            if (genesis.hash === '0x41941023680923e0fe4d74a34bdac8141f2540e3ae90623718e47d66d1ca4a2d' &&
-                id === 3) {
-                returnValue = 'ropsten';
-            }
-            if (genesis.hash === '0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177' &&
-                id === 4) {
-                returnValue = 'rinkeby';
-            }
-            if (genesis.hash === '0xa3c565fc15c7478862d50ccd6561e3c06b24cc509bf388941c25ea985ce32cb9' &&
-                id === 42) {
-                returnValue = 'kovan';
+            if (genesis.hash === '0xc72e5293c3c3ba38ed8ae910f780e4caaa9fb95e79784f7ab74c3c262ea7137e' && id === 8217) {
+                returnValue = 'cypress';
             }
 
             if (_.isFunction(callback)) {
