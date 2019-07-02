@@ -39,8 +39,8 @@ var getNetworkType = function (callback) {
         })
         .then(function (genesis) {
             var returnValue = 'private';
-
-            if (genesis.hash === '0x2c4e9c507f8481b02c60e1f7b4a018c6a0b0681c61da917cde2450490ac21205' && id === 1001) {
+            
+            if (genesis.hash === '0xe33ff05ceec2581ca9496f38a2bf9baad5d4eed629e896ccb33d1dc991bc4b4a' && id === 1001) {
                 returnValue = 'baobab';
             }
             if (genesis.hash === '0xc72e5293c3c3ba38ed8ae910f780e4caaa9fb95e79784f7ab74c3c262ea7137e' && id === 8217) {
