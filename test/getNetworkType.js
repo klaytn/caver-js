@@ -1,5 +1,5 @@
 /*
-    Copyright 2018 The caver-js Authors
+    Copyright 2019 The caver-js Authors
     This file is part of the caver-js library.
  
     The caver-js library is free software: you can redistribute it and/or modify
