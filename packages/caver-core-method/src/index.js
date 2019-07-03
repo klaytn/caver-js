@@ -289,7 +289,7 @@ const buildSendTxCallbackFunc = (defer, method, payload, isSendTx) => (err, resu
   // return PROMISE
   if (!isSendTx) {
     defer.resolve(result)
-  } else {
+  } else if (!_.isObject(result)) {
     defer.eventEmitter.emit('transactionHash', result)
     method._confirmTransaction(defer, result, payload)
   }
