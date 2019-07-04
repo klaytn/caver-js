@@ -26,11 +26,15 @@
 
 const EventEmitter = require('eventemitter3')
 
-const mergeEmitterProp = (obj) => (
-  Object
-    .entries(new EventEmitter().__proto__)
-    .reduce((acc, [k, v]) => (acc[k] = v, acc), obj)
-  )
+const mergeEmitterProp = (obj) => {
+    const emitter = new EventEmitter()
+    Object.entries(emitter.__proto__)
+      .reduce((acc, [k, v]) => (acc[k] = v, acc), obj)
+      
+    obj._events = emitter._events
+    obj._eventsCount = emitter._eventsCount
+    return obj
+}
 
 function PromiEvent(promiseOnly) {
   let resolve, reject
