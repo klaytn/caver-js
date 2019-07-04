@@ -44,8 +44,9 @@ function Subscription(options) {
     };
 }
 
-Subscription.prototype = Object.create(EventEmitter.prototype);
-Subscription.prototype.constructor = Subscription;
+Subscription.prototype = Object.create(EventEmitter.prototype, {
+    constructor: { value: Subscription }
+});
 
 
 /**
