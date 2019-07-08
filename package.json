@@ -39,7 +39,7 @@
     "underscore": "^1.9.1",
     "utf8": "2.1.1",
     "uuid": "2.0.1",
-    "websocket": "git://github.com/frozeman/WebSocket-Node.git#browserifyCompatible",
+    "websocket": "^1.0.28",
     "xhr2-cookies": "^1.1.0"
   },
   "devDependencies": {
