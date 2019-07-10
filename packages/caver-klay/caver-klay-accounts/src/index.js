@@ -734,7 +734,7 @@ Wallet.prototype.add = function (account, targetAddressRaw) {
     const accountAlreadyExists = !!this[account.address]
 
     if (accountAlreadyExists) {
-      throw new Error('Account is existed with ' + account.address)
+      throw new Error('Account exists with ' + account.address)
     }
 
     account = this._accounts.privateKeyToAccount(account.privateKey, targetAddressRaw || account.address)
