@@ -377,4 +377,8 @@ WebsocketProvider.prototype.reset = function () {
     this.addDefaultEvents();
 };
 
+WebsocketProvider.prototype.supportsSubscriptions = function() {
+    return true
+}
+
 module.exports = WebsocketProvider;

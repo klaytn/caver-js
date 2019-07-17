@@ -509,7 +509,7 @@ var startWatching = function (mutableConfirmationPack, existingReceipt) {
       method
     } = mutableConfirmationPack
   // if provider allows PUB/SUB
-  if (_.isFunction(method.requestManager.provider.on)) {
+  if (method.requestManager.provider.supportsSubscriptions()) {
     _klaytnCall.subscribe('newBlockHeaders', checkConfirmation.bind(null, mutableConfirmationPack, existingReceipt, false));
   } else {
     mutableConfirmationPack.intervalId = setInterval(checkConfirmation.bind(null, mutableConfirmationPack, existingReceipt, true), 1000);

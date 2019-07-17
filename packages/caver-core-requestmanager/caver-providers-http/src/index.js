@@ -140,4 +140,8 @@ HttpProvider.prototype.send = function(payload, callback) {
     }
 }
 
+HttpProvider.prototype.supportsSubscriptions = function() {
+    return false
+}
+
 module.exports = HttpProvider;
