@@ -305,4 +305,8 @@ IpcProvider.prototype.reset = function () {
     this.addDefaultEvents();
 };
 
+IpcProvider.prototype.supportsSubscriptions = function() {
+    return true
+}
+
 module.exports = IpcProvider;
