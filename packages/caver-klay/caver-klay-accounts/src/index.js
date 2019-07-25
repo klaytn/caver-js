@@ -72,6 +72,7 @@ var Accounts = function Accounts(...args) {
     // attach methods to this._klaytnCall
     this._klaytnCall = {};
     _.each(_klaytnCall, function (method) {
+        method = new Method(method)
         method.attachToObject(_this._klaytnCall);
         method.setRequestManager(_this._requestManager);
     });

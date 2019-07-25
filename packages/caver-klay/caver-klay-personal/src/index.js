@@ -98,6 +98,7 @@ var Personal = function Personal(...args) {
       rpc.personal.sendAccountUpdate,
     ];
     methods.forEach(function(method) {
+        method = new Method(method)
         method.attachToObject(_this);
         method.setRequestManager(_this._requestManager);
         method.defaultBlock = _this.defaultBlock;
