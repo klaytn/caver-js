@@ -9,7 +9,12 @@
     "build": "gulp default"
   },
   "keywords": [
-    "caver"
+    "caver",
+    "caverjs",
+    "caver.js",
+    "klaytn",
+    "klaytn sdk",
+    "klaytn api"
   ],
   "author": "Klaytn Team",
   "license": "LGPL",
