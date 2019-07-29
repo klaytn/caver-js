@@ -4,7 +4,7 @@
   "description": "caver-js is a JavaScript API library that allows developers to interact with a Klaytn node",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test/packages/*",
+    "test": "npm run build && mocha test/packages/*",
     "build-all": "gulp all",
     "build": "gulp default"
   },
@@ -20,7 +20,6 @@
   "author": "Klaytn Team",
   "license": "LGPL",
   "dependencies": {
-    "@babel/polyfill": "^7.2.5",
     "@babel/runtime": "^7.3.1",
     "any-promise": "1.3.0",
     "bignumber": "^1.1.0",

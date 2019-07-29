@@ -29,7 +29,6 @@
  * @date 2017
  */
 
-require('@babel/polyfill')
 global.rootRequire = (name) => require(`${__dirname}/packages/${name}/src/index.js`)
 
 const { packageInit, providers } = require('./packages/caver-core')
