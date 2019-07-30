@@ -1039,7 +1039,7 @@ Contract.prototype._executeMethod = function _executeMethod(){
                 if (args.options.type !== 'SMART_CONTRACT_EXECUTION' && args.options.type !== 'SMART_CONTRACT_DEPLOY') {
                     throw new Error('Unsupported transaction type. Please use SMART_CONTRACT_EXECUTION or SMART_CONTRACT_DEPLOY.')
                 } 
-
+                
                 var sendTransaction = (new Method({
                     name: 'sendTransaction',
                     call: 'klay_sendTransaction',
@@ -1051,6 +1051,11 @@ Contract.prototype._executeMethod = function _executeMethod(){
                     defaultBlock: _this._parent.defaultBlock,
                     extraFormatters: extraFormatters
                 })).createFunction();
+
+                const fromInWallet = sendTransaction.method.accounts.wallet[args.options.from.toLowerCase()]
+                if (!fromInWallet || !fromInWallet.privateKey) {
+                    args.options.type = 'LEGACY'
+                }
 
                 return sendTransaction(args.options, args.callback);
 

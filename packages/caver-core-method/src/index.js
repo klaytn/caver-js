@@ -107,7 +107,7 @@ function createFunction(requestManager, accounts) {
   // call is directly used for rpc calling,
   // ex) 'klay_sendTransaction'
   func.call = this.call
-
+  
   return func
 }
 
@@ -285,7 +285,7 @@ const buildSendTxCallbackFunc = (defer, method, payload, isSendTx) => (err, resu
 
   // fire callback
   if (payload.callback) payload.callback(null, result)
-
+  
   // return PROMISE
   if (!isSendTx) {
     defer.resolve(result)
@@ -309,7 +309,7 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
       switch (payload.method) {
         case 'klay_sendTransaction': {
           var tx = payload.params[0]
-          
+
           // TODO : Check signTransactionWithSignature function with this logic
           //        and if need, implement sendTransactionWithSignature function.
           // if (tx.signature) {
@@ -429,7 +429,7 @@ function _confirmTransaction (defer, result, payload) {
     timeoutCount: 0,
     intervalId: null,
     gasProvided: payloadTxObject.gas || null,
-    isContractDeployment: payloadTxObject.data && payloadTxObject.from && !payloadTxObject.to,
+    isContractDeployment: payloadTxObject.data && payloadTxObject.from && (!payloadTxObject.to || payloadTxObject.to === '0x'),
     defer,
     result,
     _klaytnCall: {},
