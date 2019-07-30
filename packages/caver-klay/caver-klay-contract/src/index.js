@@ -1039,7 +1039,7 @@ Contract.prototype._executeMethod = function _executeMethod(){
                 if (args.options.type !== 'SMART_CONTRACT_EXECUTION' && args.options.type !== 'SMART_CONTRACT_DEPLOY') {
                     throw new Error('Unsupported transaction type. Please use SMART_CONTRACT_EXECUTION or SMART_CONTRACT_DEPLOY.')
                 } 
-                
+
                 var sendTransaction = (new Method({
                     name: 'sendTransaction',
                     call: 'klay_sendTransaction',
