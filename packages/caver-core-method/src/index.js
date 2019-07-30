@@ -429,7 +429,7 @@ function _confirmTransaction (defer, result, payload) {
     timeoutCount: 0,
     intervalId: null,
     gasProvided: payloadTxObject.gas || null,
-    isContractDeployment: payloadTxObject.data && payloadTxObject.from && !payloadTxObject.to,
+    isContractDeployment: payloadTxObject.data && payloadTxObject.from && (!payloadTxObject.to || payloadTxObject.to === '0x'),
     defer,
     result,
     _klaytnCall: {},

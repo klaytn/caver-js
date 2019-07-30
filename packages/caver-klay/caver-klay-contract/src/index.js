@@ -1052,6 +1052,11 @@ Contract.prototype._executeMethod = function _executeMethod(){
                     extraFormatters: extraFormatters
                 })).createFunction();
 
+                const fromInWallet = sendTransaction.method.accounts.wallet[args.options.from.toLowerCase()]
+                if (!fromInWallet || !fromInWallet.privateKey) {
+                    args.options.type = 'LEGACY'
+                }
+
                 return sendTransaction(args.options, args.callback);
 
         }
