@@ -30,7 +30,7 @@ beforeEach(() => {
 
 describe('ServiceChain: Chain data anchoring', () => {
   const sender_transaction = {
-    type: 'CHAIN_DATA_ANCHROING',
+    type: 'CHAIN_DATA_ANCHORING',
     from: '0x90B3E9A3770481345A7F17f22f16D020Bccfd33e',
     to: '0x75c3098Be5E4B63FBAc05838DaAEE378dD48098d',
     nonce: '0x11',

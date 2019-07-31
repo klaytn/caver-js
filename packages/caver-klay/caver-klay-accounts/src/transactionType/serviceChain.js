@@ -22,14 +22,14 @@ var utils = require('../../../../caver-utils')
 var helpers = require('../../../../caver-core-helpers')
 
 const {
-  CHAIN_DATA_ANCHROING_TYPE_TAG,
+  CHAIN_DATA_ANCHORING_TYPE_TAG,
 } = helpers.constants
 
 function rlpEncodeForChainDataAnchoring(transaction) {
 
   return RLP.encode([
       RLP.encode([
-        CHAIN_DATA_ANCHROING_TYPE_TAG,
+        CHAIN_DATA_ANCHORING_TYPE_TAG,
         Bytes.fromNat(transaction.nonce),
         Bytes.fromNat(transaction.gasPrice),
         Bytes.fromNat(transaction.gas),

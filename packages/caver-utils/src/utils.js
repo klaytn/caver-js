@@ -54,7 +54,7 @@ const txTypeToString = {
   '0x38': 'CANCEL',
   '0x39': 'FEE_DELEGATED_CANCEL',
   '0x3a': 'FEE_DELEGATED_CANCEL_WITH_RATIO',
-  '0x48': 'CHAIN_DATA_ANCHROING',
+  '0x48': 'CHAIN_DATA_ANCHORING',
 }
 
 /**

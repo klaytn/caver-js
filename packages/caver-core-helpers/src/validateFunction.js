@@ -81,7 +81,7 @@ function validateParams (tx) {
         case 'CANCEL':
         case 'FEE_DELEGATED_CANCEL': 
         case 'FEE_DELEGATED_CANCEL_WITH_RATIO': 
-        case 'CHAIN_DATA_ANCHROING':
+        case 'CHAIN_DATA_ANCHORING':
         case 'LEGACY':
             return true
     }
