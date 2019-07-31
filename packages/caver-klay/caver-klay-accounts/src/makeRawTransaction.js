@@ -94,7 +94,7 @@ function encodeRLPByTxType(transaction) {
       return rlpEncodeForFeeDelegatedCancel(transaction)
     case 'FEE_DELEGATED_CANCEL_WITH_RATIO':
       return rlpEncodeForFeeDelegatedCancelWithRatio(transaction)
-    case 'CHAIN_DATA_ANCHROING':
+    case 'CHAIN_DATA_ANCHORING':
       return rlpEncodeForChainDataAnchoring(transaction)
     case 'LEGACY':
     default:
@@ -121,7 +121,7 @@ function makeRawTransaction(rlpEncoded, sig, transaction) {
     case 'SMART_CONTRACT_DEPLOY':
     case 'SMART_CONTRACT_EXECUTION':
     case 'CANCEL':
-    case 'CHAIN_DATA_ANCHROING': 
+    case 'CHAIN_DATA_ANCHORING': 
       return _combineSenderRawTransaction(rlpEncoded, sig)
     case 'FEE_DELEGATED_VALUE_TRANSFER': 
     case 'FEE_DELEGATED_VALUE_TRANSFER_WITH_RATIO': 
@@ -266,7 +266,7 @@ function decodeFromRawTransaction (rawTransaction, type) {
       const [ nonce, gasPrice, gas, from, feeRatio, [ [ v, r, s ] ], feePayer, [ [ payerV, payerR, payerS ] ] ] = RLP.decode(rawTransaction)
       return { type: typeString, nonce, gasPrice, gas, from, feeRatio, v, r, s, feePayer, payerV, payerR, payerS }
     }
-    case 'CHAIN_DATA_ANCHROING': {
+    case 'CHAIN_DATA_ANCHORING': {
       const [ nonce, gasPrice, gas, to, value, from, data, [ [ v, r, s ] ] ] = RLP.decode(rawTransaction)
       return { type: typeString, nonce, gasPrice, gas, to, value, from, anchoredData:data, v, r, s }
     }
