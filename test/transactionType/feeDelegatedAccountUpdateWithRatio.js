@@ -22,7 +22,6 @@ const assert = require('assert')
 
 const testRPCURL = require('../testrpc')
 const Caver = require('../../index.js')
-const {decodeFromRawTransaction} = require('../../packages/caver-klay/caver-klay-accounts/src/makeRawTransaction')
 
 let caver
 
@@ -48,7 +47,7 @@ describe('Account: Fee Delegated Account Update with ratio', () => {
     caver.klay.accounts.wallet.add(privateKey)
 
     const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(sender_transaction, privateKey)
-    const decoded = decodeFromRawTransaction(senderRawTransaction)
+    const decoded = await caver.klay.decodeTransaction(senderRawTransaction)
     expect(decoded.feePayer).to.equals('0x')
     expect(decoded.payerV).to.equals('0x01')
     expect(decoded.payerR).to.equals('0x')
@@ -68,7 +67,7 @@ describe('Account: Fee Delegated Account Update with ratio', () => {
   }).timeout(200000)
 
   it('CAVERJS-UNIT-SER-048: Decode raw transaction', async () => {
-    const txObj = decodeFromRawTransaction(expectedRawTransaction)
+    const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
 
     expect(txObj).not.to.be.undefined
     expect(txObj.type).to.equals(sender_transaction.type)
