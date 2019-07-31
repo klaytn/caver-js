@@ -663,6 +663,18 @@ const compressPublicKey = (uncompressedPublicKey) => {
   return compressedPublicKey
 }
 
+const isContractDeployment = (txObject) => {
+  if (txObject.type) {
+    if (txObject.type.includes('SMART_CONTRACT_DEPLOY')) return true
+    if (txObject.type !== 'LEGACY') return false
+  }
+
+  if ((txObject.data && txObject.data !== '0x') && (!txObject.to || txObject.to === '0x')) return true
+
+  return false
+
+}
+
 module.exports = {
     BN: BN,
     isBN: isBN,
@@ -693,6 +705,7 @@ module.exports = {
     isValidNSHSN: isValidNSHSN,
     parsePrivateKey: parsePrivateKey,
     isKlaytnWalletKey: isKlaytnWalletKey,
+    isContractDeployment: isContractDeployment,
 
     rlpEncode: rlpEncode,
     rlpDecode: rlpDecode,
