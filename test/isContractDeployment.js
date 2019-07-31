@@ -355,7 +355,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.false
     })
 
-    it('CHAIN_DATA_ANCHROING', () => {
+    it('CHAIN_DATA_ANCHORING', () => {
         const txObject = {
             type: 'CHAIN_DATA_ANCHROING',
             from: '0x90B3E9A3770481345A7F17f22f16D020Bccfd33e',
