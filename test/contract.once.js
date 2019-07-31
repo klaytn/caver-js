@@ -66,14 +66,13 @@ describe('caver.klay.contract.once', () => {
    ]
 
     const contractInst = new caver.klay.Contract(helloContractABI)
-    const receipt = await contractInst.deploy({data: byteCode}).send({
+    const newInstance = await contractInst.deploy({data: byteCode}).send({
       from: senderAddress,
       gas: 100000000,
       value: 0,
     })
-    contractInst.options.address = receipt.contractAddress
     var dataVariable 
-    contractInst.once('callevent', (error, data) => {
+    newInstance.once('callevent', (error, data) => {
       dataVariable = data
     })
 
@@ -82,7 +81,7 @@ describe('caver.klay.contract.once', () => {
       gas: 30000,
     }
 
-    await contractInst.methods.say().send(options)
+    await newInstance.methods.say().send(options)
     
     expect(dataVariable).not.to.null
   }).timeout(200000)
