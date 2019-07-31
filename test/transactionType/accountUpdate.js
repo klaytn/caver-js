@@ -23,8 +23,6 @@ const assert = require('assert')
 const testRPCURL = require('../testrpc')
 const Caver = require('../../index.js')
 
-const {decodeFromRawTransaction} = require('../../packages/caver-klay/caver-klay-accounts/src/makeRawTransaction')
-
 let caver
 var senderPrvKey
 var senderAddress
@@ -57,7 +55,7 @@ describe('Account: Account update', () => {
   }).timeout(200000)
 
   it('CAVERJS-UNIT-SER-042: Decode raw transaction', async () => {
-    const txObj = decodeFromRawTransaction(expectedRawTransaction)
+    const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
 
     expect(txObj).not.to.be.undefined
     expect(txObj.type).to.equals(sender_transaction.type)

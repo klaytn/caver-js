@@ -40,6 +40,8 @@ const getNetworkType = require('./getNetworkType.js')
 
 const rpcCalls = require('../../caver-rtm')
 
+const {decodeFromRawTransaction} = require('../caver-klay-accounts/src/makeRawTransaction')
+
 var Klay = function Klay(...args) {
     var _this = this;
 
@@ -106,6 +108,8 @@ var Klay = function Klay(...args) {
     });
 
     this.clearSubscriptions = _this._requestManager.clearSubscriptions;
+
+    this.decodeTransaction = decodeFromRawTransaction;
 
     // add net
     this.net = new Net(this.currentProvider);

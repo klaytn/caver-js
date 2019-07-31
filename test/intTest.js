@@ -41,7 +41,7 @@ var secp256k1 = new (elliptic.ec)('secp256k1')
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
 
-const {decodeFromRawTransaction, overwriteSignature, getSenderTxHash} = require('../packages/caver-klay/caver-klay-accounts/src/makeRawTransaction')
+const {overwriteSignature, getSenderTxHash} = require('../packages/caver-klay/caver-klay-accounts/src/makeRawTransaction')
 
 var deployedContractAddr = {}
 
@@ -320,7 +320,7 @@ const getSignedRawTransaction = async (t) => {
   rawTransaction = signedRawTx.rawTransaction
 
   if (t.tx.v !== undefined || t.tx.r !== undefined || t.tx.s !== undefined) {
-    const txObj = decodeFromRawTransaction(rawTransaction, t.tx.type)
+    const txObj = await caver.klay.decodeTransaction(rawTransaction, t.tx.type)
     if (t.tx.v !== undefined) { txObj.v = t.tx.v }
     if (t.tx.r !== undefined) { txObj.r = t.tx.r }
     if (t.tx.s !== undefined) { txObj.s = t.tx.s }
@@ -350,7 +350,7 @@ const getSignedRawTransaction = async (t) => {
 
     // If v or r or s value is set in test case, overwrite with that.
     if (t.tx.payerV !== undefined || t.tx.payerR !== undefined || t.tx.payerS !== undefined) {
-      const txObj = decodeFromRawTransaction(rawTransaction, t.tx.type)
+      const txObj = await caver.klay.decodeTransaction(rawTransaction, t.tx.type)
       if (t.tx.payerV !== undefined) { txObj.payerV = t.tx.payerV }
       if (t.tx.payerR !== undefined) { txObj.payerR = t.tx.payerR }
       if (t.tx.payerS !== undefined) { txObj.payerS = t.tx.payerS }
