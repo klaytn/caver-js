@@ -32,7 +32,7 @@ The following packages are required to use the caver-js library.
 - lts/carbon ([8.16.0](https://nodejs.org/dist/latest-v8.x/))
 - lts/dubnium ([10.16.0](https://nodejs.org/dist/latest-v10.x/))
 
-If you are already using a different version of the node(for example, node v12), use the Node Version Manager([NVM](https://github.com/nvm-sh/nvm)) to install and use the version of caver-js executable node.
+If you are already using a different version of the node(for example, node v12), use the Node Version Manager([NVM](https://github.com/nvm-sh/nvm)) to install and use the version supported by caver-js.
 
 
 Installation
