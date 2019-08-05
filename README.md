@@ -28,7 +28,7 @@ The following packages are required to use the caver-js library.
 - [npm](https://www.npmjs.com/get-npm)
 - [gcc-c++](https://gcc.gnu.org/)
 
-**Note** The recommended node versions are
+**Note** The recommended node.js versions are
 - lts/carbon (8.16.0)
 - lts/dubnium (10.16.0)
 
