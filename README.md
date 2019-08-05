@@ -28,13 +28,12 @@ The following packages are required to use the caver-js library.
 - [npm](https://www.npmjs.com/get-npm)
 - [gcc-c++](https://gcc.gnu.org/)
 
-**Note** The recommended Node.js versions are
-- lts/carbon (8.16.0)
-- lts/dubnium (10.16.0)
+**Note** caver-js can run on Node.js versions 8 and 10, and the recommended versions are:
+- lts/carbon ([8.16.0](https://nodejs.org/dist/latest-v8.x/))
+- lts/dubnium ([10.16.0](https://nodejs.org/dist/latest-v10.x/))
 
-also, support [AWS lambda runtimes](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html).
+If you are already using a different version of the node(for example, node v12), use the Node Version Manager([NVM](https://github.com/nvm-sh/nvm)) to install and use the version of caver-js executable node.
 
-If you are using a different node version(for example, node v12), use the node version manager([NVM](https://github.com/nvm-sh/nvm)).
 
 Installation
 =================
