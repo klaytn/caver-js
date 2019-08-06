@@ -194,3 +194,34 @@ describe('caver.klay.contract with using caver-js wallet account', () => {
         expect(execReceipt.status).to.be.true
     }).timeout(200000)
 })
+
+describe('caver.klay.contract with using account exists in Node', () => {
+    it('When there is account information inside the wallet of caver-js, the node\'s account is used to deploy and execute the smart contract', async () => {
+        caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+
+        // When using account in node, then contract instance send transaction with 'LEGACY' type
+        senderAddress = caver.klay.accounts.privateKeyToAccount(senderPrvKey).address
+
+        try {
+            await caver.klay.personal.importRawKey(senderPrvKey, 'passphrase')
+        } catch(e) {}
+        const isUnlock = await caver.klay.personal.unlockAccount(senderAddress, 'passphrase')
+        expect(isUnlock).to.be.true
+
+        const contractInst = new caver.klay.Contract(abi)
+        let receipt
+        const newInstance = await contractInst.deploy({data: byteCode}).send({
+            from: senderAddress,
+            gas: 100000000,
+            value: 0,
+        }).on('receipt', (r) => receipt = r)
+        expect(receipt.type).to.equals('TxTypeLegacyTransaction')
+
+        const execReceipt = await newInstance.methods.getBlockNumber().send({
+            from: senderAddress,
+            gas: 30000,
+        })
+
+        expect(execReceipt.type).to.equals('TxTypeLegacyTransaction')
+    }).timeout(200000)
+})
