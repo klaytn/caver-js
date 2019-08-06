@@ -330,7 +330,7 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
           
           // If wallet was not found in caver-js wallet, then it has to use wallet in Node.
           // Signing to transaction using wallet in Node supports only LEGACY transaction, so if transaction is not LEGACY, return error.
-          if (tx.feePayer !== undefined || (tx.type !== undefined && tx.txpe !== 'LEGACY')) {
+          if (tx.feePayer !== undefined || (tx.type !== undefined && tx.type !== 'LEGACY')) {
             var error = new Error('Only Legacy transactions can be signed on a Klaytn node!')
             sendTxCallback(error)
             return Promise.reject(error)
