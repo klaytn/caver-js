@@ -39,7 +39,7 @@ before(() => {
 })
 
 describe('estimateComputationCost from Node', () => {
-    it('estimateComputationCost should return estimated computation cost', async () => {
+    it('CAVERJS-UNIT-TX-572: estimateComputationCost should return estimated computation cost', async () => {
         const txObj = {
             type: 'SMART_CONTRACT_DEPLOY',
             from: senderAddress,
@@ -60,7 +60,7 @@ describe('estimateComputationCost from Node', () => {
         expect(typeof(computationCost)).to.equals('string')
     }).timeout(50000)
 
-    it('estimateComputationCost should return estimated computation cost with latest block tag', async () => {
+    it('CAVERJS-UNIT-TX-573: estimateComputationCost should return estimated computation cost with latest block tag', async () => {
         const txObj = {
             type: 'SMART_CONTRACT_DEPLOY',
             from: senderAddress,

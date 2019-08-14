@@ -52,7 +52,7 @@ before(() => {
 
 
 describe('get transaction', () => {
-  it('getTransaction should return information of transaction.', async () => {
+  it('CAVERJS-UNIT-ETC-094: getTransaction should return information of transaction.', async () => {
     const txObj = {
       from: senderAddress,
       to: receiver.address,

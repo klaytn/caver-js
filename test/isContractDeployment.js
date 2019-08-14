@@ -24,7 +24,7 @@ var Caver = require('../index.js')
 const caver = new Caver(testRPCURL)
 
 describe('caver.utils.isContractDeployment', () => {
-    it('LEGACY (type X / deploy x)', () => {
+    it('CAVERJS-UNIT-ETC-054: LEGACY (type X / deploy x)', () => {
         const txObject = {
             from: '0x90b3e9a3770481345a7f17f22f16d020bccfd33e',
             to: '0xd03227635c90c7986f0e3a4e551cefbca8c55316',
@@ -38,7 +38,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.false
     })
 
-    it('LEGACY (type o / deploy x)', () => {
+    it('CAVERJS-UNIT-ETC-055: LEGACY (type o / deploy x)', () => {
         const txObject = {
             type: 'LEGACY',
             from: '0x90b3e9a3770481345a7f17f22f16d020bccfd33e',
@@ -53,7 +53,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.false
     })
 
-    it('LEGACY (type X / deploy o)', () => {
+    it('CAVERJS-UNIT-ETC-056: LEGACY (type X / deploy o)', () => {
         const txObject = {
             from: '0x90b3e9a3770481345a7f17f22f16d020bccfd33e',
             gas: '0x3b9ac9ff',
@@ -67,7 +67,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.true
     })
 
-    it('LEGACY (type o / deploy o)', () => {
+    it('CAVERJS-UNIT-ETC-057: LEGACY (type o / deploy o)', () => {
         const txObject = {
             type: 'LEGACY',
             from: '0x90b3e9a3770481345a7f17f22f16d020bccfd33e',
@@ -82,7 +82,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.true
     })
 
-    it('VALUE_TRANSFER', () => {
+    it('CAVERJS-UNIT-ETC-058: VALUE_TRANSFER', () => {
         const txObject = {
             type: 'VALUE_TRANSFER',
             from: '0x90B3E9A3770481345A7F17f22f16D020Bccfd33e',
@@ -97,7 +97,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.false
     })
 
-    it('FEE_DELEGATED_VALUE_TRANSFER', () => {
+    it('CAVERJS-UNIT-ETC-059: FEE_DELEGATED_VALUE_TRANSFER', () => {
         const txObject = {
             type: 'FEE_DELEGATED_VALUE_TRANSFER',
             from: '0x90B3E9A3770481345A7F17f22f16D020Bccfd33e',
@@ -112,7 +112,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.false
     })
 
-    it('FEE_DELEGATED_VALUE_TRANSFER_WITH_RATIO', () => {
+    it('CAVERJS-UNIT-ETC-060: FEE_DELEGATED_VALUE_TRANSFER_WITH_RATIO', () => {
         const txObject = {
             type: 'FEE_DELEGATED_VALUE_TRANSFER_WITH_RATIO',
             from: '0x90B3E9A3770481345A7F17f22f16D020Bccfd33e',
@@ -128,7 +128,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.false
     })
 
-    it('VALUE_TRANSFER_MEMO', () => {
+    it('CAVERJS-UNIT-ETC-061: VALUE_TRANSFER_MEMO', () => {
         const txObject = {
             type: 'VALUE_TRANSFER_MEMO',
             from: '0x90B3E9A3770481345A7F17f22f16D020Bccfd33e',
@@ -144,7 +144,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.false
     })
 
-    it('FEE_DELEGATED_VALUE_TRANSFER_MEMO', () => {
+    it('CAVERJS-UNIT-ETC-062: FEE_DELEGATED_VALUE_TRANSFER_MEMO', () => {
         const txObject = {
             type: 'FEE_DELEGATED_VALUE_TRANSFER_MEMO',
             from: '0x90B3E9A3770481345A7F17f22f16D020Bccfd33e',
@@ -160,7 +160,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.false
     })
 
-    it('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO', () => {
+    it('CAVERJS-UNIT-ETC-063: FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO', () => {
         const txObject = {
             type: 'FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO',
             from: '0x90b3e9a3770481345a7f17f22f16d020bccfd33e',
@@ -177,7 +177,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.false
     })
 
-    it('ACCOUNT_UPDATE', () => {
+    it('CAVERJS-UNIT-ETC-064: ACCOUNT_UPDATE', () => {
         const txObject = {
             type: 'ACCOUNT_UPDATE',
             from: '0x88e245dec96830f012f8fc1806bc623b3774560d',
@@ -191,7 +191,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.false
     })
 
-    it('FEE_DELEGATED_ACCOUNT_UPDATE', () => {
+    it('CAVERJS-UNIT-ETC-065: FEE_DELEGATED_ACCOUNT_UPDATE', () => {
         const txObject = {
             type: 'FEE_DELEGATED_ACCOUNT_UPDATE',
             from: '0x5104711f7faa9e2dadf593e43db1577a2887636f',
@@ -205,7 +205,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.false
     })
 
-    it('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO', () => {
+    it('CAVERJS-UNIT-ETC-066: FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO', () => {
         const txObject = {
             type: 'FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO',
             from: '0xd03227635c90c7986f0e3a4e551cefbca8c55316',
@@ -220,7 +220,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.false
     })
 
-    it('SMART_CONTRACT_DEPLOY', () => {
+    it('CAVERJS-UNIT-ETC-067: SMART_CONTRACT_DEPLOY', () => {
         const txObject = {
             type: 'SMART_CONTRACT_DEPLOY',
             from: '0x90B3E9A3770481345A7F17f22f16D020Bccfd33e',
@@ -235,7 +235,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.true
     })
 
-    it('FEE_DELEGATED_SMART_CONTRACT_DEPLOY', () => {
+    it('CAVERJS-UNIT-ETC-068: FEE_DELEGATED_SMART_CONTRACT_DEPLOY', () => {
         const txObject = {
             type: 'FEE_DELEGATED_SMART_CONTRACT_DEPLOY',
             from: '0x90B3E9A3770481345A7F17f22f16D020Bccfd33e',
@@ -250,7 +250,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.true
     })
 
-    it('FEE_DELEGATED_SMART_CONTRACT_DEPLOY_WITH_RATIO', () => {
+    it('CAVERJS-UNIT-ETC-069: FEE_DELEGATED_SMART_CONTRACT_DEPLOY_WITH_RATIO', () => {
         const txObject = {
             type: 'FEE_DELEGATED_SMART_CONTRACT_DEPLOY_WITH_RATIO',
             from: '0x90B3E9A3770481345A7F17f22f16D020Bccfd33e',
@@ -266,7 +266,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.true
     })
 
-    it('SMART_CONTRACT_EXECUTION', () => {
+    it('CAVERJS-UNIT-ETC-070: SMART_CONTRACT_EXECUTION', () => {
         const txObject = {
             type: 'SMART_CONTRACT_EXECUTION',
             from: '0x90B3E9A3770481345A7F17f22f16D020Bccfd33e',
@@ -282,7 +282,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.false
     })
 
-    it('FEE_DELEGATED_SMART_CONTRACT_EXECUTION', () => {
+    it('CAVERJS-UNIT-ETC-071: FEE_DELEGATED_SMART_CONTRACT_EXECUTION', () => {
         const txObject = {
             type: 'FEE_DELEGATED_SMART_CONTRACT_EXECUTION',
             from: '0x90B3E9A3770481345A7F17f22f16D020Bccfd33e',
@@ -298,7 +298,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.false
     })
 
-    it('FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO', () => {
+    it('CAVERJS-UNIT-ETC-072: FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO', () => {
         const txObject = {
             type: 'FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO',
             from: '0x90B3E9A3770481345A7F17f22f16D020Bccfd33e',
@@ -315,7 +315,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.false
     })
 
-    it('CANCEL', () => {
+    it('CAVERJS-UNIT-ETC-073: CANCEL', () => {
         const txObject = {
             type: 'CANCEL',
             from: '0x90B3E9A3770481345A7F17f22f16D020Bccfd33e',
@@ -328,7 +328,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.false
     })
 
-    it('FEE_DELEGATED_CANCEL', () => {
+    it('CAVERJS-UNIT-ETC-074: FEE_DELEGATED_CANCEL', () => {
         const txObject = {
             type: 'FEE_DELEGATED_CANCEL',
             from: '0x90B3E9A3770481345A7F17f22f16D020Bccfd33e',
@@ -341,7 +341,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.false
     })
 
-    it('FEE_DELEGATED_CANCEL_WITH_RATIO', () => {
+    it('CAVERJS-UNIT-ETC-075: FEE_DELEGATED_CANCEL_WITH_RATIO', () => {
         const txObject = {
             type: 'FEE_DELEGATED_CANCEL_WITH_RATIO',
             from: '0x90B3E9A3770481345A7F17f22f16D020Bccfd33e',
@@ -355,7 +355,7 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.false
     })
 
-    it('CHAIN_DATA_ANCHORING', () => {
+    it('CAVERJS-UNIT-ETC-076: CHAIN_DATA_ANCHORING', () => {
         const txObject = {
             type: 'CHAIN_DATA_ANCHORING',
             from: '0x90B3E9A3770481345A7F17f22f16D020Bccfd33e',

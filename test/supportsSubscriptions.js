@@ -26,12 +26,12 @@ const Caver = require('../index.js')
 
 
 describe('supportsSubscriptions from Providers', () => {
-    it('HttpProvider should return false', () => {
+    it('CAVERJS-UNIT-ETC-095: HttpProvider should return false', () => {
         const caver = new Caver(testRPCURL)
         expect(caver.klay.currentProvider.supportsSubscriptions()).to.be.false
     })
 
-    it('WebSocketProvider should return true', () => {
+    it('CAVERJS-UNIT-ETC-096: WebSocketProvider should return true', () => {
         const caver = new Caver(websocketURL)
         expect(caver.klay.currentProvider.supportsSubscriptions()).to.be.true
     })

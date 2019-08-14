@@ -23,7 +23,7 @@ const Caver = require('../index')
 let caver
 
 describe('Connection error test', () => {
-    it('host url is invalid, return connection error.', async () => {
+    it('CAVERJS-UNIT-ETC-051: host url is invalid, return connection error.', async () => {
         caver = new Caver(new Caver.providers.HttpProvider('invalid:1234', { timeout: 5000 }))
         try {
             await caver.klay.getNodeInfo()
@@ -35,7 +35,7 @@ describe('Connection error test', () => {
 })
 
 describe('Invalid response test', () => {
-    it('without timeout return Invalid response: null error.', async () => {
+    it('CAVERJS-UNIT-ETC-052: without timeout return Invalid response: null error.', async () => {
         caver = new Caver('http://localhost:1234/')
         try {
             await caver.klay.getNodeInfo()
@@ -45,7 +45,7 @@ describe('Invalid response test', () => {
         }
     })
 
-    it('with timeout return Invalid response: null error.', async () => {
+    it('CAVERJS-UNIT-ETC-053: with timeout return Invalid response: null error.', async () => {
         caver = new Caver(new Caver.providers.HttpProvider('http://localhost:1234/', { timeout: 5000 }))
         try {
             await caver.klay.getNodeInfo()
