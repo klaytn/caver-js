@@ -38,7 +38,7 @@ before(() => {
 
 
 describe('eventEmitter with transactionHash', () => {
-  it('transactionHash event is called only with transactionHash.', () => {
+  it('CAVERJS-UNIT-ETC-048: transactionHash event is called only with transactionHash.', () => {
       caver.klay.sendTransaction({
         from: senderAddress,
         to: receiver.address,

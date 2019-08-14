@@ -25,7 +25,7 @@ var Caver = require('../index.js')
 
 
 describe('getNodeInfo from Node', () => {
-    it('should return valid value', () => {
+    it('CAVERJS-UNIT-ETC-042: should return valid value', () => {
         var caver = new Caver(testRPCURL)
         expect(()=>caver.klay.getNodeInfo()).not.to.throws()
     })

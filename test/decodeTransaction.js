@@ -31,7 +31,7 @@ before(() => {
 })
 
 describe('Decode Transaction', () => {
-    it('Decode transaction from raw transaction', async () => {
+    it('CAVERJS-UNIT-SER-063: Decode transaction from raw transaction', async () => {
         // This test code is for testing the decodeTransaction for the scenario if it is a feeDelegated transaction type.
         // Check the transaction / decodeTransaction test for test / transactionType.
         const txObj = {

@@ -40,14 +40,14 @@ describe('Personal RPC test', () => {
     let testAddress
 
     // getAccounts
-    it('getAccounts should return list of wallet in Node.', async () => {
+    it('CAVERJS-UNIT-ETC-078: getAccounts should return list of wallet in Node.', async () => {
         const accounts = await caver.klay.personal.getAccounts()
         acctLength = accounts.length
         expect(Array.isArray(accounts)).to.be.true
     }).timeout(50000)
 
     // newAccount
-    it('newAccount should make new account in node and return address.', async () => {
+    it('CAVERJS-UNIT-ETC-079: newAccount should make new account in node and return address.', async () => {
         const address = await caver.klay.personal.newAccount(passphrase)
         expect(caver.utils.isAddress(address)).to.be.true
         testAddress = address
@@ -57,46 +57,46 @@ describe('Personal RPC test', () => {
     }).timeout(50000)
 
     // unlockAccount
-    it('unlockAccount should return boolean result of unlock(without duration).', async () => {
+    it('CAVERJS-UNIT-ETC-080: unlockAccount should return boolean result of unlock(without duration).', async () => {
         const isUnlock = await caver.klay.personal.unlockAccount(testAddress, passphrase)
         expect(typeof(isUnlock)).to.equals('boolean')
         expect(isUnlock).to.be.true
     }).timeout(50000)
 
-    it('unlockAccount should return boolean result of unlock(with duration).', async () => {
+    it('CAVERJS-UNIT-ETC-081: unlockAccount should return boolean result of unlock(with duration).', async () => {
         const isUnlock = await caver.klay.personal.unlockAccount(testAddress, passphrase, 100)
         expect(typeof(isUnlock)).to.equals('boolean')
         expect(isUnlock).to.be.true
     }).timeout(50000)
 
-    it('unlockAccount should return error with invalid address.', async () => {
+    it('CAVERJS-UNIT-ETC-082: unlockAccount should return error with invalid address.', async () => {
         const invalidAddress = 'invalid'
         expect(()=>caver.klay.personal.unlockAccount(invalidAddress, passphrase, 100)).to.throws(`Provided address "${invalidAddress}" is invalid, the capitalization checksum test failed.`)
     }).timeout(50000)
 
     // lockAccount
-    it('lockAccount should return boolean result of lock.', async () => {
+    it('CAVERJS-UNIT-ETC-083: lockAccount should return boolean result of lock.', async () => {
         const isLock = await caver.klay.personal.lockAccount(testAddress)
         expect(typeof(isLock)).to.equals('boolean')
         expect(isLock).to.be.true
     }).timeout(50000)
 
     // importRawKey
-    it('importRawKey should return address of account(0x format).', async () => {
+    it('CAVERJS-UNIT-ETC-084: importRawKey should return address of account(0x format).', async () => {
         const testAccount = caver.klay.accounts.create()
         const address = await caver.klay.personal.importRawKey(testAccount.privateKey, passphrase)
 
         expect(address.toLowerCase()).to.equals(testAccount.address.toLowerCase())
     }).timeout(50000)
 
-    it('importRawKey should return address of account(without 0x format).', async () => {
+    it('CAVERJS-UNIT-ETC-085: importRawKey should return address of account(without 0x format).', async () => {
         const testAccount = caver.klay.accounts.create()
         const address = await caver.klay.personal.importRawKey(testAccount.privateKey.slice(2), passphrase)
 
         expect(address.toLowerCase()).to.equals(testAccount.address.toLowerCase())
     }).timeout(50000)
 
-    it('importRawKey with klaytnWalletKey format.', async () => {
+    it('CAVERJS-UNIT-ETC-086: importRawKey with klaytnWalletKey format.', async () => {
         const testAccount = caver.klay.accounts.create()
         const decoupledAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create(), testAccount.address)
         const klaytnWalletKey = decoupledAccount.getKlaytnWalletKey()
@@ -107,7 +107,7 @@ describe('Personal RPC test', () => {
     }).timeout(50000)
 
     // sendTransaction
-    it('sendTransaction should send a transaction using an account in the node.', async () => {
+    it('CAVERJS-UNIT-ETC-087: sendTransaction should send a transaction using an account in the node.', async () => {
         try {
             // If account is already existed in node, return error.
             const address = await caver.klay.personal.importRawKey(senderPrvKey, passphrase)
@@ -125,7 +125,7 @@ describe('Personal RPC test', () => {
     }).timeout(50000)
 
     // signTransaction
-    it('signTransaction should send a signed transaction using an account in the node.', async () => {
+    it('CAVERJS-UNIT-ETC-088: signTransaction should send a signed transaction using an account in the node.', async () => {
         const testAccount = caver.klay.accounts.create()
         const address = await caver.klay.personal.importRawKey(testAccount.privateKey, passphrase)
         expect(address.toLowerCase()).to.equals(testAccount.address.toLowerCase())
@@ -144,7 +144,7 @@ describe('Personal RPC test', () => {
     }).timeout(50000)
 
     // sign
-    it('sign makes a signature of the data using an account in the node.', async () => {
+    it('CAVERJS-UNIT-ETC-089: sign makes a signature of the data using an account in the node.', async () => {
         const testAccount = caver.klay.accounts.create()
         const address = await caver.klay.personal.importRawKey(testAccount.privateKey, passphrase)
         expect(address.toLowerCase()).to.equals(testAccount.address.toLowerCase())
@@ -156,19 +156,19 @@ describe('Personal RPC test', () => {
     }).timeout(50000)
 
     // ecRecover
-    it('ecRecover returns the address from the signature.', async () => {
+    it('CAVERJS-UNIT-ETC-090: ecRecover returns the address from the signature.', async () => {
         const testAccount = caver.klay.accounts.create()
         const address = await caver.klay.personal.importRawKey(testAccount.privateKey, passphrase)
         expect(address.toLowerCase()).to.equals(testAccount.address.toLowerCase())
 
         const data = '0xdeadbeaf'
         const signedData = await caver.klay.personal.sign(data, testAccount.address, passphrase)
-        const recoveredAddress = await caver.klay.ecRecover(data, signedData)
+        const recoveredAddress = await caver.klay.personal.ecRecover(data, signedData)
         expect(recoveredAddress.toLowerCase()).to.equals(testAccount.address.toLowerCase())
     }).timeout(50000)
 
     // replaceRawKey
-    it('replaceRawKey should replace the private key of the account.', async () => {
+    it('CAVERJS-UNIT-ETC-091: replaceRawKey should replace the private key of the account.', async () => {
         const testAccount = caver.klay.accounts.create()
         const address = await caver.klay.personal.importRawKey(testAccount.privateKey, passphrase)
         expect(address.toLowerCase()).to.equals(testAccount.address.toLowerCase())
@@ -186,7 +186,7 @@ describe('Personal RPC test', () => {
     }).timeout(50000)
 
     // sendValueTransfer
-    it('sendValueTransfer should send a value transfer transaction using an account in the node.', async () => {
+    it('CAVERJS-UNIT-ETC-092: sendValueTransfer should send a value transfer transaction using an account in the node.', async () => {
         try {
             // If account is already existed in node, return error.
             const address = await caver.klay.personal.importRawKey(senderPrvKey, passphrase)
@@ -204,7 +204,7 @@ describe('Personal RPC test', () => {
     }).timeout(50000)
 
     // sendAccountUpdate
-    it('sendAccountUpdate should send account update transaction using account in node.', async () => {
+    it('CAVERJS-UNIT-ETC-093: sendAccountUpdate should send account update transaction using account in node.', async () => {
         try {
             // If account is already existed in node, return error.
             const address = await caver.klay.personal.importRawKey(senderPrvKey, passphrase)

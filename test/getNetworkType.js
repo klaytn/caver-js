@@ -23,13 +23,13 @@ var Caver = require('../index.js')
 
 
 describe('getNetworkType', () => {
-    it('cypress mainnet should return "cypress"', async () => {
+    it('CAVERJS-UNIT-ETC-049: cypress mainnet should return "cypress"', async () => {
         const caver = new Caver('https://api.cypress.klaytn.net:8651/')
         const networkType = await caver.klay.net.getNetworkType()
         expect(networkType).to.equals('cypress')
     })
 
-    it('baobab testnet should return "baobab"', async () => {
+    it('CAVERJS-UNIT-ETC-050: baobab testnet should return "baobab"', async () => {
         const caver = new Caver('https://api.baobab.klaytn.net:8651/')
         const networkType = await caver.klay.net.getNetworkType()
         expect(networkType).to.equals('baobab')
