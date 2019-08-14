@@ -523,7 +523,7 @@ describe('Integration tests', () => {
 
               params = replaceWithEnv(tc.deploy[k].constructorParams)
               contractInstance = new caver.klay.Contract(abi)
-              const receipt = await contractInstance.deploy({
+              const newContractInstance = await contractInstance.deploy({
                 data: '0x' + bin,
                 arguments: params,
               }).send({
@@ -532,8 +532,8 @@ describe('Integration tests', () => {
                 value:0,
               })
 
-              expect(receipt).to.not.null
-              deployedContractAddr[k] = {"address":receipt.contractAddress, "abi": abi}
+              expect(newContractInstance).to.not.null
+              deployedContractAddr[k] = {"address":newContractInstance.options.address, "abi": abi}
             }
           }).timeout(10000)
 
