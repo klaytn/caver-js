@@ -368,6 +368,40 @@ function _flattenTypes (includeTuple, puts) {
    return types;
 };
 
+/**
+ *
+ * @method isHexPrefixed
+ * @param {String} string
+ * @return {bool}
+ */
+var isHexPrefixed = function (str) {
+  return isHexParameter(str)
+}
+
+/**
+ *
+ * @method addHexPrefix
+ * @param {String} string
+ * @return {String}
+ */
+var addHexPrefix = function (str) {
+  if (typeof str !== 'string') return str
+
+  return isHexParameter(str) ? str : '0x' + str
+}
+
+/**
+ * 
+ * @method stripHexPrefix
+ * @param {String} string
+ * @return {String}
+ */
+var stripHexPrefix = function (str) {
+  if (typeof str !== 'string') return str
+
+  return isHexParameter(str) ? str.slice(2) : str
+}
+
 module.exports = {
     _fireError: _fireError,
     _jsonInterfaceMethodToString: _jsonInterfaceMethodToString,
@@ -432,6 +466,10 @@ module.exports = {
     Iban: Iban,
     // Newly added for supporting rpc.js
     isHexParameter: isHexParameter,
+    isHexPrefixed: isHexPrefixed,
+    addHexPrefix: addHexPrefix,
+    stripHexPrefix: stripHexPrefix,
+
     // Newly added for supporting of setting default block.
     parsePredefinedBlockNumber: utils.parsePredefinedBlockNumber,
     isPredefinedBlockNumber: utils.isPredefinedBlockNumber,

@@ -774,3 +774,28 @@ describe('caver.utils.toTwosComplement', () => {
     }
   )
 })
+
+describe('caver.utils.isHexPrefixed', () => {
+  it('caver.utils.isHexPrefixed should return boolean depends on parameter', ()=>{
+    expect(caver.utils.isHexPrefixed('0x')).to.be.true
+    expect(caver.utils.isHexPrefixed('01')).to.be.false
+    expect(caver.utils.isHexPrefixed({})).to.be.false
+  })
+})
+
+describe('caver.utils.addHexPrefix', () => {
+  it('caver.utils.addHexPrefix should return 0x hex format string', ()=>{
+    expect(caver.utils.addHexPrefix('0x')).to.equals('0x')
+    expect(caver.utils.addHexPrefix('01')).to.equals('0x01')
+    expect(typeof(caver.utils.addHexPrefix({}))).to.equals('object')
+  })
+})
+
+describe('caver.utils.stripHexPrefix', () => {
+  it('caver.utils.stripHexPrefix should strip 0x prefix and return string', ()=>{
+    expect(caver.utils.stripHexPrefix('0x')).to.equals('')
+    expect(caver.utils.stripHexPrefix('01')).to.equals('01')
+    expect(caver.utils.stripHexPrefix('0x01')).to.equals('01')
+    expect(typeof(caver.utils.stripHexPrefix({}))).to.equals('object')
+  })
+})
