@@ -61,7 +61,7 @@ RequestManager.prototype.setProvider = function (p, net) {
 
       // HTTP
       if(/^http(s)?:\/\//i.test(p)) {
-          p = new this.providers.HttpProvider(p);
+          p = new this.providers.HttpProvider(p, net);
 
           // WS
       } else if(/^ws(s)?:\/\//i.test(p)) {
