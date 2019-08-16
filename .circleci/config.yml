@@ -37,7 +37,7 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints: 
-            - "36:bc:44:d2:56:9a:74:82:ca:aa:3d:20:4c:36:1f:e9"     
+            - "8e:dd:d4:ac:05:3f:10:da:24:23:e3:a8:b0:10:a8:ba"     
       - checkout
       - run:
           name: "Authenticate with registry"
@@ -58,7 +58,7 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints: 
-            - "36:bc:44:d2:56:9a:74:82:ca:aa:3d:20:4c:36:1f:e9"     
+            - "8e:dd:d4:ac:05:3f:10:da:24:23:e3:a8:b0:10:a8:ba"     
       - checkout
       - run:
           name: "Generate tag"
