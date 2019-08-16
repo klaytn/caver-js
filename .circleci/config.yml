@@ -82,21 +82,6 @@ jobs:
               echo "Delete branch release/${version%-*}"
               git push origin --delete release/${version%-*}
 
-  job_publish:
-    <<: *defaults
-    steps:
-      - checkout
-      - run: npm install
-      - run: npm test
-      - run:
-          name: Authenticate with registry
-          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN > ~/repo/.npmrc"
-      - run:
-          name: Update version in package.json
-          command: |
-            tag=$CIRCLE_TAG
-            sed -i "s/\"version\": \".*\",/\"version\": \"${tag}\",/" package.json
-
 workflows:
   workflow_commit:
     jobs:
