@@ -40,53 +40,6 @@ before(() => {
   senderAddress = sender.address
 })
 
-describe('Account: Account creation', () => {
-  const publicKey = '0xc8785266510368d9372badd4c7f4a94b692e82ba74e0b5e26b34558b0f08144794c27901465af0a703859ab47f8ae17e54aaba453b7cde5a6a9e4a32d45d72b2'
-
-  const sender_transaction = {
-    type: 'ACCOUNT_CREATION',
-    from: '0x90B3E9A3770481345A7F17f22f16D020Bccfd33e',
-    to: 'colin.klaytn',
-    publicKey,
-    nonce: '0x7',
-    gas: '0x3b9ac9ff',
-    gasPrice: '0x19',
-    value: '0x174876e800',
-    chainId: '0x1',
-  }
-
-  const expectedRawTransaction = '0x18f8a30719843b9ac9ff94636f6c696e2e6b6c6179746e000000000000000085174876e8009490b3e9a3770481345a7f17f22f16d020bccfd33e01a302a102c8785266510368d9372badd4c7f4a94b692e82ba74e0b5e26b34558b0f081447f845f84326a05065ac8337d2c1bb36a25f720c396b5f012205c0bc4022f6c027b1072410bf18a047b976ab41aa59b513dcc95d859eb687d1388a41921a21eb2d9468b4e8e58392'
-  
-  it('CAVERJS-UNIT-SER-001 : Sign transaction', async () => {
-    const privateKey = '0xf8cc7c3813ad23817466b1802ee805ee417001fcce9376ab8728c92dd8ea0a6b'
-
-    caver.klay.accounts.wallet.add(privateKey)
-
-    const { rawTransaction } = await caver.klay.accounts.signTransaction(sender_transaction, privateKey)
-
-    expect(rawTransaction).to.equal(expectedRawTransaction)
-
-  }).timeout(200000)
-
-  it('CAVERJS-UNIT-SER-041: Decode raw transaction', async () => {
-    const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
-
-    expect(txObj).not.to.be.undefined
-    expect(txObj.type).to.equals(sender_transaction.type)
-    expect(caver.utils.hexToNumber(txObj.nonce)).to.equals(caver.utils.hexToNumber(sender_transaction.nonce))
-    expect(txObj.gasPrice).to.equals(sender_transaction.gasPrice)
-    expect(caver.utils.hexToNumber(txObj.gas)).to.equals(caver.utils.hexToNumber(sender_transaction.gas))
-    expect(txObj.to).to.equals(sender_transaction.to)
-    expect(txObj.value).to.equals(sender_transaction.value)
-    expect(txObj.from).to.equals(sender_transaction.from)
-    expect(txObj.humanReadable).to.be.true
-    expect(txObj.publicKey).to.equals(caver.utils.compressPublicKey(publicKey))
-    expect(txObj.v).not.to.be.undefined
-    expect(txObj.r).not.to.be.undefined
-    expect(txObj.s).not.to.be.undefined
-  }).timeout(200000)
-})
-
 describe('ACCOUNT_CREATION transaction', () => {
   var accountCreationObject
   const pubKey1 = '0x82e50e05ae21d4d35cf41856ec665b70ddb65fa3570f71f50b236f221fbd57598cfac224fee0b41f6152484060a608110757caf4eb7e7fbbd7a097244539e2e7'

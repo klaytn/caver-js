@@ -25,68 +25,6 @@ const Caver = require('../../index.js')
 
 let caver
 
-describe('Account: Fee Delegated Account Update with ratio', () => {
-  const sender_transaction = {
-    type: 'FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO',
-    from: '0xd03227635c90c7986f0e3a4e551cefbca8c55316',
-    nonce: '0x0',
-    gas: '0x3b9ac9ff',
-    gasPrice: '0x19',
-    publicKey: '0xc8785266510368d9372badd4c7f4a94b692e82ba74e0b5e26b34558b0f08144794c27901465af0a703859ab47f8ae17e54aaba453b7cde5a6a9e4a32d45d72b2',
-    feeRatio: 11,
-    chainId: '0x1',
-  }
-
-  const feePayer = '0x90b3e9a3770481345a7f17f22f16d020bccfd33e'
-  const expectedRawTransaction = '0x22f8e48019843b9ac9ff94d03227635c90c7986f0e3a4e551cefbca8c55316a302a102c8785266510368d9372badd4c7f4a94b692e82ba74e0b5e26b34558b0f0814470bf845f84325a06ccf7dcc61310b1b5f3d20daf165cde39a134040918c35029da9d3c25cb8f58ca06d31d05a1219d3e15acdb75cd88c58ab606cd0e78cc89ed3f16666e08c732e329490b3e9a3770481345a7f17f22f16d020bccfd33ef845f84326a0bc4efd4b0e3b2f3986c6e0eac78cdde28b49517dea23d479a6c2aaa5b955e573a02e23b4ee527b443ba90c845c289fbcfbc0c70ac75bcce94e05b75950cc80c42a'
-  
-  it('CAVERJS-UNIT-SER-008 : Sign transaction', async () => {
-    caver = new Caver(testRPCURL)
-    const privateKey = '0x98275a145bc1726eb0445433088f5f882f8a4a9499135239cfb4040e78991dab'
-
-    caver.klay.accounts.wallet.add(privateKey)
-
-    const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(sender_transaction, privateKey)
-    const decoded = await caver.klay.decodeTransaction(senderRawTransaction)
-    expect(decoded.feePayer).to.equals('0x')
-    expect(decoded.payerV).to.equals('0x01')
-    expect(decoded.payerR).to.equals('0x')
-    expect(decoded.payerS).to.equals('0x')
-
-    const fee_payer_transaction = {
-      senderRawTransaction: senderRawTransaction,
-      feePayer,
-      chainId: '0x1',
-    }
-
-    const feePayerPrivateKey = '0xf8cc7c3813ad23817466b1802ee805ee417001fcce9376ab8728c92dd8ea0a6b'
-    const { rawTransaction } = await caver.klay.accounts.signTransaction(fee_payer_transaction, feePayerPrivateKey)
-
-    expect(rawTransaction).to.equal(expectedRawTransaction)
-
-  }).timeout(200000)
-
-  it('CAVERJS-UNIT-SER-048: Decode raw transaction', async () => {
-    const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
-
-    expect(txObj).not.to.be.undefined
-    expect(txObj.type).to.equals(sender_transaction.type)
-    expect(caver.utils.hexToNumber(txObj.nonce)).to.equals(caver.utils.hexToNumber(sender_transaction.nonce))
-    expect(caver.utils.hexToNumber(txObj.gasPrice)).to.equals(caver.utils.hexToNumber(sender_transaction.gasPrice))
-    expect(caver.utils.hexToNumber(txObj.gas)).to.equals(caver.utils.hexToNumber(sender_transaction.gas))
-    expect(txObj.from).to.equals(sender_transaction.from)
-    expect(caver.utils.hexToNumber(txObj.feeRatio)).to.equals(caver.utils.hexToNumber(sender_transaction.feeRatio))
-    expect(txObj.v).not.to.be.undefined
-    expect(txObj.r).not.to.be.undefined
-    expect(txObj.s).not.to.be.undefined
-    expect(txObj.feePayer).to.equals(feePayer)
-    expect(txObj.payerV).not.to.be.undefined
-    expect(txObj.payerR).not.to.be.undefined
-    expect(txObj.payerS).not.to.be.undefined
-    expect(txObj.publicKey).to.equals(caver.utils.compressPublicKey(sender_transaction.publicKey))
-  }).timeout(200000)
-})
-
 describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', () => {
   var accountUpdateObject
   var acct

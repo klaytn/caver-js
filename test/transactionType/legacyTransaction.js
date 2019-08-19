@@ -42,48 +42,6 @@ before(() => {
   testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
 })
 
-describe('Legacy: Legacy transaction', () => {
-  const transaction = {
-    from: '0x90b3e9a3770481345a7f17f22f16d020bccfd33e',
-    to: '0xd03227635c90c7986f0e3a4e551cefbca8c55316',
-    gas: '0x3b9ac9ff',
-    gasPrice: '0x19',
-    nonce: '0x0',
-    value: '0x174876e800',
-    chainId: '0x1',
-  }
-  const expectedRawTransaction = '0xf8668019843b9ac9ff94d03227635c90c7986f0e3a4e551cefbca8c5531685174876e8008025a0399466cac18fe56a0607adea3de14a8d1dca4b3445080361246ec125adb2a1f3a06d187fdceed7e5c9d1b9142cbd368ce615f77bbedebf1df3a05166c8561d71c4'
-  
-  it('CAVERJS-UNIT-SER-019 : Sign transaction', (done) => {
-    const privateKey = '0xf8cc7c3813ad23817466b1802ee805ee417001fcce9376ab8728c92dd8ea0a6b'
-
-    caver.klay.accounts.wallet.add(privateKey)
-
-    caver.klay.accounts.signTransaction(transaction, privateKey)
-      .then(({ rawTransaction }) => {
-        expect(rawTransaction).to.equal(expectedRawTransaction)
-        done()
-      })
-      .catch(done)
-  }).timeout(200000)
-
-  it('CAVERJS-UNIT-SER-059: Decode raw transaction', async () => {
-    const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
-    
-    expect(txObj).not.to.be.undefined
-    expect(txObj.type).to.equals('LEGACY')
-    expect(caver.utils.hexToNumber(txObj.nonce)).to.equals(caver.utils.hexToNumber(transaction.nonce))
-    expect(caver.utils.hexToNumber(txObj.gasPrice)).to.equals(caver.utils.hexToNumber(transaction.gasPrice))
-    expect(caver.utils.hexToNumber(txObj.gas)).to.equals(caver.utils.hexToNumber(transaction.gas))
-    expect(txObj.to).to.equals(transaction.to)
-    expect(caver.utils.hexToNumber(txObj.value)).to.equals(caver.utils.hexToNumber(transaction.value))
-    expect(txObj.data).to.equals(transaction.data)
-    expect(txObj.v).not.to.be.undefined
-    expect(txObj.r).not.to.be.undefined
-    expect(txObj.s).not.to.be.undefined
-  }).timeout(200000)
-})
-
 describe('LEGACY transaction', () => {
   var legacyObject
 
