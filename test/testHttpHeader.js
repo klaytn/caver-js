@@ -16,33 +16,32 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-var chai = require('chai');
-var chaiAsPromised = require("chai-as-promised");
-chai.use(chaiAsPromised);
+var chai = require('chai')
+var chaiAsPromised = require("chai-as-promised")
+chai.use(chaiAsPromised)
 const { expect } = require('chai')
 const nock = require('nock')
 var Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
-const authorizationValue = 'WLRyv95rHM3urcccdS7v42tFElH7G7zG9sTeshf5';
+const authorizationValue = 'WLRyv95rHM3urcccdS7v42tFElH7G7zG9sTeshf5'
+const option = {
+    headers: [
+        { name: 'Authorization', value: authorizationValue },
+    ]
+}
 
-describe('test Http Header', (done) => {
-
+describe('test Http Header', () => {
     before(() => {
         nock(testRPCURL)
             .post("/")
             .matchHeader('Authorization', (value) => value === authorizationValue)
-            .reply(200, '{"jsonrpc":"2.0","id":1,"result":1001}');
-    });
+            .reply(200, '{"jsonrpc":"2.0","id":1,"result":1001}')
+    })
     after(() => {
-        nock.restore();
+        nock.restore()
     })
 
     it('should return networkId correctly', async () => {
-        const option = {
-            headers: [
-                { name: 'Authorization', value: authorizationValue }
-            ]
-        }
         const caver = new Caver(testRPCURL, option)
         const networkId = await caver.klay.net.getId()
         expect(networkId).to.exist
@@ -50,7 +49,15 @@ describe('test Http Header', (done) => {
 
     it('should return null when there is no Authorization value in header', async () => {
         const caver = new Caver(testRPCURL)
-        return expect(caver.klay.net.getId()).to.be.rejected;
+        return expect(caver.klay.net.getId()).to.be.rejected
     })
-
 })
+
+describe('test normal request flow with header', () => {
+    it('Should return number type chain id', async () => {
+        const caver = new Caver(testRPCURL, option)
+        const networkId = await caver.klay.net.getId()
+        expect(networkId).be.a('number')
+    })
+})
+
