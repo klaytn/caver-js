@@ -53,12 +53,3 @@ describe('test Http Header', () => {
         return expect(caver.klay.net.getId()).to.be.rejected
     })
 })
-
-describe('test normal request flow with header', () => {
-    it('Should return number type chain id', async () => {
-        const caver = new Caver(new HttpProvider(testRPCURL, option))
-        const networkId = await caver.klay.net.getId()
-        expect(networkId).be.a('number')
-    })
-})
-
