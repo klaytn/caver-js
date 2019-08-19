@@ -22,7 +22,6 @@ chai.use(chaiAsPromised)
 const { expect } = require('chai')
 const nock = require('nock')
 var Caver = require('../index.js')
-const HttpProvider = require('../packages/caver-core-requestmanager/caver-providers-http')
 const testRPCURL = require('./testrpc')
 const authorizationValue = 'WLRyv95rHM3urcccdS7v42tFElH7G7zG9sTeshf5'
 const option = {
@@ -43,7 +42,7 @@ describe('test Http Header', () => {
     })
 
     it('should return networkId correctly', async () => {
-        const caver = new Caver(new HttpProvider(testRPCURL, option))
+        const caver = new Caver(new Caver.providers.HttpProvider(testRPCURL, option));
         const networkId = await caver.klay.net.getId()
         expect(networkId).to.exist
     })
