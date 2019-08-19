@@ -212,7 +212,7 @@ Accounts.prototype.signTransaction = function signTransaction(tx, privateKey, ca
         return Promise.resolve(signed(tx));
     }
 
-    // When feePayer sign to transaction, information needed for signing is only chainId.
+    // When the feePayer signs a transaction, required information is only chainId.
     if (tx.senderRawTransaction !== undefined) {
       return Promise.all([
           isNot(tx.chainId) ? _this._klaytnCall.getChainId() : tx.chainId,
