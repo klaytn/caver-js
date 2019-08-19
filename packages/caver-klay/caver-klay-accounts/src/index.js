@@ -212,12 +212,23 @@ Accounts.prototype.signTransaction = function signTransaction(tx, privateKey, ca
         return Promise.resolve(signed(tx));
     }
 
+    // When the feePayer signs a transaction, required information is only chainId.
+    if (tx.senderRawTransaction !== undefined) {
+      return Promise.all([
+          isNot(tx.chainId) ? _this._klaytnCall.getChainId() : tx.chainId,
+      ]).then(function (args) {
+          if (isNot(args[0])) {
+              throw new Error('"chainId" couldn\'t be fetched: '+ JSON.stringify(args));
+          }
+          return signed(_.extend(tx, {chainId: args[0]}));
+      });
+    }
 
     // Otherwise, get the missing info from the Klaytn Node
     return Promise.all([
         isNot(tx.chainId) ? _this._klaytnCall.getChainId() : tx.chainId,
         isNot(tx.gasPrice) ? _this._klaytnCall.getGasPrice() : tx.gasPrice,
-        isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.feePayer || tx.from || _this.privateKeyToAccount(privateKey).address) : tx.nonce
+        isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from || _this.privateKeyToAccount(privateKey).address) : tx.nonce 
     ]).then(function (args) {
         if (isNot(args[0]) || isNot(args[1]) || isNot(args[2])) {
             throw new Error('One of the values "chainId", "gasPrice", or "nonce" couldn\'t be fetched: '+ JSON.stringify(args));
