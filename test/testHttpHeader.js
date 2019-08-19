@@ -56,7 +56,7 @@ describe('test Http Header', () => {
 
 describe('test normal request flow with header', () => {
     it('Should return number type chain id', async () => {
-        const caver = new Caver(testRPCURL, option)
+        const caver = new Caver(new HttpProvider(testRPCURL, option))
         const networkId = await caver.klay.net.getId()
         expect(networkId).be.a('number')
     })
