@@ -7,7 +7,7 @@
     "test": "npm run build && mocha test/packages/* && npm run serTest",
     "build-all": "gulp all",
     "build": "gulp default",
-    "serTest": "mocha test/transactionType/serializationTest.js"
+    "serTest": "mocha test/transactionType/serializationTest.js && mocha test/compressPublicKey.js && mocha test/encodeContractDeploy.js && mocha test/isCompressedPublicKey.js && mocha test/parseAccountKey.js"
   },
   "keywords": [
     "caver",
