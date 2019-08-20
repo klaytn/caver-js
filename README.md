@@ -28,6 +28,9 @@ The following packages are required to use the caver-js library.
 - [npm](https://www.npmjs.com/get-npm)
 - [gcc-c++](https://gcc.gnu.org/)
 
+Testing in caver-js is implemented using the mocha testing framework. If you want to run unit tests in caver-js, you need to install mocha first.
+- [mocha](https://mochajs.org/#installation)
+
 **Note** caver-js can run on Node.js versions 8 and 10, and the recommended versions are:
 - lts/carbon ([8.16.0](https://nodejs.org/dist/latest-v8.x/))
 - lts/dubnium ([10.16.0](https://nodejs.org/dist/latest-v10.x/))
