@@ -28,48 +28,6 @@ var senderPrvKey
 var senderAddress
 var testAccount
 
-describe('Account: Account update', () => {
-  const publicKey = '0x4ef27ba4b7d1ae09b166744c5b7ee4a7a0cc5c76b2e5d74523a0a4fb56db319162ff3255302045cd047a27141916d55615a7c1ead06e211e62119e7bc2a40def'
-
-  const sender_transaction = {
-    type: 'ACCOUNT_UPDATE',
-    from: '0x88e245dec96830f012f8fc1806bc623b3774560d',
-    publicKey,
-    nonce: '0x0',
-    gas: '0x3b9ac9ff',
-    chainId: '0x7e3',
-    gasPrice: '0x5d21dba00',
-  }
-  const expectedRawTransaction ='0x20f88e808505d21dba00843b9ac9ff9488e245dec96830f012f8fc1806bc623b3774560da302a1034ef27ba4b7d1ae09b166744c5b7ee4a7a0cc5c76b2e5d74523a0a4fb56db3191f847f845820feaa07545ef18848ed30d377258aa99ec44c848b14e3b7c0bc3c0793d5d9acffb917ca06ffcf9720d7d87fbc9544c7fd1790fb318c4ecb64fe5bcfccd658a5c3d1c30e9'
-  it('CAVERJS-UNIT-SER-002 : Sign transaction', async () => {
-    caver = new Caver(testRPCURL)
-    const privateKey = '0xed580f5bd71a2ee4dae5cb43e331b7d0318596e561e6add7844271ed94156b20'
-
-    caver.klay.accounts.wallet.add(privateKey)
-    
-
-    const { rawTransaction } = await caver.klay.accounts.signTransaction(sender_transaction, privateKey)
-
-    expect(rawTransaction).to.equal(expectedRawTransaction)
-
-  }).timeout(200000)
-
-  it('CAVERJS-UNIT-SER-042: Decode raw transaction', async () => {
-    const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
-
-    expect(txObj).not.to.be.undefined
-    expect(txObj.type).to.equals(sender_transaction.type)
-    expect(caver.utils.hexToNumber(txObj.nonce)).to.equals(caver.utils.hexToNumber(sender_transaction.nonce))
-    expect(caver.utils.hexToNumber(txObj.gasPrice)).to.equals(caver.utils.hexToNumber(sender_transaction.gasPrice))
-    expect(caver.utils.hexToNumber(txObj.gas)).to.equals(caver.utils.hexToNumber(sender_transaction.gas))
-    expect(txObj.from).to.equals(sender_transaction.from)
-    expect(txObj.publicKey).to.equals(caver.utils.compressPublicKey(publicKey))
-    expect(txObj.v).not.to.be.undefined
-    expect(txObj.r).not.to.be.undefined
-    expect(txObj.s).not.to.be.undefined
-  }).timeout(200000)
-})
-
 describe('ACCOUNT_UPDATE transaction', () => {
   var accountUpdateObject
   var acct
