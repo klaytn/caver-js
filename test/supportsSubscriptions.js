@@ -34,5 +34,6 @@ describe('supportsSubscriptions from Providers', () => {
     it('CAVERJS-UNIT-ETC-096: WebSocketProvider should return true', () => {
         const caver = new Caver(websocketURL)
         expect(caver.klay.currentProvider.supportsSubscriptions()).to.be.true
+        caver.currentProvider.connection.close()
     })
 })
