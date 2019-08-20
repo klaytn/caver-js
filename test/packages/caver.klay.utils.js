@@ -799,3 +799,63 @@ describe('caver.utils.stripHexPrefix', () => {
     expect(typeof(caver.utils.stripHexPrefix({}))).to.equals('object')
   })
 })
+
+describe('caver.utils.toBuffer', () => {
+  it('caver.utils.toBuffer should return input when input is Buffer', ()=>{
+    expect(caver.utils.toBuffer(Buffer.from('test Buffer'))).to.deep.equal(Buffer.from('test Buffer'))
+  })
+  it('caver.utils.toBuffer should convert null or undefined to buffer', ()=>{
+    expect(caver.utils.toBuffer(null)).to.deep.equal(Buffer.alloc(0))
+    expect(caver.utils.toBuffer(undefined)).to.deep.equal(Buffer.alloc(0))
+  })
+  it('caver.utils.toBuffer should convert Array to buffer', ()=>{
+    expect(caver.utils.toBuffer([1,2,3,4,5])).to.deep.equal(Buffer.from([1,2,3,4,5]))
+    expect(caver.utils.toBuffer([])).to.deep.equal(Buffer.alloc(0))
+  })
+  it('caver.utils.toBuffer should convert BN to buffer', ()=>{
+    expect(caver.utils.toBuffer(new BN(1))).to.deep.equal(Buffer.from([1]))
+    expect(caver.utils.toBuffer(new BN(255)).toString('hex')).to.deep.equal('ff')
+    expect(caver.utils.toBuffer(new BN('ff', 16)).toString('hex')).to.deep.equal('ff')
+    expect(caver.utils.toBuffer(new BN('377', 8)).toString('hex')).to.deep.equal('ff')
+    expect(caver.utils.toBuffer(new BN('11111111', 2)).toString('hex')).to.deep.equal('ff')
+  })
+  it('caver.utils.toBuffer should convert Object has toArray function to buffer', ()=>{
+    expect(caver.utils.toBuffer({toArray: function () {return [1, 2, 3, 4, 5]}})).to.deep.equal(Buffer.from([1,2,3,4,5]))
+  })
+  it('caver.utils.toBuffer should convert String to buffer', ()=>{
+    expect(caver.utils.toBuffer('0x01').toString('hex')).to.deep.equal('01')
+    expect(caver.utils.toBuffer('0x1').toString('hex')).to.deep.equal('01')
+    expect(caver.utils.toBuffer('0x1234').toString('hex')).to.deep.equal('1234')
+    expect(caver.utils.toBuffer('0x12345').toString('hex')).to.deep.equal('012345')
+    expect(caver.utils.toBuffer('0x11')).to.deep.equal(Buffer.from([17]))
+    expect(caver.utils.toBuffer('0x')).to.deep.equal(Buffer.from([]))
+  })
+  it('caver.utils.toBuffer should convert Number to buffer', ()=>{
+    expect(caver.utils.toBuffer(1)).to.deep.equal(Buffer.from([1]))
+    expect(caver.utils.toBuffer(1).toString('hex')).to.deep.equal('01')
+    expect(caver.utils.toBuffer(100).toString('hex')).to.deep.equal('64')
+  })
+
+  it('caver.utils.toBuffer should throw error when input type is not supported with toBuffer function', ()=>{
+    expect(()=>caver.utils.toBuffer({})).to.throw('To convert an object to a buffer, the toArray function must be implemented inside the object')
+    expect(()=>caver.utils.toBuffer({toArray: [1,2,3,4,5]})).to.throw('To convert an object to a buffer, the toArray function must be implemented inside the object')
+  })
+  it('caver.utils.toBuffer should throw error when String is not 0x-prefixed', ()=>{
+    expect(()=>caver.utils.toBuffer('010x')).to.throw(`Failed to convert string to Buffer. 'toBuffer' function only supports 0x-prefixed hex string`)
+    expect(()=>caver.utils.toBuffer('01')).to.throw(`Failed to convert string to Buffer. 'toBuffer' function only supports 0x-prefixed hex string`)
+    expect(()=>caver.utils.toBuffer('')).to.throw(`Failed to convert string to Buffer. 'toBuffer' function only supports 0x-prefixed hex string`)
+    expect(()=>caver.utils.toBuffer('0xqwer')).to.throw(`Failed to convert string to Buffer. 'toBuffer' function only supports 0x-prefixed hex string`)
+    expect(()=>caver.utils.toBuffer('qwer')).to.throw(`Failed to convert string to Buffer. 'toBuffer' function only supports 0x-prefixed hex string`)
+  })
+})
+
+describe('caver.utils.numberToBuffer', () => {
+  it('caver.utils.numberToBuffer should convert number to buffer', ()=>{
+    expect(caver.utils.numberToBuffer(6003400).toString('hex')).to.equals('5b9ac8')
+    expect(caver.utils.numberToBuffer(1).toString('hex')).to.equals('01')
+    expect(caver.utils.numberToBuffer(12345).toString('hex')).to.equals('3039')
+    expect(caver.utils.numberToBuffer(123456789).toString('hex')).to.equals('075bcd15')
+    expect(caver.utils.numberToBuffer(100000000).toString('hex')).to.equals('05f5e100')
+    expect(caver.utils.numberToBuffer(819263839023).toString('hex')).to.equals('bebfee1b2f')
+  })
+})
