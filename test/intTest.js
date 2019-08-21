@@ -17,7 +17,7 @@
 */
 
 // Instruction
-// $ git clone git@github.com:ground-x/klaytn-integration-tests.git test/klaytn-integration-tests
+// $ git clone git@github.com:klaytn/klaytn-integration-tests.git test/klaytn-integration-tests
 // $ cp test/klaytn-integration-tests/env.template.json test/klaytn-integration-tests/env.json
 // $ mocha test/intTest.js
 // 
