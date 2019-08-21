@@ -859,3 +859,32 @@ describe('caver.utils.numberToBuffer', () => {
     expect(caver.utils.numberToBuffer(819263839023).toString('hex')).to.equals('bebfee1b2f')
   })
 })
+
+describe('caver.utils.isHexParameter', () => {
+  it('caver.utils.isHexParameter should return true if input is hex string', ()=>{
+    expect(caver.utils.isHexParameter('0x01')).to.be.true
+    expect(caver.utils.isHexParameter('0xa')).to.be.true
+    expect(caver.utils.isHexParameter('0x256d774a7a1bbd469d4fb08545d171df1c755a78')).to.be.true
+    expect(caver.utils.isHexParameter('0x256d774a7a1bbd469d4fb08545d171df1c755a78171df1c755a78')).to.be.true
+  })
+
+  it('caver.utils.isHexParameter should return false if input is not hex string', ()=>{
+    // string type input
+    expect(caver.utils.isHexParameter('')).to.be.false
+    expect(caver.utils.isHexParameter('1')).to.be.false
+    expect(caver.utils.isHexParameter('0xqwer')).to.be.false
+    expect(caver.utils.isHexParameter('10x')).to.be.false
+    expect(caver.utils.isHexParameter('0x14qr')).to.be.false
+    expect(caver.utils.isHexParameter('0x1!')).to.be.false
+    expect(caver.utils.isHexParameter(' 0x256d774a7a1bbd469d4fb08545d171df1c755a78')).to.be.false
+    // not string type input
+    expect(caver.utils.isHexParameter(null)).to.be.false
+    expect(caver.utils.isHexParameter(undefined)).to.be.false
+    expect(caver.utils.isHexParameter(true)).to.be.false
+    expect(caver.utils.isHexParameter(1)).to.be.false
+    expect(caver.utils.isHexParameter({})).to.be.false
+    expect(caver.utils.isHexParameter([])).to.be.false
+    expect(caver.utils.isHexParameter(Buffer.alloc(0))).to.be.false
+    expect(caver.utils.isHexParameter(new BN())).to.be.false
+  })
+})
