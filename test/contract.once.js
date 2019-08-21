@@ -84,5 +84,6 @@ describe('caver.klay.contract.once', () => {
     await newInstance.methods.say().send(options)
     
     expect(dataVariable).not.to.null
+    caver.currentProvider.connection.close()
   }).timeout(200000)
 })

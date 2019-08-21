@@ -49,7 +49,7 @@ before(() => {
   testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
 })
 
-describe('FEE_DELEGATED_VALUE_TRANSFER transaction', () => {
+describe('FEE_DELEGATED_VALUE_TRANSFER_WITH_RATIO transaction', () => {
   var feeDelegatedValueTransferWithRatioObject
 
   beforeEach(() => {

@@ -80,5 +80,7 @@ describe('get transaction', () => {
     expect(receipt.type).not.to.undefined
     expect(receipt.typeInt).not.to.undefined
     expect(receipt.value).not.to.undefined
+
+    caver.currentProvider.connection.close()
   }).timeout(10000)
 })
