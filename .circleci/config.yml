@@ -35,30 +35,52 @@ jobs:
   rc_publish:
     <<: *defaults
     steps:
-      - add_ssh_keys:
-          fingerprints: 
-            - "8e:dd:d4:ac:05:3f:10:da:24:23:e3:a8:b0:10:a8:ba"     
+      - add_ssh_keys   
       - checkout
       - run:
           name: "Authenticate with registry"
           command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN > ~/repo/.npmrc"
       - run:
-          name: "Publish package with tag rc"
-          command: echo "npm publish --tag rc" #remove " when its ready
-      - run:
-          name: "push to release branch"
+          name: "Publish package with rc tag"
           command: |
-            echo "Publishing a release candidate! version=$CIRCLE_TAG"
+              echo "Publishing a release candidate! version=$CIRCLE_TAG"
+              echo "npm publish --tag rc" #remove " when its ready
+      - run:
+          name: "Push to release branch"
+          command: |
+              echo "push to release branch: /release/${CIRCLE_TAG%-*}"
+              git checkout -b release/${CIRCLE_TAG%-*}
+              git push origin release/${CIRCLE_TAG%-*}
+      - run:
+          name: "Install hub" 
+          command: |
+              curl -sSLf https://github.com/github/hub/releases/download/v2.12.3/hub-linux-amd64-2.12.3.tgz | \
+                tar zxf - --strip-components=1 -C /tmp && \
+                sudo mv /tmp/bin/hub /usr/local/bin/hub
+              type hub
+      - run:
+          name: "Create pull request" 
+          command: |
+              version=$(hub pr list -s open -L 10 -f "%H%n")
+              echo $version
 
-            git checkout -b release/${CIRCLE_TAG%-*}
-            git push origin release/${CIRCLE_TAG%-*}
+              if [[ $version == *"release/${CIRCLE_TAG%-*}"* ]]; then
+                echo "PR already exist"
+              else
+                echo "hub pull-request -m "[Master] release/$CIRCLE_TAG QA Signoff" -b $CIRCLE_PROJECT_USERNAME:master -h $CIRCLE_PROJECT_USERNAME:${CIRCLE_TAG%-*}"
+                hub pull-request -b $CIRCLE_PROJECT_USERNAME:master -h $CIRCLE_PROJECT_USERNAME:release/${CIRCLE_TAG%-*} -r $GITHUB_reviewer -l circleci -F- <<EOF
+                [Master] release/${CIRCLE_TAG%-*} QA Sign-off
+
+                This PR is automatically created by CI to release a new official version of caver-js.
+
+                When this PR is approved by QA team, a new version will be released.
+              EOF
+              fi
 
   major_publish:
     <<: *defaults
     steps:
-      - add_ssh_keys:
-          fingerprints: 
-            - "8e:dd:d4:ac:05:3f:10:da:24:23:e3:a8:b0:10:a8:ba"     
+      - add_ssh_keys
       - checkout
       - run:
           name: "Generate tag"
@@ -70,19 +92,26 @@ jobs:
               git push origin v$current_version
       - run:
           name: "Authenticate with registry"
-          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN > ~/repo/.npmrc"
+          command: echo "//registry.npmjs.org/:_authToken=npm_TOKEN > ~/repo/.npmrc"
       - run:
-          name: "publish major version and delete release branch"
+          name: "Publish major version and delete release branch"
           command: |
-              version=$(git log --pretty=format:"%s" -1 | grep -o "v[0-9].\+")
+              version=v$(.circleci/version.sh)
+
               echo "Publishing a major release! version=$version"
               echo "npm publish" #remove " when its ready
 
               #delete release branch. it trigger by merge title
-              echo "Delete branch release/${version%-*}"
-              git push origin --delete release/${version%-*}
+              if [[ "release/v" = $(git log --oneline -1 | grep -o "release/v") ]]; then
+                echo "Delete branch release/$version"
+                git push origin --delete release/$version
+              else
+                echo "Need to delete branch manually"
+              fi  
+
 
 workflows:
+  version: 2
   workflow_commit:
     jobs:
       - test:
