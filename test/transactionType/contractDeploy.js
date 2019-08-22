@@ -48,51 +48,6 @@ before(() => {
   testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
 })
 
-describe('Contract: Contract deploy', () => {
-  const sender_transaction = {
-    type: 'SMART_CONTRACT_DEPLOY',
-    from: '0x90B3E9A3770481345A7F17f22f16D020Bccfd33e',
-    nonce: '0x8',
-    data: '0x608060405234801561001057600080fd5b506101de806100206000396000f3006080604052600436106100615763ffffffff7c01000000000000000000000000000000000000000000000000000000006000350416631a39d8ef81146100805780636353586b146100a757806370a08231146100ca578063fd6b7ef8146100f8575b3360009081526001602052604081208054349081019091558154019055005b34801561008c57600080fd5b5061009561010d565b60408051918252519081900360200190f35b6100c873ffffffffffffffffffffffffffffffffffffffff60043516610113565b005b3480156100d657600080fd5b5061009573ffffffffffffffffffffffffffffffffffffffff60043516610147565b34801561010457600080fd5b506100c8610159565b60005481565b73ffffffffffffffffffffffffffffffffffffffff1660009081526001602052604081208054349081019091558154019055565b60016020526000908152604090205481565b336000908152600160205260408120805490829055908111156101af57604051339082156108fc029083906000818181858888f193505050501561019c576101af565b3360009081526001602052604090208190555b505600a165627a7a72305820627ca46bb09478a015762806cc00c431230501118c7c26c30ac58c4e09e51c4f0029',
-    gas: '0x3b9ac9ff',
-    gasPrice: '0x0',
-    value: '0x0',
-    chainId: '0x1',
-  }
-
-  const expectedRawTransaction = '0x28f902680880843b9ac9ff80809490b3e9a3770481345a7f17f22f16d020bccfd33eb901fe608060405234801561001057600080fd5b506101de806100206000396000f3006080604052600436106100615763ffffffff7c01000000000000000000000000000000000000000000000000000000006000350416631a39d8ef81146100805780636353586b146100a757806370a08231146100ca578063fd6b7ef8146100f8575b3360009081526001602052604081208054349081019091558154019055005b34801561008c57600080fd5b5061009561010d565b60408051918252519081900360200190f35b6100c873ffffffffffffffffffffffffffffffffffffffff60043516610113565b005b3480156100d657600080fd5b5061009573ffffffffffffffffffffffffffffffffffffffff60043516610147565b34801561010457600080fd5b506100c8610159565b60005481565b73ffffffffffffffffffffffffffffffffffffffff1660009081526001602052604081208054349081019091558154019055565b60016020526000908152604090205481565b336000908152600160205260408120805490829055908111156101af57604051339082156108fc029083906000818181858888f193505050501561019c576101af565b3360009081526001602052604090208190555b505600a165627a7a72305820627ca46bb09478a015762806cc00c431230501118c7c26c30ac58c4e09e51c4f00298080f845f84326a04696114c665e455e1e69bcd1f967d6e530a1404131e624807985eeec55bcf49ca0147f0ec54f75ed564dd480e20756c5754d8534a8b9697ff66d4b221945f0992f'
-  
-  it('CAVERJS-UNIT-SER-005 : Sign transaction', async () => {
-    const privateKey = '0xf8cc7c3813ad23817466b1802ee805ee417001fcce9376ab8728c92dd8ea0a6b'
-
-    caver.klay.accounts.wallet.add(privateKey)
-
-    const { rawTransaction } = await caver.klay.accounts.signTransaction(sender_transaction, privateKey)
-
-    expect(rawTransaction).to.equal(expectedRawTransaction)
-
-  }).timeout(200000)
-
-  it('CAVERJS-UNIT-SER-045: Decode raw transaction', async () => {
-    const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
-    
-    expect(txObj).not.to.be.undefined
-    expect(txObj.type).to.equals(sender_transaction.type)
-    expect(caver.utils.hexToNumber(txObj.nonce)).to.equals(caver.utils.hexToNumber(sender_transaction.nonce))
-    expect(caver.utils.hexToNumber(txObj.gasPrice)).to.equals(caver.utils.hexToNumber(sender_transaction.gasPrice))
-    expect(caver.utils.hexToNumber(txObj.gas)).to.equals(caver.utils.hexToNumber(sender_transaction.gas))
-    expect(txObj.to).to.equals(sender_transaction.to)
-    expect(caver.utils.hexToNumber(txObj.value)).to.equals(caver.utils.hexToNumber(sender_transaction.value))
-    expect(txObj.from).to.equals(sender_transaction.from)
-    expect(txObj.data).to.equals(sender_transaction.data)
-    expect(txObj.humanReadable).to.be.false
-    expect(caver.utils.hexToNumber(txObj.codeFormat)).to.equals(0)
-    expect(txObj.v).not.to.be.undefined
-    expect(txObj.r).not.to.be.undefined
-    expect(txObj.s).not.to.be.undefined
-  }).timeout(200000)
-})
-
 describe('SMART_CONTRACT_DEPLOY transaction', () => {
   var deployObject
 
