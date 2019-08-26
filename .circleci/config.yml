@@ -1,7 +1,3 @@
-# Javascript Node CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-javascript/ for more details
-#
 version: 2
 
 defaults: &defaults
@@ -17,49 +13,134 @@ jobs:
       - run: npm install
       - run: npm test
 
-  job_publish:
+  tag_verify:
     <<: *defaults
     steps:
       - checkout
-      - run: npm install
-      - run: npm test
       - run:
-          name: Authenticate with registry
-          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/repo/.npmrc
-      - run:
-          name: Update version in package.json
+          name: "verify tag and file verison match"
           command: |
-            tag=$CIRCLE_TAG
-            sed -i "s/\"version\": \".*\",/\"version\": \"${tag}\",/" package.json
-      - run:
-          name: Publish package with tag rc
-          command: |
-            tag=$CIRCLE_TAG
-            if [[ $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$ ]]; then
-              echo "Publishing a release candidate! version=$tag"
-              npm publish --tag rc
-            elif [[ $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+-redistributed\.[0-9]+$ ]]; then
-              echo "Publishing a redistributed version! version=$tag"
-              npm publish --tag redistributed
-            elif [[ $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-              echo "Publishing a major release! version=$tag"
-              npm publish
+            echo "tag version is " $CIRCLE_TAG
+
+            file_version=v$(.circleci/version.sh)
+            echo "file version is " $file_version
+
+            if [ $file_version == ${CIRCLE_TAG%-*} ]; then
+              echo "verification pass"
             else
-              echo "Undefined version: $tag"
-              echo "Supported version strings: v1.0.0, v1.0.0-rc.1, v1.0.0-redistributed.1, etc"
+              echo "It's not same version."
               exit 1
             fi
 
+  rc_publish:
+    <<: *defaults
+    steps:
+      - add_ssh_keys   
+      - checkout
+      - run:
+          name: "Authenticate with registry"
+          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN > ~/repo/.npmrc"
+      - run:
+          name: "Publish package with rc tag"
+          command: |
+              echo "Publishing a release candidate! version=$CIRCLE_TAG"
+              echo "npm publish --tag rc" #remove " when its ready
+      - run:
+          name: "Push to release branch"
+          command: |
+              echo "push to release branch: /release/${CIRCLE_TAG%-*}"
+              git checkout -b release/${CIRCLE_TAG%-*}
+              git push origin release/${CIRCLE_TAG%-*}
+      - run:
+          name: "Install hub" 
+          command: |
+              curl -sSLf https://github.com/github/hub/releases/download/v2.12.3/hub-linux-amd64-2.12.3.tgz | \
+                tar zxf - --strip-components=1 -C /tmp && \
+                sudo mv /tmp/bin/hub /usr/local/bin/hub
+              type hub
+      - run:
+          name: "Create pull request" 
+          command: |
+              version=$(hub pr list -s open -L 10 -f "%H%n")
+              echo $version
+
+              if [[ $version == *"release/${CIRCLE_TAG%-*}"* ]]; then
+                echo "PR already exist"
+              else
+                echo "hub pull-request -m "[Master] release/$CIRCLE_TAG QA Signoff" -b $CIRCLE_PROJECT_USERNAME:master -h $CIRCLE_PROJECT_USERNAME:${CIRCLE_TAG%-*}"
+                hub pull-request -b $CIRCLE_PROJECT_USERNAME:master -h $CIRCLE_PROJECT_USERNAME:release/${CIRCLE_TAG%-*} -r $GITHUB_reviewer -l circleci -F- <<EOF
+                [Master] release/${CIRCLE_TAG%-*} QA Sign-off
+
+                This PR is automatically created by CI to release a new official version of caver-js.
+
+                When this PR is approved by QA team, a new version will be released.
+              EOF
+              fi
+
+  major_publish:
+    <<: *defaults
+    steps:
+      - add_ssh_keys
+      - checkout
+      - run:
+          name: "Generate tag"
+          command: |
+              current_version=$(.circleci/version.sh)
+
+              echo "git tag v$current_version"
+              git tag v$current_version
+              git push origin v$current_version
+      - run:
+          name: "Authenticate with registry"
+          command: echo "//registry.npmjs.org/:_authToken=npm_TOKEN > ~/repo/.npmrc"
+      - run:
+          name: "Publish major version and delete release branch"
+          command: |
+              version=v$(.circleci/version.sh)
+
+              echo "Publishing a major release! version=$version"
+              echo "npm publish" #remove " when its ready
+
+              #delete release branch. it trigger by merge title
+              if [[ "release/v" = $(git log --oneline -1 | grep -o "release/v") ]]; then
+                echo "Delete branch release/$version"
+                git push origin --delete release/$version
+              else
+                echo "Need to delete branch manually"
+              fi  
+
+
 workflows:
   version: 2
-  workflow_test:
+  workflow_commit:
     jobs:
-      - test
+      - test:
+          filters:
+            branches:
+              ignore:
+                - /release\/.*/
+                - master
+
   workflow_publish:
     jobs:
-      - job_publish:
+      - tag_verify:
           filters:
             tags:
-              only: /^v[0-9]+\.[0-9]+\.[0-9]+.*/
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+-.*/
             branches:
               ignore: /.*/
+
+      - rc_publish:
+          requires:
+            - tag_verify
+          filters:
+            tags:
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+-.*/
+            branches:
+              ignore: /.*/
+
+      - major_publish:
+          filters:
+            branches:
+              only: master
+
