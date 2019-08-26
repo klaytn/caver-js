@@ -888,3 +888,12 @@ describe('caver.utils.isHexParameter', () => {
     expect(caver.utils.isHexParameter(new BN())).to.be.false
   })
 })
+
+describe('caver.utils.xyPointFromPublicKey', () => {
+  it('caver.utils.xyPointFromPublicKey should return true if input is hex string', ()=>{
+    expect(caver.utils.isHexParameter('0x01')).to.be.true
+    expect(caver.utils.isHexParameter('0xa')).to.be.true
+    expect(caver.utils.isHexParameter('0x256d774a7a1bbd469d4fb08545d171df1c755a78')).to.be.true
+    expect(caver.utils.isHexParameter('0x256d774a7a1bbd469d4fb08545d171df1c755a78171df1c755a78')).to.be.true
+  })
+})
