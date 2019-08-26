@@ -888,3 +888,14 @@ describe('caver.utils.isHexParameter', () => {
     expect(caver.utils.isHexParameter(new BN())).to.be.false
   })
 })
+
+describe('caver.utils.xyPointFromPublicKey', () => {
+  it('caver.utils.xyPointFromPublicKey should return x, y point from publicKey', ()=>{
+    const account = caver.klay.accounts.create()
+    const publicKey = caver.klay.accounts.privateKeyToPublicKey(account.privateKey)
+    const xyPoint = caver.utils.xyPointFromPublicKey(publicKey)
+    expect(Array.isArray(xyPoint)).to.be.true
+    expect(xyPoint.length).to.equals(2)
+    expect(publicKey).to.equals(xyPoint[0]+xyPoint[1].slice(2))
+  })
+})
