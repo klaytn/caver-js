@@ -44,7 +44,7 @@ jobs:
           name: "Publish package with rc tag"
           command: |
               echo "Publishing a release candidate! version=$CIRCLE_TAG"
-              echo "npm publish --tag rc" #remove " when its ready
+              npm publish --tag rc
       - run:
           name: "Push to release branch"
           command: |
@@ -92,14 +92,14 @@ jobs:
               git push origin v$current_version
       - run:
           name: "Authenticate with registry"
-          command: echo "//registry.npmjs.org/:_authToken=npm_TOKEN > ~/repo/.npmrc"
+          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN > ~/repo/.npmrc"
       - run:
           name: "Publish major version and delete release branch"
           command: |
               version=v$(.circleci/version.sh)
 
               echo "Publishing a major release! version=$version"
-              echo "npm publish" #remove " when its ready
+              npm publish
 
               #delete release branch. it trigger by merge title
               if [[ "release/v" = $(git log --oneline -1 | grep -o "release/v") ]]; then
