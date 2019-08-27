@@ -39,7 +39,12 @@ jobs:
       - checkout
       - run:
           name: "Authenticate with registry"
-          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN > ~/repo/.npmrc"
+          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/repo/.npmrc
+      - run:
+          name: "Update version in package.json"
+          command: |
+              tag=$CIRCLE_TAG
+              sed -i "s/\"version\": \".*\",/\"version\": \"${tag}\",/" package.json
       - run:
           name: "Publish package with rc tag"
           command: |
@@ -92,7 +97,7 @@ jobs:
               git push origin v$current_version
       - run:
           name: "Authenticate with registry"
-          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN > ~/repo/.npmrc"
+          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/repo/.npmrc
       - run:
           name: "Publish major version and delete release branch"
           command: |
