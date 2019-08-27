@@ -409,7 +409,7 @@ var stripHexPrefix = function (str) {
  * Convert a input into a Buffer.
  * 
  * @method toBuffer
- * @param {Buffer|String|Number|BN|Object} input
+ * @param {Buffer|Array|String|Number|BN|Object} input
  * @return {Buffer}
  */
 var toBuffer = function (input) {
@@ -433,10 +433,10 @@ var toBuffer = function (input) {
 }
 
 /**
- * Convert a Number to a Buffer.
+ * Convert a number to a Buffer.
  * 
  * @method numberToBuffer
- * @param {Number} num
+ * @param {Number|String|BN} num
  * @return {Buffer}
  */
 var numberToBuffer = function (num) {
