@@ -41,6 +41,11 @@ jobs:
           name: "Authenticate with registry"
           command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/repo/.npmrc
       - run:
+          name: "Update version in package.json"
+          command: |
+              tag=$CIRCLE_TAG
+              sed -i "s/\"version\": \".*\",/\"version\": \"${tag}\",/" package.json
+      - run:
           name: "Publish package with rc tag"
           command: |
               echo "Publishing a release candidate! version=$CIRCLE_TAG"
