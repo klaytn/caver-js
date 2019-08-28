@@ -408,6 +408,13 @@ var isHex = function (hex) {
  */
 const isTxHash = (tx) => new RegExp(`^(0x|0X)?[0-9a-fA-F]{${TRANSACTION_HASH_LENGTH - 2}}$`).test(tx)
 
+/**
+ * Checks if the given string is a hexadecimal transaction hash that starts with 0x
+ * @method isTxHashStrict
+ * @param {String} tx given hexadecimal transaction hash
+ * @return {Boolean}
+ */
+const isTxHashStrict = (tx) => new RegExp(`^(0x|0X)[0-9a-fA-F]{${TRANSACTION_HASH_LENGTH - 2}}$`).test(tx)
 
 /**
  * Returns true if given string is a valid Klaytn block header bloom.
@@ -728,4 +735,5 @@ module.exports = {
     isCompressedPublicKey,
     compressPublicKey,
     isTxHash,
+    isTxHashStrict,
 };

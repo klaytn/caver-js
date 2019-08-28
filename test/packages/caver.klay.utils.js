@@ -337,6 +337,36 @@ describe('CAVERJS-UNIT-ETC-117: caver.utils.toHex', () => {
   })
 })
 
+describe('caver.utils.isTxHashStrict', () => {
+  const example = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
+  context('input: valid strict transaction hex', () => {
+    it.each([
+      [example, true], // all lower
+      [example.toUpperCase(), true], // all upper
+      [example.slice(0, 10) + example.slice(10).toUpperCase(), true], // mixed
+    ],
+    'should return true',
+    ([tx, expected]) => {
+      const result = caver.utils.isTxHashStrict(tx)
+      expect(result).to.be.equal(expected)
+    })
+  })
+
+  context('input: invalid strict transaction hex', () => {
+    it.each([
+      [`00${example.slice(2)}`, false], // doesn't start with 0x
+      [example.slice(2), false], // doesn't start with 0x
+      [`${example.slice(0, 64)}ZZ`, false], // not hex
+      [example.slice(0, 10), false], // length is not enough
+    ],
+    'should return false',
+    ([tx, expected]) => {
+      const result = caver.utils.isTxHashStrict(tx)
+      expect(result).to.be.equal(expected)
+    })
+  })
+})
+
 describe('caver.utils.isTxHash', () => {
   const example = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
   context('input: valid transaction hex', () => {
