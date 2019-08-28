@@ -338,64 +338,56 @@ describe('CAVERJS-UNIT-ETC-117: caver.utils.toHex', () => {
 })
 
 describe('caver.utils.isTxHashStrict', () => {
-  const example = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
-  context('input: valid strict transaction hex', () => {
-    it.each([
-      [example, true], // all lower
-      [example.toUpperCase(), true], // all upper
-      [example.slice(0, 10) + example.slice(10).toUpperCase(), true], // mixed
-    ],
-    'should return true',
-    ([tx, expected]) => {
-      const result = caver.utils.isTxHashStrict(tx)
-      expect(result).to.be.equal(expected)
+  const transactionHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
+  context('CAVERJS-UNIT-ETC-162: input: valid strict transaction hex', () => {
+    const tests = [
+      {hash: transactionHash, expected: true}, // all lower
+      {hash: transactionHash.toUpperCase(), expected: true}, // all upper
+      {hash: transactionHash.slice(0, 10) + transactionHash.slice(10).toUpperCase(), expected: true}, // mixed
+    ]
+    it.each(tests, 'should return true', (test) => {
+      expect(caver.utils.isTxHashStrict(test.hash)).to.be.equal(test.expected)
     })
   })
 
-  context('input: invalid strict transaction hex', () => {
-    it.each([
-      [`00${example.slice(2)}`, false], // doesn't start with 0x
-      [example.slice(2), false], // doesn't start with 0x
-      [`${example.slice(0, 64)}ZZ`, false], // not hex
-      [example.slice(0, 10), false], // length is not enough
-    ],
-    'should return false',
-    ([tx, expected]) => {
-      const result = caver.utils.isTxHashStrict(tx)
-      expect(result).to.be.equal(expected)
+  context('CAVERJS-UNIT-ETC-163: input: invalid strict transaction hex', () => {
+    const tests = [
+      {hash: `00${transactionHash.slice(2)}`, expected: false}, // doesn't start with 0x
+      {hash: transactionHash.slice(2), expected: false}, // doesn't start with 0x
+      {hash: `${transactionHash.slice(0, 64)}ZZ`, expected: false}, // not hex
+      {hash: transactionHash.slice(0, 10), expected: false}, // length is not enough
+    ]
+    it.each(tests, 'should return false', (test) => {
+      expect(caver.utils.isTxHashStrict(test.hash)).to.be.equal(test.expected)
     })
   })
 })
 
 describe('caver.utils.isTxHash', () => {
-  const example = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
-  context('input: valid transaction hex', () => {
-    it.each([
-      [example, true], // all lower long
-      [example.slice(2), true], // all lower short
-      [example.toUpperCase(), true], // all upper long
-      [example.slice(2).toUpperCase(), true], // all upper short
-      [example.slice(0, 10) + example.slice(10).toUpperCase(), true], // mixed long
-      [example.slice(2, 10) + example.slice(10).toUpperCase(), true], // mixed short
-    ],
-    'should return true',
-    ([tx, expected]) => {
-      const result = caver.utils.isTxHash(tx)
-      expect(result).to.be.equal(expected)
+  const transactionHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
+  context('CAVERJS-UNIT-ETC-164: input: valid transaction hex', () => {
+    const tests = [
+      {hash: transactionHash, expected: true}, // all lower long
+      {hash: transactionHash.slice(2), expected: true}, // all lower short
+      {hash: transactionHash.toUpperCase(), expected: true}, // all upper long
+      {hash: transactionHash.slice(2).toUpperCase(), expected: true}, // all upper short
+      {hash: transactionHash.slice(0, 10) + transactionHash.slice(10).toUpperCase(), expected: true}, // mixed long
+      {hash: transactionHash.slice(2, 10) + transactionHash.slice(10).toUpperCase(), expected: true}, // mixed short
+    ]
+    it.each(tests, 'should return true', (test) => {
+      expect(caver.utils.isTxHash(test.hash)).to.be.equal(test.expected)
     })
   })
 
-  context('input: invalid transaction hex', () => {
-    it.each([
-      [example.slice(4), false], // length is not enough (62)
-      [`${example.slice(0, 62)}ZZ`, false], // not hex
-      [`${example.slice(2)}00`, false], // length is too long (66 without 0x)
-      [`${example}00`, false], // length is too long (68)
-    ],
-    'should return false',
-    ([tx, expected]) => {
-      const result = caver.utils.isTxHash(tx)
-      expect(result).to.be.equal(expected)
+  context('CAVERJS-UNIT-ETC-165: input: invalid transaction hex', () => {
+    const tests = [
+      {hash: transactionHash.slice(4), expected: false}, // length is not enough (62)
+      {hash: `${transactionHash.slice(0, 62)}ZZ`, expected: false}, // not hex
+      {hash: `${transactionHash.slice(2)}00`, expected: false}, // length is too long (66 without 0x)
+      {hash: `${transactionHash}00`, expected: false}, // length is too long (68)
+    ]
+    it.each(tests, 'should return false', (test) => {
+      expect(caver.utils.isTxHash(test.tx)).to.be.equal(test.expected)
     })
   })
 })
