@@ -505,6 +505,8 @@ module.exports = {
     padRight: utils.rightPad,
     rightPad: utils.rightPad,
     toTwosComplement: utils.toTwosComplement,
+    isTxHash: utils.isTxHash,
+    isTxHashStrict: utils.isTxHashStrict,
     // Moved promiEvent to utils,
     promiEvent: promiEvent,
     Iban: Iban,

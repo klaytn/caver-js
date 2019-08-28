@@ -57,6 +57,8 @@ const txTypeToString = {
   '0x48': 'CHAIN_DATA_ANCHORING',
 }
 
+const TRANSACTION_HASH_LENGTH = 66
+
 /**
  * Returns true if object is BN, otherwise false
  *
@@ -398,6 +400,21 @@ var isHex = function (hex) {
     return ((_.isString(hex) || _.isNumber(hex)) && /^(-0x|0x)?[0-9a-f]*$/i.test(hex));
 };
 
+/**
+ * Checks if the given string is a hexadecimal transaction hash with or without prefix 0x
+ * @method isTxHash
+ * @param {String} tx given hexadecimal transaction hash
+ * @return {Boolean}
+ */
+const isTxHash = (tx) => new RegExp(`^(0x|0X)?[0-9a-fA-F]{${TRANSACTION_HASH_LENGTH - 2}}$`).test(tx)
+
+/**
+ * Checks if the given string is a hexadecimal transaction hash that starts with 0x
+ * @method isTxHashStrict
+ * @param {String} tx given hexadecimal transaction hash
+ * @return {Boolean}
+ */
+const isTxHashStrict = (tx) => new RegExp(`^(0x|0X)[0-9a-fA-F]{${TRANSACTION_HASH_LENGTH - 2}}$`).test(tx)
 
 /**
  * Returns true if given string is a valid Klaytn block header bloom.
@@ -717,4 +734,6 @@ module.exports = {
     txTypeToString,
     isCompressedPublicKey,
     compressPublicKey,
+    isTxHash,
+    isTxHashStrict,
 };

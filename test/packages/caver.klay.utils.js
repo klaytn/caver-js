@@ -337,6 +337,69 @@ describe('CAVERJS-UNIT-ETC-117: caver.utils.toHex', () => {
   })
 })
 
+describe('caver.utils.isTxHashStrict', () => {
+  const example = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
+  context('input: valid strict transaction hex', () => {
+    it.each([
+      [example, true], // all lower
+      [example.toUpperCase(), true], // all upper
+      [example.slice(0, 10) + example.slice(10).toUpperCase(), true], // mixed
+    ],
+    'should return true',
+    ([tx, expected]) => {
+      const result = caver.utils.isTxHashStrict(tx)
+      expect(result).to.be.equal(expected)
+    })
+  })
+
+  context('input: invalid strict transaction hex', () => {
+    it.each([
+      [`00${example.slice(2)}`, false], // doesn't start with 0x
+      [example.slice(2), false], // doesn't start with 0x
+      [`${example.slice(0, 64)}ZZ`, false], // not hex
+      [example.slice(0, 10), false], // length is not enough
+    ],
+    'should return false',
+    ([tx, expected]) => {
+      const result = caver.utils.isTxHashStrict(tx)
+      expect(result).to.be.equal(expected)
+    })
+  })
+})
+
+describe('caver.utils.isTxHash', () => {
+  const example = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
+  context('input: valid transaction hex', () => {
+    it.each([
+      [example, true], // all lower long
+      [example.slice(2), true], // all lower short
+      [example.toUpperCase(), true], // all upper long
+      [example.slice(2).toUpperCase(), true], // all upper short
+      [example.slice(0, 10) + example.slice(10).toUpperCase(), true], // mixed long
+      [example.slice(2, 10) + example.slice(10).toUpperCase(), true], // mixed short
+    ],
+    'should return true',
+    ([tx, expected]) => {
+      const result = caver.utils.isTxHash(tx)
+      expect(result).to.be.equal(expected)
+    })
+  })
+
+  context('input: invalid transaction hex', () => {
+    it.each([
+      [example.slice(4), false], // length is not enough (62)
+      [`${example.slice(0, 62)}ZZ`, false], // not hex
+      [`${example.slice(2)}00`, false], // length is too long (66 without 0x)
+      [`${example}00`, false], // length is too long (68)
+    ],
+    'should return false',
+    ([tx, expected]) => {
+      const result = caver.utils.isTxHash(tx)
+      expect(result).to.be.equal(expected)
+    })
+  })
+})
+
 describe('caver.utils.toBN', () => {
   context('CAVERJS-UNIT-ETC-118: input: valid value', () => {
     const tests = [
