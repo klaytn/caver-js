@@ -40,7 +40,7 @@
   "bugs": {
     "url": "https://github.com/klaytn/caver-js/issues"
   },
-  "homepage": "https://github.com/klaytn/caver-js#readme",
+  "homepage": "https://github.com/klaytn/caver-js",
   "author": "Klaytn Team",
   "license": "LGPL",
   "dependencies": {
