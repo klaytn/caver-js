@@ -63,6 +63,19 @@ module.exports = {
   packageInit: function (pkg, [provider, net]) {
     if (!pkg) throw new Error('You need to instantiate using the "new" keyword.')
 
+    // make property of pkg._provider, which can properly set providers
+    Object.defineProperty(pkg, 'currentProvider', {
+        get: function () {
+            return pkg._provider;
+        },
+        set: function (value) {
+            return pkg.setProvider(value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+
+
     if (provider && provider._requestManager) {
       pkg._requestManager = new Manager(provider.currentProvider)
     // set requestmanager on package
@@ -73,8 +86,7 @@ module.exports = {
     pkg.providers = Manager.providers
 
     pkg._provider = pkg._requestManager.provider
-    pkg.currentProvider = pkg._provider
-
+    
     // add SETPROVIDER function (don't overwrite if already existing)
     if (!pkg.setProvider) {
       pkg.setProvider = (provider, net) => pkg._provider = pkg._requestManager.setProvider(provider, net).provider
