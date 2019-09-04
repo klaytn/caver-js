@@ -46,7 +46,7 @@ describe('Decode Transaction', () => {
         }
         let ret = await caver.klay.accounts.signTransaction(txObj, sender.privateKey)
 
-        let decodedTx = await caver.klay.decodeTransaction(ret.rawTransaction)
+        let decodedTx = caver.klay.decodeTransaction(ret.rawTransaction)
 
         expect(decodedTx.type).to.equals(txObj.type)
         expect(decodedTx.nonce).to.equals(txObj.nonce)
@@ -58,6 +58,10 @@ describe('Decode Transaction', () => {
         expect(decodedTx.v).not.to.undefined
         expect(decodedTx.r).not.to.undefined
         expect(decodedTx.s).not.to.undefined
+        expect(decodedTx.signature).not.to.be.undefined
+        expect(decodedTx.signature[0][0]).to.equals(decodedTx.v)
+        expect(decodedTx.signature[0][1]).to.equals(decodedTx.r)
+        expect(decodedTx.signature[0][2]).to.equals(decodedTx.s)
         expect(decodedTx.feePayer).to.equals('0x')
         expect(decodedTx.payerV).to.equals('0x01')
         expect(decodedTx.payerR).to.equals('0x')
@@ -68,7 +72,7 @@ describe('Decode Transaction', () => {
             feePayer: payer.address,
         }, payer.privateKey)
 
-        decodedTx = await caver.klay.decodeTransaction(ret.rawTransaction)
+        decodedTx = caver.klay.decodeTransaction(ret.rawTransaction)
 
         expect(decodedTx.type).to.equals(txObj.type)
         expect(decodedTx.nonce).to.equals(txObj.nonce)
@@ -80,9 +84,71 @@ describe('Decode Transaction', () => {
         expect(decodedTx.v).not.to.undefined
         expect(decodedTx.r).not.to.undefined
         expect(decodedTx.s).not.to.undefined
+        expect(decodedTx.signature).not.to.be.undefined
+        expect(decodedTx.signature[0][0]).to.equals(decodedTx.v)
+        expect(decodedTx.signature[0][1]).to.equals(decodedTx.r)
+        expect(decodedTx.signature[0][2]).to.equals(decodedTx.s)
         expect(decodedTx.feePayer).to.equals(payer.address)
         expect(decodedTx.payerV).not.to.undefined
         expect(decodedTx.payerR).not.to.undefined
         expect(decodedTx.payerS).not.to.undefined
+        expect(decodedTx.feePayerSignature).not.to.be.undefined
+        expect(decodedTx.feePayerSignature[0][0]).to.equals(decodedTx.payerV)
+        expect(decodedTx.feePayerSignature[0][1]).to.equals(decodedTx.payerR)
+        expect(decodedTx.feePayerSignature[0][2]).to.equals(decodedTx.payerS)
+    }).timeout(10000)
+
+    it('CAVERJS-UNIT-SER-064: Decode sender multi signature transaction', () => {
+        const rawTransaction = '0x08f8c6028505d21dba00830dbba094342a2853b442c66e47cc0aff29836983050bd1850294cde32e19cfa95b0f03de3d09c549d636e43bed22f88ef845824e43a0edb3620ea3a317e36000ab8177342770d245c27c0a641593ffef57a16532578ba028ecaf81729774b97d7c859c064c84095b9d575278dc1b7cc45cd88a29c0cf91f845824e43a0b2874877cb71c847ad33af3d4cb0861ce2b32c6d7649a3c99a213724871cb37ca00c3e960b277623d6298b9ebd5711083321f7caa162aec10cf2eb49e042081cdd'
+        let decodedTx = caver.klay.decodeTransaction(rawTransaction)
+
+        expect(decodedTx.type).to.equals('VALUE_TRANSFER')
+        expect(caver.utils.hexToNumber(decodedTx.nonce)).to.equals(2)
+        expect(caver.utils.hexToNumber(decodedTx.gasPrice)).to.equals(25000000000)
+        expect(caver.utils.hexToNumber(decodedTx.gas)).to.equals(900000)
+        expect(decodedTx.to).to.equals('0x342a2853b442c66e47cc0aff29836983050bd185')
+        expect(caver.utils.hexToNumber(decodedTx.value)).to.equals(2)
+        expect(decodedTx.from).to.equals('0xcde32e19cfa95b0f03de3d09c549d636e43bed22')
+        expect(decodedTx.v).not.to.undefined
+        expect(decodedTx.r).not.to.undefined
+        expect(decodedTx.s).not.to.undefined
+        expect(decodedTx.signature).not.to.be.undefined
+        expect(Array.isArray(decodedTx.signature)).to.be.true
+        expect(decodedTx.signature.length).to.equals(2)
+        expect(decodedTx.signature[0][0]).to.equals(decodedTx.v)
+        expect(decodedTx.signature[0][1]).to.equals(decodedTx.r)
+        expect(decodedTx.signature[0][2]).to.equals(decodedTx.s)
+    }).timeout(10000)
+
+    it('CAVERJS-UNIT-SER-065: Decode sender and feePayer multi signature transaction', () => {
+        const rawTransaction = '0x09f9016b018505d21dba00830dbba094ca4f2df6e617e340eb2004453e3cc449a8e51d9803946b0f4bb65b4bb4c92d55b1e8574cf8059f3b2da8f88ef845824e43a0cc14fd91517649de4f3e1e2729fa63dfb2ae401e5da54fa52f305fff445d803fa07e134086a557f28847aa689207bc4375bb69cae64ba6356dedc60d8c93929131f845824e44a07d90c9385ae713199f9c4016e06da63af4956294cd66329edc6bf925f03dbfc3a04802101f506df137b218a0880e5b78585c8b7074ecc246950b8e59473d8816de946b0f4bb65b4bb4c92d55b1e8574cf8059f3b2da8f88ef845824e43a09696eec79df68c33ef2dd43302ebb3e18193266d49d805897d0591c6a7e07de0a051b2467e9f84f75c7f1473c3d709df3c13c6824fdf2061c13fe1c41c6ea24155f845824e43a0f7615987a2eeed696d90405b950e26dde93d35ff2fd9d6d94838dc71a209a017a05811cf04dce40d76873ca9ce02a72bcd5b2e748274dc11cd6cfcd34c14cf49e1'
+        let decodedTx = caver.klay.decodeTransaction(rawTransaction)
+
+        expect(decodedTx.type).to.equals('FEE_DELEGATED_VALUE_TRANSFER')
+        expect(caver.utils.hexToNumber(decodedTx.nonce)).to.equals(1)
+        expect(caver.utils.hexToNumber(decodedTx.gasPrice)).to.equals(25000000000)
+        expect(caver.utils.hexToNumber(decodedTx.gas)).to.equals(900000)
+        expect(decodedTx.to).to.equals('0xca4f2df6e617e340eb2004453e3cc449a8e51d98')
+        expect(caver.utils.hexToNumber(decodedTx.value)).to.equals(3)
+        expect(decodedTx.from).to.equals('0x6b0f4bb65b4bb4c92d55b1e8574cf8059f3b2da8')
+        expect(decodedTx.v).not.to.undefined
+        expect(decodedTx.r).not.to.undefined
+        expect(decodedTx.s).not.to.undefined
+        expect(decodedTx.signature).not.to.be.undefined
+        expect(Array.isArray(decodedTx.signature)).to.be.true
+        expect(decodedTx.signature.length).to.equals(2)
+        expect(decodedTx.signature[0][0]).to.equals(decodedTx.v)
+        expect(decodedTx.signature[0][1]).to.equals(decodedTx.r)
+        expect(decodedTx.signature[0][2]).to.equals(decodedTx.s)
+        expect(decodedTx.feePayer).to.equals('0x6b0f4bb65b4bb4c92d55b1e8574cf8059f3b2da8')
+        expect(decodedTx.payerV).not.to.undefined
+        expect(decodedTx.payerR).not.to.undefined
+        expect(decodedTx.payerS).not.to.undefined
+        expect(decodedTx.feePayerSignature).not.to.be.undefined
+        expect(Array.isArray(decodedTx.feePayerSignature)).to.be.true
+        expect(decodedTx.feePayerSignature.length).to.equals(2)
+        expect(decodedTx.feePayerSignature[0][0]).to.equals(decodedTx.payerV)
+        expect(decodedTx.feePayerSignature[0][1]).to.equals(decodedTx.payerR)
+        expect(decodedTx.feePayerSignature[0][2]).to.equals(decodedTx.payerS)
     }).timeout(10000)
 })
