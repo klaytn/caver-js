@@ -50,7 +50,7 @@ var Klay = function Klay(...args) {
 
     // overwrite setProvider
     var setProvider = this.setProvider;
-    this.setProvider = function () {
+    this.setProvider = function (...args) {
         setProvider.apply(_this, args);
         _this.net.setProvider.apply(_this, args);
         _this.personal.setProvider.apply(_this, args);
