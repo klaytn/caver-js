@@ -876,6 +876,7 @@ describe('CAVERJS-UNIT-ETC-144: caver.utils.toTwosComplement', () => {
 describe('CAVERJS-UNIT-ETC-145: caver.utils.isHexPrefixed', () => {
   it('caver.utils.isHexPrefixed should return boolean depends on parameter', ()=>{
     expect(caver.utils.isHexPrefixed('0x')).to.be.true
+    expect(caver.utils.isHexPrefixed('0x0x')).to.be.true
     expect(caver.utils.isHexPrefixed('01')).to.be.false
     expect(caver.utils.isHexPrefixed({})).to.be.false
   })
@@ -885,6 +886,7 @@ describe('CAVERJS-UNIT-ETC-146: caver.utils.addHexPrefix', () => {
   it('caver.utils.addHexPrefix should return 0x hex format string', ()=>{
     expect(caver.utils.addHexPrefix('0x')).to.equals('0x')
     expect(caver.utils.addHexPrefix('01')).to.equals('0x01')
+    expect(caver.utils.addHexPrefix('x')).to.equals('0xx')
     expect(typeof(caver.utils.addHexPrefix({}))).to.equals('object')
   })
 })
@@ -894,6 +896,7 @@ describe('CAVERJS-UNIT-ETC-147: caver.utils.stripHexPrefix', () => {
     expect(caver.utils.stripHexPrefix('0x')).to.equals('')
     expect(caver.utils.stripHexPrefix('01')).to.equals('01')
     expect(caver.utils.stripHexPrefix('0x01')).to.equals('01')
+    expect(caver.utils.stripHexPrefix('0xx')).to.equals('x')
     expect(typeof(caver.utils.stripHexPrefix({}))).to.equals('object')
   })
 })
