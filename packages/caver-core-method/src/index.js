@@ -289,7 +289,7 @@ const buildSendTxCallbackFunc = (defer, method, payload, isSendTx) => (err, resu
   // return PROMISE
   if (!isSendTx) {
     defer.resolve(result)
-  } else if (!_.isObject(result)) {
+  } else {
     defer.eventEmitter.emit('transactionHash', result)
     method._confirmTransaction(defer, result, payload)
   }
@@ -325,7 +325,12 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
 
           if (wallet && wallet.privateKey) {
             // If wallet was found, sign tx, and send using sendRawTransaction
-            return method.accounts.signTransaction(tx, wallet.privateKey, sendTxCallback).then(sendSignedTx)
+            return method.accounts.signTransaction(tx, wallet.privateKey)
+                .then(sendSignedTx)
+                .catch((e)=>{
+                  sendTxCallback(e)
+                  return Promise.reject(e)
+                })
           }
           
           // If wallet was not found in caver-js wallet, then it has to use wallet in Node.
