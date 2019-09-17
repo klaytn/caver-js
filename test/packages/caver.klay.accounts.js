@@ -137,20 +137,19 @@ describe('caver.klay.accounts.privateKeyToAccount', () => {
 })
 
 describe('caver.klay.accounts.signTransaction', () => {
-  const txObj = {
-    from: setting.toAddress,
-    nonce: '0x0',
-    to: setting.toAddress,
-    gas: setting.gas,
-    gasPrice: setting.gasPrice,
-    value: '0x1',
-    chainId: 2019,
-  }
-
-  let account
+  let txObj, account
 
   beforeEach(() => {
     account = caver.klay.accounts.create()
+    txObj = {
+      from: account.address,
+      nonce: '0x0',
+      to: setting.toAddress,
+      gas: setting.gas,
+      gasPrice: setting.gasPrice,
+      value: '0x1',
+      chainId: 2019,
+    }
   })
 
   context('CAVERJS-UNIT-WALLET-023 : input: tx, privateKey', () => {
@@ -276,6 +275,25 @@ describe('caver.klay.accounts.signTransaction', () => {
       expect(result.senderTxHash).to.equal('0x1b7c0f2fc7548056e90d9690e8c397acf99eb38e622ac91ee22c2085065f8a55')
     })
   })
+
+  context('CAVERJS-UNIT-WALLET-122 : input: legacyTx, privateKey of decoupled account', () => {
+    it('should return signature and rawTransaction', () => {
+      const decoupledAccount = caver.klay.accounts.create()
+      decoupledAccount.privateKey = caver.klay.accounts.create().privateKey
+
+      let tx = {
+        from: decoupledAccount.address,
+        nonce: '0x0',
+        to: setting.toAddress,
+        gas: setting.gas,
+        gasPrice: setting.gasPrice,
+        value: '0x1',
+        chainId: 2019,
+      }
+
+      expect(()=>caver.klay.accounts.signTransaction(tx, decoupledAccount.privateKey)).to.throws('A legacy transaction must be with a legacy account key')
+    })
+  })
 })
 
 describe('caver.klay.accounts.recoverTransaction', () => {
@@ -286,7 +304,7 @@ describe('caver.klay.accounts.recoverTransaction', () => {
     account = caver.klay.accounts.create()
 
     const txObj = {
-      from: setting.fromAddress,
+      from: account.address,
       nonce: '0x0',
       to: setting.toAddress,
       gas: setting.gas,

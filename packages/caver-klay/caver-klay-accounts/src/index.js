@@ -193,6 +193,7 @@ Accounts.prototype.determineAddress = function determineAddress(legacyAccount, a
 Accounts.prototype.signTransaction = function signTransaction(tx, privateKey, callback) {
     var _this = this,
         error = false,
+        isLegacy = false,
         result
 
     callback = callback || function () {}
@@ -214,6 +215,10 @@ Accounts.prototype.signTransaction = function signTransaction(tx, privateKey, ca
 
       if (!tx.senderRawTransaction) {
         error = helpers.validateFunction.validateParams(tx)
+        
+        // Attempting to sign with decoupled account into a legacy type transaction throw an error.
+        isLegacy = tx.type === undefined || tx.type === 'LEGACY' ? true : false
+        if (isLegacy && _this.isDecoupled(privateKey, tx.from)) throw new Error('A legacy transaction must be with a legacy account key')
       }
       if (error) {
         callback(error);
