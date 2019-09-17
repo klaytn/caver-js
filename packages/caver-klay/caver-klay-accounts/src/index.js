@@ -161,7 +161,7 @@ Accounts.prototype.getLegacyAccount = function getLegacyAccount(key) {
 }
 
 /**
- * The determineAddress function determines the priority of the parameters entered and returns the address that should be used for the account.
+ * determineAddress determines the priority of the parameters entered and returns the address that should be used for the account.
  *
  * @method determineAddress
  * @param {Object} legacyAccount Account with legacy account key extracted from private key to be used for address determination.
