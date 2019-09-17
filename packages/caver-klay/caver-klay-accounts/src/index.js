@@ -109,18 +109,32 @@ Accounts.prototype.create = function create(entropy) {
     return this._addAccountFunctions(Account.create(entropy || utils.randomHex(32)));
 };
 
-// The key parameter can be either normal private key or klaytnWalletKey format.
-Accounts.prototype.privateKeyToAccount = function privateKeyToAccount(key, targetAddressRaw) {
+/**
+ * The privateKeyToAccount function creates and returns an Account through the input passed as parameters.
+ *
+ * @method privateKeyToAccount
+ * @param {String} key The key parameter can be either normal private key or klaytnWalletKey format.
+ * @param {String} userInputAddress The address entered by the user for use in creating an account.
+ * @return {Object}
+ */
+Accounts.prototype.privateKeyToAccount = function privateKeyToAccount(key, userInputAddress) {
   let {legacyAccount: account, klaytnWalletKeyAddress} = this.getLegacyAccount(key)
 
-  account.address = this.determineAddress(account, klaytnWalletKeyAddress, targetAddressRaw)
+  account.address = this.determineAddress(account, klaytnWalletKeyAddress, userInputAddress)
   account.address = account.address.toLowerCase()
   account.address = utils.addHexPrefix(account.address)
 
   return this._addAccountFunctions(account)
 }
 
-// The key parameter can be either normal private key or klaytnWalletKey format.
+/**
+ * The isDecoupled function determines whether or not it is decoupled based on the input value.
+ *
+ * @method isDecoupled
+ * @param {String} key The key parameter can be either normal private key or klaytnWalletKey format.
+ * @param {String} userInputAddress The address to use when determining whether it is decoupled.
+ * @return {Boolean}
+ */
 Accounts.prototype.isDecoupled = function isDecoupled(key, userInputAddress) {
   let { legacyAccount, klaytnWalletKeyAddress } = this.getLegacyAccount(key)
   let actualAddress = this.determineAddress(legacyAccount, klaytnWalletKeyAddress, userInputAddress)
@@ -128,7 +142,14 @@ Accounts.prototype.isDecoupled = function isDecoupled(key, userInputAddress) {
   return legacyAccount.address.toLowerCase() !== actualAddress.toLowerCase()
 }
 
-// The key parameter can be either normal private key or klaytnWalletKey format.
+/**
+ * The getLegacyAccount function extracts the privateKey from the input key and returns an Account with the corresponding legacy account key.
+ * If the input key is KlaytnWalletKey format, it returns klaytnWalletKeyAddress, which is the address extracted from KlaytnWalletKey.
+ *
+ * @method getLegacyAccount
+ * @param {String} key The key parameter can be either normal private key or klaytnWalletKey format.
+ * @return {Object}
+ */
 Accounts.prototype.getLegacyAccount = function getLegacyAccount(key) {
   var { privateKey, address: klaytnWalletKeyAddress, isHumanReadable } = utils.parsePrivateKey(key)
 
@@ -139,8 +160,15 @@ Accounts.prototype.getLegacyAccount = function getLegacyAccount(key) {
   return { legacyAccount: Account.fromPrivate(privateKey), klaytnWalletKeyAddress }
 }
 
-// The determineAddress function determines the priority of the parameters entered 
-// and returns the address that should be used for the account.
+/**
+ * The determineAddress function determines the priority of the parameters entered and returns the address that should be used for the account.
+ *
+ * @method determineAddress
+ * @param {Object} legacyAccount Account with legacy account key extracted from private key to be used for address determination.
+ * @param {String} addressFromKey Address extracted from key.
+ * @param {String} userInputAddress Address passed as parameter by user.
+ * @return {String}
+ */
 Accounts.prototype.determineAddress = function determineAddress(legacyAccount, addressFromKey, userInputAddress) {
   if (userInputAddress) {
     if(addressFromKey && addressFromKey !== userInputAddress) {
@@ -156,7 +184,7 @@ Accounts.prototype.determineAddress = function determineAddress(legacyAccount, a
     if(!utils.isAddress(addressFromKey)) {
       throw new Error('The address extracted from the private key is invalid.')
     }
-    // If targetAddressRaw is undefined and address which is came from private is existed, set address in account.
+    // If userInputAddress is undefined and address which is came from private is existed, set address in account.
     return addressFromKey
   }
   return legacyAccount.address
@@ -746,7 +774,7 @@ Wallet.prototype.create = function (numberOfAccounts, entropy) {
         encrypt: function(password){...}
     }
  */
-Wallet.prototype.add = function (account, targetAddressRaw) {
+Wallet.prototype.add = function (account, userInputAddress) {
     var klaytnWalletKey
     /**
      * cav.klay.accounts.wallet.add('0x4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318');
@@ -757,7 +785,7 @@ Wallet.prototype.add = function (account, targetAddressRaw) {
      * });
      */
     if (_.isString(account)) {
-      account = this._accounts.privateKeyToAccount(account, targetAddressRaw);
+      account = this._accounts.privateKeyToAccount(account, userInputAddress);
     } else if(!_.isObject(account)) {
         throw new Error('Invalid private key')
     }
@@ -768,7 +796,7 @@ Wallet.prototype.add = function (account, targetAddressRaw) {
       throw new Error('Account exists with ' + account.address)
     }
 
-    account = this._accounts.privateKeyToAccount(account.privateKey, targetAddressRaw || account.address)
+    account = this._accounts.privateKeyToAccount(account.privateKey, userInputAddress || account.address)
 
     account.index = this._findSafeIndex()
     this[account.index] = account
