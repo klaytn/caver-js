@@ -590,7 +590,15 @@ Accounts.prototype.decrypt = function (v3Keystore, password, nonStrict) {
       "id":"dfde6a32-4b0e-404f-8b9f-2b18f279fe21",
     }
  */
-// The key parameter can be either normal private key or klaytnWalletKey format.
+/**
+ * encrypt encrypts an account and returns key store.
+ *
+ * @method privateKeyToAccount
+ * @param {String} key The key parameter can be either normal private key or KlaytnWalletKey format.
+ * @param {String} password The password to be used for account encryption. The encrypted key store can be decrypted with this password.
+ * @param {Object} options The options to use when encrypt an account.
+ * @return {Object}
+ */
 Accounts.prototype.encrypt = function (key, password, options) {
     /**
      * options can include below
