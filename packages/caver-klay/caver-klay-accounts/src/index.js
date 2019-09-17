@@ -147,7 +147,7 @@ Accounts.prototype.isDecoupled = function isDecoupled(key, userInputAddress) {
  * If the input key is KlaytnWalletKey format, it returns klaytnWalletKeyAddress, which is the address extracted from KlaytnWalletKey.
  *
  * @method getLegacyAccount
- * @param {String} key The key parameter can be either normal private key or klaytnWalletKey format.
+ * @param {String} key The key parameter can be either normal private key or KlaytnWalletKey format.
  * @return {Object}
  */
 Accounts.prototype.getLegacyAccount = function getLegacyAccount(key) {
