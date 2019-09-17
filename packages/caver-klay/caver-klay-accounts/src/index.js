@@ -110,7 +110,7 @@ Accounts.prototype.create = function create(entropy) {
 };
 
 /**
- * The privateKeyToAccount function creates and returns an Account through the input passed as parameters.
+ * privateKeyToAccount creates and returns an Account through the input passed as parameters.
  *
  * @method privateKeyToAccount
  * @param {String} key The key parameter can be either normal private key or klaytnWalletKey format.
