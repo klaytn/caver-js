@@ -143,7 +143,7 @@ Accounts.prototype.isDecoupled = function isDecoupled(key, userInputAddress) {
 }
 
 /**
- * The getLegacyAccount function extracts the privateKey from the input key and returns an Account with the corresponding legacy account key.
+ * getLegacyAccount extracts the private key from the input key and returns an account with the corresponding legacy account key.
  * If the input key is KlaytnWalletKey format, it returns klaytnWalletKeyAddress, which is the address extracted from KlaytnWalletKey.
  *
  * @method getLegacyAccount
