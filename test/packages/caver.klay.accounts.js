@@ -627,26 +627,26 @@ describe('caver.klay.accounts.decrypt', () => {
   */
 })
 
-describe('caver.klay.accounts.getNonDecoupledAccount', () => {
+describe('caver.klay.accounts.getLegacyAccount', () => {
   context('CAVERJS-UNIT-WALLET-106 : input: valid privateKey', () => {
     it('should return account which is derived from private key', () => {
       const testAccount = caver.klay.accounts.create()
-      let result = caver.klay.accounts.getNonDecoupledAccount(testAccount.privateKey)
+      let result = caver.klay.accounts.getLegacyAccount(testAccount.privateKey)
 
       expect(result.klaytnWalletKeyAddress).to.equals('')
-      expect(result.nonDecoupledAccount.address).to.equals(testAccount.address)
-      expect(result.nonDecoupledAccount.privateKey).to.equals(testAccount.privateKey)
+      expect(result.legacyAccount.address).to.equals(testAccount.address)
+      expect(result.legacyAccount.privateKey).to.equals(testAccount.privateKey)
     })
   })
 
   context('CAVERJS-UNIT-WALLET-107 : input: nonDecoupled valid KlaytnWalletKey format', () => {
     it('should return account which is derived from private key and address from KlaytnWalletKey format', () => {
       const testAccount = caver.klay.accounts.create()
-      let result = caver.klay.accounts.getNonDecoupledAccount(testAccount.getKlaytnWalletKey())
+      let result = caver.klay.accounts.getLegacyAccount(testAccount.getKlaytnWalletKey())
 
       expect(result.klaytnWalletKeyAddress).to.equals(testAccount.address)
-      expect(result.nonDecoupledAccount.address).to.equals(result.klaytnWalletKeyAddress)
-      expect(result.nonDecoupledAccount.privateKey).to.equals(testAccount.privateKey)
+      expect(result.legacyAccount.address).to.equals(result.klaytnWalletKeyAddress)
+      expect(result.legacyAccount.privateKey).to.equals(testAccount.privateKey)
     })
   })
 
@@ -656,11 +656,11 @@ describe('caver.klay.accounts.getNonDecoupledAccount', () => {
       const testAccount = caver.klay.accounts.create()
       testAccount.privateKey = caver.klay.accounts.create().privateKey
 
-      let result = caver.klay.accounts.getNonDecoupledAccount(testAccount.getKlaytnWalletKey())
+      let result = caver.klay.accounts.getLegacyAccount(testAccount.getKlaytnWalletKey())
 
       expect(result.klaytnWalletKeyAddress).to.equals(testAccount.address)
-      expect(result.nonDecoupledAccount.address).not.to.equals(result.klaytnWalletKeyAddress)
-      expect(result.nonDecoupledAccount.privateKey).to.equals(testAccount.privateKey)
+      expect(result.legacyAccount.address).not.to.equals(result.klaytnWalletKeyAddress)
+      expect(result.legacyAccount.privateKey).to.equals(testAccount.privateKey)
     })
   })
 
@@ -668,27 +668,27 @@ describe('caver.klay.accounts.getNonDecoupledAccount', () => {
     it('should throw error if input is invalid privateKey string', () => {
       const expectedError = 'Invalid private key'
 
-      expect(() => caver.klay.accounts.getNonDecoupledAccount('0x')).to.throws(expectedError)
-      expect(() => caver.klay.accounts.getNonDecoupledAccount('1')).to.throws(expectedError)
-      expect(() => caver.klay.accounts.getNonDecoupledAccount('a')).to.throws(expectedError)
-      expect(() => caver.klay.accounts.getNonDecoupledAccount('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364140FF')).to.throws(expectedError)
+      expect(() => caver.klay.accounts.getLegacyAccount('0x')).to.throws(expectedError)
+      expect(() => caver.klay.accounts.getLegacyAccount('1')).to.throws(expectedError)
+      expect(() => caver.klay.accounts.getLegacyAccount('a')).to.throws(expectedError)
+      expect(() => caver.klay.accounts.getLegacyAccount('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364140FF')).to.throws(expectedError)
     })
 
     it('should throw error if input is invalid privateKey type', () => {
       const expectedError = 'The private key must be of type string'
 
-      expect(() => caver.klay.accounts.getNonDecoupledAccount(1234)).to.throws(expectedError)
-      expect(() => caver.klay.accounts.getNonDecoupledAccount({})).to.throws(expectedError)
-      expect(() => caver.klay.accounts.getNonDecoupledAccount()).to.throws(expectedError)
-      expect(() => caver.klay.accounts.getNonDecoupledAccount(undefined)).to.throws(expectedError)
-      expect(() => caver.klay.accounts.getNonDecoupledAccount(null)).to.throws(expectedError)
+      expect(() => caver.klay.accounts.getLegacyAccount(1234)).to.throws(expectedError)
+      expect(() => caver.klay.accounts.getLegacyAccount({})).to.throws(expectedError)
+      expect(() => caver.klay.accounts.getLegacyAccount()).to.throws(expectedError)
+      expect(() => caver.klay.accounts.getLegacyAccount(undefined)).to.throws(expectedError)
+      expect(() => caver.klay.accounts.getLegacyAccount(null)).to.throws(expectedError)
     })
   })
 
   context('CAVERJS-UNIT-WALLET-110 : input: invalid KlaytnWalletKey format', () => {
     it('should throw error if input is invalid KlaytnWalletKey string', () => {
       const expectedError = 'Invalid private key'
-      expect(() => caver.klay.accounts.getNonDecoupledAccount(caver.klay.accounts.create().privateKey+'0x000x00')).to.throws(expectedError)
+      expect(() => caver.klay.accounts.getLegacyAccount(caver.klay.accounts.create().privateKey+'0x000x00')).to.throws(expectedError)
     })
   })
 })

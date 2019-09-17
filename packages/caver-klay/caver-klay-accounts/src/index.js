@@ -110,7 +110,7 @@ Accounts.prototype.create = function create(entropy) {
 };
 
 Accounts.prototype.privateKeyToAccount = function privateKeyToAccount(privateKey, targetAddressRaw) {
-  let {nonDecoupledAccount: account, klaytnWalletKeyAddress} = this.getNonDecoupledAccount(privateKey)
+  let {legacyAccount: account, klaytnWalletKeyAddress} = this.getLegacyAccount(privateKey)
 
   account.address = this.determineAddress(account, klaytnWalletKeyAddress, targetAddressRaw)
   account.address = account.address.toLowerCase()
@@ -120,25 +120,25 @@ Accounts.prototype.privateKeyToAccount = function privateKeyToAccount(privateKey
 }
 
 Accounts.prototype.isDecoupled = function isDecoupled(privateKey, userInputAddress) {
-  let { nonDecoupledAccount, klaytnWalletKeyAddress } = this.getNonDecoupledAccount(privateKey)
-  let actualAddress = this.determineAddress(nonDecoupledAccount, klaytnWalletKeyAddress, userInputAddress)
+  let { legacyAccount, klaytnWalletKeyAddress } = this.getLegacyAccount(privateKey)
+  let actualAddress = this.determineAddress(legacyAccount, klaytnWalletKeyAddress, userInputAddress)
 
-  return nonDecoupledAccount.address.toLowerCase() !== actualAddress.toLowerCase()
+  return legacyAccount.address.toLowerCase() !== actualAddress.toLowerCase()
 }
 
-Accounts.prototype.getNonDecoupledAccount = function getNonDecoupledAccount(privateKey) {
+Accounts.prototype.getLegacyAccount = function getLegacyAccount(privateKey) {
   var { privateKey: prvKey, address: klaytnWalletKeyAddress, isHumanReadable } = utils.parsePrivateKey(privateKey)
 
   if (!utils.isValidPrivateKey(prvKey)) throw new Error('Invalid private key')
 
   prvKey = utils.addHexPrefix(prvKey)
 
-  return { nonDecoupledAccount: Account.fromPrivate(prvKey), klaytnWalletKeyAddress }
+  return { legacyAccount: Account.fromPrivate(prvKey), klaytnWalletKeyAddress }
 }
 
 // The determineAddress function determines the priority of the parameters entered 
 // and returns the address that should be used for the account.
-Accounts.prototype.determineAddress = function determineAddress(nonDecoupledAccount, addressFromKey, userInputAddress) {
+Accounts.prototype.determineAddress = function determineAddress(legacyAccount, addressFromKey, userInputAddress) {
   if (userInputAddress) {
     if(addressFromKey && addressFromKey !== userInputAddress) {
       throw new Error('The address extracted from the private key does not match the address received as the input value.')
@@ -156,7 +156,7 @@ Accounts.prototype.determineAddress = function determineAddress(nonDecoupledAcco
     // If targetAddressRaw is undefined and address which is came from private is existed, set address in account.
     return addressFromKey
   }
-  return nonDecoupledAccount.address
+  return legacyAccount.address
 }
 
 Accounts.prototype.signTransaction = function signTransaction(tx, privateKey, callback) {
