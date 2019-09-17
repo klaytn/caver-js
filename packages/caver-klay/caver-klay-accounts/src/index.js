@@ -110,38 +110,53 @@ Accounts.prototype.create = function create(entropy) {
 };
 
 Accounts.prototype.privateKeyToAccount = function privateKeyToAccount(privateKey, targetAddressRaw) {
-  var { privateKey: prvKey, address, isHumanReadable } = utils.parsePrivateKey(privateKey)
+  let {nonDecoupledAccount: account, klaytnWalletKeyAddress} = this.getNonDecoupledAccount(privateKey)
+
+  account.address = this.determineAddress(account, klaytnWalletKeyAddress, targetAddressRaw)
+  account.address = account.address.toLowerCase()
+  account.address = utils.addHexPrefix(account.address)
+
+  return this._addAccountFunctions(account)
+}
+
+Accounts.prototype.isDecoupled = function isDecoupled(privateKey, userInputAddress) {
+  let { nonDecoupledAccount, klaytnWalletKeyAddress } = this.getNonDecoupledAccount(privateKey)
+  let actualAddress = this.determineAddress(nonDecoupledAccount, klaytnWalletKeyAddress, userInputAddress)
+
+  return nonDecoupledAccount.address.toLowerCase() !== actualAddress.toLowerCase()
+}
+
+Accounts.prototype.getNonDecoupledAccount = function getNonDecoupledAccount(privateKey) {
+  var { privateKey: prvKey, address: klaytnWalletKeyAddress, isHumanReadable } = utils.parsePrivateKey(privateKey)
 
   if (!utils.isValidPrivateKey(prvKey)) throw new Error('Invalid private key')
 
-  if (prvKey.slice(0, 2) !== '0x') {
-    prvKey = `0x${prvKey}`
-  }
+  prvKey = utils.addHexPrefix(prvKey)
 
-  let account = Account.fromPrivate(prvKey)
+  return { nonDecoupledAccount: Account.fromPrivate(prvKey), klaytnWalletKeyAddress }
+}
 
-  if (targetAddressRaw) {
-    if(address && address !== targetAddressRaw) {
+// The determineAddress function determines the priority of the parameters entered 
+// and returns the address that should be used for the account.
+Accounts.prototype.determineAddress = function determineAddress(nonDecoupledAccount, addressFromKey, userInputAddress) {
+  if (userInputAddress) {
+    if(addressFromKey && addressFromKey !== userInputAddress) {
       throw new Error('The address extracted from the private key does not match the address received as the input value.')
     }
 
-    if(!utils.isAddress(targetAddressRaw)) {
+    if(!utils.isAddress(userInputAddress)) {
       throw new Error('The address received as the input value is invalid.')
     }
-    account.address = targetAddressRaw
+    return userInputAddress
 
-  } else if (address){
-    if(!utils.isAddress(address)) {
+  } else if (addressFromKey){
+    if(!utils.isAddress(addressFromKey)) {
       throw new Error('The address extracted from the private key is invalid.')
     }
     // If targetAddressRaw is undefined and address which is came from private is existed, set address in account.
-    account.address = address
+    return addressFromKey
   }
-
-  account.address = account.address.toLowerCase()
-  account.address = '0x' + account.address.replace('0x', '')
-
-  return this._addAccountFunctions(account)
+  return nonDecoupledAccount.address
 }
 
 Accounts.prototype.signTransaction = function signTransaction(tx, privateKey, callback) {

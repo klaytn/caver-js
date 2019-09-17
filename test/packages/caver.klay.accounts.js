@@ -627,6 +627,189 @@ describe('caver.klay.accounts.decrypt', () => {
   */
 })
 
+describe('caver.klay.accounts.getNonDecoupledAccount', () => {
+  context('CAVERJS-UNIT-WALLET-106 : input: valid privateKey', () => {
+    it('should return account which is derived from private key', () => {
+      const testAccount = caver.klay.accounts.create()
+      let result = caver.klay.accounts.getNonDecoupledAccount(testAccount.privateKey)
+
+      expect(result.klaytnWalletKeyAddress).to.equals('')
+      expect(result.nonDecoupledAccount.address).to.equals(testAccount.address)
+      expect(result.nonDecoupledAccount.privateKey).to.equals(testAccount.privateKey)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-107 : input: nonDecoupled valid KlaytnWalletKey format', () => {
+    it('should return account which is derived from private key and address from KlaytnWalletKey format', () => {
+      const testAccount = caver.klay.accounts.create()
+      let result = caver.klay.accounts.getNonDecoupledAccount(testAccount.getKlaytnWalletKey())
+
+      expect(result.klaytnWalletKeyAddress).to.equals(testAccount.address)
+      expect(result.nonDecoupledAccount.address).to.equals(result.klaytnWalletKeyAddress)
+      expect(result.nonDecoupledAccount.privateKey).to.equals(testAccount.privateKey)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-108 : input: decoupled valid KlaytnWalletKey format', () => {
+    it('should return account which is derived from private key and address from KlaytnWalletKey format', () => {
+      // decoupled
+      const testAccount = caver.klay.accounts.create()
+      testAccount.privateKey = caver.klay.accounts.create().privateKey
+
+      let result = caver.klay.accounts.getNonDecoupledAccount(testAccount.getKlaytnWalletKey())
+
+      expect(result.klaytnWalletKeyAddress).to.equals(testAccount.address)
+      expect(result.nonDecoupledAccount.address).not.to.equals(result.klaytnWalletKeyAddress)
+      expect(result.nonDecoupledAccount.privateKey).to.equals(testAccount.privateKey)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-109 : input: invalid privateKey', () => {
+    it('should throw error if input is invalid privateKey string', () => {
+      const expectedError = 'Invalid private key'
+
+      expect(() => caver.klay.accounts.getNonDecoupledAccount('0x')).to.throws(expectedError)
+      expect(() => caver.klay.accounts.getNonDecoupledAccount('1')).to.throws(expectedError)
+      expect(() => caver.klay.accounts.getNonDecoupledAccount('a')).to.throws(expectedError)
+      expect(() => caver.klay.accounts.getNonDecoupledAccount('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364140FF')).to.throws(expectedError)
+    })
+
+    it('should throw error if input is invalid privateKey type', () => {
+      const expectedError = 'The private key must be of type string'
+
+      expect(() => caver.klay.accounts.getNonDecoupledAccount(1234)).to.throws(expectedError)
+      expect(() => caver.klay.accounts.getNonDecoupledAccount({})).to.throws(expectedError)
+      expect(() => caver.klay.accounts.getNonDecoupledAccount()).to.throws(expectedError)
+      expect(() => caver.klay.accounts.getNonDecoupledAccount(undefined)).to.throws(expectedError)
+      expect(() => caver.klay.accounts.getNonDecoupledAccount(null)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-110 : input: invalid KlaytnWalletKey format', () => {
+    it('should throw error if input is invalid KlaytnWalletKey string', () => {
+      const expectedError = 'Invalid private key'
+      expect(() => caver.klay.accounts.getNonDecoupledAccount(caver.klay.accounts.create().privateKey+'0x000x00')).to.throws(expectedError)
+    })
+  })
+})
+
+describe('caver.klay.accounts.isDecoupled', () => {
+  context('CAVERJS-UNIT-WALLET-111 : input: valid privateKey and decoupled address', () => {
+    it('should return true if input is decoupled private and address', () => {
+      const testAccount = caver.klay.accounts.create()
+      testAccount.privateKey = caver.klay.accounts.create().privateKey
+      expect(caver.klay.accounts.isDecoupled(testAccount.privateKey, testAccount.address)).to.be.true
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-112 : input: valid KlaytnWalletKey', () => {
+    it('should return true if input is decoupled KlaytnWalletKey', () => {
+      const testAccount = caver.klay.accounts.create()
+      testAccount.privateKey = caver.klay.accounts.create().privateKey
+      expect(caver.klay.accounts.isDecoupled(testAccount.getKlaytnWalletKey())).to.be.true
+      expect(caver.klay.accounts.isDecoupled(testAccount.getKlaytnWalletKey(), testAccount.address)).to.be.true
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-113 : input: valid privateKey', () => {
+    it('should return false if input is valid privateKey', () => {
+      expect(caver.klay.accounts.isDecoupled(caver.klay.accounts.create().privateKey)).to.be.false
+      expect(caver.klay.accounts.isDecoupled(caver.klay.accounts.create().privateKey.slice(2))).to.be.false
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-114 : input: valid KlaytnWalletKey', () => {
+    it('should return true if input is nonDecoupled KlaytnWalletKey', () => {
+      const testAccount = caver.klay.accounts.create()
+      expect(caver.klay.accounts.isDecoupled(testAccount.getKlaytnWalletKey())).to.be.false
+      expect(caver.klay.accounts.isDecoupled(testAccount.getKlaytnWalletKey(), testAccount.address)).to.be.false
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-115 : input: invalid privateKey', () => {
+    it('should throw error if input is invalid privateKey string', () => {
+      const expectedError = 'Invalid private key'
+
+      expect(() => caver.klay.accounts.isDecoupled('0x')).to.throws(expectedError)
+      expect(() => caver.klay.accounts.isDecoupled('1')).to.throws(expectedError)
+      expect(() => caver.klay.accounts.isDecoupled('a')).to.throws(expectedError)
+      expect(() => caver.klay.accounts.isDecoupled('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364140FF')).to.throws(expectedError)
+    })
+
+    it('should throw error if input is invalid privateKey type', () => {
+      const expectedError = 'The private key must be of type string'
+
+      expect(() => caver.klay.accounts.isDecoupled(1234)).to.throws(expectedError)
+      expect(() => caver.klay.accounts.isDecoupled({})).to.throws(expectedError)
+      expect(() => caver.klay.accounts.isDecoupled()).to.throws(expectedError)
+      expect(() => caver.klay.accounts.isDecoupled(undefined)).to.throws(expectedError)
+      expect(() => caver.klay.accounts.isDecoupled(null)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-116 : input: not match address with KlaytnWalletKey and input', () => {
+    it('should throw error if input is invalid privateKey string', () => {
+      const testAccount = caver.klay.accounts.create()
+      testAccount.privateKey = caver.klay.accounts.create().privateKey
+
+      const expectedError = 'The address extracted from the private key does not match the address received as the input value.'
+
+      expect(() => caver.klay.accounts.isDecoupled(testAccount.getKlaytnWalletKey(), caver.klay.accounts.create().address)).to.throws(expectedError)
+    })
+  })
+})
+
+describe('caver.klay.accounts.determineAddress', () => {
+  context('CAVERJS-UNIT-WALLET-117 : input: valid nonDecoupledAccount', () => {
+    it('should return address of nonDecoupledAccount', () => {
+      const testAccount = caver.klay.accounts.create()
+      
+      expect(caver.klay.accounts.determineAddress(testAccount)).to.equals(testAccount.address)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-118 : input: valid nonDecoupledAccount and addressFromKey', () => {
+    it('should return address of account', () => {
+      const testAccount = caver.klay.accounts.create()
+      const addressFromKey = caver.klay.accounts.create().address
+      
+      expect(caver.klay.accounts.determineAddress(testAccount, addressFromKey)).to.equals(addressFromKey)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-119 : input: valid nonDecoupledAccount, addressFromKey and userInputAddress', () => {
+    it('should return address of account', () => {
+      const testAccount = caver.klay.accounts.create()
+      const addressFromKey = ''
+      const userInputAddress = caver.klay.accounts.create().address
+      
+      expect(caver.klay.accounts.determineAddress(testAccount, addressFromKey, userInputAddress)).to.equals(userInputAddress)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-120 : input: valid nonDecoupledAccount, addressFromKey and userInputAddress', () => {
+    it('should return address of account', () => {
+      const testAccount = caver.klay.accounts.create()
+      const addressFromKey = caver.klay.accounts.create().address
+      const userInputAddress = addressFromKey
+      
+      expect(caver.klay.accounts.determineAddress(testAccount, addressFromKey, userInputAddress)).to.equals(userInputAddress)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-121 : input: valid nonDecoupledAccount, addressFromKey and userInputAddress', () => {
+    it('should throw error if addressFromKey and userInputAddress is not matched', () => {
+      const testAccount = caver.klay.accounts.create()
+      const addressFromKey = caver.klay.accounts.create().address
+      const userInputAddress = caver.klay.accounts.create().address
+
+      const expectedError = 'The address extracted from the private key does not match the address received as the input value.'
+      
+      expect(() => caver.klay.accounts.determineAddress(testAccount, addressFromKey, userInputAddress)).to.throws(expectedError)
+    })
+  })
+})
+
 describe('caver.klay.accounts.wallet', () => {
 
   it('CAVERJS-UNIT-WALLET-043 : should return valid wallet instance', () => {
