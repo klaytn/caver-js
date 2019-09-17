@@ -128,7 +128,7 @@ Accounts.prototype.privateKeyToAccount = function privateKeyToAccount(key, userI
 }
 
 /**
- * The isDecoupled function determines whether or not it is decoupled based on the input value.
+ * isDecoupled determines whether or not it is decoupled based on the input value.
  *
  * @method isDecoupled
  * @param {String} key The key parameter can be either normal private key or klaytnWalletKey format.
