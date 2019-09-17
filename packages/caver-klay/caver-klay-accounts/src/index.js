@@ -109,8 +109,9 @@ Accounts.prototype.create = function create(entropy) {
     return this._addAccountFunctions(Account.create(entropy || utils.randomHex(32)));
 };
 
-Accounts.prototype.privateKeyToAccount = function privateKeyToAccount(privateKey, targetAddressRaw) {
-  let {legacyAccount: account, klaytnWalletKeyAddress} = this.getLegacyAccount(privateKey)
+// The key parameter can be either normal private key or klaytnWalletKey format.
+Accounts.prototype.privateKeyToAccount = function privateKeyToAccount(key, targetAddressRaw) {
+  let {legacyAccount: account, klaytnWalletKeyAddress} = this.getLegacyAccount(key)
 
   account.address = this.determineAddress(account, klaytnWalletKeyAddress, targetAddressRaw)
   account.address = account.address.toLowerCase()
@@ -119,21 +120,23 @@ Accounts.prototype.privateKeyToAccount = function privateKeyToAccount(privateKey
   return this._addAccountFunctions(account)
 }
 
-Accounts.prototype.isDecoupled = function isDecoupled(privateKey, userInputAddress) {
-  let { legacyAccount, klaytnWalletKeyAddress } = this.getLegacyAccount(privateKey)
+// The key parameter can be either normal private key or klaytnWalletKey format.
+Accounts.prototype.isDecoupled = function isDecoupled(key, userInputAddress) {
+  let { legacyAccount, klaytnWalletKeyAddress } = this.getLegacyAccount(key)
   let actualAddress = this.determineAddress(legacyAccount, klaytnWalletKeyAddress, userInputAddress)
 
   return legacyAccount.address.toLowerCase() !== actualAddress.toLowerCase()
 }
 
-Accounts.prototype.getLegacyAccount = function getLegacyAccount(privateKey) {
-  var { privateKey: prvKey, address: klaytnWalletKeyAddress, isHumanReadable } = utils.parsePrivateKey(privateKey)
+// The key parameter can be either normal private key or klaytnWalletKey format.
+Accounts.prototype.getLegacyAccount = function getLegacyAccount(key) {
+  var { privateKey, address: klaytnWalletKeyAddress, isHumanReadable } = utils.parsePrivateKey(key)
 
-  if (!utils.isValidPrivateKey(prvKey)) throw new Error('Invalid private key')
+  if (!utils.isValidPrivateKey(privateKey)) throw new Error('Invalid private key')
 
-  prvKey = utils.addHexPrefix(prvKey)
+  privateKey = utils.addHexPrefix(privateKey)
 
-  return { legacyAccount: Account.fromPrivate(prvKey), klaytnWalletKeyAddress }
+  return { legacyAccount: Account.fromPrivate(privateKey), klaytnWalletKeyAddress }
 }
 
 // The determineAddress function determines the priority of the parameters entered 
@@ -559,7 +562,8 @@ Accounts.prototype.decrypt = function (v3Keystore, password, nonStrict) {
       "id":"dfde6a32-4b0e-404f-8b9f-2b18f279fe21",
     }
  */
-Accounts.prototype.encrypt = function (privateKey, password, options) {
+// The key parameter can be either normal private key or klaytnWalletKey format.
+Accounts.prototype.encrypt = function (key, password, options) {
     /**
      * options can include below
      * {
@@ -578,7 +582,7 @@ Accounts.prototype.encrypt = function (privateKey, password, options) {
      */
     options = options || {};
 
-    var account = this.privateKeyToAccount(privateKey, options.address);
+    var account = this.privateKeyToAccount(key, options.address);
 
     var salt = options.salt || cryp.randomBytes(32);
     var iv = options.iv || cryp.randomBytes(16);
