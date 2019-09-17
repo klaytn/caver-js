@@ -518,6 +518,8 @@ var sha3 = function (value) {
 sha3._Hash = Hash;
 
 function parsePrivateKey(privateKey) {
+  if (typeof privateKey !== 'string') throw new Error(`The private key must be of type string`)
+
   const has0xPrefix = privateKey.slice(0, 2) === '0x'
   privateKey = has0xPrefix ? privateKey.slice(2) : privateKey
 
