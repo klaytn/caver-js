@@ -327,9 +327,8 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
             // If wallet was found, sign tx, and send using sendRawTransaction
             return method.accounts.signTransaction(tx, wallet.privateKey)
                 .then(sendSignedTx)
-                .catch((e)=>{
+                .catch((e) => {
                   sendTxCallback(e)
-                  return Promise.reject(e)
                 })
           }
           
