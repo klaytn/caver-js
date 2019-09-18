@@ -194,22 +194,31 @@ Accounts.prototype.signTransaction = function signTransaction(tx, privateKey, ca
     var _this = this,
         error = false,
         isLegacy = false,
+        parsed,
         result
 
     callback = callback || function () {}
 
-    const parsed = utils.parsePrivateKey(privateKey)
-    privateKey = parsed.privateKey
-
-    if (!utils.isValidPrivateKey(privateKey)) throw new Error('Invalid private key')
-    privateKey = privateKey.startsWith('0x') ? privateKey : '0x' + privateKey
-
     if (!tx) {
       error = new Error('No transaction object given!')
-
       callback(error)
       return Promise.reject(error)
     }
+
+    try {
+      parsed = utils.parsePrivateKey(privateKey)
+      privateKey = parsed.privateKey
+    } catch(e) {
+      callback(e)
+      return Promise.reject(e)
+    }
+    if (!utils.isValidPrivateKey(privateKey)) {
+      error = new Error('Invalid private key')
+      callback(error)
+      return Promise.reject(error)
+    }
+
+    privateKey = utils.addHexPrefix(privateKey)
 
     function signed(tx) {
 
@@ -218,7 +227,7 @@ Accounts.prototype.signTransaction = function signTransaction(tx, privateKey, ca
         
         // Attempting to sign with decoupled account into a legacy type transaction throw an error.
         isLegacy = tx.type === undefined || tx.type === 'LEGACY' ? true : false
-        if (isLegacy && _this.isDecoupled(privateKey, tx.from)) throw new Error('A legacy transaction must be with a legacy account key')
+        if (!error && isLegacy && _this.isDecoupled(privateKey, tx.from)) error = new Error('A legacy transaction must be with a legacy account key')
       }
       if (error) {
         callback(error);
