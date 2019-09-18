@@ -239,8 +239,8 @@ describe('caver.klay.accounts.signTransaction', () => {
 
       const errorMessage = 'Invalid private key'
 
-      expect(() => caver.klay.accounts.signTransaction(txObj, invalidPrivateKey))
-        .to.throw(errorMessage)
+      expect(caver.klay.accounts.signTransaction(txObj, invalidPrivateKey))
+        .to.be.rejectedWith(errorMessage)
     })
   })
 
@@ -291,7 +291,8 @@ describe('caver.klay.accounts.signTransaction', () => {
         chainId: 2019,
       }
 
-      expect(()=>caver.klay.accounts.signTransaction(tx, decoupledAccount.privateKey)).to.throws('A legacy transaction must be with a legacy account key')
+      expect(caver.klay.accounts.signTransaction(tx, decoupledAccount.privateKey))
+        .to.be.rejectedWith('A legacy transaction must be with a legacy account key')
     })
   })
 })
