@@ -105,6 +105,37 @@ Accounts.prototype._addAccountFunctions = function (account) {
     return account;
 };
 
+
+/**
+ * _determineAddress determines the priority of the parameters entered and returns the address that should be used for the account.
+ *
+ * @method _determineAddress
+ * @param {Object} legacyAccount Account with a legacy account key extracted from private key to be used for address determination.
+ * @param {String} addressFromKey Address extracted from key.
+ * @param {String} userInputAddress Address passed as parameter by user.
+ * @return {String}
+ */
+Accounts.prototype._determineAddress = function _determineAddress(legacyAccount, addressFromKey, userInputAddress) {
+  if (userInputAddress) {
+    if(addressFromKey && addressFromKey !== userInputAddress) {
+      throw new Error('The address extracted from the private key does not match the address received as the input value.')
+    }
+
+    if(!utils.isAddress(userInputAddress)) {
+      throw new Error('The address received as the input value is invalid.')
+    }
+    return userInputAddress
+
+  } else if (addressFromKey){
+    if(!utils.isAddress(addressFromKey)) {
+      throw new Error('The address extracted from the private key is invalid.')
+    }
+    // If userInputAddress is undefined and address which is came from private is existed, set address in account.
+    return addressFromKey
+  }
+  return legacyAccount.address
+}
+
 Accounts.prototype.create = function create(entropy) {
     return this._addAccountFunctions(Account.create(entropy || utils.randomHex(32)));
 };
@@ -120,7 +151,7 @@ Accounts.prototype.create = function create(entropy) {
 Accounts.prototype.privateKeyToAccount = function privateKeyToAccount(key, userInputAddress) {
   let {legacyAccount: account, klaytnWalletKeyAddress} = this.getLegacyAccount(key)
 
-  account.address = this.determineAddress(account, klaytnWalletKeyAddress, userInputAddress)
+  account.address = this._determineAddress(account, klaytnWalletKeyAddress, userInputAddress)
   account.address = account.address.toLowerCase()
   account.address = utils.addHexPrefix(account.address)
 
@@ -137,7 +168,7 @@ Accounts.prototype.privateKeyToAccount = function privateKeyToAccount(key, userI
  */
 Accounts.prototype.isDecoupled = function isDecoupled(key, userInputAddress) {
   let { legacyAccount, klaytnWalletKeyAddress } = this.getLegacyAccount(key)
-  let actualAddress = this.determineAddress(legacyAccount, klaytnWalletKeyAddress, userInputAddress)
+  let actualAddress = this._determineAddress(legacyAccount, klaytnWalletKeyAddress, userInputAddress)
 
   return legacyAccount.address.toLowerCase() !== actualAddress.toLowerCase()
 }
@@ -158,36 +189,6 @@ Accounts.prototype.getLegacyAccount = function getLegacyAccount(key) {
   privateKey = utils.addHexPrefix(privateKey)
 
   return { legacyAccount: Account.fromPrivate(privateKey), klaytnWalletKeyAddress }
-}
-
-/**
- * determineAddress determines the priority of the parameters entered and returns the address that should be used for the account.
- *
- * @method determineAddress
- * @param {Object} legacyAccount Account with a legacy account key extracted from private key to be used for address determination.
- * @param {String} addressFromKey Address extracted from key.
- * @param {String} userInputAddress Address passed as parameter by user.
- * @return {String}
- */
-Accounts.prototype.determineAddress = function determineAddress(legacyAccount, addressFromKey, userInputAddress) {
-  if (userInputAddress) {
-    if(addressFromKey && addressFromKey !== userInputAddress) {
-      throw new Error('The address extracted from the private key does not match the address received as the input value.')
-    }
-
-    if(!utils.isAddress(userInputAddress)) {
-      throw new Error('The address received as the input value is invalid.')
-    }
-    return userInputAddress
-
-  } else if (addressFromKey){
-    if(!utils.isAddress(addressFromKey)) {
-      throw new Error('The address extracted from the private key is invalid.')
-    }
-    // If userInputAddress is undefined and address which is came from private is existed, set address in account.
-    return addressFromKey
-  }
-  return legacyAccount.address
 }
 
 Accounts.prototype.signTransaction = function signTransaction(tx, privateKey, callback) {

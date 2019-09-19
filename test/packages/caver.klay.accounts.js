@@ -778,57 +778,6 @@ describe('caver.klay.accounts.isDecoupled', () => {
   })
 })
 
-describe('caver.klay.accounts.determineAddress', () => {
-  context('CAVERJS-UNIT-WALLET-117 : input: valid nonDecoupledAccount', () => {
-    it('should return address of nonDecoupledAccount', () => {
-      const testAccount = caver.klay.accounts.create()
-      
-      expect(caver.klay.accounts.determineAddress(testAccount)).to.equals(testAccount.address)
-    })
-  })
-
-  context('CAVERJS-UNIT-WALLET-118 : input: valid nonDecoupledAccount and addressFromKey', () => {
-    it('should return address of account', () => {
-      const testAccount = caver.klay.accounts.create()
-      const addressFromKey = caver.klay.accounts.create().address
-      
-      expect(caver.klay.accounts.determineAddress(testAccount, addressFromKey)).to.equals(addressFromKey)
-    })
-  })
-
-  context('CAVERJS-UNIT-WALLET-119 : input: valid nonDecoupledAccount, addressFromKey and userInputAddress', () => {
-    it('should return address of account', () => {
-      const testAccount = caver.klay.accounts.create()
-      const addressFromKey = ''
-      const userInputAddress = caver.klay.accounts.create().address
-      
-      expect(caver.klay.accounts.determineAddress(testAccount, addressFromKey, userInputAddress)).to.equals(userInputAddress)
-    })
-  })
-
-  context('CAVERJS-UNIT-WALLET-120 : input: valid nonDecoupledAccount, addressFromKey and userInputAddress', () => {
-    it('should return address of account', () => {
-      const testAccount = caver.klay.accounts.create()
-      const addressFromKey = caver.klay.accounts.create().address
-      const userInputAddress = addressFromKey
-      
-      expect(caver.klay.accounts.determineAddress(testAccount, addressFromKey, userInputAddress)).to.equals(userInputAddress)
-    })
-  })
-
-  context('CAVERJS-UNIT-WALLET-121 : input: valid nonDecoupledAccount, addressFromKey and userInputAddress', () => {
-    it('should throw error if addressFromKey and userInputAddress is not matched', () => {
-      const testAccount = caver.klay.accounts.create()
-      const addressFromKey = caver.klay.accounts.create().address
-      const userInputAddress = caver.klay.accounts.create().address
-
-      const expectedError = 'The address extracted from the private key does not match the address received as the input value.'
-      
-      expect(() => caver.klay.accounts.determineAddress(testAccount, addressFromKey, userInputAddress)).to.throws(expectedError)
-    })
-  })
-})
-
 describe('caver.klay.accounts.wallet', () => {
 
   it('CAVERJS-UNIT-WALLET-043 : should return valid wallet instance', () => {
