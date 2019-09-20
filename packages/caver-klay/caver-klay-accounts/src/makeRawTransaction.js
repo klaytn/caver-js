@@ -144,7 +144,7 @@ function makeRawTransaction(rlpEncoded, sig, transaction) {
     }
     case 'LEGACY':
     default:
-      rawTx = decodedValues.slice(0, 6).concat(sig)
+      rawTx = decodedValues.slice(0, 6).concat(sig[0])
       return RLP.encode(rawTx)
   }
 }

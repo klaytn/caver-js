@@ -137,10 +137,12 @@ describe('caver.klay.accounts.privateKeyToAccount', () => {
 })
 
 describe('caver.klay.accounts.signTransaction', () => {
-  let txObj, account
+  let txObj, vtTx, account
 
   beforeEach(() => {
     account = caver.klay.accounts.create()
+    caver.klay.accounts.wallet.add(account)
+
     txObj = {
       from: account.address,
       nonce: '0x0',
@@ -149,6 +151,18 @@ describe('caver.klay.accounts.signTransaction', () => {
       gasPrice: setting.gasPrice,
       value: '0x1',
       chainId: 2019,
+    }
+
+
+    vtTx = { 
+      type: 'VALUE_TRANSFER',
+      from: account.address,
+      to: '0xd05c5926b0a2f31aadcc9a9cbd3868a50104d834',
+      value: '0x1',
+      gas: '0xdbba0',
+      chainId: '0x7e3',
+      gasPrice: '0x5d21dba00',
+      nonce: '0x9a',
     }
   })
 
@@ -159,7 +173,7 @@ describe('caver.klay.accounts.signTransaction', () => {
         account.privateKey
       )
 
-      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash']
+      const keys = ['messageHash', 'v', 'r', 's', 'signature', 'rawTransaction', 'txHash', 'senderTxHash']
       expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
 
       expect(caver.klay.accounts.recoverTransaction(result.rawTransaction)).to.equal(account.address)
@@ -173,7 +187,7 @@ describe('caver.klay.accounts.signTransaction', () => {
 
       const result = await caver.klay.accounts.signTransaction(tx, account.privateKey)
 
-      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash']
+      const keys = ['messageHash', 'v', 'r', 's', 'signature', 'rawTransaction', 'txHash', 'senderTxHash']
       expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
 
       expect(caver.klay.accounts.recoverTransaction(result.rawTransaction)).to.equal(account.address)
@@ -187,7 +201,7 @@ describe('caver.klay.accounts.signTransaction', () => {
 
       const result = await caver.klay.accounts.signTransaction(tx, account.privateKey)
 
-      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash']
+      const keys = ['messageHash', 'v', 'r', 's', 'signature', 'rawTransaction', 'txHash', 'senderTxHash']
       expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
 
       expect(caver.klay.accounts.recoverTransaction(result.rawTransaction)).to.equal(account.address)
@@ -201,7 +215,7 @@ describe('caver.klay.accounts.signTransaction', () => {
 
       const result = await caver.klay.accounts.signTransaction(tx, account.privateKey)
 
-      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash']
+      const keys = ['messageHash', 'v', 'r', 's', 'signature', 'rawTransaction', 'txHash', 'senderTxHash']
       expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
 
       expect(caver.klay.accounts.recoverTransaction(result.rawTransaction)).to.equal(account.address)
@@ -234,13 +248,12 @@ describe('caver.klay.accounts.signTransaction', () => {
   })
 
   context('CAVERJS-UNIT-WALLET-025 : input: tx, privateKey:invalid', () => {
-    it('should throw an error', () => {
+    it('should throw an error', async () => {
       const invalidPrivateKey = caver.utils.randomHex(31)    // 31bytes
 
       const errorMessage = 'Invalid private key'
 
-      expect(caver.klay.accounts.signTransaction(txObj, invalidPrivateKey))
-        .to.be.rejectedWith(errorMessage)
+      await expect(caver.klay.accounts.signTransaction(txObj, invalidPrivateKey)).to.be.rejectedWith(errorMessage)
     })
   })
 
@@ -250,7 +263,7 @@ describe('caver.klay.accounts.signTransaction', () => {
         txObj,
         account.privateKey,
         (error, result) => {
-          const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash']
+          const keys = ['messageHash', 'v', 'r', 's', 'signature', 'rawTransaction', 'txHash', 'senderTxHash']
           expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
 
           expect(caver.klay.accounts.recoverTransaction(result.rawTransaction)).to.equal(account.address)
@@ -277,7 +290,7 @@ describe('caver.klay.accounts.signTransaction', () => {
   })
 
   context('CAVERJS-UNIT-WALLET-122 : input: legacyTx, privateKey of decoupled account', () => {
-    it('should return signature and rawTransaction', () => {
+    it('should return signature and rawTransaction', async () => {
       const decoupledAccount = caver.klay.accounts.create()
       decoupledAccount.privateKey = caver.klay.accounts.create().privateKey
 
@@ -291,8 +304,77 @@ describe('caver.klay.accounts.signTransaction', () => {
         chainId: 2019,
       }
 
-      expect(caver.klay.accounts.signTransaction(tx, decoupledAccount.privateKey))
-        .to.be.rejectedWith('A legacy transaction must be with a legacy account key')
+      const errorMessage = 'A legacy transaction must be with a legacy account key'
+
+      await expect(caver.klay.accounts.signTransaction(tx, decoupledAccount.privateKey)).to.be.rejectedWith(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-123 : input: if there are invalid number of parameters then signTrasnaction should reject', () => {
+    it('should reject when there is no parameter', async () => {
+      const errorMessage = 'Inavlid parameter: The number of parameter is invalid.'
+      await expect(caver.klay.accounts.signTransaction()).to.be.rejectedWith(errorMessage)
+    })
+
+    it('should reject when there are more than three parameters', async () => {
+      const errorMessage = 'Inavlid parameter: The number of parameter is invalid.'
+      await expect(caver.klay.accounts.signTransaction({}, 'privateKey', ()=>{}, 'one more')).to.be.rejectedWith(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-124 : input: if there are valid number of parameters then signTrasnaction should set properly', () => {
+    it('should sign to transaction parameter with private key in wallet', async () => {
+      const result = await caver.klay.accounts.signTransaction(txObj)
+
+      const keys = ['messageHash', 'v', 'r', 's', 'signature', 'rawTransaction', 'txHash', 'senderTxHash']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(typeof result.signature[0]).to.equals('string')
+
+      expect(caver.klay.accounts.recoverTransaction(result.rawTransaction)).to.equal(account.address)
+    })
+
+    it('should sign to transaction parameter with private key in wallet with callback', async () => {
+      let isCalled = false
+      const result = await caver.klay.accounts.signTransaction(txObj, (error, result) => isCalled = true)
+
+      const keys = ['messageHash', 'v', 'r', 's', 'signature', 'rawTransaction', 'txHash', 'senderTxHash']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(typeof result.signature[0]).to.equals('string')
+
+      expect(caver.klay.accounts.recoverTransaction(result.rawTransaction)).to.equal(account.address)
+
+      expect(isCalled).to.be.true
+    })
+
+    it('should sign to transaction parameter with private key parameter', async () => {
+      const result = await caver.klay.accounts.signTransaction(vtTx, account.privateKey)
+
+      const keys = ['messageHash', 'v', 'r', 's', 'signature', 'rawTransaction', 'txHash', 'senderTxHash']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(Array.isArray(result.signature[0])).to.be.true
+      expect(result.signature.length).to.equals(1)
+    })
+
+    it('should sign to transaction parameter with private key array', async () => {
+      const result = await caver.klay.accounts.signTransaction(vtTx, [account.privateKey.slice(2), account.privateKey])
+
+      const keys = ['messageHash', 'v', 'r', 's', 'signature', 'rawTransaction', 'txHash', 'senderTxHash']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(Array.isArray(result.signature[0])).to.be.true
+      expect(result.signature.length).to.equals(2)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.signature.length).to.equals(2)
+      expect(decoded.signature[0][0]).to.equals(result.signature[0][0])
+      expect(decoded.signature[0][1]).to.equals(result.signature[0][1])
+      expect(decoded.signature[0][2]).to.equals(result.signature[0][2])
+      expect(decoded.signature[1][0]).to.equals(result.signature[1][0])
+      expect(decoded.signature[1][1]).to.equals(result.signature[1][1])
+      expect(decoded.signature[1][2]).to.equals(result.signature[1][2])
     })
   })
 })
@@ -1090,4 +1172,67 @@ describe('caver.klay.accounts.wallet.decrypt', () => {
     validateErrorCodeblock(() => caver.klay.accounts.wallet.decrypt(encryptedKeystore, invalid), expectedError)
   })
   */
+})
+
+describe('caver.klay.accounts.wallet.getAccount', () => {
+  context('CAVERJS-UNIT-WALLET-125 : input: number', () => {
+    it('should return Account from Wallet', () => {
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+
+      const fromWallet = caver.klay.accounts.wallet.getAccount(testAccount.index)
+
+      expect(testAccount.address).to.equals(fromWallet.address)
+      expect(testAccount.privateKey).to.equals(fromWallet.privateKey)
+      expect(testAccount.index).to.equals(fromWallet.index)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-126 : input: invalid number index', () => {
+    it('should throw Error', () => {
+      const errorMessage = `The index(${caver.klay.accounts.wallet.length}) is out of range(Wallet length : ${caver.klay.accounts.wallet.length}).`
+
+      expect(() => caver.klay.accounts.wallet.getAccount(caver.klay.accounts.wallet.length)).to.throws(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-127 : input: invalid parameter type for getAccount', () => {
+    it('should throw Error', () => {
+      const errorMessage = `Accounts in the Wallet can be searched by only index or address.`
+
+      expect(() => caver.klay.accounts.wallet.getAccount({})).to.throws(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-128 : input: invalid address for getAccount', () => {
+    it('should throw Error', () => {
+      const input = 'address'
+      const errorMessage = `Failed to getAccount from Wallet: invalid address(${input})`
+
+      expect(() => caver.klay.accounts.wallet.getAccount(input)).to.throws(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-129 : input: validAddress', () => {
+    it('should return Account from Wallet', () => {
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+
+      let fromWallet = caver.klay.accounts.wallet.getAccount(testAccount.address)
+
+      expect(testAccount.address).to.equals(fromWallet.address)
+      expect(testAccount.privateKey).to.equals(fromWallet.privateKey)
+      expect(testAccount.index).to.equals(fromWallet.index)
+
+      fromWallet = caver.klay.accounts.wallet.getAccount(testAccount.address.toLowerCase())
+
+      expect(testAccount.address).to.equals(fromWallet.address)
+      expect(testAccount.privateKey).to.equals(fromWallet.privateKey)
+      expect(testAccount.index).to.equals(fromWallet.index)
+
+      fromWallet = caver.klay.accounts.wallet.getAccount(testAccount.address.toUpperCase())
+
+      expect(testAccount.address).to.equals(fromWallet.address)
+      expect(testAccount.privateKey).to.equals(fromWallet.privateKey)
+      expect(testAccount.index).to.equals(fromWallet.index)
+    })
+  })
 })
