@@ -285,17 +285,17 @@ Accounts.prototype.signTransaction = function signTransaction() {
         for(const privateKey of privateKeys) {
           const signature = Account.makeSigner(Nat.toNumber(transaction.chainId || "0x1") * 2 + 35)(messageHash, privateKey)
           const [v, r, s] = Account.decodeSignature(signature).map(sig => utils.makeEven(utils.trimLeadingZero(sig)))
-          signatrues.push([v, r, s])
+          signatures.push([v, r, s])
         }
 
-        const rawTransaction = makeRawTransaction(rlpEncoded, signatrues, transaction)
+        const rawTransaction = makeRawTransaction(rlpEncoded, signatures, transaction)
 
         result = {
             messageHash: messageHash,
-            v: signatrues[0][0],
-            r: signatrues[0][1],
-            s: signatrues[0][2],
-            signature: isLegacy? signatrues[0] : signatrues,
+            v: signatures[0][0],
+            r: signatures[0][1],
+            s: signatures[0][2],
+            signature: isLegacy? signatures[0] : signatures,
             rawTransaction: rawTransaction,
             txHash: Hash.keccak256(rawTransaction),
             senderTxHash: getSenderTxHash(rawTransaction),
