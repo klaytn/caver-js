@@ -65,10 +65,10 @@ describe('Legacy: Legacy transaction', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
-        expect(txObj.signature).not.to.be.undefined
-        expect(txObj.signature[0]).to.equals(txObj.v)
-        expect(txObj.signature[1]).to.equals(txObj.r)
-        expect(txObj.signature[2]).to.equals(txObj.s)
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0]).to.equals(txObj.v)
+        expect(txObj.signatures[1]).to.equals(txObj.r)
+        expect(txObj.signatures[2]).to.equals(txObj.s)
     }).timeout(200000)
 })
 
@@ -108,10 +108,10 @@ describe('Value transfer: Value Transfer', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
-        expect(txObj.signature).not.to.be.undefined
-        expect(txObj.signature[0][0]).to.equals(txObj.v)
-        expect(txObj.signature[0][1]).to.equals(txObj.r)
-        expect(txObj.signature[0][2]).to.equals(txObj.s)
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
     }).timeout(200000)
 })
 
@@ -161,18 +161,18 @@ describe('Value transfer: Fee Delegated Value Transfer', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
-        expect(txObj.signature).not.to.be.undefined
-        expect(txObj.signature[0][0]).to.equals(txObj.v)
-        expect(txObj.signature[0][1]).to.equals(txObj.r)
-        expect(txObj.signature[0][2]).to.equals(txObj.s)
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
-        expect(txObj.feePayerSignature).not.to.be.undefined
-        expect(txObj.feePayerSignature[0][0]).to.equals(txObj.payerV)
-        expect(txObj.feePayerSignature[0][1]).to.equals(txObj.payerR)
-        expect(txObj.feePayerSignature[0][2]).to.equals(txObj.payerS)
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
     }).timeout(200000)
 })
 
@@ -229,18 +229,18 @@ describe('Value transfer: Fee Delegated Value Transfer With Ratio', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
-        expect(txObj.signature).not.to.be.undefined
-        expect(txObj.signature[0][0]).to.equals(txObj.v)
-        expect(txObj.signature[0][1]).to.equals(txObj.r)
-        expect(txObj.signature[0][2]).to.equals(txObj.s)
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
-        expect(txObj.feePayerSignature).not.to.be.undefined
-        expect(txObj.feePayerSignature[0][0]).to.equals(txObj.payerV)
-        expect(txObj.feePayerSignature[0][1]).to.equals(txObj.payerR)
-        expect(txObj.feePayerSignature[0][2]).to.equals(txObj.payerS)
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
     }).timeout(200000)
 })
 
@@ -282,10 +282,10 @@ describe('Value transfer memo: Value Transfer With Memo', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
-        expect(txObj.signature).not.to.be.undefined
-        expect(txObj.signature[0][0]).to.equals(txObj.v)
-        expect(txObj.signature[0][1]).to.equals(txObj.r)
-        expect(txObj.signature[0][2]).to.equals(txObj.s)
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
     }).timeout(200000)
 })
 
@@ -342,18 +342,18 @@ describe('Value transfer memo: Fee Delegated Value Transfer Memo', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
-        expect(txObj.signature).not.to.be.undefined
-        expect(txObj.signature[0][0]).to.equals(txObj.v)
-        expect(txObj.signature[0][1]).to.equals(txObj.r)
-        expect(txObj.signature[0][2]).to.equals(txObj.s)
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
-        expect(txObj.feePayerSignature).not.to.be.undefined
-        expect(txObj.feePayerSignature[0][0]).to.equals(txObj.payerV)
-        expect(txObj.feePayerSignature[0][1]).to.equals(txObj.payerR)
-        expect(txObj.feePayerSignature[0][2]).to.equals(txObj.payerS)
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
     }).timeout(200000)
 })
 
@@ -412,18 +412,18 @@ describe('Value transfer memo with ratio: Fee Delegated Value Transfer Memo With
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
-        expect(txObj.signature).not.to.be.undefined
-        expect(txObj.signature[0][0]).to.equals(txObj.v)
-        expect(txObj.signature[0][1]).to.equals(txObj.r)
-        expect(txObj.signature[0][2]).to.equals(txObj.s)
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
-        expect(txObj.feePayerSignature).not.to.be.undefined
-        expect(txObj.feePayerSignature[0][0]).to.equals(txObj.payerV)
-        expect(txObj.feePayerSignature[0][1]).to.equals(txObj.payerR)
-        expect(txObj.feePayerSignature[0][2]).to.equals(txObj.payerS)
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
     }).timeout(200000)
 })
 
@@ -465,10 +465,10 @@ describe('Account: Account update', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
-        expect(txObj.signature).not.to.be.undefined
-        expect(txObj.signature[0][0]).to.equals(txObj.v)
-        expect(txObj.signature[0][1]).to.equals(txObj.r)
-        expect(txObj.signature[0][2]).to.equals(txObj.s)
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
     }).timeout(200000)
 })
 
@@ -520,18 +520,18 @@ describe('Account: Fee Delegated Account Update', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
-        expect(txObj.signature).not.to.be.undefined
-        expect(txObj.signature[0][0]).to.equals(txObj.v)
-        expect(txObj.signature[0][1]).to.equals(txObj.r)
-        expect(txObj.signature[0][2]).to.equals(txObj.s)
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
-        expect(txObj.feePayerSignature).not.to.be.undefined
-        expect(txObj.feePayerSignature[0][0]).to.equals(txObj.payerV)
-        expect(txObj.feePayerSignature[0][1]).to.equals(txObj.payerR)
-        expect(txObj.feePayerSignature[0][2]).to.equals(txObj.payerS)
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
         expect(txObj.publicKey).to.equals(caver.utils.compressPublicKey(sender_transaction.publicKey))
     }).timeout(200000)
 })
@@ -587,18 +587,18 @@ describe('Account: Fee Delegated Account Update with ratio', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
-        expect(txObj.signature).not.to.be.undefined
-        expect(txObj.signature[0][0]).to.equals(txObj.v)
-        expect(txObj.signature[0][1]).to.equals(txObj.r)
-        expect(txObj.signature[0][2]).to.equals(txObj.s)
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
-        expect(txObj.feePayerSignature).not.to.be.undefined
-        expect(txObj.feePayerSignature[0][0]).to.equals(txObj.payerV)
-        expect(txObj.feePayerSignature[0][1]).to.equals(txObj.payerR)
-        expect(txObj.feePayerSignature[0][2]).to.equals(txObj.payerS)
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
         expect(txObj.publicKey).to.equals(caver.utils.compressPublicKey(sender_transaction.publicKey))
     }).timeout(200000)
 })
@@ -643,10 +643,10 @@ describe('Contract: Contract deploy', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
-        expect(txObj.signature).not.to.be.undefined
-        expect(txObj.signature[0][0]).to.equals(txObj.v)
-        expect(txObj.signature[0][1]).to.equals(txObj.r)
-        expect(txObj.signature[0][2]).to.equals(txObj.s)
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
     }).timeout(200000)
 })
 
@@ -705,18 +705,18 @@ describe('Contract: Fee Delegated Contract Deploy', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
-        expect(txObj.signature).not.to.be.undefined
-        expect(txObj.signature[0][0]).to.equals(txObj.v)
-        expect(txObj.signature[0][1]).to.equals(txObj.r)
-        expect(txObj.signature[0][2]).to.equals(txObj.s)
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
-        expect(txObj.feePayerSignature).not.to.be.undefined
-        expect(txObj.feePayerSignature[0][0]).to.equals(txObj.payerV)
-        expect(txObj.feePayerSignature[0][1]).to.equals(txObj.payerR)
-        expect(txObj.feePayerSignature[0][2]).to.equals(txObj.payerS)
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
     }).timeout(200000)
 })
 
@@ -776,18 +776,18 @@ describe('Contract: Fee Delegated Contract Deploy With Ratio', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
-        expect(txObj.signature).not.to.be.undefined
-        expect(txObj.signature[0][0]).to.equals(txObj.v)
-        expect(txObj.signature[0][1]).to.equals(txObj.r)
-        expect(txObj.signature[0][2]).to.equals(txObj.s)
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
-        expect(txObj.feePayerSignature).not.to.be.undefined
-        expect(txObj.feePayerSignature[0][0]).to.equals(txObj.payerV)
-        expect(txObj.feePayerSignature[0][1]).to.equals(txObj.payerR)
-        expect(txObj.feePayerSignature[0][2]).to.equals(txObj.payerS)
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
     }).timeout(200000)
 })
 
@@ -830,10 +830,10 @@ describe('Contract: Contract execution', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
-        expect(txObj.signature).not.to.be.undefined
-        expect(txObj.signature[0][0]).to.equals(txObj.v)
-        expect(txObj.signature[0][1]).to.equals(txObj.r)
-        expect(txObj.signature[0][2]).to.equals(txObj.s)
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
     }).timeout(200000)
 })
 
@@ -890,18 +890,18 @@ describe('Contract: Fee Delegated Contract Execution', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
-        expect(txObj.signature).not.to.be.undefined
-        expect(txObj.signature[0][0]).to.equals(txObj.v)
-        expect(txObj.signature[0][1]).to.equals(txObj.r)
-        expect(txObj.signature[0][2]).to.equals(txObj.s)
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
-        expect(txObj.feePayerSignature).not.to.be.undefined
-        expect(txObj.feePayerSignature[0][0]).to.equals(txObj.payerV)
-        expect(txObj.feePayerSignature[0][1]).to.equals(txObj.payerR)
-        expect(txObj.feePayerSignature[0][2]).to.equals(txObj.payerS)
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
     }).timeout(200000)
 })
 
@@ -962,18 +962,18 @@ describe('Contract: Fee Delegated Contract Execution With Ratio', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
-        expect(txObj.signature).not.to.be.undefined
-        expect(txObj.signature[0][0]).to.equals(txObj.v)
-        expect(txObj.signature[0][1]).to.equals(txObj.r)
-        expect(txObj.signature[0][2]).to.equals(txObj.s)
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
-        expect(txObj.feePayerSignature).not.to.be.undefined
-        expect(txObj.feePayerSignature[0][0]).to.equals(txObj.payerV)
-        expect(txObj.feePayerSignature[0][1]).to.equals(txObj.payerR)
-        expect(txObj.feePayerSignature[0][2]).to.equals(txObj.payerS)
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
     }).timeout(200000)
 })
 
@@ -1010,10 +1010,10 @@ describe('Cancel: Cancel transaction', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
-        expect(txObj.signature).not.to.be.undefined
-        expect(txObj.signature[0][0]).to.equals(txObj.v)
-        expect(txObj.signature[0][1]).to.equals(txObj.r)
-        expect(txObj.signature[0][2]).to.equals(txObj.s)
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
     }).timeout(200000)
 })
 
@@ -1065,18 +1065,18 @@ describe('Cancel: Fee Delegated Cancel Transaction', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
-        expect(txObj.signature).not.to.be.undefined
-        expect(txObj.signature[0][0]).to.equals(txObj.v)
-        expect(txObj.signature[0][1]).to.equals(txObj.r)
-        expect(txObj.signature[0][2]).to.equals(txObj.s)
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
-        expect(txObj.feePayerSignature).not.to.be.undefined
-        expect(txObj.feePayerSignature[0][0]).to.equals(txObj.payerV)
-        expect(txObj.feePayerSignature[0][1]).to.equals(txObj.payerR)
-        expect(txObj.feePayerSignature[0][2]).to.equals(txObj.payerS)
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
     }).timeout(200000)
 })
 
@@ -1129,18 +1129,18 @@ describe('Cancel: Fee Delegated Cancel Transaction With Ratio', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
-        expect(txObj.signature).not.to.be.undefined
-        expect(txObj.signature[0][0]).to.equals(txObj.v)
-        expect(txObj.signature[0][1]).to.equals(txObj.r)
-        expect(txObj.signature[0][2]).to.equals(txObj.s)
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
-        expect(txObj.feePayerSignature).not.to.be.undefined
-        expect(txObj.feePayerSignature[0][0]).to.equals(txObj.payerV)
-        expect(txObj.feePayerSignature[0][1]).to.equals(txObj.payerR)
-        expect(txObj.feePayerSignature[0][2]).to.equals(txObj.payerS)
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
     }).timeout(200000)
 })
 
@@ -1183,10 +1183,10 @@ describe('ServiceChain: Chain data anchoring', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
-        expect(txObj.signature).not.to.be.undefined
-        expect(txObj.signature[0][0]).to.equals(txObj.v)
-        expect(txObj.signature[0][1]).to.equals(txObj.r)
-        expect(txObj.signature[0][2]).to.equals(txObj.s)
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
     }).timeout(200000)
 })
 
