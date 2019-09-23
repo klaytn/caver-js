@@ -212,7 +212,7 @@ Accounts.prototype.signTransaction = function signTransaction() {
     let tx = arguments[0], privateKey
 
     if (!tx || !_.isObject(tx)) {
-      return handleError('Invalid paramter: The transaction must be defined as an object')
+      return handleError('Invalid parameter: The transaction must be defined as an object')
     }
 
     if (arguments.length === 2) {
