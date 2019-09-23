@@ -312,12 +312,12 @@ describe('caver.klay.accounts.signTransaction', () => {
 
   context('CAVERJS-UNIT-WALLET-123 : input: if there are invalid number of parameters then signTrasnaction should reject', () => {
     it('should reject when there is no parameter', async () => {
-      const errorMessage = 'Inavlid parameter: The number of parameter is invalid.'
+      const errorMessage = 'Invalid parameter: The number of parameters is invalid.'
       await expect(caver.klay.accounts.signTransaction()).to.be.rejectedWith(errorMessage)
     })
 
     it('should reject when there are more than three parameters', async () => {
-      const errorMessage = 'Inavlid parameter: The number of parameter is invalid.'
+      const errorMessage = 'Invalid parameter: The number of parameters is invalid.'
       await expect(caver.klay.accounts.signTransaction({}, 'privateKey', ()=>{}, 'one more')).to.be.rejectedWith(errorMessage)
     })
   })
