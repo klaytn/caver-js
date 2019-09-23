@@ -280,7 +280,7 @@ Accounts.prototype.signTransaction = function signTransaction() {
 
         const messageHash = Hash.keccak256(rlpEncoded)
 
-        let signatrues = []
+        let signatures = []
 
         for(const privateKey of privateKeys) {
           const signature = Account.makeSigner(Nat.toNumber(transaction.chainId || "0x1") * 2 + 35)(messageHash, privateKey)
