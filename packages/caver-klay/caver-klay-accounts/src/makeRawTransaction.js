@@ -138,7 +138,7 @@ function makeRawTransaction(rlpEncoded, sig, transaction) {
     case 'FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO': {
       if (transaction.senderRawTransaction) {
         const decoded = decodeFromRawTransaction(transaction.senderRawTransaction)
-        return _combineFeePayerRawTransaction(rlpEncoded, sig, transaction, decoded.signature)
+        return _combineFeePayerRawTransaction(rlpEncoded, sig, transaction, decoded.signatures)
       }
       return _combineSenderRawTransaction(rlpEncoded, sig)
     }
@@ -191,86 +191,86 @@ function decodeFromRawTransaction (rawTransaction, type) {
   switch(typeString) {
     case 'LEGACY': {
       const [ nonce, gasPrice, gas, to, value, data, v, r, s ] = RLP.decode(rawTransaction)
-      return { type: typeString, nonce, gasPrice, gas, to, value, data, v, r, s, signature: [v, r, s] }
+      return { type: typeString, nonce, gasPrice, gas, to, value, data, v, r, s, signatures: [v, r, s] }
     }
     case 'VALUE_TRANSFER': {
-      const [ nonce, gasPrice, gas, to, value, from, signature ] = RLP.decode(rawTransaction)
-      return { type: typeString, nonce, gasPrice, gas, to, value, from, v: signature[0][0], r: signature[0][1], s: signature[0][2], signature }
+      const [ nonce, gasPrice, gas, to, value, from, signatures ] = RLP.decode(rawTransaction)
+      return { type: typeString, nonce, gasPrice, gas, to, value, from, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures }
     }
     case 'FEE_DELEGATED_VALUE_TRANSFER': {
-      const [ nonce, gasPrice, gas, to, value, from, signature, feePayer, feePayerSignature ] = RLP.decode(rawTransaction)
-      return { type: typeString, nonce, gasPrice, gas, to, value, from, v: signature[0][0], r: signature[0][1], s: signature[0][2], signature, feePayer, payerV: feePayerSignature[0][0], payerR: feePayerSignature[0][1], payerS: feePayerSignature[0][2], feePayerSignature }
+      const [ nonce, gasPrice, gas, to, value, from, signatures, feePayer, feePayerSignatures ] = RLP.decode(rawTransaction)
+      return { type: typeString, nonce, gasPrice, gas, to, value, from, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures, feePayer, payerV: feePayerSignatures[0][0], payerR: feePayerSignatures[0][1], payerS: feePayerSignatures[0][2], feePayerSignatures }
     }
     case 'FEE_DELEGATED_VALUE_TRANSFER_WITH_RATIO': {
-      const [ nonce, gasPrice, gas, to, value, from, feeRatio, signature, feePayer, feePayerSignature ] = RLP.decode(rawTransaction)
-      return { type: typeString, nonce, gasPrice, gas, to, value, from, feeRatio, v: signature[0][0], r: signature[0][1], s: signature[0][2], signature, feePayer, payerV: feePayerSignature[0][0], payerR: feePayerSignature[0][1], payerS: feePayerSignature[0][2], feePayerSignature }
+      const [ nonce, gasPrice, gas, to, value, from, feeRatio, signatures, feePayer, feePayerSignatures ] = RLP.decode(rawTransaction)
+      return { type: typeString, nonce, gasPrice, gas, to, value, from, feeRatio, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures, feePayer, payerV: feePayerSignatures[0][0], payerR: feePayerSignatures[0][1], payerS: feePayerSignatures[0][2], feePayerSignatures }
     }
     case 'VALUE_TRANSFER_MEMO': {
-      const [ nonce, gasPrice, gas, to, value, from, data, signature ] = RLP.decode(rawTransaction)
-      return { type: typeString, nonce, gasPrice, gas, to, value, from, data, v: signature[0][0], r: signature[0][1], s: signature[0][2], signature }
+      const [ nonce, gasPrice, gas, to, value, from, data, signatures ] = RLP.decode(rawTransaction)
+      return { type: typeString, nonce, gasPrice, gas, to, value, from, data, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures }
     }
     case 'FEE_DELEGATED_VALUE_TRANSFER_MEMO': {
-      const [ nonce, gasPrice, gas, to, value, from, data, signature, feePayer, feePayerSignature ] = RLP.decode(rawTransaction)
-      return { type: typeString, nonce, gasPrice, gas, to, value, from, data, v: signature[0][0], r: signature[0][1], s: signature[0][2], signature, feePayer, payerV: feePayerSignature[0][0], payerR: feePayerSignature[0][1], payerS: feePayerSignature[0][2], feePayerSignature }
+      const [ nonce, gasPrice, gas, to, value, from, data, signatures, feePayer, feePayerSignatures ] = RLP.decode(rawTransaction)
+      return { type: typeString, nonce, gasPrice, gas, to, value, from, data, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures, feePayer, payerV: feePayerSignatures[0][0], payerR: feePayerSignatures[0][1], payerS: feePayerSignatures[0][2], feePayerSignatures }
     }
     case 'FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO':  {
-      const [ nonce, gasPrice, gas, to, value, from, data, feeRatio, signature, feePayer, feePayerSignature ] = RLP.decode(rawTransaction)
-      return { type: typeString, nonce, gasPrice, gas, to, value, from, data, feeRatio, v: signature[0][0], r: signature[0][1], s: signature[0][2], signature, feePayer, payerV: feePayerSignature[0][0], payerR: feePayerSignature[0][1], payerS: feePayerSignature[0][2], feePayerSignature }
+      const [ nonce, gasPrice, gas, to, value, from, data, feeRatio, signatures, feePayer, feePayerSignatures ] = RLP.decode(rawTransaction)
+      return { type: typeString, nonce, gasPrice, gas, to, value, from, data, feeRatio, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures, feePayer, payerV: feePayerSignatures[0][0], payerR: feePayerSignatures[0][1], payerS: feePayerSignatures[0][2], feePayerSignatures }
     }
     case 'ACCOUNT_CREATION': {
       throw new Error(creationNotSupportError)
     }
     case 'ACCOUNT_UPDATE': {
-      const [ nonce, gasPrice, gas, from, accountKey, signature ] = RLP.decode(rawTransaction)
-      return parseAccountKey({ type: typeString, nonce, gasPrice, gas, from, accountKey, v: signature[0][0], r: signature[0][1], s: signature[0][2], signature })
+      const [ nonce, gasPrice, gas, from, accountKey, signatures ] = RLP.decode(rawTransaction)
+      return parseAccountKey({ type: typeString, nonce, gasPrice, gas, from, accountKey, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures })
     }
     case 'FEE_DELEGATED_ACCOUNT_UPDATE': {
-      const [ nonce, gasPrice, gas, from, accountKey, signature, feePayer, feePayerSignature ] = RLP.decode(rawTransaction)
-      return parseAccountKey({ type: typeString, nonce, gasPrice, gas, from, accountKey, v: signature[0][0], r: signature[0][1], s: signature[0][2], signature, feePayer, payerV: feePayerSignature[0][0], payerR: feePayerSignature[0][1], payerS: feePayerSignature[0][2], feePayerSignature })
+      const [ nonce, gasPrice, gas, from, accountKey, signatures, feePayer, feePayerSignatures ] = RLP.decode(rawTransaction)
+      return parseAccountKey({ type: typeString, nonce, gasPrice, gas, from, accountKey, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures, feePayer, payerV: feePayerSignatures[0][0], payerR: feePayerSignatures[0][1], payerS: feePayerSignatures[0][2], feePayerSignatures })
     }
     case 'FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO': {
-      const [ nonce, gasPrice, gas, from, accountKey, feeRatio, signature, feePayer, feePayerSignature ] = RLP.decode(rawTransaction)
-      return parseAccountKey({ type: typeString, nonce, gasPrice, gas, from, accountKey, feeRatio, v: signature[0][0], r: signature[0][1], s: signature[0][2], signature, feePayer, payerV: feePayerSignature[0][0], payerR: feePayerSignature[0][1], payerS: feePayerSignature[0][2], feePayerSignature })
+      const [ nonce, gasPrice, gas, from, accountKey, feeRatio, signatures, feePayer, feePayerSignatures ] = RLP.decode(rawTransaction)
+      return parseAccountKey({ type: typeString, nonce, gasPrice, gas, from, accountKey, feeRatio, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures, feePayer, payerV: feePayerSignatures[0][0], payerR: feePayerSignatures[0][1], payerS: feePayerSignatures[0][2], feePayerSignatures })
     }
     case 'SMART_CONTRACT_DEPLOY': {
-      const [ nonce, gasPrice, gas, to, value, from, data, humanReadable, codeFormat, signature ] = RLP.decode(rawTransaction)
-      return { type: typeString, nonce, gasPrice, gas, to, value, from, data, humanReadable: humanReadable === '0x01'? true: false, codeFormat, v: signature[0][0], r: signature[0][1], s: signature[0][2], signature }
+      const [ nonce, gasPrice, gas, to, value, from, data, humanReadable, codeFormat, signatures ] = RLP.decode(rawTransaction)
+      return { type: typeString, nonce, gasPrice, gas, to, value, from, data, humanReadable: humanReadable === '0x01'? true: false, codeFormat, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures }
     }
     case 'FEE_DELEGATED_SMART_CONTRACT_DEPLOY': {
-      const [ nonce, gasPrice, gas, to, value, from, data, humanReadable, codeFormat, signature, feePayer, feePayerSignature ] = RLP.decode(rawTransaction)
-      return { type: typeString, nonce, gasPrice, gas, to, value, from, data, humanReadable: humanReadable === '0x01'? true: false, codeFormat, v: signature[0][0], r: signature[0][1], s: signature[0][2], signature, feePayer, payerV: feePayerSignature[0][0], payerR: feePayerSignature[0][1], payerS: feePayerSignature[0][2], feePayerSignature }
+      const [ nonce, gasPrice, gas, to, value, from, data, humanReadable, codeFormat, signatures, feePayer, feePayerSignatures ] = RLP.decode(rawTransaction)
+      return { type: typeString, nonce, gasPrice, gas, to, value, from, data, humanReadable: humanReadable === '0x01'? true: false, codeFormat, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures, feePayer, payerV: feePayerSignatures[0][0], payerR: feePayerSignatures[0][1], payerS: feePayerSignatures[0][2], feePayerSignatures }
     }
     case 'FEE_DELEGATED_SMART_CONTRACT_DEPLOY_WITH_RATIO': {
-      const [ nonce, gasPrice, gas, to, value, from, data, humanReadable, feeRatio, codeFormat, signature, feePayer, feePayerSignature ] = RLP.decode(rawTransaction)
-      return { type: typeString, nonce, gasPrice, gas, to, value, from, data, humanReadable: humanReadable === '0x01'? true: false, feeRatio, codeFormat, v: signature[0][0], r: signature[0][1], s: signature[0][2], signature, feePayer, payerV: feePayerSignature[0][0], payerR: feePayerSignature[0][1], payerS: feePayerSignature[0][2], feePayerSignature }
+      const [ nonce, gasPrice, gas, to, value, from, data, humanReadable, feeRatio, codeFormat, signatures, feePayer, feePayerSignatures ] = RLP.decode(rawTransaction)
+      return { type: typeString, nonce, gasPrice, gas, to, value, from, data, humanReadable: humanReadable === '0x01'? true: false, feeRatio, codeFormat, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures, feePayer, payerV: feePayerSignatures[0][0], payerR: feePayerSignatures[0][1], payerS: feePayerSignatures[0][2], feePayerSignatures }
     }
     case 'SMART_CONTRACT_EXECUTION': {
-      const [ nonce, gasPrice, gas, to, value, from, data, signature ] = RLP.decode(rawTransaction)
-      return { type: typeString, nonce, gasPrice, gas, to, value, from, data, v: signature[0][0], r: signature[0][1], s: signature[0][2], signature }
+      const [ nonce, gasPrice, gas, to, value, from, data, signatures ] = RLP.decode(rawTransaction)
+      return { type: typeString, nonce, gasPrice, gas, to, value, from, data, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures }
     }
     case 'FEE_DELEGATED_SMART_CONTRACT_EXECUTION': {
-      const [ nonce, gasPrice, gas, to, value, from, data, signature, feePayer, feePayerSignature ] = RLP.decode(rawTransaction)
-      return { type: typeString, nonce, gasPrice, gas, to, value, from, data, v: signature[0][0], r: signature[0][1], s: signature[0][2], signature, feePayer, payerV: feePayerSignature[0][0], payerR: feePayerSignature[0][1], payerS: feePayerSignature[0][2], feePayerSignature }
+      const [ nonce, gasPrice, gas, to, value, from, data, signatures, feePayer, feePayerSignatures ] = RLP.decode(rawTransaction)
+      return { type: typeString, nonce, gasPrice, gas, to, value, from, data, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures, feePayer, payerV: feePayerSignatures[0][0], payerR: feePayerSignatures[0][1], payerS: feePayerSignatures[0][2], feePayerSignatures }
     }
     case 'FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO': {
-      const [ nonce, gasPrice, gas, to, value, from, data, feeRatio, signature, feePayer, feePayerSignature ] = RLP.decode(rawTransaction)
-      return { type: typeString, nonce, gasPrice, gas, to, value, from, data, feeRatio, v: signature[0][0], r: signature[0][1], s: signature[0][2], signature, feePayer, payerV: feePayerSignature[0][0], payerR: feePayerSignature[0][1], payerS: feePayerSignature[0][2], feePayerSignature }
+      const [ nonce, gasPrice, gas, to, value, from, data, feeRatio, signatures, feePayer, feePayerSignatures ] = RLP.decode(rawTransaction)
+      return { type: typeString, nonce, gasPrice, gas, to, value, from, data, feeRatio, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures, feePayer, payerV: feePayerSignatures[0][0], payerR: feePayerSignatures[0][1], payerS: feePayerSignatures[0][2], feePayerSignatures }
     }
     case 'CANCEL': {
-      const [ nonce, gasPrice, gas, from, signature ] = RLP.decode(rawTransaction)
-      return { type: typeString, nonce, gasPrice, gas, from, v: signature[0][0], r: signature[0][1], s: signature[0][2], signature }
+      const [ nonce, gasPrice, gas, from, signatures ] = RLP.decode(rawTransaction)
+      return { type: typeString, nonce, gasPrice, gas, from, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures }
     }
     case 'FEE_DELEGATED_CANCEL': {
-      const [ nonce, gasPrice, gas, from, signature, feePayer, feePayerSignature ] = RLP.decode(rawTransaction)
-      return { type: typeString, nonce, gasPrice, gas, from, v: signature[0][0], r: signature[0][1], s: signature[0][2], signature, feePayer, payerV: feePayerSignature[0][0], payerR: feePayerSignature[0][1], payerS: feePayerSignature[0][2], feePayerSignature }
+      const [ nonce, gasPrice, gas, from, signatures, feePayer, feePayerSignatures ] = RLP.decode(rawTransaction)
+      return { type: typeString, nonce, gasPrice, gas, from, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures, feePayer, payerV: feePayerSignatures[0][0], payerR: feePayerSignatures[0][1], payerS: feePayerSignatures[0][2], feePayerSignatures }
     }
     case 'FEE_DELEGATED_CANCEL_WITH_RATIO': {
-      const [ nonce, gasPrice, gas, from, feeRatio, signature, feePayer, feePayerSignature ] = RLP.decode(rawTransaction)
-      return { type: typeString, nonce, gasPrice, gas, from, feeRatio, v: signature[0][0], r: signature[0][1], s: signature[0][2], signature, feePayer, payerV: feePayerSignature[0][0], payerR: feePayerSignature[0][1], payerS: feePayerSignature[0][2], feePayerSignature }
+      const [ nonce, gasPrice, gas, from, feeRatio, signatures, feePayer, feePayerSignatures ] = RLP.decode(rawTransaction)
+      return { type: typeString, nonce, gasPrice, gas, from, feeRatio, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures, feePayer, payerV: feePayerSignatures[0][0], payerR: feePayerSignatures[0][1], payerS: feePayerSignatures[0][2], feePayerSignatures }
     }
     case 'CHAIN_DATA_ANCHORING': {
-      const [ nonce, gasPrice, gas, to, value, from, data, signature ] = RLP.decode(rawTransaction)
-      return { type: typeString, nonce, gasPrice, gas, to, value, from, anchoredData:data, v: signature[0][0], r: signature[0][1], s: signature[0][2], signature }
+      const [ nonce, gasPrice, gas, to, value, from, data, signatures ] = RLP.decode(rawTransaction)
+      return { type: typeString, nonce, gasPrice, gas, to, value, from, anchoredData:data, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures }
     }
   }
 }

@@ -58,10 +58,10 @@ describe('Decode Transaction', () => {
         expect(decodedTx.v).not.to.undefined
         expect(decodedTx.r).not.to.undefined
         expect(decodedTx.s).not.to.undefined
-        expect(decodedTx.signature).not.to.be.undefined
-        expect(decodedTx.signature[0][0]).to.equals(decodedTx.v)
-        expect(decodedTx.signature[0][1]).to.equals(decodedTx.r)
-        expect(decodedTx.signature[0][2]).to.equals(decodedTx.s)
+        expect(decodedTx.signatures).not.to.be.undefined
+        expect(decodedTx.signatures[0][0]).to.equals(decodedTx.v)
+        expect(decodedTx.signatures[0][1]).to.equals(decodedTx.r)
+        expect(decodedTx.signatures[0][2]).to.equals(decodedTx.s)
         expect(decodedTx.feePayer).to.equals('0x')
         expect(decodedTx.payerV).to.equals('0x01')
         expect(decodedTx.payerR).to.equals('0x')
@@ -84,18 +84,18 @@ describe('Decode Transaction', () => {
         expect(decodedTx.v).not.to.undefined
         expect(decodedTx.r).not.to.undefined
         expect(decodedTx.s).not.to.undefined
-        expect(decodedTx.signature).not.to.be.undefined
-        expect(decodedTx.signature[0][0]).to.equals(decodedTx.v)
-        expect(decodedTx.signature[0][1]).to.equals(decodedTx.r)
-        expect(decodedTx.signature[0][2]).to.equals(decodedTx.s)
+        expect(decodedTx.signatures).not.to.be.undefined
+        expect(decodedTx.signatures[0][0]).to.equals(decodedTx.v)
+        expect(decodedTx.signatures[0][1]).to.equals(decodedTx.r)
+        expect(decodedTx.signatures[0][2]).to.equals(decodedTx.s)
         expect(decodedTx.feePayer).to.equals(payer.address)
         expect(decodedTx.payerV).not.to.undefined
         expect(decodedTx.payerR).not.to.undefined
         expect(decodedTx.payerS).not.to.undefined
-        expect(decodedTx.feePayerSignature).not.to.be.undefined
-        expect(decodedTx.feePayerSignature[0][0]).to.equals(decodedTx.payerV)
-        expect(decodedTx.feePayerSignature[0][1]).to.equals(decodedTx.payerR)
-        expect(decodedTx.feePayerSignature[0][2]).to.equals(decodedTx.payerS)
+        expect(decodedTx.feePayerSignatures).not.to.be.undefined
+        expect(decodedTx.feePayerSignatures[0][0]).to.equals(decodedTx.payerV)
+        expect(decodedTx.feePayerSignatures[0][1]).to.equals(decodedTx.payerR)
+        expect(decodedTx.feePayerSignatures[0][2]).to.equals(decodedTx.payerS)
     }).timeout(10000)
 
     it('CAVERJS-UNIT-SER-064: Decode sender multi signature transaction', () => {
@@ -112,12 +112,12 @@ describe('Decode Transaction', () => {
         expect(decodedTx.v).not.to.undefined
         expect(decodedTx.r).not.to.undefined
         expect(decodedTx.s).not.to.undefined
-        expect(decodedTx.signature).not.to.be.undefined
-        expect(Array.isArray(decodedTx.signature)).to.be.true
-        expect(decodedTx.signature.length).to.equals(2)
-        expect(decodedTx.signature[0][0]).to.equals(decodedTx.v)
-        expect(decodedTx.signature[0][1]).to.equals(decodedTx.r)
-        expect(decodedTx.signature[0][2]).to.equals(decodedTx.s)
+        expect(decodedTx.signatures).not.to.be.undefined
+        expect(Array.isArray(decodedTx.signatures)).to.be.true
+        expect(decodedTx.signatures.length).to.equals(2)
+        expect(decodedTx.signatures[0][0]).to.equals(decodedTx.v)
+        expect(decodedTx.signatures[0][1]).to.equals(decodedTx.r)
+        expect(decodedTx.signatures[0][2]).to.equals(decodedTx.s)
     }).timeout(10000)
 
     it('CAVERJS-UNIT-SER-065: Decode sender and feePayer multi signature transaction', () => {
@@ -134,21 +134,21 @@ describe('Decode Transaction', () => {
         expect(decodedTx.v).not.to.undefined
         expect(decodedTx.r).not.to.undefined
         expect(decodedTx.s).not.to.undefined
-        expect(decodedTx.signature).not.to.be.undefined
-        expect(Array.isArray(decodedTx.signature)).to.be.true
-        expect(decodedTx.signature.length).to.equals(2)
-        expect(decodedTx.signature[0][0]).to.equals(decodedTx.v)
-        expect(decodedTx.signature[0][1]).to.equals(decodedTx.r)
-        expect(decodedTx.signature[0][2]).to.equals(decodedTx.s)
+        expect(decodedTx.signatures).not.to.be.undefined
+        expect(Array.isArray(decodedTx.signatures)).to.be.true
+        expect(decodedTx.signatures.length).to.equals(2)
+        expect(decodedTx.signatures[0][0]).to.equals(decodedTx.v)
+        expect(decodedTx.signatures[0][1]).to.equals(decodedTx.r)
+        expect(decodedTx.signatures[0][2]).to.equals(decodedTx.s)
         expect(decodedTx.feePayer).to.equals('0x6b0f4bb65b4bb4c92d55b1e8574cf8059f3b2da8')
         expect(decodedTx.payerV).not.to.undefined
         expect(decodedTx.payerR).not.to.undefined
         expect(decodedTx.payerS).not.to.undefined
-        expect(decodedTx.feePayerSignature).not.to.be.undefined
-        expect(Array.isArray(decodedTx.feePayerSignature)).to.be.true
-        expect(decodedTx.feePayerSignature.length).to.equals(2)
-        expect(decodedTx.feePayerSignature[0][0]).to.equals(decodedTx.payerV)
-        expect(decodedTx.feePayerSignature[0][1]).to.equals(decodedTx.payerR)
-        expect(decodedTx.feePayerSignature[0][2]).to.equals(decodedTx.payerS)
+        expect(decodedTx.feePayerSignatures).not.to.be.undefined
+        expect(Array.isArray(decodedTx.feePayerSignatures)).to.be.true
+        expect(decodedTx.feePayerSignatures.length).to.equals(2)
+        expect(decodedTx.feePayerSignatures[0][0]).to.equals(decodedTx.payerV)
+        expect(decodedTx.feePayerSignatures[0][1]).to.equals(decodedTx.payerR)
+        expect(decodedTx.feePayerSignatures[0][2]).to.equals(decodedTx.payerS)
     }).timeout(10000)
 })
