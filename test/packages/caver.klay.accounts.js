@@ -173,7 +173,7 @@ describe('caver.klay.accounts.signTransaction', () => {
         account.privateKey
       )
 
-      const keys = ['messageHash', 'v', 'r', 's', 'signature', 'rawTransaction', 'txHash', 'senderTxHash']
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'signatures']
       expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
 
       expect(caver.klay.accounts.recoverTransaction(result.rawTransaction)).to.equal(account.address)
@@ -187,7 +187,7 @@ describe('caver.klay.accounts.signTransaction', () => {
 
       const result = await caver.klay.accounts.signTransaction(tx, account.privateKey)
 
-      const keys = ['messageHash', 'v', 'r', 's', 'signature', 'rawTransaction', 'txHash', 'senderTxHash']
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'signatures']
       expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
 
       expect(caver.klay.accounts.recoverTransaction(result.rawTransaction)).to.equal(account.address)
@@ -201,7 +201,7 @@ describe('caver.klay.accounts.signTransaction', () => {
 
       const result = await caver.klay.accounts.signTransaction(tx, account.privateKey)
 
-      const keys = ['messageHash', 'v', 'r', 's', 'signature', 'rawTransaction', 'txHash', 'senderTxHash']
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'signatures']
       expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
 
       expect(caver.klay.accounts.recoverTransaction(result.rawTransaction)).to.equal(account.address)
@@ -215,7 +215,7 @@ describe('caver.klay.accounts.signTransaction', () => {
 
       const result = await caver.klay.accounts.signTransaction(tx, account.privateKey)
 
-      const keys = ['messageHash', 'v', 'r', 's', 'signature', 'rawTransaction', 'txHash', 'senderTxHash']
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'signatures']
       expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
 
       expect(caver.klay.accounts.recoverTransaction(result.rawTransaction)).to.equal(account.address)
@@ -263,7 +263,7 @@ describe('caver.klay.accounts.signTransaction', () => {
         txObj,
         account.privateKey,
         (error, result) => {
-          const keys = ['messageHash', 'v', 'r', 's', 'signature', 'rawTransaction', 'txHash', 'senderTxHash']
+          const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'signatures']
           expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
 
           expect(caver.klay.accounts.recoverTransaction(result.rawTransaction)).to.equal(account.address)
@@ -326,10 +326,10 @@ describe('caver.klay.accounts.signTransaction', () => {
     it('should sign to transaction parameter with private key in wallet', async () => {
       const result = await caver.klay.accounts.signTransaction(txObj)
 
-      const keys = ['messageHash', 'v', 'r', 's', 'signature', 'rawTransaction', 'txHash', 'senderTxHash']
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'signatures']
       expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
 
-      expect(typeof result.signature[0]).to.equals('string')
+      expect(typeof result.signatures[0]).to.equals('string')
 
       expect(caver.klay.accounts.recoverTransaction(result.rawTransaction)).to.equal(account.address)
     })
@@ -338,10 +338,10 @@ describe('caver.klay.accounts.signTransaction', () => {
       let isCalled = false
       const result = await caver.klay.accounts.signTransaction(txObj, (error, result) => isCalled = true)
 
-      const keys = ['messageHash', 'v', 'r', 's', 'signature', 'rawTransaction', 'txHash', 'senderTxHash']
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'signatures']
       expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
 
-      expect(typeof result.signature[0]).to.equals('string')
+      expect(typeof result.signatures[0]).to.equals('string')
 
       expect(caver.klay.accounts.recoverTransaction(result.rawTransaction)).to.equal(account.address)
 
@@ -351,30 +351,63 @@ describe('caver.klay.accounts.signTransaction', () => {
     it('should sign to transaction parameter with private key parameter', async () => {
       const result = await caver.klay.accounts.signTransaction(vtTx, account.privateKey)
 
-      const keys = ['messageHash', 'v', 'r', 's', 'signature', 'rawTransaction', 'txHash', 'senderTxHash']
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'signatures']
       expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
 
-      expect(Array.isArray(result.signature[0])).to.be.true
-      expect(result.signature.length).to.equals(1)
+      expect(Array.isArray(result.signatures[0])).to.be.true
+      expect(result.signatures.length).to.equals(1)
     })
 
     it('should sign to transaction parameter with private key array', async () => {
       const result = await caver.klay.accounts.signTransaction(vtTx, [account.privateKey.slice(2), account.privateKey])
 
-      const keys = ['messageHash', 'v', 'r', 's', 'signature', 'rawTransaction', 'txHash', 'senderTxHash']
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'signatures']
       expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
 
-      expect(Array.isArray(result.signature[0])).to.be.true
-      expect(result.signature.length).to.equals(2)
+      expect(Array.isArray(result.signatures[0])).to.be.true
+      expect(result.signatures.length).to.equals(2)
 
       const decoded = caver.klay.decodeTransaction(result.rawTransaction)
       expect(decoded.signature.length).to.equals(2)
-      expect(decoded.signature[0][0]).to.equals(result.signature[0][0])
-      expect(decoded.signature[0][1]).to.equals(result.signature[0][1])
-      expect(decoded.signature[0][2]).to.equals(result.signature[0][2])
-      expect(decoded.signature[1][0]).to.equals(result.signature[1][0])
-      expect(decoded.signature[1][1]).to.equals(result.signature[1][1])
-      expect(decoded.signature[1][2]).to.equals(result.signature[1][2])
+      expect(decoded.signature[0][0]).to.equals(result.signatures[0][0])
+      expect(decoded.signature[0][1]).to.equals(result.signatures[0][1])
+      expect(decoded.signature[0][2]).to.equals(result.signatures[0][2])
+      expect(decoded.signature[1][0]).to.equals(result.signatures[1][0])
+      expect(decoded.signature[1][1]).to.equals(result.signatures[1][1])
+      expect(decoded.signature[1][2]).to.equals(result.signatures[1][2])
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-130 : input: txObject', () => {
+    it('should sign with feePayer and return feePayerSignatures', async () => {
+      const feeDelegatedTx = { 
+        type: 'FEE_DELEGATED_VALUE_TRANSFER',
+        from: '0x76d1cc1cdb081de8627cab2c074f02ebc7bce0d0',
+        to: '0xd05c5926b0a2f31aadcc9a9cbd3868a50104d834',
+        value: '0x1',
+        gas: '0xdbba0',
+        chainId: '0x7e3',
+        gasPrice: '0x5d21dba00',
+        nonce: '0x9a',
+      }
+      const senderSigned = await caver.klay.accounts.signTransaction(feeDelegatedTx, '1881a973628dba6ab07b6b47c8f3fb50d8e7cbf71fef3b4739155619a3c126fa')
+      
+      const feePayerTransaction = {
+        senderRawTransaction: senderSigned.rawTransaction,
+        feePayer: account.address
+      }
+      const feePayerSigned = await caver.klay.accounts.signTransaction(feePayerTransaction)
+      expect(feePayerSigned.feePayerSignatures).not.to.be.undefined
+      expect(Array.isArray(feePayerSigned.feePayerSignatures)).to.be.true
+
+      const decoded = caver.klay.decodeTransaction(feePayerSigned.rawTransaction)
+      expect(decoded.signature.length).to.equals(1)
+      expect(decoded.signature[0][0]).to.equals(senderSigned.signatures[0][0])
+      expect(decoded.signature[0][1]).to.equals(senderSigned.signatures[0][1])
+      expect(decoded.signature[0][2]).to.equals(senderSigned.signatures[0][2])
+      expect(decoded.feePayerSignature[0][0]).to.equals(feePayerSigned.feePayerSignatures[0][0])
+      expect(decoded.feePayerSignature[0][1]).to.equals(feePayerSigned.feePayerSignatures[0][1])
+      expect(decoded.feePayerSignature[0][2]).to.equals(feePayerSigned.feePayerSignatures[0][2])
     })
   })
 })

@@ -295,10 +295,15 @@ Accounts.prototype.signTransaction = function signTransaction() {
             v: signatures[0][0],
             r: signatures[0][1],
             s: signatures[0][2],
-            signature: isLegacy? signatures[0] : signatures,
             rawTransaction: rawTransaction,
             txHash: Hash.keccak256(rawTransaction),
             senderTxHash: getSenderTxHash(rawTransaction),
+        }
+
+        if (tx.senderRawTransaction && tx.feePayer) {
+          result.feePayerSignatures = signatures
+        } else {
+          result.signatures = isLegacy? signatures[0] : signatures
         }
 
       } catch(e) {
