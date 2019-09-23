@@ -497,8 +497,8 @@ Accounts.prototype.recover = function recover(message, signature, preFixed) {
      * const recover = (hash, signature) => {
      *   const vals = decodeSignature(signature);
      *   const vrs = { v: Bytes.toNumber(vals[0]), r: vals[1].slice(2), s: vals[2].slice(2) };
-     *   const ecPublicKey = secp256k1.recoverPubKey(new Buffer(hash.slice(2), "hex"), vrs, vrs.v < 2 ? vrs.v : 1 - vrs.v % 2); // because odd vals mean v=0... sadly that means v=0 means v=1... I hate that
-     *   const publicKey = "0x" + ecPublicKey.encode("hex", false).slice(2);
+     *   const ecPublicKey = secp256k1.recoverPubKey(Buffer.from(hash.slice(2), 'hex'), vrs, vrs.v < 2 ? vrs.v : 1 - vrs.v % 2); // because odd vals mean v=0... sadly that means v=0 means v=1... I hate that
+     *   const publicKey = "0x" + ecPublicKey.encode('hex', false).slice(2);
      *   const publicHash = keccak256(publicKey);
      *   const address = toChecksum("0x" + publicHash.slice(-40));
      *   return address;
@@ -531,7 +531,7 @@ Accounts.prototype.decrypt = function (v3Keystore, password, nonStrict) {
         kdfparams = json.crypto.kdfparams;
 
         // FIXME: support progress reporting callback
-        derivedKey = scrypt(new Buffer(password), new Buffer(kdfparams.salt, 'hex'), kdfparams.n, kdfparams.r, kdfparams.p, kdfparams.dklen);
+        derivedKey = scrypt(Buffer.from(password), Buffer.from(kdfparams.salt, 'hex'), kdfparams.n, kdfparams.r, kdfparams.p, kdfparams.dklen);
     } else if (json.crypto.kdf === 'pbkdf2') {
         kdfparams = json.crypto.kdfparams;
 
@@ -539,19 +539,19 @@ Accounts.prototype.decrypt = function (v3Keystore, password, nonStrict) {
             throw new Error('Unsupported parameters to PBKDF2');
         }
 
-        derivedKey = cryp.pbkdf2Sync(new Buffer(password), new Buffer(kdfparams.salt, 'hex'), kdfparams.c, kdfparams.dklen, 'sha256');
+        derivedKey = cryp.pbkdf2Sync(Buffer.from(password), Buffer.from(kdfparams.salt, 'hex'), kdfparams.c, kdfparams.dklen, 'sha256');
     } else {
         throw new Error('Unsupported key derivation scheme');
     }
 
-    var ciphertext = new Buffer(json.crypto.ciphertext, 'hex');
+    var ciphertext = Buffer.from(json.crypto.ciphertext, 'hex');
 
     var mac = utils.sha3(Buffer.concat([ derivedKey.slice(16, 32), ciphertext ])).replace('0x','');
     if (mac !== json.crypto.mac) {
         throw new Error('Key derivation failed - possibly wrong password');
     }
 
-    var decipher = cryp.createDecipheriv(json.crypto.cipher, derivedKey.slice(0, 16), new Buffer(json.crypto.cipherparams.iv, 'hex'));
+    var decipher = cryp.createDecipheriv(json.crypto.cipher, derivedKey.slice(0, 16), Buffer.from(json.crypto.cipherparams.iv, 'hex'));
     var seed = '0x'+ Buffer.concat([ decipher.update(ciphertext), decipher.final() ]).toString('hex');
 
     return this.privateKeyToAccount(seed, json.address);
@@ -653,13 +653,13 @@ Accounts.prototype.encrypt = function (key, password, options) {
     if (kdf === 'pbkdf2') {
         kdfparams.c = options.c || 262144;
         kdfparams.prf = 'hmac-sha256';
-        derivedKey = cryp.pbkdf2Sync(new Buffer(password), salt, kdfparams.c, kdfparams.dklen, 'sha256');
+        derivedKey = cryp.pbkdf2Sync(Buffer.from(password), salt, kdfparams.c, kdfparams.dklen, 'sha256');
     } else if (kdf === 'scrypt') {
         // FIXME: support progress reporting callback
         kdfparams.n = options.n || 4096; // 2048 4096 8192 16384
         kdfparams.r = options.r || 8;
         kdfparams.p = options.p || 1;
-        derivedKey = scrypt(new Buffer(password), salt, kdfparams.n, kdfparams.r, kdfparams.p, kdfparams.dklen);
+        derivedKey = scrypt(Buffer.from(password), salt, kdfparams.n, kdfparams.r, kdfparams.p, kdfparams.dklen);
     } else {
         throw new Error('Unsupported kdf');
     }
@@ -669,9 +669,9 @@ Accounts.prototype.encrypt = function (key, password, options) {
         throw new Error('Unsupported cipher');
     }
 
-    var ciphertext = Buffer.concat([ cipher.update(new Buffer(account.privateKey.replace('0x',''), 'hex')), cipher.final() ]);
+    var ciphertext = Buffer.concat([ cipher.update(Buffer.from(account.privateKey.replace('0x',''), 'hex')), cipher.final() ]);
 
-    var mac = utils.sha3(Buffer.concat([ derivedKey.slice(16, 32), new Buffer(ciphertext, 'hex') ])).replace('0x','');
+    var mac = utils.sha3(Buffer.concat([ derivedKey.slice(16, 32), Buffer.from(ciphertext, 'hex') ])).replace('0x','');
 
     return {
         version: 3,
@@ -698,7 +698,7 @@ Accounts.prototype.privateKeyToPublicKey = function (privateKey, compressed = fa
   if (privateKey.length !== 64) {
     throw new Error('Received a invalid privateKey. The length of privateKey should be 64.')
   }
-  const buffer = new Buffer(privateKey, "hex");
+  const buffer = Buffer.from(privateKey, 'hex');
   const ecKey = secp256k1.keyFromPrivate(buffer)
 
   let publicKey
