@@ -433,6 +433,23 @@ describe('caver.klay.accounts.signTransaction', () => {
       await expect(caver.klay.accounts.signTransaction(feePayerTransaction)).to.be.rejectedWith(errorMessage)
     })
   })
+
+  context('CAVERJS-UNIT-WALLET-132 : input: txObject without private key', () => {
+    it('when fail to find account, should reject with expected error message', async () => {
+      const feeDelegatedTx = { 
+        type: 'FEE_DELEGATED_VALUE_TRANSFER',
+        from: caver.klay.accounts.create().address,
+        to: '0xd05c5926b0a2f31aadcc9a9cbd3868a50104d834',
+        value: '0x1',
+        gas: '0xdbba0',
+        chainId: '0x7e3',
+        gasPrice: '0x5d21dba00',
+        nonce: '0x9a',
+      }
+      const errorMessage = 'Failed to find get private key to sign. The account you want to use for signing must exist in caver.klay.accounts.wallet or you must pass the private key as a parameter.'
+      await expect(caver.klay.accounts.signTransaction(feeDelegatedTx)).to.be.rejectedWith(errorMessage)
+    })
+  })
 })
 
 describe('caver.klay.accounts.recoverTransaction', () => {
