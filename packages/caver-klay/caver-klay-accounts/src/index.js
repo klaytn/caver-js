@@ -29,7 +29,7 @@ var core = require('../../../caver-core');
 var Method = require('../../../caver-core-method');
 var Promise = require('any-promise');
 // account, hash, rlp, nat, bytes library will be used from 'eth-lib' temporarily.
-var Account = require("eth-lib/lib/account");
+var AccountLib = require("eth-lib/lib/account");
 var Hash = require("eth-lib/lib/hash");
 var RLP = require("eth-lib/lib/rlp");
 var Nat = require("eth-lib/lib/nat");
@@ -137,7 +137,7 @@ Accounts.prototype._determineAddress = function _determineAddress(legacyAccount,
 }
 
 Accounts.prototype.create = function create(entropy) {
-    return this._addAccountFunctions(Account.create(entropy || utils.randomHex(32)));
+    return this._addAccountFunctions(AccountLib.create(entropy || utils.randomHex(32)));
 };
 
 /**
@@ -188,7 +188,7 @@ Accounts.prototype.getLegacyAccount = function getLegacyAccount(key) {
 
   privateKey = utils.addHexPrefix(privateKey)
 
-  return { legacyAccount: Account.fromPrivate(privateKey), klaytnWalletKeyAddress }
+  return { legacyAccount: AccountLib.fromPrivate(privateKey), klaytnWalletKeyAddress }
 }
 
 Accounts.prototype.signTransaction = function signTransaction() {
@@ -283,8 +283,8 @@ Accounts.prototype.signTransaction = function signTransaction() {
         let signatures = []
 
         for(const privateKey of privateKeys) {
-          const signature = Account.makeSigner(Nat.toNumber(transaction.chainId || "0x1") * 2 + 35)(messageHash, privateKey)
-          const [v, r, s] = Account.decodeSignature(signature).map(sig => utils.makeEven(utils.trimLeadingZero(sig)))
+          const signature = AccountLib.makeSigner(Nat.toNumber(transaction.chainId || "0x1") * 2 + 35)(messageHash, privateKey)
+          const [v, r, s] = AccountLib.decodeSignature(signature).map(sig => utils.makeEven(utils.trimLeadingZero(sig)))
           signatures.push([v, r, s])
         }
 
@@ -447,13 +447,13 @@ Accounts.prototype.recoverTransaction = function recoverTransaction(rawTx) {
     })
     arr.unshift(values[6])
 
-    var signature = Account.encodeSignature(arr);
+    var signature = AccountLib.encodeSignature(arr);
     var recovery = Bytes.toNumber(values[6]);
     var extraData = recovery < 35 ? [] : [Bytes.fromNumber((recovery - 35) >> 1), "0x", "0x"];
     var signingData = values.slice(0,6).concat(extraData);
     var signingDataHex = RLP.encode(signingData);
 
-    return Account.recover(Hash.keccak256(signingDataHex), signature);
+    return AccountLib.recover(Hash.keccak256(signingDataHex), signature);
 };
 
 /**
@@ -499,8 +499,8 @@ Accounts.prototype.sign = function sign(data, privateKey) {
   if (!utils.isValidPrivateKey(privateKey)) throw new Error('Invalid private key')
 
   const messageHash = this.hashMessage(data)
-  const signature = Account.sign(messageHash, privateKey)
-  const [v, r, s] = Account.decodeSignature(signature)
+  const signature = AccountLib.sign(messageHash, privateKey)
+  const [v, r, s] = AccountLib.decodeSignature(signature)
   return {
     message: data,
     messageHash,
@@ -523,7 +523,7 @@ Accounts.prototype.recover = function recover(message, signature, preFixed) {
     if (_.isObject(message)) {
       return this.recover(
         message.messageHash,
-        Account.encodeSignature([message.v, message.r, message.s]),
+        AccountLib.encodeSignature([message.v, message.r, message.s]),
         true,
       )
     }
@@ -536,7 +536,7 @@ Accounts.prototype.recover = function recover(message, signature, preFixed) {
         preFixed = args.slice(-1)[0];
         preFixed = _.isBoolean(preFixed) ? !!preFixed : false;
 
-        return this.recover(message, Account.encodeSignature(args.slice(1, 4)), preFixed); // v, r, s
+        return this.recover(message, AccountLib.encodeSignature(args.slice(1, 4)), preFixed); // v, r, s
     }
     /**
      * recover in Account module
@@ -550,7 +550,7 @@ Accounts.prototype.recover = function recover(message, signature, preFixed) {
      *   return address;
      * };
      */
-    return Account.recover(message, signature);
+    return AccountLib.recover(message, signature);
 };
 
 // Taken from https://github.com/ethereumjs/ethereumjs-wallet
