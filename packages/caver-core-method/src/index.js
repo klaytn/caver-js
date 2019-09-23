@@ -246,25 +246,6 @@ function toPayload (args) {
   return (this.transformPayload && this.transformPayload(payload)) || payload
 }
 
-var getWallet = function(from, accounts) {
-  let wallet = null
-
-  // is index given
-  if (_.isNumber(from)) {
-      wallet = accounts.wallet[from]
-
-      // is account given
-  } else if (_.isObject(from) && from.address && from.privateKey) {
-      wallet = from
-
-      // search in wallet for address
-  } else {
-      wallet = accounts.wallet[from.toLowerCase()]
-  }
-
-  return wallet
-}
-
 const buildSendTxCallbackFunc = (defer, method, payload, isSendTx) => (err, result) => {
   try { result = method.formatOutput(result) }
   catch (e) {
@@ -316,12 +297,18 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
           //   return method.accounts.sendTransactionWithSignature(tx).then(sendSignedTx)
           // }
           
+          if (!_.isObject(tx)) {
+            let error = new Error('The transaction must be defined as an object.')
+            sendTxCallback(error)
+            return Promise.reject(error)
+          }
+
           if (tx.senderRawTransaction && tx.from && tx.feePayer){
             console.log('"from" is ignored for a fee-delegated transaction.')
             delete tx.from
           }
 
-          const wallet = getWallet(_.isObject(tx) && tx.from || tx.feePayer || null, method.accounts)
+          const wallet = method.accounts.wallet.getAccount(tx.from || tx.feePayer)
 
           if (wallet && wallet.privateKey) {
             // If wallet was found, sign tx, and send using sendRawTransaction
@@ -351,7 +338,7 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
         }
         case 'klay_sign': {
           const data = payload.params[1]
-          const wallet = getWallet(payload.params[0], method.accounts)
+          const wallet = method.accounts.wallet.getAccount(payload.params[0])
 
           if (wallet && wallet.privateKey) {
             // If wallet was found, sign tx, and send using sendRawTransaction

@@ -191,50 +191,85 @@ Accounts.prototype.getLegacyAccount = function getLegacyAccount(key) {
   return { legacyAccount: Account.fromPrivate(privateKey), klaytnWalletKeyAddress }
 }
 
-Accounts.prototype.signTransaction = function signTransaction(tx, privateKey, callback) {
+Accounts.prototype.signTransaction = function signTransaction() {
     var _this = this,
-        error = false,
         isLegacy = false,
-        parsed,
-        result
+        result,
+        callback
 
-    callback = callback || function () {}
-
-    if (!tx) {
-      error = new Error('No transaction object given!')
-      callback(error)
-      return Promise.reject(error)
-    }
-
-    try {
-      parsed = utils.parsePrivateKey(privateKey)
-      privateKey = parsed.privateKey
-    } catch(e) {
-      callback(e)
+    let handleError = (e) => {
+      e = e instanceof Error? e : new Error(e)
+      if (callback) callback(e)
       return Promise.reject(e)
     }
-    if (!utils.isValidPrivateKey(privateKey)) {
-      error = new Error('Invalid private key')
-      callback(error)
-      return Promise.reject(error)
+
+    if (arguments.length === 0 || arguments.length > 3) {
+      return handleError('Invalid parameter: The number of parameters is invalid.')
+    }
+    
+    // privateKey and callback are optional parameter
+    // "arguments.length === 2" means that user sent parameter privateKey or callback
+    let tx = arguments[0], privateKey
+
+    if (!tx || !_.isObject(tx)) {
+      return handleError('Invalid parameter: The transaction must be defined as an object')
     }
 
-    privateKey = utils.addHexPrefix(privateKey)
+    if (arguments.length === 2) {
+      if (_.isFunction(arguments[1])) {
+        callback = arguments[1]
+      } else {
+        privateKey = arguments[1]
+      }
+    } else if (arguments.length === 3) {
+      if (typeof arguments[1] !== 'string' && !_.isArray(arguments[1])){
+        return handleError('Invalid parameter: The parameter for the private key is invalid')
+      }
+      privateKey = arguments[1]
+      callback = arguments[2]
+    }
+
+    // For handling when callback is undefined.
+    callback = callback || function () {}
+
+    // Validate tx object
+    if (!tx.senderRawTransaction) {
+      const error = helpers.validateFunction.validateParams(tx)
+      if (error) return handleError(error)
+    } else if (!tx.feePayer) { return handleError('To sign with fee payer, senderRawTransaction and feePayer must be defined in the transaction object.') }
+
+    // When privateKey is undefined, find Account from Wallet.
+    if (privateKey === undefined) {
+      try {
+        const account = this.wallet.getAccount(tx.from || tx.feePayer)
+        privateKey = account.privateKey
+      } catch(e) {
+        return handleError(e)
+      }
+    }
+
+    let privateKeys = _.isArray(privateKey) ? privateKey : [privateKey]
+    
+    try {
+      for (let i = 0; i < privateKeys.length; i ++) {
+        const parsed = utils.parsePrivateKey(privateKeys[i])
+        privateKeys[i] = parsed.privateKey
+        privateKeys[i] = utils.addHexPrefix(privateKeys[i])
+  
+        if (!utils.isValidPrivateKey(privateKeys[i])) return handleError('Invalid private key')
+      }
+    } catch(e) {
+      return handleError(e)
+    }
+
+    // Attempting to sign with a decoupled account into a legacy type transaction should be rejected.
+    if (!tx.senderRawTransaction) {
+      isLegacy = tx.type === undefined || tx.type === 'LEGACY' ? true : false
+      if (isLegacy && privateKeys.length > 1) return handleError('Legacy transaction cannot signed with multiple keys')
+      if (isLegacy && _this.isDecoupled(privateKeys[0], tx.from)) return handleError('A legacy transaction must be with a legacy account key')
+    }
 
     function signed(tx) {
-
-      if (!tx.senderRawTransaction) {
-        error = helpers.validateFunction.validateParams(tx)
-        
-        // Attempting to sign with decoupled account into a legacy type transaction throw an error.
-        isLegacy = tx.type === undefined || tx.type === 'LEGACY' ? true : false
-        if (!error && isLegacy && _this.isDecoupled(privateKey, tx.from)) error = new Error('A legacy transaction must be with a legacy account key')
-      }
-      if (error) {
-        callback(error);
-        return Promise.reject(error);
-      }
-
       try {
         // Guarantee all property in transaction is hex.
         tx = helpers.formatters.inputCallFormatter(tx)
@@ -245,19 +280,30 @@ Accounts.prototype.signTransaction = function signTransaction(tx, privateKey, ca
 
         const messageHash = Hash.keccak256(rlpEncoded)
 
-        const signature = Account.makeSigner(Nat.toNumber(transaction.chainId || "0x1") * 2 + 35)(messageHash, privateKey)
-        const [v, r, s] = Account.decodeSignature(signature).map(sig => utils.makeEven(utils.trimLeadingZero(sig)))
+        let signatures = []
 
-        const rawTransaction = makeRawTransaction(rlpEncoded, [v, r, s], transaction)
+        for(const privateKey of privateKeys) {
+          const signature = Account.makeSigner(Nat.toNumber(transaction.chainId || "0x1") * 2 + 35)(messageHash, privateKey)
+          const [v, r, s] = Account.decodeSignature(signature).map(sig => utils.makeEven(utils.trimLeadingZero(sig)))
+          signatures.push([v, r, s])
+        }
+
+        const rawTransaction = makeRawTransaction(rlpEncoded, signatures, transaction)
 
         result = {
             messageHash: messageHash,
-            v: v,
-            r: r,
-            s: s,
+            v: signatures[0][0],
+            r: signatures[0][1],
+            s: signatures[0][2],
             rawTransaction: rawTransaction,
             txHash: Hash.keccak256(rawTransaction),
             senderTxHash: getSenderTxHash(rawTransaction),
+        }
+
+        if (tx.senderRawTransaction && tx.feePayer) {
+          result.feePayerSignatures = signatures
+        } else {
+          result.signatures = isLegacy? signatures[0] : signatures
         }
 
       } catch(e) {
@@ -289,7 +335,7 @@ Accounts.prototype.signTransaction = function signTransaction(tx, privateKey, ca
     return Promise.all([
         isNot(tx.chainId) ? _this._klaytnCall.getChainId() : tx.chainId,
         isNot(tx.gasPrice) ? _this._klaytnCall.getGasPrice() : tx.gasPrice,
-        isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from || _this.privateKeyToAccount(privateKey).address) : tx.nonce 
+        isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from) : tx.nonce 
     ]).then(function (args) {
         if (isNot(args[0]) || isNot(args[1]) || isNot(args[2])) {
             throw new Error('One of the values "chainId", "gasPrice", or "nonce" couldn\'t be fetched: '+ JSON.stringify(args));
@@ -1051,6 +1097,19 @@ Wallet.prototype.getKlaytnWalletKey = function (addressOrIndex) {
   if (!account) throw new Error('Failed to find account')
 
   return genKlaytnWalletKeyStringFromAccount(account)
+}
+
+Wallet.prototype.getAccount = function (input) {
+  if (_.isNumber(input)) {
+    if (this.length <= input) throw new Error(`The index(${input}) is out of range(Wallet length : ${this.length}).`)
+    return this[input]
+  }
+
+  if (!_.isString(input)) throw new Error(`Accounts in the Wallet can be searched by only index or address.`)
+
+  if (!utils.isAddress(input)) throw new Error(`Failed to getAccount from Wallet: invalid address(${input})`)
+
+  return this[input.toLowerCase()]
 }
 
 function genKlaytnWalletKeyStringFromAccount(account) {
