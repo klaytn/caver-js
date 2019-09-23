@@ -204,7 +204,7 @@ Accounts.prototype.signTransaction = function signTransaction() {
     }
 
     if (arguments.length === 0 || arguments.length > 3) {
-      return handleError('Inavlid parameter: The number of parameter is invalid.')
+      return handleError('Invalid parameter: The number of parameters is invalid.')
     }
     
     // privateKey and callback are optional parameter
