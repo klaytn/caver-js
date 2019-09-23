@@ -236,7 +236,7 @@ Accounts.prototype.signTransaction = function signTransaction() {
     if (!tx.senderRawTransaction) {
       const error = helpers.validateFunction.validateParams(tx)
       if (error) return handleError(error)
-    }
+    } else if (!tx.feePayer) { return handleError('To sign with fee payer, senderRawTransaction and feePayer must be defined in the transaction object.') }
 
     // When privateKey is undefined, find Account from Wallet.
     if (privateKey === undefined) {

@@ -410,6 +410,29 @@ describe('caver.klay.accounts.signTransaction', () => {
       expect(decoded.feePayerSignature[0][2]).to.equals(feePayerSigned.feePayerSignatures[0][2])
     })
   })
+
+  context('CAVERJS-UNIT-WALLET-131 : input: txObject for fee payer without feePayer field', () => {
+    it('should reject', async () => {
+      const feeDelegatedTx = { 
+        type: 'FEE_DELEGATED_VALUE_TRANSFER',
+        from: '0x76d1cc1cdb081de8627cab2c074f02ebc7bce0d0',
+        to: '0xd05c5926b0a2f31aadcc9a9cbd3868a50104d834',
+        value: '0x1',
+        gas: '0xdbba0',
+        chainId: '0x7e3',
+        gasPrice: '0x5d21dba00',
+        nonce: '0x9a',
+      }
+      const senderSigned = await caver.klay.accounts.signTransaction(feeDelegatedTx, '1881a973628dba6ab07b6b47c8f3fb50d8e7cbf71fef3b4739155619a3c126fa')
+      
+      const feePayerTransaction = {
+        senderRawTransaction: senderSigned.rawTransaction,
+      }
+
+      const errorMessage = 'To sign with fee payer, senderRawTransaction and feePayer must be defined in the transaction object.'
+      await expect(caver.klay.accounts.signTransaction(feePayerTransaction)).to.be.rejectedWith(errorMessage)
+    })
+  })
 })
 
 describe('caver.klay.accounts.recoverTransaction', () => {
