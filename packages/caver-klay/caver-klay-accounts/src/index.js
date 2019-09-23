@@ -262,7 +262,7 @@ Accounts.prototype.signTransaction = function signTransaction() {
       return handleError(e)
     }
 
-    // Attempting to sign with decoupled account into a legacy type transaction should be rejected.
+    // Attempting to sign with a decoupled account into a legacy type transaction should be rejected.
     if (!tx.senderRawTransaction) {
       isLegacy = tx.type === undefined || tx.type === 'LEGACY' ? true : false
       if (isLegacy && privateKeys.length > 1) return handleError('Legacy transaction cannot signed with multiple keys')
