@@ -223,7 +223,7 @@ Accounts.prototype.signTransaction = function signTransaction() {
       }
     } else if (arguments.length === 3) {
       if (typeof arguments[1] !== 'string' && !_.isArray(arguments[1])){
-        return handleError('Invalid paramter: The parameter for the private key is invalid')
+        return handleError('Invalid parameter: The parameter for the private key is invalid')
       }
       privateKey = arguments[1]
       callback = arguments[2]
