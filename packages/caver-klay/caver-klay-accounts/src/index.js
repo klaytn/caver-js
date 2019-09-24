@@ -242,6 +242,7 @@ Accounts.prototype.signTransaction = function signTransaction() {
     if (privateKey === undefined) {
       try {
         const account = this.wallet.getAccount(tx.from || tx.feePayer)
+        if (!account) return handleError('Failed to find get private key to sign. The account you want to use for signing must exist in caver.klay.accounts.wallet or you must pass the private key as a parameter.')
         privateKey = account.privateKey
       } catch(e) {
         return handleError(e)
