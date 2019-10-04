@@ -297,8 +297,8 @@ Sample Projects
 
 The BApp (Blockchain Application) Development sample projects using caver-js are the following:
 
-* [Count BApp](https://docs.klaytn.com/tutorials/countbapp)
-* [Klaystagram](https://docs.klaytn.com/tutorials/klaystagram)
+* [Count BApp](https://docs.klaytn.com/bapp/tutorials/count-bapp)
+* [Klaystagram](https://docs.klaytn.com/bapp/tutorials/klaystagram)
 
 Github Repository
 =================
