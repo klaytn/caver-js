@@ -24,21 +24,25 @@ const testRPCURL = require('../testrpc')
 const Caver = require('../../index.js')
 
 let caver
-var senderPrvKey
-var senderAddress
+var senderPrvKey, payerPrvKey
+var senderAddress, payerAddress
 var testAccount
 
 before(() => {
   caver = new Caver(testRPCURL)
-  if (process.env.privateKey) {
+  if (process.env.privateKey && process.env.privateKey2) {
     senderPrvKey = process.env.privateKey && String(process.env.privateKey).indexOf('0x') === -1
       ? '0x' + process.env.privateKey
       : process.env.privateKey
+      payerPrvKey = process.env.privateKey2 && String(process.env.privateKey2).indexOf('0x') === -1
+      ? '0x' + process.env.privateKey2
+      : process.env.privateKey2
 
-    caver.klay.accounts.wallet.add(senderPrvKey)
+    const sender = caver.klay.accounts.wallet.add(senderPrvKey)
+    const payer = caver.klay.accounts.wallet.add(payerPrvKey)
   
-    const sender = caver.klay.accounts.privateKeyToAccount(senderPrvKey)
     senderAddress = sender.address
+    payerAddress = payer.address
   } else {
     const sender = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
     senderPrvKey = sender.privateKey
@@ -330,5 +334,19 @@ describe('FEE_DELEGATED_SMART_CONTRACT_DEPLOY_WITH_RATIO transaction', () => {
     const tx = Object.assign({to: "0x5e008646fde91fb6eda7b1fdabc7d84649125cf5"}, deployObject)
 
     expect(()=> caver.klay.sendTransaction(tx)).to.throws('"to" cannot be used with FEE_DELEGATED_SMART_CONTRACT_DEPLOY_WITH_RATIO transaction')
+  }).timeout(200000)
+
+  it('CAVERJS-UNIT-TX-580: If data field of transaction is not 0x-hex prefixed, signTransaction should formatting and sign', async() => {
+    deployObject.data = caver.utils.stripHexPrefix(deployObject.data)
+    expect(deployObject.data.slice(0, 2) !== '0x').to.be.true
+
+    let { rawTransaction } = await caver.klay.accounts.signTransaction(deployObject, senderPrvKey)
+
+    const receipt = await caver.klay.sendTransaction({
+      senderRawTransaction: rawTransaction,
+      feePayer: payerAddress
+    })
+
+    expect(receipt.status).to.be.true
   }).timeout(200000)
 })

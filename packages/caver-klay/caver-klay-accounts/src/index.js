@@ -53,7 +53,7 @@ var isNot = function(value) {
 function coverInitialTxValue(tx) {
   if (typeof tx !== 'object') throw ('Invalid transaction')
   tx.to = tx.to || '0x'
-  tx.data = tx.data || '0x'
+  tx.data = utils.addHexPrefix(tx.data || '0x')
   tx.chainId = utils.numberToHex(tx.chainId)
   return tx
 }

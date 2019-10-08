@@ -330,4 +330,23 @@ describe('SMART_CONTRACT_DEPLOY transaction', () => {
 
     expect(()=> caver.klay.sendTransaction(tx)).to.throws('"to" cannot be used with SMART_CONTRACT_DEPLOY transaction')
   }).timeout(200000)
+  
+  it('CAVERJS-UNIT-TX-577: If data field of transaction is not 0x-hex prefixed, signTransaction should formatting and sign', async() => {
+    deployObject.data = caver.utils.stripHexPrefix(deployObject.data)
+    expect(deployObject.data.slice(0, 2) !== '0x').to.be.true
+
+    let { rawTransaction } = await caver.klay.accounts.signTransaction(deployObject, senderPrvKey)
+    const receipt = await caver.klay.sendSignedTransaction(rawTransaction)
+
+    expect(receipt.status).to.be.true
+  }).timeout(200000)
+  
+  it('CAVERJS-UNIT-TX-578: If data field of transaction is not 0x-hex prefixed, sendTransaction should formatting and sign', async() => {
+    deployObject.data = caver.utils.stripHexPrefix(deployObject.data)
+    expect(deployObject.data.slice(0, 2) !== '0x').to.be.true
+
+    const receipt = await caver.klay.sendTransaction(deployObject)
+
+    expect(receipt.status).to.be.true
+  }).timeout(200000)
 })
