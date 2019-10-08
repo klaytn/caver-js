@@ -164,8 +164,8 @@ var inputTransactionFormatter = function (options) {
         options.from = inputAddressFormatter(options.from);
     }
 
-    if (options.data && options.data.slice(0, 2) !== '0x') {
-      options.data = '0x' + options.data
+    if (options.data) {
+      options.data = utils.addHexPrefix(options.data)
     }
 
     const err = validateParams(options)
@@ -198,8 +198,8 @@ var inputPersonalTransactionFormatter = function (options) {
       options.from = inputAddressFormatter(options.from);
   }
 
-  if (options.data && options.data.slice(0, 2) !== '0x') {
-    options.data = '0x' + options.data
+  if (options.data) {
+    options.data = utils.addHexPrefix(options.data)
   }
   
   return options;
