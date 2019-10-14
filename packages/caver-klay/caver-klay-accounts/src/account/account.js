@@ -5,7 +5,7 @@ const isAddress = require('../../../../caver-utils/src/utils').isAddress
 
 class Account {
 	static fromObject(obj) { return new Account(obj.address, new AccountKeyPublic(obj.privateKey)) }
-	
+
 	static isAccountKey(accountKey) {
 		let isAccountKey = false
 		if (accountKey instanceof AccountKeyPublic) isAccountKey = true
@@ -35,7 +35,7 @@ class Account {
 			set: function (accountKeyInput) {
 				if (!Account.isAccountKey(accountKeyInput) && accountKeyInput !== null) throw new Error(`Invalid accountKey.`)
 				
-				if (accountKeyInput === null) {
+				if (accountKey === null || accountKeyInput === null) {
 					accountKey = accountKeyInput
 				} else if (accountKey.type !== accountKeyInput.type) {
 					accountKey = accountKeyInput
