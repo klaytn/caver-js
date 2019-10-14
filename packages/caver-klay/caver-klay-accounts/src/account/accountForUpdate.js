@@ -1,4 +1,5 @@
 const isValidRole = require('../../../../caver-utils').isValidRole
+const isValidPublicKey = require('../../../../caver-utils').isValidPublicKey
 
 class AccountForUpdate {
 	constructor(address, keyForUpdate, options) {
@@ -25,6 +26,7 @@ function keyFormatter(keyForUpdate, options) {
 				keyObject.failKey = true
 				break
 			default:
+				if (!isValidPublicKey(keyForUpdate)) throw new Error(`Invalid public key`)
 				keyObject.publicKey = keyForUpdate
 				break
 		}
@@ -42,6 +44,7 @@ function keyFormatter(keyForUpdate, options) {
 
 		for (let i = 0; i < keyForUpdate.length; i ++) {
 			const key = keyForUpdate[i]
+			if (!isValidPublicKey(key)) throw new Error(`Invalid public key`)
 			keyObject.multisig.keys.push({weight: options.weight[i], publicKey: key})
 			weightSum += options.weight[i]
 		}

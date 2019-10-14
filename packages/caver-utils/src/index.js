@@ -535,6 +535,7 @@ module.exports = {
     txTypeToString: utils.txTypeToString,
     trimLeadingZero: utils.trimLeadingZero,
     makeEven: utils.makeEven,
+    isValidPublicKey: utils.isValidPublicKey,
     isCompressedPublicKey: utils.isCompressedPublicKey,
     compressPublicKey: utils.compressPublicKey,
 };
