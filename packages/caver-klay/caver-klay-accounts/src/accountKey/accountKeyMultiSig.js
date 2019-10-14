@@ -23,7 +23,7 @@ class AccountKeyMultiSig {
 	get feePayerKey() { return this._keys }
 
 	toPublicKey(toPublicKeyFunc) {
-		const keys = []
+	const keys = []
 
         for (let i = 0; i < this._keys.length; i ++) {
             let key = this._keys[i]
