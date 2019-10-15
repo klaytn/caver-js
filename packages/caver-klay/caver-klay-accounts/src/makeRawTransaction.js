@@ -189,7 +189,7 @@ function extractSignatures(rawTransaction) {
   return { senderSignatures, feePayerSignatures, decodedTransaction: decoded }
 }
 
-function decodeTxForFeePayer(rawTransaction) {
+function splitFeePayer(rawTransaction) {
   const typeString = utils.getTxTypeStringFromRawTransaction(rawTransaction)
   
   if (!typeString || !typeString.includes('FEE_DELEGATED')) throw new Error(`The RLP encoded transaction is not a fee delegated transaction type: '${typeString? typeString : 'LEGACY'}'`)
@@ -361,6 +361,6 @@ module.exports = {
   decodeFromRawTransaction,
   overwriteSignature,
   getSenderTxHash,
-  decodeTxForFeePayer,
+  splitFeePayer,
   extractSignatures,
 }
