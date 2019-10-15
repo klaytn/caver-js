@@ -1025,56 +1025,6 @@ describe('caver.utils.xyPointFromPublicKey', () => {
   })
 })
 
-describe('caver.utils.isValidRole', () => {
-  it('CAVERJS-UNIT-ETC-176: caver.utils.isValidRole should true with valid role', ()=>{
-    let isValid = caver.utils.isValidRole('transactionKey')
-    expect(isValid).to.be.true
-
-    isValid = caver.utils.isValidRole('updateKey')
-    expect(isValid).to.be.true
-
-    isValid = caver.utils.isValidRole('feePayerKey')
-    expect(isValid).to.be.true
-  })
-
-  it('CAVERJS-UNIT-ETC-177: caver.utils.isValidRole should false with invalid role', ()=>{
-    let isValid = caver.utils.isValidRole('invalid')
-    expect(isValid).to.be.false
-
-    isValid = caver.utils.isValidRole(undefined)
-    expect(isValid).to.be.false
-
-    isValid = caver.utils.isValidRole({})
-    expect(isValid).to.be.false
-  })
-})
-
-describe('caver.utils.isDefaultSig', () => {
-  it('CAVERJS-UNIT-ETC-178: caver.utils.isDefaultSig should true with default signatures', ()=>{
-    let isDefault = caver.utils.isDefaultSig(['0x01', '0x', '0x'])
-    expect(isDefault).to.be.true
-
-    isDefault = caver.utils.isDefaultSig([['0x01', '0x', '0x']])
-    expect(isDefault).to.be.true
-  })
-
-  it('CAVERJS-UNIT-ETC-179: caver.utils.isDefaultSig should false if signatures is not same with default signatures', ()=>{
-    let isDefault = caver.utils.isDefaultSig([['0x01', '0x', '0x'], ['0x01', '0x', '0x']])
-    expect(isDefault).to.be.false
-
-    isDefault = caver.utils.isDefaultSig(['0x25', '0xb2a5a15550ec298dc7dddde3774429ed75f864c82caeb5ee24399649ad731be9', '0x29da1014d16f2011b3307f7bbe1035b6e699a4204fc416c763def6cefd976567'])
-    expect(isDefault).to.be.false
-
-    isDefault = caver.utils.isDefaultSig([['0x25', '0xb2a5a15550ec298dc7dddde3774429ed75f864c82caeb5ee24399649ad731be9', '0x29da1014d16f2011b3307f7bbe1035b6e699a4204fc416c763def6cefd976567']])
-    expect(isDefault).to.be.false
-  })
-
-  it('CAVERJS-UNIT-ETC-180: caver.utils.isDefaultSig should throw error with invalid length of signatures', ()=>{
-    let expectedError = `Invalid signatures length: 6`
-    expect(() => caver.utils.isDefaultSig(['0x01', '0x', '0x', '0x01', '0x', '0x'])).to.throws(expectedError)
-    expect(() => caver.utils.isDefaultSig([['0x01', '0x', '0x', '0x01', '0x', '0x']])).to.throws(expectedError)
-  })
-})
 describe('caver.utils.isValidPublicKey', () => {
   it('CAVERJS-UNIT-ETC-171: caver.utils.isValidPublicKey should true with valid uncompressed public key', ()=>{
     const account = caver.klay.accounts.create()
@@ -1125,5 +1075,56 @@ describe('caver.utils.isValidPublicKey', () => {
 
     let isValid = caver.utils.isValidPublicKey(compressed)
     expect(isValid).to.be.false
+  })
+})
+
+describe('caver.utils.isValidRole', () => {
+  it('CAVERJS-UNIT-ETC-176: caver.utils.isValidRole should true with valid role', ()=>{
+    let isValid = caver.utils.isValidRole('transactionKey')
+    expect(isValid).to.be.true
+
+    isValid = caver.utils.isValidRole('updateKey')
+    expect(isValid).to.be.true
+
+    isValid = caver.utils.isValidRole('feePayerKey')
+    expect(isValid).to.be.true
+  })
+
+  it('CAVERJS-UNIT-ETC-177: caver.utils.isValidRole should false with invalid role', ()=>{
+    let isValid = caver.utils.isValidRole('invalid')
+    expect(isValid).to.be.false
+
+    isValid = caver.utils.isValidRole(undefined)
+    expect(isValid).to.be.false
+
+    isValid = caver.utils.isValidRole({})
+    expect(isValid).to.be.false
+  })
+})
+
+describe('caver.utils.isDefaultSig', () => {
+  it('CAVERJS-UNIT-ETC-178: caver.utils.isDefaultSig should true with default signatures', ()=>{
+    let isDefault = caver.utils.isDefaultSig(['0x01', '0x', '0x'])
+    expect(isDefault).to.be.true
+
+    isDefault = caver.utils.isDefaultSig([['0x01', '0x', '0x']])
+    expect(isDefault).to.be.true
+  })
+
+  it('CAVERJS-UNIT-ETC-179: caver.utils.isDefaultSig should false if signatures is not same with default signatures', ()=>{
+    let isDefault = caver.utils.isDefaultSig([['0x01', '0x', '0x'], ['0x01', '0x', '0x']])
+    expect(isDefault).to.be.false
+
+    isDefault = caver.utils.isDefaultSig(['0x25', '0xb2a5a15550ec298dc7dddde3774429ed75f864c82caeb5ee24399649ad731be9', '0x29da1014d16f2011b3307f7bbe1035b6e699a4204fc416c763def6cefd976567'])
+    expect(isDefault).to.be.false
+
+    isDefault = caver.utils.isDefaultSig([['0x25', '0xb2a5a15550ec298dc7dddde3774429ed75f864c82caeb5ee24399649ad731be9', '0x29da1014d16f2011b3307f7bbe1035b6e699a4204fc416c763def6cefd976567']])
+    expect(isDefault).to.be.false
+  })
+
+  it('CAVERJS-UNIT-ETC-180: caver.utils.isDefaultSig should throw error with invalid length of signatures', ()=>{
+    let expectedError = `Invalid signatures length: 6`
+    expect(() => caver.utils.isDefaultSig(['0x01', '0x', '0x', '0x01', '0x', '0x'])).to.throws(expectedError)
+    expect(() => caver.utils.isDefaultSig([['0x01', '0x', '0x', '0x01', '0x', '0x']])).to.throws(expectedError)
   })
 })
