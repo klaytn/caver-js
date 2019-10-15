@@ -474,6 +474,8 @@ var outputPostFormatter = function(post){
 };
 
 var inputAddressFormatter = function (address) {
+    // For handling coverInitialTxValue to value
+    if (address === '0x') return address
 
     var iban = new utils.Iban(address);
     if (iban.isValid() && iban.isDirect()) {
