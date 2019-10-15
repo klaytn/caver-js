@@ -1024,3 +1024,56 @@ describe('caver.utils.xyPointFromPublicKey', () => {
     expect(xyPoint4[1]).to.equals('0x50047c5aea3c2f55de7de04203f8fe8ccc3b491029338d038a7ef6d6903b302e')
   })
 })
+
+describe('caver.utils.isValidPublicKey', () => {
+  it('CAVERJS-UNIT-ETC-171: caver.utils.isValidPublicKey should true with valid uncompressed public key', ()=>{
+    const account = caver.klay.accounts.create()
+    
+    const unCompressedPublicKey = caver.klay.accounts.privateKeyToPublicKey(account.privateKey)
+    
+    let isValid = caver.utils.isValidPublicKey(unCompressedPublicKey)
+    expect(isValid).to.be.true
+  })
+
+  it('CAVERJS-UNIT-ETC-172: caver.utils.isValidPublicKey should true with valid compressed public key', ()=>{
+    const account = caver.klay.accounts.create()
+    
+    const unCompressedPublicKey = caver.klay.accounts.privateKeyToPublicKey(account.privateKey)
+    const compressed = caver.utils.compressPublicKey(unCompressedPublicKey)
+    
+    let isValid = caver.utils.isValidPublicKey(compressed)
+    expect(isValid).to.be.true
+  })
+
+  it('CAVERJS-UNIT-ETC-173: caver.utils.isValidPublicKey should false with invalid uncompressed public key', ()=>{
+    const account = caver.klay.accounts.create()
+    
+    const unCompressedPublicKey = caver.klay.accounts.privateKeyToPublicKey(account.privateKey)
+    
+    let isValid = caver.utils.isValidPublicKey(unCompressedPublicKey.slice(1))
+    expect(isValid).to.be.false
+  })
+
+  it('CAVERJS-UNIT-ETC-174: caver.utils.isValidPublicKey should false with invalid compressed public key', ()=>{
+    const account = caver.klay.accounts.create()
+    
+    const unCompressedPublicKey = caver.klay.accounts.privateKeyToPublicKey(account.privateKey)
+    const compressed = caver.utils.compressPublicKey(unCompressedPublicKey)
+    
+    let isValid = caver.utils.isValidPublicKey(compressed.slice(1))
+    expect(isValid).to.be.false
+  })
+
+  it('CAVERJS-UNIT-ETC-175: caver.utils.isValidPublicKey should false with invalid indicated compressed public key', ()=>{
+    const account = caver.klay.accounts.create()
+    
+    const unCompressedPublicKey = caver.klay.accounts.privateKeyToPublicKey(account.privateKey)
+    let compressed = caver.utils.compressPublicKey(unCompressedPublicKey)
+    compressed = compressed.replace('0x', '')
+    compressed = compressed.slice(2)
+    compressed = '05' + compressed
+
+    let isValid = caver.utils.isValidPublicKey(compressed)
+    expect(isValid).to.be.false
+  })
+})

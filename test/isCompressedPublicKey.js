@@ -32,6 +32,9 @@ describe('caver.utils.isCompressedPublicKey', (done) => {
     expect(caver.utils.isCompressedPublicKey(uncompressedPublicKey1)).to.false
     expect(caver.utils.isCompressedPublicKey(uncompressedPublicKey2)).to.false
     expect(caver.utils.isCompressedPublicKey(uncompressedPublicKey3)).to.false
+    expect(caver.utils.isCompressedPublicKey(uncompressedPublicKey1.slice(2))).to.false
+    expect(caver.utils.isCompressedPublicKey(uncompressedPublicKey2.slice(2))).to.false
+    expect(caver.utils.isCompressedPublicKey(uncompressedPublicKey3.slice(2))).to.false
   })
   
   it('CAVERJS-UNIT-SER-026 : Should return true if the argument is compressed public key', () => {
@@ -45,5 +48,8 @@ describe('caver.utils.isCompressedPublicKey', (done) => {
     expect(caver.utils.isCompressedPublicKey(compressedPublicKey1)).to.true
     expect(caver.utils.isCompressedPublicKey(compressedPublicKey2)).to.true
     expect(caver.utils.isCompressedPublicKey(compressedPublicKey3)).to.true
+    expect(caver.utils.isCompressedPublicKey(compressedPublicKey1.slice(2))).to.true
+    expect(caver.utils.isCompressedPublicKey(compressedPublicKey2.slice(2))).to.true
+    expect(caver.utils.isCompressedPublicKey(compressedPublicKey3.slice(2))).to.true
   })
 })
