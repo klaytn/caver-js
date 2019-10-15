@@ -177,7 +177,44 @@ function _combineFeePayerRawTransaction(rlpEncoded, sig, transaction, senderSign
   return txType + RLP.encode(rawTx).slice(2)
 }
 
+function extractSignatures(rawTransaction) {
+  let senderSignatures = []
+  let feePayerSignatures = []
+
+  const decoded = _decodeFromRawTransaction(rawTransaction)
+  senderSignatures = senderSignatures.concat(decoded.signatures)
+  if (decoded.feePayerSignatures) {
+    feePayerSignatures = feePayerSignatures.concat(decoded.feePayerSignatures)
+  }
+  return { senderSignatures, feePayerSignatures, decodedTransaction: decoded }
+}
+
+function decodeTxForFeePayer(rawTransaction) {
+  const txType = rawTransaction.slice(0, 4)
+  const decodedValues = RLP.decode(utils.addHexPrefix(rawTransaction.slice(4)))
+
+  const detachFeePayer = decodedValues.splice(0, decodedValues.length-2)
+  detachFeePayer.push('0x')
+  detachFeePayer.push([['0x01', '0x', '0x']])
+
+  return { senderRawTransaction: txType + RLP.encode(detachFeePayer).slice(2), feePayer: decodedValues[0], feePayerSignatures: decodedValues[1] }
+}
+
 function decodeFromRawTransaction (rawTransaction, type) {
+  let decodeResult = _decodeFromRawTransaction(rawTransaction, type)
+  
+  switch(decodeResult.type) {
+    case 'ACCOUNT_UPDATE':
+    case 'FEE_DELEGATED_ACCOUNT_UPDATE':
+    case 'FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO': {
+      decodeResult = parseAccountKey(decodeResult)
+    }
+  }
+  return decodeResult
+}
+
+
+function _decodeFromRawTransaction(rawTransaction, type) {
   var typeString = type
   if (typeString === undefined || typeString !== 'LEGACY') {
     typeString = utils.getTxTypeStringFromRawTransaction(rawTransaction)
@@ -222,15 +259,15 @@ function decodeFromRawTransaction (rawTransaction, type) {
     }
     case 'ACCOUNT_UPDATE': {
       const [ nonce, gasPrice, gas, from, accountKey, signatures ] = RLP.decode(rawTransaction)
-      return parseAccountKey({ type: typeString, nonce, gasPrice, gas, from, accountKey, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures })
+      return { type: typeString, nonce, gasPrice, gas, from, accountKey, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures }
     }
     case 'FEE_DELEGATED_ACCOUNT_UPDATE': {
       const [ nonce, gasPrice, gas, from, accountKey, signatures, feePayer, feePayerSignatures ] = RLP.decode(rawTransaction)
-      return parseAccountKey({ type: typeString, nonce, gasPrice, gas, from, accountKey, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures, feePayer, payerV: feePayerSignatures[0][0], payerR: feePayerSignatures[0][1], payerS: feePayerSignatures[0][2], feePayerSignatures })
+      return { type: typeString, nonce, gasPrice, gas, from, accountKey, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures, feePayer, payerV: feePayerSignatures[0][0], payerR: feePayerSignatures[0][1], payerS: feePayerSignatures[0][2], feePayerSignatures }
     }
     case 'FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO': {
       const [ nonce, gasPrice, gas, from, accountKey, feeRatio, signatures, feePayer, feePayerSignatures ] = RLP.decode(rawTransaction)
-      return parseAccountKey({ type: typeString, nonce, gasPrice, gas, from, accountKey, feeRatio, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures, feePayer, payerV: feePayerSignatures[0][0], payerR: feePayerSignatures[0][1], payerS: feePayerSignatures[0][2], feePayerSignatures })
+      return { type: typeString, nonce, gasPrice, gas, from, accountKey, feeRatio, v: signatures[0][0], r: signatures[0][1], s: signatures[0][2], signatures, feePayer, payerV: feePayerSignatures[0][0], payerR: feePayerSignatures[0][1], payerS: feePayerSignatures[0][2], feePayerSignatures }
     }
     case 'SMART_CONTRACT_DEPLOY': {
       const [ nonce, gasPrice, gas, to, value, from, data, humanReadable, codeFormat, signatures ] = RLP.decode(rawTransaction)
@@ -321,4 +358,6 @@ module.exports = {
   decodeFromRawTransaction,
   overwriteSignature,
   getSenderTxHash,
+  decodeTxForFeePayer,
+  extractSignatures,
 }
