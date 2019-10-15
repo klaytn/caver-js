@@ -190,6 +190,10 @@ function extractSignatures(rawTransaction) {
 }
 
 function decodeTxForFeePayer(rawTransaction) {
+  const typeString = utils.getTxTypeStringFromRawTransaction(rawTransaction)
+  
+  if (!typeString || !typeString.includes('FEE_DELEGATED')) throw new Error(`The RLP encoded transaction is not a fee delegated transaction type: '${typeString? typeString : 'LEGACY'}'`)
+
   const txType = rawTransaction.slice(0, 4)
   const decodedValues = RLP.decode(utils.addHexPrefix(rawTransaction.slice(4)))
 
