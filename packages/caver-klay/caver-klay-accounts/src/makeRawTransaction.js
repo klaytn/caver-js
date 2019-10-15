@@ -213,7 +213,6 @@ function decodeFromRawTransaction (rawTransaction, type) {
   return decodeResult
 }
 
-
 function _decodeFromRawTransaction(rawTransaction, type) {
   var typeString = type
   if (typeString === undefined || typeString !== 'LEGACY') {
