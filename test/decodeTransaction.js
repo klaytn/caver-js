@@ -88,7 +88,7 @@ describe('Decode Transaction', () => {
         expect(decodedTx.signatures[0][0]).to.equals(decodedTx.v)
         expect(decodedTx.signatures[0][1]).to.equals(decodedTx.r)
         expect(decodedTx.signatures[0][2]).to.equals(decodedTx.s)
-        expect(decodedTx.feePayer).to.equals(payer.address)
+        expect(decodedTx.feePayer.toLowerCase()).to.equals(payer.address.toLowerCase())
         expect(decodedTx.payerV).not.to.undefined
         expect(decodedTx.payerR).not.to.undefined
         expect(decodedTx.payerS).not.to.undefined
