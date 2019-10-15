@@ -651,6 +651,21 @@ const getTxTypeStringFromRawTransaction = (rawTransaction) => {
   return typeString
 }
 
+const isValidPublicKey = (publicKey) => {
+  publicKey = publicKey.replace('0x', '')
+  
+  if (publicKey.length !== 66 && publicKey.length !== 128) return false
+
+  if (publicKey.length === 66 && !isCompressedPublicKey(publicKey)) return false
+  
+  if (publicKey.length === 128) {
+    const xyPoints = xyPointFromPublicKey(publicKey)
+    if (xyPoints === undefined || !xyPoints.length) return false
+  }
+
+  return true
+}
+
 const isCompressedPublicKey = (publicKey) => {
   const compressedIndicators = ['02', '03']
   return publicKey.replace('0x', '').length === 66 && compressedIndicators.includes(publicKey.slice(2, 4))
@@ -734,6 +749,7 @@ module.exports = {
     trimLeadingZero,
     makeEven,
     txTypeToString,
+    isValidPublicKey,
     isCompressedPublicKey,
     compressPublicKey,
     isTxHash,
