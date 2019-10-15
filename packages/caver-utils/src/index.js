@@ -542,5 +542,5 @@ module.exports = {
     // For account key
     isValidRole: utils.isValidRole,
 
-    isDefaultSig: utils.isDefaultSig,
+    isEmptySig: utils.isEmptySig,
 };

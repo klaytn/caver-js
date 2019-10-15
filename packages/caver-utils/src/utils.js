@@ -720,10 +720,10 @@ const isValidRole = (role) => {
   return false
 }
 
-const isDefaultSig = (sig) => {
+const isEmptySig = (sig) => {
   if (!Array.isArray(sig)) return false
 
-  function isDefault (s) {
+  function isEmpty (s) {
     if (s.length !== 3) throw new Error(`Invalid signatures length: ${s.length}`)
 
     if (s[0] === '0x01' && s[1] === '0x' && s[2] === '0x') return true
@@ -733,10 +733,10 @@ const isDefaultSig = (sig) => {
   if (Array.isArray(sig[0])) {
     // [[v,r,s]]
     if (sig.length !== 1) return false
-    return isDefault(sig[0])
+    return isEmpty(sig[0])
   }
 
-  return isDefault(sig)
+  return isEmpty(sig)
 }
 
 module.exports = {
@@ -787,5 +787,5 @@ module.exports = {
 
     isValidRole: isValidRole,
 
-    isDefaultSig: isDefaultSig,
+    isEmptySig: isEmptySig,
 };
