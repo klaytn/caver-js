@@ -710,6 +710,35 @@ const isContractDeployment = (txObject) => {
 
 }
 
+const isValidRole = (role) => {
+  switch(role) {
+    case 'transactionKey':
+    case 'updateKey':
+    case 'feePayerKey':
+      return true
+  }
+  return false
+}
+
+const isDefaultSig = (sig) => {
+  if (!Array.isArray(sig)) return false
+
+  function isDefault (s) {
+    if (s.length !== 3) throw new Error(`Invalid signatures length: ${s.length}`)
+
+    if (s[0] === '0x01' && s[1] === '0x' && s[2] === '0x') return true
+    return false
+  }
+
+  if (Array.isArray(sig[0])) {
+    // [[v,r,s]]
+    if (sig.length !== 1) return false
+    return isDefault(sig[0])
+  }
+
+  return isDefault(sig)
+}
+
 module.exports = {
     BN: BN,
     isBN: isBN,
@@ -755,4 +784,8 @@ module.exports = {
     compressPublicKey,
     isTxHash,
     isTxHashStrict,
+
+    isValidRole: isValidRole,
+
+    isDefaultSig: isDefaultSig,
 };
