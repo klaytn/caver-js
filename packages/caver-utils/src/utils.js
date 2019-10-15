@@ -668,7 +668,8 @@ const isValidPublicKey = (publicKey) => {
 
 const isCompressedPublicKey = (publicKey) => {
   const compressedIndicators = ['02', '03']
-  return publicKey.replace('0x', '').length === 66 && compressedIndicators.includes(publicKey.slice(2, 4))
+  const withoutPrefix = publicKey.replace('0x', '')
+  return withoutPrefix.length === 66 && compressedIndicators.includes(withoutPrefix.slice(0, 2))
 }
 
 const compressPublicKey = (uncompressedPublicKey) => {
