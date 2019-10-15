@@ -82,7 +82,7 @@ function rlpEncodeForContractExecution(transaction) {
 
 function rlpEncodeForFeeDelegatedSmartContractDeploy(transaction) {
     
-  if (transaction.feePayer) {
+  if (transaction.senderRawTransaction) {
     const typeDetacehdRawTransaction = '0x' + transaction.senderRawTransaction.slice(4)
 
     const [ nonce, gasPrice, gas, to, value, from, data, humanReadable, codeFormat, [ [ v, r, s ] ] ] = utils.rlpDecode(typeDetacehdRawTransaction)
@@ -129,7 +129,7 @@ function rlpEncodeForFeeDelegatedSmartContractDeploy(transaction) {
 
 function rlpEncodeForFeeDelegatedSmartContractDeployWithRatio(transaction) {
     
-  if (transaction.feePayer) {
+  if (transaction.senderRawTransaction) {
     const typeDetacehdRawTransaction = '0x' + transaction.senderRawTransaction.slice(4)
 
     const [ nonce, gasPrice, gas, to, value, from, data, humanReadable, feeRatio, codeFormat, [ [ v, r, s ] ] ] = utils.rlpDecode(typeDetacehdRawTransaction)
@@ -178,7 +178,7 @@ function rlpEncodeForFeeDelegatedSmartContractDeployWithRatio(transaction) {
 
 function rlpEncodeForFeeDelegatedSmartContractExecution(transaction) {
     
-  if (transaction.feePayer) {
+  if (transaction.senderRawTransaction) {
     const typeDetacehdRawTransaction = '0x' + transaction.senderRawTransaction.slice(4)
 
     const [ nonce, gasPrice, gas, to, value, from, data, [ [ v, r, s ] ] ] = utils.rlpDecode(typeDetacehdRawTransaction)
@@ -221,7 +221,7 @@ function rlpEncodeForFeeDelegatedSmartContractExecution(transaction) {
 
 function rlpEncodeForFeeDelegatedSmartContractExecutionWithRatio(transaction) {
     
-  if (transaction.feePayer) {
+  if (transaction.senderRawTransaction) {
     const typeDetacehdRawTransaction = '0x' + transaction.senderRawTransaction.slice(4)
 
     const [ nonce, gasPrice, gas, to, value, from, data, feeRatio, [ [ v, r, s ] ] ] = utils.rlpDecode(typeDetacehdRawTransaction)

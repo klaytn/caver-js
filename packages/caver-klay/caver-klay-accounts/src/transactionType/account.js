@@ -55,7 +55,7 @@ function rlpEncodeForAccountUpdate(transaction) {
 
 function rlpEncodeForFeeDelegatedAccountUpdate(transaction) {
   
-  if (transaction.feePayer) {
+  if (transaction.senderRawTransaction) {
     const typeDetacehdRawTransaction = '0x' + transaction.senderRawTransaction.slice(4)
 
     const [ nonce, gasPrice, gas, from, accountKey, [ [ v, r, s ] ] ] = utils.rlpDecode(typeDetacehdRawTransaction)
@@ -96,7 +96,7 @@ function rlpEncodeForFeeDelegatedAccountUpdate(transaction) {
 
 function rlpEncodeForFeeDelegatedAccountUpdateWithRatio(transaction) {
   
-  if (transaction.feePayer) {
+  if (transaction.senderRawTransaction) {
     const typeDetacehdRawTransaction = '0x' + transaction.senderRawTransaction.slice(4)
 
     const [ nonce, gasPrice, gas, from, accountKey, feeRatio, [ [ v, r, s ] ] ] = utils.rlpDecode(typeDetacehdRawTransaction)
