@@ -287,6 +287,7 @@ const buildSendSignedTxFunc = (method, payload, sendTxCallback) => (sign) => {
 
 const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, method) => {
   if (method && method.accounts && method.accounts.wallet && method.accounts.wallet.length) {
+      let error
       switch (payload.method) {
         case 'klay_sendTransaction': {
           var tx = payload.params[0]
@@ -298,41 +299,47 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
           // }
           
           if (!_.isObject(tx)) {
-            let error = new Error('The transaction must be defined as an object.')
+            error = new Error('The transaction must be defined as an object.')
             sendTxCallback(error)
             return Promise.reject(error)
           }
 
-          if (tx.senderRawTransaction && tx.from && tx.feePayer){
-            console.log('"from" is ignored for a fee-delegated transaction.')
-            delete tx.from
+          let addressToUse = tx.from
+
+          if (tx.senderRawTransaction && tx.feePayer){
+            addressToUse = tx.feePayer
+            if (tx.from) {
+              console.log('"from" is ignored for a fee-delegated transaction.')
+              delete tx.from
+            }
           }
 
-          const wallet = method.accounts.wallet.getAccount(tx.from || tx.feePayer)
+          let wallet
+
+          try {
+            wallet = method.accounts.wallet.getAccount(addressToUse)
+          } catch (e) {
+            sendTxCallback(e)
+            return Promise.reject(e)
+          }
 
           if (wallet && wallet.privateKey) {
             // If wallet was found, sign tx, and send using sendRawTransaction
-            return method.accounts.signTransaction(tx, wallet.privateKey)
-                .then(sendSignedTx)
-                .catch((e) => {
-                  sendTxCallback(e)
-                })
+            return method.accounts.signTransaction(tx, wallet.privateKey).then(sendSignedTx).catch((e) => { sendTxCallback(e) })
           }
           
           // If wallet was not found in caver-js wallet, then it has to use wallet in Node.
           // Signing to transaction using wallet in Node supports only LEGACY transaction, so if transaction is not LEGACY, return error.
           if (tx.feePayer !== undefined || (tx.type !== undefined && tx.type !== 'LEGACY')) {
-            var error = new Error('Only Legacy transactions can be signed on a Klaytn node!')
+            error = new Error('Only Legacy transactions can be signed on a Klaytn node!')
             sendTxCallback(error)
             return Promise.reject(error)
           }
           
-          if (!tx.senderRawTransaction){
-            var error = validateParams(tx)
-            if (error) {
-              sendTxCallback(error)
-              return Promise.reject(error)
-            }
+          error = validateParams(tx)
+          if (error) {
+            sendTxCallback(error)
+            return Promise.reject(error)
           }
           break
         }
