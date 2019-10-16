@@ -157,7 +157,7 @@ describe('SMART_CONTRACT_DEPLOY transaction', () => {
     const tx = Object.assign({feePayer: testAccount.address}, deployObject)
 
     // This error return from formatter. Because in formatter discriminate fee delegation through feePayer and senderRawTransaction
-    expect(()=> caver.klay.sendTransaction(tx)).to.throws('The "senderRawTransaction" field must be defined for signing with feePayer!')
+    expect(()=> caver.klay.sendTransaction(tx)).to.throws('"feePayer" cannot be used with SMART_CONTRACT_DEPLOY transaction')
   }).timeout(200000)
 
   // UnnecessaryFeeRatio
@@ -348,5 +348,43 @@ describe('SMART_CONTRACT_DEPLOY transaction', () => {
     const receipt = await caver.klay.sendTransaction(deployObject)
 
     expect(receipt.status).to.be.true
+  }).timeout(200000)
+
+  // Invalid from address
+  it('CAVERJS-UNIT-TX-592: If transaction object has invalid from, signTransaction should throw error', async () => {
+    const tx = Object.assign({}, deployObject)
+    tx.from = 'invalidAddress'
+
+    const expectedError = `Invalid address of from: ${tx.from}`
+
+    await expect(caver.klay.accounts.signTransaction(tx, testAccount.privateKey)).to.be.rejectedWith(expectedError)
+  }).timeout(200000)
+
+  it('CAVERJS-UNIT-TX-592: If transaction object has invalid from, sendTransaction should throw error', () => {
+    const tx = Object.assign({}, deployObject)
+    tx.from = 'invalidAddress'
+
+    const expectedError = `Provided address "${tx.from}" is invalid, the capitalization checksum test failed`
+
+    // Throw error from formatter validation
+    expect(()=> caver.klay.sendTransaction(tx)).to.throws(expectedError)
+  }).timeout(200000)
+
+  // UnnecessaryFeePayerSignatures
+  it('CAVERJS-UNIT-TX-593: If transaction object has unnecessary feePayerSignatures, signTransaction should throw error', async () => {
+    const tx = Object.assign({feePayerSignatures: [['0x01', '0x', '0x']]}, deployObject)
+
+    const expectedError = `"feePayerSignatures" cannot be used with ${tx.type} transaction`
+
+    await expect(caver.klay.accounts.signTransaction(tx, testAccount.privateKey)).to.be.rejectedWith(expectedError)
+  }).timeout(200000)
+
+  it('CAVERJS-UNIT-TX-593: If transaction object has unnecessary feePayerSignatures, sendTransaction should throw error', () => {
+    const tx = Object.assign({feePayerSignatures: [['0x01', '0x', '0x']]}, deployObject)
+
+    const expectedError = `"feePayerSignatures" cannot be used with ${tx.type} transaction`
+
+    // Throw error from formatter validation
+    expect(()=> caver.klay.sendTransaction(tx)).to.throws(expectedError)
   }).timeout(200000)
 })

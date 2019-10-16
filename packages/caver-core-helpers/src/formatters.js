@@ -140,12 +140,9 @@ var inputTransactionFormatter = function (options) {
 
     options = _txInputFormatter(options);
 
-    // If 'feePayer' or 'senderRawTransaction' exist in transaction, it means it doesn't need 'from' field.
-    if (options.feePayer || options.senderRawTransaction) {
-      if (options.senderRawTransaction === undefined) {
-        throw new Error('The "senderRawTransaction" field must be defined for signing with feePayer!');
-      }
-
+    // If senderRawTransaction' exist in transaction, it means object is fee payer transaction format like below
+    // { senderRawTransaction: '', feePayer: '' }
+    if (options.senderRawTransaction) {
       if (options.feePayer === undefined) {
         throw new Error('The "feePayer" field must be defined for signing with feePayer!');
       }
@@ -474,9 +471,6 @@ var outputPostFormatter = function(post){
 };
 
 var inputAddressFormatter = function (address) {
-    // For handling coverInitialTxValue to value
-    if (address === '0x') return address
-
     var iban = new utils.Iban(address);
     if (iban.isValid() && iban.isDirect()) {
         return iban.toAddress().toLowerCase();

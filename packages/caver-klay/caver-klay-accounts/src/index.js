@@ -232,11 +232,8 @@ Accounts.prototype.signTransaction = function signTransaction() {
     // For handling when callback is undefined.
     callback = callback || function () {}
 
-    // Validate tx object
-    if (!tx.senderRawTransaction) {
-      const error = helpers.validateFunction.validateParams(tx)
-      if (error) return handleError(error)
-    } else if (!tx.feePayer) { return handleError('To sign with fee payer, senderRawTransaction and feePayer must be defined in the transaction object.') }
+    let error = helpers.validateFunction.validateParams(tx)
+    if (error) return handleError(error)
 
     // When privateKey is undefined, find Account from Wallet.
     if (privateKey === undefined) {
@@ -367,9 +364,7 @@ Accounts.prototype.signTransactionWithSignature = function signTransactionWithSi
     }
 
     function signed(tx) {
-      if (!tx.senderRawTransaction) {
-        error = helpers.validateFunction.validateParams(tx)
-      }
+      error = helpers.validateFunction.validateParams(tx)
       if (error) {
         callback(error)
         return Promise.reject(error)
@@ -1106,7 +1101,7 @@ Wallet.prototype.getAccount = function (input) {
     return this[input]
   }
 
-  if (!_.isString(input)) throw new Error(`Accounts in the Wallet can be searched by only index or address.`)
+  if (!_.isString(input)) throw new Error(`Accounts in the Wallet can be searched by only index or address. :${input}`)
 
   if (!utils.isAddress(input)) throw new Error(`Failed to getAccount from Wallet: invalid address(${input})`)
 

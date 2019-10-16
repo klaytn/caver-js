@@ -429,7 +429,7 @@ describe('caver.klay.accounts.signTransaction', () => {
         senderRawTransaction: senderSigned.rawTransaction,
       }
 
-      const errorMessage = 'To sign with fee payer, senderRawTransaction and feePayer must be defined in the transaction object.'
+      const errorMessage = `Invalid fee payer: ${feePayerTransaction.feePayer}`
       await expect(caver.klay.accounts.signTransaction(feePayerTransaction)).to.be.rejectedWith(errorMessage)
     })
   })
