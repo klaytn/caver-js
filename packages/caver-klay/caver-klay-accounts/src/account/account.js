@@ -2,6 +2,7 @@ const AccountKeyPublic = require('../accountKey/accountKeyPublic')
 const AccountKeyMultiSig = require('../accountKey/accountKeyMultiSig')
 const AccountKeyRoleBased = require('../accountKey/accountKeyRoleBased')
 const isAddress = require('../../../../caver-utils/src/utils').isAddress
+const addHexPrefix = require('../../../../caver-utils').addHexPrefix
 
 class Account {
 	static fromObject(obj) { return new Account(obj.address, new AccountKeyPublic(obj.privateKey)) }
@@ -21,11 +22,13 @@ class Account {
 		if (!isAddress(address)) throw new Error(`Invalid address : ${address}`)
 		if (!Account.isAccountKey(accountKey)) throw new Error(`Invalid accountKey.`)
 
+		address = addHexPrefix(address)
+
 		Object.defineProperty(this, 'address', {
 			get: function () { return address },
 			set: function (addressInput) {
 				if (!isAddress(addressInput)) throw new Error(`Invalid address : ${addressInput}`)
-				address = addressInput
+				address = addHexPrefix(addressInput)
 			},
 			enumerable: true
 		})
