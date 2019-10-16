@@ -1247,11 +1247,6 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE transaction', () => {
     expect(()=>caver.klay.sendTransaction({senderRawTransaction: ret.rawTransaction})).to.throws('The "feePayer" field must be defined for signing with feePayer!')
   }).timeout(200000)
 
-  // Error senderRawTransaction missing (A check on the senderRawTransaction is performed when the feePayer attempts to sign the rawTransaction after sender signed.)
-  it('CAVERJS-UNIT-TX-334 : If transaction object missing senderRawTransaction, signTransaction should throw error', async () => {
-    expect(()=>caver.klay.sendTransaction({feePayer: payerAddress})).to.throws('The "senderRawTransaction" field must be defined for signing with feePayer!')
-  }).timeout(200000)
-
   // UnnecessaryFeeRatio
   it('CAVERJS-UNIT-TX-335 : If transaction object has feeRatio, signTransaction should throw error', async () => {
     const tx = Object.assign({feeRatio: 20, publicKey}, accountUpdateObject)
@@ -1392,5 +1387,125 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE transaction', () => {
 
     // Throw error from formatter validation
     expect(()=> caver.klay.sendTransaction(tx)).to.throws('The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE is duplicated.')
+  }).timeout(200000)
+
+  // Invalid from address
+  it('CAVERJS-UNIT-TX-597: If transaction object has invalid from, signTransaction should throw error', async () => {
+    const tx = Object.assign({publicKey}, accountUpdateObject)
+    tx.from = 'invalidAddress'
+
+    const expectedError = `Invalid address of from: ${tx.from}`
+
+    await expect(caver.klay.accounts.signTransaction(tx, testAccount.privateKey)).to.be.rejectedWith(expectedError)
+  }).timeout(200000)
+
+  it('CAVERJS-UNIT-TX-597: If transaction object has invalid from, sendTransaction should throw error', () => {
+    const tx = Object.assign({publicKey}, accountUpdateObject)
+    tx.from = 'invalidAddress'
+
+    const expectedError = `Provided address "${tx.from}" is invalid, the capitalization checksum test failed`
+
+    // Throw error from formatter validation
+    expect(()=> caver.klay.sendTransaction(tx)).to.throws(expectedError)
+  }).timeout(200000)
+
+  // Error feePayer missing when feePayerSignatures is defined in transaction object
+  it('CAVERJS-UNIT-TX-598: If transaction object missing feePayer, signTransaction should throw error', async () => {
+    const feePayerSignatures = [['0x26', '0x984e9d43c496ef39ef2d496c8e1aee695f871e4f6cfae7f205ddda1589ca5c9e', '0x46647d1ce8755cd664f5fb4eba3082dd1a13817488029f3869662986b7b1a5ae']]
+    const tx = Object.assign({publicKey, feePayerSignatures}, accountUpdateObject)
+
+    const expectedError = `"feePayer" is missing: feePayer must be defined with feePayerSignatures.`
+
+    await expect(caver.klay.accounts.signTransaction(tx, testAccount.privateKey)).to.be.rejectedWith(expectedError)
+  }).timeout(200000)
+
+  it('CAVERJS-UNIT-TX-598: If transaction object missing feePayer, sendTransaction should throw error', async () => {
+    const feePayerSignatures = [['0x26', '0x984e9d43c496ef39ef2d496c8e1aee695f871e4f6cfae7f205ddda1589ca5c9e', '0x46647d1ce8755cd664f5fb4eba3082dd1a13817488029f3869662986b7b1a5ae']]
+    const tx = Object.assign({publicKey, feePayerSignatures}, accountUpdateObject)
+
+    const expectedError = `"feePayer" is missing: feePayer must be defined with feePayerSignatures.`
+
+    expect(()=> caver.klay.sendTransaction(tx)).to.throws(expectedError)
+  }).timeout(200000)
+
+  // Error with invalid feePayer missing when feePayerSignatures is defined in transaction object
+  it('CAVERJS-UNIT-TX-599: If transaction object missing feePayer, signTransaction should throw error', async () => {
+    const feePayerSignatures = [['0x26', '0x984e9d43c496ef39ef2d496c8e1aee695f871e4f6cfae7f205ddda1589ca5c9e', '0x46647d1ce8755cd664f5fb4eba3082dd1a13817488029f3869662986b7b1a5ae']]
+    const invalidFeePayer = 'feePayer'
+    const tx = Object.assign({feePayer: invalidFeePayer, publicKey, feePayerSignatures}, accountUpdateObject)
+
+    const expectedError = `Invalid address of fee payer: ${invalidFeePayer}`
+
+    await expect(caver.klay.accounts.signTransaction(tx, testAccount.privateKey)).to.be.rejectedWith(expectedError)
+  }).timeout(200000)
+
+  it('CAVERJS-UNIT-TX-599: If transaction object missing feePayer, sendTransaction should throw error', async () => {
+    const feePayerSignatures = [['0x26', '0x984e9d43c496ef39ef2d496c8e1aee695f871e4f6cfae7f205ddda1589ca5c9e', '0x46647d1ce8755cd664f5fb4eba3082dd1a13817488029f3869662986b7b1a5ae']]
+    const invalidFeePayer = 'feePayer'
+    const tx = Object.assign({feePayer: invalidFeePayer, publicKey, feePayerSignatures}, accountUpdateObject)
+
+    const expectedError = `Invalid address of fee payer: ${invalidFeePayer}`
+
+    expect(()=> caver.klay.sendTransaction(tx)).to.throws(expectedError)
+  }).timeout(200000)
+
+  // Error when feePayer is not defined with fee payer transaction format
+  it('CAVERJS-UNIT-TX-600: If transaction object missing feePayer, signTransaction should throw error', async () => {
+    const tx = Object.assign({publicKey}, accountUpdateObject)
+    const { rawTransaction } = await caver.klay.accounts.signTransaction(tx, testAccount.privateKey)
+    
+    const feePayerTx = {
+      senderRawTransaction: rawTransaction,
+      feePayer: '0x',
+    }
+
+    const expectedError = `Invalid fee payer: ${feePayerTx.feePayer}`
+
+    await expect(caver.klay.accounts.signTransaction(feePayerTx, payerPrvKey)).to.be.rejectedWith(expectedError)
+  }).timeout(200000)
+
+  it('CAVERJS-UNIT-TX-600: If transaction object missing feePayer, sendTransaction should throw error', async () => {
+    const tx = Object.assign({publicKey}, accountUpdateObject)
+    const { rawTransaction } = await caver.klay.accounts.signTransaction(tx, testAccount.privateKey)
+    
+    const feePayerTx = {
+      senderRawTransaction: rawTransaction,
+      feePayer: '0x',
+    }
+
+    // when sendTransaction, get account from wallet before calling signTransaction
+    const expectedError = `Provided address "${feePayerTx.feePayer}" is invalid, the capitalization checksum test failed.`
+
+    expect(()=> caver.klay.sendTransaction(feePayerTx)).to.throws(expectedError)
+  }).timeout(200000)
+
+  // Error when feePayer is invalid with fee payer transaction format
+  it('CAVERJS-UNIT-TX-601: If transaction object has invalid feePayer, signTransaction should throw error', async () => {
+    const tx = Object.assign({publicKey}, accountUpdateObject)
+    const { rawTransaction } = await caver.klay.accounts.signTransaction(tx, testAccount.privateKey)
+    
+    const feePayerTx = {
+      senderRawTransaction: rawTransaction,
+      feePayer: 'invalid',
+    }
+
+    const expectedError = `Invalid address of fee payer: ${feePayerTx.feePayer}`
+
+    await expect(caver.klay.accounts.signTransaction(feePayerTx, payerPrvKey)).to.be.rejectedWith(expectedError)
+  }).timeout(200000)
+
+  it('CAVERJS-UNIT-TX-601: If transaction object has invalid feePayer, sendTransaction should throw error', async () => {
+    const tx = Object.assign({publicKey}, accountUpdateObject)
+    const { rawTransaction } = await caver.klay.accounts.signTransaction(tx, testAccount.privateKey)
+    
+    const feePayerTx = {
+      senderRawTransaction: rawTransaction,
+      feePayer: 'invalid',
+    }
+
+    // when sendTransaction, get account from wallet before calling signTransaction
+    const expectedError = `Provided address "${feePayerTx.feePayer}" is invalid, the capitalization checksum test failed.`
+
+    expect(()=> caver.klay.sendTransaction(feePayerTx)).to.throws(expectedError)
   }).timeout(200000)
 })

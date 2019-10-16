@@ -378,4 +378,64 @@ describe('VALUE_TRANSFER_MEMO transaction', () => {
     
     expect(()=> caver.klay.sendTransaction(tx)).to.throws('"legacyKey" cannot be used with VALUE_TRANSFER_MEMO transaction')
   }).timeout(200000)
+
+  // Invalid from address
+  it('CAVERJS-UNIT-TX-669: If transaction object has invalid from, signTransaction should throw error', async () => {
+    const tx = Object.assign({}, valueTransferMemoObject)
+    tx.from = 'invalidAddress'
+
+    const expectedError = `Invalid address of from: ${tx.from}`
+
+    await expect(caver.klay.accounts.signTransaction(tx, testAccount.privateKey)).to.be.rejectedWith(expectedError)
+  }).timeout(200000)
+
+  it('CAVERJS-UNIT-TX-669: If transaction object has invalid from, sendTransaction should throw error', () => {
+    const tx = Object.assign({}, valueTransferMemoObject)
+    tx.from = 'invalidAddress'
+    
+    const expectedError = `Provided address "${tx.from}" is invalid, the capitalization checksum test failed`
+
+    // Throw error from formatter validation
+    expect(()=> caver.klay.sendTransaction(tx)).to.throws(expectedError)
+  }).timeout(200000)
+
+  // UnnecessaryFeePayerSignatures
+  it('CAVERJS-UNIT-TX-670: If transaction object has unnecessary feePayerSignatures, signTransaction should throw error', async () => {
+    const tx = Object.assign({feePayerSignatures: [['0x01', '0x', '0x']]}, valueTransferMemoObject)
+
+    const expectedError = `"feePayerSignatures" cannot be used with ${tx.type} transaction`
+
+    await expect(caver.klay.accounts.signTransaction(tx, testAccount.privateKey)).to.be.rejectedWith(expectedError)
+  }).timeout(200000)
+
+  it('CAVERJS-UNIT-TX-670: If transaction object has unnecessary feePayerSignatures, sendTransaction should throw error', () => {
+    const tx = Object.assign({feePayerSignatures: [['0x01', '0x', '0x']]}, valueTransferMemoObject)
+
+    const expectedError = `"feePayerSignatures" cannot be used with ${tx.type} transaction`
+
+    // Throw error from formatter validation
+    expect(()=> caver.klay.sendTransaction(tx)).to.throws(expectedError)
+  }).timeout(200000)
+
+  // InvalidTo
+  it('CAVERJS-UNIT-TX-671: If transaction object has invalid to address, signTransaction should throw error', async () => {
+    const invalidTo = 'invalid'
+    const tx = Object.assign({}, valueTransferMemoObject)
+    tx.to = invalidTo
+
+    const expectedError = `Invalid address of to: ${tx.to}`
+
+    await expect(caver.klay.accounts.signTransaction(tx, senderPrvKey)).to.be.rejectedWith(expectedError)
+  }).timeout(200000)
+
+  it('CAVERJS-UNIT-TX-671: If transaction object has unnecessary feePayerSignatures, sendTransaction should throw error', () => {
+    const invalidTo = 'invalid'
+    const tx = Object.assign({}, valueTransferMemoObject)
+    tx.to = invalidTo
+
+    const expectedError = `Provided address "${tx.to}" is invalid, the capitalization checksum test failed.`
+
+    // Throw error from formatter validation
+    expect(()=> caver.klay.sendTransaction(tx)).to.throws(expectedError)
+  }).timeout(200000)
 })
