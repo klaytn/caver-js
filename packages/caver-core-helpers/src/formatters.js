@@ -140,12 +140,9 @@ var inputTransactionFormatter = function (options) {
 
     options = _txInputFormatter(options);
 
-    // If 'feePayer' or 'senderRawTransaction' exist in transaction, it means it doesn't need 'from' field.
-    if (options.feePayer || options.senderRawTransaction) {
-      if (options.senderRawTransaction === undefined) {
-        throw new Error('The "senderRawTransaction" field must be defined for signing with feePayer!');
-      }
-
+    // If senderRawTransaction' exist in transaction, it means object is fee payer transaction format like below
+    // { senderRawTransaction: '', feePayer: '' }
+    if (options.senderRawTransaction) {
       if (options.feePayer === undefined) {
         throw new Error('The "feePayer" field must be defined for signing with feePayer!');
       }
