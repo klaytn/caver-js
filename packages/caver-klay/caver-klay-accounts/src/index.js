@@ -331,7 +331,7 @@ Accounts.prototype.privateKeyToAccount = function privateKeyToAccount(key, userI
 
 
 /**
- * createAccountForUpdate creates AccountForUpdate instance.
+ * createAccountForUpdate creates an AccountForUpdate instance.
  * The AccountForUpdate returned as a result of this function contains only the address and public key used to update the account.
  *
  * @method createAccountForUpdate
