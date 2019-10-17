@@ -1126,74 +1126,74 @@ Wallet.prototype.add = function (account, userInputAddress) {
 }
 
 Wallet.prototype.updatePrivateKey = function (privateKey, address) {
-if (privateKey === undefined || address === undefined) {
-  throw new Error('To update the privatKey in wallet, need to set both privateKey and address.')
-}
+  if (privateKey === undefined || address === undefined) {
+    throw new Error('To update the privatKey in wallet, need to set both privateKey and address.')
+  }
 
-// If privateKey parameter is not string type, return error
-if (!_.isString(privateKey)) {
-  throw new Error('The private key used for the update is not a valid string.')
-}
+  // If privateKey parameter is not string type, return error
+  if (!_.isString(privateKey)) {
+    throw new Error('The private key used for the update is not a valid string.')
+  }
 
-if (!utils.isAddress(address)) throw new Error(`Invalid address : ${address}`)
+  if (!utils.isAddress(address)) throw new Error(`Invalid address : ${address}`)
 
-// If failed to find account through address, return error
-const accountExists = !!this[address]
-if (!accountExists) throw new Error('Failed to find account with ' + address)
+  // If failed to find account through address, return error
+  const accountExists = !!this[address]
+  if (!accountExists) throw new Error('Failed to find account with ' + address)
 
-const account = this[address]
+  const account = this[address]
 
-if (account.accountKeyType !== AccountKeyEnum.ACCOUNT_KEY_PUBLIC) {
-  throw new Error('Account using AccountKeyMultiSig or AccountKeyRoleBased must be updated using the caver.klay.accounts.updateAccountKey function.')
-}
+  if (account.accountKeyType !== AccountKeyEnum.ACCOUNT_KEY_PUBLIC) {
+    throw new Error('Account using AccountKeyMultiSig or AccountKeyRoleBased must be updated using the caver.klay.accounts.updateAccountKey function.')
+  }
 
-const parsed = utils.parsePrivateKey(privateKey)
-if (!utils.isValidPrivateKey(parsed.privateKey)) throw new Error('Invalid private key')
+  const parsed = utils.parsePrivateKey(privateKey)
+  if (!utils.isValidPrivateKey(parsed.privateKey)) throw new Error('Invalid private key')
 
-if (parsed.address && parsed.address !== account.address) {
-  throw new Error('The address extracted from the private key does not match the address received as the input value.')
-}
+  if (parsed.address && parsed.address !== account.address) {
+    throw new Error('The address extracted from the private key does not match the address received as the input value.')
+  }
 
-const newAccountKeyPublic = new AccountKeyPublic(parsed.privateKey)
-this[account.index].accountKey = newAccountKeyPublic
-this[account.address].accountKey = newAccountKeyPublic
-this[account.address.toLowerCase()].accountKey = newAccountKeyPublic
-this[account.address.toUpperCase()].accountKey = newAccountKeyPublic
+  const newAccountKeyPublic = new AccountKeyPublic(parsed.privateKey)
+  this[account.index].accountKey = newAccountKeyPublic
+  this[account.address].accountKey = newAccountKeyPublic
+  this[account.address.toLowerCase()].accountKey = newAccountKeyPublic
+  this[account.address.toUpperCase()].accountKey = newAccountKeyPublic
 
-try {
-  this[utils.toChecksumAddress(account.address)].accountKey = newAccountKeyPublic
-} catch (e) {}
+  try {
+    this[utils.toChecksumAddress(account.address)].accountKey = newAccountKeyPublic
+  } catch (e) {}
 
-return account
+  return account
 }
 
 Wallet.prototype.updateAccountKey = function updateAccountKey(address, accountKey) {
-if (address === undefined || accountKey === undefined) {
-  throw new Error('To update the accountKey in wallet, need to set both address and accountKey.')
-}
+  if (address === undefined || accountKey === undefined) {
+    throw new Error('To update the accountKey in wallet, need to set both address and accountKey.')
+  }
 
-if (!Account.isAccountKey(accountKey)) {
-  accountKey = this._accounts.createAccountKey(accountKey)
-}
+  if (!Account.isAccountKey(accountKey)) {
+    accountKey = this._accounts.createAccountKey(accountKey)
+  }
 
-if (!utils.isAddress(address)) throw new Error(`Invalid address : ${address}`)
+  if (!utils.isAddress(address)) throw new Error(`Invalid address : ${address}`)
 
-// If failed to find account through address, return error
-const accountExists = !!this[address]
-if (!accountExists) throw new Error('Failed to find account with ' + address)
+  // If failed to find account through address, return error
+  const accountExists = !!this[address]
+  if (!accountExists) throw new Error('Failed to find account with ' + address)
 
-const account = this[address]
+  const account = this[address]
 
-this[account.index].accountKey = accountKey
-this[account.address].accountKey = accountKey
-this[account.address.toLowerCase()].accountKey = accountKey
-this[account.address.toUpperCase()].accountKey = accountKey
+  this[account.index].accountKey = accountKey
+  this[account.address].accountKey = accountKey
+  this[account.address.toLowerCase()].accountKey = accountKey
+  this[account.address.toUpperCase()].accountKey = accountKey
 
-try {
-  this[utils.toChecksumAddress(account.address)].accountKey = accountKey
-} catch (e) {}
+  try {
+    this[utils.toChecksumAddress(account.address)].accountKey = accountKey
+  } catch (e) {}
 
-return account
+  return account
 }
 
 Wallet.prototype.remove = function (addressOrIndex) {
