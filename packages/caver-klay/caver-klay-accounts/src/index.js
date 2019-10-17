@@ -203,7 +203,7 @@ Accounts.prototype.createAccountKeyPublic = function createAccountKeyPublic(priv
  * createAccountKeyMultiSig creates AccountKeyMultiSig with an array of private keys.
  *
  * @method createAccountKeyMultiSig
- * @param {Array} privateKeys An Array of private key string that will be used to create AccountKeyMultiSig.
+ * @param {Array} privateKeys An Array of private key strings that will be used to create AccountKeyMultiSig.
  * @return {Object}
  */
 Accounts.prototype.createAccountKeyMultiSig = function createAccountKeyMultiSig(privateKeys) {
