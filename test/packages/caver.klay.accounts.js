@@ -1494,6 +1494,67 @@ describe('caver.klay.accounts.isDecoupled', () => {
   })
 })
 
+describe('caver.klay.accounts._getRoleKey', () => {
+  let account
+
+  beforeEach(() => {
+    const keyObject = {
+      transactionKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+      updateKey: [caver.klay.accounts.create().privateKey],
+      feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+    }
+    account = caver.klay.accounts.createWithAccountKey(caver.klay.accounts.create().address, keyObject)
+  })
+
+  context('CAVERJS-UNIT-WALLET-133: input: legacy tx and account', () => {
+    it('should return transactionKey', () => {
+      const tx = {}
+      const roleKey = caver.klay.accounts._getRoleKey(tx, account)
+      expect(isSameKeyArray(roleKey, account.transactionKey)).to.be.true
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-134: input: update tx and account', () => {
+    it('should return updateKey', () => {
+      const tx = { type: 'FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO' }
+      const roleKey = caver.klay.accounts._getRoleKey(tx, account)
+      expect(isSameKeyArray(roleKey, account.updateKey)).to.be.true
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-135: input: tx for fee payer and account', () => {
+    it('should return feePayerKey', () => {
+      const tx = { senderRawTransaction: '0x', feePayer: account.address }
+      const roleKey = caver.klay.accounts._getRoleKey(tx, account)
+      expect(isSameKeyArray(roleKey, account.feePayerKey)).to.be.true
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-136: input: tx and account', () => {
+    it('should throw error if there is not key matched with role', () => {
+      let testAccount = {updateKey: caver.klay.accounts.create().privateKey}
+      const expectedError = `The key corresponding to the role used for signing is not defined.`
+      expect(() => caver.klay.accounts._getRoleKey({}, testAccount)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-137: input: tx and account', () => {
+    it('should throw error if there is not key matched with role', () => {
+      let testAccount = {transactionKey: caver.klay.accounts.create().privateKey}
+      const expectedError = `The key corresponding to the role used for signing is not defined.`
+      expect(() => caver.klay.accounts._getRoleKey({type: 'ACCOUNT_UPDATE'}, testAccount)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-138: input: tx and account', () => {
+    it('should throw error if there is not key matched with role', () => {
+      let testAccount = {transactionKey: caver.klay.accounts.create().privateKey}
+      const expectedError = `The key corresponding to the role used for signing is not defined.`
+      expect(() => caver.klay.accounts._getRoleKey({ senderRawTransaction: '0x', feePayer: account.address }, testAccount)).to.throws(expectedError)
+    })
+  })
+})
+
 describe('caver.klay.accounts.createAccountKey', () => {
   context('CAVERJS-UNIT-WALLET-139: input: private key string`', () => {
     it('should return AccountKeyPublic', () => {

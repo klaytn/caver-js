@@ -147,6 +147,32 @@ Accounts.prototype._determineAddress = function _determineAddress(legacyAccount,
 }
 
 /**
+ * _getRoleKey returns a key that matches the role that should be used according to the transaction.
+ *
+ * @method _getRoleKey
+ * @param {Object} tx transaction object to be sign.
+ * @param {Object} account Account to be used for signing.
+ * @return {String|Array}
+ */
+Accounts.prototype._getRoleKey = function _getRoleKey(tx, account) {
+  let key
+
+  if (!account) throw new Error(`The account to be used for signing is not defined.`)
+
+  if (tx.senderRawTransaction && tx.feePayer) {
+    key = account.feePayerKey
+  } else if (tx.type && tx.type.includes('ACCOUNT_UPDATE')) {
+    key = account.updateKey
+  } else {
+    key = account.transactionKey
+  }
+
+  if (!key) throw new Error(`The key corresponding to the role used for signing is not defined.`)
+
+  return key
+}
+
+/**
  * create function creates random account with entropy.
  *
  * @method create
