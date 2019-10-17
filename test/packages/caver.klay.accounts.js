@@ -32,10 +32,11 @@ beforeEach(() => {
   caver = new Caver(testRPCURL)
 })
 
-function isAccount(data, { privateKey, address } = {}) {
+function isAccount(data, { keys, address } = {}) {
   // account object keys
-  const keys = [
+  const objectKeys = [
     'address',
+    'accountKey',
     'privateKey',
     'signTransaction',
     'sign',
@@ -43,16 +44,16 @@ function isAccount(data, { privateKey, address } = {}) {
     'getKlaytnWalletKey'
   ]
 
-  expect(Object.getOwnPropertyNames(data)).to.deep.equal(keys)
+  expect(Object.getOwnPropertyNames(data)).to.deep.equal(objectKeys)
 
   expect(caver.utils.isAddress(data.address)).to.equal(true)
 
-  if (privateKey !== undefined) {
-    expect(data.privateKey).to.equal(privateKey)
+  if (keys !== undefined) {
+    compareAccountKey(data.accountKey, keys)
   }
 
   if (address !== undefined) {
-    expect(data.address).to.equal(address.toLowerCase())
+    expect(data.address.toLowerCase()).to.equal(address.toLowerCase())
   }
 }
 
@@ -85,17 +86,57 @@ function isWallet(data, { accounts } = {}) {
     expect(data.length).to.equal(accounts.length)
 
     for (let i = 0; i < data.length; i++) {
-        let accountObj = Object.assign({}, data[i])
-        delete accountObj.index
+        let accountObj = caver.klay.accounts.createWithAccountKey(data[i].address, data[i].accountKey)
 
-        isAccount(accountObj, { privateKey: accounts[i].privateKey, address: accounts[i].address })
+        isAccount(accountObj, { keys: accounts[i].keys, address: accounts[i].address })
 
-        accountObj = Object.assign({}, data[accountObj.address])
-        delete accountObj.index
+        accountObj = caver.klay.accounts.createWithAccountKey(data[i].address, data[accountObj.address].accountKey)
 
-        isAccount(accountObj, { privateKey: accounts[i].privateKey, address: accounts[i].address })
+        isAccount(accountObj, { keys: accounts[i].keys, address: accounts[i].address })
     }
   }
+}
+
+function compareAccountKey(keyFromAccount, key) {
+  if (!keyFromAccount && !key) return
+
+  if (typeof keyFromAccount.keys === 'string') {
+    expect(isSameKeyString(keyFromAccount.keys, key)).to.be.true
+    expect(isSameKeyString(keyFromAccount.transactionKey, key)).to.be.true
+    expect(isSameKeyString(keyFromAccount.updateKey, key)).to.be.true
+    expect(isSameKeyString(keyFromAccount.feePayerKey, key)).to.be.true
+  } else if (Array.isArray(keyFromAccount.keys)) {
+    expect(isSameKeyArray(keyFromAccount.keys, key)).to.be.true
+    expect(isSameKeyArray(keyFromAccount.transactionKey, key)).to.be.true
+    expect(isSameKeyArray(keyFromAccount.updateKey, key)).to.be.true
+    expect(isSameKeyArray(keyFromAccount.feePayerKey, key)).to.be.true
+  } else {
+    expect(isSameKeyObject(keyFromAccount.keys, key)).to.be.true
+    compareAccountKey(keyFromAccount._transactionKey, key.transactionKey)
+    compareAccountKey(keyFromAccount._updateKey, key.updateKey)
+    compareAccountKey(keyFromAccount._feePayerKey, key.feePayerKey)
+  }
+}
+
+function isSameKeyString(str1, str2) {
+  return str1.toLowerCase() === str2.toLowerCase()
+}
+
+function isSameKeyArray(arr1, arr2) {
+  if (arr1.length !== arr2.length) return false
+  for (let i = 0; i < arr1.length; i ++) {
+    if (arr1[i].toLowerCase() !== arr2[i].toLowerCase()) return false
+  }
+  return true
+}
+
+function isSameKeyObject(obj1, obj2) {
+  const keys = Object.keys(obj1)
+  keys.map((r)=> {
+    if (typeof obj1[r] === 'string' && !isSameKeyString(obj1[r], obj2[r])) return false
+    if (Array.isArray(obj1[r]) && !isSameKeyArray(obj1[r], obj2[r])) return false
+  })
+  return true
 }
 
 describe('caver.klay.accounts.create', () => {
@@ -142,6 +183,8 @@ describe('caver.klay.accounts.signTransaction', () => {
   beforeEach(() => {
     account = caver.klay.accounts.create()
     caver.klay.accounts.wallet.add(account)
+    feePayer = caver.klay.accounts.wallet.add('0x3bdc858e890c3c845ea9ca24b1e9ed183a56eb78d4bf5463da219a74f708eff6')
+    sender = caver.klay.accounts.wallet.add('0x66de1a1fa104b008c3c34c1695415d71435384f3b68df03dda82e74f9d85064d')
 
     txObj = {
       from: account.address,
@@ -291,8 +334,7 @@ describe('caver.klay.accounts.signTransaction', () => {
 
   context('CAVERJS-UNIT-WALLET-122 : input: legacyTx, privateKey of decoupled account', () => {
     it('should return signature and rawTransaction', async () => {
-      const decoupledAccount = caver.klay.accounts.create()
-      decoupledAccount.privateKey = caver.klay.accounts.create().privateKey
+      const decoupledAccount = caver.klay.accounts.privateKeyToAccount(caver.klay.accounts.create().privateKey, caver.klay.accounts.create().address)
 
       let tx = {
         from: decoupledAccount.address,
@@ -359,7 +401,8 @@ describe('caver.klay.accounts.signTransaction', () => {
     })
 
     it('should sign to transaction parameter with private key array', async () => {
-      const result = await caver.klay.accounts.signTransaction(vtTx, [account.privateKey.slice(2), account.privateKey])
+      const privateKeyArray = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      const result = await caver.klay.accounts.signTransaction(vtTx, privateKeyArray)
 
       const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'signatures']
       expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
@@ -497,8 +540,9 @@ describe('caver.klay.accounts.recoverTransaction', () => {
         value: '0x1',
         chainId: 10000,
       }
-      account.address = '0x13b0d8316F0c3cE0C3C51Ebb586A14d7d90112fD'
-      account.privateKey = '0x72d72a46401220f08ccb1b17b550feb816840f2f8ce86361e7ee54ac7a9ee6d8'
+
+      let privateKey = '0x72d72a46401220f08ccb1b17b550feb816840f2f8ce86361e7ee54ac7a9ee6d8'
+      account = caver.klay.accounts.privateKeyToAccount(privateKey)
 
       const signed = await caver.klay.accounts.signTransaction(transaction, account.privateKey)
 
@@ -522,8 +566,9 @@ describe('caver.klay.accounts.recoverTransaction', () => {
         value: '0x1',
         chainId: 10000,
       }
-      account.address = '0x13b0d8316F0c3cE0C3C51Ebb586A14d7d90112fD'
-      account.privateKey = '0x72d72a46401220f08ccb1b17b550feb816840f2f8ce86361e7ee54ac7a9ee6d8'
+      address = '0x13b0d8316F0c3cE0C3C51Ebb586A14d7d90112fD'
+      privateKey = '0x72d72a46401220f08ccb1b17b550feb816840f2f8ce86361e7ee54ac7a9ee6d8'
+      caver.klay.accounts.privateKeyToAccount(privateKey, address)
 
       const signed = await caver.klay.accounts.signTransaction(transaction, account.privateKey)
 
@@ -665,7 +710,7 @@ describe('caver.klay.accounts.encrypt', () => {
       isKeystoreV3(result, account)
 
       const decryptedAccount = caver.klay.accounts.decrypt(result, password)
-      isAccount(decryptedAccount, account)
+      isAccount(decryptedAccount, {keys: account.keys, address: account.address})
     })
   })
 
@@ -688,7 +733,7 @@ describe('caver.klay.accounts.encrypt', () => {
       isKeystoreV3(result, account)
 
       const decryptedAccount = caver.klay.accounts.decrypt(result, password)
-      isAccount(decryptedAccount, account)
+      isAccount(decryptedAccount, {keys: account.keys, address: account.address})
     })
   })
 
@@ -701,7 +746,7 @@ describe('caver.klay.accounts.encrypt', () => {
       isKeystoreV3(result, account)
 
       const decryptedAccount = caver.klay.accounts.decrypt(result, password)
-      isAccount(decryptedAccount, account)
+      isAccount(decryptedAccount, {keys: account.keys, address: account.address})
     })
   })
 
@@ -717,39 +762,41 @@ describe('caver.klay.accounts.encrypt', () => {
   context('CAVERJS-UNIT-WALLET-099 : input: privateKey:KlaytnWalletKey(decoupled), password', () => {
     it('should encrypt password with privateKey', () => {
       const password = 'klaytn!@'
-      caver.klay.accounts.wallet.add(account)
-      var updatedAccount = caver.klay.accounts.wallet.updatePrivateKey(caver.klay.accounts.create().privateKey, account.address)
-      let result = caver.klay.accounts.encrypt(updatedAccount.getKlaytnWalletKey(), password)
 
-      isKeystoreV3(result, updatedAccount)
+      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, caver.klay.accounts.create().privateKey)
+
+      let result = caver.klay.accounts.encrypt(testAccount.getKlaytnWalletKey(), password)
+
+      isKeystoreV3(result, testAccount)
 
       const decryptedAccount = caver.klay.accounts.decrypt(result, password)
-      isAccount(decryptedAccount, updatedAccount)
+      isAccount(decryptedAccount, {keys: testAccount.keys, address: testAccount.address})
     })
   })
 
   context('CAVERJS-UNIT-WALLET-100 : input: privateKey:KlaytnWalletKey(decoupled), password, {address:valid}', () => {
     it('should encrypt password with privateKey', () => {
       const password = 'klaytn!@'
-      caver.klay.accounts.wallet.add(account)
-      var updatedAccount = caver.klay.accounts.wallet.updatePrivateKey(caver.klay.accounts.create().privateKey, account.address)
-      let result = caver.klay.accounts.encrypt(updatedAccount.getKlaytnWalletKey(), password, {address: updatedAccount.address})
+      
+      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, caver.klay.accounts.create().privateKey)
 
-      isKeystoreV3(result, updatedAccount)
+      let result = caver.klay.accounts.encrypt(testAccount.getKlaytnWalletKey(), password, {address: testAccount.address})
+
+      isKeystoreV3(result, testAccount)
 
       const decryptedAccount = caver.klay.accounts.decrypt(result, password)
-      isAccount(decryptedAccount, updatedAccount)
+      isAccount(decryptedAccount, {keys: testAccount.keys, address: testAccount.address})
     })
   })
 
   context('CAVERJS-UNIT-WALLET-101 : input: privateKey:KlaytnWalletKey(decoupled), password, {address:invalid}', () => {
     it('should encrypt password with privateKey', () => {
       const password = 'klaytn!@'
-      caver.klay.accounts.wallet.add(account)
-      var updatedAccount = caver.klay.accounts.wallet.updatePrivateKey(caver.klay.accounts.create().privateKey, account.address)
+
+      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, caver.klay.accounts.create().privateKey)
 
       const errorMessage = 'The address extracted from the private key does not match the address received as the input value.'
-      expect(() => caver.klay.accounts.encrypt(updatedAccount.getKlaytnWalletKey(), password, {address: caver.klay.accounts.create().address})).to.throw(errorMessage)
+      expect(() => caver.klay.accounts.encrypt(testAccount.getKlaytnWalletKey(), password, {address: caver.klay.accounts.create().address})).to.throw(errorMessage)
     })
   })
 })
@@ -769,7 +816,7 @@ describe('caver.klay.accounts.decrypt', () => {
       let result = caver.klay.accounts.decrypt(keystoreJsonV3, password)
       isKeystoreV3(keystoreJsonV3, result)
 
-      isAccount(result, account)
+      isAccount(result, {keys: account.keys, address: account.address})
     })
   })
 
@@ -827,8 +874,9 @@ describe('caver.klay.accounts.getLegacyAccount', () => {
   context('CAVERJS-UNIT-WALLET-108 : input: decoupled valid KlaytnWalletKey format', () => {
     it('should return account which is derived from private key and address from KlaytnWalletKey format', () => {
       // decoupled
-      const testAccount = caver.klay.accounts.create()
-      testAccount.privateKey = caver.klay.accounts.create().privateKey
+      const privateKey = caver.klay.accounts.create().privateKey
+      const address = caver.klay.accounts.create().address
+      const testAccount = caver.klay.accounts.privateKeyToAccount(privateKey, address)
 
       let result = caver.klay.accounts.getLegacyAccount(testAccount.getKlaytnWalletKey())
 
@@ -870,16 +918,20 @@ describe('caver.klay.accounts.getLegacyAccount', () => {
 describe('caver.klay.accounts.isDecoupled', () => {
   context('CAVERJS-UNIT-WALLET-111 : input: valid privateKey and decoupled address', () => {
     it('should return true if input is decoupled private and address', () => {
-      const testAccount = caver.klay.accounts.create()
-      testAccount.privateKey = caver.klay.accounts.create().privateKey
+      const privateKey = caver.klay.accounts.create().privateKey
+      const address = caver.klay.accounts.create().address
+      const testAccount = caver.klay.accounts.privateKeyToAccount(privateKey, address)
+
       expect(caver.klay.accounts.isDecoupled(testAccount.privateKey, testAccount.address)).to.be.true
     })
   })
 
   context('CAVERJS-UNIT-WALLET-112 : input: valid KlaytnWalletKey', () => {
     it('should return true if input is decoupled KlaytnWalletKey', () => {
-      const testAccount = caver.klay.accounts.create()
-      testAccount.privateKey = caver.klay.accounts.create().privateKey
+      const privateKey = caver.klay.accounts.create().privateKey
+      const address = caver.klay.accounts.create().address
+      const testAccount = caver.klay.accounts.privateKeyToAccount(privateKey, address)
+
       expect(caver.klay.accounts.isDecoupled(testAccount.getKlaytnWalletKey())).to.be.true
       expect(caver.klay.accounts.isDecoupled(testAccount.getKlaytnWalletKey(), testAccount.address)).to.be.true
     })
@@ -923,12 +975,1363 @@ describe('caver.klay.accounts.isDecoupled', () => {
 
   context('CAVERJS-UNIT-WALLET-116 : input: not match address with KlaytnWalletKey and input', () => {
     it('should throw error if input is invalid privateKey string', () => {
-      const testAccount = caver.klay.accounts.create()
-      testAccount.privateKey = caver.klay.accounts.create().privateKey
+      const privateKey = caver.klay.accounts.create().privateKey
+      const address = caver.klay.accounts.create().address
+      const testAccount = caver.klay.accounts.privateKeyToAccount(privateKey, address)
 
       const expectedError = 'The address extracted from the private key does not match the address received as the input value.'
 
       expect(() => caver.klay.accounts.isDecoupled(testAccount.getKlaytnWalletKey(), caver.klay.accounts.create().address)).to.throws(expectedError)
+    })
+  })
+})
+
+describe('caver.klay.accounts.createAccountKey', () => {
+  context('CAVERJS-UNIT-WALLET-139: input: private key string`', () => {
+    it('should return AccountKeyPublic', () => {
+      const key = caver.klay.accounts.create().privateKey
+      const accountKey = caver.klay.accounts.createAccountKey(key)
+
+      expect(accountKey.type).to.equals('AccountKeyPublic')
+      expect(accountKey.defaultKey).to.equals(key)
+      compareAccountKey(accountKey, key)
+      expect(typeof accountKey.toPublicKey).to.equals('function')
+      expect(typeof accountKey.update).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-140: input: array of private key string', () => {
+    it('should return accountKeyMultiSig', () => {
+      const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      const accountKey = caver.klay.accounts.createAccountKey(key)
+      
+      expect(accountKey.type).to.equals('AccountKeyMultiSig')
+      expect(accountKey.defaultKey).to.equals(key[0])
+      compareAccountKey(accountKey, key)
+      expect(typeof accountKey.toPublicKey).to.equals('function')
+      expect(typeof accountKey.update).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-141: input: keyObject(transactionKey is defined with private key string)', () => {
+    it('should return accountKeyRoleBased', () => {
+      const key = {
+        transactionKey: caver.klay.accounts.create().privateKey
+      }
+      const accountKey = caver.klay.accounts.createAccountKey(key)
+      
+      expect(accountKey.type).to.equals('AccountKeyRoleBased')
+      expect(accountKey.defaultKey).to.equals(key.transactionKey)
+      compareAccountKey(accountKey, key)
+      expect(typeof accountKey.toPublicKey).to.equals('function')
+      expect(typeof accountKey.update).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-142: input: keyObject(transactionKey is defined with array of private key string)', () => {
+    it('should return accountKeyRoleBased', () => {
+      const key = {
+        transactionKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      }
+      const accountKey = caver.klay.accounts.createAccountKey(key)
+      
+      expect(accountKey.type).to.equals('AccountKeyRoleBased')
+      expect(accountKey.defaultKey).to.equals(key.transactionKey[0])
+      compareAccountKey(accountKey, key)
+      expect(typeof accountKey.toPublicKey).to.equals('function')
+      expect(typeof accountKey.update).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-143: input: keyObject(updateKey is defined with private key string)', () => {
+    it('should return accountKeyRoleBased', () => {
+      const key = {
+        updateKey: caver.klay.accounts.create().privateKey
+      }
+      const accountKey = caver.klay.accounts.createAccountKey(key)
+      
+      expect(accountKey.type).to.equals('AccountKeyRoleBased')
+      expect(accountKey.defaultKey).to.equals(key.updateKey)
+      compareAccountKey(accountKey, key)
+      expect(typeof accountKey.toPublicKey).to.equals('function')
+      expect(typeof accountKey.update).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-144: input: keyObject(updateKey is defined with array of private key string)', () => {
+    it('should return accountKeyRoleBased', () => {
+      const key = {
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      }
+      const accountKey = caver.klay.accounts.createAccountKey(key)
+      
+      expect(accountKey.type).to.equals('AccountKeyRoleBased')
+      expect(accountKey.defaultKey).to.equals(key.updateKey[0])
+      compareAccountKey(accountKey, key)
+      expect(typeof accountKey.toPublicKey).to.equals('function')
+      expect(typeof accountKey.update).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-145: input: keyObject(feePayerKey is defined with private key string)', () => {
+    it('should return accountKeyRoleBased', () => {
+      const key = {
+        feePayerKey: caver.klay.accounts.create().privateKey
+      }
+      const accountKey = caver.klay.accounts.createAccountKey(key)
+      
+      expect(accountKey.type).to.equals('AccountKeyRoleBased')
+      expect(accountKey.defaultKey).to.equals(key.feePayerKey)
+      compareAccountKey(accountKey, key)
+      expect(typeof accountKey.toPublicKey).to.equals('function')
+      expect(typeof accountKey.update).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-146: input: keyObject(feePayerKey is defined with array of private key string)', () => {
+    it('should return accountKeyRoleBased', () => {
+      const key = {
+        feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      }
+      const accountKey = caver.klay.accounts.createAccountKey(key)
+      
+      expect(accountKey.type).to.equals('AccountKeyRoleBased')
+      expect(accountKey.defaultKey).to.equals(key.feePayerKey[0])
+      compareAccountKey(accountKey, key)
+      expect(typeof accountKey.toPublicKey).to.equals('function')
+      expect(typeof accountKey.update).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-147: input: keyObject(transactionKey, updateKey, feePayerKey are defined)', () => {
+    it('should return accountKeyRoleBased', () => {
+      const key = {
+        transactionKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        updateKey: caver.klay.accounts.create().privateKey,
+        feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      }
+
+      const accountKey = caver.klay.accounts.createAccountKey(key)
+      
+      expect(accountKey.type).to.equals('AccountKeyRoleBased')
+      expect(accountKey.defaultKey).to.equals(key.transactionKey[0])
+      compareAccountKey(accountKey, key)
+      expect(typeof accountKey.toPublicKey).to.equals('function')
+      expect(typeof accountKey.update).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-148: input: invalid type of parameter', () => {
+    it('should throw Error', () => {
+      let param = 1
+      let expectedError = `Invalid accountKey type: ${typeof param}`
+      expect(() => caver.klay.accounts.createAccountKey(param)).to.throws(expectedError)
+
+      param = undefined
+      expectedError = `Invalid accountKey type: ${typeof param}`
+      expect(() => caver.klay.accounts.createAccountKey(param)).to.throws(expectedError)
+
+      param = null
+      expectedError = `Invalid accountKey type: ${typeof param}`
+      expect(() => caver.klay.accounts.createAccountKey(param)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-149: input: invalid parameter', () => {
+    it('should throw Error', () => {
+      let param = 'invalidString'
+      let expectedError = `Invalid private key`
+      expect(() => caver.klay.accounts.createAccountKey(param)).to.throws(expectedError)
+
+      param = ['invalidString']
+      expectedError = `Invalid private key`
+      expect(() => caver.klay.accounts.createAccountKey(param)).to.throws(expectedError)
+
+      param = {}
+      expectedError = `Failed to create AccountKeyRoleBased: empty object`
+      expect(() => caver.klay.accounts.createAccountKey(param)).to.throws(expectedError)
+    })
+  })
+})
+
+describe('caver.klay.accounts.createAccountKeyPublic', () => {
+  context('CAVERJS-UNIT-WALLET-150: input: private key string`', () => {
+    it('should return AccountKeyPublic', () => {
+      const key = caver.klay.accounts.create().privateKey
+      const accountKey = caver.klay.accounts.createAccountKeyPublic(key)
+
+      expect(accountKey.type).to.equals('AccountKeyPublic')
+      expect(accountKey.defaultKey).to.equals(key)
+      compareAccountKey(accountKey, key)
+      expect(typeof accountKey.toPublicKey).to.equals('function')
+      expect(typeof accountKey.update).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-151: input: AccountKeyPublic', () => {
+    it('should return AccountKeyPublic', () => {
+      const key = caver.klay.accounts.create().privateKey
+      const accountKey = caver.klay.accounts.createAccountKeyPublic(caver.klay.accounts.createAccountKeyPublic(key))
+
+      expect(accountKey.type).to.equals('AccountKeyPublic')
+      expect(accountKey.defaultKey).to.equals(key)
+      compareAccountKey(accountKey, key)
+      expect(typeof accountKey.toPublicKey).to.equals('function')
+      expect(typeof accountKey.update).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-152: input: invalid type of parameter', () => {
+    it('should throw Error', () => {
+      let param = 1
+      let expectedError = `Creating a AccountKeyPublic requires a private key string.`
+      expect(() => caver.klay.accounts.createAccountKeyPublic(param)).to.throws(expectedError)
+
+      param = []
+      expectedError = `Creating a AccountKeyPublic requires a private key string.`
+      expect(() => caver.klay.accounts.createAccountKeyPublic(param)).to.throws(expectedError)
+
+      param = {}
+      expectedError = `Creating a AccountKeyPublic requires a private key string.`
+      expect(() => caver.klay.accounts.createAccountKeyPublic(param)).to.throws(expectedError)
+
+      param = undefined
+      expectedError = `Creating a AccountKeyPublic requires a private key string.`
+      expect(() => caver.klay.accounts.createAccountKeyPublic(param)).to.throws(expectedError)
+
+      param = null
+      expectedError = `Creating a AccountKeyPublic requires a private key string.`
+      expect(() => caver.klay.accounts.createAccountKeyPublic(param)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-153: input: invalid parameter', () => {
+    it('should throw Error', () => {
+      const param = 'invalidString'
+      const expectedError = `Invalid private key`
+      expect(() => caver.klay.accounts.createAccountKeyPublic(param)).to.throws(expectedError)
+    })
+  })
+})
+
+describe('caver.klay.accounts.createAccountKeyMultiSig', () => {
+  context('CAVERJS-UNIT-WALLET-154: input: private key string`', () => {
+    it('should return AccountKeyMultiSig', () => {
+      const key = [caver.klay.accounts.create().privateKey]
+      const accountKey = caver.klay.accounts.createAccountKeyMultiSig(key)
+
+      expect(accountKey.type).to.equals('AccountKeyMultiSig')
+      expect(accountKey.defaultKey).to.equals(key[0])
+      compareAccountKey(accountKey, key)
+      expect(typeof accountKey.toPublicKey).to.equals('function')
+      expect(typeof accountKey.update).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-155: input: AccountKeyMultiSig', () => {
+    it('should return AccountKeyMultiSig', () => {
+      const key = [caver.klay.accounts.create().privateKey]
+      const accountKey = caver.klay.accounts.createAccountKeyMultiSig(caver.klay.accounts.createAccountKeyMultiSig(key))
+
+      expect(accountKey.type).to.equals('AccountKeyMultiSig')
+      expect(accountKey.defaultKey).to.equals(key[0])
+      compareAccountKey(accountKey, key)
+      expect(typeof accountKey.toPublicKey).to.equals('function')
+      expect(typeof accountKey.update).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-156: input: invalid type of parameter', () => {
+    it('should throw Error', () => {
+      let param = 1
+      let expectedError = `Creating a AccountKeyMultiSig requires an array of private key string.`
+      expect(() => caver.klay.accounts.createAccountKeyMultiSig(param)).to.throws(expectedError)
+
+      param = 'string'
+      expectedError = `Creating a AccountKeyMultiSig requires an array of private key string.`
+      expect(() => caver.klay.accounts.createAccountKeyMultiSig(param)).to.throws(expectedError)
+
+      param = {}
+      expectedError = `Creating a AccountKeyMultiSig requires an array of private key string.`
+      expect(() => caver.klay.accounts.createAccountKeyMultiSig(param)).to.throws(expectedError)
+
+      param = undefined
+      expectedError = `Creating a AccountKeyMultiSig requires an array of private key string.`
+      expect(() => caver.klay.accounts.createAccountKeyMultiSig(param)).to.throws(expectedError)
+
+      param = null
+      expectedError = `Creating a AccountKeyMultiSig requires an array of private key string.`
+      expect(() => caver.klay.accounts.createAccountKeyMultiSig(param)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-157: input: invalid parameter', () => {
+    it('should throw Error', () => {
+      const param = ['invalidString']
+      const expectedError = `Invalid private key`
+      expect(() => caver.klay.accounts.createAccountKeyMultiSig(param)).to.throws(expectedError)
+    })
+  })
+})
+
+describe('caver.klay.accounts.createAccountKeyRoleBased', () => {
+  context('CAVERJS-UNIT-WALLET-158: input: private key string', () => {
+    it('should return AccountKeyRoleBased', () => {
+      const key = {
+        transactionKey: [caver.klay.accounts.create().privateKey],
+        updateKey: caver.klay.accounts.create().privateKey,
+        feePayerKey: caver.klay.accounts.create().privateKey,
+      }
+      const accountKey = caver.klay.accounts.createAccountKeyRoleBased(key)
+
+      expect(accountKey.type).to.equals('AccountKeyRoleBased')
+      expect(accountKey.defaultKey).to.equals(key.transactionKey[0])
+      compareAccountKey(accountKey, key)
+      expect(typeof accountKey.toPublicKey).to.equals('function')
+      expect(typeof accountKey.update).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-159: input: AccountKeyRoleBased', () => {
+    it('should return AccountKeyRoleBased', () => {
+      const key = {
+        transactionKey: [caver.klay.accounts.create().privateKey],
+        updateKey: caver.klay.accounts.create().privateKey,
+        feePayerKey: caver.klay.accounts.create().privateKey,
+      }
+      const accountKey = caver.klay.accounts.createAccountKeyRoleBased(caver.klay.accounts.createAccountKeyRoleBased(key))
+
+      expect(accountKey.type).to.equals('AccountKeyRoleBased')
+      expect(accountKey.defaultKey).to.equals(key.transactionKey[0])
+      compareAccountKey(accountKey, key)
+      expect(typeof accountKey.toPublicKey).to.equals('function')
+      expect(typeof accountKey.update).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-160: input: invalid type of parameter', () => {
+    it('should throw Error', () => {
+      let param = 1
+      let expectedError = `Creating a AccountKeyRoleBased requires an object.`
+      expect(() => caver.klay.accounts.createAccountKeyRoleBased(param)).to.throws(expectedError)
+
+      param = 'string'
+      expectedError = `Creating a AccountKeyRoleBased requires an object.`
+      expect(() => caver.klay.accounts.createAccountKeyRoleBased(param)).to.throws(expectedError)
+
+      param = []
+      expectedError = `Creating a AccountKeyRoleBased requires an object.`
+      expect(() => caver.klay.accounts.createAccountKeyRoleBased(param)).to.throws(expectedError)
+
+      param = undefined
+      expectedError = `Creating a AccountKeyRoleBased requires an object.`
+      expect(() => caver.klay.accounts.createAccountKeyRoleBased(param)).to.throws(expectedError)
+
+      param = null
+      expectedError = `Creating a AccountKeyRoleBased requires an object.`
+      expect(() => caver.klay.accounts.createAccountKeyRoleBased(param)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-161: input: empty object', () => {
+    it('should throw Error', () => {
+      let param = {}
+      let expectedError = `Failed to create AccountKeyRoleBased: empty object`
+      expect(() => caver.klay.accounts.createAccountKeyRoleBased(param)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-162: input: invalid role is defined', () => {
+    it('should throw Error', () => {
+      let param = { invalidRole: 'invalidString' }
+      expectedError = `Failed to create AccountKeyRoleBased. Invalid role is defined : invalidRole`
+      expect(() => caver.klay.accounts.createAccountKeyRoleBased(param)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-163: input: invalid parameter', () => {
+    it('should throw Error', () => {
+      let param = { transactionKey: 'invalidString' }
+      let expectedError = `Invalid private key`
+      expect(() => caver.klay.accounts.createAccountKeyRoleBased(param)).to.throws(expectedError)
+    })
+  })
+})
+
+describe('caver.klay.accounts.accountKeyToPublicKey', () => {
+  context('CAVERJS-UNIT-WALLET-164: input: private key string', () => {
+    it('should return string of public key', () => {
+      const key = caver.klay.accounts.create().privateKey
+      const expectedPublicKey = caver.klay.accounts.privateKeyToPublicKey(key)
+
+      const publicKey = caver.klay.accounts.accountKeyToPublicKey(key)
+
+      expect(expectedPublicKey).to.equals(publicKey)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-165: input: AccountKeyPublic', () => {
+    it('should return string of public key', () => {
+      const key = caver.klay.accounts.create().privateKey
+      const accountKey = caver.klay.accounts.createAccountKeyPublic(key)
+      const expectedPublicKey = caver.klay.accounts.privateKeyToPublicKey(key)
+
+      const publicKey = caver.klay.accounts.accountKeyToPublicKey(accountKey)
+
+      expect(expectedPublicKey).to.equals(publicKey)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-166: input: array of private key string', () => {
+    it('should return array of public key string', () => {
+      const key = [caver.klay.accounts.create().privateKey]
+      const expectedPublicKey = [caver.klay.accounts.privateKeyToPublicKey(key[0])]
+
+      const publicKey = caver.klay.accounts.accountKeyToPublicKey(key)
+
+      expect(isSameKeyArray(expectedPublicKey, publicKey)).to.be.true
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-167: input: AccountKeyMultiSig', () => {
+    it('should return array of public key string', () => {
+      const key = [caver.klay.accounts.create().privateKey]
+      const accountKey = caver.klay.accounts.createAccountKeyMultiSig(key)
+      const expectedPublicKey = [caver.klay.accounts.privateKeyToPublicKey(key[0])]
+
+      const publicKey = caver.klay.accounts.accountKeyToPublicKey(accountKey)
+
+      expect(isSameKeyArray(expectedPublicKey, publicKey)).to.be.true
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-168: input: object defines key', () => {
+    it('should return object of public key string', () => {
+      const key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: caver.klay.accounts.create().privateKey,
+        feePayerKey: [caver.klay.accounts.create().privateKey],
+      }
+      const expectedPublicKey = {
+        transactionKey: caver.klay.accounts.privateKeyToPublicKey(key.transactionKey),
+        updateKey: caver.klay.accounts.privateKeyToPublicKey(key.updateKey),
+        feePayerKey: [caver.klay.accounts.privateKeyToPublicKey(key.feePayerKey[0])],
+      }
+
+      const publicKey = caver.klay.accounts.accountKeyToPublicKey(key)
+
+      expect(publicKey.transactionKey).to.equals(expectedPublicKey.transactionKey)
+      expect(publicKey.updateKey).to.equals(expectedPublicKey.updateKey)
+      expect(isSameKeyArray(expectedPublicKey.feePayerKey, publicKey.feePayerKey)).to.be.true
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-169: input: AccountKeyRoleBased', () => {
+    it('should return array of public key string', () => {
+      const key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: caver.klay.accounts.create().privateKey,
+        feePayerKey: [caver.klay.accounts.create().privateKey],
+      }
+      const accountKey = caver.klay.accounts.createAccountKeyRoleBased(key)
+      const expectedPublicKey = {
+        transactionKey: caver.klay.accounts.privateKeyToPublicKey(key.transactionKey),
+        updateKey: caver.klay.accounts.privateKeyToPublicKey(key.updateKey),
+        feePayerKey: [caver.klay.accounts.privateKeyToPublicKey(key.feePayerKey[0])],
+      }
+
+      const publicKey = caver.klay.accounts.accountKeyToPublicKey(accountKey)
+
+      expect(publicKey.transactionKey).to.equals(expectedPublicKey.transactionKey)
+      expect(publicKey.updateKey).to.equals(expectedPublicKey.updateKey)
+      expect(isSameKeyArray(expectedPublicKey.feePayerKey, publicKey.feePayerKey)).to.be.true
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-170: input: object defines transactionKey only', () => {
+    it('should return object of public key string', () => {
+      const key = { transactionKey: caver.klay.accounts.create().privateKey, }
+      const expectedPublicKey = {
+        transactionKey: caver.klay.accounts.privateKeyToPublicKey(key.transactionKey),
+      }
+
+      const publicKey = caver.klay.accounts.accountKeyToPublicKey(key)
+
+      expect(publicKey.transactionKey).to.equals(expectedPublicKey.transactionKey)
+      expect(publicKey.updateKey).to.be.undefined
+      expect(publicKey.feePayerKey).to.be.undefined
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-171: input: object defines updateKey only', () => {
+    it('should return object of public key string', () => {
+      const key = { updateKey: caver.klay.accounts.create().privateKey, }
+      const expectedPublicKey = {
+        updateKey: caver.klay.accounts.privateKeyToPublicKey(key.updateKey),
+      }
+
+      const publicKey = caver.klay.accounts.accountKeyToPublicKey(key)
+
+      expect(publicKey.transactionKey).to.be.undefined
+      expect(publicKey.updateKey).to.equals(expectedPublicKey.updateKey)
+      expect(publicKey.feePayerKey).to.be.undefined
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-172: input: object defines feePayerKey only', () => {
+    it('should return object of public key string', () => {
+      const key = { feePayerKey: caver.klay.accounts.create().privateKey, }
+      const expectedPublicKey = {
+        feePayerKey: caver.klay.accounts.privateKeyToPublicKey(key.feePayerKey),
+      }
+
+      const publicKey = caver.klay.accounts.accountKeyToPublicKey(key)
+
+      expect(publicKey.transactionKey).to.be.undefined
+      expect(publicKey.updateKey).to.be.undefined
+      expect(publicKey.feePayerKey).to.equals(expectedPublicKey.feePayerKey)
+    })
+  })
+})
+
+describe('caver.klay.accounts.createWithAccountKey', () => {
+  context('CAVERJS-UNIT-WALLET-173: input: address and private key string', () => {
+    it('should return Account with AccountKeyPublic', () => {
+      const address = caver.klay.accounts.create().address
+      const key = caver.klay.accounts.create().privateKey
+
+      const account = caver.klay.accounts.createWithAccountKey(address, key)
+
+      isAccount(account, {keys: key, address})
+      expect(account.privateKey).to.equals(key)
+      expect(account.accountKeyType).to.equals('AccountKeyPublic')
+      expect(typeof account.toPublicKey).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-174: input: address and array of private key string', () => {
+    it('should return Account with AccountKeyMultiSig', () => {
+      const address = caver.klay.accounts.create().address
+      const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+
+      const account = caver.klay.accounts.createWithAccountKey(address, key)
+
+      isAccount(account, {keys: key, address})
+      expect(account.privateKey).to.equals(key[0])
+      expect(account.accountKeyType).to.equals('AccountKeyMultiSig')
+      expect(typeof account.toPublicKey).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-175: input: address and object of private key', () => {
+    it('should return Account with AccountKeyRoleBased', () => {
+      const address = caver.klay.accounts.create().address
+      const key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        feePayerKey: [caver.klay.accounts.create().privateKey]
+      }
+
+      const account = caver.klay.accounts.createWithAccountKey(address, key)
+      isAccount(account, {keys: key, address})
+      expect(account.privateKey).to.equals(key.transactionKey)
+      expect(account.accountKeyType).to.equals('AccountKeyRoleBased')
+      expect(typeof account.toPublicKey).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-176: input: address and object defines only transactionKey', () => {
+    it('should return Account with AccountKeyRoleBased', () => {
+      const address = caver.klay.accounts.create().address
+      const key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+      }
+
+      const account = caver.klay.accounts.createWithAccountKey(address, key)
+      isAccount(account, {keys: key, address})
+      expect(account.privateKey).to.equals(key.transactionKey)
+      expect(account.accountKeyType).to.equals('AccountKeyRoleBased')
+      expect(typeof account.toPublicKey).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-177: input: address and object defines only updateKey', () => {
+    it('should return Account with AccountKeyRoleBased', () => {
+      const address = caver.klay.accounts.create().address
+      const key = {
+        updateKey: caver.klay.accounts.create().privateKey,
+      }
+
+      const account = caver.klay.accounts.createWithAccountKey(address, key)
+      isAccount(account, {keys: key, address})
+      expect(account.privateKey).to.equals(key.updateKey)
+      expect(account.accountKeyType).to.equals('AccountKeyRoleBased')
+      expect(typeof account.toPublicKey).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-178: input: address and object defines only feePayerKey', () => {
+    it('should return Account with AccountKeyRoleBased', () => {
+      const address = caver.klay.accounts.create().address
+      const key = {
+        feePayerKey: caver.klay.accounts.create().privateKey,
+      }
+
+      const account = caver.klay.accounts.createWithAccountKey(address, key)
+      isAccount(account, {keys: key, address})
+      expect(account.privateKey).to.equals(key.feePayerKey)
+      expect(account.accountKeyType).to.equals('AccountKeyRoleBased')
+      expect(typeof account.toPublicKey).to.equals('function')
+    })
+  })
+})
+
+describe('caver.klay.accounts.createWithAccountKeyPublic', () => {
+  context('CAVERJS-UNIT-WALLET-179: input: address and private key string', () => {
+    it('should return Account with AccountKeyPublic', () => {
+      const address = caver.klay.accounts.create().address
+      const key = caver.klay.accounts.create().privateKey
+
+      const account = caver.klay.accounts.createWithAccountKeyPublic(address, key)
+
+      isAccount(account, {keys: key, address})
+      expect(account.privateKey).to.equals(key)
+      expect(account.accountKeyType).to.equals('AccountKeyPublic')
+      expect(typeof account.toPublicKey).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-180: input: address and AccountKeyPublic', () => {
+    it('should return Account with AccountKeyPublic', () => {
+      const address = caver.klay.accounts.create().address
+      const key = caver.klay.accounts.create().privateKey
+      const accountKey = caver.klay.accounts.createAccountKey(key)
+
+      const account = caver.klay.accounts.createWithAccountKeyPublic(address, accountKey)
+
+      isAccount(account, {keys: key, address})
+      expect(account.privateKey).to.equals(key)
+      expect(account.accountKeyType).to.equals('AccountKeyPublic')
+      expect(typeof account.toPublicKey).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-181: input: address and array of private key string', () => {
+    it('should throw error', () => {
+      const address = caver.klay.accounts.create().address
+      const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+
+      const expectedError = 'Creating a AccountKeyPublic requires a private key string.'
+
+      expect(() => caver.klay.accounts.createWithAccountKeyPublic(address, key)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-182: input: address and object', () => {
+    it('should throw error', () => {
+      const address = caver.klay.accounts.create().address
+      const key = {transactionKey: caver.klay.accounts.create().privateKey}
+      
+      const expectedError = 'Creating a AccountKeyPublic requires a private key string.'
+
+      expect(() => caver.klay.accounts.createWithAccountKeyPublic(address, key)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-183: input: address and AccountKeyMultiSig', () => {
+    it('should throw error', () => {
+      const address = caver.klay.accounts.create().address
+      const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      const accountKey = caver.klay.accounts.createAccountKey(key)
+
+      const expectedError = `Failed to create account with AccountKeyPublic. Invalid account key : ${accountKey.type}`
+
+      expect(() => caver.klay.accounts.createWithAccountKeyPublic(address, accountKey)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-184: input: address and AccountKeyRoleBased', () => {
+    it('should throw error', () => {
+      const address = caver.klay.accounts.create().address
+      const key = {transactionKey: caver.klay.accounts.create().privateKey}
+      const accountKey = caver.klay.accounts.createAccountKey(key)
+
+      const expectedError = `Failed to create account with AccountKeyPublic. Invalid account key : ${accountKey.type}`
+
+      expect(() => caver.klay.accounts.createWithAccountKeyPublic(address, accountKey)).to.throws(expectedError)
+    })
+  })
+})
+
+describe('caver.klay.accounts.createWithAccountKeyMultiSig', () => {
+  context('CAVERJS-UNIT-WALLET-185: input: address and array of private key string', () => {
+    it('should return Account with AccountKeyMultiSig', () => {
+      const address = caver.klay.accounts.create().address
+      const key = [caver.klay.accounts.create().privateKey]
+
+      const account = caver.klay.accounts.createWithAccountKeyMultiSig(address, key)
+
+      isAccount(account, {keys: key, address})
+      expect(account.privateKey).to.equals(key[0])
+      expect(account.accountKeyType).to.equals('AccountKeyMultiSig')
+      expect(typeof account.toPublicKey).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-186: input: address and AccountKeyMultiSig', () => {
+    it('should return Account with AccountKeyMultiSig', () => {
+      const address = caver.klay.accounts.create().address
+      const key = [caver.klay.accounts.create().privateKey]
+      const accountKey = caver.klay.accounts.createAccountKey(key)
+
+      const account = caver.klay.accounts.createWithAccountKeyMultiSig(address, accountKey)
+
+      isAccount(account, {keys: key, address})
+      expect(account.privateKey).to.equals(key[0])
+      expect(account.accountKeyType).to.equals('AccountKeyMultiSig')
+      expect(typeof account.toPublicKey).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-187: input: address and private key string', () => {
+    it('should throw error', () => {
+      const address = caver.klay.accounts.create().address
+      const key = caver.klay.accounts.create().privateKey
+
+      const expectedError = 'Creating a AccountKeyMultiSig requires an array of private key string.'
+
+      expect(() => caver.klay.accounts.createWithAccountKeyMultiSig(address, key)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-188: input: address and object', () => {
+    it('should throw error', () => {
+      const address = caver.klay.accounts.create().address
+      const key = {transactionKey: caver.klay.accounts.create().privateKey}
+      
+      const expectedError = 'Creating a AccountKeyMultiSig requires an array of private key string.'
+
+      expect(() => caver.klay.accounts.createWithAccountKeyMultiSig(address, key)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-189: input: address and AccountKeyPublic', () => {
+    it('should throw error', () => {
+      const address = caver.klay.accounts.create().address
+      const key = caver.klay.accounts.create().privateKey
+      const accountKey = caver.klay.accounts.createAccountKey(key)
+
+      const expectedError = `Failed to create account with AccountKeyMultiSig. Invalid account key : ${accountKey.type}`
+
+      expect(() => caver.klay.accounts.createWithAccountKeyMultiSig(address, accountKey)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-190: input: address and AccountKeyRoleBased', () => {
+    it('should throw error', () => {
+      const address = caver.klay.accounts.create().address
+      const key = {transactionKey: caver.klay.accounts.create().privateKey}
+      const accountKey = caver.klay.accounts.createAccountKey(key)
+
+      const expectedError = `Failed to create account with AccountKeyMultiSig. Invalid account key : ${accountKey.type}`
+
+      expect(() => caver.klay.accounts.createWithAccountKeyMultiSig(address, accountKey)).to.throws(expectedError)
+    })
+  })
+})
+
+describe('caver.klay.accounts.createWithAccountKeyRoleBased', () => {
+  context('CAVERJS-UNIT-WALLET-191: input: address and object of key', () => {
+    it('should return Account with AccountKeyRoleBased', () => {
+      const address = caver.klay.accounts.create().address
+      const key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        feePayerKey: caver.klay.accounts.create().privateKey
+      }
+
+      const account = caver.klay.accounts.createWithAccountKeyRoleBased(address, key)
+
+      isAccount(account, {keys: key, address})
+      expect(account.privateKey).to.equals(key.transactionKey)
+      expect(account.accountKeyType).to.equals('AccountKeyRoleBased')
+      expect(typeof account.toPublicKey).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-192: input: address and AccountKeyRoleBased', () => {
+    it('should return Account with AccountKeyRoleBased', () => {
+      const address = caver.klay.accounts.create().address
+      const key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        feePayerKey: caver.klay.accounts.create().privateKey
+      }
+      const accountKey = caver.klay.accounts.createAccountKey(key)
+
+      const account = caver.klay.accounts.createWithAccountKeyRoleBased(address, accountKey)
+
+      isAccount(account, {keys: key, address})
+      expect(account.privateKey).to.equals(key.transactionKey)
+      expect(account.accountKeyType).to.equals('AccountKeyRoleBased')
+      expect(typeof account.toPublicKey).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-193: input: address and private key string', () => {
+    it('should throw error', () => {
+      const address = caver.klay.accounts.create().address
+      const key = caver.klay.accounts.create().privateKey
+
+      const expectedError = 'Creating a AccountKeyRoleBased requires an object.'
+
+      expect(() => caver.klay.accounts.createWithAccountKeyRoleBased(address, key)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-194: input: address and array of private key string', () => {
+    it('should throw error', () => {
+      const address = caver.klay.accounts.create().address
+      const key = [caver.klay.accounts.create().privateKey]
+      
+      const expectedError = 'Creating a AccountKeyRoleBased requires an object.'
+
+      expect(() => caver.klay.accounts.createWithAccountKeyRoleBased(address, key)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-195: input: address and AccountKeyPublic', () => {
+    it('should throw error', () => {
+      const address = caver.klay.accounts.create().address
+      const key = caver.klay.accounts.create().privateKey
+      const accountKey = caver.klay.accounts.createAccountKey(key)
+
+      const expectedError = `Failed to create account with AccountKeyRoleBased. Invalid account key : ${accountKey.type}`
+
+      expect(() => caver.klay.accounts.createWithAccountKeyRoleBased(address, accountKey)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-196: input: address and AccountKeyMultiSig', () => {
+    it('should throw error', () => {
+      const address = caver.klay.accounts.create().address
+      const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      const accountKey = caver.klay.accounts.createAccountKey(key)
+
+      const expectedError = `Failed to create account with AccountKeyRoleBased. Invalid account key : ${accountKey.type}`
+
+      expect(() => caver.klay.accounts.createWithAccountKeyRoleBased(address, accountKey)).to.throws(expectedError)
+    })
+  })
+})
+
+describe('caver.klay.accounts.createAccountForUpdate', () => {
+  context('CAVERJS-UNIT-WALLET-197: input: address and private key string', () => {
+    it('should return AccountForUpdate', () => {
+      const address = caver.klay.accounts.create().address
+      const key = caver.klay.accounts.create().privateKey
+      const publicKey = caver.klay.accounts.privateKeyToPublicKey(key)
+
+      const accountForUpdate = caver.klay.accounts.createAccountForUpdate(address, key)
+
+      expect(accountForUpdate.address).to.equals(address)
+      expect(accountForUpdate.keyForUpdate.publicKey).to.equals(publicKey)
+      expect(typeof accountForUpdate.fillUpdateObject).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-198: input: address and AccountKeyPublic', () => {
+    it('should return AccountForUpdate', () => {
+      const address = caver.klay.accounts.create().address
+      const key = caver.klay.accounts.create().privateKey
+      const accountKey = caver.klay.accounts.createAccountKeyPublic(key)
+      const publicKey = caver.klay.accounts.privateKeyToPublicKey(key)
+
+      const accountForUpdate = caver.klay.accounts.createAccountForUpdate(address, accountKey)
+
+      expect(accountForUpdate.address).to.equals(address)
+      expect(accountForUpdate.keyForUpdate.publicKey).to.equals(publicKey)
+      expect(typeof accountForUpdate.fillUpdateObject).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-199: input: address and array of private key string', () => {
+    it('should return AccountForUpdate', () => {
+      const address = caver.klay.accounts.create().address
+      const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      const options = { threshold: 2, weight: [1,1] }
+      const publicKey = [caver.klay.accounts.privateKeyToPublicKey(key[0]), caver.klay.accounts.privateKeyToPublicKey(key[1])]
+
+      const accountForUpdate = caver.klay.accounts.createAccountForUpdate(address, key, options)
+
+      expect(accountForUpdate.address).to.equals(address)
+      expect(accountForUpdate.keyForUpdate.multisig.threshold).to.equals(options.threshold)
+      expect(accountForUpdate.keyForUpdate.multisig.keys[0].weight).to.equals(options.weight[0])
+      expect(accountForUpdate.keyForUpdate.multisig.keys[0].publicKey).to.equals(publicKey[0])
+      expect(accountForUpdate.keyForUpdate.multisig.keys[1].weight).to.equals(options.weight[1])
+      expect(accountForUpdate.keyForUpdate.multisig.keys[1].publicKey).to.equals(publicKey[1])
+      expect(typeof accountForUpdate.fillUpdateObject).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-200: input: address and AccountKeyMultiSig', () => {
+    it('should return AccountForUpdate', () => {
+      const address = caver.klay.accounts.create().address
+      const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      const accountKey = caver.klay.accounts.createAccountKeyMultiSig(key)
+      const options = { threshold: 2, weight: [1,1] }
+      const publicKey = [caver.klay.accounts.privateKeyToPublicKey(key[0]), caver.klay.accounts.privateKeyToPublicKey(key[1])]
+
+      const accountForUpdate = caver.klay.accounts.createAccountForUpdate(address, accountKey, options)
+
+      expect(accountForUpdate.address).to.equals(address)
+      expect(accountForUpdate.keyForUpdate.multisig.threshold).to.equals(options.threshold)
+      expect(accountForUpdate.keyForUpdate.multisig.keys[0].weight).to.equals(options.weight[0])
+      expect(accountForUpdate.keyForUpdate.multisig.keys[0].publicKey).to.equals(publicKey[0])
+      expect(accountForUpdate.keyForUpdate.multisig.keys[1].weight).to.equals(options.weight[1])
+      expect(accountForUpdate.keyForUpdate.multisig.keys[1].publicKey).to.equals(publicKey[1])
+      expect(typeof accountForUpdate.fillUpdateObject).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-201: input: address and object', () => {
+    it('should return AccountForUpdate', () => {
+      const address = caver.klay.accounts.create().address
+      const key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        feePayerKey: caver.klay.accounts.create().privateKey,
+      }
+      const options = { updateKey: { threshold: 2, weight: [1,1] } }
+      const publicKey = {
+        transactionKey: caver.klay.accounts.privateKeyToPublicKey(key.transactionKey),
+        updateKey: [caver.klay.accounts.privateKeyToPublicKey(key.updateKey[0]), caver.klay.accounts.privateKeyToPublicKey(key.updateKey[1])],
+        feePayerKey: caver.klay.accounts.privateKeyToPublicKey(key.feePayerKey)
+      }
+
+      const accountForUpdate = caver.klay.accounts.createAccountForUpdate(address, key, options)
+
+      expect(accountForUpdate.address).to.equals(address)
+      expect(accountForUpdate.keyForUpdate.roleTransactionKey.publicKey).to.equals(publicKey.transactionKey)
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.multisig.threshold).to.equals(options.updateKey.threshold)
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.multisig.keys[0].weight).to.equals(options.updateKey.weight[0])
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.multisig.keys[0].publicKey).to.equals(publicKey.updateKey[0])
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.multisig.keys[1].weight).to.equals(options.updateKey.weight[1])
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.multisig.keys[1].publicKey).to.equals(publicKey.updateKey[1])
+      expect(accountForUpdate.keyForUpdate.roleFeePayerKey.publicKey).to.equals(publicKey.feePayerKey)
+      expect(typeof accountForUpdate.fillUpdateObject).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-202: input: address and AccountKeyRoleBased', () => {
+    it('should return AccountForUpdate', () => {
+      const address = caver.klay.accounts.create().address
+      const key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        feePayerKey: caver.klay.accounts.create().privateKey,
+      }
+      const accountKey = caver.klay.accounts.createAccountKeyRoleBased(key)
+      const options = { updateKey: { threshold: 2, weight: [1,1] } }
+      const publicKey = {
+        transactionKey: caver.klay.accounts.privateKeyToPublicKey(key.transactionKey),
+        updateKey: [caver.klay.accounts.privateKeyToPublicKey(key.updateKey[0]), caver.klay.accounts.privateKeyToPublicKey(key.updateKey[1])],
+        feePayerKey: caver.klay.accounts.privateKeyToPublicKey(key.feePayerKey)
+      }
+
+      const accountForUpdate = caver.klay.accounts.createAccountForUpdate(address, accountKey, options)
+
+      expect(accountForUpdate.address).to.equals(address)
+      expect(accountForUpdate.keyForUpdate.roleTransactionKey.publicKey).to.equals(publicKey.transactionKey)
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.multisig.threshold).to.equals(options.updateKey.threshold)
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.multisig.keys[0].weight).to.equals(options.updateKey.weight[0])
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.multisig.keys[0].publicKey).to.equals(publicKey.updateKey[0])
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.multisig.keys[1].weight).to.equals(options.updateKey.weight[1])
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.multisig.keys[1].publicKey).to.equals(publicKey.updateKey[1])
+      expect(accountForUpdate.keyForUpdate.roleFeePayerKey.publicKey).to.equals(publicKey.feePayerKey)
+      expect(typeof accountForUpdate.fillUpdateObject).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-203: input: address and object defines transactionKey only', () => {
+    it('should return AccountForUpdate', () => {
+      const address = caver.klay.accounts.create().address
+      const key = { transactionKey: caver.klay.accounts.create().privateKey }
+      const publicKey = { transactionKey: caver.klay.accounts.privateKeyToPublicKey(key.transactionKey) }
+
+      const accountForUpdate = caver.klay.accounts.createAccountForUpdate(address, key)
+
+      expect(accountForUpdate.address).to.equals(address)
+      expect(accountForUpdate.keyForUpdate.roleTransactionKey.publicKey).to.equals(publicKey.transactionKey)
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey).to.be.undefined
+      expect(accountForUpdate.keyForUpdate.roleFeePayerKey).to.be.undefined
+      expect(typeof accountForUpdate.fillUpdateObject).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-204: input: address and AccountKeyRoleBased defines transactionKey only', () => {
+    it('should return AccountForUpdate', () => {
+      const address = caver.klay.accounts.create().address
+      const key = { transactionKey: caver.klay.accounts.create().privateKey }
+      const accountKey = caver.klay.accounts.createAccountKeyRoleBased(key)
+      const publicKey = { transactionKey: caver.klay.accounts.privateKeyToPublicKey(key.transactionKey) }
+
+      const accountForUpdate = caver.klay.accounts.createAccountForUpdate(address, accountKey)
+
+      expect(accountForUpdate.address).to.equals(address)
+      expect(accountForUpdate.keyForUpdate.roleTransactionKey.publicKey).to.equals(publicKey.transactionKey)
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey).to.be.undefined
+      expect(accountForUpdate.keyForUpdate.roleFeePayerKey).to.be.undefined
+      expect(typeof accountForUpdate.fillUpdateObject).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-205: input: address and object defines updateKey only', () => {
+    it('should return AccountForUpdate', () => {
+      const address = caver.klay.accounts.create().address
+      const key = { updateKey: caver.klay.accounts.create().privateKey }
+      const publicKey = { updateKey: caver.klay.accounts.privateKeyToPublicKey(key.updateKey) }
+
+      const accountForUpdate = caver.klay.accounts.createAccountForUpdate(address, key)
+
+      expect(accountForUpdate.address).to.equals(address)
+      expect(accountForUpdate.keyForUpdate.roleTransactionKey).to.be.undefined
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.publicKey).to.equals(publicKey.updateKey)
+      expect(accountForUpdate.keyForUpdate.roleFeePayerKey).to.be.undefined
+      expect(typeof accountForUpdate.fillUpdateObject).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-206: input: address and AccountKeyRoleBased defines updateKey only', () => {
+    it('should return AccountForUpdate', () => {
+      const address = caver.klay.accounts.create().address
+      const key = { updateKey: caver.klay.accounts.create().privateKey }
+      const accountKey = caver.klay.accounts.createAccountKeyRoleBased(key)
+      const publicKey = { updateKey: caver.klay.accounts.privateKeyToPublicKey(key.updateKey) }
+
+      const accountForUpdate = caver.klay.accounts.createAccountForUpdate(address, accountKey)
+
+      expect(accountForUpdate.address).to.equals(address)
+      expect(accountForUpdate.keyForUpdate.roleTransactionKey).to.be.undefined
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.publicKey).to.equals(publicKey.updateKey)
+      expect(accountForUpdate.keyForUpdate.roleFeePayerKey).to.be.undefined
+      expect(typeof accountForUpdate.fillUpdateObject).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-207: input: address and object defines feePayerKey only', () => {
+    it('should return AccountForUpdate', () => {
+      const address = caver.klay.accounts.create().address
+      const key = { feePayerKey: caver.klay.accounts.create().privateKey }
+      const publicKey = { feePayerKey: caver.klay.accounts.privateKeyToPublicKey(key.feePayerKey) }
+
+      const accountForUpdate = caver.klay.accounts.createAccountForUpdate(address, key)
+
+      expect(accountForUpdate.address).to.equals(address)
+      expect(accountForUpdate.keyForUpdate.roleTransactionKey).to.be.undefined
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey).to.be.undefined
+      expect(accountForUpdate.keyForUpdate.roleFeePayerKey.publicKey).to.equals(publicKey.feePayerKey)
+      expect(typeof accountForUpdate.fillUpdateObject).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-208: input: address and AccountKeyRoleBased defines feePayerKey only', () => {
+    it('should return AccountForUpdate', () => {
+      const address = caver.klay.accounts.create().address
+      const key = { feePayerKey: caver.klay.accounts.create().privateKey }
+      const accountKey = caver.klay.accounts.createAccountKeyRoleBased(key)
+      const publicKey = { feePayerKey: caver.klay.accounts.privateKeyToPublicKey(key.feePayerKey) }
+
+      const accountForUpdate = caver.klay.accounts.createAccountForUpdate(address, accountKey)
+
+      expect(accountForUpdate.address).to.equals(address)
+      expect(accountForUpdate.keyForUpdate.roleTransactionKey).to.be.undefined
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey).to.be.undefined
+      expect(accountForUpdate.keyForUpdate.roleFeePayerKey.publicKey).to.equals(publicKey.feePayerKey)
+      expect(typeof accountForUpdate.fillUpdateObject).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-209: input: address and array of private key without options', () => {
+    it('should throw error', () => {
+      const address = caver.klay.accounts.create().address
+      const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+
+      const expectedError = 'For AccountKeyMultiSig, threshold and weight should be defined in options object.'
+
+      expect(() => caver.klay.accounts.createAccountForUpdate(address, key)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-210: input: address and array of private key with invalid options(weight sum < threshold)', () => {
+    it('should throw error', () => {
+      const address = caver.klay.accounts.create().address
+      const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      const options = { threshold: 4, weight: [1,1] }
+
+      const expectedError = 'Invalid options for AccountKeyMultiSig: The sum of weights is less than the threshold.'
+
+      expect(() => caver.klay.accounts.createAccountForUpdate(address, key, options)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-211: input: address and array of private key with invalid options(weight is not array)', () => {
+    it('should throw error', () => {
+      const address = caver.klay.accounts.create().address
+      const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      const options = { threshold: 4, weight: 1 }
+
+      const expectedError = 'The weight should be defined as a array.'
+
+      expect(() => caver.klay.accounts.createAccountForUpdate(address, key, options)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-212: input: address and array of private key with invalid options(weight length is not matched with key array)', () => {
+    it('should throw error', () => {
+      const address = caver.klay.accounts.create().address
+      const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      const options = { threshold: 2, weight: [1,1,1,1] }
+
+      const expectedError = 'The length of keys in AccountKeyMultiSig and the length of weight array do not match.'
+
+      expect(() => caver.klay.accounts.createAccountForUpdate(address, key, options)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-213: input: address and object has multisig without options', () => {
+    it('should throw error', () => {
+      const address = caver.klay.accounts.create().address
+      const key = { transactionKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey] }
+
+      const expectedError = 'For AccountKeyMultiSig, threshold and weight should be defined in options object.'
+
+      expect(() => caver.klay.accounts.createAccountForUpdate(address, key)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-214: input: address and array of private key with invalid options(weight sum < threshold)', () => {
+    it('should throw error', () => {
+      const address = caver.klay.accounts.create().address
+      const key = { transactionKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey] }
+      const options = { transactionKey: { threshold: 4, weight: [1,1] } }
+
+      const expectedError = 'Invalid options for AccountKeyMultiSig: The sum of weights is less than the threshold.'
+
+      expect(() => caver.klay.accounts.createAccountForUpdate(address, key, options)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-215: input: address and array of private key with invalid options(weight is not array)', () => {
+    it('should throw error', () => {
+      const address = caver.klay.accounts.create().address
+      const key = { transactionKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey] }
+      const options = { transactionKey: { threshold: 4, weight: 1 } }
+
+      const expectedError = 'The weight should be defined as a array.'
+
+      expect(() => caver.klay.accounts.createAccountForUpdate(address, key, options)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-216: input: address and array of private key with invalid options(weight length is not matched with key array)', () => {
+    it('should throw error', () => {
+      const address = caver.klay.accounts.create().address
+      const key = { transactionKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey] }
+      const options = { transactionKey: { threshold: 2, weight: [1,1,1,1] } }
+
+      const expectedError = 'The length of keys in AccountKeyMultiSig and the length of weight array do not match.'
+
+      expect(() => caver.klay.accounts.createAccountForUpdate(address, key, options)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-348: input: address and key object which has legacyKey and failKey', () => {
+    it('should return AccountForUpdate', () => {
+      const address = caver.klay.accounts.create().address
+      const key = { transactionKey: 'legacyKey', feePayerKey: 'failKey' }
+
+      const accountForUpdate = caver.klay.accounts.createAccountForUpdate(address, key)
+
+      expect(accountForUpdate.address).to.equals(address)
+      expect(accountForUpdate.keyForUpdate.roleTransactionKey.legacyKey).to.be.true
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey).to.be.undefined
+      expect(accountForUpdate.keyForUpdate.roleFeePayerKey.failKey).to.be.true
+      expect(typeof accountForUpdate.fillUpdateObject).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-349: input: address and key object which has transactionKey(legacyKey), updateKey(multiSigKey) and feePayerKey(failKey)', () => {
+    it('should return AccountForUpdate', () => {
+      const address = caver.klay.accounts.create().address
+      const updateKey = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      const updatePublicKey = [caver.klay.accounts.privateKeyToPublicKey(updateKey[0]), caver.klay.accounts.privateKeyToPublicKey(updateKey[1])]
+      const key = { transactionKey: 'legacyKey', updateKey: updateKey ,feePayerKey: 'failKey' }
+      const options = { updateKey: { threshold: 2, weight: [1, 1] } }
+
+      const accountForUpdate = caver.klay.accounts.createAccountForUpdate(address, key, options)
+
+      expect(accountForUpdate.address).to.equals(address)
+      expect(accountForUpdate.keyForUpdate.roleTransactionKey.legacyKey).to.be.true
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.multisig.threshold).to.equals(options.updateKey.threshold)
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.multisig.keys.length).to.equals(updateKey.length)
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.multisig.keys[0].publicKey).to.equals(updatePublicKey[0])
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.multisig.keys[1].publicKey).to.equals(updatePublicKey[1])
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.multisig.keys[0].weight).to.equals(options.updateKey.weight[0])
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.multisig.keys[1].weight).to.equals(options.updateKey.weight[1])
+      expect(accountForUpdate.keyForUpdate.roleFeePayerKey.failKey).to.be.true
+      expect(typeof accountForUpdate.fillUpdateObject).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-350: input: address and key object which has legacyKey and failKey with options', () => {
+    it('should throw error', () => {
+      const address = caver.klay.accounts.create().address
+      const key = { transactionKey: 'legacyKey', feePayerKey: 'failKey' }
+      const options = { transactionKey: { threshold: 2, weight: [1,1,1,1] } }
+
+      const expectedError = 'Failed to keyFormatter for AccountForUpdate: AccountKeyPublic/legacyKey/failKey cannot have options'
+
+      expect(() => caver.klay.accounts.createAccountForUpdate(address, key, options)).to.throws(expectedError)
+    })
+  })
+})
+
+describe('caver.klay.accounts.createAccountForUpdateWithPublicKey', () => {
+  context('CAVERJS-UNIT-WALLET-217: input: address and public key string', () => {
+    it('should return AccountForUpdate', () => {
+      const address = caver.klay.accounts.create().address
+      const key = caver.klay.accounts.create().privateKey
+      const publicKey = caver.klay.accounts.privateKeyToPublicKey(key)
+
+      const accountForUpdate = caver.klay.accounts.createAccountForUpdateWithPublicKey(address, publicKey)
+
+      expect(accountForUpdate.address).to.equals(address)
+      expect(accountForUpdate.keyForUpdate.publicKey).to.equals(publicKey)
+      expect(typeof accountForUpdate.fillUpdateObject).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-218: input: address and array of public key string', () => {
+    it('should return AccountForUpdate', () => {
+      const address = caver.klay.accounts.create().address
+      const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      const options = { threshold: 2, weight: [1,1] }
+      const publicKey = [caver.klay.accounts.privateKeyToPublicKey(key[0]), caver.klay.accounts.privateKeyToPublicKey(key[1])]
+
+      const accountForUpdate = caver.klay.accounts.createAccountForUpdateWithPublicKey(address, publicKey, options)
+      
+      expect(accountForUpdate.address).to.equals(address)
+      expect(accountForUpdate.keyForUpdate.multisig.threshold).to.equals(options.threshold)
+      expect(accountForUpdate.keyForUpdate.multisig.keys[0].weight).to.equals(options.weight[0])
+      expect(accountForUpdate.keyForUpdate.multisig.keys[0].publicKey).to.equals(publicKey[0])
+      expect(accountForUpdate.keyForUpdate.multisig.keys[1].weight).to.equals(options.weight[1])
+      expect(accountForUpdate.keyForUpdate.multisig.keys[1].publicKey).to.equals(publicKey[1])
+      expect(typeof accountForUpdate.fillUpdateObject).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-219: input: address and object of public key', () => {
+    it('should return AccountForUpdate', () => {
+      const address = caver.klay.accounts.create().address
+      const key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        feePayerKey: caver.klay.accounts.create().privateKey,
+      }
+
+      const options = { updateKey: { threshold: 2, weight: [1,1] } }
+      const publicKey = {
+        transactionKey: caver.klay.accounts.privateKeyToPublicKey(key.transactionKey),
+        updateKey: [caver.klay.accounts.privateKeyToPublicKey(key.updateKey[0]), caver.klay.accounts.privateKeyToPublicKey(key.updateKey[1])],
+        feePayerKey: caver.klay.accounts.privateKeyToPublicKey(key.feePayerKey)
+      }
+
+      const accountForUpdate = caver.klay.accounts.createAccountForUpdateWithPublicKey(address, publicKey, options)
+
+      expect(accountForUpdate.address).to.equals(address)
+      expect(accountForUpdate.keyForUpdate.roleTransactionKey.publicKey).to.equals(publicKey.transactionKey)
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.multisig.threshold).to.equals(options.updateKey.threshold)
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.multisig.keys[0].weight).to.equals(options.updateKey.weight[0])
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.multisig.keys[0].publicKey).to.equals(publicKey.updateKey[0])
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.multisig.keys[1].weight).to.equals(options.updateKey.weight[1])
+      expect(accountForUpdate.keyForUpdate.roleAccountUpdateKey.multisig.keys[1].publicKey).to.equals(publicKey.updateKey[1])
+      expect(accountForUpdate.keyForUpdate.roleFeePayerKey.publicKey).to.equals(publicKey.feePayerKey)
+      expect(typeof accountForUpdate.fillUpdateObject).to.equals('function')
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-220: input: address and object of public key with invalid role', () => {
+    it('should return AccountForUpdate', () => {
+      const address = caver.klay.accounts.create().address
+      const key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        feePayerKey: caver.klay.accounts.create().privateKey,
+      }
+      
+      const options = { updateKey: { threshold: 2, weight: [1,1] } }
+      const publicKey = {
+        invalidRoleKey: caver.klay.accounts.privateKeyToPublicKey(key.transactionKey),
+        updateKey: [caver.klay.accounts.privateKeyToPublicKey(key.updateKey[0]), caver.klay.accounts.privateKeyToPublicKey(key.updateKey[1])],
+        feePayerKey: caver.klay.accounts.privateKeyToPublicKey(key.feePayerKey)
+      }
+
+      const expectedError = `Invalid role is defined: invalidRoleKey`
+
+      expect(() => caver.klay.accounts.createAccountForUpdateWithPublicKey(address, publicKey, options)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-221: input: address and array of public key string without options', () => {
+    it('should return AccountForUpdate', () => {
+      const address = caver.klay.accounts.create().address
+      const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      const publicKey = [caver.klay.accounts.privateKeyToPublicKey(key[0]), caver.klay.accounts.privateKeyToPublicKey(key[1])]
+
+      const expectedError = 'For AccountKeyMultiSig, threshold and weight should be defined in options object.'
+
+      expect(() => caver.klay.accounts.createAccountForUpdateWithPublicKey(address, publicKey)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-222: input: address and object of public key string without options', () => {
+    it('should return AccountForUpdate', () => {
+      const address = caver.klay.accounts.create().address
+      const key = { updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey] }
+      const publicKey = [caver.klay.accounts.privateKeyToPublicKey(key.updateKey[0]), caver.klay.accounts.privateKeyToPublicKey(key.updateKey[1])]
+
+      const expectedError = 'For AccountKeyMultiSig, threshold and weight should be defined in options object.'
+
+      expect(() => caver.klay.accounts.createAccountForUpdateWithPublicKey(address, publicKey)).to.throws(expectedError)
+    })
+  })
+})
+
+describe('caver.klay.accounts.createAccountForUpdateWithLegacyKey', () => {
+  context('CAVERJS-UNIT-WALLET-223: input: address', () => {
+    it('should return AccountForUpdate with legacy key setting', () => {
+      const address = caver.klay.accounts.create().address
+
+      const accountForUpdate = caver.klay.accounts.createAccountForUpdateWithLegacyKey(address)
+
+      expect(accountForUpdate.address).to.equals(address)
+      expect(accountForUpdate.keyForUpdate.legacyKey).to.be.true
+      expect(typeof accountForUpdate.fillUpdateObject).to.equals('function')
+    })
+  })
+})
+
+describe('caver.klay.accounts.createAccountForUpdateWithFailKey', () => {
+  context('CAVERJS-UNIT-WALLET-224: input: address', () => {
+    it('should return AccountForUpdate with fail key setting', () => {
+      const address = caver.klay.accounts.create().address
+
+      const accountForUpdate = caver.klay.accounts.createAccountForUpdateWithFailKey(address)
+
+      expect(accountForUpdate.address).to.equals(address)
+      expect(accountForUpdate.keyForUpdate.failKey).to.be.true
+      expect(typeof accountForUpdate.fillUpdateObject).to.equals('function')
     })
   })
 })
@@ -957,14 +2360,11 @@ describe('caver.klay.accounts.wallet.create', () => {
     isWallet(result)
     expect(result.length).to.equal(numberOfAccounts)
     for (let i = 0; i < result.length; i++) {
-      const accountByIndex = Object.assign({}, result[i])
-      const accountByAddress = Object.assign({}, result[accountByIndex.address])
+      const accountByIndex = caver.klay.accounts.createWithAccountKey(result[i].address, result[i].accountKey)
+      const accountByAddress = caver.klay.accounts.createWithAccountKey(result[accountByIndex.address].address, result[accountByIndex.address].accountKey)
 
-      delete accountByIndex.index
-      delete accountByAddress.index
-
-      isAccount(accountByIndex, { privateKey: accountByAddress.privateKey, address: accountByAddress.address })
-      isAccount(accountByAddress, { privateKey: accountByIndex.privateKey, address: accountByIndex.address })
+      isAccount(accountByIndex, { keys: accountByAddress.keys, address: accountByAddress.address })
+      isAccount(accountByAddress, { keys: accountByIndex.keys, address: accountByIndex.address })
     }
   }
 
@@ -999,13 +2399,12 @@ describe('caver.klay.accounts.wallet.add', () => {
   const validateCheckForWalletAddition = (data, { account, wallet }) => {
     const accounts = []  
 
-    accounts.push(Object.assign({}, data))
-    accounts.push(Object.assign({}, wallet[data.index]))
-    accounts.push(Object.assign({}, wallet[data.address]))
+    accounts.push(caver.klay.accounts.createWithAccountKey(data.address, data.accountKey))
+    accounts.push(caver.klay.accounts.createWithAccountKey(wallet[data.index].address, wallet[data.index].accountKey))
+    accounts.push(caver.klay.accounts.createWithAccountKey(wallet[data.address].address, wallet[data.address].accountKey))
 
     for (v of accounts) {
-      delete v.index
-      isAccount(v, { privateKey: account.privateKey, address: account.address })
+      isAccount(v, { keys: account.keys, address: account.address })
     }
   }
 
@@ -1103,8 +2502,343 @@ describe('caver.klay.accounts.wallet.add', () => {
   context('CAVERJS-UNIT-WALLET-049 : input: account:invalid', () => {
     it('should throw an error', () => {
       const invalid = -1
-      const errorMessage = 'Invalid private key'
+      const errorMessage = 'Invalid accountKey type: number'
       expect(() => caver.klay.accounts.wallet.add(invalid)).to.throw(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-244: input: userInputAddress and AccountKeyPublic', () => {
+    it('should have valid Account instance in wallet after addition', () => {
+      const key = caver.klay.accounts.create().privateKey
+      const address = caver.klay.accounts.create().address
+      const accountKeyPublic = caver.klay.accounts.createAccountKeyPublic(key)
+      const accountWithPublic = caver.klay.accounts.createWithAccountKey(address, accountKeyPublic)
+
+      let accountInWallet = caver.klay.accounts.wallet.add(accountKeyPublic, address)
+      validateCheckForWalletAddition(accountInWallet, { account: accountWithPublic, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-245: input: userInputAddress and AccountKeyMultiSig', () => {
+    it('should have valid Account instance in wallet after addition', () => {
+      const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      const address = caver.klay.accounts.create().address
+      const accountKeyMultiSig = caver.klay.accounts.createAccountKeyMultiSig(key)
+      const accountWithMultiSig = caver.klay.accounts.createWithAccountKey(address, accountKeyMultiSig)
+
+      let accountInWallet = caver.klay.accounts.wallet.add(accountKeyMultiSig, address)
+      validateCheckForWalletAddition(accountInWallet, { account: accountWithMultiSig, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-246: input: userInputAddress and AccountKeyRoleBased which defines transactionKey, updateKey and feePayerKey', () => {
+    it('should have valid Account instance in wallet after addition', () => {
+      const key = {
+        transactionKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        updateKey: caver.klay.accounts.create().privateKey,
+        feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      }
+      const address = caver.klay.accounts.create().address
+      const accountKeyRoleBased = caver.klay.accounts.createAccountKeyRoleBased(key)
+      const accountWithRoleBased = caver.klay.accounts.createWithAccountKey(address, accountKeyRoleBased)
+
+      let accountInWallet = caver.klay.accounts.wallet.add(accountKeyRoleBased, address)
+      validateCheckForWalletAddition(accountInWallet, { account: accountWithRoleBased, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-247: input: userInputAddress and AccountKeyRoleBased which defines transactionKey only', () => {
+    it('should have valid Account instance in wallet after addition', () => {
+      const key = {
+        transactionKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      }
+      const address = caver.klay.accounts.create().address
+      const accountKeyRoleBased = caver.klay.accounts.createAccountKeyRoleBased(key)
+      const accountWithRoleBased = caver.klay.accounts.createWithAccountKey(address, accountKeyRoleBased)
+
+      let accountInWallet = caver.klay.accounts.wallet.add(accountKeyRoleBased, address)
+      validateCheckForWalletAddition(accountInWallet, { account: accountWithRoleBased, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-248: input: userInputAddress and AccountKeyRoleBased which defines updateKey only', () => {
+    it('should have valid Account instance in wallet after addition', () => {
+      const key = {
+        updateKey: caver.klay.accounts.create().privateKey
+      }
+      const address = caver.klay.accounts.create().address
+      const accountKeyRoleBased = caver.klay.accounts.createAccountKeyRoleBased(key)
+      const accountWithRoleBased = caver.klay.accounts.createWithAccountKey(address, accountKeyRoleBased)
+
+      let accountInWallet = caver.klay.accounts.wallet.add(accountKeyRoleBased, address)
+      validateCheckForWalletAddition(accountInWallet, { account: accountWithRoleBased, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-249: input: userInputAddress and AccountKeyRoleBased which defines feePayerKey only', () => {
+    it('should have valid Account instance in wallet after addition', () => {
+      const key = {
+        feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      }
+      const address = caver.klay.accounts.create().address
+      const accountKeyRoleBased = caver.klay.accounts.createAccountKeyRoleBased(key)
+      const accountWithRoleBased = caver.klay.accounts.createWithAccountKey(address, accountKeyRoleBased)
+
+      let accountInWallet = caver.klay.accounts.wallet.add(accountKeyRoleBased, address)
+      validateCheckForWalletAddition(accountInWallet, { account: accountWithRoleBased, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-250: input: AccountKeyPublic without userInputAddress', () => {
+    it('should throw error', () => {
+      const accountKey = caver.klay.accounts.createAccountKey(caver.klay.accounts.create().privateKey)
+
+      const expectedError = `Address is not defined. Address cannot be determined from AccountKey`
+      expect(() => caver.klay.accounts.wallet.add(accountKey)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-251: input: AccountKeyMultiSig without userInputAddress', () => {
+    it('should throw error', () => {
+      const accountKey = caver.klay.accounts.createAccountKey([caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey])
+
+      const expectedError = `Address is not defined. Address cannot be determined from AccountKey`
+      expect(() => caver.klay.accounts.wallet.add(accountKey)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-252: input: AccountKeyRoleBased without userInputAddress', () => {
+    it('should throw error', () => {
+      const accountKey = caver.klay.accounts.createAccountKey({transactionKey: caver.klay.accounts.create().privateKey})
+
+      const expectedError = `Address is not defined. Address cannot be determined from AccountKey`
+      expect(() => caver.klay.accounts.wallet.add(accountKey)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-253: input: Account with AccountKeyPublic', () => {
+    it('should have valid Account instance in wallet after addition', () => {
+      const key = caver.klay.accounts.create().privateKey
+      const address = caver.klay.accounts.create().address
+      const accountWithPublic = caver.klay.accounts.createWithAccountKey(address, key)
+
+      let accountInWallet = caver.klay.accounts.wallet.add(accountWithPublic)
+      validateCheckForWalletAddition(accountInWallet, { account: accountWithPublic, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-254: input: Account with AccountKeyMultiSig', () => {
+    it('should have valid Account instance in wallet after addition', () => {
+      const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      const address = caver.klay.accounts.create().address
+      const accountWithMultiSig = caver.klay.accounts.createWithAccountKey(address, key)
+
+      let accountInWallet = caver.klay.accounts.wallet.add(accountWithMultiSig)
+      validateCheckForWalletAddition(accountInWallet, { account: accountWithMultiSig, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-255: input: Account with AccountKeyRoleBased which defines transactionKey, updateKey and feePayerKey', () => {
+    it('should have valid Account instance in wallet after addition', () => {
+      const key = {
+        transactionKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        updateKey: caver.klay.accounts.create().privateKey,
+        feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      }
+      const address = caver.klay.accounts.create().address
+      const accountWithRoleBased = caver.klay.accounts.createWithAccountKey(address, key)
+
+      let accountInWallet = caver.klay.accounts.wallet.add(accountWithRoleBased)
+      validateCheckForWalletAddition(accountInWallet, { account: accountWithRoleBased, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-256: input: Account with AccountKeyRoleBased which defines transactionKey only', () => {
+    it('should have valid Account instance in wallet after addition', () => {
+      const key = {
+        transactionKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      }
+      const address = caver.klay.accounts.create().address
+      const accountWithRoleBased = caver.klay.accounts.createWithAccountKey(address, key)
+
+      let accountInWallet = caver.klay.accounts.wallet.add(accountWithRoleBased)
+      validateCheckForWalletAddition(accountInWallet, { account: accountWithRoleBased, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-257: input: Account with AccountKeyRoleBased which defines updateKey only', () => {
+    it('should have valid Account instance in wallet after addition', () => {
+      const key = {
+        updateKey: caver.klay.accounts.create().privateKey
+      }
+      const address = caver.klay.accounts.create().address
+      const accountWithRoleBased = caver.klay.accounts.createWithAccountKey(address, key)
+
+      let accountInWallet = caver.klay.accounts.wallet.add(accountWithRoleBased)
+      validateCheckForWalletAddition(accountInWallet, { account: accountWithRoleBased, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-258: input: Account with AccountKeyRoleBased which defines feePayerKey only', () => {
+    it('should have valid Account instance in wallet after addition', () => {
+      const key = {
+        feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      }
+      const address = caver.klay.accounts.create().address
+      const accountWithRoleBased = caver.klay.accounts.createWithAccountKey(address, key)
+
+      let accountInWallet = caver.klay.accounts.wallet.add(accountWithRoleBased)
+      validateCheckForWalletAddition(accountInWallet, { account: accountWithRoleBased, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-259: input: Account with AccountKeyPublic and userInputAddress', () => {
+    it('should have valid Account instance with userInputAddress as an address in wallet after addition', () => {
+      const key = caver.klay.accounts.create().privateKey
+      const address = caver.klay.accounts.create().address
+      const accountWithPublic = caver.klay.accounts.createWithAccountKey(address, key)
+      const userInputAddrees = caver.klay.accounts.create().address
+
+      let accountInWallet = caver.klay.accounts.wallet.add(accountWithPublic, userInputAddrees)
+      accountWithPublic.address = userInputAddrees
+
+      validateCheckForWalletAddition(accountInWallet, { account: accountWithPublic, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-260: input: object which has address and privateKey', () => {
+    it('should have valid Account instance in wallet after addition', () => {
+      const key = caver.klay.accounts.create().privateKey
+      const address = caver.klay.accounts.create().address
+      const accountWithPublic = caver.klay.accounts.createWithAccountKey(address, key)
+
+      const inputObject = {
+        address: accountWithPublic.address,
+        privateKey: accountWithPublic.privateKey,
+      }
+
+      let accountInWallet = caver.klay.accounts.wallet.add(inputObject)
+      
+      validateCheckForWalletAddition(accountInWallet, { account: accountWithPublic, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-261: input: userInputAddress and object which has address and privateKey', () => {
+    it('should have valid Account instance with userInputAddress as an address in wallet after addition', () => {
+      const key = caver.klay.accounts.create().privateKey
+      const address = caver.klay.accounts.create().address
+      const accountWithPublic = caver.klay.accounts.createWithAccountKey(address, key)
+      const userInputAddrees = caver.klay.accounts.create().address
+
+      const inputObject = {
+        address: accountWithPublic.address,
+        privateKey: accountWithPublic.privateKey,
+      }
+
+      let accountInWallet = caver.klay.accounts.wallet.add(inputObject, userInputAddrees)
+      accountWithPublic.address = userInputAddrees
+      
+      validateCheckForWalletAddition(accountInWallet, { account: accountWithPublic, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-262: input: userInputAddress and array of private key string', () => {
+    it('should have valid Account instance with userInputAddress as an address in wallet after addition', () => {
+      const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      const address = caver.klay.accounts.create().address
+      const account = caver.klay.accounts.createWithAccountKey(address, key)
+
+      let accountInWallet = caver.klay.accounts.wallet.add(key, address)
+      
+      validateCheckForWalletAddition(accountInWallet, { account: account, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-263: input: userInputAddress and key object which defines transactionKey, updateKey and feePayerKey', () => {
+    it('should have valid Account instance with userInputAddress as an address in wallet after addition', () => {
+      const key = {
+        transactionKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        updateKey: caver.klay.accounts.create().privateKey,
+        feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      }
+      const address = caver.klay.accounts.create().address
+      const account = caver.klay.accounts.createWithAccountKey(address, key)
+
+      let accountInWallet = caver.klay.accounts.wallet.add(key, address)
+      
+      validateCheckForWalletAddition(accountInWallet, { account: account, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-264: input: userInputAddress and key object which defines transactionKey only', () => {
+    it('should have valid Account instance with userInputAddress as an address in wallet after addition', () => {
+      const key = {
+        transactionKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      }
+      const address = caver.klay.accounts.create().address
+      const account = caver.klay.accounts.createWithAccountKey(address, key)
+
+      let accountInWallet = caver.klay.accounts.wallet.add(key, address)
+      
+      validateCheckForWalletAddition(accountInWallet, { account: account, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-265: input: userInputAddress and key object which defines updateKey only', () => {
+    it('should have valid Account instance with userInputAddress as an address in wallet after addition', () => {
+      const key = {
+        updateKey: caver.klay.accounts.create().privateKey
+      }
+      const address = caver.klay.accounts.create().address
+      const account = caver.klay.accounts.createWithAccountKey(address, key)
+
+      let accountInWallet = caver.klay.accounts.wallet.add(key, address)
+      
+      validateCheckForWalletAddition(accountInWallet, { account: account, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-266: input: userInputAddress and key object which defines feePayerKey only', () => {
+    it('should have valid Account instance with userInputAddress as an address in wallet after addition', () => {
+      const key = {
+        feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      }
+      const address = caver.klay.accounts.create().address
+      const account = caver.klay.accounts.createWithAccountKey(address, key)
+
+      let accountInWallet = caver.klay.accounts.wallet.add(key, address)
+      
+      validateCheckForWalletAddition(accountInWallet, { account: account, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-267: input: invalid type parameter', () => {
+    it('should throw error', () => {
+      let invalid = {}
+
+      let expectedError = `Failed to create AccountKeyRoleBased: empty object`
+      expect(() => caver.klay.accounts.wallet.add(invalid)).to.throws(expectedError)
+
+      invalid = undefined
+      expectedError = `Invalid accountKey type: ${typeof invalid}`
+      expect(() => caver.klay.accounts.wallet.add(invalid)).to.throws(expectedError)
+
+      invalid = null
+      expectedError = `Invalid accountKey type: ${typeof invalid}`
+      expect(() => caver.klay.accounts.wallet.add(invalid)).to.throws(expectedError)
+
+      invalid = 1
+      expectedError = `Invalid accountKey type: ${typeof invalid}`
+      expect(() => caver.klay.accounts.wallet.add(invalid)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-268: input: invalid role defined', () => {
+    it('should throw error', () => {
+      const invalid = {invalidRole: caver.klay.accounts.create().privateKey}
+
+      const expectedError = `Failed to create AccountKeyRoleBased. Invalid role is defined : invalidRole`
+      expect(() => caver.klay.accounts.wallet.add(invalid)).to.throws(expectedError)
     })
   })
 })
@@ -1149,6 +2883,73 @@ describe('caver.klay.accounts.wallet.remove', () => {
       invalid = numberOfAccounts
       result = caver.klay.accounts.wallet.remove(invalid)
       validateCheckForWalletRemove(result, { expected: false })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-269: input: Account with AccountKeyPublic', () => {
+    it('should remove wallet instance', () => {
+      const address = caver.klay.accounts.create().address
+      const key = caver.klay.accounts.create().privateKey
+      const account = caver.klay.accounts.createWithAccountKey(address, key)
+      let accountInWallet = caver.klay.accounts.wallet.add(account)
+
+      let result = caver.klay.accounts.wallet.remove(accountInWallet.index)
+
+      expect(accountInWallet.accountKey).to.be.null
+      validateCheckForWalletRemove(result, { account: accountInWallet, wallet: caver.klay.accounts.wallet })
+
+      accountInWallet = caver.klay.accounts.wallet.add(account)
+
+      result = caver.klay.accounts.wallet.remove(accountInWallet.address)
+
+      expect(accountInWallet.accountKey).to.be.null
+      validateCheckForWalletRemove(result, { account: accountInWallet, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-270: input: Account with AccountKeyMultiSig', () => {
+    it('should remove wallet instance', () => {
+      const address = caver.klay.accounts.create().address
+      const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      const account = caver.klay.accounts.createWithAccountKey(address, key)
+      let accountInWallet = caver.klay.accounts.wallet.add(account)
+
+      let result = caver.klay.accounts.wallet.remove(accountInWallet.index)
+
+      expect(accountInWallet.accountKey).to.be.null
+      validateCheckForWalletRemove(result, { account: accountInWallet, wallet: caver.klay.accounts.wallet })
+
+      accountInWallet = caver.klay.accounts.wallet.add(account)
+
+      result = caver.klay.accounts.wallet.remove(accountInWallet.address)
+
+      expect(accountInWallet.accountKey).to.be.null
+      validateCheckForWalletRemove(result, { account: accountInWallet, wallet: caver.klay.accounts.wallet })
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-271: input: Account with AccountKeyRoleBased', () => {
+    it('should remove wallet instance', () => {
+      const address = caver.klay.accounts.create().address
+      const key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: caver.klay.accounts.create().privateKey,
+        feePayerKey: caver.klay.accounts.create().privateKey
+      }
+      const account = caver.klay.accounts.createWithAccountKey(address, key)
+      let accountInWallet = caver.klay.accounts.wallet.add(account)
+
+      let result = caver.klay.accounts.wallet.remove(accountInWallet.index)
+
+      expect(accountInWallet.accountKey).to.be.null
+      validateCheckForWalletRemove(result, { account: accountInWallet, wallet: caver.klay.accounts.wallet })
+
+      accountInWallet = caver.klay.accounts.wallet.add(account)
+
+      result = caver.klay.accounts.wallet.remove(accountInWallet.address)
+
+      expect(accountInWallet.accountKey).to.be.null
+      validateCheckForWalletRemove(result, { account: accountInWallet, wallet: caver.klay.accounts.wallet })
     })
   })
 })
@@ -1306,6 +3107,366 @@ describe('caver.klay.accounts.wallet.getAccount', () => {
       expect(testAccount.address).to.equals(fromWallet.address)
       expect(testAccount.privateKey).to.equals(fromWallet.privateKey)
       expect(testAccount.index).to.equals(fromWallet.index)
+    })
+  })
+})
+
+describe('caver.klay.accounts.wallet.updatePrivateKey', () => {
+  context('CAVERJS-UNIT-WALLET-322: input: private key string and address', () => {
+    it('should update the private key of account by updating the accountKey', () => {
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+      const originalPrivateKey = testAccount.privateKey
+      const updatePrivateKey = caver.klay.accounts.create().privateKey
+
+      let account = caver.klay.accounts.wallet.getAccount(testAccount.address)
+      expect(account.privateKey).to.equals(originalPrivateKey)
+
+      account = caver.klay.accounts.wallet.updatePrivateKey(updatePrivateKey, testAccount.address)
+      expect(account.privateKey).to.equals(updatePrivateKey)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-323: input: KlaytnWalletKey and address', () => {
+    it('should update the private key of account by updating the accountKey', () => {
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+      const originalPrivateKey = testAccount.privateKey
+      const updatedAccount = caver.klay.accounts.createWithAccountKey(testAccount.address, caver.klay.accounts.create().privateKey)
+      const klaytnWalletKey = updatedAccount.getKlaytnWalletKey()
+      const updatedPrivateKey = updatedAccount.privateKey
+
+      let account = caver.klay.accounts.wallet.getAccount(testAccount.address)
+      expect(account.privateKey).to.equals(originalPrivateKey)
+
+      account = caver.klay.accounts.wallet.updatePrivateKey(klaytnWalletKey, testAccount.address)
+      expect(account.privateKey).to.equals(updatedPrivateKey)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-324: input: private key or address are undefined', () => {
+    it('should throw error', () => {
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+      const updatePrivateKey = caver.klay.accounts.create().privateKey
+
+      const expectedError = `To update the privatKey in wallet, need to set both privateKey and address.`
+
+      expect(() => caver.klay.accounts.wallet.updatePrivateKey()).to.throws(expectedError)
+      expect(() => caver.klay.accounts.wallet.updatePrivateKey(updatePrivateKey)).to.throws(expectedError)
+      expect(() => caver.klay.accounts.wallet.updatePrivateKey(undefined, testAccount.address)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-325: input: invalid type of privateKey', () => {
+    it('should throw error', () => {
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+      
+      let invalid = ''
+      let expectedError = `Invalid private key(${invalid})`
+      expect(() => caver.klay.accounts.wallet.updatePrivateKey(invalid, testAccount.address)).to.throws(expectedError)
+
+      invalid = {}
+      expectedError = `The private key used for the update is not a valid string.`
+      expect(() => caver.klay.accounts.wallet.updatePrivateKey(invalid, testAccount.address)).to.throws(expectedError)
+
+      invalid = 1
+      expectedError = `The private key used for the update is not a valid string.`
+      expect(() => caver.klay.accounts.wallet.updatePrivateKey(invalid, testAccount.address)).to.throws(expectedError)
+
+      invalid = []
+      expectedError = `The private key used for the update is not a valid string.`
+      expect(() => caver.klay.accounts.wallet.updatePrivateKey(invalid, testAccount.address)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-326: input: private key string and address', () => {
+    it('should throw error when accountKey in Account is AccountKeyMultiSig', () => {
+      const address = caver.klay.accounts.create().address
+      const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.createWithAccountKey(address, key))
+      const updatePrivateKey = caver.klay.accounts.create().privateKey
+      
+      let expectedError = `Account using AccountKeyMultiSig or AccountKeyRoleBased must be updated using the caver.klay.accounts.updateAccountKey function.`
+      expect(() => caver.klay.accounts.wallet.updatePrivateKey(updatePrivateKey, testAccount.address)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-327: input: private key string and address', () => {
+    it('should throw error when accountKey in Account is AccountKeyRoleBased', () => {
+      const address = caver.klay.accounts.create().address
+      const key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: caver.klay.accounts.create().privateKey,
+        feePayerKey: caver.klay.accounts.create().privateKey
+      }
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.createWithAccountKey(address, key))
+      const updatePrivateKey = caver.klay.accounts.create().privateKey
+      
+      let expectedError = `Account using AccountKeyMultiSig or AccountKeyRoleBased must be updated using the caver.klay.accounts.updateAccountKey function.`
+      expect(() => caver.klay.accounts.wallet.updatePrivateKey(updatePrivateKey, testAccount.address)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-328: input: invalid private key string and address', () => {
+    it('should throw error', () => {
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+      let invalid = '0x01'
+      
+      let expectedError = `Invalid private key(${invalid.slice(2)})`
+      expect(() => caver.klay.accounts.wallet.updatePrivateKey(invalid, testAccount.address)).to.throws(expectedError)
+
+      invalid = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364142'
+      expectedError = `Invalid private key`
+      expect(() => caver.klay.accounts.wallet.updatePrivateKey(invalid, testAccount.address)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-329: input: KlaytnWalletKey and address', () => {
+    it('should throw error when address from KlaytnWalletKey is not matched with address parameter', () => {
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+      const updatedAccount = caver.klay.accounts.createWithAccountKey(caver.klay.accounts.create().address, caver.klay.accounts.create().privateKey)
+      const klaytnWalletKey = updatedAccount.getKlaytnWalletKey()
+      
+      let expectedError = `The address extracted from the private key does not match the address received as the input value.`
+      expect(() => caver.klay.accounts.wallet.updatePrivateKey(klaytnWalletKey, testAccount.address)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-330: input: not existed address of account', () => {
+    it('should throw error when account cannot be found with address', () => {
+      const notExistAddress = caver.klay.accounts.create().address
+      const updatePrivateKey = caver.klay.accounts.create().privateKey
+      
+      const expectedError = `Failed to find account with ${notExistAddress}`
+
+      expect(() => caver.klay.accounts.wallet.updatePrivateKey(updatePrivateKey, notExistAddress)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-331: input: invalid address', () => {
+    it('should throw error when account cannot be found with address', () => {
+      const invalidAddress = 'invalidAddress'
+      const updatePrivateKey = caver.klay.accounts.create().privateKey
+      
+      const expectedError = `Invalid address : ${invalidAddress}`
+
+      expect(() => caver.klay.accounts.wallet.updatePrivateKey(updatePrivateKey, invalidAddress)).to.throws(expectedError)
+    })
+  })
+})
+
+describe('caver.klay.accounts.wallet.updateAccountKey', () => {
+  context('CAVERJS-UNIT-WALLET-332: input: address and private key string', () => {
+    it('should update the accountKey', () => {
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+      const updatePrivateKey = caver.klay.accounts.create().privateKey
+
+      account = caver.klay.accounts.wallet.updateAccountKey(testAccount.address, updatePrivateKey)
+      compareAccountKey(account.accountKey, updatePrivateKey)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-333: input: address and AccountKeyPublic', () => {
+    it('should update the accountKey', () => {
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+      const updatePrivateKey = caver.klay.accounts.createAccountKeyPublic(caver.klay.accounts.create().privateKey)
+
+      account = caver.klay.accounts.wallet.updateAccountKey(testAccount.address, updatePrivateKey)
+      compareAccountKey(account.accountKey, updatePrivateKey.keys)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-334: input: address and array of private key string', () => {
+    it('should update the accountKey', () => {
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+      const updatePrivateKey = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+
+      account = caver.klay.accounts.wallet.updateAccountKey(testAccount.address, updatePrivateKey)
+      compareAccountKey(account.accountKey, updatePrivateKey)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-335: input: address and AccountKeyMultiSig', () => {
+    it('should update the accountKey', () => {
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+      const updatePrivateKey = caver.klay.accounts.createAccountKeyMultiSig([caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey])
+
+      account = caver.klay.accounts.wallet.updateAccountKey(testAccount.address, updatePrivateKey)
+      compareAccountKey(account.accountKey, updatePrivateKey.keys)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-336: input: address and key object which defines transactionKey, updateKey and feePayerKey', () => {
+    it('should update the accountKey', () => {
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+      const updatePrivateKey = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        feePayerKey: caver.klay.accounts.create().privateKey,
+      }
+
+      account = caver.klay.accounts.wallet.updateAccountKey(testAccount.address, updatePrivateKey)
+      compareAccountKey(account.accountKey, updatePrivateKey)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-337: input: address and AccountKeyRoleBased which defines transactionKey, updateKey and feePayerKey', () => {
+    it('should update the accountKey', () => {
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+      const keyObject = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        feePayerKey: caver.klay.accounts.create().privateKey,
+      }
+      const updatePrivateKey = caver.klay.accounts.createAccountKeyRoleBased(keyObject)
+
+      account = caver.klay.accounts.wallet.updateAccountKey(testAccount.address, updatePrivateKey)
+      compareAccountKey(account.accountKey, updatePrivateKey.keys)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-338: input: address and key object which defines transactionKey only', () => {
+    it('should update the accountKey', () => {
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+      const updatePrivateKey = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+      }
+
+      account = caver.klay.accounts.wallet.updateAccountKey(testAccount.address, updatePrivateKey)
+      compareAccountKey(account.accountKey, updatePrivateKey)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-339: input: address and AccountKeyRoleBased which defines transactionKey only', () => {
+    it('should update the accountKey', () => {
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+      const keyObject = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+      }
+      const updatePrivateKey = caver.klay.accounts.createAccountKeyRoleBased(keyObject)
+
+      account = caver.klay.accounts.wallet.updateAccountKey(testAccount.address, updatePrivateKey)
+      compareAccountKey(account.accountKey, updatePrivateKey.keys)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-340: input: address and key object which defines updateKey only', () => {
+    it('should update the accountKey', () => {
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+      const updatePrivateKey = {
+        updateKey: caver.klay.accounts.create().privateKey,
+      }
+
+      account = caver.klay.accounts.wallet.updateAccountKey(testAccount.address, updatePrivateKey)
+      compareAccountKey(account.accountKey, updatePrivateKey)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-341: input: address and AccountKeyRoleBased which defines updateKey only', () => {
+    it('should update the accountKey', () => {
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+      const keyObject = {
+        updateKey: caver.klay.accounts.create().privateKey,
+      }
+      const updatePrivateKey = caver.klay.accounts.createAccountKeyRoleBased(keyObject)
+
+      account = caver.klay.accounts.wallet.updateAccountKey(testAccount.address, updatePrivateKey)
+      compareAccountKey(account.accountKey, updatePrivateKey.keys)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-342: input: address and key object which defines feePayerKey only', () => {
+    it('should update the accountKey', () => {
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+      const updatePrivateKey = {
+        feePayerKey: caver.klay.accounts.create().privateKey,
+      }
+
+      account = caver.klay.accounts.wallet.updateAccountKey(testAccount.address, updatePrivateKey)
+      compareAccountKey(account.accountKey, updatePrivateKey)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-343: input: address and AccountKeyRoleBased which defines feePayerKey only', () => {
+    it('should update the accountKey', () => {
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+      const keyObject = {
+        updateKey: caver.klay.accounts.create().privateKey,
+      }
+      const updatePrivateKey = caver.klay.accounts.createAccountKeyRoleBased(keyObject)
+
+      account = caver.klay.accounts.wallet.updateAccountKey(testAccount.address, updatePrivateKey)
+      compareAccountKey(account.accountKey, updatePrivateKey.keys)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-344: input: address of role based account and key object which defines role key partially', () => {
+    it('should update the key defined inside the AccountKey only', () => {
+      const originalKeyObject = {
+        transactionKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        feePayerKey: caver.klay.accounts.create().privateKey,
+      }
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.createWithAccountKey(caver.klay.accounts.create().address, originalKeyObject))
+      
+      const keyObject = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+      }
+      
+      let updatedAccount = caver.klay.accounts.wallet.updateAccountKey(testAccount.address, keyObject)
+      
+      const expectedUpdatedKey = {
+        transactionKey: keyObject.transactionKey,
+        updateKey: keyObject.updateKey,
+        feePayerKey: originalKeyObject.feePayerKey
+      }
+      compareAccountKey(updatedAccount.accountKey, expectedUpdatedKey)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-345: input: address of role based account and AccountKeyRoleBased which defines role key partially', () => {
+    it('should update the key defined inside the AccountKey only', () => {
+      const originalKeyObject = {
+        transactionKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        feePayerKey: caver.klay.accounts.create().privateKey,
+      }
+      const testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.createWithAccountKey(caver.klay.accounts.create().address, originalKeyObject))
+      
+      const keyObject = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+      }
+      
+      const updatePrivateKey = caver.klay.accounts.createAccountKeyRoleBased(keyObject)
+      
+      let updatedAccount = caver.klay.accounts.wallet.updateAccountKey(testAccount.address, updatePrivateKey)
+      
+      const expectedUpdatedKey = {
+        transactionKey: keyObject.transactionKey,
+        updateKey: keyObject.updateKey,
+        feePayerKey: originalKeyObject.feePayerKey
+      }
+      compareAccountKey(updatedAccount.accountKey, expectedUpdatedKey)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-346: input: not existed address of account', () => {
+    it('should throw error when account cannot be found with address', () => {
+      const notExistAddress = caver.klay.accounts.create().address
+      const updatePrivateKey = caver.klay.accounts.create().privateKey
+      
+      const expectedError = `Failed to find account with ${notExistAddress}`
+
+      expect(() => caver.klay.accounts.wallet.updateAccountKey(notExistAddress, updatePrivateKey)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-347: input: invalid address', () => {
+    it('should throw error when account cannot be found with address', () => {
+      const invalidAddress = 'invalidAddress'
+      const updatePrivateKey = caver.klay.accounts.create().privateKey
+      
+      const expectedError = `Invalid address : ${invalidAddress}`
+
+      expect(() => caver.klay.accounts.wallet.updateAccountKey(invalidAddress, updatePrivateKey)).to.throws(expectedError)
     })
   })
 })

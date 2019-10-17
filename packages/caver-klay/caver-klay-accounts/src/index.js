@@ -44,6 +44,14 @@ const { encodeRLPByTxType, makeRawTransaction, getSenderTxHash } = require('./ma
 var elliptic = require('elliptic')
 var secp256k1 = new (elliptic.ec)('secp256k1')
 
+const AccountKeyPublic = require('./accountKey/accountKeyPublic')
+const AccountKeyMultiSig = require('./accountKey/accountKeyMultiSig')
+const AccountKeyRoleBased = require('./accountKey/accountKeyRoleBased')
+const AccountKeyEnum = require('./accountKey/accountKeyEnum').AccountKeyEnum
+
+const Account = require('./account/account')
+const AccountForUpdate = require('./account/accountForUpdate')
+
 const rpc = require('../../../caver-rtm').rpc
 
 var isNot = function(value) {
@@ -52,8 +60,10 @@ var isNot = function(value) {
 
 function coverInitialTxValue(tx) {
   if (typeof tx !== 'object') throw ('Invalid transaction')
-  tx.to = tx.to || '0x'
-  tx.data = utils.addHexPrefix(tx.data || '0x')
+  if (!tx.senderRawTransaction && (!tx.type || tx.type === 'LEGACY' || tx.type.includes('SMART_CONTRACT_DEPLOY'))) {
+    tx.to = tx.to || '0x'
+    tx.data = utils.addHexPrefix(tx.data || '0x')
+  }
   tx.chainId = utils.numberToHex(tx.chainId)
   return tx
 }
@@ -94,7 +104,7 @@ Accounts.prototype._addAccountFunctions = function (account) {
 
     account.encrypt = function encrypt(password, options = {}) {
         options.address = account.address
-        return _this.encrypt(account.privateKey, password, options);
+        return _this.encrypt(account.keys, password, options);
     };
 
     account.getKlaytnWalletKey = function getKlaytnWalletKey() {
@@ -136,9 +146,170 @@ Accounts.prototype._determineAddress = function _determineAddress(legacyAccount,
   return legacyAccount.address
 }
 
+/**
+ * create function creates random account with entropy.
+ *
+ * @method create
+ * @param {Object} entropy A random string to increase entropy.
+ * @return {Object}
+ */
 Accounts.prototype.create = function create(entropy) {
-    return this._addAccountFunctions(AccountLib.create(entropy || utils.randomHex(32)));
+    return this._addAccountFunctions(Account.fromObject(AccountLib.create(entropy || utils.randomHex(32))));
 };
+
+/**
+ * createAccountKey creates AccountKeyPublic, AccountKeyMultiSig or AccountKeyRoleBased instance with parameter.
+ *
+ * @method createAccountKey
+ * @param {String|Array|Object} accountKey Parameters to be used when creating the AccountKey.
+ * @return {Object}
+ */
+Accounts.prototype.createAccountKey = function createAccountKey(accountKey) {
+  if (Account.isAccountKey(accountKey)) accountKey = accountKey.keys
+  
+  if (_.isString(accountKey)) {
+    accountKey = this.createAccountKeyPublic(accountKey)
+  } else if (_.isArray(accountKey)) {
+    accountKey = this.createAccountKeyMultiSig(accountKey)
+  } else if (_.isObject(accountKey)) {
+    accountKey = this.createAccountKeyRoleBased(accountKey)
+  } else {
+    throw new Error(`Invalid accountKey type: ${typeof accountKey}`)
+  }
+  return accountKey
+}
+
+/**
+ * createAccountKeyPublic creates AccountKeyPublic with a string of private key.
+ *
+ * @method createAccountKeyPublic
+ * @param {String} privateKey Private key string that will be used to create AccountKeyPublic.
+ * @return {Object}
+ */
+Accounts.prototype.createAccountKeyPublic = function createAccountKeyPublic(privateKey) { 
+  if (privateKey instanceof AccountKeyPublic) return privateKey
+
+  if (!_.isString(privateKey)) throw new Error('Creating a AccountKeyPublic requires a private key string.')
+  
+  const parsed = utils.parsePrivateKey(privateKey)
+  privateKey = parsed.privateKey
+
+  if (!utils.isValidPrivateKey(privateKey)) throw new Error(`Failed to create AccountKeyPublic. Invalid private key : ${privateKey}`)
+
+  return new AccountKeyPublic(privateKey)
+}
+
+/**
+ * createAccountKeyMultiSig creates AccountKeyMultiSig with an array of private keys.
+ *
+ * @method createAccountKeyMultiSig
+ * @param {Array} privateKeys An Array of private key strings that will be used to create AccountKeyMultiSig.
+ * @return {Object}
+ */
+Accounts.prototype.createAccountKeyMultiSig = function createAccountKeyMultiSig(privateKeys) {
+  if (privateKeys instanceof AccountKeyMultiSig) return privateKeys
+
+  if (!_.isArray(privateKeys)) throw new Error('Creating a AccountKeyMultiSig requires an array of private key string.')
+
+  for (let p of privateKeys) {
+    const parsed = utils.parsePrivateKey(p)
+    p = parsed.privateKey
+    if (!utils.isValidPrivateKey(p)) throw new Error(`Failed to create AccountKeyMultiSig. Invalid private key : ${p}`)
+  }
+
+  return new AccountKeyMultiSig(privateKeys)
+}
+
+/**
+ * createAccountKeyRoleBased creates AccountKeyRoleBased with an obejct of key.
+ *
+ * @method createAccountKeyRoleBased
+ * @param {Object} keyObject Object that defines key for each role to use when creating AccountKeyRoleBased.
+ * @return {Object}
+ */
+Accounts.prototype.createAccountKeyRoleBased = function createAccountKeyRoleBased(keyObject) {
+  if (keyObject instanceof AccountKeyRoleBased) return keyObject
+
+  if (!_.isObject(keyObject) || _.isArray(keyObject)) throw new Error('Creating a AccountKeyRoleBased requires an object.')
+
+  return new AccountKeyRoleBased(keyObject)
+}
+
+/**
+ * accountKeyToPublicKey creates public key format with AccountKey.
+ *
+ * @method accountKeyToPublicKey
+ * @param {Object} accountKey AccountKey instance for which you want to generate a public key format.
+ * @return {String|Array|Object}
+ */
+Accounts.prototype.accountKeyToPublicKey = function accountKeyToPublicKey(accountKey) {
+  accountKey = this.createAccountKey(accountKey)
+  return accountKey.toPublicKey(this.privateKeyToPublicKey)
+}
+
+/**
+ * createWithAccountKey creates Account instance with AccountKey.
+ *
+ * @method createWithAccountKey
+ * @param {String} address The address of account.
+ * @param {String|Array|Object} accountKey The accountKey of account.
+ * @return {Object}
+ */
+Accounts.prototype.createWithAccountKey = function createWithAccountKey(address, accountKey) {
+  const account = new Account(address, this.createAccountKey(accountKey))
+  return this._addAccountFunctions(account)
+}
+
+/**
+ * createWithAccountKeyPublic create an account with AccountKeyPublic.
+ *
+ * @method createWithAccountKeyPublic
+ * @param {String} address An address of account.
+ * @param {String|Object} key Key of account.
+ * @return {Object}
+ */
+Accounts.prototype.createWithAccountKeyPublic = function createWithAccountKeyPublic(address, key) {
+  if (!Account.isAccountKey(key)) key = this.createAccountKeyPublic(key)
+
+  if (key.type !== AccountKeyEnum.ACCOUNT_KEY_PUBLIC) throw new Error(`Failed to create account with AccountKeyPublic. Invalid account key : ${key.type}`)
+
+  const account = new Account(address, key)
+  return this._addAccountFunctions(account)
+}
+
+/**
+ * createWithAccountKeyMultiSig create an account with AccountKeyMultiSig.
+ *
+ * @method createWithAccountKeyMultiSig
+ * @param {String} address An address of account.
+ * @param {String|Object} keys Key of account.
+ * @return {Object}
+ */
+Accounts.prototype.createWithAccountKeyMultiSig = function createWithAccountKeyMultiSig(address, keys) { 
+  if (!Account.isAccountKey(keys)) keys = this.createAccountKeyMultiSig(keys)
+
+  if (keys.type !== AccountKeyEnum.ACCOUNT_KEY_MULTISIG) throw new Error(`Failed to create account with AccountKeyMultiSig. Invalid account key : ${keys.type}`)
+
+  const account = new Account(address, keys)
+  return this._addAccountFunctions(account)
+}
+
+/**
+ * createWithAccountKeyRoleBased create an account with AccountKeyRoleBased.
+ *
+ * @method createWithAccountKeyRoleBased
+ * @param {String} address An address of account.
+ * @param {String|Object} keyObject Key of account.
+ * @return {Object}
+ */
+Accounts.prototype.createWithAccountKeyRoleBased = function createWithAccountKeyRoleBased(address, keyObject) {
+  if (!Account.isAccountKey(keyObject)) keyObject = this.createAccountKeyRoleBased(keyObject)
+
+  if (keyObject.type !== AccountKeyEnum.ACCOUNT_KEY_ROLEBASED) throw new Error(`Failed to create account with AccountKeyRoleBased. Invalid account key : ${keyObject.type}`)
+
+  const account = new Account(address, keyObject)
+  return this._addAccountFunctions(account)
+}
 
 /**
  * privateKeyToAccount creates and returns an Account through the input passed as parameters.
@@ -155,7 +326,77 @@ Accounts.prototype.privateKeyToAccount = function privateKeyToAccount(key, userI
   account.address = account.address.toLowerCase()
   account.address = utils.addHexPrefix(account.address)
 
-  return this._addAccountFunctions(account)
+  return account
+}
+
+
+/**
+ * createAccountForUpdate creates an AccountForUpdate instance.
+ * The AccountForUpdate returned as a result of this function contains only the address and public key used to update the account.
+ *
+ * @method createAccountForUpdate
+ * @param {String} address The address value of AccountForUpdate, a structure that contains data for updating an account.
+ * @param {String|Array|Object} accountKey Private key or AccountKey to update account.
+ * @param {Object} options Options to use for setting threshold and weight for multiSig.
+ * @return {Object}
+ */
+Accounts.prototype.createAccountForUpdate = function createAccountForUpdate(address, accountKey, options) {
+  let legacyOrFail
+
+  // Logic for handling cases where legacyKey or failKey is set inside AccountKeyRoleBased object.
+  if (!_.isArray(accountKey) && _.isObject(accountKey)) {
+    legacyOrFail = {}
+    Object.keys(accountKey).map((role) => {
+      if (accountKey[role] === 'legacyKey' || accountKey[role] === 'failKey') {
+        legacyOrFail[role] = accountKey[role]
+        delete accountKey[role]
+      }
+    })
+    if (Object.keys(accountKey).length === 0) return new AccountForUpdate(address, legacyOrFail, options)
+  }
+
+  const publicKey = this.accountKeyToPublicKey(accountKey)
+
+  if (legacyOrFail !== undefined) {
+    Object.assign(publicKey, legacyOrFail)
+  }
+
+  return new AccountForUpdate(address, publicKey, options)
+}
+
+/**
+ * createAccountForUpdateWithPublicKey creates AccountForUpdate instance with public key format.
+ *
+ * @method createAccountForUpdateWithPublicKey
+ * @param {String} address The address value of AccountForUpdate, a structure that contains data for updating an account.
+ * @param {String|Array|Object} keyForUpdate Public key to update.
+ * @param {Object} options Options to use for setting threshold and weight for multiSig.
+ * @return {Object}
+ */
+Accounts.prototype.createAccountForUpdateWithPublicKey = function createAccountForUpdateWithPublicKey(address, keyForUpdate, options) {
+  return new AccountForUpdate(address, keyForUpdate, options)
+}
+
+/**
+ * createAccountForUpdateWithLegacyKey creates AccountForUpdate instance with legacyKey.
+ *
+ * @method createAccountForUpdateWithLegacyKey
+ * @param {String} address The address of account to update with the legacy key.
+ * @return {Object}
+ */
+Accounts.prototype.createAccountForUpdateWithLegacyKey = function createAccountForUpdateWithLegacyKey(address) {
+  return new AccountForUpdate(address, 'legacyKey')
+}
+
+/**
+ * createAccountForUpdateWithFailKey creates AccountForUpdate instance with failKey.
+ *
+ * @method createAccountForUpdateWithFailKey
+ * @param {String} address The address of account to update with the fail key.
+ * @return {Object}
+ */
+Accounts.prototype.createAccountForUpdateWithFailKey = function createAccountForUpdateWithFailKey(address) {
+  return new AccountForUpdate(address, 'failKey')
 }
 
 /**
@@ -188,7 +429,9 @@ Accounts.prototype.getLegacyAccount = function getLegacyAccount(key) {
 
   privateKey = utils.addHexPrefix(privateKey)
 
-  return { legacyAccount: AccountLib.fromPrivate(privateKey), klaytnWalletKeyAddress }
+  const account = this._addAccountFunctions(Account.fromObject(AccountLib.fromPrivate(privateKey)))
+
+  return { legacyAccount: account, klaytnWalletKeyAddress }
 }
 
 Accounts.prototype.signTransaction = function signTransaction() {
@@ -840,42 +1083,46 @@ Wallet.prototype.create = function (numberOfAccounts, entropy) {
     }
  */
 Wallet.prototype.add = function (account, userInputAddress) {
-    var klaytnWalletKey
-    /**
-     * cav.klay.accounts.wallet.add('0x4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318');
-     * 
-     * cav.klay.accounts.wallet.add({
-     *   privateKey: '0x348ce564d427a3311b6536bbcff9390d69395b06ed6c486954e971d960fe8709',
-     *   address: '0xb8CE9ab6943e0eCED004cDe8e3bBed6568B2Fa01'
-     * });
-     */
-    if (_.isString(account)) {
-      account = this._accounts.privateKeyToAccount(account, userInputAddress);
-    } else if(!_.isObject(account)) {
-        throw new Error('Invalid private key')
-    }
+  let accountForWallet
+  /**
+   * cav.klay.accounts.wallet.add('0x4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318');
+   * 
+   * cav.klay.accounts.wallet.add({
+   *   privateKey: '0x348ce564d427a3311b6536bbcff9390d69395b06ed6c486954e971d960fe8709',
+   *   address: '0xb8CE9ab6943e0eCED004cDe8e3bBed6568B2Fa01'
+   * });
+   */
+  if (Account.isAccountKey(account)) {
+    if (!userInputAddress) throw new Error(`Address is not defined. Address cannot be determined from AccountKey`)
+    accountForWallet = this._accounts.createWithAccountKey(userInputAddress, account)
+  } else if(account instanceof Account) {
+    accountForWallet = this._accounts.createWithAccountKey(account.address, account.accountKey)
+    accountForWallet.address = userInputAddress || account.address
+  } else if (_.isObject(account) && account.address && account.privateKey) {
+    accountForWallet = this._accounts.privateKeyToAccount(account.privateKey, userInputAddress || account.address)
+  } else if (_.isString(account)) {
+    accountForWallet = this._accounts.privateKeyToAccount(account, userInputAddress);
+  } else {
+    const accountKey = this._accounts.createAccountKey(account)
+    if (!userInputAddress) throw new Error(`Address is not defined. Address cannot be determined from AccountKey format`)
+    accountForWallet = this._accounts.createWithAccountKey(userInputAddress, accountKey)
+  }
 
-    const accountAlreadyExists = !!this[account.address]
+  if (!!this[accountForWallet.address]) throw new Error('Account exists with ' + accountForWallet.address)
 
-    if (accountAlreadyExists) {
-      throw new Error('Account exists with ' + account.address)
-    }
+  accountForWallet.index = this._findSafeIndex()
+  this[accountForWallet.index] = accountForWallet
 
-    account = this._accounts.privateKeyToAccount(account.privateKey, userInputAddress || account.address)
+  this[accountForWallet.address] = accountForWallet
+  this[accountForWallet.address.toLowerCase()] = accountForWallet
+  this[accountForWallet.address.toUpperCase()] = accountForWallet
+  try {
+    this[utils.toChecksumAddress(accountForWallet.address)] = accountForWallet
+  } catch (e) {}
 
-    account.index = this._findSafeIndex()
-    this[account.index] = account
+  this.length++
 
-    this[account.address] = account
-    this[account.address.toLowerCase()] = account
-    this[account.address.toUpperCase()] = account
-    try {
-      this[utils.toChecksumAddress(account.address)] = account
-    } catch (e) {}
-
-    this.length++
-
-    return account
+  return accountForWallet
 }
 
 Wallet.prototype.updatePrivateKey = function (privateKey, address) {
@@ -888,64 +1135,103 @@ Wallet.prototype.updatePrivateKey = function (privateKey, address) {
     throw new Error('The private key used for the update is not a valid string.')
   }
 
+  if (!utils.isAddress(address)) throw new Error(`Invalid address : ${address}`)
+
   // If failed to find account through address, return error
   const accountExists = !!this[address]
   if (!accountExists) throw new Error('Failed to find account with ' + address)
 
   const account = this[address]
 
+  if (account.accountKeyType !== AccountKeyEnum.ACCOUNT_KEY_PUBLIC) {
+    throw new Error('Account using AccountKeyMultiSig or AccountKeyRoleBased must be updated using the caver.klay.accounts.updateAccountKey function.')
+  }
+
   const parsed = utils.parsePrivateKey(privateKey)
   if (!utils.isValidPrivateKey(parsed.privateKey)) throw new Error('Invalid private key')
-  if (parsed.address && parsed.address !== account.address) throw new Error('The address extracted from the private key does not match the address received as the input value.')
 
-  this[account.index].privateKey = parsed.privateKey
+  if (parsed.address && parsed.address !== account.address) {
+    throw new Error('The address extracted from the private key does not match the address received as the input value.')
+  }
 
-  this[account.address].privateKey = parsed.privateKey
-  this[account.address.toLowerCase()].privateKey = parsed.privateKey
-  this[account.address.toUpperCase()].privateKey = parsed.privateKey
+  const newAccountKeyPublic = new AccountKeyPublic(parsed.privateKey)
+  this[account.index].accountKey = newAccountKeyPublic
+  this[account.address].accountKey = newAccountKeyPublic
+  this[account.address.toLowerCase()].accountKey = newAccountKeyPublic
+  this[account.address.toUpperCase()].accountKey = newAccountKeyPublic
+
   try {
-    this[utils.toChecksumAddress(account.address)].privateKey = parsed.privateKey
+    this[utils.toChecksumAddress(account.address)].accountKey = newAccountKeyPublic
   } catch (e) {}
 
   return account
 }
 
- Wallet.prototype.remove = function (addressOrIndex) {
-   var account = this[addressOrIndex]
+Wallet.prototype.updateAccountKey = function updateAccountKey(address, accountKey) {
+  if (address === undefined || accountKey === undefined) {
+    throw new Error('To update the accountKey in wallet, need to set both address and accountKey.')
+  }
 
-   if (account && account.address) {
-     // address
-     this[account.address].privateKey = null
-     delete this[account.address]
+  if (!Account.isAccountKey(accountKey)) {
+    accountKey = this._accounts.createAccountKey(accountKey)
+  }
 
-     if (this[account.address.toLowerCase()]) {
-       // address lowercase
-       this[account.address.toLowerCase()].privateKey = null
-       delete this[account.address.toLowerCase()]
-     }
+  if (!utils.isAddress(address)) throw new Error(`Invalid address : ${address}`)
 
-     if (this[account.address.toUpperCase()]) {
-       // address uppercase
-       this[account.address.toUpperCase()].privateKey = null
-       delete this[account.address.toUpperCase()]
-     }
+  // If failed to find account through address, return error
+  const accountExists = !!this[address]
+  if (!accountExists) throw new Error('Failed to find account with ' + address)
 
-     try {
-       this[utils.toChecksumAddress(account.address)].privateKey = null
-       delete this[utils.toChecksumAddress(account.address)]
-     } catch (e) {}
+  const account = this[address]
 
-     // index
-     this[account.index].privateKey = null
-     delete this[account.index]
+  this[account.index].accountKey = accountKey
+  this[account.address].accountKey = accountKey
+  this[account.address.toLowerCase()].accountKey = accountKey
+  this[account.address.toUpperCase()].accountKey = accountKey
 
-     this.length--
+  try {
+    this[utils.toChecksumAddress(account.address)].accountKey = accountKey
+  } catch (e) {}
 
-     return true
-   } else {
-     return false
+  return account
+}
+
+Wallet.prototype.remove = function (addressOrIndex) {
+ var account = this[addressOrIndex]
+
+ if (account && account.address) {
+   // address
+   this[account.address].accountKey = null
+   delete this[account.address]
+
+   if (this[account.address.toLowerCase()]) {
+     // address lowercase
+     this[account.address.toLowerCase()].accountKey = null
+     delete this[account.address.toLowerCase()]
    }
+
+   if (this[account.address.toUpperCase()]) {
+     // address uppercase
+     this[account.address.toUpperCase()].accountKey = null
+     delete this[account.address.toUpperCase()]
+   }
+
+   try {
+     this[utils.toChecksumAddress(account.address)].accountKey = null
+     delete this[utils.toChecksumAddress(account.address)]
+   } catch (e) {}
+
+   // index
+   this[account.index].accountKey = null
+   delete this[account.index]
+
+   this.length--
+
+   return true
+ } else {
+   return false
  }
+}
 
 Wallet.prototype.clear = function () {
     var _this = this;

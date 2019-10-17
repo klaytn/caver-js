@@ -1,12 +1,15 @@
 const AccountKeyEnum = require('./accountKeyEnum').AccountKeyEnum
 const AccountKeyPublic = require('./accountKeyPublic')
 const AccountKeyMultiSig = require('./accountKeyMultiSig')
+const utils = require('../../../../caver-utils')
 
 class AccountKeyRoleBased {
 	constructor(keyObj = {}) {
 		if (keyObj instanceof AccountKeyRoleBased) keyObj = keyObj.keys
 		
 		if (typeof keyObj !== 'object') throw new Error('RoleBasedKey should be created with Object')
+
+		validateKeyObject(keyObj)
 
 		this._transactionKey = makeAccountKey(keyObj.transactionKey)
 		this._updateKey = makeAccountKey(keyObj.updateKey)
@@ -71,6 +74,25 @@ function makeAccountKey(key) {
 	if (typeof key !== 'string') throw new Error('Invalid account key type')
 
 	return new AccountKeyPublic(key)
+}
+
+function validateKeyObject(keyObject) {
+	const key = Object.keys(keyObject)
+	if (key.length === 0) throw new Error(`Failed to create AccountKeyRoleBased: empty object`)
+
+	key.map((role) => {
+		if (!utils.isValidRole(role)) throw new Error(`Failed to create AccountKeyRoleBased. Invalid role is defined : ${role}`)
+
+		if (Array.isArray(keyObject[role])) {
+			for (let p of keyObject[role]) {
+				const parsed = utils.parsePrivateKey(p)
+				p = parsed.privateKey
+				if (!utils.isValidPrivateKey(p)) throw new Error(`Failed to create AccountKeyRoleBased. Invalid private key : ${p}`)
+			}
+		} else {
+			if (!utils.isValidPrivateKey(keyObject[role])) throw new Error(`Failed to create AccountKeyRoleBased. Invalid private key : ${keyObject[role]}`)
+		}
+	})
 }
 
 module.exports = AccountKeyRoleBased
