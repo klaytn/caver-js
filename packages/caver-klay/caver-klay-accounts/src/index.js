@@ -158,7 +158,7 @@ Accounts.prototype.create = function create(entropy) {
 };
 
 /**
- * createAccountKey creates AccountKeyPublic or AccountKeyMultiSig or AccountKeyRoleBased instance with parameter.
+ * createAccountKey creates AccountKeyPublic, AccountKeyMultiSig or AccountKeyRoleBased instance with parameter.
  *
  * @method createAccountKey
  * @param {String|Array|Object} accountKey Parameters to be used when creating the AccountKey.
