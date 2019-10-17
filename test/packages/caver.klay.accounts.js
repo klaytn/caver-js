@@ -64,8 +64,8 @@ function checkHashMessage(hashed, originMessage) {
 }
 
 function isKeystoreV3(data, { address }) {
-  const keys = ['version', 'id', 'address', 'crypto']
-  expect(Object.getOwnPropertyNames(data)).to.deep.equal(keys)
+  const objectKeys = ['version', 'id', 'address', 'keyRing']
+  expect(Object.getOwnPropertyNames(data)).to.deep.equal(objectKeys)
 
   expect(caver.utils.isAddress(data.address)).to.equal(true)
 
@@ -799,6 +799,375 @@ describe('caver.klay.accounts.encrypt', () => {
       expect(() => caver.klay.accounts.encrypt(testAccount.getKlaytnWalletKey(), password, {address: caver.klay.accounts.create().address})).to.throw(errorMessage)
     })
   })
+
+  context('CAVERJS-UNIT-WALLET-351: input: array of private key string, password, {address:valid}', () => {
+    it('should encrypt password with privateKey', () => {
+      const password = 'klaytn!@'
+
+      let key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, key)
+
+      let result = caver.klay.accounts.encrypt(testAccount.keys, password, {address: testAccount.address})
+
+      isKeystoreV3(result, testAccount)
+      expect(result.keyRing.length).to.equals(1)
+      expect(result.keyRing[0].length).to.equals(key.length)
+
+      const decrypted = caver.klay.accounts.decrypt(result, password)
+      isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-352: input: array of private key string, password', () => {
+    it('should throw error when address is not defined', () => {
+      const password = 'klaytn!@'
+
+      let key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, key)
+
+      const errorMessage = 'The address must be defined inside the options object.'
+      expect(() => caver.klay.accounts.encrypt(testAccount.keys, password)).to.throw(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-353: input: key object(transactionKey, updateKey and feePayerKey are defined), password, {address:valid}', () => {
+    it('should encrypt password with privateKey', () => {
+      const password = 'klaytn!@'
+
+      let key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: caver.klay.accounts.create().privateKey,
+        feePayerKey: caver.klay.accounts.create().privateKey,
+      }
+      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, key)
+
+      let result = caver.klay.accounts.encrypt(testAccount.keys, password, {address: testAccount.address})
+
+      isKeystoreV3(result, testAccount)
+      expect(result.keyRing.length).to.equals(3)
+      expect(result.keyRing[0].length).to.equals(1)
+      expect(result.keyRing[1].length).to.equals(1)
+      expect(result.keyRing[2].length).to.equals(1)
+
+      const decrypted = caver.klay.accounts.decrypt(result, password)
+      isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-354: input: key object(transactionKey, updateKey and feePayerKey are defined with array of private key), password, {address:valid}', () => {
+    it('should encrypt password with privateKey', () => {
+      const password = 'klaytn!@'
+
+      let key = {
+        transactionKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+      }
+      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, key)
+
+      let result = caver.klay.accounts.encrypt(testAccount.keys, password, {address: testAccount.address})
+
+      isKeystoreV3(result, testAccount)
+      expect(result.keyRing.length).to.equals(3)
+      expect(result.keyRing[0].length).to.equals(key.transactionKey.length)
+      expect(result.keyRing[1].length).to.equals(key.updateKey.length)
+      expect(result.keyRing[2].length).to.equals(key.feePayerKey.length)
+
+      const decrypted = caver.klay.accounts.decrypt(result, password)
+      isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-355: input: key object(transactionKey is defined), password, {address:valid}', () => {
+    it('should encrypt password with privateKey', () => {
+      const password = 'klaytn!@'
+
+      let key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+      }
+      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, key)
+
+      let result = caver.klay.accounts.encrypt(testAccount.keys, password, {address: testAccount.address})
+
+      isKeystoreV3(result, testAccount)
+      expect(result.keyRing.length).to.equals(3)
+      expect(result.keyRing[0].length).to.equals(1)
+      expect(result.keyRing[1].length).to.equals(0)
+      expect(result.keyRing[2].length).to.equals(0)
+
+      const decrypted = caver.klay.accounts.decrypt(result, password)
+      isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-356: input: key object(updateKey is defined), password, {address:valid}', () => {
+    it('should encrypt password with privateKey', () => {
+      const password = 'klaytn!@'
+
+      let key = {
+        updateKey: caver.klay.accounts.create().privateKey,
+      }
+      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, key)
+
+      let result = caver.klay.accounts.encrypt(testAccount.keys, password, {address: testAccount.address})
+
+      isKeystoreV3(result, testAccount)
+      expect(result.keyRing.length).to.equals(3)
+      expect(result.keyRing[0].length).to.equals(0)
+      expect(result.keyRing[1].length).to.equals(1)
+      expect(result.keyRing[2].length).to.equals(0)
+
+      const decrypted = caver.klay.accounts.decrypt(result, password)
+      isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-357: input: key object(feePayerKey is defined), password, {address:valid}', () => {
+    it('should encrypt password with privateKey', () => {
+      const password = 'klaytn!@'
+
+      let key = {
+        feePayerKey: caver.klay.accounts.create().privateKey,
+      }
+      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, key)
+
+      let result = caver.klay.accounts.encrypt(testAccount.keys, password, {address: testAccount.address})
+
+      isKeystoreV3(result, testAccount)
+      expect(result.keyRing.length).to.equals(3)
+      expect(result.keyRing[0].length).to.equals(0)
+      expect(result.keyRing[1].length).to.equals(0)
+      expect(result.keyRing[2].length).to.equals(1)
+
+      const decrypted = caver.klay.accounts.decrypt(result, password)
+      isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-358: input: key object, password', () => {
+    it('should throw error when address is not defined', () => {
+      const password = 'klaytn!@'
+
+      let key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: caver.klay.accounts.create().privateKey,
+        feePayerKey: caver.klay.accounts.create().privateKey,
+      }
+      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, key)
+
+      const errorMessage = 'The address must be defined inside the options object.'
+      expect(() => caver.klay.accounts.encrypt(testAccount.keys, password)).to.throw(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-359: input: AccountKeyPublic, password, {address:valid}', () => {
+    it('should encrypt password with privateKey', () => {
+      const password = 'klaytn!@'
+
+      let key = caver.klay.accounts.create().privateKey
+      let accountKey = caver.klay.accounts.createAccountKey(key)
+      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, accountKey)
+
+      let result = caver.klay.accounts.encrypt(accountKey, password, {address: testAccount.address})
+
+      isKeystoreV3(result, testAccount)
+      expect(result.keyRing.length).to.equals(1)
+      expect(result.keyRing[0].length).to.equals(1)
+
+      const decrypted = caver.klay.accounts.decrypt(result, password)
+      isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-360: input: AccountKeyPublic, password', () => {
+    it('should throw error', () => {
+      const password = 'klaytn!@'
+
+      let key = caver.klay.accounts.create().privateKey
+      let accountKey = caver.klay.accounts.createAccountKey(key)
+
+      const errorMessage = 'The address must be defined inside the options object.'
+      expect(() => caver.klay.accounts.encrypt(accountKey, password)).to.throw(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-361: input: AccountKeyMultiSig, password, {address:valid}', () => {
+    it('should encrypt key with password', () => {
+      const password = 'klaytn!@'
+
+      let key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      let accountKey = caver.klay.accounts.createAccountKey(key)
+      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, accountKey)
+
+      let result = caver.klay.accounts.encrypt(accountKey, password, {address: testAccount.address})
+
+      isKeystoreV3(result, testAccount)
+      expect(result.keyRing.length).to.equals(1)
+      expect(result.keyRing[0].length).to.equals(key.length)
+
+      const decrypted = caver.klay.accounts.decrypt(result, password)
+      isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-362: input: AccountKeyMultiSig, password', () => {
+    it('should throw error', () => {
+      const password = 'klaytn!@'
+
+      let key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      let accountKey = caver.klay.accounts.createAccountKey(key)
+
+      const errorMessage = 'The address must be defined inside the options object.'
+      expect(() => caver.klay.accounts.encrypt(accountKey, password)).to.throw(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-363: input: AccountKeyRoleBased, password, {address:valid}', () => {
+    it('should encrypt key with password', () => {
+      const password = 'klaytn!@'
+
+      let key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+      }
+      let accountKey = caver.klay.accounts.createAccountKey(key)
+      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, accountKey)
+
+      let result = caver.klay.accounts.encrypt(accountKey, password, {address: testAccount.address})
+
+      isKeystoreV3(result, testAccount)
+      expect(result.keyRing.length).to.equals(3)
+      expect(result.keyRing[0].length).to.equals(1)
+      expect(result.keyRing[1].length).to.equals(key.updateKey.length)
+      expect(result.keyRing[2].length).to.equals(key.feePayerKey.length)
+
+      const decrypted = caver.klay.accounts.decrypt(result, password)
+      isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-364: input: AccountKeyMultiSig, password', () => {
+    it('should throw error', () => {
+      const password = 'klaytn!@'
+
+      let key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+      }
+      let accountKey = caver.klay.accounts.createAccountKey(key)
+
+      const errorMessage = 'The address must be defined inside the options object.'
+      expect(() => caver.klay.accounts.encrypt(accountKey, password)).to.throw(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-365: input: Account with AccountKeyPublic, password, {address:valid}', () => {
+    it('should encrypt password with privateKey', () => {
+      const password = 'klaytn!@'
+
+      let key = caver.klay.accounts.create().privateKey
+      let accountKey = caver.klay.accounts.createAccountKey(key)
+      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, accountKey)
+
+      let result = caver.klay.accounts.encrypt(testAccount, password, {address: testAccount.address})
+
+      isKeystoreV3(result, testAccount)
+      expect(result.keyRing.length).to.equals(1)
+      expect(result.keyRing[0].length).to.equals(1)
+
+      const decrypted = caver.klay.accounts.decrypt(result, password)
+      isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-366: input: Account with AccountKeyPublic, password, {address:different address}', () => {
+    it('should throw error when addresses are not matched', () => {
+      const password = 'klaytn!@'
+
+      let key = caver.klay.accounts.create().privateKey
+      let accountKey = caver.klay.accounts.createAccountKey(key)
+      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, accountKey)
+
+      const errorMessage = 'Address in account is not matched with address in options object'
+      expect(() => caver.klay.accounts.encrypt(testAccount, password, {address: caver.klay.accounts.create().address})).to.throw(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-367: input: Account with AccountKeyMultiSig, password, {address:valid}', () => {
+    it('should encrypt key with password', () => {
+      const password = 'klaytn!@'
+
+      let key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      let accountKey = caver.klay.accounts.createAccountKey(key)
+      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, accountKey)
+
+      let result = caver.klay.accounts.encrypt(accountKey, password, {address: testAccount.address})
+
+      isKeystoreV3(result, testAccount)
+      expect(result.keyRing.length).to.equals(1)
+      expect(result.keyRing[0].length).to.equals(key.length)
+
+      const decrypted = caver.klay.accounts.decrypt(result, password)
+      isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-368: input: Account with AccountKeyMultiSig, password, {address:different address}', () => {
+    it('should throw error when addresses are not matched', () => {
+      const password = 'klaytn!@'
+
+      let key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      let accountKey = caver.klay.accounts.createAccountKey(key)
+      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, accountKey)
+
+      const errorMessage = 'Address in account is not matched with address in options object'
+      expect(() => caver.klay.accounts.encrypt(testAccount, password, {address: caver.klay.accounts.create().address})).to.throw(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-369: input: Account with AccountKeyRoleBased, password, {address:valid}', () => {
+    it('should encrypt key with password', () => {
+      const password = 'klaytn!@'
+
+      let key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+      }
+      let accountKey = caver.klay.accounts.createAccountKey(key)
+      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, accountKey)
+
+      let result = caver.klay.accounts.encrypt(accountKey, password, {address: testAccount.address})
+
+      isKeystoreV3(result, testAccount)
+      expect(result.keyRing.length).to.equals(3)
+      expect(result.keyRing[0].length).to.equals(1)
+      expect(result.keyRing[1].length).to.equals(key.updateKey.length)
+      expect(result.keyRing[2].length).to.equals(key.feePayerKey.length)
+
+      const decrypted = caver.klay.accounts.decrypt(result, password)
+      isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-370: input: Account with AccountKeyMultiSig, password, {address:different address}', () => {
+    it('should throw error when addresses are not matched', () => {
+      const password = 'klaytn!@'
+
+      let key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+      }
+      let accountKey = caver.klay.accounts.createAccountKey(key)
+      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, accountKey)
+
+      const errorMessage = 'Address in account is not matched with address in options object'
+      expect(() => caver.klay.accounts.encrypt(testAccount, password, {address: caver.klay.accounts.create().address})).to.throw(errorMessage)
+    })
+  })
 })
 
 describe('caver.klay.accounts.decrypt', () => {
@@ -831,6 +1200,145 @@ describe('caver.klay.accounts.decrypt', () => {
       expect(result.address.slice(0, 2)).to.equals('0x')
     })
   })
+
+  context('CAVERJS-UNIT-WALLET-371: input: keystoreJsonV3 that encrypts Account with AccountKeyMultiSig, password', () => {
+    it('After decrypting, should return valid account', () => {
+      const password = 'klaytn!@'
+      const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      const keystoreJsonV3 = caver.klay.accounts.encrypt(key, password, { address: account.address })
+      
+      let result = caver.klay.accounts.decrypt(keystoreJsonV3, password)
+      
+      isAccount(result, {keys: key, address: account.address})
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-372: input: keystoreJsonV3 that encrypts Account with AccountKeyRoleBased, password', () => {
+    it('After decrypting, should return valid account', () => {
+      const password = 'klaytn!@'
+      const key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      }
+      const keystoreJsonV3 = caver.klay.accounts.encrypt(key, password, { address: account.address })
+      
+      let result = caver.klay.accounts.decrypt(keystoreJsonV3, password)
+      
+      isAccount(result, {keys: key, address: account.address})
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-373: input: keystoreJsonV3 that encrypts Account with AccountKeyRoleBased(transactionKey only), password', () => {
+    it('After decrypting, should return valid account', () => {
+      const password = 'klaytn!@'
+      const key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+      }
+      const keystoreJsonV3 = caver.klay.accounts.encrypt(key, password, { address: account.address })
+      
+      let result = caver.klay.accounts.decrypt(keystoreJsonV3, password)
+      
+      isAccount(result, {keys: key, address: account.address})
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-374: input: keystoreJsonV3 that encrypts Account with AccountKeyRoleBased(updateKey only), password', () => {
+    it('After decrypting, should return valid account', () => {
+      const password = 'klaytn!@'
+      const key = {
+        updateKey: caver.klay.accounts.create().privateKey,
+      }
+      const keystoreJsonV3 = caver.klay.accounts.encrypt(key, password, { address: account.address })
+      
+      let result = caver.klay.accounts.decrypt(keystoreJsonV3, password)
+      
+      isAccount(result, {keys: key, address: account.address})
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-375: input: keystoreJsonV3 that encrypts Account with AccountKeyRoleBased(feePayerKey only), password', () => {
+    it('After decrypting, should return valid account', () => {
+      const password = 'klaytn!@'
+      const key = {
+        feePayerKey: caver.klay.accounts.create().privateKey,
+      }
+      const keystoreJsonV3 = caver.klay.accounts.encrypt(key, password, { address: account.address })
+      
+      let result = caver.klay.accounts.decrypt(keystoreJsonV3, password)
+      
+      isAccount(result, {keys: key, address: account.address})
+    })
+  })
+  
+  context('CAVERJS-UNIT-WALLET-378: input: keystoreJsonV3 that encrypts Account, password', () => {
+    it('After decrypting, should return valid account', () => {
+      const password = 'klaytn!@'
+      const key = caver.klay.accounts.create().privateKey
+      const keystore = caver.klay.accounts.encrypt(key, password, { address: account.address })
+      keystore.version = 3
+      keystore.crypto = keystore.keyRing[0][0]
+      delete keystore.keyRing
+      
+      let result = caver.klay.accounts.decrypt(keystore, password)
+      
+      isAccount(result, {keys: key, address: account.address})
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-379: input: keystoreJsonV3 that encrypts Account, password', () => {
+    it('should throw error with invalid keystore v3 which not defines crypto', () => {
+      const password = 'klaytn!@'
+      const key = caver.klay.accounts.create().privateKey
+      const keystore = caver.klay.accounts.encrypt(key, password, { address: account.address })
+      keystore.version = 3
+      
+      const expectedError = `Invalid keystore V3 format: 'crypto' is not defined.`
+      
+      expect(() => caver.klay.accounts.decrypt(keystore, password)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-380: input: keystoreJsonV3 that encrypts Account, password', () => {
+    it('should throw error with invalid keystore v3 which defines crypto and keyRing', () => {
+      const password = 'klaytn!@'
+      const key = caver.klay.accounts.create().privateKey
+      const keystore = caver.klay.accounts.encrypt(key, password, { address: account.address })
+      keystore.version = 3
+      keystore.crypto = keystore.keyRing[0][0]
+      
+      const expectedError = `Invalid key store format: 'crypto' can not be with 'keyRing'`
+      
+      expect(() => caver.klay.accounts.decrypt(keystore, password)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-381: input: keystoreJsonV4 that encrypts Account, password', () => {
+    it('should throw error with invalid keystore v3 which defines crypto and keyRing', () => {
+      const password = 'klaytn!@'
+      const key = caver.klay.accounts.create().privateKey
+      const keystore = caver.klay.accounts.encrypt(key, password, { address: account.address })
+      keystore.crypto = keystore.keyRing[0][0]
+      
+      const expectedError = `Invalid key store format: 'crypto' can not be with 'keyRing'`
+      
+      expect(() => caver.klay.accounts.decrypt(keystore, password)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-382: input: keystoreJsonV4 that encrypts Account, password', () => {
+    it('should throw error with invalid length of key', () => {
+      const password = 'klaytn!@'
+      const key = caver.klay.accounts.create().privateKey
+      const keystore = caver.klay.accounts.encrypt(key, password, { address: account.address })
+      keystore.keyRing = [[], [], [], []]
+      
+      const expectedError = `Invalid key store format`
+      
+      expect(() => caver.klay.accounts.decrypt(keystore, password)).to.throws(expectedError)
+    })
+  })
+
 
   /*
   it('keystoreJsonV3, password:invalid [KLAYTN-52]', () => {
@@ -2993,6 +3501,37 @@ describe('caver.klay.accounts.wallet.encrypt', () => {
     })
   })
 
+  context('CAVERJS-UNIT-WALLET-272: input: password', () => {
+    it('should throw error if there is Account with AccountKeyMultiSig or AccountKeyRoleBased', () => {
+      const password = 'klaytn!@'
+
+      // AccountKeyMultiSig
+      let address = caver.klay.accounts.create().address
+      let key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      caver.klay.accounts.wallet.add(caver.klay.accounts.createWithAccountKey(address, key))
+
+      // AccountKeyRoleBased
+      let roleBasedaddress = caver.klay.accounts.create().address
+      let roleBasedkey = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: caver.klay.accounts.create().privateKey,
+        feePayerKey: caver.klay.accounts.create().privateKey
+      }
+      caver.klay.accounts.wallet.add(caver.klay.accounts.createWithAccountKey(roleBasedaddress, roleBasedkey))
+
+      let result = caver.klay.accounts.wallet.encrypt(password)
+
+      expect(result.length).to.equal(caver.klay.accounts.wallet.length)
+      result.forEach((v, i) => {
+        isKeystoreV3(v, { address: caver.klay.accounts.wallet[i].address })
+      })
+      const decryptedWallet = caver.klay.accounts.wallet.decrypt(result, password)
+      isWallet(decryptedWallet, { accounts: caver.klay.accounts.wallet })
+
+    })
+  })
+
+
   /*
   it('password:invalid [KLAYTN-52]', () => {
     const invalid = ''
@@ -3019,6 +3558,20 @@ describe('caver.klay.accounts.wallet.decrypt', () => {
 
       const numberOfAccounts = Math.floor(Math.random() * 5) + 1
       caver.klay.accounts.wallet.create(numberOfAccounts)
+
+      // AccountKeyMultiSig
+      let address = caver.klay.accounts.create().address
+      let key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      caver.klay.accounts.wallet.add(caver.klay.accounts.createWithAccountKey(address, key))
+
+      // AccountKeyRoleBased
+      let roleBasedaddress = caver.klay.accounts.create().address
+      let roleBasedkey = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: caver.klay.accounts.create().privateKey,
+        feePayerKey: caver.klay.accounts.create().privateKey
+      }
+      caver.klay.accounts.wallet.add(caver.klay.accounts.createWithAccountKey(roleBasedaddress, roleBasedkey))
 
       const encryptedKeystore = caver.klay.accounts.wallet.encrypt(password)
       caver.klay.accounts.wallet.clear()
