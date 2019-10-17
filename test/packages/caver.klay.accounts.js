@@ -1179,43 +1179,43 @@ describe('caver.klay.accounts.decrypt', () => {
     account = caver.klay.accounts.create()
   })
 
-  context('CAVERJS-UNIT-WALLET-042 : input: keystoreJsonV3, password', () => {
+  context('CAVERJS-UNIT-WALLET-042 : input: keystoreJsonV4, password', () => {
     it('After decrypting, should return valid account', () => {
       const password = 'klaytn!@'
-      const keystoreJsonV3 = caver.klay.accounts.encrypt(account.privateKey, password)
+      const keystoreJsonV4 = caver.klay.accounts.encrypt(account.privateKey, password)
 
-      let result = caver.klay.accounts.decrypt(keystoreJsonV3, password)
-      isKeystoreV4(keystoreJsonV3, result)
+      let result = caver.klay.accounts.decrypt(keystoreJsonV4, password)
+      isKeystoreV4(keystoreJsonV4, result)
 
       isAccount(result, {keys: account.keys, address: account.address})
     })
   })
 
-  context('CAVERJS-UNIT-WALLET-103 : input: keystoreJsonV3(without 0x address format), password', () => {
+  context('CAVERJS-UNIT-WALLET-103 : input: keystoreJsonV4(without 0x address format), password', () => {
     it('After decrypting, should return valid account', () => {
       const password = 'klaytn!@'
-      const keystoreJsonV3 = caver.klay.accounts.encrypt(account.privateKey, password)
-      keystoreJsonV3.address = keystoreJsonV3.address.replace('0x', '')
+      const keystoreJsonV4 = caver.klay.accounts.encrypt(account.privateKey, password)
+      keystoreJsonV4.address = keystoreJsonV4.address.replace('0x', '')
       
-      let result = caver.klay.accounts.decrypt(keystoreJsonV3, password)
+      let result = caver.klay.accounts.decrypt(keystoreJsonV4, password)
       
       expect(result.address.slice(0, 2)).to.equals('0x')
     })
   })
 
-  context('CAVERJS-UNIT-WALLET-371: input: keystoreJsonV3 that encrypts Account with AccountKeyMultiSig, password', () => {
+  context('CAVERJS-UNIT-WALLET-371: input: keystoreJsonV4 that encrypts Account with AccountKeyMultiSig, password', () => {
     it('After decrypting, should return valid account', () => {
       const password = 'klaytn!@'
       const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
-      const keystoreJsonV3 = caver.klay.accounts.encrypt(key, password, { address: account.address })
+      const keystoreJsonV4 = caver.klay.accounts.encrypt(key, password, { address: account.address })
       
-      let result = caver.klay.accounts.decrypt(keystoreJsonV3, password)
+      let result = caver.klay.accounts.decrypt(keystoreJsonV4, password)
       
       isAccount(result, {keys: key, address: account.address})
     })
   })
 
-  context('CAVERJS-UNIT-WALLET-372: input: keystoreJsonV3 that encrypts Account with AccountKeyRoleBased, password', () => {
+  context('CAVERJS-UNIT-WALLET-372: input: keystoreJsonV4 that encrypts Account with AccountKeyRoleBased, password', () => {
     it('After decrypting, should return valid account', () => {
       const password = 'klaytn!@'
       const key = {
@@ -1223,57 +1223,57 @@ describe('caver.klay.accounts.decrypt', () => {
         updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
         feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
       }
-      const keystoreJsonV3 = caver.klay.accounts.encrypt(key, password, { address: account.address })
+      const keystoreJsonV4 = caver.klay.accounts.encrypt(key, password, { address: account.address })
       
-      let result = caver.klay.accounts.decrypt(keystoreJsonV3, password)
+      let result = caver.klay.accounts.decrypt(keystoreJsonV4, password)
       
       isAccount(result, {keys: key, address: account.address})
     })
   })
 
-  context('CAVERJS-UNIT-WALLET-373: input: keystoreJsonV3 that encrypts Account with AccountKeyRoleBased(transactionKey only), password', () => {
+  context('CAVERJS-UNIT-WALLET-373: input: keystoreJsonV4 that encrypts Account with AccountKeyRoleBased(transactionKey only), password', () => {
     it('After decrypting, should return valid account', () => {
       const password = 'klaytn!@'
       const key = {
         transactionKey: caver.klay.accounts.create().privateKey,
       }
-      const keystoreJsonV3 = caver.klay.accounts.encrypt(key, password, { address: account.address })
+      const keystoreJsonV4 = caver.klay.accounts.encrypt(key, password, { address: account.address })
       
-      let result = caver.klay.accounts.decrypt(keystoreJsonV3, password)
+      let result = caver.klay.accounts.decrypt(keystoreJsonV4, password)
       
       isAccount(result, {keys: key, address: account.address})
     })
   })
 
-  context('CAVERJS-UNIT-WALLET-374: input: keystoreJsonV3 that encrypts Account with AccountKeyRoleBased(updateKey only), password', () => {
+  context('CAVERJS-UNIT-WALLET-374: input: keystoreJsonV4 that encrypts Account with AccountKeyRoleBased(updateKey only), password', () => {
     it('After decrypting, should return valid account', () => {
       const password = 'klaytn!@'
       const key = {
         updateKey: caver.klay.accounts.create().privateKey,
       }
-      const keystoreJsonV3 = caver.klay.accounts.encrypt(key, password, { address: account.address })
+      const keystoreJsonV4 = caver.klay.accounts.encrypt(key, password, { address: account.address })
       
-      let result = caver.klay.accounts.decrypt(keystoreJsonV3, password)
+      let result = caver.klay.accounts.decrypt(keystoreJsonV4, password)
       
       isAccount(result, {keys: key, address: account.address})
     })
   })
 
-  context('CAVERJS-UNIT-WALLET-375: input: keystoreJsonV3 that encrypts Account with AccountKeyRoleBased(feePayerKey only), password', () => {
+  context('CAVERJS-UNIT-WALLET-375: input: keystoreJsonV4 that encrypts Account with AccountKeyRoleBased(feePayerKey only), password', () => {
     it('After decrypting, should return valid account', () => {
       const password = 'klaytn!@'
       const key = {
         feePayerKey: caver.klay.accounts.create().privateKey,
       }
-      const keystoreJsonV3 = caver.klay.accounts.encrypt(key, password, { address: account.address })
+      const keystoreJsonV4 = caver.klay.accounts.encrypt(key, password, { address: account.address })
       
-      let result = caver.klay.accounts.decrypt(keystoreJsonV3, password)
+      let result = caver.klay.accounts.decrypt(keystoreJsonV4, password)
       
       isAccount(result, {keys: key, address: account.address})
     })
   })
   
-  context('CAVERJS-UNIT-WALLET-378: input: keystoreJsonV3 that encrypts Account, password', () => {
+  context('CAVERJS-UNIT-WALLET-378: input: keystoreJsonV4 that encrypts Account, password', () => {
     it('After decrypting, should return valid account', () => {
       const password = 'klaytn!@'
       const key = caver.klay.accounts.create().privateKey
@@ -1288,7 +1288,7 @@ describe('caver.klay.accounts.decrypt', () => {
     })
   })
 
-  context('CAVERJS-UNIT-WALLET-379: input: keystoreJsonV3 that encrypts Account, password', () => {
+  context('CAVERJS-UNIT-WALLET-379: input: keystoreJsonV4 that encrypts Account, password', () => {
     it('should throw error with invalid keystore v3 which not defines crypto', () => {
       const password = 'klaytn!@'
       const key = caver.klay.accounts.create().privateKey
@@ -1301,7 +1301,7 @@ describe('caver.klay.accounts.decrypt', () => {
     })
   })
 
-  context('CAVERJS-UNIT-WALLET-380: input: keystoreJsonV3 that encrypts Account, password', () => {
+  context('CAVERJS-UNIT-WALLET-380: input: keystoreJsonV4 that encrypts Account, password', () => {
     it('should throw error with invalid keystore v3 which defines crypto and keyRing', () => {
       const password = 'klaytn!@'
       const key = caver.klay.accounts.create().privateKey
@@ -1338,6 +1338,134 @@ describe('caver.klay.accounts.decrypt', () => {
       const expectedError = `Invalid key store format`
       
       expect(() => caver.klay.accounts.decrypt(keystore, password)).to.throws(expectedError)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-383: input: hard coded keystoreJsonV4 that encrypts Account, password', () => {
+    it('should decrypt and return valid account', () => {
+      const keystoreJsonV4 = { 
+        version: 4,
+        id: '55da3f9c-6444-4fc1-abfa-f2eabfc57501',
+        address: '0x86bce8c859f5f304aa30adb89f2f7b6ee5a0d6e2',
+        keyRing:[ 
+          [ 
+            { 
+              ciphertext: '93dd2c777abd9b80a0be8e1eb9739cbf27c127621a5d3f81e7779e47d3bb22f6',
+              cipherparams: { iv: '84f90907f3f54f53d19cbd6ae1496b86' },
+              cipher: 'aes-128-ctr',
+              kdf: 'scrypt',
+              kdfparams: { 
+                dklen: 32,
+                salt: '69bf176a136c67a39d131912fb1e0ada4be0ed9f882448e1557b5c4233006e10',
+                n: 4096,
+                r: 8,
+                p: 1 
+              },
+             mac: '8f6d1d234f4a87162cf3de0c7fb1d4a8421cd8f5a97b86b1a8e576ffc1eb52d2' 
+            },
+            { 
+              ciphertext: '53d50b4e86b550b26919d9b8cea762cd3c637dfe4f2a0f18995d3401ead839a6',
+              cipherparams: { iv: 'd7a6f63558996a9f99e7daabd289aa2c' },
+              cipher: 'aes-128-ctr',
+              kdf: 'scrypt',
+              kdfparams: { 
+                dklen: 32,
+                salt: '966116898d90c3e53ea09e4850a71e16df9533c1f9e1b2e1a9edec781e1ad44f',
+                n: 4096,
+                r: 8,
+                p: 1 
+              },
+              mac: 'bca7125e17565c672a110ace9a25755847d42b81aa7df4bb8f5ce01ef7213295'
+            }
+          ],
+          [ 
+            { 
+              ciphertext: 'f16def98a70bb2dae053f791882f3254c66d63416633b8d91c2848893e7876ce',
+              cipherparams: { iv: 'f5006128a4c53bc02cada64d095c15cf' },
+              cipher: 'aes-128-ctr',
+              kdf: 'scrypt',
+              kdfparams: { 
+                dklen: 32,
+                salt: '0d8a2f71f79c4880e43ff0795f6841a24cb18838b3ca8ecaeb0cda72da9a72ce',
+                n: 4096,
+                r: 8,
+                p: 1 
+              },
+              mac: '38b79276c3805b9d2ff5fbabf1b9d4ead295151b95401c1e54aed782502fc90a' 
+            }
+          ],
+          [ 
+            { 
+              ciphertext: '544dbcc327942a6a52ad6a7d537e4459506afc700a6da4e8edebd62fb3dd55ee',
+              cipherparams: { iv: '05dd5d25ad6426e026818b6fa9b25818' },
+              cipher: 'aes-128-ctr',
+              kdf: 'scrypt',
+              kdfparams: { 
+                dklen: 32,
+                salt: '3a9003c1527f65c772c54c6056a38b0048c2e2d58dc0e584a1d867f2039a25aa',
+                n: 4096,
+                r: 8,
+                p: 1 
+              },
+              mac: '19a698b51409cc9ac22d63d329b1201af3c89a04a1faea3111eec4ca97f2e00f' 
+            },
+            { 
+              ciphertext: 'dd6b920f02cbcf5998ed205f8867ddbd9b6b088add8dfe1774a9fda29ff3920b',
+              cipherparams: { iv: 'ac04c0f4559dad80dc86c975d1ef7067' },
+              cipher: 'aes-128-ctr',
+              kdf: 'scrypt',
+              kdfparams: { 
+                dklen: 32,
+                salt: '22279c6dbcc706d7daa120022a236cfe149496dca8232b0f8159d1df999569d6',
+                n: 4096,
+                r: 8,
+                p: 1 
+              },
+              mac: '1c54f7378fa279a49a2f790a0adb683defad8535a21bdf2f3dadc48a7bddf517' 
+            }
+          ] 
+        ],
+      }
+      const password = 'password'
+      const expectedAccount = caver.klay.accounts.createWithAccountKey('0x86bce8c859f5f304aa30adb89f2f7b6ee5a0d6e2', {
+        transactionKey: ['0xd1e9f8f00ef9f93365f5eabccccb3f3c5783001b61a40f0f74270e50158c163d', '0x4bd8d0b0c1575a7a35915f9af3ef8beb11ad571337ec9b6aca7c88ca7458ef5c'], 
+        updateKey: '0xdc2690ac6017e32ef17ea219c2a2fd14a2bb73e7a0a253dfd69abba3eb8d7d91', 
+        feePayerKey: ['0xf17bf8b7bee09ffc50a401b7ba8e633b9e55eedcf776782f2a55cf7cc5c40aa8', '0x4f8f1e9e1466609b836dba611a0a24628aea8ee11265f757aa346bde3d88d548']
+      })
+      
+      let result = caver.klay.accounts.decrypt(keystoreJsonV4, password)
+
+      isAccount(result, {keys: expectedAccount.keys, address: expectedAccount.address})
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-384: input: hard coded keystoreJsonV3 that encrypts Account, password', () => {
+    it('should decrypt and return valid account', () => {
+      const keystoreJsonV3 = { 
+        version: 3,
+        id: '7a0a8557-22a5-4c90-b554-d6f3b13783ea',
+        address: '0x86bce8c859f5f304aa30adb89f2f7b6ee5a0d6e2',
+        crypto: { 
+          ciphertext: '696d0e8e8bd21ff1f82f7c87b6964f0f17f8bfbd52141069b59f084555f277b7',
+          cipherparams: { iv: '1fd13e0524fa1095c5f80627f1d24cbd' },
+          cipher: 'aes-128-ctr',
+          kdf: 'scrypt',
+          kdfparams: { 
+            dklen: 32,
+            salt: '7ee980925cef6a60553cda3e91cb8e3c62733f64579f633d0f86ce050c151e26',
+            n: 4096,
+            r: 8,
+            p: 1 
+          },
+          mac: '8684d8dc4bf17318cd46c85dbd9a9ec5d9b290e04d78d4f6b5be9c413ff30ea4' 
+        } 
+      }
+      const password = 'password'
+      const expectedAccount = caver.klay.accounts.privateKeyToAccount('0x36e0a792553f94a7660e5484cfc8367e7d56a383261175b9abced7416a5d87df', '0x86bce8c859f5f304aa30adb89f2f7b6ee5a0d6e2')
+      
+      let result = caver.klay.accounts.decrypt(keystoreJsonV3, password)
+
+      isAccount(result, {keys: expectedAccount.keys, address: expectedAccount.address})
     })
   })
 
@@ -3547,7 +3675,7 @@ describe('caver.klay.accounts.wallet.clear', () => {
 describe('caver.klay.accounts.wallet.encrypt', () => {
 
   context('CAVERJS-UNIT-WALLET-062 : input: password', () => {
-    it('should encrypted as v3Keystore', () => {
+    it('should encrypted as v4Keystore', () => {
       const password = 'klaytn!@'
 
       const numberOfAccounts = Math.floor(Math.random() * 5) + 1
@@ -3616,7 +3744,7 @@ describe('caver.klay.accounts.wallet.encrypt', () => {
 describe('caver.klay.accounts.wallet.decrypt', () => {
 
   context('CAVERJS-UNIT-WALLET-063 : input: keystoreArray, password', () => {
-    it('should decrypt v3Keystore to account instance', () => {
+    it('should decrypt v4Keystore to account instance', () => {
       const password = 'klaytn!@'
 
       const numberOfAccounts = Math.floor(Math.random() * 5) + 1
