@@ -63,9 +63,11 @@ function checkHashMessage(hashed, originMessage) {
   expect(hashed).to.equal(originHashed)
 }
 
-function isKeystoreV3(data, { address }) {
+function isKeystoreV4(data, { address }) {
   const objectKeys = ['version', 'id', 'address', 'keyRing']
   expect(Object.getOwnPropertyNames(data)).to.deep.equal(objectKeys)
+
+  expect(data.version).to.equals(4)
 
   expect(caver.utils.isAddress(data.address)).to.equal(true)
 
@@ -707,7 +709,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
       let result = caver.klay.accounts.encrypt(account.privateKey, password)
 
-      isKeystoreV3(result, account)
+      isKeystoreV4(result, account)
 
       const decryptedAccount = caver.klay.accounts.decrypt(result, password)
       isAccount(decryptedAccount, {keys: account.keys, address: account.address})
@@ -730,7 +732,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
       let result = caver.klay.accounts.encrypt(account.getKlaytnWalletKey(), password)
 
-      isKeystoreV3(result, account)
+      isKeystoreV4(result, account)
 
       const decryptedAccount = caver.klay.accounts.decrypt(result, password)
       isAccount(decryptedAccount, {keys: account.keys, address: account.address})
@@ -743,7 +745,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
       let result = caver.klay.accounts.encrypt(account.getKlaytnWalletKey(), password, {address: account.address})
 
-      isKeystoreV3(result, account)
+      isKeystoreV4(result, account)
 
       const decryptedAccount = caver.klay.accounts.decrypt(result, password)
       isAccount(decryptedAccount, {keys: account.keys, address: account.address})
@@ -767,7 +769,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
       let result = caver.klay.accounts.encrypt(testAccount.getKlaytnWalletKey(), password)
 
-      isKeystoreV3(result, testAccount)
+      isKeystoreV4(result, testAccount)
 
       const decryptedAccount = caver.klay.accounts.decrypt(result, password)
       isAccount(decryptedAccount, {keys: testAccount.keys, address: testAccount.address})
@@ -782,7 +784,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
       let result = caver.klay.accounts.encrypt(testAccount.getKlaytnWalletKey(), password, {address: testAccount.address})
 
-      isKeystoreV3(result, testAccount)
+      isKeystoreV4(result, testAccount)
 
       const decryptedAccount = caver.klay.accounts.decrypt(result, password)
       isAccount(decryptedAccount, {keys: testAccount.keys, address: testAccount.address})
@@ -809,7 +811,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
       let result = caver.klay.accounts.encrypt(testAccount.keys, password, {address: testAccount.address})
 
-      isKeystoreV3(result, testAccount)
+      isKeystoreV4(result, testAccount)
       expect(result.keyRing.length).to.equals(1)
       expect(result.keyRing[0].length).to.equals(key.length)
 
@@ -843,7 +845,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
       let result = caver.klay.accounts.encrypt(testAccount.keys, password, {address: testAccount.address})
 
-      isKeystoreV3(result, testAccount)
+      isKeystoreV4(result, testAccount)
       expect(result.keyRing.length).to.equals(3)
       expect(result.keyRing[0].length).to.equals(1)
       expect(result.keyRing[1].length).to.equals(1)
@@ -867,7 +869,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
       let result = caver.klay.accounts.encrypt(testAccount.keys, password, {address: testAccount.address})
 
-      isKeystoreV3(result, testAccount)
+      isKeystoreV4(result, testAccount)
       expect(result.keyRing.length).to.equals(3)
       expect(result.keyRing[0].length).to.equals(key.transactionKey.length)
       expect(result.keyRing[1].length).to.equals(key.updateKey.length)
@@ -889,7 +891,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
       let result = caver.klay.accounts.encrypt(testAccount.keys, password, {address: testAccount.address})
 
-      isKeystoreV3(result, testAccount)
+      isKeystoreV4(result, testAccount)
       expect(result.keyRing.length).to.equals(3)
       expect(result.keyRing[0].length).to.equals(1)
       expect(result.keyRing[1].length).to.equals(0)
@@ -911,7 +913,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
       let result = caver.klay.accounts.encrypt(testAccount.keys, password, {address: testAccount.address})
 
-      isKeystoreV3(result, testAccount)
+      isKeystoreV4(result, testAccount)
       expect(result.keyRing.length).to.equals(3)
       expect(result.keyRing[0].length).to.equals(0)
       expect(result.keyRing[1].length).to.equals(1)
@@ -933,7 +935,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
       let result = caver.klay.accounts.encrypt(testAccount.keys, password, {address: testAccount.address})
 
-      isKeystoreV3(result, testAccount)
+      isKeystoreV4(result, testAccount)
       expect(result.keyRing.length).to.equals(3)
       expect(result.keyRing[0].length).to.equals(0)
       expect(result.keyRing[1].length).to.equals(0)
@@ -970,7 +972,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
       let result = caver.klay.accounts.encrypt(accountKey, password, {address: testAccount.address})
 
-      isKeystoreV3(result, testAccount)
+      isKeystoreV4(result, testAccount)
       expect(result.keyRing.length).to.equals(1)
       expect(result.keyRing[0].length).to.equals(1)
 
@@ -1001,7 +1003,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
       let result = caver.klay.accounts.encrypt(accountKey, password, {address: testAccount.address})
 
-      isKeystoreV3(result, testAccount)
+      isKeystoreV4(result, testAccount)
       expect(result.keyRing.length).to.equals(1)
       expect(result.keyRing[0].length).to.equals(key.length)
 
@@ -1036,7 +1038,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
       let result = caver.klay.accounts.encrypt(accountKey, password, {address: testAccount.address})
 
-      isKeystoreV3(result, testAccount)
+      isKeystoreV4(result, testAccount)
       expect(result.keyRing.length).to.equals(3)
       expect(result.keyRing[0].length).to.equals(1)
       expect(result.keyRing[1].length).to.equals(key.updateKey.length)
@@ -1073,7 +1075,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
       let result = caver.klay.accounts.encrypt(testAccount, password, {address: testAccount.address})
 
-      isKeystoreV3(result, testAccount)
+      isKeystoreV4(result, testAccount)
       expect(result.keyRing.length).to.equals(1)
       expect(result.keyRing[0].length).to.equals(1)
 
@@ -1105,7 +1107,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
       let result = caver.klay.accounts.encrypt(accountKey, password, {address: testAccount.address})
 
-      isKeystoreV3(result, testAccount)
+      isKeystoreV4(result, testAccount)
       expect(result.keyRing.length).to.equals(1)
       expect(result.keyRing[0].length).to.equals(key.length)
 
@@ -1141,7 +1143,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
       let result = caver.klay.accounts.encrypt(accountKey, password, {address: testAccount.address})
 
-      isKeystoreV3(result, testAccount)
+      isKeystoreV4(result, testAccount)
       expect(result.keyRing.length).to.equals(3)
       expect(result.keyRing[0].length).to.equals(1)
       expect(result.keyRing[1].length).to.equals(key.updateKey.length)
@@ -1183,7 +1185,7 @@ describe('caver.klay.accounts.decrypt', () => {
       const keystoreJsonV3 = caver.klay.accounts.encrypt(account.privateKey, password)
 
       let result = caver.klay.accounts.decrypt(keystoreJsonV3, password)
-      isKeystoreV3(keystoreJsonV3, result)
+      isKeystoreV4(keystoreJsonV3, result)
 
       isAccount(result, {keys: account.keys, address: account.address})
     })
@@ -3555,7 +3557,7 @@ describe('caver.klay.accounts.wallet.encrypt', () => {
 
       expect(result.length).to.equal(caver.klay.accounts.wallet.length)
       result.forEach((v, i) => {
-        isKeystoreV3(v, { address: caver.klay.accounts.wallet[i].address })
+        isKeystoreV4(v, { address: caver.klay.accounts.wallet[i].address })
       })
       const decryptedWallet = caver.klay.accounts.wallet.decrypt(result, password)
       isWallet(decryptedWallet, { accounts: caver.klay.accounts.wallet })
@@ -3584,7 +3586,7 @@ describe('caver.klay.accounts.wallet.encrypt', () => {
 
       expect(result.length).to.equal(caver.klay.accounts.wallet.length)
       result.forEach((v, i) => {
-        isKeystoreV3(v, { address: caver.klay.accounts.wallet[i].address })
+        isKeystoreV4(v, { address: caver.klay.accounts.wallet[i].address })
       })
       const decryptedWallet = caver.klay.accounts.wallet.decrypt(result, password)
       isWallet(decryptedWallet, { accounts: caver.klay.accounts.wallet })
