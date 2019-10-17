@@ -231,23 +231,7 @@ Accounts.prototype.createAccountKeyRoleBased = function createAccountKeyRoleBase
   if (keyObject instanceof AccountKeyRoleBased) return keyObject
 
   if (!_.isObject(keyObject) || _.isArray(keyObject)) throw new Error('Creating a AccountKeyRoleBased requires an object.')
-  
-  const key = Object.keys(keyObject)
-  if (key.length === 0) throw new Error(`Failed to create AccountKeyRoleBased: empty object`)
 
-  key.map((role) => {
-    if (!utils.isValidRole(role)) throw new Error(`Failed to create AccountKeyRoleBased. Invalid role is defined : ${role}`)
-
-    if (Array.isArray(keyObject[role])) {
-      for (let p of keyObject[role]) {
-        const parsed = utils.parsePrivateKey(p)
-        p = parsed.privateKey
-        if (!utils.isValidPrivateKey(p)) throw new Error(`Failed to create AccountKeyRoleBased. Invalid private key : ${p}`)
-      }
-    } else {
-      if (!utils.isValidPrivateKey(keyObject[role])) throw new Error(`Failed to create AccountKeyRoleBased. Invalid private key : ${keyObject[role]}`)
-    }
-  })
   return new AccountKeyRoleBased(keyObject)
 }
 
