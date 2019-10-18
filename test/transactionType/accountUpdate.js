@@ -1612,4 +1612,196 @@ describe('ACCOUNT_UPDATE transaction', () => {
     // Throw error from formatter validation
     expect(()=> caver.klay.sendTransaction(tx)).to.throws(expectedError)
   }).timeout(200000)
+
+  // Update with key field with AccountKeyPublic.
+  it('CAVERJS-UNIT-TX-672: If transaction object has key with AccountKeyPublic, update account with AccountKeyPublic', async () => {
+    const key = caver.klay.accounts.create().privateKey
+    const updator = caver.klay.accounts.createAccountForUpdate(testAccount.address, key)
+
+    var tx = Object.assign({key: updator}, accountUpdateObject)
+
+    const receipt = await caver.klay.sendTransaction(tx)
+    expect(receipt.from).to.equals(tx.from)
+
+    const accountKey = await caver.klay.getAccountKey(receipt.from)
+    expect(accountKey.keyType).to.equals(2)
+
+    await createTestAccount()
+  }).timeout(200000)
+
+  // Update with key field with AccountKeyMultiSig.
+  it('CAVERJS-UNIT-TX-673: If transaction object has key with AccountKeyMultiSig, update account with AccountKeyMultiSig', async () => {
+    const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+    const options = { threshold: 1, weight: [1, 1] }
+    const updator = caver.klay.accounts.createAccountForUpdate(testAccount.address, key, options)
+
+    var tx = Object.assign({key: updator}, accountUpdateObject)
+
+    const receipt = await caver.klay.sendTransaction(tx)
+    expect(receipt.from).to.equals(tx.from)
+
+    const accountKey = await caver.klay.getAccountKey(receipt.from)
+    expect(accountKey.keyType).to.equals(4)
+    expect(accountKey.key.threshold).to.equals(options.threshold)
+    expect(accountKey.key.keys.length).to.equals(key.length)
+
+    await createTestAccount()
+  }).timeout(200000)
+
+  // Update with key field with AccountKeyRoleBased.
+  it('CAVERJS-UNIT-TX-674: If transaction object has key with AccountKeyRoleBased, update account with AccountKeyRoleBased', async () => {
+    const key = {
+      transactionKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+      updateKey: caver.klay.accounts.create().privateKey,
+      feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+    }
+    const options = {
+      transactionKey: { threshold: 2, weight: [1, 1] },
+      feePayerKey: { threshold: 2, weight: [1, 1, 1] }
+    }
+    const updator = caver.klay.accounts.createAccountForUpdate(testAccount.address, key, options)
+
+    var tx = Object.assign({key: updator}, accountUpdateObject)
+
+    const receipt = await caver.klay.sendTransaction(tx)
+    expect(receipt.from).to.equals(tx.from)
+
+    const accountKey = await caver.klay.getAccountKey(receipt.from)
+    expect(accountKey.keyType).to.equals(5)
+    expect(accountKey.key.length).to.equals(3)
+    expect(accountKey.key[0].keyType).to.equals(4)
+    expect(accountKey.key[1].keyType).to.equals(2)
+    expect(accountKey.key[2].keyType).to.equals(4)
+    expect(accountKey.key[0].key.threshold).to.equals(options.transactionKey.threshold)
+    expect(accountKey.key[2].key.threshold).to.equals(options.feePayerKey.threshold)
+    expect(accountKey.key[0].key.keys.length).to.equals(key.transactionKey.length)
+    expect(accountKey.key[2].key.keys.length).to.equals(key.feePayerKey.length)
+
+    await createTestAccount()
+  }).timeout(200000)
+
+  // Update with key field with LegacyKey.
+  it('CAVERJS-UNIT-TX-675: If transaction object has key with LegacyKey, update account with LegacyKey', async () => {
+    const updator = caver.klay.accounts.createAccountForUpdateWithLegacyKey(testAccount.address)
+
+    var tx = Object.assign({key: updator}, accountUpdateObject)
+
+    const receipt = await caver.klay.sendTransaction(tx)
+    expect(receipt.from).to.equals(tx.from)
+
+    const accountKey = await caver.klay.getAccountKey(receipt.from)
+    expect(accountKey.keyType).to.equals(1)
+
+    await createTestAccount()
+  }).timeout(200000)
+
+  // Update with key field with FailKey.
+  it('CAVERJS-UNIT-TX-676: If transaction object has key with FailKey, update account with FailKey', async () => {
+    const updator = caver.klay.accounts.createAccountForUpdateWithFailKey(testAccount.address)
+
+    var tx = Object.assign({key: updator}, accountUpdateObject)
+
+    const receipt = await caver.klay.sendTransaction(tx)
+    expect(receipt.from).to.equals(tx.from)
+
+    const accountKey = await caver.klay.getAccountKey(receipt.from)
+    expect(accountKey.keyType).to.equals(3)
+
+    await createTestAccount()
+  }).timeout(200000)
+
+  // Update with key field with AccountKeyRoleBased with legacyKey and failKey.
+  it('CAVERJS-UNIT-TX-677: If transaction object has key with AccountKeyRoleBased, update account with AccountKeyRoleBased', async () => {
+    const key = {
+      transactionKey: 'legacyKey',
+      updateKey: 'failKey',
+      feePayerKey: 'legacyKey'
+    }
+    const updator = caver.klay.accounts.createAccountForUpdate(testAccount.address, key)
+
+    var tx = Object.assign({key: updator}, accountUpdateObject)
+
+    const receipt = await caver.klay.sendTransaction(tx)
+    expect(receipt.from).to.equals(tx.from)
+
+    const accountKey = await caver.klay.getAccountKey(receipt.from)
+    expect(accountKey.keyType).to.equals(5)
+    expect(accountKey.key.length).to.equals(3)
+    expect(accountKey.key[0].keyType).to.equals(1)
+    expect(accountKey.key[1].keyType).to.equals(3)
+    expect(accountKey.key[2].keyType).to.equals(1)
+
+    await createTestAccount()
+  }).timeout(200000)
+
+  // Duplication key check with key field
+  it('CAVERJS-UNIT-TX-678: If transaction object has key with legacyKey field, should throw error', async () => {
+    const updator = caver.klay.accounts.createAccountForUpdateWithLegacyKey(testAccount.address)
+
+    var tx = Object.assign({key: updator, legacyKey: true}, accountUpdateObject)
+
+    const expectedError = `The key parameter to be used for ${tx.type} is duplicated.`
+
+    expect(()=> caver.klay.signTransaction(tx)).to.throws(expectedError)
+  }).timeout(200000)
+
+  it('CAVERJS-UNIT-TX-679: If transaction object has key with publicKey field, should throw error', async () => {
+    const updator = caver.klay.accounts.createAccountForUpdateWithLegacyKey(testAccount.address)
+
+    var tx = Object.assign({key: updator, publicKey}, accountUpdateObject)
+
+    const expectedError = `The key parameter to be used for ${tx.type} is duplicated.`
+    
+    expect(()=> caver.klay.signTransaction(tx)).to.throws(expectedError)
+  }).timeout(200000)
+
+  it('CAVERJS-UNIT-TX-680: If transaction object has key with multisig field, should throw error', async () => {
+    const updator = caver.klay.accounts.createAccountForUpdateWithLegacyKey(testAccount.address)
+
+    var tx = Object.assign({key: updator, multisig}, accountUpdateObject)
+
+    const expectedError = `The key parameter to be used for ${tx.type} is duplicated.`
+    
+    expect(()=> caver.klay.signTransaction(tx)).to.throws(expectedError)
+  }).timeout(200000)
+
+  it('CAVERJS-UNIT-TX-681: If transaction object has key with roleTransactionKey field, should throw error', async () => {
+    const updator = caver.klay.accounts.createAccountForUpdateWithLegacyKey(testAccount.address)
+
+    var tx = Object.assign({key: updator, roleTransactionKey: {publicKey}}, accountUpdateObject)
+
+    const expectedError = `The key parameter to be used for ${tx.type} is duplicated.`
+    
+    expect(()=> caver.klay.signTransaction(tx)).to.throws(expectedError)
+  }).timeout(200000)
+
+  it('CAVERJS-UNIT-TX-682: If transaction object has key with roleAccountUpdateKey field, should throw error', async () => {
+    const updator = caver.klay.accounts.createAccountForUpdateWithLegacyKey(testAccount.address)
+
+    var tx = Object.assign({key: updator, roleAccountUpdateKey: {publicKey}}, accountUpdateObject)
+
+    const expectedError = `The key parameter to be used for ${tx.type} is duplicated.`
+    
+    expect(()=> caver.klay.signTransaction(tx)).to.throws(expectedError)
+  }).timeout(200000)
+
+  it('CAVERJS-UNIT-TX-683: If transaction object has key with roleFeePayerKey field, should throw error', async () => {
+    const updator = caver.klay.accounts.createAccountForUpdateWithLegacyKey(testAccount.address)
+
+    var tx = Object.assign({key: updator, roleFeePayerKey: {publicKey}}, accountUpdateObject)
+
+    const expectedError = `The key parameter to be used for ${tx.type} is duplicated.`
+    
+    expect(()=> caver.klay.signTransaction(tx)).to.throws(expectedError)
+  }).timeout(200000)
+
+  it('CAVERJS-UNIT-TX-684: If transaction object has key with failKey field, should throw error', async () => {
+    const updator = caver.klay.accounts.createAccountForUpdateWithLegacyKey(testAccount.address)
+
+    var tx = Object.assign({key: updator, failKey: true}, accountUpdateObject)
+
+    const expectedError = `The key parameter to be used for ${tx.type} is duplicated.`
+    
+    expect(()=> caver.klay.signTransaction(tx)).to.throws(expectedError)
+  }).timeout(200000)
 })
