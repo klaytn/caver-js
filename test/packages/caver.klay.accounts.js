@@ -1165,18 +1165,120 @@ describe('caver.klay.accounts.encrypt', () => {
 
   context('input: Account with AccountKeyMultiSig, password, option', () => {
     it('should throw error when addresses are not matched', () => {
-      const password = 'klaytn!@'
+      const password = 'password'
 
-      let key = {
-        transactionKey: caver.klay.accounts.create().privateKey,
-        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
-        feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+      let testAccount = caver.klay.accounts.createWithAccountKey('0xf725a2950dc959638fa09f9d9b5426ad3dd8cd90', {
+        transactionKey: '0x7dc66dca0e5d56940c99ad01903a8ba5fd9e1f7a51a8ab07cf81ccd1d3c4be16',
+        updateKey: ['0x5fc3216454ab841ffa2bed0933a27bcdf2965238372bff3ec4fe56cbf5389a87', '0x79fe0616e7624314611b8e9c716b8d9c0c8c8c20f654021ff5fa7c46dc50709b'],
+        feePayerKey: '0xfac188dc156ef58d529ea14ac95379f502a390d5720a9575b87545e36b3f758e',
+      })
+      
+      let encryptOption = {
+        salt: 'e7c4605ad8200e0d93cd67f9d82fb9971e1a2763b22362017c2927231c2a733a',
+        iv: Buffer.from('38aa896fc128075425e512f01e4b206c', 'hex'),
+        kdf: 'scrypt',
+        dklen: 32,
+        n: 4096,
+        r: 8,
+        p: 1,
+        cipher: 'aes-128-ctr',
+        uuid: Buffer.from('e7c4605ad8200e0d93cd67f9d82fb997', 'hex'),
       }
-      let accountKey = caver.klay.accounts.createAccountKey(key)
-      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, accountKey)
 
-      const errorMessage = 'Address in account is not matched with address in options object'
-      expect(() => caver.klay.accounts.encrypt(testAccount, password, {address: caver.klay.accounts.create().address})).to.throw(errorMessage)
+      const expectedKeystore = { 
+        version: 4,
+        id: 'e7c4605a-d820-4e0d-93cd-67f9d82fb997',
+        address: '0xf725a2950dc959638fa09f9d9b5426ad3dd8cd90',
+        keyRing:[ 
+          [ 
+            { 
+              ciphertext: '5e2f95f61d7af3bebf4ff9f5d5813690c80b0b5aaebd6e8b22d0f928ff06776a',
+              cipherparams: { iv: '38aa896fc128075425e512f01e4b206c' },
+              cipher: 'aes-128-ctr',
+              kdf: 'scrypt',
+              kdfparams: { 
+                dklen: 32,
+                salt: 'e7c4605ad8200e0d93cd67f9d82fb9971e1a2763b22362017c2927231c2a733a',
+                n: 4096,
+                r: 8,
+                p: 1 
+              },
+             mac: 'fb86255428e24ba701201d5815f2f2114214cbd34fe4bc7a24b948a8ceac9f9b' 
+            }
+          ],
+          [ 
+            { 
+              ciphertext: '7c2ad958478c213549fdb9fd7619c6f8c7034618c83e3ab229af6332d9fa53fb',
+              cipherparams: { iv: '38aa896fc128075425e512f01e4b206c' },
+              cipher: 'aes-128-ctr',
+              kdf: 'scrypt',
+              kdfparams: { 
+                dklen: 32,
+                salt: 'e7c4605ad8200e0d93cd67f9d82fb9971e1a2763b22362017c2927231c2a733a',
+                n: 4096,
+                r: 8,
+                p: 1 
+              },
+              mac: 'e6c3897772916c69f7c778ac2e0e60b786c55f17367c68b086486bd68fea9517' 
+            },
+            { 
+              ciphertext: '5a17fe2af445e63ed2cdda6834d030a9391998000941c79318ab49bff092b9e7',
+              cipherparams: { iv: '38aa896fc128075425e512f01e4b206c' },
+              cipher: 'aes-128-ctr',
+              kdf: 'scrypt',
+              kdfparams: { 
+                dklen: 32,
+                salt: 'e7c4605ad8200e0d93cd67f9d82fb9971e1a2763b22362017c2927231c2a733a',
+                n: 4096,
+                r: 8,
+                p: 1 
+              },
+              mac: '633f91994f33541fbf1c3c3e973e539c12f1dd98f2757f64e3b63de986f367e0'
+            }
+          ],
+          [ 
+            { 
+              ciphertext: 'd92870e0064950a7e148f5be8ce8c4c0373684f58d1f50f95524701a47fdbcf2',
+              cipherparams: { iv: '38aa896fc128075425e512f01e4b206c' },
+              cipher: 'aes-128-ctr',
+              kdf: 'scrypt',
+              kdfparams: { 
+                dklen: 32,
+                salt: 'e7c4605ad8200e0d93cd67f9d82fb9971e1a2763b22362017c2927231c2a733a',
+                n: 4096,
+                r: 8,
+                p: 1 
+              },
+              mac: 'b2f0245036e7bbdea712819dfbe019c8bfb237684c67d61fa82638868a7ae752' 
+            }
+          ] 
+        ],
+      }
+
+      let result = caver.klay.accounts.encrypt(testAccount, password, encryptOption)
+      
+      expect(result.version).to.equals(expectedKeystore.version)
+      expect(result.id).to.equals(expectedKeystore.id)
+      expect(result.address).to.equals(expectedKeystore.address)
+      compareEncrypted(result.keyRing[0][0], expectedKeystore.keyRing[0][0])
+      compareEncrypted(result.keyRing[1][0], expectedKeystore.keyRing[1][0])
+      compareEncrypted(result.keyRing[1][1], expectedKeystore.keyRing[1][1])
+      compareEncrypted(result.keyRing[2][0], expectedKeystore.keyRing[2][0])
+
+      function compareEncrypted(ret, exp) {
+        expect(ret.ciphertext).to.equals(exp.ciphertext)
+        expect(ret.cipherparams.iv).to.equals(exp.cipherparams.iv)
+        expect(ret.cipher).to.equals(exp.cipher)
+        expect(ret.kdf).to.equals(exp.kdf)
+        expect(ret.kdfparams.dklen).to.equals(exp.kdfparams.dklen)
+        expect(ret.kdfparams.salt).to.equals(exp.kdfparams.salt)
+        expect(ret.kdfparams.n).to.equals(exp.kdfparams.n)
+        expect(ret.kdfparams.r).to.equals(exp.kdfparams.r)
+        expect(ret.kdfparams.p).to.equals(exp.kdfparams.p)
+        expect(ret.mac).to.equals(exp.mac)
+      }
+
+      isKeystoreV4(result, testAccount)
     })
   })
 })
