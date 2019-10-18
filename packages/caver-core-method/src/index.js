@@ -286,18 +286,27 @@ const buildSendSignedTxFunc = (method, payload, sendTxCallback) => (sign) => {
 }
 
 const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, method) => {
+  // Logic for handling multiple cases of parameters in sendSignedTransaction.
+  // 1. Object containing rawTransaction
+  // 2. A transaction object containing signatures or feePayerSignatures
+  if (method && method.accounts && payload.method === 'klay_sendRawTransaction') {
+    var tx = payload.params[0]
+    if (typeof tx !== 'string' && _.isObject(tx)) {
+      if (tx.rawTransaction) {
+        return sendSignedTx(tx)
+      } else {
+        return method.accounts.getRawTransactionWithSignatures(tx).then(sendSignedTx).catch((e) => {sendTxCallback(e)})
+      }
+    }
+  }
+
   if (method && method.accounts && method.accounts.wallet && method.accounts.wallet.length) {
       let error
       switch (payload.method) {
         case 'klay_sendTransaction': {
           var tx = payload.params[0]
-          
-          // TODO : Check signTransactionWithSignature function with this logic
-          //        and if need, implement sendTransactionWithSignature function.
-          // if (tx.signature) {
-          //   return method.accounts.sendTransactionWithSignature(tx).then(sendSignedTx)
-          // }
-          
+
+          let error
           if (!_.isObject(tx)) {
             error = new Error('The transaction must be defined as an object.')
             sendTxCallback(error)
@@ -324,8 +333,13 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
           }
 
           if (wallet && wallet.privateKey) {
+            privateKey = method.accounts._getRoleKey(tx, wallet)
             // If wallet was found, sign tx, and send using sendRawTransaction
-            return method.accounts.signTransaction(tx, wallet.privateKey).then(sendSignedTx).catch((e) => { sendTxCallback(e) })
+            return method.accounts.signTransaction(tx, privateKey).then(sendSignedTx).catch((e) => { sendTxCallback(e) })
+          } else if (tx.signatures) {
+            // If signatures is defined inside of the transaction object, 
+            // get rawTransaction string from signed transaction object and send to network
+            return method.accounts.getRawTransactionWithSignatures(tx).then(sendSignedTx).catch((e) => { sendTxCallback(e) })
           }
           
           // If wallet was not found in caver-js wallet, then it has to use wallet in Node.
