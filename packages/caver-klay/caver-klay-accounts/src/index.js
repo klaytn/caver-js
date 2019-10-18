@@ -838,14 +838,18 @@ Accounts.prototype.decrypt = function (v3Keystore, password, nonStrict) {
 
     if (json.crypto) {
       if (json.keyRing) throw new Error(`Invalid key store format: 'crypto' can not be with 'keyRing'`)
-      json.keyRing = [[json.crypto]]
+      json.keyRing = [json.crypto]
       delete json.crypto
     }
 
-    if (json.keyRing.length !== 1 && json.keyRing.length !== 3) throw new Error(`Invalid key store format`)
+    if (_.isArray(json.keyRing[0]) && json.keyRing.length > 3) {
+      throw new Error(`Invalid key store format`)
+    }
 
     let accountKey = {}
-    if (json.keyRing.length === 3) {
+    
+    // AccountKeyRoleBased format
+    if (_.isArray(json.keyRing[0])) {
       let transactionKey = decryptKey(json.keyRing[0])
       if (transactionKey) accountKey.transactionKey = transactionKey
 
@@ -855,11 +859,11 @@ Accounts.prototype.decrypt = function (v3Keystore, password, nonStrict) {
       let feePayerKey = decryptKey(json.keyRing[2])
       if (feePayerKey) accountKey.feePayerKey = feePayerKey
     } else {
-      accountKey = decryptKey(json.keyRing[0])
+      accountKey = decryptKey(json.keyRing)
     }
 
     function decryptKey(encryptedArray) {
-      if (encryptedArray.length === 0) return undefined
+      if (!encryptedArray || encryptedArray.length === 0) return undefined
       
       let decryptedArray = []
       for (const encrypted of encryptedArray) {
@@ -995,20 +999,25 @@ Accounts.prototype.encrypt = function (key, password, options) {
 
     if (!account) account = this.createWithAccountKey(address, key)
 
-    let keyRing = []
+    let keyRing
 
     switch(account.accountKeyType) {
       case AccountKeyEnum.ACCOUNT_KEY_PUBLIC:
       case AccountKeyEnum.ACCOUNT_KEY_MULTISIG:
-        keyRing.push(encryptKey(account.keys))
+        keyRing = encryptKey(account.keys)
         break
       case AccountKeyEnum.ACCOUNT_KEY_ROLEBASED:
+        keyRing = []
         let transactionKey = encryptKey(account.transactionKey)
-        keyRing.push(transactionKey)
         let updateKey = encryptKey(account.updateKey)
-        keyRing.push(updateKey)
         let feePayerKey = encryptKey(account.feePayerKey)
+        keyRing.push(transactionKey)
+        keyRing.push(updateKey)
         keyRing.push(feePayerKey)
+        for (i = keyRing.length-1; i >=0; i --) {
+          if (keyRing[i].length !== 0) break
+          keyRing = keyRing.slice(0, i)
+        }
         break
     }
 

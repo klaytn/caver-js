@@ -812,8 +812,7 @@ describe('caver.klay.accounts.encrypt', () => {
       let result = caver.klay.accounts.encrypt(testAccount.keys, password, {address: testAccount.address})
 
       isKeystoreV4(result, testAccount)
-      expect(result.keyRing.length).to.equals(1)
-      expect(result.keyRing[0].length).to.equals(key.length)
+      expect(result.keyRing.length).to.equals(key.length)
 
       const decrypted = caver.klay.accounts.decrypt(result, password)
       isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
@@ -892,10 +891,8 @@ describe('caver.klay.accounts.encrypt', () => {
       let result = caver.klay.accounts.encrypt(testAccount.keys, password, {address: testAccount.address})
 
       isKeystoreV4(result, testAccount)
-      expect(result.keyRing.length).to.equals(3)
+      expect(result.keyRing.length).to.equals(1)
       expect(result.keyRing[0].length).to.equals(1)
-      expect(result.keyRing[1].length).to.equals(0)
-      expect(result.keyRing[2].length).to.equals(0)
 
       const decrypted = caver.klay.accounts.decrypt(result, password)
       isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
@@ -914,10 +911,9 @@ describe('caver.klay.accounts.encrypt', () => {
       let result = caver.klay.accounts.encrypt(testAccount.keys, password, {address: testAccount.address})
 
       isKeystoreV4(result, testAccount)
-      expect(result.keyRing.length).to.equals(3)
+      expect(result.keyRing.length).to.equals(2)
       expect(result.keyRing[0].length).to.equals(0)
       expect(result.keyRing[1].length).to.equals(1)
-      expect(result.keyRing[2].length).to.equals(0)
 
       const decrypted = caver.klay.accounts.decrypt(result, password)
       isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
@@ -974,7 +970,6 @@ describe('caver.klay.accounts.encrypt', () => {
 
       isKeystoreV4(result, testAccount)
       expect(result.keyRing.length).to.equals(1)
-      expect(result.keyRing[0].length).to.equals(1)
 
       const decrypted = caver.klay.accounts.decrypt(result, password)
       isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
@@ -1004,8 +999,7 @@ describe('caver.klay.accounts.encrypt', () => {
       let result = caver.klay.accounts.encrypt(accountKey, password, {address: testAccount.address})
 
       isKeystoreV4(result, testAccount)
-      expect(result.keyRing.length).to.equals(1)
-      expect(result.keyRing[0].length).to.equals(key.length)
+      expect(result.keyRing.length).to.equals(key.length)
 
       const decrypted = caver.klay.accounts.decrypt(result, password)
       isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
@@ -1077,7 +1071,6 @@ describe('caver.klay.accounts.encrypt', () => {
 
       isKeystoreV4(result, testAccount)
       expect(result.keyRing.length).to.equals(1)
-      expect(result.keyRing[0].length).to.equals(1)
 
       const decrypted = caver.klay.accounts.decrypt(result, password)
       isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
@@ -1108,8 +1101,7 @@ describe('caver.klay.accounts.encrypt', () => {
       let result = caver.klay.accounts.encrypt(accountKey, password, {address: testAccount.address})
 
       isKeystoreV4(result, testAccount)
-      expect(result.keyRing.length).to.equals(1)
-      expect(result.keyRing[0].length).to.equals(key.length)
+      expect(result.keyRing.length).to.equals(key.length)
 
       const decrypted = caver.klay.accounts.decrypt(result, password)
       isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
@@ -1154,7 +1146,24 @@ describe('caver.klay.accounts.encrypt', () => {
     })
   })
 
-  context('CAVERJS-UNIT-WALLET-370: input: Account with AccountKeyMultiSig, password, {address:different address}', () => {
+  context('CAVERJS-UNIT-WALLET-370: input: Account with AccountKeyRoleBased, password, {address:different address}', () => {
+    it('should throw error when addresses are not matched', () => {
+      const password = 'klaytn!@'
+
+      let key = {
+        transactionKey: caver.klay.accounts.create().privateKey,
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+      }
+      let accountKey = caver.klay.accounts.createAccountKey(key)
+      let testAccount = caver.klay.accounts.createWithAccountKey(account.address, accountKey)
+
+      const errorMessage = 'Address in account is not matched with address in options object'
+      expect(() => caver.klay.accounts.encrypt(testAccount, password, {address: caver.klay.accounts.create().address})).to.throw(errorMessage)
+    })
+  })
+
+  context('input: Account with AccountKeyMultiSig, password, option', () => {
     it('should throw error when addresses are not matched', () => {
       const password = 'klaytn!@'
 
@@ -1279,7 +1288,7 @@ describe('caver.klay.accounts.decrypt', () => {
       const key = caver.klay.accounts.create().privateKey
       const keystore = caver.klay.accounts.encrypt(key, password, { address: account.address })
       keystore.version = 3
-      keystore.crypto = keystore.keyRing[0][0]
+      keystore.crypto = keystore.keyRing[0]
       delete keystore.keyRing
       
       let result = caver.klay.accounts.decrypt(keystore, password)
@@ -1307,7 +1316,7 @@ describe('caver.klay.accounts.decrypt', () => {
       const key = caver.klay.accounts.create().privateKey
       const keystore = caver.klay.accounts.encrypt(key, password, { address: account.address })
       keystore.version = 3
-      keystore.crypto = keystore.keyRing[0][0]
+      keystore.crypto = keystore.keyRing[0]
       
       const expectedError = `Invalid key store format: 'crypto' can not be with 'keyRing'`
       
@@ -1320,7 +1329,7 @@ describe('caver.klay.accounts.decrypt', () => {
       const password = 'klaytn!@'
       const key = caver.klay.accounts.create().privateKey
       const keystore = caver.klay.accounts.encrypt(key, password, { address: account.address })
-      keystore.crypto = keystore.keyRing[0][0]
+      keystore.crypto = keystore.keyRing[0]
       
       const expectedError = `Invalid key store format: 'crypto' can not be with 'keyRing'`
       
