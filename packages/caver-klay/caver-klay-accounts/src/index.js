@@ -68,6 +68,13 @@ function coverInitialTxValue(tx) {
   return tx
 }
 
+/**
+ * resolveArgsForSignTransaction parse arguments for signTransaction.
+ *
+ * @method resolveArgsForSignTransaction
+ * @param {Object} args Parameters of signTransaction.
+ * @return {Object}
+ */
 function resolveArgsForSignTransaction(args) {
   if (args.length === 0 || args.length > 3) throw new Error('Invalid parameter: The number of parameters is invalid.')
   
@@ -99,6 +106,13 @@ function resolveArgsForSignTransaction(args) {
   return { tx, privateKey, callback }
 }
 
+/**
+ * resolveArgsForFeePayerSignTransaction parse arguments for feePayerSignTransaction.
+ *
+ * @method resolveArgsForFeePayerSignTransaction
+ * @param {Object} args Parameters of feePayerSignTransaction.
+ * @return {Object}
+ */
 function resolveArgsForFeePayerSignTransaction(args) {
   if (args.length === 0 || args.length > 4) throw new Error('Invalid parameter: The number of parameters is invalid.')
   
