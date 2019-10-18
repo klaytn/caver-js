@@ -140,12 +140,15 @@ function makeRawTransaction(rlpEncoded, sig, transaction) {
         const decoded = decodeFromRawTransaction(transaction.senderRawTransaction)
         return _combineFeePayerRawTransaction(rlpEncoded, sig, transaction, decoded.signatures)
       }
+      if (transaction.feePayer && transaction.feePayer !== '0x' && transaction.feePayerSignatures) {
+        return _combineFeePayerRawTransaction(rlpEncoded, transaction.feePayerSignatures, transaction, sig)
+      }
       return _combineSenderRawTransaction(rlpEncoded, sig)
     }
     case 'LEGACY':
     default:
       rawTx = decodedValues.slice(0, 6).concat(sig[0])
-      return RLP.encode(rawTx)
+      return { rawTransaction: RLP.encode(rawTx), signatures: sig[0], feePayerSignatures: undefined }
   }
 }
 
@@ -156,25 +159,49 @@ function _combineSenderRawTransaction(rlpEncoded, sig) {
   let [txType, ...rawTx] = RLP.decode(data)
 
   if (!Array.isArray(sig[0])) sig = [sig]
+  sig = refineSignatures(sig)
+
   rawTx = [...rawTx, sig]
 
   // set default feepayer's information in rawTx
   const typeString = utils.getTxTypeStringFromRawTransaction(txType)
   if (typeString !== undefined && typeString.includes('FEE_DELEGATED')) rawTx = [...rawTx, '0x', [['0x01', '0x', '0x']]]
   
-  return txType + RLP.encode(rawTx).slice(2)
+  return { rawTransaction: txType + RLP.encode(rawTx).slice(2), signatures: sig, feePayerSignatures: undefined }
 }
 
-function _combineFeePayerRawTransaction(rlpEncoded, sig, transaction, senderSignature) {
+function _combineFeePayerRawTransaction(rlpEncoded, feePayerSignatures, transaction, senderSignature) {
   const decodedValues = RLP.decode(rlpEncoded)
   
   let [data] = decodedValues
   let [txType, ...rawTx] = RLP.decode(data)
   
-  if (!Array.isArray(sig[0])) sig = [sig]
-  rawTx = [...rawTx, senderSignature, transaction.feePayer.toLowerCase(), sig]
+  if (!Array.isArray(feePayerSignatures[0])) feePayerSignatures = [feePayerSignatures]
+  senderSignature = refineSignatures(senderSignature)
+  feePayerSignatures = refineSignatures(feePayerSignatures)
 
-  return txType + RLP.encode(rawTx).slice(2)
+  rawTx = [...rawTx, senderSignature, transaction.feePayer.toLowerCase(), feePayerSignatures]
+
+  return { rawTransaction: txType + RLP.encode(rawTx).slice(2), signatures: senderSignature, feePayerSignatures }
+}
+
+// refineSignatures removes duplication and empty signatures
+function refineSignatures(sigArray) {
+  const set = new Set()
+  let result = []
+  for (const sig of sigArray) {
+    if (sig.length === 0 || utils.isEmptySig(sig)) continue
+    
+    const sigString = sig.join('')
+    if (!set.has(sigString)) {
+      set.add(sigString, true)
+      result.push(sig)
+    }
+  }
+
+  if (result.length === 0) result = [['0x01', '0x', '0x']]
+
+  return result
 }
 
 function extractSignatures(rawTransaction) {
@@ -192,7 +219,7 @@ function extractSignatures(rawTransaction) {
 function splitFeePayer(rawTransaction) {
   const typeString = utils.getTxTypeStringFromRawTransaction(rawTransaction)
   
-  if (!typeString || !typeString.includes('FEE_DELEGATED')) throw new Error(`The RLP encoded transaction is not a fee delegated transaction type: '${typeString? typeString : 'LEGACY'}'`)
+  if (!typeString || !typeString.includes('FEE_DELEGATED')) throw new Error(`Failed to split fee payer: not a fee delegated transaction type('${typeString? typeString : 'LEGACY'}')`)
 
   const txType = rawTransaction.slice(0, 4)
   const decodedValues = RLP.decode(utils.addHexPrefix(rawTransaction.slice(4)))

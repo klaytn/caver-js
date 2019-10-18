@@ -180,7 +180,7 @@ describe('caver.klay.accounts.privateKeyToAccount', () => {
 })
 
 describe('caver.klay.accounts.signTransaction', () => {
-  let txObj, vtTx, account
+  let txObj, vtTx, account, feePayer, sender
 
   beforeEach(() => {
     account = caver.klay.accounts.create()
@@ -493,6 +493,905 @@ describe('caver.klay.accounts.signTransaction', () => {
       }
       const errorMessage = 'Failed to find get private key to sign. The account you want to use for signing must exist in caver.klay.accounts.wallet or you must pass the private key as a parameter.'
       await expect(caver.klay.accounts.signTransaction(feeDelegatedTx)).to.be.rejectedWith(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-225: input: rawTransaction without other signatures', () => {
+    it('should sign to transaction', async () => {
+      const rawTransaction = '0x08f83c819a8505d21dba00830dbba094d05c5926b0a2f31aadcc9a9cbd3868a50104d8340194f63c07602e64ca5e2ffb325fdbe4b76015d56f1cc4c3018080'
+      const result = await caver.klay.accounts.signTransaction(rawTransaction, account.privateKey)
+
+      expect(result.signatures.length).to.equals(1)
+      expect(result.feePayerSignatures).to.be.undefined
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-226: input: rawTransaction with other sender signatures', () => {
+    it('should sign with private key and append to signatures', async () => {
+      const rawTransaction = '0x08f880819a8505d21dba00830dbba094d05c5926b0a2f31aadcc9a9cbd3868a50104d8340194f63c07602e64ca5e2ffb325fdbe4b76015d56f1cf847f845824e44a068e480ad868cdbe509d3f6419f872d5f0bfe5c81dd6b56463df73f2225353ef0a005836c1c756bcc5262dfcb4aa1c1b69858475c389a770170f25105f58e23bc85'
+      const result = await caver.klay.accounts.signTransaction(rawTransaction, account.privateKey)
+      
+      expect(result.signatures.length).to.equals(2)
+      expect(result.feePayerSignatures).to.be.undefined
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-227: input: rawTransaction without signatures of sender and fee payer', () => {
+    it('should sign with fee payer', async () => {
+      const rawTransaction = '0x09f842819a8505d21dba00830dbba094d05c5926b0a2f31aadcc9a9cbd3868a50104d8340194127a24ec811aa1e45071a669e5d117a475e68149c4c301808080c4c3018080'
+      const feePayerTx = {
+        senderRawTransaction: rawTransaction,
+        feePayer: feePayer.address
+      }
+      const result = await caver.klay.accounts.signTransaction(feePayerTx, feePayer.privateKey)
+
+      expect(result.signatures).to.be.undefined
+      expect(result.feePayerSignatures.length).to.equals(1)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-228: input: rawTransaction with signatures of fee payer', () => {
+    it('should sign with sender and include existed signatures of fee payer', async () => {
+      const rawTransaction = '0x09f89a819a8505d21dba00830dbba094d05c5926b0a2f31aadcc9a9cbd3868a50104d8340194127a24ec811aa1e45071a669e5d117a475e68149c4c3018080944a804669b2637b18d46e62109ed8edc0dc8526c7f847f845824e43a0113bf0986a48768e38daeff685ce56766aacf449f2aec8a0c77165777970f954a00717c4d4720fe706a075374f8eb0432f6c9f70c0a6e6267483d0b0cc8100ec07'
+      const result = await caver.klay.accounts.signTransaction(rawTransaction, account.privateKey)
+      
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      
+      expect(result.signatures.length).to.equals(1)
+      expect(result.feePayerSignatures).to.be.undefined
+      expect(decoded.signatures.length).to.equals(1)
+      expect(decoded.feePayerSignatures.length).to.equals(1)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-229: input: rawTransaction with signatures of sender and fee payer', () => {
+    it('should append signatures of sender to existed signatures', async () => {
+      const rawTransaction = '0x09f8de819a8505d21dba00830dbba094d05c5926b0a2f31aadcc9a9cbd3868a50104d8340194127a24ec811aa1e45071a669e5d117a475e68149f847f845824e44a030accfbec3b577a53103c843744754a98408e7518391a31399bc757610ad1fc5a00eecc65e8f6f1795f7665513442fe30f881ddce12ceb687a8a7d9b65a0eee595944a804669b2637b18d46e62109ed8edc0dc8526c7f847f845824e43a0113bf0986a48768e38daeff685ce56766aacf449f2aec8a0c77165777970f954a00717c4d4720fe706a075374f8eb0432f6c9f70c0a6e6267483d0b0cc8100ec07'
+      const result = await caver.klay.accounts.signTransaction(rawTransaction, sender.privateKey)
+      
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      
+      expect(result.signatures.length).to.equals(2)
+      expect(result.feePayerSignatures).to.be.undefined
+      expect(decoded.signatures.length).to.equals(2)
+      expect(decoded.feePayerSignatures.length).to.equals(1)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-230: input: rawTransaction with signatures of sender and fee payer', () => {
+    it('should append signatures of fee payer to existed feePayerSignatures', async () => {
+      const rawTransaction = '0x09f90125819a8505d21dba00830dbba094d05c5926b0a2f31aadcc9a9cbd3868a50104d8340194127a24ec811aa1e45071a669e5d117a475e68149f88ef845824e44a030accfbec3b577a53103c843744754a98408e7518391a31399bc757610ad1fc5a00eecc65e8f6f1795f7665513442fe30f881ddce12ceb687a8a7d9b65a0eee595f845824e44a006400dc68ab85d838a02e202e2ca52c6a30f11f7fa84f4046e08a940f4c95d1ea061a09e1a2dd6b823c42552d1cf0a4c0e408b4ada2b0236ef14ba0f036e6da262944a804669b2637b18d46e62109ed8edc0dc8526c7f847f845824e43a0113bf0986a48768e38daeff685ce56766aacf449f2aec8a0c77165777970f954a00717c4d4720fe706a075374f8eb0432f6c9f70c0a6e6267483d0b0cc8100ec07'
+      const feePayerTx = {
+        senderRawTransaction: rawTransaction,
+        feePayer: feePayer.address
+      }
+      const result = await caver.klay.accounts.signTransaction(feePayerTx, account.privateKey)
+      
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      
+      expect(result.signatures).to.be.undefined
+      expect(result.feePayerSignatures.length).to.equals(2)
+      expect(decoded.signatures.length).to.equals(2)
+      expect(decoded.feePayerSignatures.length).to.equals(2)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-231: input: rawTransaction with signatures of sender and fee payer', () => {
+    it('should remove duplicated signatures of sender', async () => {
+      const tx = { 
+        type: 'VALUE_TRANSFER',
+        from: account.address,
+        to: '0xd05c5926b0a2f31aadcc9a9cbd3868a50104d834',
+        value: '0x1',
+        gas: '0xdbba0',
+        gasPrice: '0x5d21dba00',
+        nonce: '0x9a',
+      }
+      const {rawTransaction} = await caver.klay.accounts.signTransaction(tx, [account.privateKey, caver.klay.accounts.create().privateKey])
+      const result = await caver.klay.accounts.signTransaction(rawTransaction, account.privateKey)
+      
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      
+      expect(result.signatures.length).to.equals(2)
+      expect(result.feePayerSignatures).to.be.undefined
+      expect(decoded.signatures.length).to.equals(2)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-232: input: rawTransaction with signatures of sender and fee payer', () => {
+    it('should remove duplicated signatures of fee payer', async () => {
+      const rawTransaction = '0x09f9016c819a8505d21dba00830dbba094d05c5926b0a2f31aadcc9a9cbd3868a50104d8340194127a24ec811aa1e45071a669e5d117a475e68149f88ef845824e44a030accfbec3b577a53103c843744754a98408e7518391a31399bc757610ad1fc5a00eecc65e8f6f1795f7665513442fe30f881ddce12ceb687a8a7d9b65a0eee595f845824e44a006400dc68ab85d838a02e202e2ca52c6a30f11f7fa84f4046e08a940f4c95d1ea061a09e1a2dd6b823c42552d1cf0a4c0e408b4ada2b0236ef14ba0f036e6da262944a804669b2637b18d46e62109ed8edc0dc8526c7f88ef845824e43a0113bf0986a48768e38daeff685ce56766aacf449f2aec8a0c77165777970f954a00717c4d4720fe706a075374f8eb0432f6c9f70c0a6e6267483d0b0cc8100ec07f845824e43a00553c26e9e69541f7feca9484a5af8997c6f55b04bcac315be9c4888213709c4a00d0df6543f53afd0f131283c9a52f3c0a389b65b7a54ffe4c88004ddab74dd58'
+      const feePayerTx = {
+        senderRawTransaction: rawTransaction,
+        feePayer: feePayer.address,
+        chainId: 10000
+      }
+      const result = await caver.klay.accounts.signTransaction(feePayerTx, feePayer.privateKey)
+      
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      
+      expect(result.signatures).to.be.undefined
+      expect(result.feePayerSignatures.length).to.equals(2)
+      expect(decoded.signatures.length).to.equals(2)
+      expect(decoded.feePayerSignatures.length).to.equals(2)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-233: input: transaction object with signatures of sender', () => {
+    it('should append signatures when signatures is defined in transaction object', async () => {
+      vtTx.signatures = [
+        [ 
+          '0x4e44',
+          '0x30accfbec3b577a53103c843744754a98408e7518391a31399bc757610ad1fc5',
+          '0x0eecc65e8f6f1795f7665513442fe30f881ddce12ceb687a8a7d9b65a0eee595'
+        ]
+      ]
+      const result = await caver.klay.accounts.signTransaction(vtTx, account.privateKey)
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      
+      expect(result.signatures.length).to.equals(2)
+      expect(result.feePayerSignatures).to.be.undefined
+      expect(decoded.signatures.length).to.equals(2)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-234: input: rawTransaction with signatures of sender and fee payer', () => {
+    it('should append feePayerSignatures when feePayerSignatures is defined in transaction object', async () => {
+      const rawTransaction = '0x09f8de819a8505d21dba00830dbba094d05c5926b0a2f31aadcc9a9cbd3868a50104d8340194127a24ec811aa1e45071a669e5d117a475e68149f847f845824e44a030accfbec3b577a53103c843744754a98408e7518391a31399bc757610ad1fc5a00eecc65e8f6f1795f7665513442fe30f881ddce12ceb687a8a7d9b65a0eee595944a804669b2637b18d46e62109ed8edc0dc8526c7f847f845824e43a0113bf0986a48768e38daeff685ce56766aacf449f2aec8a0c77165777970f954a00717c4d4720fe706a075374f8eb0432f6c9f70c0a6e6267483d0b0cc8100ec07'
+      const feePayerTx = {
+        senderRawTransaction: rawTransaction,
+        feePayer: feePayer.address,
+        feePayerSignatures: [
+          [
+            '0x4e44',
+            '0xe5465dd2d07aaf56a43a1ee0dd01583105d8f34f335e27e0ae5321a913871d0d',
+            '0x77f6c873a2a2d94d3501fd8ccc9c9d9cfdcedbde2ce645605c6849bb64be0fcf'
+          ]
+        ]
+      }
+      const result = await caver.klay.accounts.signTransaction(feePayerTx, account.privateKey)
+      
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      
+      expect(result.signatures).to.be.undefined
+      expect(result.feePayerSignatures.length).to.equals(3)
+      expect(decoded.signatures.length).to.equals(1)
+      expect(decoded.feePayerSignatures.length).to.equals(3)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-235: input: transaction object with from account accountKeyMultiSig', () => {
+    it('should sign with multiple private key in wallet', async () => {
+      const multiSigKey = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+      const multiSigAddress = caver.klay.accounts.create().address
+      const multiSigAccount = caver.klay.accounts.createWithAccountKey(multiSigAddress, multiSigKey)
+      caver.klay.accounts.wallet.add(multiSigAccount)
+
+      vtTx.from = multiSigAddress
+      
+      const result = await caver.klay.accounts.signTransaction(vtTx)
+
+      expect(result.signatures.length).to.equals(2)
+      expect(result.feePayerSignatures).to.be.undefined
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-236: input: transaction object with from account accountKeyRoleBased', () => {
+    it('should sign with transactionKey', async () => {
+      const keyObject = {
+        transactionKey: [caver.klay.accounts.create().privateKey],
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey,caver.klay.accounts.create().privateKey]
+      }
+      const roleBasedAddress = caver.klay.accounts.create().address
+      const roleBasedAccount = caver.klay.accounts.createWithAccountKey(roleBasedAddress, keyObject)
+      caver.klay.accounts.wallet.add(roleBasedAccount)
+
+      vtTx.from = roleBasedAddress
+      
+      const result = await caver.klay.accounts.signTransaction(vtTx)
+
+      expect(result.signatures.length).to.equals(1)
+      expect(result.feePayerSignatures).to.be.undefined
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-237: input: transaction object with from account accountKeyRoleBased', () => {
+    it('should sign with updateKey when transaction is for account update', async () => {
+      const keyObject = {
+        transactionKey: [caver.klay.accounts.create().privateKey],
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey,caver.klay.accounts.create().privateKey]
+      }
+      const roleBasedAddress = caver.klay.accounts.create().address
+      const roleBasedAccount = caver.klay.accounts.createWithAccountKey(roleBasedAddress, keyObject)
+      caver.klay.accounts.wallet.add(roleBasedAccount)
+
+      const updator = caver.klay.accounts.createAccountForUpdate(roleBasedAddress, '0x19d3e96ab579566fa7cbe735cbcad18e2382d44b5e1cb8e8284d0d6e7b37094e')
+      const updateTx = {
+        type: 'ACCOUNT_UPDATE',
+        from: roleBasedAddress,
+        key: updator,
+        gas: 90000,
+      }
+      
+      const result = await caver.klay.accounts.signTransaction(updateTx)
+
+      expect(result.signatures.length).to.equals(2)
+      expect(result.feePayerSignatures).to.be.undefined
+    })
+  })
+  
+  context('CAVERJS-UNIT-WALLET-238: input: fee payer transaction object with fee payer account accountKeyRoleBased', () => {
+    it('should sign with feePayerKey when transaction object is fee payer format', async () => {
+      const keyObject = {
+        transactionKey: [caver.klay.accounts.create().privateKey],
+        updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+        feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey,caver.klay.accounts.create().privateKey]
+      }
+      const roleBasedAddress = caver.klay.accounts.create().address
+      const roleBasedAccount = caver.klay.accounts.createWithAccountKey(roleBasedAddress, keyObject)
+      caver.klay.accounts.wallet.add(roleBasedAccount)
+
+      const rawTransaction = '0x09f842819a8505d21dba00830dbba094d05c5926b0a2f31aadcc9a9cbd3868a50104d8340194127a24ec811aa1e45071a669e5d117a475e68149c4c301808080c4c3018080'
+      const feePayerTx = {
+        senderRawTransaction: rawTransaction,
+        feePayer: roleBasedAddress
+      }
+
+      const result = await caver.klay.accounts.signTransaction(feePayerTx)
+      
+      expect(result.signatures).to.be.undefined
+      expect(result.feePayerSignatures.length).to.equals(3)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-239: input: rawTransaction with signatures of sender and fee payer with different fee payer', () => {
+    it('should remove duplicated signatures of fee payer', async () => {
+      const rawTransaction = '0x09f9016c819a8505d21dba00830dbba094d05c5926b0a2f31aadcc9a9cbd3868a50104d8340194127a24ec811aa1e45071a669e5d117a475e68149f88ef845824e44a030accfbec3b577a53103c843744754a98408e7518391a31399bc757610ad1fc5a00eecc65e8f6f1795f7665513442fe30f881ddce12ceb687a8a7d9b65a0eee595f845824e44a006400dc68ab85d838a02e202e2ca52c6a30f11f7fa84f4046e08a940f4c95d1ea061a09e1a2dd6b823c42552d1cf0a4c0e408b4ada2b0236ef14ba0f036e6da262944a804669b2637b18d46e62109ed8edc0dc8526c7f88ef845824e43a0113bf0986a48768e38daeff685ce56766aacf449f2aec8a0c77165777970f954a00717c4d4720fe706a075374f8eb0432f6c9f70c0a6e6267483d0b0cc8100ec07f845824e43a00553c26e9e69541f7feca9484a5af8997c6f55b04bcac315be9c4888213709c4a00d0df6543f53afd0f131283c9a52f3c0a389b65b7a54ffe4c88004ddab74dd58'
+      const newFeePayer = caver.klay.accounts.create()
+      const feePayerTx = {
+        senderRawTransaction: rawTransaction,
+        feePayer: newFeePayer.address
+      }
+      
+      const errorMessage = `Invalid feePayer: The fee payer(${feePayer.address}) included in the transaction does not match the fee payer(${newFeePayer.address}) you want to sign.`
+      await expect(caver.klay.accounts.signTransaction(feePayerTx, newFeePayer.privateKey)).to.be.rejectedWith(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-240: input: legacy rawTransaction with signatures of sender', () => {
+    it('should throw error becuase encoded legacy transaction do not contain from', async () => {
+      const rawTransaction = '0xf867808505d21dba00830dbba09430d8d4217145ba3f6cde24ec28c64c9120f2bdfb0180820feaa03ae52bd8b105a138f179ecc85c94296c851922775ef15d9d775b6cc1971ad19ca07164eff9bf7ac3f9a80d1578ee48ccaa08fe127d21ce00a5b3110b774289695b'
+      
+      const errorMessage = `"from" is missing`
+      await expect(caver.klay.accounts.signTransaction(rawTransaction, account.privateKey)).to.be.rejectedWith(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-241: input: legacy rawTransaction with signatures of sender', () => {
+    it('should throw error becuase encoded legacy transaction do not contain from', async () => {
+      txObj.signatures = [
+        '0x0fea',
+        '0x3ae52bd8b105a138f179ecc85c94296c851922775ef15d9d775b6cc1971ad19c',
+        '0x7164eff9bf7ac3f9a80d1578ee48ccaa08fe127d21ce00a5b3110b774289695b'
+      ]
+      
+      const errorMessage = `Legacy transaction cannot be signed with multiple keys.`
+      await expect(caver.klay.accounts.signTransaction(txObj, account.privateKey)).to.be.rejectedWith(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-242: input: rawTransaction without fee payer in tx object', () => {
+    it('should throw error when fee payer is not defined', async () => {
+      const rawTransaction = '0x09f9016c819a8505d21dba00830dbba094d05c5926b0a2f31aadcc9a9cbd3868a50104d8340194127a24ec811aa1e45071a669e5d117a475e68149f88ef845824e44a030accfbec3b577a53103c843744754a98408e7518391a31399bc757610ad1fc5a00eecc65e8f6f1795f7665513442fe30f881ddce12ceb687a8a7d9b65a0eee595f845824e44a006400dc68ab85d838a02e202e2ca52c6a30f11f7fa84f4046e08a940f4c95d1ea061a09e1a2dd6b823c42552d1cf0a4c0e408b4ada2b0236ef14ba0f036e6da262944a804669b2637b18d46e62109ed8edc0dc8526c7f88ef845824e43a0113bf0986a48768e38daeff685ce56766aacf449f2aec8a0c77165777970f954a00717c4d4720fe706a075374f8eb0432f6c9f70c0a6e6267483d0b0cc8100ec07f845824e43a00553c26e9e69541f7feca9484a5af8997c6f55b04bcac315be9c4888213709c4a00d0df6543f53afd0f131283c9a52f3c0a389b65b7a54ffe4c88004ddab74dd58'
+      const feePayerTx = { senderRawTransaction: rawTransaction }
+      
+      const errorMessage = `Invalid fee payer: undefined`
+      await expect(caver.klay.accounts.signTransaction(feePayerTx, account.privateKey)).to.be.rejectedWith(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-243: input: update transaction object with AccountForUpdate with mismatched address', () => {
+    it('should throw error when address is not matched', async () => {
+      const updator = caver.klay.accounts.createAccountForUpdate(caver.klay.accounts.create().address, '0x19d3e96ab579566fa7cbe735cbcad18e2382d44b5e1cb8e8284d0d6e7b37094e')
+      const updateTx = {
+        type: 'ACCOUNT_UPDATE',
+        from: account.address,
+        key: updator,
+        gas: 90000
+      }
+      
+      const errorMessage = `The value of the from field of the transaction does not match the address of AccountForUpdate.`
+      await expect(caver.klay.accounts.signTransaction(updateTx)).to.be.rejectedWith(errorMessage)
+    })
+  })
+})
+
+describe('caver.klay.accounts.feePayerSignTransaction', () => {
+  let txObj
+  let sender, feePayer
+  let withoutSig = '0x09f842819a8505d21dba00830dbba094d2553e0508d481892aa1b481b3ac29aba5c7fb4d01946f9a8851feca74f6694a12d11c9684f0b5c1d3b6c4c301808080c4c3018080'
+  let withSenderSig = '0x09f90114819a8505d21dba00830dbba094d2553e0508d481892aa1b481b3ac29aba5c7fb4d01946f9a8851feca74f6694a12d11c9684f0b5c1d3b6f8d5f845820feaa06d2b6c9530a9f311a3ea42b2fc474ce0decefc65a88510161a392eef029714b8a0360fff97c9818dabb7d25ce4dc1afb4a5cca00409d79c0e3f76e151dec542701f845820feaa0fb24ef24dd6d10a9410417c56a5a8b09575d0611251f6f03b9199b4004cee087a02a1b040cc80942deda8523c2bf24364b3b2ea1a6d33165fde35d86a1c247ddfef845820fe9a0ae0d77d98aec5880efc7bd943fb58ea691e3023975e757a720586d3781284d9aa077072cfa045f872a1e33840e28ed2704f8a6d77f5077171b6b45e3ec7a671ddf80c4c3018080'
+  let withFeePayerSig = '0x09f90128819a8505d21dba00830dbba094d2553e0508d481892aa1b481b3ac29aba5c7fb4d01946f9a8851feca74f6694a12d11c9684f0b5c1d3b6c4c3018080944a804669b2637b18d46e62109ed8edc0dc8526c7f8d5f845824e43a003df110e3d328d75ac8b05ff29e3b00b65c4402bc0f2556590077e3ffd699f85a0395252d8b2bf6a5b1b997d41694bb84b6e30bc846263b6fc55a023a66ef68630f845824e44a08eb3eb4414fe1b5f0f1baaa0192a9ee018b6132b8fc965918318bdd7087acb42a0211741eae45dae25659894ada38c0c5b03483337148182d2951e7386cb2c2ab8f845824e44a0691eaea2dead54efce368395f2394a9cbc7b3d68effd5c5b3ba9bee7b57dfa59a00b7cbe6b8ebcf013a197f6ee81e3c3e180cf62c940fd8f9282d3f6814d710c9d'
+  let withBothSig = '0x09f901fa819a8505d21dba00830dbba094d2553e0508d481892aa1b481b3ac29aba5c7fb4d01946f9a8851feca74f6694a12d11c9684f0b5c1d3b6f8d5f845820feaa06d2b6c9530a9f311a3ea42b2fc474ce0decefc65a88510161a392eef029714b8a0360fff97c9818dabb7d25ce4dc1afb4a5cca00409d79c0e3f76e151dec542701f845820feaa0fb24ef24dd6d10a9410417c56a5a8b09575d0611251f6f03b9199b4004cee087a02a1b040cc80942deda8523c2bf24364b3b2ea1a6d33165fde35d86a1c247ddfef845820fe9a0ae0d77d98aec5880efc7bd943fb58ea691e3023975e757a720586d3781284d9aa077072cfa045f872a1e33840e28ed2704f8a6d77f5077171b6b45e3ec7a671ddf944a804669b2637b18d46e62109ed8edc0dc8526c7f8d5f845824e43a0e0cd799758d93f3ac9ff1fd5055bff9e7c7e664599f5615c5016c88b7c8edea5a00353e206c246a10a5ac4388924e8eb42fedbbbfb674efa8441f0b0c4957cf05df845824e43a04c5c84dcace452a5bde411d7888d116f0a993a579b11a79cc9ed7fa6e9adb421a023d33c71fced04801643d4d58c9fbb184625cbfaa8dab5a8e25ec5e84d25452af845824e44a0051fad2c19ee4936721b5985ebdf354d069f3e9e3d3c832751caf20f69202c20a03f340e42613e6868cff9b3312fa0f671523b340d469d7d69f6573724bd6f6047'
+  
+  beforeEach(() => {
+    let senderRoleBasedKey = { transactionKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey] }
+    let feePayerRoleBasedKey = { feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey] }
+
+    sender = caver.klay.accounts.wallet.add(caver.klay.accounts.createWithAccountKey('0x6f9a8851feca74f6694a12d11c9684f0b5c1d3b6', senderRoleBasedKey))
+    feePayer = caver.klay.accounts.wallet.add(caver.klay.accounts.createWithAccountKey('0x4a804669b2637b18d46e62109ed8edc0dc8526c7', feePayerRoleBasedKey))
+
+    txObj = { 
+      type: 'FEE_DELEGATED_VALUE_TRANSFER',
+      from: sender.address,
+      to: '0xd2553e0508d481892aa1b481b3ac29aba5c7fb4d',
+      value: '0x1',
+      gas: '0xdbba0',
+      chainId: '0x7e3',
+      gasPrice: '0x5d21dba00',
+      nonce: '0x9a',
+    }
+  })
+
+  context('CAVERJS-UNIT-WALLET-273: input: tx object without signatures and feePayer', () => {
+    it('should sign with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
+      const result = await caver.klay.accounts.feePayerSignTransaction(txObj, feePayer.address)
+      
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-274: input: tx object(signatures) and feePayer', () => {
+    it('should sign with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
+      txObj.signatures = [
+        [ 
+          '0x0fea',
+          '0x6d2b6c9530a9f311a3ea42b2fc474ce0decefc65a88510161a392eef029714b8',
+          '0x360fff97c9818dabb7d25ce4dc1afb4a5cca00409d79c0e3f76e151dec542701'
+        ]
+      ]
+      const result = await caver.klay.accounts.feePayerSignTransaction(txObj, feePayer.address)
+      
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.signatures.length).to.equals(txObj.signatures.length)
+      expect(decoded.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-275: input: tx object(feePayer/feePayerSignatures) and feePayer', () => {
+    it('should append with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
+      txObj.feePayer = feePayer.address
+      txObj.feePayerSignatures = [
+        [ 
+          '0x4e44',
+          '0x7328aa537646bfffebfd6f006f9a6e0520d077cb898225e4fa44f52c54c4c2f2',
+          '0x6302349a19b4b7b9d82798eac1d4716cdaa239e490fd8427f49c9bca4dd4b6a2'
+        ]
+      ]
+      const result = await caver.klay.accounts.feePayerSignTransaction(txObj, feePayer.address)
+      
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length + 1)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length + 1)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-276: input: tx object(feePayerSignatures) and feePayer', () => {
+    it('should set feePayer with value of feePayer parameter and append feePayerSignatures', async () => {
+      txObj.feePayerSignatures = [
+        [ 
+          '0x4e44',
+          '0x7328aa537646bfffebfd6f006f9a6e0520d077cb898225e4fa44f52c54c4c2f2',
+          '0x6302349a19b4b7b9d82798eac1d4716cdaa239e490fd8427f49c9bca4dd4b6a2'
+        ]
+      ]
+      const result = await caver.klay.accounts.feePayerSignTransaction(txObj, feePayer.address)
+      
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length + 1)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length + 1)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-277: input: tx object(signatures/feePayer/feePayerSignatures) and feePayer', () => {
+    it('should append with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
+      txObj.signatures = [
+        [ 
+          '0x0fea',
+          '0x6d2b6c9530a9f311a3ea42b2fc474ce0decefc65a88510161a392eef029714b8',
+          '0x360fff97c9818dabb7d25ce4dc1afb4a5cca00409d79c0e3f76e151dec542701'
+        ]
+      ]
+      txObj.feePayer = feePayer.address
+      txObj.feePayerSignatures = [
+        [ 
+          '0x4e44',
+          '0x7328aa537646bfffebfd6f006f9a6e0520d077cb898225e4fa44f52c54c4c2f2',
+          '0x6302349a19b4b7b9d82798eac1d4716cdaa239e490fd8427f49c9bca4dd4b6a2'
+        ]
+      ]
+      const result = await caver.klay.accounts.feePayerSignTransaction(txObj, feePayer.address)
+      
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length + 1)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.signatures.length).to.equals(txObj.signatures.length)
+      expect(decoded.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length + 1)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-278: input: tx object(signatures/feePayer/feePayerSignatures), feePayer and privateKey', () => {
+    it('should append with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
+      txObj.signatures = [
+        [ 
+          '0x0fea',
+          '0x6d2b6c9530a9f311a3ea42b2fc474ce0decefc65a88510161a392eef029714b8',
+          '0x360fff97c9818dabb7d25ce4dc1afb4a5cca00409d79c0e3f76e151dec542701'
+        ]
+      ]
+      txObj.feePayer = feePayer.address
+      txObj.feePayerSignatures = [
+        [ 
+          '0x4e44',
+          '0x7328aa537646bfffebfd6f006f9a6e0520d077cb898225e4fa44f52c54c4c2f2',
+          '0x6302349a19b4b7b9d82798eac1d4716cdaa239e490fd8427f49c9bca4dd4b6a2'
+        ]
+      ]
+      const result = await caver.klay.accounts.feePayerSignTransaction(txObj, feePayer.address, feePayer.feePayerKey[0])
+      
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(2)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.signatures.length).to.equals(txObj.signatures.length)
+      expect(decoded.feePayerSignatures.length).to.equals(2)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-279: input: tx object(feePayer), feePayer and privateKey', () => {
+    it('should throw error when feePayer is not matched', async () => {
+      txObj.feePayer = caver.klay.accounts.create().address
+
+      const errorMessage = 'Invalid parameter: The address of fee payer does not match.'
+
+      await expect(caver.klay.accounts.feePayerSignTransaction(txObj, feePayer.address)).to.be.rejectedWith(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-280: input: tx object(without nonce) and feePayer', () => {
+    it('should return signature and rawTransaction', async () => {
+      const tx = Object.assign({}, txObj)
+      delete tx.nonce
+
+      const result = await caver.klay.accounts.feePayerSignTransaction(tx, feePayer.address)
+
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-281: input: tx object(without nonce), feePayer and privateKey', () => {
+    it('should return signature and rawTransaction', async () => {
+      const tx = Object.assign({}, txObj)
+      delete tx.nonce
+
+      const result = await caver.klay.accounts.feePayerSignTransaction(tx, feePayer.address, feePayer.feePayerKey[0])
+
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(1)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.feePayerSignatures.length).to.equals(1)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-282: input: tx object(without gasPrice) and feePayer', () => {
+    it('should return signature and rawTransaction', async () => {
+      const tx = Object.assign({}, txObj)
+      delete tx.gasPrice
+
+      const result = await caver.klay.accounts.feePayerSignTransaction(tx, feePayer.address)
+
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-283: input: tx object(without gasPrice), feePayer and privateKey', () => {
+    it('should return signature and rawTransaction', async () => {
+      const tx = Object.assign({}, txObj)
+      delete tx.gasPrice
+
+      const result = await caver.klay.accounts.feePayerSignTransaction(tx, feePayer.address, feePayer.feePayerKey[0])
+
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(1)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.feePayerSignatures.length).to.equals(1)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-284: input: tx object(without chainId) and feePayer', () => {
+    it('should return signature and rawTransaction', async () => {
+      const tx = Object.assign({}, txObj)
+      delete tx.chainId
+
+      const result = await caver.klay.accounts.feePayerSignTransaction(tx, feePayer.address)
+
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-285: input: tx object(without chainId), feePayer and privateKey', () => {
+    it('should return signature and rawTransaction', async () => {
+      const tx = Object.assign({}, txObj)
+      delete tx.chainId
+
+      const result = await caver.klay.accounts.feePayerSignTransaction(tx, feePayer.address, feePayer.feePayerKey[0])
+
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(1)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.feePayerSignatures.length).to.equals(1)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-286: input: tx object, feePayer and invalid privateKey', () => {
+    it('should throw error when private key is invalid', async () => {
+      const invalid = '0x01'
+      const errorMessage = `Invalid private key(${invalid.slice(2)})`
+      
+      await expect(caver.klay.accounts.feePayerSignTransaction(txObj, feePayer.address, invalid)).to.be.rejectedWith(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-287: input: tx object, invalid feePayer address', () => {
+    it('should throw error when private key is invalid', async () => {
+      const invalid = 'feePayer'
+      const errorMessage = `Invalid fee payer address : ${invalid}`
+      
+      await expect(caver.klay.accounts.feePayerSignTransaction(txObj, invalid)).to.be.rejectedWith(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-288: input: tx object(without from) and feePayer', () => {
+    it('should throw error when invalid transaction', async () => {
+      const invalid = Object.assign({}, txObj)
+      delete invalid.from
+
+      const errorMessage = '"from" is missing'
+      await expect(caver.klay.accounts.feePayerSignTransaction(invalid, feePayer.address)).to.be.rejectedWith(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-289: input: tx object(without from), feePayer and privateKey', () => {
+    it('should throw error when invalid transaction', async () => {
+      const invalid = Object.assign({}, txObj)
+      delete invalid.from
+
+      const errorMessage = '"from" is missing'
+      await expect(caver.klay.accounts.feePayerSignTransaction(invalid, feePayer.address, feePayer.feePayerKey[0])).to.be.rejectedWith(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-290: input: RLP encoded rawTransaction(without signatures) string and feePayer', () => {
+    it('should sign with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
+      const result = await caver.klay.accounts.feePayerSignTransaction(withoutSig, feePayer.address)
+
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(3)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-291: input: RLP encoded rawTransaction(with signatures of sender) string and feePayer', () => {
+    it('should sign with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
+      const result = await caver.klay.accounts.feePayerSignTransaction(withSenderSig, feePayer.address)
+
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(3)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.signatures.length).to.equals(3)
+      expect(decoded.feePayerSignatures.length).to.equals(3)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-292: input: RLP encoded rawTransaction(with signatures of fee payer) string and feePayer', () => {
+    it('should append with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
+      const result = await caver.klay.accounts.feePayerSignTransaction(withFeePayerSig, feePayer.address)
+
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(6)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-293: input: RLP encoded rawTransaction(with signatures of sender and fee payer) string and feePayer', () => {
+    it('should append with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
+      const result = await caver.klay.accounts.feePayerSignTransaction(withBothSig, feePayer.address)
+
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(6)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.signatures.length).to.equals(3)
+      expect(decoded.feePayerSignatures.length).to.equals(6)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-294: input: RLP encoded rawTransaction(with signatures of sender and fee payer) string, feePayer and privateKey', () => {
+    it('should append with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
+      const result = await caver.klay.accounts.feePayerSignTransaction(withBothSig, feePayer.address, feePayer.feePayerKey[0])
+
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(4)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.signatures.length).to.equals(3)
+      expect(decoded.feePayerSignatures.length).to.equals(4)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-295: input: RLP encoded rawTransaction(with signatures of sender and fee payer) string with invalid feePayer', () => {
+    it('should throw error when address of fee payer is invalid', async () => {
+      const invalid = 'feePayer'
+      const errorMessage = `Invalid fee payer address : ${invalid}`
+
+      await expect(caver.klay.accounts.feePayerSignTransaction(withBothSig, invalid)).to.be.rejectedWith(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-296: input: RLP encoded rawTransaction(with signatures of sender and fee payer) string, feePayer and invalid private key', () => {
+    it('should throw error when private key is invalid', async () => {
+      const invalid = '0x01'
+      const errorMessage = `Invalid private key(${invalid.slice(2)})`
+      
+      await expect(caver.klay.accounts.feePayerSignTransaction(withBothSig, feePayer.address, invalid)).to.be.rejectedWith(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-297: input: fee payer format transaction(without signatures) string and feePayer', () => {
+    it('should sign with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
+      const feePayerTx = {
+        senderRawTransaction: withoutSig,
+        feePayer: feePayer.address,
+      }
+      const result = await caver.klay.accounts.feePayerSignTransaction(feePayerTx, feePayer.address)
+
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(3)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-298: input: fee payer format transaction(with signatures of sender) string and feePayer', () => {
+    it('should sign with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
+      const feePayerTx = {
+        senderRawTransaction: withSenderSig,
+        feePayer: feePayer.address,
+      }
+      const result = await caver.klay.accounts.feePayerSignTransaction(feePayerTx, feePayer.address)
+
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(3)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.signatures.length).to.equals(3)
+      expect(decoded.feePayerSignatures.length).to.equals(3)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-299: input: fee payer format transaction(with signatures of fee payer) string and feePayer', () => {
+    it('should append with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
+      const feePayerTx = {
+        senderRawTransaction: withFeePayerSig,
+        feePayer: feePayer.address,
+      }
+      const result = await caver.klay.accounts.feePayerSignTransaction(feePayerTx, feePayer.address)
+
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(6)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-300: input: fee payer format transaction(with signatures of sender and fee payer) string and feePayer', () => {
+    it('should append with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
+      const feePayerTx = {
+        senderRawTransaction: withBothSig,
+        feePayer: feePayer.address,
+      }
+      const result = await caver.klay.accounts.feePayerSignTransaction(feePayerTx, feePayer.address)
+
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(6)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.signatures.length).to.equals(3)
+      expect(decoded.feePayerSignatures.length).to.equals(6)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-301: input: fee payer format transaction(with signatures of sender and fee payer) string, feePayer and privateKey', () => {
+    it('should append with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
+      const feePayerTx = {
+        senderRawTransaction: withBothSig,
+        feePayer: feePayer.address,
+      }
+      const result = await caver.klay.accounts.feePayerSignTransaction(feePayerTx, feePayer.address, feePayer.feePayerKey[0])
+
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(4)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.signatures.length).to.equals(3)
+      expect(decoded.feePayerSignatures.length).to.equals(4)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-302: input: fee payer tx object(without feePayer) and feePayer', () => {
+    it('should set feePayer information through feePayer parameter', async () => {
+      const feePayerTx = { senderRawTransaction: withoutSig }
+
+      const result = await caver.klay.accounts.feePayerSignTransaction(feePayerTx, feePayer.address)
+
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-303: input: fee payer tx object(with 0x feePayer) and feePayer', () => {
+    it('should set feePayer information through feePayer parameter', async () => {
+      const feePayerTx = { senderRawTransaction: withoutSig, feePayer: '0x' }
+
+      const result = await caver.klay.accounts.feePayerSignTransaction(feePayerTx, feePayer.address)
+
+      const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(result.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-304: input: fee payer format transaction(with signatures of sender and fee payer) string with invalid feePayer', () => {
+    it('should throw error when address of fee payer is invalid', async () => {
+      const invalid = 'feePayer'
+      const feePayerTx = {
+        senderRawTransaction: withBothSig,
+        feePayer: invalid,
+      }
+      const errorMessage = `Invalid fee payer address : ${invalid}`
+
+      await expect(caver.klay.accounts.feePayerSignTransaction(feePayerTx, invalid)).to.be.rejectedWith(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-305: input: fee payer format transaction(with signatures of sender and fee payer) string with not matched feePayer', () => {
+    it('should throw error when address of fee payer in transaction object is not matched with fee payer parameter', async () => {
+      const address = caver.klay.accounts.create().address
+      const feePayerTx = {
+        senderRawTransaction: withBothSig,
+        feePayer: caver.klay.accounts.create().address,
+      }
+      const errorMessage = `Invalid parameter: The address of fee payer does not match.`
+
+      await expect(caver.klay.accounts.feePayerSignTransaction(feePayerTx, address)).to.be.rejectedWith(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-306: input: fee payer format transaction(with signatures of sender and fee payer) string, feePayer and invalid private key', () => {
+    it('should throw error when private key is invalid', async () => {
+      const invalid = '0x01'
+      const feePayerTx = {
+        senderRawTransaction: withBothSig,
+        feePayer: feePayer.address,
+      }
+      const errorMessage = `Invalid private key(${invalid.slice(2)})`
+      
+      await expect(caver.klay.accounts.feePayerSignTransaction(feePayerTx, feePayer.address, invalid)).to.be.rejectedWith(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-376: input: non fee delegated transaction, fee payer address', () => {
+    it('should throw error when private key is invalid', async () => {
+      const nonFeeDelegated = {
+        type: 'VALUE_TRANSFER',
+        from: sender.address,
+        to: '0xd2553e0508d481892aa1b481b3ac29aba5c7fb4d',
+        value: '0x1',
+        gas: '0xdbba0',
+        chainId: '0x7e3',
+        gasPrice: '0x5d21dba00',
+        nonce: '0x9a',
+      }
+      const errorMessage = `Failed to sign transaction with fee payer: invalid transaction type(VALUE_TRANSFER)`
+      
+      await expect(caver.klay.accounts.feePayerSignTransaction(nonFeeDelegated, feePayer.address)).to.be.rejectedWith(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-377: input: non fee delegated transaction, fee payer address', () => {
+    it('should throw error when private key is invalid', async () => {
+      const nonFeeDelegated = {
+        type: 'VALUE_TRANSFER',
+        from: sender.address,
+        to: '0xd2553e0508d481892aa1b481b3ac29aba5c7fb4d',
+        value: '0x1',
+        gas: '0xdbba0',
+        chainId: '0x7e3',
+        gasPrice: '0x5d21dba00',
+        nonce: '0x9a',
+      }
+      const { rawTransaction } = await caver.klay.accounts.signTransaction(nonFeeDelegated)
+      const errorMessage = `Failed to split fee payer: not a fee delegated transaction type('VALUE_TRANSFER')`
+      
+      await expect(caver.klay.accounts.feePayerSignTransaction(rawTransaction, feePayer.address)).to.be.rejectedWith(errorMessage)
     })
   })
 })

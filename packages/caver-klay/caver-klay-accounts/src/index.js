@@ -39,7 +39,7 @@ var scrypt = require('./scrypt');
 var uuid = require('uuid');
 var utils = require('../../../caver-utils');
 var helpers = require('../../../caver-core-helpers');
-const { encodeRLPByTxType, makeRawTransaction, getSenderTxHash } = require('./makeRawTransaction')
+const { encodeRLPByTxType, makeRawTransaction, getSenderTxHash, decodeFromRawTransaction, splitFeePayer, extractSignatures } = require('./makeRawTransaction')
 
 var elliptic = require('elliptic')
 var secp256k1 = new (elliptic.ec)('secp256k1')
@@ -66,6 +66,70 @@ function coverInitialTxValue(tx) {
   }
   tx.chainId = utils.numberToHex(tx.chainId)
   return tx
+}
+
+function resolveArgsForSignTransaction(args) {
+  if (args.length === 0 || args.length > 3) throw new Error('Invalid parameter: The number of parameters is invalid.')
+  
+  // privateKey and callback are optional parameter
+  // "args.length === 2" means that user sent parameter privateKey or callback
+  let tx = args[0], privateKey, callback
+
+  if (!tx || (!_.isObject(tx) && !_.isString(tx))) {
+    throw new Error('Invalid parameter: The transaction must be defined as an object or RLP encoded string')
+  }
+
+  if (args.length === 2) {
+    if (_.isFunction(args[1])) {
+      callback = args[1]
+    } else {
+      privateKey = args[1]
+    }
+  } else if (args.length === 3) {
+    if (args[1] && typeof args[1] !== 'string' && !_.isArray(args[1])){
+      return handleError('Invalid parameter: The parameter for the private key is invalid')
+    }
+    privateKey = args[1]
+    callback = args[2]
+  }
+
+  // For handling when callback is undefined.
+  callback = callback || function () {}
+
+  return { tx, privateKey, callback }
+}
+
+function resolveArgsForFeePayerSignTransaction(args) {
+  if (args.length === 0 || args.length > 4) throw new Error('Invalid parameter: The number of parameters is invalid.')
+  
+  // privateKey and callback are optional parameter
+  // "args.length === 3" means that user sent parameter privateKey or callback
+  let tx = args[0], feePayer = args[1], privateKey, callback
+
+  if (!tx || (!_.isObject(tx) && !_.isString(tx))) {
+    throw new Error('Invalid parameter: The transaction must be defined as an object or RLP encoded string')
+  }
+
+  if (!utils.isAddress(feePayer)) throw new Error(`Invalid fee payer address : ${feePayer}`)
+
+  if (args.length === 3) {
+    if (_.isFunction(args[2])) {
+      callback = args[2]
+    } else {
+      privateKey = args[2]
+    }
+  } else if (args.length === 4) {
+    if (args[2] && typeof args[2] !== 'string' && !_.isArray(args[2])){
+      return handleError('Invalid parameter: The parameter for the private key is invalid')
+    }
+    privateKey = args[2]
+    callback = args[3]
+  }
+
+  // For handling when callback is undefined.
+  callback = callback || function () {}
+
+  return { tx, privateKey, feePayer, callback }
 }
 
 var Accounts = function Accounts(...args) {
@@ -460,11 +524,20 @@ Accounts.prototype.getLegacyAccount = function getLegacyAccount(key) {
   return { legacyAccount: account, klaytnWalletKeyAddress }
 }
 
+/**
+ * signTransaction signs to transaction with private key.
+ *
+ * @method signTransaction
+ * @param {String|Object} tx The transaction to sign.
+ * @param {String|Array} privateKey The private key to use for signing.
+ * @param {String} callback The callback function to call.
+ * @return {Object}
+ */
 Accounts.prototype.signTransaction = function signTransaction() {
-    var _this = this,
-        isLegacy = false,
-        result,
-        callback
+    let _this = this
+    let isLegacy = false, isFeePayer = false
+    let existedSenderSignatures = [], existedFeePayerSignatures = []
+    let result, tx, privateKey, callback
 
     let handleError = (e) => {
       e = e instanceof Error? e : new Error(e)
@@ -472,57 +545,74 @@ Accounts.prototype.signTransaction = function signTransaction() {
       return Promise.reject(e)
     }
 
-    if (arguments.length === 0 || arguments.length > 3) {
-      return handleError('Invalid parameter: The number of parameters is invalid.')
-    }
-    
-    // privateKey and callback are optional parameter
-    // "arguments.length === 2" means that user sent parameter privateKey or callback
-    let tx = arguments[0], privateKey
+    try {
+      let resolved = resolveArgsForSignTransaction(arguments)
+      tx = resolved.tx
+      privateKey = resolved.privateKey
+      callback = resolved.callback
+    } catch(e) { return handleError(e) }
 
-    if (!tx || !_.isObject(tx)) {
-      return handleError('Invalid parameter: The transaction must be defined as an object')
-    }
-
-    if (arguments.length === 2) {
-      if (_.isFunction(arguments[1])) {
-        callback = arguments[1]
-      } else {
-        privateKey = arguments[1]
-      }
-    } else if (arguments.length === 3) {
-      if (typeof arguments[1] !== 'string' && !_.isArray(arguments[1])){
-        return handleError('Invalid parameter: The parameter for the private key is invalid')
-      }
-      privateKey = arguments[1]
-      callback = arguments[2]
+    // If the user signs an RLP encoded transaction, tx is of type string.
+    if (_.isString(tx)) {
+      tx = decodeFromRawTransaction(tx)
     }
 
-    // For handling when callback is undefined.
-    callback = callback || function () {}
-
-    let error = helpers.validateFunction.validateParams(tx)
+    // Validate tx object
+    const error = helpers.validateFunction.validateParams(tx)
     if (error) return handleError(error)
+
+    if (tx.senderRawTransaction) {
+      if (tx.feePayerSignatures) {
+        existedFeePayerSignatures = existedFeePayerSignatures.concat(tx.feePayerSignatures)
+      }
+
+      try {
+        // Decode senderRawTransaction to get signatures of fee payer
+        const { senderRawTransaction, feePayer, feePayerSignatures } = splitFeePayer(tx.senderRawTransaction)
+
+        // feePayer !== '0x' means that in senderRawTransaction there are feePayerSignatures
+        if (feePayer !== '0x') {
+          // The feePayer inside the tx object does not match the feePayer information contained in the senderRawTransaction.
+          if (feePayer.toLowerCase() !== tx.feePayer.toLowerCase()) return handleError(`Invalid feePayer: The fee payer(${feePayer}) included in the transaction does not match the fee payer(${tx.feePayer}) you want to sign.`)
+          existedFeePayerSignatures = existedFeePayerSignatures.concat(feePayerSignatures)
+        }
+
+        tx.senderRawTransaction = senderRawTransaction
+        isFeePayer = true
+      } catch(e) {
+        return handleError(e)
+      }
+      
+    } else {
+      isLegacy = tx.type === undefined || tx.type === 'LEGACY' ? true : false
+
+      if (tx.signatures) {
+        // if there is existed signatures or feePayerSignatures, those should be preserved.
+        if (isLegacy) return handleError('Legacy transaction cannot be signed with multiple keys.')
+        existedSenderSignatures = existedSenderSignatures.concat(tx.signatures)
+      }
+      
+    }
 
     // When privateKey is undefined, find Account from Wallet.
     if (privateKey === undefined) {
       try {
-        const account = this.wallet.getAccount(tx.from || tx.feePayer)
+        const account = this.wallet.getAccount(isFeePayer? tx.feePayer : tx.from)
         if (!account) return handleError('Failed to find get private key to sign. The account you want to use for signing must exist in caver.klay.accounts.wallet or you must pass the private key as a parameter.')
-        privateKey = account.privateKey
+        privateKey = this._getRoleKey(tx, account)
       } catch(e) {
         return handleError(e)
       }
     }
 
     let privateKeys = _.isArray(privateKey) ? privateKey : [privateKey]
-    
+
     try {
       for (let i = 0; i < privateKeys.length; i ++) {
         const parsed = utils.parsePrivateKey(privateKeys[i])
         privateKeys[i] = parsed.privateKey
         privateKeys[i] = utils.addHexPrefix(privateKeys[i])
-  
+
         if (!utils.isValidPrivateKey(privateKeys[i])) return handleError('Invalid private key')
       }
     } catch(e) {
@@ -530,10 +620,9 @@ Accounts.prototype.signTransaction = function signTransaction() {
     }
 
     // Attempting to sign with a decoupled account into a legacy type transaction should be rejected.
-    if (!tx.senderRawTransaction) {
-      isLegacy = tx.type === undefined || tx.type === 'LEGACY' ? true : false
-      if (isLegacy && privateKeys.length > 1) return handleError('Legacy transaction cannot signed with multiple keys')
-      if (isLegacy && _this.isDecoupled(privateKeys[0], tx.from)) return handleError('A legacy transaction must be with a legacy account key')
+    if (isLegacy) {
+      if (privateKeys.length > 1) return handleError('Legacy transaction cannot signed with multiple keys')
+      if (_this.isDecoupled(privateKeys[0], tx.from)) return handleError('A legacy transaction must be with a legacy account key')
     }
 
     function signed(tx) {
@@ -547,30 +636,30 @@ Accounts.prototype.signTransaction = function signTransaction() {
 
         const messageHash = Hash.keccak256(rlpEncoded)
 
-        let signatures = []
+        let sigs = isFeePayer? existedFeePayerSignatures : existedSenderSignatures
 
         for(const privateKey of privateKeys) {
           const signature = AccountLib.makeSigner(Nat.toNumber(transaction.chainId || "0x1") * 2 + 35)(messageHash, privateKey)
           const [v, r, s] = AccountLib.decodeSignature(signature).map(sig => utils.makeEven(utils.trimLeadingZero(sig)))
-          signatures.push([v, r, s])
+          sigs.push([v, r, s])
         }
-
-        const rawTransaction = makeRawTransaction(rlpEncoded, signatures, transaction)
+        // makeRawTransaction will return signatures and feePayerSignatures with duplicates removed.
+        let { rawTransaction, signatures, feePayerSignatures } = makeRawTransaction(rlpEncoded, sigs, transaction)
 
         result = {
             messageHash: messageHash,
-            v: signatures[0][0],
-            r: signatures[0][1],
-            s: signatures[0][2],
+            v: sigs[0][0],
+            r: sigs[0][1],
+            s: sigs[0][2],
             rawTransaction: rawTransaction,
             txHash: Hash.keccak256(rawTransaction),
             senderTxHash: getSenderTxHash(rawTransaction),
         }
 
-        if (tx.senderRawTransaction && tx.feePayer) {
-          result.feePayerSignatures = signatures
+        if (isFeePayer) {
+          result.feePayerSignatures = feePayerSignatures
         } else {
-          result.signatures = isLegacy? signatures[0] : signatures
+          result.signatures = signatures
         }
 
       } catch(e) {
@@ -587,7 +676,7 @@ Accounts.prototype.signTransaction = function signTransaction() {
     }
 
     // When the feePayer signs a transaction, required information is only chainId.
-    if (tx.senderRawTransaction !== undefined) {
+    if (isFeePayer) {
       return Promise.all([
           isNot(tx.chainId) ? _this._klaytnCall.getChainId() : tx.chainId,
       ]).then(function (args) {
@@ -595,7 +684,7 @@ Accounts.prototype.signTransaction = function signTransaction() {
               throw new Error('"chainId" couldn\'t be fetched: '+ JSON.stringify(args));
           }
           return signed(_.extend(tx, {chainId: args[0]}));
-      });
+      })
     }
 
     // Otherwise, get the missing info from the Klaytn Node
@@ -608,8 +697,84 @@ Accounts.prototype.signTransaction = function signTransaction() {
             throw new Error('One of the values "chainId", "gasPrice", or "nonce" couldn\'t be fetched: '+ JSON.stringify(args));
         }
         return signed(_.extend(tx, {chainId: args[0], gasPrice: args[1], nonce: args[2]}));
-    });
-};
+    })
+}
+
+/**
+* feePayerSignTransaction calls signTransaction, creating a format for feePayer to sign the transaction.
+*
+* @method feePayerSignTransaction
+* @param {Object|String} tx The transaction to sign.
+* @param {String} feePayer The address of fee payer.
+* @param {String|Array} privateKey The private key to use for signing.
+* @param {Function} callback The callback function to call.
+* @return {Object}
+*/
+Accounts.prototype.feePayerSignTransaction = function feePayerSignTransaction() {
+    let _this = this
+    let tx, feePayer, privateKey, callback
+
+    let handleError = (e) => {
+      e = e instanceof Error? e : new Error(e)
+      if (callback) callback(e)
+      return Promise.reject(e)
+    }
+
+    try {
+      let resolved = resolveArgsForFeePayerSignTransaction(arguments)
+      tx = resolved.tx
+      feePayer = resolved.feePayer
+      privateKey = resolved.privateKey
+      callback = resolved.callback
+    } catch(e) {
+      return handleError(e)
+    }
+
+    if (_.isString(tx)) {
+      return this.signTransaction({ senderRawTransaction: tx, feePayer }, privateKey, callback)
+    }
+
+    if (!tx.feePayer || tx.feePayer === '0x') { tx.feePayer = feePayer }
+
+    if (!tx.senderRawTransaction) {
+      if (!tx.type || !tx.type.includes('FEE_DELEGATED')) {
+        return handleError(`Failed to sign transaction with fee payer: invalid transaction type(${tx.type? tx.type: 'LEGACY'})`)
+      }
+    }
+
+    let e = helpers.validateFunction.validateParams(tx)
+    if (e) {
+      return handleError(e)
+    }
+
+    if (tx.feePayer.toLowerCase() !== feePayer.toLowerCase()) {
+      return handleError(`Invalid parameter: The address of fee payer does not match.`)
+    }
+
+    if (tx.senderRawTransaction) {
+      return this.signTransaction(tx, privateKey, callback)
+    }
+
+    return Promise.all([
+      isNot(tx.chainId) ? _this._klaytnCall.getChainId() : tx.chainId,
+      isNot(tx.gasPrice) ? _this._klaytnCall.getGasPrice() : tx.gasPrice,
+      isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from) : tx.nonce 
+    ]).then(function (args) {
+        if (isNot(args[0]) || isNot(args[1]) || isNot(args[2])) {
+            throw new Error('One of the values "chainId", "gasPrice", or "nonce" couldn\'t be fetched: '+ JSON.stringify(args));
+        }
+        let transaction = _.extend(tx, {chainId: args[0], gasPrice: args[1], nonce: args[2]})
+
+        transaction = helpers.formatters.inputCallFormatter(transaction)
+        transaction = coverInitialTxValue(transaction)
+
+        const rlpEncoded = encodeRLPByTxType(transaction)
+        let sig = transaction.signatures? transaction.signatures : [['0x01', '0x', '0x']]
+        let { rawTransaction } = makeRawTransaction(rlpEncoded, sig, transaction)
+
+        return _this.signTransaction({ senderRawTransaction: rawTransaction, feePayer }, privateKey, callback)
+    })
+}
 
 Accounts.prototype.signTransactionWithSignature = function signTransactionWithSignature(tx, callback) {
     var _this = this,

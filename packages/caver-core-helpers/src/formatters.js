@@ -76,7 +76,9 @@ var _txInputFormatter = function (options){
     if (options.to) {
       options.humanReadable = options.humanReadable !== undefined? options.humanReadable : false
       if (options.humanReadable) throw new Error('HumanReadableAddress is not supported yet.')
-      options.to = inputAddressFormatter(options.to)
+      if (!utils.isContractDeployment(options) || options.to !== '0x') {
+        options.to = inputAddressFormatter(options.to)
+      }
     }
 
     if (options.data && options.input) {
