@@ -1396,6 +1396,340 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
   })
 })
 
+describe('caver.klay.accounts.getRawTransactionWithSignatures', () => {
+  let vtTx, feeDelegatedTx
+  let sender, feePayer
+  
+  beforeEach(() => {
+    let senderRoleBasedKey = { transactionKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey] }
+    let feePayerRoleBasedKey = { feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey] }
+
+    sender = caver.klay.accounts.wallet.add(caver.klay.accounts.createWithAccountKey('0x6f9a8851feca74f6694a12d11c9684f0b5c1d3b6', senderRoleBasedKey))
+    feePayer = caver.klay.accounts.wallet.add(caver.klay.accounts.createWithAccountKey('0x4a804669b2637b18d46e62109ed8edc0dc8526c7', feePayerRoleBasedKey))
+
+    vtTx = { 
+      type: 'VALUE_TRANSFER',
+      from: sender.address,
+      to: '0xd2553e0508d481892aa1b481b3ac29aba5c7fb4d',
+      value: '0x1',
+      gas: '0xdbba0',
+      chainId: '0x7e3',
+      gasPrice: '0x5d21dba00',
+      nonce: '0x9a',
+    }
+    
+    feeDelegatedTx = { 
+      type: 'FEE_DELEGATED_VALUE_TRANSFER',
+      from: sender.address,
+      to: '0xd2553e0508d481892aa1b481b3ac29aba5c7fb4d',
+      value: '0x1',
+      gas: '0xdbba0',
+      chainId: '0x7e3',
+      gasPrice: '0x5d21dba00',
+      nonce: '0x9a',
+    }
+  })
+
+  context('CAVERJS-UNIT-WALLET-307: input: value transfer tx object with signatures', () => {
+    it('should return valid rawTransaction', async () => {
+      let signResult = await caver.klay.accounts.signTransaction(vtTx)
+      vtTx.signatures = signResult.signatures
+
+      let result = await caver.klay.accounts.getRawTransactionWithSignatures(vtTx)
+
+      const keys = ['rawTransaction', 'txHash', 'senderTxHash', 'signatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(signResult.rawTransaction).to.equals(result.rawTransaction)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-308: input: fee delegated value transfer tx object with signatures', () => {
+    it('should return valid rawTransaction', async () => {
+      let signResult = await caver.klay.accounts.signTransaction(feeDelegatedTx)
+      feeDelegatedTx.signatures = signResult.signatures
+
+      let result = await caver.klay.accounts.getRawTransactionWithSignatures(feeDelegatedTx)
+
+      const keys = ['rawTransaction', 'txHash', 'senderTxHash', 'signatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+      expect(signResult.rawTransaction).to.equals(result.rawTransaction)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-309: input: fee delegated value transfer tx object with feePayerSignatures', () => {
+    it('should return valid rawTransaction', async () => {
+      const tx = Object.assign({}, feeDelegatedTx)
+
+      let feePayerSignResult = await caver.klay.accounts.feePayerSignTransaction(feeDelegatedTx, feePayer.address)
+
+      tx.feePayer = feePayer.address
+      tx.feePayerSignatures = feePayerSignResult.feePayerSignatures
+
+      let result = await caver.klay.accounts.getRawTransactionWithSignatures(tx)
+
+      const keys = ['rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+      expect(result.feePayerSignatures.length).to.equals(3)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(caver.utils.isEmptySig(decoded.signatures)).to.be.true
+      expect(decoded.feePayerSignatures.length).to.equals(3)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-310: input: fee delegated value transfer tx object with signatures and feePayerSignatures', () => {
+    it('should return valid rawTransaction', async () => {
+      const tx = Object.assign({}, feeDelegatedTx)
+
+      let signResult = await caver.klay.accounts.signTransaction(feeDelegatedTx)
+
+      let feePayerSignResult = await caver.klay.accounts.feePayerSignTransaction(feeDelegatedTx, feePayer.address)
+
+      tx.signatures = signResult.signatures
+      tx.feePayer = feePayer.address
+      tx.feePayerSignatures = feePayerSignResult.feePayerSignatures
+
+      let result = await caver.klay.accounts.getRawTransactionWithSignatures(tx)
+
+      const keys = ['rawTransaction', 'txHash', 'senderTxHash', 'signatures', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+      expect(result.signatures.length).to.equals(3)
+      expect(result.feePayerSignatures.length).to.equals(3)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.signatures.length).to.equals(3)
+      expect(decoded.feePayerSignatures.length).to.equals(3)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-311: input: fee payer tx format(includes signatures) object with signatures', () => {
+    it('should return valid rawTransaction', async () => {
+      let signResult = await caver.klay.accounts.signTransaction(feeDelegatedTx, sender.transactionKey[0])
+      let signResult2 = await caver.klay.accounts.signTransaction(feeDelegatedTx, [sender.transactionKey[1], sender.transactionKey[2]])
+
+      const feePayerTx = {
+        senderRawTransaction: signResult.rawTransaction,
+        feePayer: feePayer.address,
+        signatures: signResult2.signatures
+      }
+      let result = await caver.klay.accounts.getRawTransactionWithSignatures(feePayerTx)
+
+      const keys = ['rawTransaction', 'txHash', 'senderTxHash', 'signatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+      expect(result.signatures.length).to.equals(3)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.signatures.length).to.equals(3)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-312: input: fee payer tx format(includes signatures and feePayerSignatures) object with signatures', () => {
+    it('should return valid rawTransaction', async () => {
+      let signResult = await caver.klay.accounts.signTransaction(feeDelegatedTx, sender.transactionKey[0])
+      let signResult2 = await caver.klay.accounts.signTransaction(feeDelegatedTx, [sender.transactionKey[1], sender.transactionKey[2]])
+      let feePayerSigned = await caver.klay.accounts.feePayerSignTransaction(signResult.rawTransaction, feePayer.address, feePayer.feePayerKey[0])
+
+      const feePayerTx = {
+        senderRawTransaction: feePayerSigned.rawTransaction,
+        feePayer: feePayer.address,
+        signatures: signResult2.signatures
+      }
+      let result = await caver.klay.accounts.getRawTransactionWithSignatures(feePayerTx)
+
+      const keys = ['rawTransaction', 'txHash', 'senderTxHash', 'signatures', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+      expect(result.signatures.length).to.equals(3)
+      expect(result.feePayerSignatures.length).to.equals(1)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.signatures.length).to.equals(3)
+      expect(decoded.feePayerSignatures.length).to.equals(1)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-313: input: fee payer tx format(includes signatures and feePayerSignatures) object with signatures and feePayerSignatures', () => {
+    it('should return valid rawTransaction', async () => {
+      let signResult = await caver.klay.accounts.signTransaction(feeDelegatedTx, sender.transactionKey[0])
+      let signResult2 = await caver.klay.accounts.signTransaction(feeDelegatedTx, [sender.transactionKey[1], sender.transactionKey[2]])
+      let feePayerSigned = await caver.klay.accounts.feePayerSignTransaction(signResult.rawTransaction, feePayer.address, feePayer.feePayerKey[0])
+      let feePayerSigned2 = await caver.klay.accounts.feePayerSignTransaction(signResult.rawTransaction, feePayer.address, [feePayer.feePayerKey[1], feePayer.feePayerKey[2]])
+
+      const feePayerTx = {
+        senderRawTransaction: feePayerSigned.rawTransaction,
+        feePayer: feePayer.address,
+        signatures: signResult2.signatures,
+        feePayerSignatures: feePayerSigned2.feePayerSignatures
+      }
+      let result = await caver.klay.accounts.getRawTransactionWithSignatures(feePayerTx)
+
+      const keys = ['rawTransaction', 'txHash', 'senderTxHash', 'signatures', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+      expect(result.signatures.length).to.equals(3)
+      expect(result.feePayerSignatures.length).to.equals(3)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.signatures.length).to.equals(3)
+      expect(decoded.feePayerSignatures.length).to.equals(3)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-314: input: fee delegated value transfer tx object without signatures and feePayerSignatures', () => {
+    it('should throw error when there is no signatures information', async () => {
+      const errorMessage = `There are no signatures or feePayerSignatures defined in the transaction object.`
+      
+      await expect(caver.klay.accounts.getRawTransactionWithSignatures(feeDelegatedTx)).to.be.rejectedWith(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-315: input: fee delegated value transfer tx object without feePayerSignatures only(no feePayer)', () => {
+    it('should throw error when tx defines feePayerSignatures only without feePayer', async () => {
+      const tx = Object.assign({}, feeDelegatedTx)
+      let feePayerSignResult = await caver.klay.accounts.feePayerSignTransaction(feeDelegatedTx, feePayer.address)
+      tx.feePayerSignatures = feePayerSignResult.feePayerSignatures
+
+      const errorMessage = `"feePayer" is missing: feePayer must be defined with feePayerSignatures.`
+      
+      await expect(caver.klay.accounts.getRawTransactionWithSignatures(tx)).to.be.rejectedWith(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-316: input: value transfer tx object with feePayer', () => {
+    it('should throw error when non-feeDelegated tx defines feePayer', async () => {
+      let signResult = await caver.klay.accounts.signTransaction(vtTx)
+      vtTx.signatures = signResult.signatures
+      vtTx.feePayer = feePayer.address
+
+      const errorMessage = `"feePayer" cannot be used with ${vtTx.type} transaction`
+      
+      await expect(caver.klay.accounts.getRawTransactionWithSignatures(vtTx)).to.be.rejectedWith(errorMessage)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-317: input: value transfer tx object with feePayerSignatures', () => {
+    it('should throw error when non-feeDelegated tx defines feePayerSignatures', async () => {
+      let feePayerSignResult = await caver.klay.accounts.feePayerSignTransaction(feeDelegatedTx, feePayer.address)
+      vtTx.feePayerSignatures = feePayerSignResult.feePayerSignatures
+
+      const errorMessage = `"feePayerSignatures" cannot be used with ${vtTx.type} transaction`
+      
+      await expect(caver.klay.accounts.getRawTransactionWithSignatures(vtTx)).to.be.rejectedWith(errorMessage)
+    })
+  })
+})
+
+describe('caver.klay.accounts.combineSignatures', () => {
+  let feeDelegatedTx
+  let sender, feePayer
+  
+  beforeEach(() => {
+    let senderRoleBasedKey = { transactionKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey] }
+    let feePayerRoleBasedKey = { feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey] }
+
+    sender = caver.klay.accounts.wallet.add(caver.klay.accounts.createWithAccountKey('0x6f9a8851feca74f6694a12d11c9684f0b5c1d3b6', senderRoleBasedKey))
+    feePayer = caver.klay.accounts.wallet.add(caver.klay.accounts.createWithAccountKey('0x4a804669b2637b18d46e62109ed8edc0dc8526c7', feePayerRoleBasedKey))
+    
+    feeDelegatedTx = { 
+      type: 'FEE_DELEGATED_VALUE_TRANSFER',
+      from: sender.address,
+      to: '0xd2553e0508d481892aa1b481b3ac29aba5c7fb4d',
+      value: '0x1',
+      gas: '0xdbba0',
+      chainId: '0x7e3',
+      gasPrice: '0x5d21dba00',
+      nonce: '0x9a',
+    }
+  })
+
+  context('CAVERJS-UNIT-WALLET-318: input: RLP encoded raw transaction string(includes signatures of sender only)', () => {
+    it('should combine signatures and return valid rawTransaction', async () => {
+      let signResult = await caver.klay.accounts.signTransaction(feeDelegatedTx, sender.transactionKey[0])
+      let signResult2 = await caver.klay.accounts.signTransaction(feeDelegatedTx, sender.transactionKey[1])
+      let signResult3 = await caver.klay.accounts.signTransaction(feeDelegatedTx, sender.transactionKey[2])
+
+      let result = await caver.klay.accounts.combineSignatures([signResult.rawTransaction, signResult2.rawTransaction, signResult3.rawTransaction])
+
+      const keys = ['rawTransaction', 'txHash', 'senderTxHash', 'signatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+      expect(result.signatures.length).to.equals(3)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.signatures.length).to.equals(3)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-319: input: RLP encoded raw transaction string(includes signatures of fee payer only)', () => {
+    it('should combine signatures and return valid rawTransaction', async () => {
+      let feePayerSignResult = await caver.klay.accounts.feePayerSignTransaction(feeDelegatedTx, feePayer.address, feePayer.feePayerKey[0])
+      let feePayerSignResult2 = await caver.klay.accounts.feePayerSignTransaction(feeDelegatedTx, feePayer.address, feePayer.feePayerKey[1])
+      let feePayerSignResult3 = await caver.klay.accounts.feePayerSignTransaction(feeDelegatedTx, feePayer.address, feePayer.feePayerKey[2])
+
+      let result = await caver.klay.accounts.combineSignatures([feePayerSignResult.rawTransaction, feePayerSignResult2.rawTransaction, feePayerSignResult3.rawTransaction])
+
+      const keys = ['rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+      expect(result.feePayerSignatures.length).to.equals(3)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.feePayerSignatures.length).to.equals(3)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-320: input: RLP encoded raw transaction string(includes signatures of sender and fee payer)', () => {
+    it('should combine signatures and return valid rawTransaction', async () => {
+      let signResult = await caver.klay.accounts.signTransaction(feeDelegatedTx)
+      let feePayerSignResult = await caver.klay.accounts.feePayerSignTransaction(feeDelegatedTx, feePayer.address)
+
+      let result = await caver.klay.accounts.combineSignatures([signResult.rawTransaction, feePayerSignResult.rawTransaction])
+
+      const keys = ['rawTransaction', 'txHash', 'senderTxHash', 'signatures', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+      expect(result.signatures.length).to.equals(3)
+      expect(result.feePayerSignatures.length).to.equals(3)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.signatures.length).to.equals(3)
+      expect(decoded.feePayerSignatures.length).to.equals(3)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-321: input: RLP encoded raw transaction string(includes duplicated signatures of sender and fee payer)', () => {
+    it('should remove duplicated signatures return valid rawTransaction', async () => {
+      let signResult = await caver.klay.accounts.signTransaction(feeDelegatedTx)
+      let signResult2 = await caver.klay.accounts.signTransaction(feeDelegatedTx, sender.transactionKey[0])
+      let signResult3 = await caver.klay.accounts.signTransaction(feeDelegatedTx, sender.transactionKey[1])
+      let signResult4 = await caver.klay.accounts.signTransaction(feeDelegatedTx, sender.transactionKey[2])
+
+      let feePayerSignResult = await caver.klay.accounts.feePayerSignTransaction(feeDelegatedTx, feePayer.address)
+      let feePayerSignResult2 = await caver.klay.accounts.feePayerSignTransaction(feeDelegatedTx, feePayer.address, feePayer.feePayerKey[0])
+      let feePayerSignResult3 = await caver.klay.accounts.feePayerSignTransaction(feeDelegatedTx, feePayer.address, feePayer.feePayerKey[1])
+      let feePayerSignResult4 = await caver.klay.accounts.feePayerSignTransaction(feeDelegatedTx, feePayer.address, feePayer.feePayerKey[2])
+
+      let rawArray = [
+        signResult.rawTransaction, 
+        signResult2.rawTransaction, 
+        signResult3.rawTransaction, 
+        signResult4.rawTransaction, 
+        feePayerSignResult.rawTransaction, 
+        feePayerSignResult2.rawTransaction, 
+        feePayerSignResult3.rawTransaction, 
+        feePayerSignResult4.rawTransaction
+      ]
+      let result = await caver.klay.accounts.combineSignatures(rawArray)
+
+      const keys = ['rawTransaction', 'txHash', 'senderTxHash', 'signatures', 'feePayerSignatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+      expect(result.signatures.length).to.equals(3)
+      expect(result.feePayerSignatures.length).to.equals(3)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.signatures.length).to.equals(3)
+      expect(decoded.feePayerSignatures.length).to.equals(3)
+    })
+  })
+})
+
 describe('caver.klay.accounts.recoverTransaction', () => {
   let account
   let rawTx

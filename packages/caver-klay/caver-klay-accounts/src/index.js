@@ -793,33 +793,50 @@ Accounts.prototype.feePayerSignTransaction = function feePayerSignTransaction() 
     })
 }
 
-Accounts.prototype.signTransactionWithSignature = function signTransactionWithSignature(tx, callback) {
+/**
+ * getRawTransactionWithSignatures returns object which contains rawTransaction.
+ *
+ * @method getRawTransactionWithSignatures
+ * @param {Object} tx The transaction object which contains signatures or feePayerSignatures.
+ * @param {Function} callback The callback function to call.
+ * @return {Object}
+ */
+Accounts.prototype.getRawTransactionWithSignatures = function getRawTransactionWithSignatures(tx, callback) {
     var _this = this,
-        error = false,
         result
 
     callback = callback || function () {}
 
-    if (!tx) {
-      error = new Error('No transaction object given!')
-
-      callback(error)
-      return Promise.reject(error)
+    let handleError = (e) => {
+      e = e instanceof Error? e : new Error(e)
+      if (callback) callback(e)
+      return Promise.reject(e)
     }
 
-    if (!tx.signature) {
-      error = new Error('No tx signature given!')
+    if (!tx || !_.isObject(tx)) return handleError('Invalid parameter: The transaction must be defined as an object')
+    if (!tx.signatures && !tx.feePayerSignatures) return handleError('There are no signatures or feePayerSignatures defined in the transaction object.')
 
-      callback(error)
-      return Promise.reject(error)
+    let error = helpers.validateFunction.validateParams(tx)
+    if (error) return handleError(error)
+
+    if (tx.senderRawTransaction) {
+      tx.feePayerSignatures = tx.feePayerSignatures || [['0x01', '0x', '0x']]
+
+      const decoded = decodeFromRawTransaction(tx.senderRawTransaction)
+      // feePayer !== '0x' means that in senderRawTransaction there are feePayerSignatures
+      if (decoded.feePayer !== '0x' && !utils.isEmptySig(decoded.feePayerSignatures)) {
+        if (decoded.feePayer.toLowerCase() !== tx.feePayer.toLowerCase()) return handleError('Invalid feePayer')
+        tx.feePayerSignatures = tx.feePayerSignatures.concat(decoded.feePayerSignatures)
+      }
+
+      decoded.feePayer = tx.feePayer
+      decoded.feePayerSignatures = tx.feePayerSignatures
+
+      if (tx.signatures) decoded.signatures = decoded.signatures.concat(tx.signatures)
+      tx = decoded
     }
 
     function signed(tx) {
-      error = helpers.validateFunction.validateParams(tx)
-      if (error) {
-        callback(error)
-        return Promise.reject(error)
-      }
 
       try {
         // Guarantee all property in transaction is hex.
@@ -829,23 +846,24 @@ Accounts.prototype.signTransactionWithSignature = function signTransactionWithSi
 
         const rlpEncoded = encodeRLPByTxType(transaction)
 
-        const messageHash = Hash.keccak256(rlpEncoded)
+        let sigs = transaction.signatures? transaction.signatures : ['0x01', '0x', '0x']
 
-        let sig
-        if (_.isArray(transaction.signature)) {
-          sig = transaction.signature.map((_sig) => utils.resolveSignature(_sig))
-        } else {
-          sig = utils.resolveSignature(transaction.signature)
-        }
+        if (!_.isArray(sigs[0])) sigs = [sigs]
 
-        const rawTransaction = makeRawTransaction(rlpEncoded, sig, transaction)
+        const { rawTransaction, signatures, feePayerSignatures } = makeRawTransaction(rlpEncoded, sigs, transaction)
 
         result = {
-            messageHash: messageHash,
-            signature: sig,
-            rawTransaction: rawTransaction,
-            txHash: Hash.keccak256(rawTransaction),
-            senderTxHash: getSenderTxHash(rawTransaction),
+          rawTransaction: rawTransaction,
+          txHash: Hash.keccak256(rawTransaction),
+          senderTxHash: getSenderTxHash(rawTransaction),
+        }
+
+        if (signatures && !utils.isEmptySig(signatures)) {
+          result.signatures = signatures
+        }
+
+        if (feePayerSignatures && !utils.isEmptySig(feePayerSignatures)) {
+          result.feePayerSignatures = feePayerSignatures
         }
         
       } catch(e) {
@@ -861,12 +879,11 @@ Accounts.prototype.signTransactionWithSignature = function signTransactionWithSi
         return Promise.resolve(signed(tx));
     }
 
-
     // Otherwise, get the missing info from the Klaytn Node
     return Promise.all([
         isNot(tx.chainId) ? _this._klaytnCall.getChainId() : tx.chainId,
         isNot(tx.gasPrice) ? _this._klaytnCall.getGasPrice() : tx.gasPrice,
-        isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.feePayer || tx.from) : tx.nonce
+        isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from) : tx.nonce
     ]).then(function (args) {
         if (isNot(args[0]) || isNot(args[1]) || isNot(args[2])) {
             throw new Error('One of the values "chainId", "gasPrice", or "nonce" couldn\'t be fetched: '+ JSON.stringify(args));
@@ -874,6 +891,68 @@ Accounts.prototype.signTransactionWithSignature = function signTransactionWithSi
         return signed(_.extend(tx, {chainId: args[0], gasPrice: args[1], nonce: args[2]}));
     });
 };
+
+/**
+ * combineSignatures combines RLP encoded raw transaction strings.
+ *
+ * @method combineSignatures
+ * @param {Array} rawTransactions The array of raw transaction string to combine.
+ * @param {Function} callback The callback function to call.
+ * @return {Object}
+ */
+Accounts.prototype.combineSignatures = function combineSignatures(rawTransactions) {
+  let decodedTx
+  let senders = []
+  let feePayers = []
+  let feePayer
+
+  if (!_.isArray(rawTransactions)) throw new Error(`The parameter of the combineSignatures function must be an array of RLP encoded transaction strings.`)
+  
+  for (const raw of rawTransactions) {
+    const { senderSignatures, feePayerSignatures, decodedTransaction } = extractSignatures(raw)
+
+    senders = senders.concat(senderSignatures)
+    feePayers = feePayers.concat(feePayerSignatures)
+    
+    if (decodedTx) {
+      let isSame = true
+      const keys = Object.keys(decodedTx)
+      for (const key of keys) {
+        if (key === 'v' || key === 'r' || key === 's' || key === 'signatures' || key === 'payerV' || key === 'payerR' || key === 'payerS' || key === 'feePayerSignatures') {
+          continue
+        }
+
+        if (key === 'feePayer') {
+          if (decodedTx[key] === '0x') {
+            decodedTx[key] = decodedTransaction[key]
+            feePayer = decodedTx[key]
+          } else if (decodedTransaction[key] === '0x') {
+            continue
+          }
+        }
+
+        if (decodedTransaction[key] === undefined || decodedTx[key] !== decodedTransaction[key]) {
+          isSame = false
+          break
+        }
+      }
+      if (!isSame) throw new Error(`Failed to combineSignatures: Signatures that sign to different transaction cannot be combined.`)
+    } else {
+      decodedTx = decodedTransaction
+    }
+  }
+
+
+  const parsedTxObject = decodeFromRawTransaction(rawTransactions[0])
+  if (feePayer) parsedTxObject.feePayer = feePayer
+  
+  parsedTxObject.signatures = senders
+  if (parsedTxObject.feePayer && parsedTxObject.feePayer !== '0x' && parsedTxObject.feePayerSignatures) {
+    parsedTxObject.feePayerSignatures = feePayers
+  }
+
+  return this.getRawTransactionWithSignatures(parsedTxObject)
+}
 
 /**
  * cav.klay.accounts.recoverTransaction('0xf86180808401ef364594f0109fc8df283027b6285cc889f5aa624eac1f5580801ca031573280d608f75137e33fc14655f097867d691d5c4c44ebe5ae186070ac3d5ea0524410802cdc025034daefcdfa08e7d2ee3f0b9d9ae184b2001fe0aff07603d9');
