@@ -147,6 +147,32 @@ Accounts.prototype._determineAddress = function _determineAddress(legacyAccount,
 }
 
 /**
+ * _getRoleKey returns a key that matches the role that should be used according to the transaction.
+ *
+ * @method _getRoleKey
+ * @param {Object} tx transaction object to be sign.
+ * @param {Object} account Account to be used for signing.
+ * @return {String|Array}
+ */
+Accounts.prototype._getRoleKey = function _getRoleKey(tx, account) {
+  let key
+
+  if (!account) throw new Error(`The account to be used for signing is not defined.`)
+
+  if (tx.senderRawTransaction && tx.feePayer) {
+    key = account.feePayerKey
+  } else if (tx.type && tx.type.includes('ACCOUNT_UPDATE')) {
+    key = account.updateKey
+  } else {
+    key = account.transactionKey
+  }
+
+  if (!key) throw new Error(`The key corresponding to the role used for signing is not defined.`)
+
+  return key
+}
+
+/**
  * create function creates random account with entropy.
  *
  * @method create
@@ -800,47 +826,86 @@ Accounts.prototype.decrypt = function (v3Keystore, password, nonStrict) {
     
     var json = (_.isObject(v3Keystore)) ? v3Keystore : JSON.parse(nonStrict ? v3Keystore.toLowerCase() : v3Keystore);
 
-    if (json.version !== 3) {
-        console.warn('This is not a V3 wallet.')
+    if (json.version !== 3 && json.version !== 4) {
+        console.warn('This is not a V3 or V4 wallet.')
         // throw new Error('Not a valid V3 wallet');
     }
 
-    var derivedKey;
-    var kdfparams;
-    /**
-     * Supported kdf modules are the following:
-     * 1) pbkdf2
-     * 2) scrypt
-     */
-    if (json.crypto.kdf === 'scrypt') {
-        kdfparams = json.crypto.kdfparams;
+    if (json.version === 3 && !json.crypto) {
+      // crypto field should be existed in keystore version 3
+      throw new Error(`Invalid keystore V3 format: 'crypto' is not defined.`)
+    }
 
-        // FIXME: support progress reporting callback
-        derivedKey = scrypt(Buffer.from(password), Buffer.from(kdfparams.salt, 'hex'), kdfparams.n, kdfparams.r, kdfparams.p, kdfparams.dklen);
-    } else if (json.crypto.kdf === 'pbkdf2') {
-        kdfparams = json.crypto.kdfparams;
+    if (json.crypto) {
+      if (json.keyRing) throw new Error(`Invalid key store format: 'crypto' can not be with 'keyRing'`)
+      json.keyRing = [json.crypto]
+      delete json.crypto
+    }
 
-        if (kdfparams.prf !== 'hmac-sha256') {
-            throw new Error('Unsupported parameters to PBKDF2');
+    if (_.isArray(json.keyRing[0]) && json.keyRing.length > 3) {
+      throw new Error(`Invalid key store format`)
+    }
+
+    let accountKey = {}
+    
+    // AccountKeyRoleBased format
+    if (_.isArray(json.keyRing[0])) {
+      let transactionKey = decryptKey(json.keyRing[0])
+      if (transactionKey) accountKey.transactionKey = transactionKey
+
+      let updateKey = decryptKey(json.keyRing[1])
+      if (updateKey) accountKey.updateKey = updateKey
+
+      let feePayerKey = decryptKey(json.keyRing[2])
+      if (feePayerKey) accountKey.feePayerKey = feePayerKey
+    } else {
+      accountKey = decryptKey(json.keyRing)
+    }
+
+    function decryptKey(encryptedArray) {
+      if (!encryptedArray || encryptedArray.length === 0) return undefined
+      
+      let decryptedArray = []
+      for (const encrypted of encryptedArray) {
+        var derivedKey
+        var kdfparams
+        /**
+         * Supported kdf modules are the following:
+         * 1) pbkdf2
+         * 2) scrypt
+         */
+        if (encrypted.kdf === 'scrypt') {
+            kdfparams = encrypted.kdfparams;
+
+            // FIXME: support progress reporting callback
+            derivedKey = scrypt(Buffer.from(password), Buffer.from(kdfparams.salt, 'hex'), kdfparams.n, kdfparams.r, kdfparams.p, kdfparams.dklen);
+        } else if (encrypted.kdf === 'pbkdf2') {
+            kdfparams = encrypted.kdfparams;
+
+            if (kdfparams.prf !== 'hmac-sha256') {
+                throw new Error('Unsupported parameters to PBKDF2');
+            }
+
+            derivedKey = cryp.pbkdf2Sync(Buffer.from(password), Buffer.from(kdfparams.salt, 'hex'), kdfparams.c, kdfparams.dklen, 'sha256');
+        } else {
+            throw new Error('Unsupported key derivation scheme');
         }
 
-        derivedKey = cryp.pbkdf2Sync(Buffer.from(password), Buffer.from(kdfparams.salt, 'hex'), kdfparams.c, kdfparams.dklen, 'sha256');
-    } else {
-        throw new Error('Unsupported key derivation scheme');
+        var ciphertext = Buffer.from(encrypted.ciphertext, 'hex');
+
+        var mac = utils.sha3(Buffer.concat([ derivedKey.slice(16, 32), ciphertext ])).replace('0x','');
+        if (mac !== encrypted.mac) {
+            throw new Error('Key derivation failed - possibly wrong password');
+        }
+
+        var decipher = cryp.createDecipheriv(encrypted.cipher, derivedKey.slice(0, 16), Buffer.from(encrypted.cipherparams.iv, 'hex'));
+        decryptedArray.push('0x'+ Buffer.concat([ decipher.update(ciphertext), decipher.final() ]).toString('hex'))
+      }
+      return decryptedArray.length === 1? decryptedArray[0] : decryptedArray
     }
 
-    var ciphertext = Buffer.from(json.crypto.ciphertext, 'hex');
-
-    var mac = utils.sha3(Buffer.concat([ derivedKey.slice(16, 32), ciphertext ])).replace('0x','');
-    if (mac !== json.crypto.mac) {
-        throw new Error('Key derivation failed - possibly wrong password');
-    }
-
-    var decipher = cryp.createDecipheriv(json.crypto.cipher, derivedKey.slice(0, 16), Buffer.from(json.crypto.cipherparams.iv, 'hex'));
-    var seed = '0x'+ Buffer.concat([ decipher.update(ciphertext), decipher.final() ]).toString('hex');
-
-    return this.privateKeyToAccount(seed, json.address);
-};
+    return this.createWithAccountKey(json.address, accountKey);
+  };
 
 /**
  * cav.klay.accounts.encrypt(privateKey, password);
@@ -918,60 +983,110 @@ Accounts.prototype.encrypt = function (key, password, options) {
      */
     options = options || {};
 
-    var account = this.privateKeyToAccount(key, options.address);
+    let address, account
 
-    var salt = options.salt || cryp.randomBytes(32);
-    var iv = options.iv || cryp.randomBytes(16);
-
-    var derivedKey;
-    var kdf = options.kdf || 'scrypt';
-    var kdfparams = {
-        dklen: options.dklen || 32,
-        salt: salt.toString('hex')
-    };
-
-    /**
-     * Supported kdf modules are the following:
-     * 1) pbkdf2
-     * 2) scrypt - default
-     */
-    if (kdf === 'pbkdf2') {
-        kdfparams.c = options.c || 262144;
-        kdfparams.prf = 'hmac-sha256';
-        derivedKey = cryp.pbkdf2Sync(Buffer.from(password), salt, kdfparams.c, kdfparams.dklen, 'sha256');
-    } else if (kdf === 'scrypt') {
-        // FIXME: support progress reporting callback
-        kdfparams.n = options.n || 4096; // 2048 4096 8192 16384
-        kdfparams.r = options.r || 8;
-        kdfparams.p = options.p || 1;
-        derivedKey = scrypt(Buffer.from(password), salt, kdfparams.n, kdfparams.r, kdfparams.p, kdfparams.dklen);
+    if (key instanceof Account) {
+      if (options.address && options.address !== key.address) throw new Error(`Address in account is not matched with address in options object`) 
+      address = key.address
+      account = key
+    } else if (_.isString(key)) {
+      account = this.privateKeyToAccount(key, options.address)
+      address = account.address
     } else {
-        throw new Error('Unsupported kdf');
+      if (!options.address) throw new Error(`The address must be defined inside the options object.`)
+      address = options.address
     }
 
-    var cipher = cryp.createCipheriv(options.cipher || 'aes-128-ctr', derivedKey.slice(0, 16), iv);
-    if (!cipher) {
-        throw new Error('Unsupported cipher');
+    if (!account) account = this.createWithAccountKey(address, key)
+
+    let keyRing
+
+    switch(account.accountKeyType) {
+      case AccountKeyEnum.ACCOUNT_KEY_PUBLIC:
+      case AccountKeyEnum.ACCOUNT_KEY_MULTISIG:
+        keyRing = encryptKey(account.keys)
+        break
+      case AccountKeyEnum.ACCOUNT_KEY_ROLEBASED:
+        keyRing = []
+        let transactionKey = encryptKey(account.transactionKey)
+        let updateKey = encryptKey(account.updateKey)
+        let feePayerKey = encryptKey(account.feePayerKey)
+        keyRing.push(transactionKey)
+        keyRing.push(updateKey)
+        keyRing.push(feePayerKey)
+        for (i = keyRing.length-1; i >=0; i --) {
+          if (keyRing[i].length !== 0) break
+          keyRing = keyRing.slice(0, i)
+        }
+        break
     }
 
-    var ciphertext = Buffer.concat([ cipher.update(Buffer.from(account.privateKey.replace('0x',''), 'hex')), cipher.final() ]);
+    function encryptKey(privateKey) {
+      let encryptedArray = []
 
-    var mac = utils.sha3(Buffer.concat([ derivedKey.slice(16, 32), Buffer.from(ciphertext, 'hex') ])).replace('0x','');
+      if (!privateKey) return encryptedArray
+      
+      let privateKeyArray = _.isArray(privateKey)? privateKey : [privateKey]
+
+      for (const privateKey of privateKeyArray) {
+        var salt = options.salt || cryp.randomBytes(32);
+        var iv = options.iv || cryp.randomBytes(16);
+  
+        var derivedKey;
+        var kdf = options.kdf || 'scrypt';
+        var kdfparams = {
+            dklen: options.dklen || 32,
+            salt: salt.toString('hex')
+        };
+  
+        /**
+         * Supported kdf modules are the following:
+         * 1) pbkdf2
+         * 2) scrypt - default
+         */
+        if (kdf === 'pbkdf2') {
+            kdfparams.c = options.c || 262144;
+            kdfparams.prf = 'hmac-sha256';
+            derivedKey = cryp.pbkdf2Sync(Buffer.from(password), salt, kdfparams.c, kdfparams.dklen, 'sha256');
+        } else if (kdf === 'scrypt') {
+            // FIXME: support progress reporting callback
+            kdfparams.n = options.n || 4096; // 2048 4096 8192 16384
+            kdfparams.r = options.r || 8;
+            kdfparams.p = options.p || 1;
+            derivedKey = scrypt(Buffer.from(password), salt, kdfparams.n, kdfparams.r, kdfparams.p, kdfparams.dklen);
+        } else {
+            throw new Error('Unsupported kdf');
+        }
+  
+        var cipher = cryp.createCipheriv(options.cipher || 'aes-128-ctr', derivedKey.slice(0, 16), iv);
+        if (!cipher) {
+            throw new Error('Unsupported cipher');
+        }
+  
+        var ciphertext = Buffer.concat([cipher.update(Buffer.from(privateKey.replace('0x',''), 'hex')), cipher.final()]);
+  
+        var mac = utils.sha3(Buffer.concat([derivedKey.slice(16, 32), Buffer.from(ciphertext, 'hex')])).replace('0x','');
+
+        encryptedArray.push({
+          ciphertext: ciphertext.toString('hex'),
+          cipherparams: {
+              iv: iv.toString('hex')
+          },
+          cipher: options.cipher || 'aes-128-ctr',
+          kdf: kdf,
+          kdfparams: kdfparams,
+          mac: mac.toString('hex')
+        })
+      }
+
+      return encryptedArray
+    }
 
     return {
-        version: 3,
+        version: 4,
         id: uuid.v4({ random: options.uuid || cryp.randomBytes(16) }),
         address: account.address.toLowerCase(),
-        crypto: {
-            ciphertext: ciphertext.toString('hex'),
-            cipherparams: {
-                iv: iv.toString('hex')
-            },
-            cipher: options.cipher || 'aes-128-ctr',
-            kdf: kdf,
-            kdfparams: kdfparams,
-            mac: mac.toString('hex')
-        }
+        keyRing
     };
 };
 
