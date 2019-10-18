@@ -1441,7 +1441,7 @@ describe('caver.klay.accounts.getRawTransactionWithSignatures', () => {
       expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
 
       expect(signResult.rawTransaction).to.equals(result.rawTransaction)
-    })
+    }).timeout(200000)
   })
 
   context('CAVERJS-UNIT-WALLET-308: input: fee delegated value transfer tx object with signatures', () => {
@@ -1455,7 +1455,7 @@ describe('caver.klay.accounts.getRawTransactionWithSignatures', () => {
       expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
 
       expect(signResult.rawTransaction).to.equals(result.rawTransaction)
-    })
+    }).timeout(200000)
   })
 
   context('CAVERJS-UNIT-WALLET-309: input: fee delegated value transfer tx object with feePayerSignatures', () => {
@@ -1476,7 +1476,7 @@ describe('caver.klay.accounts.getRawTransactionWithSignatures', () => {
       const decoded = caver.klay.decodeTransaction(result.rawTransaction)
       expect(caver.utils.isEmptySig(decoded.signatures)).to.be.true
       expect(decoded.feePayerSignatures.length).to.equals(3)
-    })
+    }).timeout(200000)
   })
 
   context('CAVERJS-UNIT-WALLET-310: input: fee delegated value transfer tx object with signatures and feePayerSignatures', () => {
@@ -1501,7 +1501,7 @@ describe('caver.klay.accounts.getRawTransactionWithSignatures', () => {
       const decoded = caver.klay.decodeTransaction(result.rawTransaction)
       expect(decoded.signatures.length).to.equals(3)
       expect(decoded.feePayerSignatures.length).to.equals(3)
-    })
+    }).timeout(200000)
   })
 
   context('CAVERJS-UNIT-WALLET-311: input: fee payer tx format(includes signatures) object with signatures', () => {
@@ -1522,7 +1522,7 @@ describe('caver.klay.accounts.getRawTransactionWithSignatures', () => {
 
       const decoded = caver.klay.decodeTransaction(result.rawTransaction)
       expect(decoded.signatures.length).to.equals(3)
-    })
+    }).timeout(200000)
   })
 
   context('CAVERJS-UNIT-WALLET-312: input: fee payer tx format(includes signatures and feePayerSignatures) object with signatures', () => {
@@ -1546,7 +1546,7 @@ describe('caver.klay.accounts.getRawTransactionWithSignatures', () => {
       const decoded = caver.klay.decodeTransaction(result.rawTransaction)
       expect(decoded.signatures.length).to.equals(3)
       expect(decoded.feePayerSignatures.length).to.equals(1)
-    })
+    }).timeout(200000)
   })
 
   context('CAVERJS-UNIT-WALLET-313: input: fee payer tx format(includes signatures and feePayerSignatures) object with signatures and feePayerSignatures', () => {
@@ -1572,7 +1572,7 @@ describe('caver.klay.accounts.getRawTransactionWithSignatures', () => {
       const decoded = caver.klay.decodeTransaction(result.rawTransaction)
       expect(decoded.signatures.length).to.equals(3)
       expect(decoded.feePayerSignatures.length).to.equals(3)
-    })
+    }).timeout(200000)
   })
 
   context('CAVERJS-UNIT-WALLET-314: input: fee delegated value transfer tx object without signatures and feePayerSignatures', () => {
@@ -1580,7 +1580,7 @@ describe('caver.klay.accounts.getRawTransactionWithSignatures', () => {
       const errorMessage = `There are no signatures or feePayerSignatures defined in the transaction object.`
       
       await expect(caver.klay.accounts.getRawTransactionWithSignatures(feeDelegatedTx)).to.be.rejectedWith(errorMessage)
-    })
+    }).timeout(200000)
   })
 
   context('CAVERJS-UNIT-WALLET-315: input: fee delegated value transfer tx object without feePayerSignatures only(no feePayer)', () => {
@@ -1592,7 +1592,7 @@ describe('caver.klay.accounts.getRawTransactionWithSignatures', () => {
       const errorMessage = `"feePayer" is missing: feePayer must be defined with feePayerSignatures.`
       
       await expect(caver.klay.accounts.getRawTransactionWithSignatures(tx)).to.be.rejectedWith(errorMessage)
-    })
+    }).timeout(200000)
   })
 
   context('CAVERJS-UNIT-WALLET-316: input: value transfer tx object with feePayer', () => {
@@ -1604,7 +1604,7 @@ describe('caver.klay.accounts.getRawTransactionWithSignatures', () => {
       const errorMessage = `"feePayer" cannot be used with ${vtTx.type} transaction`
       
       await expect(caver.klay.accounts.getRawTransactionWithSignatures(vtTx)).to.be.rejectedWith(errorMessage)
-    })
+    }).timeout(200000)
   })
 
   context('CAVERJS-UNIT-WALLET-317: input: value transfer tx object with feePayerSignatures', () => {
@@ -1615,7 +1615,7 @@ describe('caver.klay.accounts.getRawTransactionWithSignatures', () => {
       const errorMessage = `"feePayerSignatures" cannot be used with ${vtTx.type} transaction`
       
       await expect(caver.klay.accounts.getRawTransactionWithSignatures(vtTx)).to.be.rejectedWith(errorMessage)
-    })
+    }).timeout(200000)
   })
 })
 
@@ -1656,7 +1656,7 @@ describe('caver.klay.accounts.combineSignatures', () => {
 
       const decoded = caver.klay.decodeTransaction(result.rawTransaction)
       expect(decoded.signatures.length).to.equals(3)
-    })
+    }).timeout(200000)
   })
 
   context('CAVERJS-UNIT-WALLET-319: input: RLP encoded raw transaction string(includes signatures of fee payer only)', () => {
@@ -1673,7 +1673,7 @@ describe('caver.klay.accounts.combineSignatures', () => {
 
       const decoded = caver.klay.decodeTransaction(result.rawTransaction)
       expect(decoded.feePayerSignatures.length).to.equals(3)
-    })
+    }).timeout(200000)
   })
 
   context('CAVERJS-UNIT-WALLET-320: input: RLP encoded raw transaction string(includes signatures of sender and fee payer)', () => {
@@ -1691,7 +1691,7 @@ describe('caver.klay.accounts.combineSignatures', () => {
       const decoded = caver.klay.decodeTransaction(result.rawTransaction)
       expect(decoded.signatures.length).to.equals(3)
       expect(decoded.feePayerSignatures.length).to.equals(3)
-    })
+    }).timeout(200000)
   })
 
   context('CAVERJS-UNIT-WALLET-321: input: RLP encoded raw transaction string(includes duplicated signatures of sender and fee payer)', () => {
@@ -1726,7 +1726,7 @@ describe('caver.klay.accounts.combineSignatures', () => {
       const decoded = caver.klay.decodeTransaction(result.rawTransaction)
       expect(decoded.signatures.length).to.equals(3)
       expect(decoded.feePayerSignatures.length).to.equals(3)
-    })
+    }).timeout(200000)
   })
 })
 
