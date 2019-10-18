@@ -540,6 +540,8 @@ Accounts.prototype.getLegacyAccount = function getLegacyAccount(key) {
 
 /**
  * signTransaction signs to transaction with private key.
+ * If there are signatures(feePayerSignatures if the fee payer signs) in tx entered as a parameter, 
+ * the signatures(feePayerSignatures if the fee payer signs) are appended.
  *
  * @method signTransaction
  * @param {String|Object} tx The transaction to sign.
@@ -716,6 +718,7 @@ Accounts.prototype.signTransaction = function signTransaction() {
 
 /**
 * feePayerSignTransaction calls signTransaction, creating a format for feePayer to sign the transaction.
+* If there are feePayerSignatures in tx entered as a parameter, the signatures for fee payer are appended.
 *
 * @method feePayerSignTransaction
 * @param {Object|String} tx The transaction to sign.
