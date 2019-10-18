@@ -1163,7 +1163,7 @@ describe('caver.klay.accounts.encrypt', () => {
     })
   })
 
-  context('input: Account with AccountKeyMultiSig, password, option', () => {
+  context('CAVERJS-UNIT-WALLET-385: input: Account with AccountKeyMultiSig, password, option', () => {
     it('should throw error when addresses are not matched', () => {
       const password = 'password'
 
