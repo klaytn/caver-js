@@ -894,10 +894,10 @@ Accounts.prototype.getRawTransactionWithSignatures = function getRawTransactionW
 
 /**
  * combineSignatures combines RLP encoded raw transaction strings.
+ * combineSignatures compares transaction before combining, and if values in field are not same(except default value), this throws error.
  *
  * @method combineSignatures
  * @param {Array} rawTransactions The array of raw transaction string to combine.
- * @param {Function} callback The callback function to call.
  * @return {Object}
  */
 Accounts.prototype.combineSignatures = function combineSignatures(rawTransactions) {
