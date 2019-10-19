@@ -894,8 +894,10 @@ Accounts.prototype.getRawTransactionWithSignatures = function getRawTransactionW
 
 /**
  * combineSignatures combines RLP encoded raw transaction strings.
- * combineSignatures compares transaction before combining, and if values in field are not same(except default value), this throws error.
- *
+ * combineSignatures compares transaction before combining, and if values in field are not same, this throws error.
+ * The result of deocdeTransaction, feePayer can be '0x'(default value) when there is not fee payer's information(address of feePayer and feePayerSignatures)
+ * In this case, feePayer field doesn't have to be compared with other transaction.
+ * 
  * @method combineSignatures
  * @param {Array} rawTransactions The array of raw transaction string to combine.
  * @return {Object}
