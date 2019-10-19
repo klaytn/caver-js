@@ -922,6 +922,8 @@ Accounts.prototype.combineSignatures = function combineSignatures(rawTransaction
           continue
         }
 
+        // feePayer field can be '0x' when after sender signs to trasnaction.
+        // For handling this, if feePayer is '0x', don't compare with other transaction
         if (key === 'feePayer') {
           if (decodedTx[key] === '0x') {
             decodedTx[key] = decodedTransaction[key]
