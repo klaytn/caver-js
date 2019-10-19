@@ -288,7 +288,9 @@ const buildSendSignedTxFunc = (method, payload, sendTxCallback) => (sign) => {
 const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, method) => {
   // Logic for handling multiple cases of parameters in sendSignedTransaction.
   // 1. Object containing rawTransaction
+  //    : call 'klay_sendRawTransaction' with RLP encoded transaction(rawTransaction) in object
   // 2. A transaction object containing signatures or feePayerSignatures
+  //    : call 'getRawTransactionWithSignatures', then call 'klay_sendRawTransaction' with result of getRawTransactionWithSignatures
   if (method && method.accounts && payload.method === 'klay_sendRawTransaction') {
     var tx = payload.params[0]
     if (typeof tx !== 'string' && _.isObject(tx)) {
