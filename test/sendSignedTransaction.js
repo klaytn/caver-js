@@ -22,24 +22,27 @@ const testRPCURL = require('./testrpc')
 var Caver = require('../index.js')
 const caver = new Caver(testRPCURL)
 
-var senderPrvKey
-var senderAddress
+var senderPrvKey, payerPrvKey
+var senderAddress, payerAddress
 var receiver
 
 before(() => {
-    senderPrvKey = process.env.privateKey && String(process.env.privateKey).indexOf('0x') === -1
+  senderPrvKey = process.env.privateKey && String(process.env.privateKey).indexOf('0x') === -1
         ? '0x' + process.env.privateKey
         : process.env.privateKey
+  payerPrvKey = process.env.privateKey2 && String(process.env.privateKey2).indexOf('0x') === -1
+      ? '0x' + process.env.privateKey2
+      : process.env.privateKey2
 
-    caver.klay.accounts.wallet.add(senderPrvKey)
+  const sender = caver.klay.accounts.wallet.add(senderPrvKey)
+  senderAddress = sender.address
+  const payer = caver.klay.accounts.wallet.add(payerPrvKey)
+  payerAddress = payer.address
 
-    const sender = caver.klay.accounts.privateKeyToAccount(senderPrvKey)
-    senderAddress = sender.address
-
-    receiver = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+  receiver = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
 })
 
-describe('caver.klay.sendSignedTransaction', (done) => {
+describe('CAVERJS-UNIT-TX-581: caver.klay.sendSignedTransaction with valid non fee delegated transaction raw string', () => {
   it('should send successfully with valid rawTransaction', async () => {
     const txObj = {
       from: senderAddress,
@@ -52,23 +55,167 @@ describe('caver.klay.sendSignedTransaction', (done) => {
     const receipt = await caver.klay.sendSignedTransaction(rawTransaction)
 
     expect(receipt).not.to.null
-    expect(receipt.blockHash).not.to.undefined
-    expect(receipt.blockNumber).not.to.undefined
-    expect(receipt.contractAddress).not.to.undefined
-    expect(receipt.from).not.to.undefined
-    expect(receipt.gas).not.to.undefined
-    expect(receipt.gasPrice).not.to.undefined
-    expect(receipt.gasUsed).not.to.undefined
-    expect(receipt.logs).not.to.undefined
-    expect(receipt.logsBloom).not.to.undefined
-    expect(receipt.nonce).not.to.undefined
-    expect(receipt.signatures).not.to.undefined
-    expect(receipt.status).equals(true)
-    expect(receipt.to).not.to.undefined
-    expect(receipt.transactionHash).not.to.undefined
-    expect(receipt.transactionIndex).not.to.undefined
-    expect(receipt.type).not.to.undefined
-    expect(receipt.typeInt).not.to.undefined
-    expect(receipt.value).not.to.undefined
+
+    const keys = ['blockHash', 'blockNumber', 'contractAddress', 'from', 'gas', 'gasPrice', 'gasUsed', 'input', 'logs', 'logsBloom', 'nonce', 'senderTxHash', 'signatures', 'status', 'to', 'transactionHash', 'transactionIndex', 'type', 'typeInt', 'value']
+    expect(Object.getOwnPropertyNames(receipt)).to.deep.equal(keys)
+
+    expect(receipt.status).to.equals(true)
+    expect(receipt.senderTxHash).to.equals(receipt.transactionHash)
+  }).timeout(100000)
+})
+
+describe('CAVERJS-UNIT-TX-582: caver.klay.sendSignedTransaction with valid fee delegated transaction raw string', () => {
+  it('should send successfully with valid rawTransaction', async () => {
+    const txObj = {
+      type: 'FEE_DELEGATED_VALUE_TRANSFER',
+      from: senderAddress,
+      to: receiver.address,
+      value: 1,
+      gas: 900000,
+    }
+
+    const senderSigned = await caver.klay.accounts.signTransaction(txObj)
+    const feePayerSigned = await caver.klay.accounts.feePayerSignTransaction(senderSigned.rawTransaction, payerAddress)
+
+    const receipt = await caver.klay.sendSignedTransaction(feePayerSigned.rawTransaction)
+
+    expect(receipt).not.to.null
+
+    const keys = ['blockHash', 'blockNumber', 'contractAddress', 'feePayer', 'feePayerSignatures', 'from', 'gas', 'gasPrice', 'gasUsed', 'logs', 'logsBloom', 'nonce', 'senderTxHash', 'signatures', 'status', 'to', 'transactionHash', 'transactionIndex', 'type', 'typeInt', 'value']
+    expect(Object.getOwnPropertyNames(receipt)).to.deep.equal(keys)
+
+    expect(receipt.status).to.equals(true)
+    expect(receipt.senderTxHash).not.to.equals(receipt.transactionHash)
+  }).timeout(100000)
+})
+
+describe('CAVERJS-UNIT-TX-583: caver.klay.sendSignedTransaction with object which has non fee delegated transaction raw string', () => {
+  it('should send successfully with valid rawTransaction', async () => {
+    const txObj = {
+      from: senderAddress,
+      to: receiver.address,
+      value: 1,
+      gas: 900000,
+    }
+
+    const senderSigned = await caver.klay.accounts.signTransaction(txObj, senderPrvKey)
+    const receipt = await caver.klay.sendSignedTransaction(senderSigned)
+
+    expect(receipt).not.to.null
+
+    const keys = ['blockHash', 'blockNumber', 'contractAddress', 'from', 'gas', 'gasPrice', 'gasUsed', 'input', 'logs', 'logsBloom', 'nonce', 'senderTxHash', 'signatures', 'status', 'to', 'transactionHash', 'transactionIndex', 'type', 'typeInt', 'value']
+    expect(Object.getOwnPropertyNames(receipt)).to.deep.equal(keys)
+
+    expect(receipt.status).to.equals(true)
+    expect(receipt.senderTxHash).to.equals(receipt.transactionHash)
+  }).timeout(100000)
+})
+
+describe('CAVERJS-UNIT-TX-584: caver.klay.sendSignedTransaction with object which has fee delegated transaction raw string', () => {
+  it('should send successfully with valid rawTransaction', async () => {
+    const txObj = {
+      type: 'FEE_DELEGATED_VALUE_TRANSFER',
+      from: senderAddress,
+      to: receiver.address,
+      value: 1,
+      gas: 900000,
+    }
+
+    const senderSigned = await caver.klay.accounts.signTransaction(txObj)
+    const feePayerSigned = await caver.klay.accounts.feePayerSignTransaction(senderSigned.rawTransaction, payerAddress)
+
+    const receipt = await caver.klay.sendSignedTransaction(feePayerSigned)
+
+    expect(receipt).not.to.null
+
+    const keys = ['blockHash', 'blockNumber', 'contractAddress', 'feePayer', 'feePayerSignatures', 'from', 'gas', 'gasPrice', 'gasUsed', 'logs', 'logsBloom', 'nonce', 'senderTxHash', 'signatures', 'status', 'to', 'transactionHash', 'transactionIndex', 'type', 'typeInt', 'value']
+    expect(Object.getOwnPropertyNames(receipt)).to.deep.equal(keys)
+
+    expect(receipt.status).to.equals(true)
+    expect(receipt.senderTxHash).not.to.equals(receipt.transactionHash)
+  }).timeout(100000)
+})
+
+describe('CAVERJS-UNIT-TX-585: caver.klay.sendSignedTransaction with transaction object which defines signatures', () => {
+  it('should send successfully with valid rawTransaction', async () => {
+    const txObj = {
+      from: senderAddress,
+      to: receiver.address,
+      value: 1,
+      gas: 900000,
+    }
+
+    const senderSigned = await caver.klay.accounts.signTransaction(txObj, senderPrvKey)
+    txObj.signatures = senderSigned.signatures
+
+    const receipt = await caver.klay.sendSignedTransaction(txObj)
+
+    expect(receipt).not.to.null
+
+    const keys = ['blockHash', 'blockNumber', 'contractAddress', 'from', 'gas', 'gasPrice', 'gasUsed', 'input', 'logs', 'logsBloom', 'nonce', 'senderTxHash', 'signatures', 'status', 'to', 'transactionHash', 'transactionIndex', 'type', 'typeInt', 'value']
+    expect(Object.getOwnPropertyNames(receipt)).to.deep.equal(keys)
+
+    expect(receipt.status).to.equals(true)
+    expect(receipt.senderTxHash).to.equals(receipt.transactionHash)
+  }).timeout(100000)
+})
+
+describe('CAVERJS-UNIT-TX-586: caver.klay.sendSignedTransaction with transaction object which defines signatures and feePayerSignatrues', () => {
+  it('should send successfully with valid rawTransaction', async () => {
+    const txObj = {
+      type: 'FEE_DELEGATED_VALUE_TRANSFER',
+      from: senderAddress,
+      to: receiver.address,
+      value: 1,
+      gas: 900000,
+    }
+
+    const senderSigned = await caver.klay.accounts.signTransaction(txObj)
+    const feePayerSigned = await caver.klay.accounts.feePayerSignTransaction(txObj, payerAddress)
+    
+    txObj.signatures = senderSigned.signatures
+    txObj.feePayer = payerAddress
+    txObj.feePayerSignatures = feePayerSigned.feePayerSignatures
+
+    const receipt = await caver.klay.sendSignedTransaction(txObj)
+
+    expect(receipt).not.to.null
+
+    const keys = ['blockHash', 'blockNumber', 'contractAddress', 'feePayer', 'feePayerSignatures', 'from', 'gas', 'gasPrice', 'gasUsed', 'logs', 'logsBloom', 'nonce', 'senderTxHash', 'signatures', 'status', 'to', 'transactionHash', 'transactionIndex', 'type', 'typeInt', 'value']
+    expect(Object.getOwnPropertyNames(receipt)).to.deep.equal(keys)
+
+    expect(receipt.status).to.equals(true)
+    expect(receipt.senderTxHash).not.to.equals(receipt.transactionHash)
+  }).timeout(100000)
+})
+
+describe('CAVERJS-UNIT-TX-587: caver.klay.sendSignedTransaction with fee payer transaction object which defines feePayerSignatrues', () => {
+  it('should send successfully with valid rawTransaction', async () => {
+    const txObj = {
+      type: 'FEE_DELEGATED_VALUE_TRANSFER',
+      from: senderAddress,
+      to: receiver.address,
+      value: 1,
+      gas: 900000,
+    }
+
+    const senderSigned = await caver.klay.accounts.signTransaction(txObj)
+    const feePayerSigned = await caver.klay.accounts.feePayerSignTransaction(senderSigned.rawTransaction, payerAddress)
+
+    const feePayerTx = {
+      senderRawTransaction: senderSigned.rawTransaction,
+      feePayer: payerAddress,
+      feePayerSignatures: feePayerSigned.feePayerSignatures
+    }
+
+    const receipt = await caver.klay.sendSignedTransaction(feePayerTx)
+
+    expect(receipt).not.to.null
+
+    const keys = ['blockHash', 'blockNumber', 'contractAddress', 'feePayer', 'feePayerSignatures', 'from', 'gas', 'gasPrice', 'gasUsed', 'logs', 'logsBloom', 'nonce', 'senderTxHash', 'signatures', 'status', 'to', 'transactionHash', 'transactionIndex', 'type', 'typeInt', 'value']
+    expect(Object.getOwnPropertyNames(receipt)).to.deep.equal(keys)
+
+    expect(receipt.status).to.equals(true)
+    expect(receipt.senderTxHash).not.to.equals(receipt.transactionHash)
   }).timeout(100000)
 })
