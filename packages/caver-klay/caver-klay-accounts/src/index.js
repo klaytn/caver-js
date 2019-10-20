@@ -927,11 +927,15 @@ Accounts.prototype.combineSignatures = function combineSignatures(rawTransaction
         // feePayer field can be '0x' when after sender signs to trasnaction.
         // For handling this, if feePayer is '0x', don't compare with other transaction
         if (key === 'feePayer') {
-          if (decodedTx[key] === '0x') {
-            decodedTx[key] = decodedTransaction[key]
-            feePayer = decodedTx[key]
-          } else if (decodedTransaction[key] === '0x') {
+          if (decodedTransaction[key] === '0x') {
             continue
+          } else {
+            // set feePayer variable with valid feePayer address(not '0x')
+            feePayer = decodedTransaction[key]
+            if (decodedTx[key] === '0x') {
+              // set feePayer field to decodedTx for comparing feePayer address with other transactions
+              decodedTx[key] = decodedTransaction[key]
+            }
           }
         }
 
@@ -948,13 +952,14 @@ Accounts.prototype.combineSignatures = function combineSignatures(rawTransaction
 
 
   const parsedTxObject = decodeFromRawTransaction(rawTransactions[0])
-  if (feePayer) parsedTxObject.feePayer = feePayer
-  
   parsedTxObject.signatures = senders
-  if (parsedTxObject.feePayer && parsedTxObject.feePayer !== '0x' && parsedTxObject.feePayerSignatures) {
-    parsedTxObject.feePayerSignatures = feePayers
-  }
 
+  if (feePayer) {
+    parsedTxObject.feePayer = feePayer
+    if (feePayers.length > 0) {
+      parsedTxObject.feePayerSignatures = feePayers
+    }
+  }
   return this.getRawTransactionWithSignatures(parsedTxObject)
 }
 

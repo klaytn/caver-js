@@ -1728,6 +1728,30 @@ describe('caver.klay.accounts.combineSignatures', () => {
       expect(decoded.feePayerSignatures.length).to.equals(3)
     }).timeout(200000)
   })
+
+  context('CAVERJS-UNIT-WALLET-386: input: RLP encoded raw transaction string(includes signatures of sender only)', () => {
+    it('should remove duplicated signatures return valid rawTransaction', async () => {
+      let signResult = await caver.klay.accounts.signTransaction(feeDelegatedTx)
+      let signResult2 = await caver.klay.accounts.signTransaction(feeDelegatedTx, sender.transactionKey[0])
+      let signResult3 = await caver.klay.accounts.signTransaction(feeDelegatedTx, sender.transactionKey[1])
+      let signResult4 = await caver.klay.accounts.signTransaction(feeDelegatedTx, sender.transactionKey[2])
+
+      let rawArray = [
+        signResult.rawTransaction,
+        signResult2.rawTransaction,
+        signResult3.rawTransaction,
+        signResult4.rawTransaction,
+      ]
+      let result = await caver.klay.accounts.combineSignatures(rawArray)
+
+      const keys = ['rawTransaction', 'txHash', 'senderTxHash', 'signatures']
+      expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+      expect(result.signatures.length).to.equals(3)
+
+      const decoded = caver.klay.decodeTransaction(result.rawTransaction)
+      expect(decoded.signatures.length).to.equals(3)
+    }).timeout(200000)
+  })
 })
 
 describe('caver.klay.accounts.recoverTransaction', () => {
