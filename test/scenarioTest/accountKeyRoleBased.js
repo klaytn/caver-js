@@ -610,14 +610,14 @@ describe('Scenario test with AccountWithAccountKeyRoleBased', () => {
 			let expectedError = 'invalid transaction v, r, s values of the sender'
 
 			try {
-				await caver.klay.sendSignedTransaction(feePayerSigned)
+				await caver.klay.sendSignedTransaction(senderSigned)
 			} catch (e) { expect(e.message).to.include(expectedError) }
 
 			// insufficient weight
 			senderSigned = await caver.klay.accounts.signTransaction(txObject, account.transactionKey[0])
 
 			try {
-				await caver.klay.sendSignedTransaction(feePayerSigned)
+				await caver.klay.sendSignedTransaction(senderSigned)
 			} catch (e) { expect(e.message).to.include(expectedError) }
 
 			txObject = {
@@ -630,14 +630,14 @@ describe('Scenario test with AccountWithAccountKeyRoleBased', () => {
 			senderSigned = await caver.klay.accounts.signTransaction(txObject, account.transactionKey)
 
 			try {
-				await caver.klay.sendSignedTransaction(feePayerSigned)
+				await caver.klay.sendSignedTransaction(senderSigned)
 			} catch (e) { expect(e.message).to.include(expectedError) }
 
 			// insufficient weight
 			senderSigned = await caver.klay.accounts.signTransaction(txObject, account.updateKey[0])
 
 			try {
-				await caver.klay.sendSignedTransaction(feePayerSigned)
+				await caver.klay.sendSignedTransaction(senderSigned)
 			} catch (e) { expect(e.message).to.include(expectedError) }
 
 			txObject = {

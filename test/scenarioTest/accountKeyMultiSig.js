@@ -598,7 +598,7 @@ describe('Scenario test with AccountWithAccountKeyMultiSig', () => {
 
 			const expectedError = 'invalid transaction v, r, s values of the sender'
 			try {
-				await caver.klay.sendSignedTransaction(feePayerSigned)
+				await caver.klay.sendSignedTransaction(senderSigned)
 			} catch (e) { expect(e.message).to.include(expectedError) }
 		}).timeout(200000)
 	})
