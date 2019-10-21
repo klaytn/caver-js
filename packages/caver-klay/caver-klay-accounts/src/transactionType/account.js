@@ -55,7 +55,7 @@ function rlpEncodeForAccountUpdate(transaction) {
 
 function rlpEncodeForFeeDelegatedAccountUpdate(transaction) {
   
-  if (transaction.feePayer) {
+  if (transaction.senderRawTransaction) {
     const typeDetacehdRawTransaction = '0x' + transaction.senderRawTransaction.slice(4)
 
     const [ nonce, gasPrice, gas, from, accountKey, [ [ v, r, s ] ] ] = utils.rlpDecode(typeDetacehdRawTransaction)
@@ -96,7 +96,7 @@ function rlpEncodeForFeeDelegatedAccountUpdate(transaction) {
 
 function rlpEncodeForFeeDelegatedAccountUpdateWithRatio(transaction) {
   
-  if (transaction.feePayer) {
+  if (transaction.senderRawTransaction) {
     const typeDetacehdRawTransaction = '0x' + transaction.senderRawTransaction.slice(4)
 
     const [ nonce, gasPrice, gas, from, accountKey, feeRatio, [ [ v, r, s ] ] ] = utils.rlpDecode(typeDetacehdRawTransaction)
@@ -138,6 +138,14 @@ function rlpEncodeForFeeDelegatedAccountUpdateWithRatio(transaction) {
 }
 
 function resolveRawKeyToAccountKey(transaction) {
+  // Handles the case where AccountForUpdate is set in key field in transaction object to update account.
+  if (transaction.key) {
+    if (transaction.from && transaction.from.toLowerCase() !== transaction.key.address.toLowerCase()) {
+      throw new Error(`The value of the from field of the transaction does not match the address of AccountForUpdate.`)
+    }
+    transaction.key.fillUpdateObject(transaction)
+  }
+
   if (!!transaction.legacyKey) return ACCOUNT_KEY_LEGACY_TAG
   if (!!transaction.failKey) return ACCOUNT_KEY_FAIL_TAG
   
@@ -167,17 +175,20 @@ function resolveRawKeyToAccountKey(transaction) {
   }
   
   if (transaction.roleTransactionKey || transaction.roleAccountUpdateKey || transaction.roleFeePayerKey) {
-    transaction.roleTransactionKey = transaction.roleTransactionKey
+    // Create a new object so as not to damage the input transaction object.
+    const roleBasedObject = {}
+
+    roleBasedObject.roleTransactionKey = transaction.roleTransactionKey
       ? resolveRawKeyToAccountKey(transaction.roleTransactionKey) 
       : ACCOUNT_KEY_NIL_TAG
-    transaction.roleAccountUpdateKey = transaction.roleAccountUpdateKey 
+    roleBasedObject.roleAccountUpdateKey = transaction.roleAccountUpdateKey 
       ? resolveRawKeyToAccountKey(transaction.roleAccountUpdateKey)
       : ACCOUNT_KEY_NIL_TAG
-    transaction.roleFeePayerKey = transaction.roleFeePayerKey 
+    roleBasedObject.roleFeePayerKey = transaction.roleFeePayerKey 
       ? resolveRawKeyToAccountKey(transaction.roleFeePayerKey) 
       : ACCOUNT_KEY_NIL_TAG
     
-    var keys = [transaction.roleTransactionKey, transaction.roleAccountUpdateKey, transaction.roleFeePayerKey]
+    var keys = [roleBasedObject.roleTransactionKey, roleBasedObject.roleAccountUpdateKey, roleBasedObject.roleFeePayerKey]
     return ACCOUNT_KEY_ROLE_BASED_TAG + RLP.encode(keys).slice(2)
   }
   

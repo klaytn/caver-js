@@ -29,20 +29,28 @@ var core = require('../../../caver-core');
 var Method = require('../../../caver-core-method');
 var Promise = require('any-promise');
 // account, hash, rlp, nat, bytes library will be used from 'eth-lib' temporarily.
-var Account = require("eth-lib/lib/account");
+var AccountLib = require("eth-lib/lib/account");
 var Hash = require("eth-lib/lib/hash");
 var RLP = require("eth-lib/lib/rlp");
 var Nat = require("eth-lib/lib/nat");
 var Bytes = require("eth-lib/lib/bytes");
 var cryp = (typeof global === 'undefined') ? require('crypto-browserify') : require('crypto');
-var scryptsy = require('scrypt.js');
+var scrypt = require('./scrypt');
 var uuid = require('uuid');
 var utils = require('../../../caver-utils');
 var helpers = require('../../../caver-core-helpers');
-const { encodeRLPByTxType, makeRawTransaction, getSenderTxHash } = require('./makeRawTransaction')
+const { encodeRLPByTxType, makeRawTransaction, getSenderTxHash, decodeFromRawTransaction, splitFeePayer, extractSignatures } = require('./makeRawTransaction')
 
 var elliptic = require('elliptic')
 var secp256k1 = new (elliptic.ec)('secp256k1')
+
+const AccountKeyPublic = require('./accountKey/accountKeyPublic')
+const AccountKeyMultiSig = require('./accountKey/accountKeyMultiSig')
+const AccountKeyRoleBased = require('./accountKey/accountKeyRoleBased')
+const AccountKeyEnum = require('./accountKey/accountKeyEnum').AccountKeyEnum
+
+const Account = require('./account/account')
+const AccountForUpdate = require('./account/accountForUpdate')
 
 const rpc = require('../../../caver-rtm').rpc
 
@@ -52,10 +60,90 @@ var isNot = function(value) {
 
 function coverInitialTxValue(tx) {
   if (typeof tx !== 'object') throw ('Invalid transaction')
-  tx.to = tx.to || '0x'
-  tx.data = tx.data || '0x'
+  if (!tx.senderRawTransaction && (!tx.type || tx.type === 'LEGACY' || tx.type.includes('SMART_CONTRACT_DEPLOY'))) {
+    tx.to = tx.to || '0x'
+    tx.data = utils.addHexPrefix(tx.data || '0x')
+  }
   tx.chainId = utils.numberToHex(tx.chainId)
   return tx
+}
+
+/**
+ * resolveArgsForSignTransaction parse arguments for signTransaction.
+ *
+ * @method resolveArgsForSignTransaction
+ * @param {Object} args Parameters of signTransaction.
+ * @return {Object}
+ */
+function resolveArgsForSignTransaction(args) {
+  if (args.length === 0 || args.length > 3) throw new Error('Invalid parameter: The number of parameters is invalid.')
+  
+  // privateKey and callback are optional parameter
+  // "args.length === 2" means that user sent parameter privateKey or callback
+  let tx = args[0], privateKey, callback
+
+  if (!tx || (!_.isObject(tx) && !_.isString(tx))) {
+    throw new Error('Invalid parameter: The transaction must be defined as an object or RLP encoded string')
+  }
+
+  if (args.length === 2) {
+    if (_.isFunction(args[1])) {
+      callback = args[1]
+    } else {
+      privateKey = args[1]
+    }
+  } else if (args.length === 3) {
+    if (args[1] && typeof args[1] !== 'string' && !_.isArray(args[1])){
+      return handleError('Invalid parameter: The parameter for the private key is invalid')
+    }
+    privateKey = args[1]
+    callback = args[2]
+  }
+
+  // For handling when callback is undefined.
+  callback = callback || function () {}
+
+  return { tx, privateKey, callback }
+}
+
+/**
+ * resolveArgsForFeePayerSignTransaction parse arguments for feePayerSignTransaction.
+ *
+ * @method resolveArgsForFeePayerSignTransaction
+ * @param {Object} args Parameters of feePayerSignTransaction.
+ * @return {Object}
+ */
+function resolveArgsForFeePayerSignTransaction(args) {
+  if (args.length === 0 || args.length > 4) throw new Error('Invalid parameter: The number of parameters is invalid.')
+  
+  // privateKey and callback are optional parameter
+  // "args.length === 3" means that user sent parameter privateKey or callback
+  let tx = args[0], feePayer = args[1], privateKey, callback
+
+  if (!tx || (!_.isObject(tx) && !_.isString(tx))) {
+    throw new Error('Invalid parameter: The transaction must be defined as an object or RLP encoded string')
+  }
+
+  if (!utils.isAddress(feePayer)) throw new Error(`Invalid fee payer address : ${feePayer}`)
+
+  if (args.length === 3) {
+    if (_.isFunction(args[2])) {
+      callback = args[2]
+    } else {
+      privateKey = args[2]
+    }
+  } else if (args.length === 4) {
+    if (args[2] && typeof args[2] !== 'string' && !_.isArray(args[2])){
+      return handleError('Invalid parameter: The parameter for the private key is invalid')
+    }
+    privateKey = args[2]
+    callback = args[3]
+  }
+
+  // For handling when callback is undefined.
+  callback = callback || function () {}
+
+  return { tx, privateKey, feePayer, callback }
 }
 
 var Accounts = function Accounts(...args) {
@@ -94,7 +182,7 @@ Accounts.prototype._addAccountFunctions = function (account) {
 
     account.encrypt = function encrypt(password, options = {}) {
         options.address = account.address
-        return _this.encrypt(account.privateKey, password, options);
+        return _this.encrypt(account.keys, password, options);
     };
 
     account.getKlaytnWalletKey = function getKlaytnWalletKey() {
@@ -105,75 +193,455 @@ Accounts.prototype._addAccountFunctions = function (account) {
     return account;
 };
 
-Accounts.prototype.create = function create(entropy) {
-    return this._addAccountFunctions(Account.create(entropy || utils.randomHex(32)));
-};
 
-Accounts.prototype.privateKeyToAccount = function privateKeyToAccount(privateKey, targetAddressRaw) {
-  var { privateKey: prvKey, address, isHumanReadable } = utils.parsePrivateKey(privateKey)
-
-  if (!utils.isValidPrivateKey(prvKey)) throw new Error('Invalid private key')
-
-  if (prvKey.slice(0, 2) !== '0x') {
-    prvKey = `0x${prvKey}`
-  }
-
-  let account = Account.fromPrivate(prvKey)
-
-  if (targetAddressRaw) {
-    if(address && address !== targetAddressRaw) {
+/**
+ * _determineAddress determines the priority of the parameters entered and returns the address that should be used for the account.
+ *
+ * @method _determineAddress
+ * @param {Object} legacyAccount Account with a legacy account key extracted from private key to be used for address determination.
+ * @param {String} addressFromKey Address extracted from key.
+ * @param {String} userInputAddress Address passed as parameter by user.
+ * @return {String}
+ */
+Accounts.prototype._determineAddress = function _determineAddress(legacyAccount, addressFromKey, userInputAddress) {
+  if (userInputAddress) {
+    if(addressFromKey && addressFromKey !== userInputAddress) {
       throw new Error('The address extracted from the private key does not match the address received as the input value.')
     }
 
-    if(!utils.isAddress(targetAddressRaw)) {
+    if(!utils.isAddress(userInputAddress)) {
       throw new Error('The address received as the input value is invalid.')
     }
-    account.address = targetAddressRaw
+    return userInputAddress
 
-  } else if (address){
-    if(!utils.isAddress(address)) {
+  } else if (addressFromKey){
+    if(!utils.isAddress(addressFromKey)) {
       throw new Error('The address extracted from the private key is invalid.')
     }
-    // If targetAddressRaw is undefined and address which is came from private is existed, set address in account.
-    account.address = address
+    // If userInputAddress is undefined and address which is came from private is existed, set address in account.
+    return addressFromKey
+  }
+  return legacyAccount.address
+}
+
+/**
+ * _getRoleKey returns a key that matches the role that should be used according to the transaction.
+ *
+ * @method _getRoleKey
+ * @param {Object} tx transaction object to be sign.
+ * @param {Object} account Account to be used for signing.
+ * @return {String|Array}
+ */
+Accounts.prototype._getRoleKey = function _getRoleKey(tx, account) {
+  let key
+
+  if (!account) throw new Error(`The account to be used for signing is not defined.`)
+
+  if (tx.senderRawTransaction && tx.feePayer) {
+    key = account.feePayerKey
+  } else if (tx.type && tx.type.includes('ACCOUNT_UPDATE')) {
+    key = account.updateKey
+  } else {
+    key = account.transactionKey
   }
 
-  account.address = account.address.toLowerCase()
-  account.address = '0x' + account.address.replace('0x', '')
+  if (!key) throw new Error(`The key corresponding to the role used for signing is not defined.`)
 
+  return key
+}
+
+/**
+ * create function creates random account with entropy.
+ *
+ * @method create
+ * @param {Object} entropy A random string to increase entropy.
+ * @return {Object}
+ */
+Accounts.prototype.create = function create(entropy) {
+    return this._addAccountFunctions(Account.fromObject(AccountLib.create(entropy || utils.randomHex(32))));
+};
+
+/**
+ * createAccountKey creates AccountKeyPublic, AccountKeyMultiSig or AccountKeyRoleBased instance with parameter.
+ *
+ * @method createAccountKey
+ * @param {String|Array|Object} accountKey Parameters to be used when creating the AccountKey.
+ * @return {Object}
+ */
+Accounts.prototype.createAccountKey = function createAccountKey(accountKey) {
+  if (Account.isAccountKey(accountKey)) accountKey = accountKey.keys
+  
+  if (_.isString(accountKey)) {
+    accountKey = this.createAccountKeyPublic(accountKey)
+  } else if (_.isArray(accountKey)) {
+    accountKey = this.createAccountKeyMultiSig(accountKey)
+  } else if (_.isObject(accountKey)) {
+    accountKey = this.createAccountKeyRoleBased(accountKey)
+  } else {
+    throw new Error(`Invalid accountKey type: ${typeof accountKey}`)
+  }
+  return accountKey
+}
+
+/**
+ * createAccountKeyPublic creates AccountKeyPublic with a string of private key.
+ *
+ * @method createAccountKeyPublic
+ * @param {String} privateKey Private key string that will be used to create AccountKeyPublic.
+ * @return {Object}
+ */
+Accounts.prototype.createAccountKeyPublic = function createAccountKeyPublic(privateKey) { 
+  if (privateKey instanceof AccountKeyPublic) return privateKey
+
+  if (!_.isString(privateKey)) throw new Error('Creating a AccountKeyPublic requires a private key string.')
+  
+  const parsed = utils.parsePrivateKey(privateKey)
+  privateKey = parsed.privateKey
+
+  if (!utils.isValidPrivateKey(privateKey)) throw new Error(`Failed to create AccountKeyPublic. Invalid private key : ${privateKey}`)
+
+  return new AccountKeyPublic(privateKey)
+}
+
+/**
+ * createAccountKeyMultiSig creates AccountKeyMultiSig with an array of private keys.
+ *
+ * @method createAccountKeyMultiSig
+ * @param {Array} privateKeys An Array of private key strings that will be used to create AccountKeyMultiSig.
+ * @return {Object}
+ */
+Accounts.prototype.createAccountKeyMultiSig = function createAccountKeyMultiSig(privateKeys) {
+  if (privateKeys instanceof AccountKeyMultiSig) return privateKeys
+
+  if (!_.isArray(privateKeys)) throw new Error('Creating a AccountKeyMultiSig requires an array of private key string.')
+
+  for (let p of privateKeys) {
+    const parsed = utils.parsePrivateKey(p)
+    p = parsed.privateKey
+    if (!utils.isValidPrivateKey(p)) throw new Error(`Failed to create AccountKeyMultiSig. Invalid private key : ${p}`)
+  }
+
+  return new AccountKeyMultiSig(privateKeys)
+}
+
+/**
+ * createAccountKeyRoleBased creates AccountKeyRoleBased with an obejct of key.
+ *
+ * @method createAccountKeyRoleBased
+ * @param {Object} keyObject Object that defines key for each role to use when creating AccountKeyRoleBased.
+ * @return {Object}
+ */
+Accounts.prototype.createAccountKeyRoleBased = function createAccountKeyRoleBased(keyObject) {
+  if (keyObject instanceof AccountKeyRoleBased) return keyObject
+
+  if (!_.isObject(keyObject) || _.isArray(keyObject)) throw new Error('Creating a AccountKeyRoleBased requires an object.')
+
+  return new AccountKeyRoleBased(keyObject)
+}
+
+/**
+ * accountKeyToPublicKey creates public key format with AccountKey.
+ *
+ * @method accountKeyToPublicKey
+ * @param {Object} accountKey AccountKey instance for which you want to generate a public key format.
+ * @return {String|Array|Object}
+ */
+Accounts.prototype.accountKeyToPublicKey = function accountKeyToPublicKey(accountKey) {
+  accountKey = this.createAccountKey(accountKey)
+  return accountKey.toPublicKey(this.privateKeyToPublicKey)
+}
+
+/**
+ * createWithAccountKey creates Account instance with AccountKey.
+ *
+ * @method createWithAccountKey
+ * @param {String} address The address of account.
+ * @param {String|Array|Object} accountKey The accountKey of account.
+ * @return {Object}
+ */
+Accounts.prototype.createWithAccountKey = function createWithAccountKey(address, accountKey) {
+  const account = new Account(address, this.createAccountKey(accountKey))
   return this._addAccountFunctions(account)
 }
 
-Accounts.prototype.signTransaction = function signTransaction(tx, privateKey, callback) {
-    var _this = this,
-        error = false,
-        result
+/**
+ * createWithAccountKeyPublic create an account with AccountKeyPublic.
+ *
+ * @method createWithAccountKeyPublic
+ * @param {String} address An address of account.
+ * @param {String|Object} key Key of account.
+ * @return {Object}
+ */
+Accounts.prototype.createWithAccountKeyPublic = function createWithAccountKeyPublic(address, key) {
+  if (!Account.isAccountKey(key)) key = this.createAccountKeyPublic(key)
 
-    callback = callback || function () {}
+  if (key.type !== AccountKeyEnum.ACCOUNT_KEY_PUBLIC) throw new Error(`Failed to create account with AccountKeyPublic. Invalid account key : ${key.type}`)
 
-    const parsed = utils.parsePrivateKey(privateKey)
-    privateKey = parsed.privateKey
+  const account = new Account(address, key)
+  return this._addAccountFunctions(account)
+}
 
-    if (!utils.isValidPrivateKey(privateKey)) throw new Error('Invalid private key')
-    privateKey = privateKey.startsWith('0x') ? privateKey : '0x' + privateKey
+/**
+ * createWithAccountKeyMultiSig create an account with AccountKeyMultiSig.
+ *
+ * @method createWithAccountKeyMultiSig
+ * @param {String} address An address of account.
+ * @param {String|Object} keys Key of account.
+ * @return {Object}
+ */
+Accounts.prototype.createWithAccountKeyMultiSig = function createWithAccountKeyMultiSig(address, keys) { 
+  if (!Account.isAccountKey(keys)) keys = this.createAccountKeyMultiSig(keys)
 
-    if (!tx) {
-      error = new Error('No transaction object given!')
+  if (keys.type !== AccountKeyEnum.ACCOUNT_KEY_MULTISIG) throw new Error(`Failed to create account with AccountKeyMultiSig. Invalid account key : ${keys.type}`)
 
-      callback(error)
-      return Promise.reject(error)
+  const account = new Account(address, keys)
+  return this._addAccountFunctions(account)
+}
+
+/**
+ * createWithAccountKeyRoleBased create an account with AccountKeyRoleBased.
+ *
+ * @method createWithAccountKeyRoleBased
+ * @param {String} address An address of account.
+ * @param {String|Object} keyObject Key of account.
+ * @return {Object}
+ */
+Accounts.prototype.createWithAccountKeyRoleBased = function createWithAccountKeyRoleBased(address, keyObject) {
+  if (!Account.isAccountKey(keyObject)) keyObject = this.createAccountKeyRoleBased(keyObject)
+
+  if (keyObject.type !== AccountKeyEnum.ACCOUNT_KEY_ROLEBASED) throw new Error(`Failed to create account with AccountKeyRoleBased. Invalid account key : ${keyObject.type}`)
+
+  const account = new Account(address, keyObject)
+  return this._addAccountFunctions(account)
+}
+
+/**
+ * privateKeyToAccount creates and returns an Account through the input passed as parameters.
+ *
+ * @method privateKeyToAccount
+ * @param {String} key The key parameter can be either normal private key or KlaytnWalletKey format.
+ * @param {String} userInputAddress The address entered by the user for use in creating an account.
+ * @return {Object}
+ */
+Accounts.prototype.privateKeyToAccount = function privateKeyToAccount(key, userInputAddress) {
+  let {legacyAccount: account, klaytnWalletKeyAddress} = this.getLegacyAccount(key)
+
+  account.address = this._determineAddress(account, klaytnWalletKeyAddress, userInputAddress)
+  account.address = account.address.toLowerCase()
+  account.address = utils.addHexPrefix(account.address)
+
+  return account
+}
+
+
+/**
+ * createAccountForUpdate creates an AccountForUpdate instance.
+ * The AccountForUpdate returned as a result of this function contains only the address and public key used to update the account.
+ *
+ * @method createAccountForUpdate
+ * @param {String} address The address value of AccountForUpdate, a structure that contains data for updating an account.
+ * @param {String|Array|Object} accountKey Private key or AccountKey to update account.
+ * @param {Object} options Options to use for setting threshold and weight for multiSig.
+ * @return {Object}
+ */
+Accounts.prototype.createAccountForUpdate = function createAccountForUpdate(address, accountKey, options) {
+  let legacyOrFail
+
+  // Logic for handling cases where legacyKey or failKey is set inside AccountKeyRoleBased object.
+  if (!_.isArray(accountKey) && _.isObject(accountKey)) {
+    legacyOrFail = {}
+    Object.keys(accountKey).map((role) => {
+      if (accountKey[role] === 'legacyKey' || accountKey[role] === 'failKey') {
+        legacyOrFail[role] = accountKey[role]
+        delete accountKey[role]
+      }
+    })
+    if (Object.keys(accountKey).length === 0) return new AccountForUpdate(address, legacyOrFail, options)
+  }
+
+  const publicKey = this.accountKeyToPublicKey(accountKey)
+
+  if (legacyOrFail !== undefined) {
+    Object.assign(publicKey, legacyOrFail)
+  }
+
+  return new AccountForUpdate(address, publicKey, options)
+}
+
+/**
+ * createAccountForUpdateWithPublicKey creates AccountForUpdate instance with public key format.
+ *
+ * @method createAccountForUpdateWithPublicKey
+ * @param {String} address The address value of AccountForUpdate, a structure that contains data for updating an account.
+ * @param {String|Array|Object} keyForUpdate Public key to update.
+ * @param {Object} options Options to use for setting threshold and weight for multiSig.
+ * @return {Object}
+ */
+Accounts.prototype.createAccountForUpdateWithPublicKey = function createAccountForUpdateWithPublicKey(address, keyForUpdate, options) {
+  return new AccountForUpdate(address, keyForUpdate, options)
+}
+
+/**
+ * createAccountForUpdateWithLegacyKey creates AccountForUpdate instance with legacyKey.
+ *
+ * @method createAccountForUpdateWithLegacyKey
+ * @param {String} address The address of account to update with the legacy key.
+ * @return {Object}
+ */
+Accounts.prototype.createAccountForUpdateWithLegacyKey = function createAccountForUpdateWithLegacyKey(address) {
+  return new AccountForUpdate(address, 'legacyKey')
+}
+
+/**
+ * createAccountForUpdateWithFailKey creates AccountForUpdate instance with failKey.
+ *
+ * @method createAccountForUpdateWithFailKey
+ * @param {String} address The address of account to update with the fail key.
+ * @return {Object}
+ */
+Accounts.prototype.createAccountForUpdateWithFailKey = function createAccountForUpdateWithFailKey(address) {
+  return new AccountForUpdate(address, 'failKey')
+}
+
+/**
+ * isDecoupled determines whether or not it is decoupled based on the input value.
+ *
+ * @method isDecoupled
+ * @param {String} key The key parameter can be either normal private key or KlaytnWalletKey format.
+ * @param {String} userInputAddress The address to use when determining whether it is decoupled.
+ * @return {Boolean}
+ */
+Accounts.prototype.isDecoupled = function isDecoupled(key, userInputAddress) {
+  let { legacyAccount, klaytnWalletKeyAddress } = this.getLegacyAccount(key)
+  let actualAddress = this._determineAddress(legacyAccount, klaytnWalletKeyAddress, userInputAddress)
+
+  return legacyAccount.address.toLowerCase() !== actualAddress.toLowerCase()
+}
+
+/**
+ * getLegacyAccount extracts the private key from the input key and returns an account with the corresponding legacy account key.
+ * If the input key is KlaytnWalletKey format, it returns klaytnWalletKeyAddress, which is the address extracted from KlaytnWalletKey.
+ *
+ * @method getLegacyAccount
+ * @param {String} key The key parameter can be either normal private key or KlaytnWalletKey format.
+ * @return {Object}
+ */
+Accounts.prototype.getLegacyAccount = function getLegacyAccount(key) {
+  var { privateKey, address: klaytnWalletKeyAddress, isHumanReadable } = utils.parsePrivateKey(key)
+
+  if (!utils.isValidPrivateKey(privateKey)) throw new Error('Invalid private key')
+
+  privateKey = utils.addHexPrefix(privateKey)
+
+  const account = this._addAccountFunctions(Account.fromObject(AccountLib.fromPrivate(privateKey)))
+
+  return { legacyAccount: account, klaytnWalletKeyAddress }
+}
+
+/**
+ * signTransaction signs to transaction with private key.
+ * If there are signatures(feePayerSignatures if the fee payer signs) in tx entered as a parameter, 
+ * the signatures(feePayerSignatures if the fee payer signs) are appended.
+ *
+ * @method signTransaction
+ * @param {String|Object} tx The transaction to sign.
+ * @param {String|Array} privateKey The private key to use for signing.
+ * @param {String} callback The callback function to call.
+ * @return {Object}
+ */
+Accounts.prototype.signTransaction = function signTransaction() {
+    let _this = this
+    let isLegacy = false, isFeePayer = false
+    let existedSenderSignatures = [], existedFeePayerSignatures = []
+    let result, tx, privateKey, callback
+
+    let handleError = (e) => {
+      e = e instanceof Error? e : new Error(e)
+      if (callback) callback(e)
+      return Promise.reject(e)
+    }
+
+    try {
+      let resolved = resolveArgsForSignTransaction(arguments)
+      tx = resolved.tx
+      privateKey = resolved.privateKey
+      callback = resolved.callback
+    } catch(e) { return handleError(e) }
+
+    // If the user signs an RLP encoded transaction, tx is of type string.
+    if (_.isString(tx)) {
+      tx = decodeFromRawTransaction(tx)
+    }
+
+    // Validate tx object
+    const error = helpers.validateFunction.validateParams(tx)
+    if (error) return handleError(error)
+
+    if (tx.senderRawTransaction) {
+      if (tx.feePayerSignatures) {
+        existedFeePayerSignatures = existedFeePayerSignatures.concat(tx.feePayerSignatures)
+      }
+
+      try {
+        // Decode senderRawTransaction to get signatures of fee payer
+        const { senderRawTransaction, feePayer, feePayerSignatures } = splitFeePayer(tx.senderRawTransaction)
+
+        // feePayer !== '0x' means that in senderRawTransaction there are feePayerSignatures
+        if (feePayer !== '0x') {
+          // The feePayer inside the tx object does not match the feePayer information contained in the senderRawTransaction.
+          if (feePayer.toLowerCase() !== tx.feePayer.toLowerCase()) return handleError(`Invalid feePayer: The fee payer(${feePayer}) included in the transaction does not match the fee payer(${tx.feePayer}) you want to sign.`)
+          existedFeePayerSignatures = existedFeePayerSignatures.concat(feePayerSignatures)
+        }
+
+        tx.senderRawTransaction = senderRawTransaction
+        isFeePayer = true
+      } catch(e) {
+        return handleError(e)
+      }
+      
+    } else {
+      isLegacy = tx.type === undefined || tx.type === 'LEGACY' ? true : false
+
+      if (tx.signatures) {
+        // if there is existed signatures or feePayerSignatures, those should be preserved.
+        if (isLegacy) return handleError('Legacy transaction cannot be signed with multiple keys.')
+        existedSenderSignatures = existedSenderSignatures.concat(tx.signatures)
+      }
+      
+    }
+
+    // When privateKey is undefined, find Account from Wallet.
+    if (privateKey === undefined) {
+      try {
+        const account = this.wallet.getAccount(isFeePayer? tx.feePayer : tx.from)
+        if (!account) return handleError('Failed to find get private key to sign. The account you want to use for signing must exist in caver.klay.accounts.wallet or you must pass the private key as a parameter.')
+        privateKey = this._getRoleKey(tx, account)
+      } catch(e) {
+        return handleError(e)
+      }
+    }
+
+    let privateKeys = _.isArray(privateKey) ? privateKey : [privateKey]
+
+    try {
+      for (let i = 0; i < privateKeys.length; i ++) {
+        const parsed = utils.parsePrivateKey(privateKeys[i])
+        privateKeys[i] = parsed.privateKey
+        privateKeys[i] = utils.addHexPrefix(privateKeys[i])
+
+        if (!utils.isValidPrivateKey(privateKeys[i])) return handleError('Invalid private key')
+      }
+    } catch(e) {
+      return handleError(e)
+    }
+
+    // Attempting to sign with a decoupled account into a legacy type transaction should be rejected.
+    if (isLegacy) {
+      if (privateKeys.length > 1) return handleError('Legacy transaction cannot signed with multiple keys')
+      if (_this.isDecoupled(privateKeys[0], tx.from)) return handleError('A legacy transaction must be with a legacy account key')
     }
 
     function signed(tx) {
-
-      if (!tx.senderRawTransaction) {
-        error = helpers.validateFunction.validateParams(tx)
-      }
-      if (error) {
-        callback(error);
-        return Promise.reject(error);
-      }
-
       try {
         // Guarantee all property in transaction is hex.
         tx = helpers.formatters.inputCallFormatter(tx)
@@ -184,19 +652,30 @@ Accounts.prototype.signTransaction = function signTransaction(tx, privateKey, ca
 
         const messageHash = Hash.keccak256(rlpEncoded)
 
-        const signature = Account.makeSigner(Nat.toNumber(transaction.chainId || "0x1") * 2 + 35)(messageHash, privateKey)
-        const [v, r, s] = Account.decodeSignature(signature).map(sig => utils.makeEven(utils.trimLeadingZero(sig)))
+        let sigs = isFeePayer? existedFeePayerSignatures : existedSenderSignatures
 
-        const rawTransaction = makeRawTransaction(rlpEncoded, [v, r, s], transaction)
+        for(const privateKey of privateKeys) {
+          const signature = AccountLib.makeSigner(Nat.toNumber(transaction.chainId || "0x1") * 2 + 35)(messageHash, privateKey)
+          const [v, r, s] = AccountLib.decodeSignature(signature).map(sig => utils.makeEven(utils.trimLeadingZero(sig)))
+          sigs.push([v, r, s])
+        }
+        // makeRawTransaction will return signatures and feePayerSignatures with duplicates removed.
+        let { rawTransaction, signatures, feePayerSignatures } = makeRawTransaction(rlpEncoded, sigs, transaction)
 
         result = {
             messageHash: messageHash,
-            v: v,
-            r: r,
-            s: s,
+            v: sigs[0][0],
+            r: sigs[0][1],
+            s: sigs[0][2],
             rawTransaction: rawTransaction,
             txHash: Hash.keccak256(rawTransaction),
             senderTxHash: getSenderTxHash(rawTransaction),
+        }
+
+        if (isFeePayer) {
+          result.feePayerSignatures = feePayerSignatures
+        } else {
+          result.signatures = signatures
         }
 
       } catch(e) {
@@ -213,7 +692,7 @@ Accounts.prototype.signTransaction = function signTransaction(tx, privateKey, ca
     }
 
     // When the feePayer signs a transaction, required information is only chainId.
-    if (tx.senderRawTransaction !== undefined) {
+    if (isFeePayer) {
       return Promise.all([
           isNot(tx.chainId) ? _this._klaytnCall.getChainId() : tx.chainId,
       ]).then(function (args) {
@@ -221,51 +700,143 @@ Accounts.prototype.signTransaction = function signTransaction(tx, privateKey, ca
               throw new Error('"chainId" couldn\'t be fetched: '+ JSON.stringify(args));
           }
           return signed(_.extend(tx, {chainId: args[0]}));
-      });
+      })
     }
 
     // Otherwise, get the missing info from the Klaytn Node
     return Promise.all([
         isNot(tx.chainId) ? _this._klaytnCall.getChainId() : tx.chainId,
         isNot(tx.gasPrice) ? _this._klaytnCall.getGasPrice() : tx.gasPrice,
-        isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from || _this.privateKeyToAccount(privateKey).address) : tx.nonce 
+        isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from) : tx.nonce 
     ]).then(function (args) {
         if (isNot(args[0]) || isNot(args[1]) || isNot(args[2])) {
             throw new Error('One of the values "chainId", "gasPrice", or "nonce" couldn\'t be fetched: '+ JSON.stringify(args));
         }
         return signed(_.extend(tx, {chainId: args[0], gasPrice: args[1], nonce: args[2]}));
-    });
-};
+    })
+}
 
-Accounts.prototype.signTransactionWithSignature = function signTransactionWithSignature(tx, callback) {
+/**
+* feePayerSignTransaction calls signTransaction, creating a format for feePayer to sign the transaction.
+* If there are feePayerSignatures in tx entered as a parameter, the signatures for fee payer are appended.
+*
+* @method feePayerSignTransaction
+* @param {Object|String} tx The transaction to sign.
+* @param {String} feePayer The address of fee payer.
+* @param {String|Array} privateKey The private key to use for signing.
+* @param {Function} callback The callback function to call.
+* @return {Object}
+*/
+Accounts.prototype.feePayerSignTransaction = function feePayerSignTransaction() {
+    let _this = this
+    let tx, feePayer, privateKey, callback
+
+    let handleError = (e) => {
+      e = e instanceof Error? e : new Error(e)
+      if (callback) callback(e)
+      return Promise.reject(e)
+    }
+
+    try {
+      let resolved = resolveArgsForFeePayerSignTransaction(arguments)
+      tx = resolved.tx
+      feePayer = resolved.feePayer
+      privateKey = resolved.privateKey
+      callback = resolved.callback
+    } catch(e) {
+      return handleError(e)
+    }
+
+    if (_.isString(tx)) {
+      return this.signTransaction({ senderRawTransaction: tx, feePayer }, privateKey, callback)
+    }
+
+    if (!tx.feePayer || tx.feePayer === '0x') { tx.feePayer = feePayer }
+
+    if (!tx.senderRawTransaction) {
+      if (!tx.type || !tx.type.includes('FEE_DELEGATED')) {
+        return handleError(`Failed to sign transaction with fee payer: invalid transaction type(${tx.type? tx.type: 'LEGACY'})`)
+      }
+    }
+
+    let e = helpers.validateFunction.validateParams(tx)
+    if (e) {
+      return handleError(e)
+    }
+
+    if (tx.feePayer.toLowerCase() !== feePayer.toLowerCase()) {
+      return handleError(`Invalid parameter: The address of fee payer does not match.`)
+    }
+
+    if (tx.senderRawTransaction) {
+      return this.signTransaction(tx, privateKey, callback)
+    }
+
+    return Promise.all([
+      isNot(tx.chainId) ? _this._klaytnCall.getChainId() : tx.chainId,
+      isNot(tx.gasPrice) ? _this._klaytnCall.getGasPrice() : tx.gasPrice,
+      isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from) : tx.nonce 
+    ]).then(function (args) {
+        if (isNot(args[0]) || isNot(args[1]) || isNot(args[2])) {
+            throw new Error('One of the values "chainId", "gasPrice", or "nonce" couldn\'t be fetched: '+ JSON.stringify(args));
+        }
+        let transaction = _.extend(tx, {chainId: args[0], gasPrice: args[1], nonce: args[2]})
+
+        transaction = helpers.formatters.inputCallFormatter(transaction)
+        transaction = coverInitialTxValue(transaction)
+
+        const rlpEncoded = encodeRLPByTxType(transaction)
+        let sig = transaction.signatures? transaction.signatures : [['0x01', '0x', '0x']]
+        let { rawTransaction } = makeRawTransaction(rlpEncoded, sig, transaction)
+
+        return _this.signTransaction({ senderRawTransaction: rawTransaction, feePayer }, privateKey, callback)
+    })
+}
+
+/**
+ * getRawTransactionWithSignatures returns object which contains rawTransaction.
+ *
+ * @method getRawTransactionWithSignatures
+ * @param {Object} tx The transaction object which contains signatures or feePayerSignatures.
+ * @param {Function} callback The callback function to call.
+ * @return {Object}
+ */
+Accounts.prototype.getRawTransactionWithSignatures = function getRawTransactionWithSignatures(tx, callback) {
     var _this = this,
-        error = false,
         result
 
     callback = callback || function () {}
 
-    if (!tx) {
-      error = new Error('No transaction object given!')
-
-      callback(error)
-      return Promise.reject(error)
+    let handleError = (e) => {
+      e = e instanceof Error? e : new Error(e)
+      if (callback) callback(e)
+      return Promise.reject(e)
     }
 
-    if (!tx.signature) {
-      error = new Error('No tx signature given!')
+    if (!tx || !_.isObject(tx)) return handleError('Invalid parameter: The transaction must be defined as an object')
+    if (!tx.signatures && !tx.feePayerSignatures) return handleError('There are no signatures or feePayerSignatures defined in the transaction object.')
 
-      callback(error)
-      return Promise.reject(error)
+    let error = helpers.validateFunction.validateParams(tx)
+    if (error) return handleError(error)
+
+    if (tx.senderRawTransaction) {
+      tx.feePayerSignatures = tx.feePayerSignatures || [['0x01', '0x', '0x']]
+
+      const decoded = decodeFromRawTransaction(tx.senderRawTransaction)
+      // feePayer !== '0x' means that in senderRawTransaction there are feePayerSignatures
+      if (decoded.feePayer !== '0x' && !utils.isEmptySig(decoded.feePayerSignatures)) {
+        if (decoded.feePayer.toLowerCase() !== tx.feePayer.toLowerCase()) return handleError('Invalid feePayer')
+        tx.feePayerSignatures = tx.feePayerSignatures.concat(decoded.feePayerSignatures)
+      }
+
+      decoded.feePayer = tx.feePayer
+      decoded.feePayerSignatures = tx.feePayerSignatures
+
+      if (tx.signatures) decoded.signatures = decoded.signatures.concat(tx.signatures)
+      tx = decoded
     }
 
     function signed(tx) {
-      if (!tx.senderRawTransaction) {
-        error = helpers.validateFunction.validateParams(tx)
-      }
-      if (error) {
-        callback(error)
-        return Promise.reject(error)
-      }
 
       try {
         // Guarantee all property in transaction is hex.
@@ -275,23 +846,24 @@ Accounts.prototype.signTransactionWithSignature = function signTransactionWithSi
 
         const rlpEncoded = encodeRLPByTxType(transaction)
 
-        const messageHash = Hash.keccak256(rlpEncoded)
+        let sigs = transaction.signatures? transaction.signatures : ['0x01', '0x', '0x']
 
-        let sig
-        if (_.isArray(transaction.signature)) {
-          sig = transaction.signature.map((_sig) => utils.resolveSignature(_sig))
-        } else {
-          sig = utils.resolveSignature(transaction.signature)
-        }
+        if (!_.isArray(sigs[0])) sigs = [sigs]
 
-        const rawTransaction = makeRawTransaction(rlpEncoded, sig, transaction)
+        const { rawTransaction, signatures, feePayerSignatures } = makeRawTransaction(rlpEncoded, sigs, transaction)
 
         result = {
-            messageHash: messageHash,
-            signature: sig,
-            rawTransaction: rawTransaction,
-            txHash: Hash.keccak256(rawTransaction),
-            senderTxHash: getSenderTxHash(rawTransaction),
+          rawTransaction: rawTransaction,
+          txHash: Hash.keccak256(rawTransaction),
+          senderTxHash: getSenderTxHash(rawTransaction),
+        }
+
+        if (signatures && !utils.isEmptySig(signatures)) {
+          result.signatures = signatures
+        }
+
+        if (feePayerSignatures && !utils.isEmptySig(feePayerSignatures)) {
+          result.feePayerSignatures = feePayerSignatures
         }
         
       } catch(e) {
@@ -307,12 +879,11 @@ Accounts.prototype.signTransactionWithSignature = function signTransactionWithSi
         return Promise.resolve(signed(tx));
     }
 
-
     // Otherwise, get the missing info from the Klaytn Node
     return Promise.all([
         isNot(tx.chainId) ? _this._klaytnCall.getChainId() : tx.chainId,
         isNot(tx.gasPrice) ? _this._klaytnCall.getGasPrice() : tx.gasPrice,
-        isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.feePayer || tx.from) : tx.nonce
+        isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from) : tx.nonce
     ]).then(function (args) {
         if (isNot(args[0]) || isNot(args[1]) || isNot(args[2])) {
             throw new Error('One of the values "chainId", "gasPrice", or "nonce" couldn\'t be fetched: '+ JSON.stringify(args));
@@ -320,6 +891,86 @@ Accounts.prototype.signTransactionWithSignature = function signTransactionWithSi
         return signed(_.extend(tx, {chainId: args[0], gasPrice: args[1], nonce: args[2]}));
     });
 };
+
+/**
+ * combineSignatures combines RLP encoded raw transaction strings.
+ * combineSignatures compares transaction before combining, and if values in field are not same, this throws error.
+ * The comparison allows that the address of the fee payer is '0x'(default value) for some transactions while the other transactions have a specific fee payer. This is for the use case that some transactions do not have the fee payer's information.
+ * In this case, feePayer field doesn't have to be compared with other transaction.
+ * 
+ * @method combineSignatures
+ * @param {Array} rawTransactions The array of raw transaction string to combine.
+ * @param {Function} callback The callback function to call.
+ * @return {Object}
+ */
+Accounts.prototype.combineSignatures = function combineSignatures(rawTransactions, callback) {
+  let decodedTx
+  let senders = []
+  let feePayers = []
+  let feePayer
+
+  callback = callback || function () {}
+
+  let handleError = (e) => {
+    e = e instanceof Error? e : new Error(e)
+    if (callback) callback(e)
+    return Promise.reject(e)
+  }
+
+  if (!_.isArray(rawTransactions)) return handleError(`The parameter of the combineSignatures function must be an array of RLP encoded transaction strings.`)
+  
+  for (const raw of rawTransactions) {
+    const { senderSignatures, feePayerSignatures, decodedTransaction } = extractSignatures(raw)
+
+    senders = senders.concat(senderSignatures)
+    feePayers = feePayers.concat(feePayerSignatures)
+    
+    if (decodedTx) {
+      let isSame = true
+      const keys = Object.keys(decodedTx)
+      for (const key of keys) {
+        if (key === 'v' || key === 'r' || key === 's' || key === 'signatures' || key === 'payerV' || key === 'payerR' || key === 'payerS' || key === 'feePayerSignatures') {
+          continue
+        }
+
+        // feePayer field can be '0x' when after sender signs to trasnaction.
+        // For handling this, if feePayer is '0x', don't compare with other transaction
+        if (key === 'feePayer') {
+          if (decodedTransaction[key] === '0x') {
+            continue
+          } else {
+            // set feePayer variable with valid feePayer address(not '0x')
+            feePayer = decodedTransaction[key]
+            if (decodedTx[key] === '0x') {
+              // set feePayer field to decodedTx for comparing feePayer address with other transactions
+              decodedTx[key] = decodedTransaction[key]
+            }
+          }
+        }
+
+        if (decodedTransaction[key] === undefined || decodedTx[key] !== decodedTransaction[key]) {
+          isSame = false
+          break
+        }
+      }
+      if (!isSame) return handleError(`Failed to combineSignatures: Signatures that sign to different transaction cannot be combined.`)
+    } else {
+      decodedTx = decodedTransaction
+    }
+  }
+
+
+  const parsedTxObject = decodeFromRawTransaction(rawTransactions[0])
+  parsedTxObject.signatures = senders
+
+  if (feePayer) {
+    parsedTxObject.feePayer = feePayer
+    if (feePayers.length > 0) {
+      parsedTxObject.feePayerSignatures = feePayers
+    }
+  }
+  return this.getRawTransactionWithSignatures(parsedTxObject, callback)
+}
 
 /**
  * cav.klay.accounts.recoverTransaction('0xf86180808401ef364594f0109fc8df283027b6285cc889f5aa624eac1f5580801ca031573280d608f75137e33fc14655f097867d691d5c4c44ebe5ae186070ac3d5ea0524410802cdc025034daefcdfa08e7d2ee3f0b9d9ae184b2001fe0aff07603d9');
@@ -340,13 +991,13 @@ Accounts.prototype.recoverTransaction = function recoverTransaction(rawTx) {
     })
     arr.unshift(values[6])
 
-    var signature = Account.encodeSignature(arr);
+    var signature = AccountLib.encodeSignature(arr);
     var recovery = Bytes.toNumber(values[6]);
     var extraData = recovery < 35 ? [] : [Bytes.fromNumber((recovery - 35) >> 1), "0x", "0x"];
     var signingData = values.slice(0,6).concat(extraData);
     var signingDataHex = RLP.encode(signingData);
 
-    return Account.recover(Hash.keccak256(signingDataHex), signature);
+    return AccountLib.recover(Hash.keccak256(signingDataHex), signature);
 };
 
 /**
@@ -392,8 +1043,8 @@ Accounts.prototype.sign = function sign(data, privateKey) {
   if (!utils.isValidPrivateKey(privateKey)) throw new Error('Invalid private key')
 
   const messageHash = this.hashMessage(data)
-  const signature = Account.sign(messageHash, privateKey)
-  const [v, r, s] = Account.decodeSignature(signature)
+  const signature = AccountLib.sign(messageHash, privateKey)
+  const [v, r, s] = AccountLib.decodeSignature(signature)
   return {
     message: data,
     messageHash,
@@ -416,7 +1067,7 @@ Accounts.prototype.recover = function recover(message, signature, preFixed) {
     if (_.isObject(message)) {
       return this.recover(
         message.messageHash,
-        Account.encodeSignature([message.v, message.r, message.s]),
+        AccountLib.encodeSignature([message.v, message.r, message.s]),
         true,
       )
     }
@@ -429,21 +1080,21 @@ Accounts.prototype.recover = function recover(message, signature, preFixed) {
         preFixed = args.slice(-1)[0];
         preFixed = _.isBoolean(preFixed) ? !!preFixed : false;
 
-        return this.recover(message, Account.encodeSignature(args.slice(1, 4)), preFixed); // v, r, s
+        return this.recover(message, AccountLib.encodeSignature(args.slice(1, 4)), preFixed); // v, r, s
     }
     /**
      * recover in Account module
      * const recover = (hash, signature) => {
      *   const vals = decodeSignature(signature);
      *   const vrs = { v: Bytes.toNumber(vals[0]), r: vals[1].slice(2), s: vals[2].slice(2) };
-     *   const ecPublicKey = secp256k1.recoverPubKey(new Buffer(hash.slice(2), "hex"), vrs, vrs.v < 2 ? vrs.v : 1 - vrs.v % 2); // because odd vals mean v=0... sadly that means v=0 means v=1... I hate that
-     *   const publicKey = "0x" + ecPublicKey.encode("hex", false).slice(2);
+     *   const ecPublicKey = secp256k1.recoverPubKey(Buffer.from(hash.slice(2), 'hex'), vrs, vrs.v < 2 ? vrs.v : 1 - vrs.v % 2); // because odd vals mean v=0... sadly that means v=0 means v=1... I hate that
+     *   const publicKey = "0x" + ecPublicKey.encode('hex', false).slice(2);
      *   const publicHash = keccak256(publicKey);
      *   const address = toChecksum("0x" + publicHash.slice(-40));
      *   return address;
      * };
      */
-    return Account.recover(message, signature);
+    return AccountLib.recover(message, signature);
 };
 
 // Taken from https://github.com/ethereumjs/ethereumjs-wallet
@@ -454,47 +1105,86 @@ Accounts.prototype.decrypt = function (v3Keystore, password, nonStrict) {
     
     var json = (_.isObject(v3Keystore)) ? v3Keystore : JSON.parse(nonStrict ? v3Keystore.toLowerCase() : v3Keystore);
 
-    if (json.version !== 3) {
-        console.warn('This is not a V3 wallet.')
+    if (json.version !== 3 && json.version !== 4) {
+        console.warn('This is not a V3 or V4 wallet.')
         // throw new Error('Not a valid V3 wallet');
     }
 
-    var derivedKey;
-    var kdfparams;
-    /**
-     * Supported kdf modules are the following:
-     * 1) pbkdf2
-     * 2) scrypt
-     */
-    if (json.crypto.kdf === 'scrypt') {
-        kdfparams = json.crypto.kdfparams;
+    if (json.version === 3 && !json.crypto) {
+      // crypto field should be existed in keystore version 3
+      throw new Error(`Invalid keystore V3 format: 'crypto' is not defined.`)
+    }
 
-        // FIXME: support progress reporting callback
-        derivedKey = scryptsy(new Buffer(password), new Buffer(kdfparams.salt, 'hex'), kdfparams.n, kdfparams.r, kdfparams.p, kdfparams.dklen);
-    } else if (json.crypto.kdf === 'pbkdf2') {
-        kdfparams = json.crypto.kdfparams;
+    if (json.crypto) {
+      if (json.keyring) throw new Error(`Invalid key store format: 'crypto' can not be with 'keyring'`)
+      json.keyring = [json.crypto]
+      delete json.crypto
+    }
 
-        if (kdfparams.prf !== 'hmac-sha256') {
-            throw new Error('Unsupported parameters to PBKDF2');
+    if (_.isArray(json.keyring[0]) && json.keyring.length > 3) {
+      throw new Error(`Invalid key store format`)
+    }
+
+    let accountKey = {}
+    
+    // AccountKeyRoleBased format
+    if (_.isArray(json.keyring[0])) {
+      let transactionKey = decryptKey(json.keyring[0])
+      if (transactionKey) accountKey.transactionKey = transactionKey
+
+      let updateKey = decryptKey(json.keyring[1])
+      if (updateKey) accountKey.updateKey = updateKey
+
+      let feePayerKey = decryptKey(json.keyring[2])
+      if (feePayerKey) accountKey.feePayerKey = feePayerKey
+    } else {
+      accountKey = decryptKey(json.keyring)
+    }
+
+    function decryptKey(encryptedArray) {
+      if (!encryptedArray || encryptedArray.length === 0) return undefined
+      
+      let decryptedArray = []
+      for (const encrypted of encryptedArray) {
+        var derivedKey
+        var kdfparams
+        /**
+         * Supported kdf modules are the following:
+         * 1) pbkdf2
+         * 2) scrypt
+         */
+        if (encrypted.kdf === 'scrypt') {
+            kdfparams = encrypted.kdfparams;
+
+            // FIXME: support progress reporting callback
+            derivedKey = scrypt(Buffer.from(password), Buffer.from(kdfparams.salt, 'hex'), kdfparams.n, kdfparams.r, kdfparams.p, kdfparams.dklen);
+        } else if (encrypted.kdf === 'pbkdf2') {
+            kdfparams = encrypted.kdfparams;
+
+            if (kdfparams.prf !== 'hmac-sha256') {
+                throw new Error('Unsupported parameters to PBKDF2');
+            }
+
+            derivedKey = cryp.pbkdf2Sync(Buffer.from(password), Buffer.from(kdfparams.salt, 'hex'), kdfparams.c, kdfparams.dklen, 'sha256');
+        } else {
+            throw new Error('Unsupported key derivation scheme');
         }
 
-        derivedKey = cryp.pbkdf2Sync(new Buffer(password), new Buffer(kdfparams.salt, 'hex'), kdfparams.c, kdfparams.dklen, 'sha256');
-    } else {
-        throw new Error('Unsupported key derivation scheme');
+        var ciphertext = Buffer.from(encrypted.ciphertext, 'hex');
+
+        var mac = utils.sha3(Buffer.concat([ derivedKey.slice(16, 32), ciphertext ])).replace('0x','');
+        if (mac !== encrypted.mac) {
+            throw new Error('Key derivation failed - possibly wrong password');
+        }
+
+        var decipher = cryp.createDecipheriv(encrypted.cipher, derivedKey.slice(0, 16), Buffer.from(encrypted.cipherparams.iv, 'hex'));
+        decryptedArray.push('0x'+ Buffer.concat([ decipher.update(ciphertext), decipher.final() ]).toString('hex'))
+      }
+      return decryptedArray.length === 1? decryptedArray[0] : decryptedArray
     }
 
-    var ciphertext = new Buffer(json.crypto.ciphertext, 'hex');
-
-    var mac = utils.sha3(Buffer.concat([ derivedKey.slice(16, 32), ciphertext ])).replace('0x','');
-    if (mac !== json.crypto.mac) {
-        throw new Error('Key derivation failed - possibly wrong password');
-    }
-
-    var decipher = cryp.createDecipheriv(json.crypto.cipher, derivedKey.slice(0, 16), new Buffer(json.crypto.cipherparams.iv, 'hex'));
-    var seed = '0x'+ Buffer.concat([ decipher.update(ciphertext), decipher.final() ]).toString('hex');
-
-    return this.privateKeyToAccount(seed, json.address);
-};
+    return this.createWithAccountKey(json.address, accountKey);
+  };
 
 /**
  * cav.klay.accounts.encrypt(privateKey, password);
@@ -544,7 +1234,16 @@ Accounts.prototype.decrypt = function (v3Keystore, password, nonStrict) {
       "id":"dfde6a32-4b0e-404f-8b9f-2b18f279fe21",
     }
  */
-Accounts.prototype.encrypt = function (privateKey, password, options) {
+/**
+ * encrypt encrypts an account and returns a key store object.
+ *
+ * @method privateKeyToAccount
+ * @param {String} key The key parameter can be either normal private key or KlaytnWalletKey format.
+ * @param {String} password The password to be used for account encryption. The encrypted key store can be decrypted with this password.
+ * @param {Object} options The options to use when encrypt an account.
+ * @return {Object}
+ */
+Accounts.prototype.encrypt = function (key, password, options) {
     /**
      * options can include below
      * {
@@ -563,60 +1262,110 @@ Accounts.prototype.encrypt = function (privateKey, password, options) {
      */
     options = options || {};
 
-    var account = this.privateKeyToAccount(privateKey, options.address);
+    let address, account
 
-    var salt = options.salt || cryp.randomBytes(32);
-    var iv = options.iv || cryp.randomBytes(16);
-
-    var derivedKey;
-    var kdf = options.kdf || 'scrypt';
-    var kdfparams = {
-        dklen: options.dklen || 32,
-        salt: salt.toString('hex')
-    };
-
-    /**
-     * Supported kdf modules are the following:
-     * 1) pbkdf2
-     * 2) scrypt - default
-     */
-    if (kdf === 'pbkdf2') {
-        kdfparams.c = options.c || 262144;
-        kdfparams.prf = 'hmac-sha256';
-        derivedKey = cryp.pbkdf2Sync(new Buffer(password), salt, kdfparams.c, kdfparams.dklen, 'sha256');
-    } else if (kdf === 'scrypt') {
-        // FIXME: support progress reporting callback
-        kdfparams.n = options.n || 4096; // 2048 4096 8192 16384
-        kdfparams.r = options.r || 8;
-        kdfparams.p = options.p || 1;
-        derivedKey = scryptsy(new Buffer(password), salt, kdfparams.n, kdfparams.r, kdfparams.p, kdfparams.dklen);
+    if (key instanceof Account) {
+      if (options.address && options.address !== key.address) throw new Error(`Address in account is not matched with address in options object`) 
+      address = key.address
+      account = key
+    } else if (_.isString(key)) {
+      account = this.privateKeyToAccount(key, options.address)
+      address = account.address
     } else {
-        throw new Error('Unsupported kdf');
+      if (!options.address) throw new Error(`The address must be defined inside the options object.`)
+      address = options.address
     }
 
-    var cipher = cryp.createCipheriv(options.cipher || 'aes-128-ctr', derivedKey.slice(0, 16), iv);
-    if (!cipher) {
-        throw new Error('Unsupported cipher');
+    if (!account) account = this.createWithAccountKey(address, key)
+
+    let keyring
+
+    switch(account.accountKeyType) {
+      case AccountKeyEnum.ACCOUNT_KEY_PUBLIC:
+      case AccountKeyEnum.ACCOUNT_KEY_MULTISIG:
+        keyring = encryptKey(account.keys)
+        break
+      case AccountKeyEnum.ACCOUNT_KEY_ROLEBASED:
+        keyring = []
+        let transactionKey = encryptKey(account.transactionKey)
+        let updateKey = encryptKey(account.updateKey)
+        let feePayerKey = encryptKey(account.feePayerKey)
+        keyring.push(transactionKey)
+        keyring.push(updateKey)
+        keyring.push(feePayerKey)
+        for (i = keyring.length-1; i >=0; i --) {
+          if (keyring[i].length !== 0) break
+          keyring = keyring.slice(0, i)
+        }
+        break
     }
 
-    var ciphertext = Buffer.concat([ cipher.update(new Buffer(account.privateKey.replace('0x',''), 'hex')), cipher.final() ]);
+    function encryptKey(privateKey) {
+      let encryptedArray = []
 
-    var mac = utils.sha3(Buffer.concat([ derivedKey.slice(16, 32), new Buffer(ciphertext, 'hex') ])).replace('0x','');
+      if (!privateKey) return encryptedArray
+      
+      let privateKeyArray = _.isArray(privateKey)? privateKey : [privateKey]
+
+      for (const privateKey of privateKeyArray) {
+        var salt = options.salt || cryp.randomBytes(32);
+        var iv = options.iv || cryp.randomBytes(16);
+  
+        var derivedKey;
+        var kdf = options.kdf || 'scrypt';
+        var kdfparams = {
+            dklen: options.dklen || 32,
+            salt: salt.toString('hex')
+        };
+  
+        /**
+         * Supported kdf modules are the following:
+         * 1) pbkdf2
+         * 2) scrypt - default
+         */
+        if (kdf === 'pbkdf2') {
+            kdfparams.c = options.c || 262144;
+            kdfparams.prf = 'hmac-sha256';
+            derivedKey = cryp.pbkdf2Sync(Buffer.from(password), salt, kdfparams.c, kdfparams.dklen, 'sha256');
+        } else if (kdf === 'scrypt') {
+            // FIXME: support progress reporting callback
+            kdfparams.n = options.n || 4096; // 2048 4096 8192 16384
+            kdfparams.r = options.r || 8;
+            kdfparams.p = options.p || 1;
+            derivedKey = scrypt(Buffer.from(password), salt, kdfparams.n, kdfparams.r, kdfparams.p, kdfparams.dklen);
+        } else {
+            throw new Error('Unsupported kdf');
+        }
+  
+        var cipher = cryp.createCipheriv(options.cipher || 'aes-128-ctr', derivedKey.slice(0, 16), iv);
+        if (!cipher) {
+            throw new Error('Unsupported cipher');
+        }
+  
+        var ciphertext = Buffer.concat([cipher.update(Buffer.from(privateKey.replace('0x',''), 'hex')), cipher.final()]);
+  
+        var mac = utils.sha3(Buffer.concat([derivedKey.slice(16, 32), Buffer.from(ciphertext, 'hex')])).replace('0x','');
+
+        encryptedArray.push({
+          ciphertext: ciphertext.toString('hex'),
+          cipherparams: {
+              iv: iv.toString('hex')
+          },
+          cipher: options.cipher || 'aes-128-ctr',
+          kdf: kdf,
+          kdfparams: kdfparams,
+          mac: mac.toString('hex')
+        })
+      }
+
+      return encryptedArray
+    }
 
     return {
-        version: 3,
+        version: 4,
         id: uuid.v4({ random: options.uuid || cryp.randomBytes(16) }),
         address: account.address.toLowerCase(),
-        crypto: {
-            ciphertext: ciphertext.toString('hex'),
-            cipherparams: {
-                iv: iv.toString('hex')
-            },
-            cipher: options.cipher || 'aes-128-ctr',
-            kdf: kdf,
-            kdfparams: kdfparams,
-            mac: mac.toString('hex')
-        }
+        keyring
     };
 };
 
@@ -628,7 +1377,7 @@ Accounts.prototype.privateKeyToPublicKey = function (privateKey, compressed = fa
   if (privateKey.length !== 64) {
     throw new Error('Received a invalid privateKey. The length of privateKey should be 64.')
   }
-  const buffer = new Buffer(privateKey, "hex");
+  const buffer = Buffer.from(privateKey, 'hex');
   const ecKey = secp256k1.keyFromPrivate(buffer)
 
   let publicKey
@@ -727,43 +1476,47 @@ Wallet.prototype.create = function (numberOfAccounts, entropy) {
         encrypt: function(password){...}
     }
  */
-Wallet.prototype.add = function (account, targetAddressRaw) {
-    var klaytnWalletKey
-    /**
-     * cav.klay.accounts.wallet.add('0x4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318');
-     * 
-     * cav.klay.accounts.wallet.add({
-     *   privateKey: '0x348ce564d427a3311b6536bbcff9390d69395b06ed6c486954e971d960fe8709',
-     *   address: '0xb8CE9ab6943e0eCED004cDe8e3bBed6568B2Fa01'
-     * });
-     */
-    if (_.isString(account)) {
-      account = this._accounts.privateKeyToAccount(account, targetAddressRaw);
-    } else if(!_.isObject(account)) {
-        throw new Error('Invalid private key')
-    }
+Wallet.prototype.add = function (account, userInputAddress) {
+  let accountForWallet
+  /**
+   * cav.klay.accounts.wallet.add('0x4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318');
+   * 
+   * cav.klay.accounts.wallet.add({
+   *   privateKey: '0x348ce564d427a3311b6536bbcff9390d69395b06ed6c486954e971d960fe8709',
+   *   address: '0xb8CE9ab6943e0eCED004cDe8e3bBed6568B2Fa01'
+   * });
+   */
+  if (Account.isAccountKey(account)) {
+    if (!userInputAddress) throw new Error(`Address is not defined. Address cannot be determined from AccountKey`)
+    accountForWallet = this._accounts.createWithAccountKey(userInputAddress, account)
+  } else if(account instanceof Account) {
+    accountForWallet = this._accounts.createWithAccountKey(account.address, account.accountKey)
+    accountForWallet.address = userInputAddress || account.address
+  } else if (_.isObject(account) && account.address && account.privateKey) {
+    accountForWallet = this._accounts.privateKeyToAccount(account.privateKey, userInputAddress || account.address)
+  } else if (_.isString(account)) {
+    accountForWallet = this._accounts.privateKeyToAccount(account, userInputAddress);
+  } else {
+    const accountKey = this._accounts.createAccountKey(account)
+    if (!userInputAddress) throw new Error(`Address is not defined. Address cannot be determined from AccountKey format`)
+    accountForWallet = this._accounts.createWithAccountKey(userInputAddress, accountKey)
+  }
 
-    const accountAlreadyExists = !!this[account.address]
+  if (!!this[accountForWallet.address]) throw new Error('Account exists with ' + accountForWallet.address)
 
-    if (accountAlreadyExists) {
-      throw new Error('Account exists with ' + account.address)
-    }
+  accountForWallet.index = this._findSafeIndex()
+  this[accountForWallet.index] = accountForWallet
 
-    account = this._accounts.privateKeyToAccount(account.privateKey, targetAddressRaw || account.address)
+  this[accountForWallet.address] = accountForWallet
+  this[accountForWallet.address.toLowerCase()] = accountForWallet
+  this[accountForWallet.address.toUpperCase()] = accountForWallet
+  try {
+    this[utils.toChecksumAddress(accountForWallet.address)] = accountForWallet
+  } catch (e) {}
 
-    account.index = this._findSafeIndex()
-    this[account.index] = account
+  this.length++
 
-    this[account.address] = account
-    this[account.address.toLowerCase()] = account
-    this[account.address.toUpperCase()] = account
-    try {
-      this[utils.toChecksumAddress(account.address)] = account
-    } catch (e) {}
-
-    this.length++
-
-    return account
+  return accountForWallet
 }
 
 Wallet.prototype.updatePrivateKey = function (privateKey, address) {
@@ -776,64 +1529,103 @@ Wallet.prototype.updatePrivateKey = function (privateKey, address) {
     throw new Error('The private key used for the update is not a valid string.')
   }
 
+  if (!utils.isAddress(address)) throw new Error(`Invalid address : ${address}`)
+
   // If failed to find account through address, return error
   const accountExists = !!this[address]
   if (!accountExists) throw new Error('Failed to find account with ' + address)
 
   const account = this[address]
 
+  if (account.accountKeyType !== AccountKeyEnum.ACCOUNT_KEY_PUBLIC) {
+    throw new Error('Account using AccountKeyMultiSig or AccountKeyRoleBased must be updated using the caver.klay.accounts.updateAccountKey function.')
+  }
+
   const parsed = utils.parsePrivateKey(privateKey)
   if (!utils.isValidPrivateKey(parsed.privateKey)) throw new Error('Invalid private key')
-  if (parsed.address && parsed.address !== account.address) throw new Error('The address extracted from the private key does not match the address received as the input value.')
 
-  this[account.index].privateKey = parsed.privateKey
+  if (parsed.address && parsed.address !== account.address) {
+    throw new Error('The address extracted from the private key does not match the address received as the input value.')
+  }
 
-  this[account.address].privateKey = parsed.privateKey
-  this[account.address.toLowerCase()].privateKey = parsed.privateKey
-  this[account.address.toUpperCase()].privateKey = parsed.privateKey
+  const newAccountKeyPublic = new AccountKeyPublic(parsed.privateKey)
+  this[account.index].accountKey = newAccountKeyPublic
+  this[account.address].accountKey = newAccountKeyPublic
+  this[account.address.toLowerCase()].accountKey = newAccountKeyPublic
+  this[account.address.toUpperCase()].accountKey = newAccountKeyPublic
+
   try {
-    this[utils.toChecksumAddress(account.address)].privateKey = parsed.privateKey
+    this[utils.toChecksumAddress(account.address)].accountKey = newAccountKeyPublic
   } catch (e) {}
 
   return account
 }
 
- Wallet.prototype.remove = function (addressOrIndex) {
-   var account = this[addressOrIndex]
+Wallet.prototype.updateAccountKey = function updateAccountKey(address, accountKey) {
+  if (address === undefined || accountKey === undefined) {
+    throw new Error('To update the accountKey in wallet, need to set both address and accountKey.')
+  }
 
-   if (account && account.address) {
-     // address
-     this[account.address].privateKey = null
-     delete this[account.address]
+  if (!Account.isAccountKey(accountKey)) {
+    accountKey = this._accounts.createAccountKey(accountKey)
+  }
 
-     if (this[account.address.toLowerCase()]) {
-       // address lowercase
-       this[account.address.toLowerCase()].privateKey = null
-       delete this[account.address.toLowerCase()]
-     }
+  if (!utils.isAddress(address)) throw new Error(`Invalid address : ${address}`)
 
-     if (this[account.address.toUpperCase()]) {
-       // address uppercase
-       this[account.address.toUpperCase()].privateKey = null
-       delete this[account.address.toUpperCase()]
-     }
+  // If failed to find account through address, return error
+  const accountExists = !!this[address]
+  if (!accountExists) throw new Error('Failed to find account with ' + address)
 
-     try {
-       this[utils.toChecksumAddress(account.address)].privateKey = null
-       delete this[utils.toChecksumAddress(account.address)]
-     } catch (e) {}
+  const account = this[address]
 
-     // index
-     this[account.index].privateKey = null
-     delete this[account.index]
+  this[account.index].accountKey = accountKey
+  this[account.address].accountKey = accountKey
+  this[account.address.toLowerCase()].accountKey = accountKey
+  this[account.address.toUpperCase()].accountKey = accountKey
 
-     this.length--
+  try {
+    this[utils.toChecksumAddress(account.address)].accountKey = accountKey
+  } catch (e) {}
 
-     return true
-   } else {
-     return false
+  return account
+}
+
+Wallet.prototype.remove = function (addressOrIndex) {
+ var account = this[addressOrIndex]
+
+ if (account && account.address) {
+   // address
+   this[account.address].accountKey = null
+   delete this[account.address]
+
+   if (this[account.address.toLowerCase()]) {
+     // address lowercase
+     this[account.address.toLowerCase()].accountKey = null
+     delete this[account.address.toLowerCase()]
    }
+
+   if (this[account.address.toUpperCase()]) {
+     // address uppercase
+     this[account.address.toUpperCase()].accountKey = null
+     delete this[account.address.toUpperCase()]
+   }
+
+   try {
+     this[utils.toChecksumAddress(account.address)].accountKey = null
+     delete this[utils.toChecksumAddress(account.address)]
+   } catch (e) {}
+
+   // index
+   this[account.index].accountKey = null
+   delete this[account.index]
+
+   this.length--
+
+   return true
+ } else {
+   return false
  }
+}
 
 Wallet.prototype.clear = function () {
     var _this = this;
@@ -981,6 +1773,19 @@ Wallet.prototype.getKlaytnWalletKey = function (addressOrIndex) {
   if (!account) throw new Error('Failed to find account')
 
   return genKlaytnWalletKeyStringFromAccount(account)
+}
+
+Wallet.prototype.getAccount = function (input) {
+  if (_.isNumber(input)) {
+    if (this.length <= input) throw new Error(`The index(${input}) is out of range(Wallet length : ${this.length}).`)
+    return this[input]
+  }
+
+  if (!_.isString(input)) throw new Error(`Accounts in the Wallet can be searched by only index or address. :${input}`)
+
+  if (!utils.isAddress(input)) throw new Error(`Failed to getAccount from Wallet: invalid address(${input})`)
+
+  return this[input.toLowerCase()]
 }
 
 function genKlaytnWalletKeyStringFromAccount(account) {

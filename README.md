@@ -56,7 +56,7 @@ $ npm install caver-js@X.X.X
 
 Getting Started
 =================
-If you want to run your own EN (Endpoint Node), see [EN Operation Guide](https://docs.klaytn.com/node/en) to set up. You can also use Klaytn Public EN like below:
+If you want to run your own EN (Endpoint Node), see [EN Operation Guide](https://docs.klaytn.com/node/endpoint-node) to set up. You can also use Klaytn Public EN like below:
 ```
 $ node
 > const Caver = require('caver-js')
@@ -73,8 +73,8 @@ Klaytn/vX.X.X/linux-amd64/goX.X.X
 
 ## Using caver-js account/wallet
 You can easily manage your account by using the account / wallet packages provided by caver-js.
-[caver.klay.accounts](https://docs.klaytn.com/sdk/caverjs/caver.klay.accounts) package provides functions related to accounts, such as create, signTransaction, and privateKeyToAccount.
-[caver.klay.accounts.wallet](https://docs.klaytn.com/sdk/caverjs/caver.klay.accounts#wallet) provides the **in-memory wallet** for easy account management in caver-js.
+[caver.klay.accounts](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.klay.accounts) package provides functions related to accounts, such as create, signTransaction, and privateKeyToAccount.
+[caver.klay.accounts.wallet](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.klay.accounts#wallet) provides the **in-memory wallet** for easy account management in caver-js.
 
 **Note** Functions associated with wallet and account provided by caver-js have no effect on the actual Klaytn network.
 
@@ -101,7 +101,7 @@ You can add to the wallet instance of caver-js using the account object created 
 ```
 
 caver-js supports two types of private key formats.
-One is a raw private key format of a 32-byte string type and the other is the [KlaytnWalletKey](https://docs.klaytn.com/klaytn/design/account#klaytn-wallet-key-format).
+One is a raw private key format of a 32-byte string type and the other is the [KlaytnWalletKey](https://docs.klaytn.com/klaytn/design/accounts#klaytn-wallet-key-format).
 
 You can also add your account using the KlaytnWalletKey format as shown below:
 ```
@@ -121,7 +121,7 @@ The private key that matches a specific account stored in the wallet instance ca
 ```
 
 ## Submitting a Transaction
-You can use caver-js to submit various types of transactions to a node. Please refer to the [caver.klay.sendTransaction](https://docs.klaytn.com/sdk/caverjs/caver.klay/transaction#sendtransaction) to see how to send a transaction of each type.
+You can use caver-js to submit various types of transactions to a node. Please refer to the [caver.klay.sendTransaction](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.klay/transaction#sendtransaction) to see how to send a transaction of each type.
 
 You can submit the transaction as shown below, and the result can be confirmed by the returned receipt:
 ```
@@ -207,19 +207,19 @@ caver-js provides the caver.utils.toPeb function for unit conversion. Please ref
 Documentation
 =================
 
-Documentation can be found at [Klaytn Docs-caver-js](https://docs.klaytn.com/sdk/caverjs).
+Documentation can be found at [Klaytn Docs-caver-js](https://docs.klaytn.com/bapp/sdk/caver-js).
 
 API Specification
 =================
 
 The API lists of caver-js are described in folloinwg links:
 
-* [caver.klay](https://docs.klaytn.com/sdk/caverjs/caver.klay)
-* [caver.klay.accounts](https://docs.klaytn.com/sdk/caverjs/caver.klay.accounts)
-* [caver.klay.contract](https://docs.klaytn.com/sdk/caverjs/caver.klay.contract)
-* [caver.klay.net](https://docs.klaytn.com/sdk/caverjs/caver.klay.net)
-* [caver.klay.abi](https://docs.klaytn.com/sdk/caverjs/caver.klay.abi)
-* [caver.utils](https://docs.klaytn.com/sdk/caverjs/caver.utils)
+* [caver.klay](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.klay)
+* [caver.klay.accounts](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.klay.accounts)
+* [caver.klay.contract](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.klay.contract)
+* [caver.klay.net](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.klay.net)
+* [caver.klay.abi](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.klay.abi)
+* [caver.utils](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.utils)
 
 
 Web3.js Similarity
@@ -297,8 +297,8 @@ Sample Projects
 
 The BApp (Blockchain Application) Development sample projects using caver-js are the following:
 
-* [Count BApp](https://docs.klaytn.com/tutorials/countbapp)
-* [Klaystagram](https://docs.klaytn.com/tutorials/klaystagram)
+* [Count BApp](https://docs.klaytn.com/bapp/tutorials/count-bapp)
+* [Klaystagram](https://docs.klaytn.com/bapp/tutorials/klaystagram)
 
 Github Repository
 =================

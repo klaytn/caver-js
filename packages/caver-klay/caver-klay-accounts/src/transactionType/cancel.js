@@ -44,7 +44,7 @@ function rlpEncodeForCancel(transaction) {
 }
 
 function rlpEncodeForFeeDelegatedCancel(transaction) {
-  if (transaction.feePayer) {
+  if (transaction.senderRawTransaction) {
     const typeDetacehdRawTransaction = '0x' + transaction.senderRawTransaction.slice(4)
 
     const [ nonce, gasPrice, gas, from, [ [ v, r, s ] ] ] = utils.rlpDecode(typeDetacehdRawTransaction)
@@ -81,7 +81,7 @@ function rlpEncodeForFeeDelegatedCancel(transaction) {
 }
 
 function rlpEncodeForFeeDelegatedCancelWithRatio(transaction) {
-  if (transaction.feePayer) {
+  if (transaction.senderRawTransaction) {
     const typeDetacehdRawTransaction = '0x' + transaction.senderRawTransaction.slice(4)
 
     const [ nonce, gasPrice, gas, from, feeRatio, [ [ v, r, s ] ] ] = utils.rlpDecode(typeDetacehdRawTransaction)

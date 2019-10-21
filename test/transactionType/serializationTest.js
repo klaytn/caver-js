@@ -52,7 +52,7 @@ describe('Legacy: Legacy transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-SER-059: Decode raw transaction', async () => {
-        const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
+        const txObj = caver.klay.decodeTransaction(expectedRawTransaction)
 
         expect(txObj).not.to.be.undefined
         expect(txObj.type).to.equals('LEGACY')
@@ -65,6 +65,10 @@ describe('Legacy: Legacy transaction', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0]).to.equals(txObj.v)
+        expect(txObj.signatures[1]).to.equals(txObj.r)
+        expect(txObj.signatures[2]).to.equals(txObj.s)
     }).timeout(200000)
 })
 
@@ -91,7 +95,7 @@ describe('Value transfer: Value Transfer', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-SER-060: Decode raw transaction', async () => {
-        const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
+        const txObj = caver.klay.decodeTransaction(expectedRawTransaction)
 
         expect(txObj).not.to.be.undefined
         expect(txObj.type).to.equals(sender_transaction.type)
@@ -104,6 +108,10 @@ describe('Value transfer: Value Transfer', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
     }).timeout(200000)
 })
 
@@ -140,7 +148,7 @@ describe('Value transfer: Fee Delegated Value Transfer', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-SER-055: Decode raw transaction', async () => {
-        const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
+        const txObj = caver.klay.decodeTransaction(expectedRawTransaction)
 
         expect(txObj).not.to.be.undefined
         expect(txObj.type).to.equals(sender_transaction.type)
@@ -153,10 +161,18 @@ describe('Value transfer: Fee Delegated Value Transfer', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
     }).timeout(200000)
 })
 
@@ -180,7 +196,7 @@ describe('Value transfer: Fee Delegated Value Transfer With Ratio', () => {
         caver.klay.accounts.wallet.add(privateKey)
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(sender_transaction, privateKey)
-        const decoded = await caver.klay.decodeTransaction(senderRawTransaction)
+        const decoded = caver.klay.decodeTransaction(senderRawTransaction)
         expect(decoded.feePayer).to.equals('0x')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
@@ -199,7 +215,7 @@ describe('Value transfer: Fee Delegated Value Transfer With Ratio', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-SER-058: Decode raw transaction', async () => {
-        const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
+        const txObj = caver.klay.decodeTransaction(expectedRawTransaction)
 
         expect(txObj).not.to.be.undefined
         expect(txObj.type).to.equals(sender_transaction.type)
@@ -213,10 +229,18 @@ describe('Value transfer: Fee Delegated Value Transfer With Ratio', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
     }).timeout(200000)
 })
 
@@ -244,7 +268,7 @@ describe('Value transfer memo: Value Transfer With Memo', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-SER-061: Decode raw transaction', async () => {
-        const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
+        const txObj = caver.klay.decodeTransaction(expectedRawTransaction)
 
         expect(txObj).not.to.be.undefined
         expect(txObj.type).to.equals(sender_transaction.type)
@@ -258,6 +282,10 @@ describe('Value transfer memo: Value Transfer With Memo', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
     }).timeout(200000)
 })
 
@@ -281,7 +309,7 @@ describe('Value transfer memo: Fee Delegated Value Transfer Memo', () => {
         caver.klay.accounts.wallet.add(privateKey)
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(sender_transaction, privateKey)
-        const decoded = await caver.klay.decodeTransaction(senderRawTransaction)
+        const decoded = caver.klay.decodeTransaction(senderRawTransaction)
         expect(decoded.feePayer).to.equals('0x')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
@@ -300,7 +328,7 @@ describe('Value transfer memo: Fee Delegated Value Transfer Memo', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-SER-056: Decode raw transaction', async () => {
-        const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
+        const txObj = caver.klay.decodeTransaction(expectedRawTransaction)
 
         expect(txObj).not.to.be.undefined
         expect(txObj.type).to.equals(sender_transaction.type)
@@ -314,10 +342,18 @@ describe('Value transfer memo: Fee Delegated Value Transfer Memo', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
     }).timeout(200000)
 })
 
@@ -342,7 +378,7 @@ describe('Value transfer memo with ratio: Fee Delegated Value Transfer Memo With
         caver.klay.accounts.wallet.add(privateKey)
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(sender_transaction, privateKey)
-        const decoded = await caver.klay.decodeTransaction(senderRawTransaction)
+        const decoded = caver.klay.decodeTransaction(senderRawTransaction)
         expect(decoded.feePayer).to.equals('0x')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
@@ -361,7 +397,7 @@ describe('Value transfer memo with ratio: Fee Delegated Value Transfer Memo With
     }).timeout(200000)
 
     it('CAVERJS-UNIT-SER-057: Decode raw transaction', async () => {
-        const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
+        const txObj = caver.klay.decodeTransaction(expectedRawTransaction)
 
         expect(txObj).not.to.be.undefined
         expect(txObj.type).to.equals(sender_transaction.type)
@@ -376,10 +412,18 @@ describe('Value transfer memo with ratio: Fee Delegated Value Transfer Memo With
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
     }).timeout(200000)
 })
 
@@ -409,7 +453,7 @@ describe('Account: Account update', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-SER-042: Decode raw transaction', async () => {
-        const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
+        const txObj = caver.klay.decodeTransaction(expectedRawTransaction)
 
         expect(txObj).not.to.be.undefined
         expect(txObj.type).to.equals(sender_transaction.type)
@@ -421,6 +465,10 @@ describe('Account: Account update', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
     }).timeout(200000)
 })
 
@@ -442,7 +490,7 @@ describe('Account: Fee Delegated Account Update', () => {
         caver.klay.accounts.wallet.add(privateKey)
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(sender_transaction, privateKey)
-        const decoded = await caver.klay.decodeTransaction(senderRawTransaction)
+        const decoded = caver.klay.decodeTransaction(senderRawTransaction)
         expect(decoded.feePayer).to.equals('0x')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
@@ -461,7 +509,7 @@ describe('Account: Fee Delegated Account Update', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-SER-047: Decode raw transaction', async () => {
-        const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
+        const txObj = caver.klay.decodeTransaction(expectedRawTransaction)
 
         expect(txObj).not.to.be.undefined
         expect(txObj.type).to.equals(sender_transaction.type)
@@ -472,10 +520,18 @@ describe('Account: Fee Delegated Account Update', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
         expect(txObj.publicKey).to.equals(caver.utils.compressPublicKey(sender_transaction.publicKey))
     }).timeout(200000)
 })
@@ -500,7 +556,7 @@ describe('Account: Fee Delegated Account Update with ratio', () => {
         caver.klay.accounts.wallet.add(privateKey)
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(sender_transaction, privateKey)
-        const decoded = await caver.klay.decodeTransaction(senderRawTransaction)
+        const decoded = caver.klay.decodeTransaction(senderRawTransaction)
         expect(decoded.feePayer).to.equals('0x')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
@@ -519,7 +575,7 @@ describe('Account: Fee Delegated Account Update with ratio', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-SER-048: Decode raw transaction', async () => {
-        const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
+        const txObj = caver.klay.decodeTransaction(expectedRawTransaction)
 
         expect(txObj).not.to.be.undefined
         expect(txObj.type).to.equals(sender_transaction.type)
@@ -531,10 +587,18 @@ describe('Account: Fee Delegated Account Update with ratio', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
         expect(txObj.publicKey).to.equals(caver.utils.compressPublicKey(sender_transaction.publicKey))
     }).timeout(200000)
 })
@@ -563,7 +627,7 @@ describe('Contract: Contract deploy', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-SER-045: Decode raw transaction', async () => {
-        const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
+        const txObj = caver.klay.decodeTransaction(expectedRawTransaction)
 
         expect(txObj).not.to.be.undefined
         expect(txObj.type).to.equals(sender_transaction.type)
@@ -579,6 +643,10 @@ describe('Contract: Contract deploy', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
     }).timeout(200000)
 })
 
@@ -601,7 +669,7 @@ describe('Contract: Fee Delegated Contract Deploy', () => {
         caver.klay.accounts.wallet.add(privateKey)
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(sender_transaction, privateKey)
-        const decoded = await caver.klay.decodeTransaction(senderRawTransaction)
+        const decoded = caver.klay.decodeTransaction(senderRawTransaction)
         expect(decoded.feePayer).to.equals('0x')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
@@ -621,7 +689,7 @@ describe('Contract: Fee Delegated Contract Deploy', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-SER-051: Decode raw transaction', async () => {
-        const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
+        const txObj = caver.klay.decodeTransaction(expectedRawTransaction)
 
         expect(txObj).not.to.be.undefined
         expect(txObj.type).to.equals(sender_transaction.type)
@@ -637,10 +705,18 @@ describe('Contract: Fee Delegated Contract Deploy', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
     }).timeout(200000)
 })
 
@@ -664,7 +740,7 @@ describe('Contract: Fee Delegated Contract Deploy With Ratio', () => {
         caver.klay.accounts.wallet.add(privateKey)
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(sender_transaction, privateKey)
-        const decoded = await caver.klay.decodeTransaction(senderRawTransaction)
+        const decoded = caver.klay.decodeTransaction(senderRawTransaction)
         expect(decoded.feePayer).to.equals('0x')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
@@ -683,7 +759,7 @@ describe('Contract: Fee Delegated Contract Deploy With Ratio', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-SER-052: Decode raw transaction', async () => {
-        const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
+        const txObj = caver.klay.decodeTransaction(expectedRawTransaction)
 
         expect(txObj).not.to.be.undefined
         expect(txObj.type).to.equals(sender_transaction.type)
@@ -700,10 +776,18 @@ describe('Contract: Fee Delegated Contract Deploy With Ratio', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
     }).timeout(200000)
 })
 
@@ -732,7 +816,7 @@ describe('Contract: Contract execution', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-SER-046: Decode raw transaction', async () => {
-        const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
+        const txObj = caver.klay.decodeTransaction(expectedRawTransaction)
 
         expect(txObj).not.to.be.undefined
         expect(txObj.type).to.equals(sender_transaction.type)
@@ -746,6 +830,10 @@ describe('Contract: Contract execution', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
     }).timeout(200000)
 })
 
@@ -769,7 +857,7 @@ describe('Contract: Fee Delegated Contract Execution', () => {
         caver.klay.accounts.wallet.add(privateKey)
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(sender_transaction, privateKey)
-        const decoded = await caver.klay.decodeTransaction(senderRawTransaction)
+        const decoded = caver.klay.decodeTransaction(senderRawTransaction)
         expect(decoded.feePayer).to.equals('0x')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
@@ -788,7 +876,7 @@ describe('Contract: Fee Delegated Contract Execution', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-SER-053: Decode raw transaction', async () => {
-        const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
+        const txObj = caver.klay.decodeTransaction(expectedRawTransaction)
 
         expect(txObj).not.to.be.undefined
         expect(txObj.type).to.equals(sender_transaction.type)
@@ -802,10 +890,18 @@ describe('Contract: Fee Delegated Contract Execution', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
     }).timeout(200000)
 })
 
@@ -831,7 +927,7 @@ describe('Contract: Fee Delegated Contract Execution With Ratio', () => {
         caver.klay.accounts.wallet.add(privateKey)
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(sender_transaction, privateKey)
-        const decoded = await caver.klay.decodeTransaction(senderRawTransaction)
+        const decoded = caver.klay.decodeTransaction(senderRawTransaction)
         expect(decoded.feePayer).to.equals('0x')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
@@ -851,7 +947,7 @@ describe('Contract: Fee Delegated Contract Execution With Ratio', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-SER-054: Decode raw transaction', async () => {
-        const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
+        const txObj = caver.klay.decodeTransaction(expectedRawTransaction)
 
         expect(txObj).not.to.be.undefined
         expect(txObj.type).to.equals(sender_transaction.type)
@@ -866,10 +962,18 @@ describe('Contract: Fee Delegated Contract Execution With Ratio', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
     }).timeout(200000)
 })
 
@@ -895,7 +999,7 @@ describe('Cancel: Cancel transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-SER-043: Decode raw transaction', async () => {
-        const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
+        const txObj = caver.klay.decodeTransaction(expectedRawTransaction)
 
         expect(txObj).not.to.be.undefined
         expect(txObj.type).to.equals(sender_transaction.type)
@@ -906,6 +1010,10 @@ describe('Cancel: Cancel transaction', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
     }).timeout(200000)
 })
 
@@ -926,7 +1034,7 @@ describe('Cancel: Fee Delegated Cancel Transaction', () => {
         caver.klay.accounts.wallet.add(privateKey)
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(sender_transaction, privateKey)
-        const decoded = await caver.klay.decodeTransaction(senderRawTransaction)
+        const decoded = caver.klay.decodeTransaction(senderRawTransaction)
         expect(decoded.feePayer).to.equals('0x')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
@@ -946,7 +1054,7 @@ describe('Cancel: Fee Delegated Cancel Transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-SER-049: Decode raw transaction', async () => {
-        const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
+        const txObj = caver.klay.decodeTransaction(expectedRawTransaction)
 
         expect(txObj).not.to.be.undefined
         expect(txObj.type).to.equals(sender_transaction.type)
@@ -957,10 +1065,18 @@ describe('Cancel: Fee Delegated Cancel Transaction', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
     }).timeout(200000)
 })
 
@@ -982,7 +1098,7 @@ describe('Cancel: Fee Delegated Cancel Transaction With Ratio', () => {
         caver.klay.accounts.wallet.add(privateKey)
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(sender_transaction, privateKey)
-        const decoded = await caver.klay.decodeTransaction(senderRawTransaction)
+        const decoded = caver.klay.decodeTransaction(senderRawTransaction)
         expect(decoded.feePayer).to.equals('0x')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
@@ -1001,7 +1117,7 @@ describe('Cancel: Fee Delegated Cancel Transaction With Ratio', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-SER-050: Decode raw transaction', async () => {
-        const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
+        const txObj = caver.klay.decodeTransaction(expectedRawTransaction)
 
         expect(txObj).not.to.be.undefined
         expect(txObj.type).to.equals(sender_transaction.type)
@@ -1013,10 +1129,18 @@ describe('Cancel: Fee Delegated Cancel Transaction With Ratio', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
         expect(txObj.feePayer).to.equals(feePayer)
         expect(txObj.payerV).not.to.be.undefined
         expect(txObj.payerR).not.to.be.undefined
         expect(txObj.payerS).not.to.be.undefined
+        expect(txObj.feePayerSignatures).not.to.be.undefined
+        expect(txObj.feePayerSignatures[0][0]).to.equals(txObj.payerV)
+        expect(txObj.feePayerSignatures[0][1]).to.equals(txObj.payerR)
+        expect(txObj.feePayerSignatures[0][2]).to.equals(txObj.payerS)
     }).timeout(200000)
 })
 
@@ -1045,7 +1169,7 @@ describe('ServiceChain: Chain data anchoring', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-SER-044: Decode raw transaction', async () => {
-        const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
+        const txObj = caver.klay.decodeTransaction(expectedRawTransaction)
 
         expect(txObj).not.to.be.undefined
         expect(txObj.type).to.equals(sender_transaction.type)
@@ -1059,6 +1183,10 @@ describe('ServiceChain: Chain data anchoring', () => {
         expect(txObj.v).not.to.be.undefined
         expect(txObj.r).not.to.be.undefined
         expect(txObj.s).not.to.be.undefined
+        expect(txObj.signatures).not.to.be.undefined
+        expect(txObj.signatures[0][0]).to.equals(txObj.v)
+        expect(txObj.signatures[0][1]).to.equals(txObj.r)
+        expect(txObj.signatures[0][2]).to.equals(txObj.s)
     }).timeout(200000)
 })
 
@@ -1091,7 +1219,7 @@ describe('ServiceChain: Chain data anchoring', () => {
 //     }).timeout(200000)
   
 //     it('CAVERJS-UNIT-SER-041: Decode raw transaction', async () => {
-//       const txObj = await caver.klay.decodeTransaction(expectedRawTransaction)
+//       const txObj = caver.klay.decodeTransaction(expectedRawTransaction)
   
 //       expect(txObj).not.to.be.undefined
 //       expect(txObj.type).to.equals(sender_transaction.type)

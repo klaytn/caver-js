@@ -246,25 +246,6 @@ function toPayload (args) {
   return (this.transformPayload && this.transformPayload(payload)) || payload
 }
 
-var getWallet = function(from, accounts) {
-  let wallet = null
-
-  // is index given
-  if (_.isNumber(from)) {
-      wallet = accounts.wallet[from]
-
-      // is account given
-  } else if (_.isObject(from) && from.address && from.privateKey) {
-      wallet = from
-
-      // search in wallet for address
-  } else {
-      wallet = accounts.wallet[from.toLowerCase()]
-  }
-
-  return wallet
-}
-
 const buildSendTxCallbackFunc = (defer, method, payload, isSendTx) => (err, result) => {
   try { result = method.formatOutput(result) }
   catch (e) {
@@ -289,7 +270,7 @@ const buildSendTxCallbackFunc = (defer, method, payload, isSendTx) => (err, resu
   // return PROMISE
   if (!isSendTx) {
     defer.resolve(result)
-  } else if (!_.isObject(result)) {
+  } else {
     defer.eventEmitter.emit('transactionHash', result)
     method._confirmTransaction(defer, result, payload)
   }
@@ -305,49 +286,82 @@ const buildSendSignedTxFunc = (method, payload, sendTxCallback) => (sign) => {
 }
 
 const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, method) => {
+  // Logic for handling multiple cases of parameters in sendSignedTransaction.
+  // 1. Object containing rawTransaction
+  //    : call 'klay_sendRawTransaction' with RLP encoded transaction(rawTransaction) in object
+  // 2. A transaction object containing signatures or feePayerSignatures
+  //    : call 'getRawTransactionWithSignatures', then call 'klay_sendRawTransaction' with result of getRawTransactionWithSignatures
+  if (method && method.accounts && payload.method === 'klay_sendRawTransaction') {
+    var tx = payload.params[0]
+    if (typeof tx !== 'string' && _.isObject(tx)) {
+      if (tx.rawTransaction) {
+        return sendSignedTx(tx)
+      } else {
+        return method.accounts.getRawTransactionWithSignatures(tx).then(sendSignedTx).catch((e) => {sendTxCallback(e)})
+      }
+    }
+  }
+
   if (method && method.accounts && method.accounts.wallet && method.accounts.wallet.length) {
+      let error
       switch (payload.method) {
         case 'klay_sendTransaction': {
           var tx = payload.params[0]
-          
-          // TODO : Check signTransactionWithSignature function with this logic
-          //        and if need, implement sendTransactionWithSignature function.
-          // if (tx.signature) {
-          //   return method.accounts.sendTransactionWithSignature(tx).then(sendSignedTx)
-          // }
-          
-          if (tx.senderRawTransaction && tx.from && tx.feePayer){
-            console.log('"from" is ignored for a fee-delegated transaction.')
-            delete tx.from
+
+          let error
+          if (!_.isObject(tx)) {
+            error = new Error('The transaction must be defined as an object.')
+            sendTxCallback(error)
+            return Promise.reject(error)
           }
 
-          const wallet = getWallet(_.isObject(tx) && tx.from || tx.feePayer || null, method.accounts)
+          let addressToUse = tx.from
+
+          if (tx.senderRawTransaction && tx.feePayer){
+            addressToUse = tx.feePayer
+            if (tx.from) {
+              console.log('"from" is ignored for a fee-delegated transaction.')
+              delete tx.from
+            }
+          }
+
+          let wallet
+
+          try {
+            wallet = method.accounts.wallet.getAccount(addressToUse)
+          } catch (e) {
+            sendTxCallback(e)
+            return Promise.reject(e)
+          }
 
           if (wallet && wallet.privateKey) {
+            privateKey = method.accounts._getRoleKey(tx, wallet)
             // If wallet was found, sign tx, and send using sendRawTransaction
-            return method.accounts.signTransaction(tx, wallet.privateKey, sendTxCallback).then(sendSignedTx)
+            return method.accounts.signTransaction(tx, privateKey).then(sendSignedTx).catch((e) => { sendTxCallback(e) })
+          } else if (tx.signatures) {
+            // If signatures is defined inside of the transaction object, 
+            // get rawTransaction string from signed transaction object and send to network
+            return method.accounts.getRawTransactionWithSignatures(tx).then(sendSignedTx).catch((e) => { sendTxCallback(e) })
           }
           
           // If wallet was not found in caver-js wallet, then it has to use wallet in Node.
           // Signing to transaction using wallet in Node supports only LEGACY transaction, so if transaction is not LEGACY, return error.
           if (tx.feePayer !== undefined || (tx.type !== undefined && tx.type !== 'LEGACY')) {
-            var error = new Error('Only Legacy transactions can be signed on a Klaytn node!')
+            error = new Error('Only Legacy transactions can be signed on a Klaytn node!')
             sendTxCallback(error)
             return Promise.reject(error)
           }
           
-          if (!tx.senderRawTransaction){
-            var error = validateParams(tx)
-            if (error) {
-              sendTxCallback(error)
-              return Promise.reject(error)
-            }
+          error = validateParams(tx)
+          if (error) {
+            sendTxCallback(error)
+            return Promise.reject(error)
           }
           break
         }
         case 'klay_sign': {
           const data = payload.params[1]
-          const wallet = getWallet(payload.params[0], method.accounts)
+          const wallet = method.accounts.wallet.getAccount(payload.params[0])
 
           if (wallet && wallet.privateKey) {
             // If wallet was found, sign tx, and send using sendRawTransaction

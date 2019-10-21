@@ -24,29 +24,50 @@
  * @return {Error} 
  */
 
-const VALID_GAS_PRICE = require('./constants').VALID_GAS_PRICE
 var utils = require('../../caver-utils')
 
 function validateParams (tx) {
+    let error
+
+    // validate for fee payer transaction format
+    if (tx.senderRawTransaction) {
+      if (!tx.feePayer || tx.feePayer === '0x') {
+        error = new Error(`Invalid fee payer: ${tx.feePayer}`)
+      } else if (!utils.isAddress(tx.feePayer)) {
+        error = new Error(`Invalid address of fee payer: ${tx.feePayer}`)
+      }
+      return error
+    }
+
     const isValidateType = validateTxType(tx.type)
     if (!isValidateType) {
       return new Error('The transaction type [' + tx.type + '] is not supported')
     } 
     
-    var error = validateTxObjectWithType(tx)
+    error = validateTxObjectWithType(tx)
     if (error !== undefined) {
       return error
     }
 
     if (!tx.from) {
       error = new Error('"from" is missing')
+    } else if (!utils.isAddress(tx.from)) {
+      error = new Error(`Invalid address of from: ${tx.from}`)
     } else if (tx.gas === undefined && tx.gasLimit === undefined) {
       error = new Error('"gas" is missing')
     } else if (tx.nonce < 0 || tx.gas < 0 || tx.gasPrice < 0 || tx.chainId < 0) {
       error = new Error('gas, gasPrice, nonce or chainId is lower than 0')
-    // } else if (tx.gasPrice !== undefined && tx.gasPrice != VALID_GAS_PRICE) {
-    //   error = new Error(`GasPrice should be a 25Gpeb(${VALID_GAS_PRICE})`);
     }
+
+    // If feePayerSignatures is set in transaction object, feePayer also should be defined together.
+    if (tx.feePayerSignatures && !utils.isEmptySig(tx.feePayerSignatures)) {
+      if (!tx.feePayer || tx.feePayer === '0x') {
+        error = new Error(`"feePayer" is missing: feePayer must be defined with feePayerSignatures.`)
+      } else if (!utils.isAddress(tx.feePayer)) {
+        error = new Error(`Invalid address of fee payer: ${tx.feePayer}`)
+      }
+    }
+
     return error
   }
   
@@ -103,6 +124,8 @@ function validateParams (tx) {
     switch (cf) {
       case 0:
       case 'EVM':
+      case '0x':
+      case '0x0':
           return true
     }
     return false
@@ -159,6 +182,11 @@ function validateParams (tx) {
     if (transaction.to === undefined && transaction.data === undefined) {
       return new Error('contract creation without any data provided')
     }
+    
+    if (transaction.to && transaction.to !== '0x' && !utils.isAddress(transaction.to)) {
+      return new Error(`Invalid address of to: ${transaction.to}`)
+    }
+
     if (transaction.codeFormat !== undefined) {
       return new Error('"codeFormat" cannot be used with LEGACY transaction')
     }
@@ -177,6 +205,9 @@ function validateParams (tx) {
     if (transaction.feeRatio !== undefined) {
       return new Error('"feeRatio" cannot be used with '+type+' transaction')
     }
+    if (transaction.feePayerSignatures !== undefined) {
+      return new Error('"feePayerSignatures" cannot be used with '+type+' transaction')
+    }
   }
 
   function validateFeeDelegated(transaction) {
@@ -193,6 +224,9 @@ function validateParams (tx) {
 
   function validateNotAccountTransaction(transaction) {
     const type = transaction.type? transaction.type : 'LEGACY'
+    if (transaction.key !== undefined) {
+      return new Error('"key" cannot be used with '+type+' transaction')
+    }
     if (transaction.legacyKey !== undefined) {
       return new Error('"legacyKey" cannot be used with '+type+' transaction')
     }
@@ -219,6 +253,8 @@ function validateParams (tx) {
   function checkValueTransferEssential(transaction) {
     if (transaction.to === undefined) {
       return new Error('"to" is missing')
+    } else if (!utils.isAddress(transaction.to)) {
+      return new Error(`Invalid address of to: ${transaction.to}`)
     }
     if (transaction.value === undefined) {
       return new Error('"value" is missing')
@@ -258,6 +294,8 @@ function validateParams (tx) {
   function checkValueTransferMemoEssential(transaction) {
     if (transaction.to === undefined) {
       return new Error('"to" is missing')
+    } else if (!utils.isAddress(transaction.to)) {
+      return new Error(`Invalid address of to: ${transaction.to}`)
     }
     if (transaction.value === undefined) {
       return new Error('"value" is missing')
@@ -302,12 +340,16 @@ function validateParams (tx) {
       return new Error('"codeFormat" cannot be used with '+transaction.type+' transaction')
     }
 
-    if (transaction.legacyKey === undefined && !transaction.publicKey && !transaction.multisig && !transaction.roleTransactionKey && !transaction.roleAccountUpdateKey && !transaction.roleFeePayerKey && transaction.failKey === undefined) {
+    if (!transaction.key && transaction.legacyKey === undefined && !transaction.publicKey && !transaction.multisig && !transaction.roleTransactionKey && !transaction.roleAccountUpdateKey && !transaction.roleFeePayerKey && transaction.failKey === undefined) {
       return new Error('Missing key information with '+transaction.type+' transaction')
     }
 
     const duplicatedKeyInfo = 'The key parameter to be used for '+transaction.type+' is duplicated.'
-    if (transaction.legacyKey !== undefined) {
+    if (transaction.key) {
+      if (transaction.legacyKey !== undefined || transaction.publicKey || transaction.multisig || transaction.roleTransactionKey || transaction.roleAccountUpdateKey || transaction.roleFeePayerKey || transaction.failKey !== undefined) {
+        return new Error(duplicatedKeyInfo)
+      } 
+    } else if (transaction.legacyKey !== undefined) {
       if (transaction.publicKey || transaction.multisig || transaction.roleTransactionKey || transaction.roleAccountUpdateKey || transaction.roleFeePayerKey || transaction.failKey !== undefined) {
         return new Error(duplicatedKeyInfo)
       } 
@@ -366,7 +408,7 @@ function validateParams (tx) {
     if (transaction.data === undefined) {
       return new Error('"data" is missing')
     }
-    if (transaction.to !== undefined) {
+    if (transaction.to !== undefined && transaction.to !== '0x') {
       return new Error('"to" cannot be used with '+transaction.type+' transaction')
     }
     if (transaction.codeFormat !== undefined && !validateCodeFormat(transaction.codeFormat)) {
@@ -401,6 +443,8 @@ function validateParams (tx) {
   function checkExecutionEssential(transaction) {
     if (transaction.to === undefined) {
       return new Error('"to" is missing')
+    } else if (!utils.isAddress(transaction.to)) {
+      return new Error(`Invalid address of to: ${transaction.to}`)
     }
     if (transaction.data === undefined) {
       return new Error('"data" is missing')

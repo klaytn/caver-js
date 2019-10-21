@@ -76,7 +76,9 @@ var _txInputFormatter = function (options){
     if (options.to) {
       options.humanReadable = options.humanReadable !== undefined? options.humanReadable : false
       if (options.humanReadable) throw new Error('HumanReadableAddress is not supported yet.')
-      options.to = inputAddressFormatter(options.to)
+      if (!utils.isContractDeployment(options) || options.to !== '0x') {
+        options.to = inputAddressFormatter(options.to)
+      }
     }
 
     if (options.data && options.input) {
@@ -140,12 +142,9 @@ var inputTransactionFormatter = function (options) {
 
     options = _txInputFormatter(options);
 
-    // If 'feePayer' or 'senderRawTransaction' exist in transaction, it means it doesn't need 'from' field.
-    if (options.feePayer || options.senderRawTransaction) {
-      if (options.senderRawTransaction === undefined) {
-        throw new Error('The "senderRawTransaction" field must be defined for signing with feePayer!');
-      }
-
+    // If senderRawTransaction' exist in transaction, it means object is fee payer transaction format like below
+    // { senderRawTransaction: '', feePayer: '' }
+    if (options.senderRawTransaction) {
       if (options.feePayer === undefined) {
         throw new Error('The "feePayer" field must be defined for signing with feePayer!');
       }
@@ -164,8 +163,8 @@ var inputTransactionFormatter = function (options) {
         options.from = inputAddressFormatter(options.from);
     }
 
-    if (options.data && options.data.slice(0, 2) !== '0x') {
-      options.data = '0x' + options.data
+    if (options.data) {
+      options.data = utils.addHexPrefix(options.data)
     }
 
     const err = validateParams(options)
@@ -198,8 +197,8 @@ var inputPersonalTransactionFormatter = function (options) {
       options.from = inputAddressFormatter(options.from);
   }
 
-  if (options.data && options.data.slice(0, 2) !== '0x') {
-    options.data = '0x' + options.data
+  if (options.data) {
+    options.data = utils.addHexPrefix(options.data)
   }
   
   return options;
@@ -474,7 +473,6 @@ var outputPostFormatter = function(post){
 };
 
 var inputAddressFormatter = function (address) {
-
     var iban = new utils.Iban(address);
     if (iban.isValid() && iban.isDirect()) {
         return iban.toAddress().toLowerCase();

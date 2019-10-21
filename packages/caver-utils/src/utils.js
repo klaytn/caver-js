@@ -57,6 +57,8 @@ const txTypeToString = {
   '0x48': 'CHAIN_DATA_ANCHORING',
 }
 
+const TRANSACTION_HASH_LENGTH = 66
+
 /**
  * Returns true if object is BN, otherwise false
  *
@@ -398,6 +400,21 @@ var isHex = function (hex) {
     return ((_.isString(hex) || _.isNumber(hex)) && /^(-0x|0x)?[0-9a-f]*$/i.test(hex));
 };
 
+/**
+ * Checks if the given string is a hexadecimal transaction hash with or without prefix 0x
+ * @method isTxHash
+ * @param {String} tx given hexadecimal transaction hash
+ * @return {Boolean}
+ */
+const isTxHash = (tx) => new RegExp(`^(0x|0X)?[0-9a-fA-F]{${TRANSACTION_HASH_LENGTH - 2}}$`).test(tx)
+
+/**
+ * Checks if the given string is a hexadecimal transaction hash that starts with 0x
+ * @method isTxHashStrict
+ * @param {String} tx given hexadecimal transaction hash
+ * @return {Boolean}
+ */
+const isTxHashStrict = (tx) => new RegExp(`^(0x|0X)[0-9a-fA-F]{${TRANSACTION_HASH_LENGTH - 2}}$`).test(tx)
 
 /**
  * Returns true if given string is a valid Klaytn block header bloom.
@@ -501,6 +518,8 @@ var sha3 = function (value) {
 sha3._Hash = Hash;
 
 function parsePrivateKey(privateKey) {
+  if (typeof privateKey !== 'string') throw new Error(`The private key must be of type string`)
+
   const has0xPrefix = privateKey.slice(0, 2) === '0x'
   privateKey = has0xPrefix ? privateKey.slice(2) : privateKey
 
@@ -632,9 +651,25 @@ const getTxTypeStringFromRawTransaction = (rawTransaction) => {
   return typeString
 }
 
+const isValidPublicKey = (publicKey) => {
+  publicKey = publicKey.replace('0x', '')
+  
+  if (publicKey.length !== 66 && publicKey.length !== 128) return false
+
+  if (publicKey.length === 66 && !isCompressedPublicKey(publicKey)) return false
+  
+  if (publicKey.length === 128) {
+    const xyPoints = xyPointFromPublicKey(publicKey)
+    if (xyPoints === undefined || !xyPoints.length) return false
+  }
+
+  return true
+}
+
 const isCompressedPublicKey = (publicKey) => {
   const compressedIndicators = ['02', '03']
-  return publicKey.replace('0x', '').length === 66 && compressedIndicators.includes(publicKey.slice(2, 4))
+  const withoutPrefix = publicKey.replace('0x', '')
+  return withoutPrefix.length === 66 && compressedIndicators.includes(withoutPrefix.slice(0, 2))
 }
 
 const compressPublicKey = (uncompressedPublicKey) => {
@@ -673,6 +708,35 @@ const isContractDeployment = (txObject) => {
 
   return false
 
+}
+
+const isValidRole = (role) => {
+  switch(role) {
+    case 'transactionKey':
+    case 'updateKey':
+    case 'feePayerKey':
+      return true
+  }
+  return false
+}
+
+const isEmptySig = (sig) => {
+  if (!Array.isArray(sig)) return false
+
+  function isEmpty (s) {
+    if (s.length !== 3) throw new Error(`Invalid signatures length: ${s.length}`)
+
+    if (s[0] === '0x01' && s[1] === '0x' && s[2] === '0x') return true
+    return false
+  }
+
+  if (Array.isArray(sig[0])) {
+    // [[v,r,s]]
+    if (sig.length !== 1) return false
+    return isEmpty(sig[0])
+  }
+
+  return isEmpty(sig)
 }
 
 module.exports = {
@@ -715,6 +779,13 @@ module.exports = {
     trimLeadingZero,
     makeEven,
     txTypeToString,
+    isValidPublicKey,
     isCompressedPublicKey,
     compressPublicKey,
+    isTxHash,
+    isTxHashStrict,
+
+    isValidRole: isValidRole,
+
+    isEmptySig: isEmptySig,
 };

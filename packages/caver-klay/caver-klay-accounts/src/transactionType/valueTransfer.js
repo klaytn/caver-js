@@ -67,7 +67,7 @@ function rlpEncodeForValueTransferMemo(transaction) {
 }
 
 function rlpEncodeForFeeDelegatedValueTransfer(transaction) {
-  if (transaction.feePayer) { // fee payer rlp encoding.
+  if (transaction.senderRawTransaction) { // fee payer rlp encoding.
     const typeDetacehdRawTransaction = '0x' + transaction.senderRawTransaction.slice(4)
 
     const [ nonce, gasPrice, gas, to, value, from, [ [ v, r, s ] ] ] = utils.rlpDecode(typeDetacehdRawTransaction)
@@ -106,7 +106,7 @@ function rlpEncodeForFeeDelegatedValueTransfer(transaction) {
 }
 
 function rlpEncodeForFeeDelegatedValueTransferWithRatio(transaction) {
-  if (transaction.feePayer) { // fee payer rlp encoding.
+  if (transaction.senderRawTransaction) { // fee payer rlp encoding.
     const typeDetacehdRawTransaction = '0x' + transaction.senderRawTransaction.slice(4)
 
     const [ nonce, gasPrice, gas, to, value, from, feeRatio, [ [ v, r, s ] ] ] = utils.rlpDecode(typeDetacehdRawTransaction)
@@ -147,7 +147,7 @@ function rlpEncodeForFeeDelegatedValueTransferWithRatio(transaction) {
 }
 
 function rlpEncodeForFeeDelegatedValueTransferMemo(transaction) {
-  if (transaction.feePayer) { // fee payer rlp encoding.
+  if (transaction.senderRawTransaction) { // fee payer rlp encoding.
     const typeDetacehdRawTransaction = '0x' + transaction.senderRawTransaction.slice(4)
 
     const [ nonce, gasPrice, gas, to, value, from, data, [ [ v, r, s ] ] ] = utils.rlpDecode(typeDetacehdRawTransaction)
@@ -188,7 +188,7 @@ function rlpEncodeForFeeDelegatedValueTransferMemo(transaction) {
 }
 
 function rlpEncodeForFeeDelegatedValueTransferMemoWithRatio(transaction) {
-  if (transaction.feePayer) { // fee payer rlp encoding.
+  if (transaction.senderRawTransaction) { // fee payer rlp encoding.
     const typeDetacehdRawTransaction = '0x' + transaction.senderRawTransaction.slice(4)
 
     const [ nonce, gasPrice, gas, to, value, from, data, feeRatio, [ [ v, r, s ] ] ] = utils.rlpDecode(typeDetacehdRawTransaction)

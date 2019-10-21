@@ -378,7 +378,8 @@ function _flattenTypes (includeTuple, puts) {
  * @return {bool}
  */
 var isHexPrefixed = function (str) {
-  return isHexParameter(str)
+  if (typeof str !== 'string') return false
+  return str.slice(0, 2) === '0x'
 }
 
 /**
@@ -390,7 +391,7 @@ var isHexPrefixed = function (str) {
 var addHexPrefix = function (str) {
   if (typeof str !== 'string') return str
 
-  return isHexParameter(str) ? str : '0x' + str
+  return isHexPrefixed(str) ? str : '0x' + str
 }
 
 /**
@@ -402,7 +403,7 @@ var addHexPrefix = function (str) {
 var stripHexPrefix = function (str) {
   if (typeof str !== 'string') return str
 
-  return isHexParameter(str) ? str.slice(2) : str
+  return isHexPrefixed(str) ? str.slice(2) : str
 }
 
 /**
@@ -505,6 +506,8 @@ module.exports = {
     padRight: utils.rightPad,
     rightPad: utils.rightPad,
     toTwosComplement: utils.toTwosComplement,
+    isTxHash: utils.isTxHash,
+    isTxHashStrict: utils.isTxHashStrict,
     // Moved promiEvent to utils,
     promiEvent: promiEvent,
     Iban: Iban,
@@ -532,6 +535,12 @@ module.exports = {
     txTypeToString: utils.txTypeToString,
     trimLeadingZero: utils.trimLeadingZero,
     makeEven: utils.makeEven,
+    isValidPublicKey: utils.isValidPublicKey,
     isCompressedPublicKey: utils.isCompressedPublicKey,
     compressPublicKey: utils.compressPublicKey,
+
+    // For account key
+    isValidRole: utils.isValidRole,
+
+    isEmptySig: utils.isEmptySig,
 };

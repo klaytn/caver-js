@@ -1,16 +1,17 @@
 {
   "name": "caver-js",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "caver-js is a JavaScript API library that allows developers to interact with a Klaytn node",
   "main": "index.js",
   "scripts": {
-    "test": "npm run build && mocha test/packages/caver.klay.utils.js && mocha test/packages/caver.klay.net.js && npm run serTest && npm run walletTest",
+    "test": "npm run build && mocha test/packages/caver.utils.js && mocha test/packages/caver.klay.net.js && npm run serTest && npm run walletTest",
     "build-all": "gulp all",
     "build": "gulp default",
-    "serTest": "mocha test/transactionType/serializationTest.js && mocha test/compressPublicKey.js && mocha test/encodeContractDeploy.js && mocha test/isCompressedPublicKey.js && mocha test/parseAccountKey.js",
+    "serTest": "mocha test/transactionType/serializationTest.js && mocha test/compressPublicKey.js && mocha test/encodeContractDeploy.js && mocha test/isCompressedPublicKey.js && mocha test/parseAccountKey.js && mocha test/decodeTransaction.js",
     "walletTest": "mocha test/accountLib.js && mocha test/accounts.privateKeyToPublicKey.js && mocha test/accounts.recover.js && mocha test/packages/caver.klay.accounts.js && mocha test/getKlaytnWalletKey.js && mocha test/isValidPrivateKey.js && mocha test/privateKeyToAccount.js",
-    "txTest": "mocha test/estimateComputationCost.js && mocha test/getTransactionReceipt.js && mocha test/getTransaction.js && mocha test/setContractOptions.js && mocha test/encodeContractDeploy.js && mocha test/accounts.signTransaction.js && mocha test/transactionType/legacyTransaction.js && mocha test/transactionType/valueTransfer* && mocha test/transactionType/accountUpdate.js && mocha test/transactionType/contract* && mocha test/transactionType/cancelTransaction.js && mocha test/transactionType/feeDelegated*",
-    "etcTest": "mocha test/confirmationListener.js && mocha test/hashMessage.js && mocha test/iban.* && mocha test/randomHex.js && mocha test/sha3.js && mocha test/toChecksumAddress.js && mocha test/unitMap.js && mocha test/default* && mocha test/getNodeInfo.js && mocha test/eventEmitter.js && mocha test/packages/caver.klay.net.js && mocha test/getNetworkType.js && mocha test/invalidResponse.js && mocha test/isContractDeployment.js && mocha test/personal.js && mocha test/multiProviderTest.js && mocha test/subscription.js && mocha test/supportsSubscriptions.js && mocha test/contract.once.js",
+    "txTest": "mocha test/sendSignedTransaction.js && mocha test/estimateComputationCost.js && mocha test/getTransactionReceipt.js && mocha test/getTransaction.js && mocha test/setContractOptions.js && mocha test/encodeContractDeploy.js && mocha test/accounts.signTransaction.js && mocha test/sendTransactionCallback.js && mocha test/signWithMultiSig.js && mocha test/transactionType/legacyTransaction.js && mocha test/transactionType/valueTransfer* && mocha test/transactionType/accountUpdate.js && mocha test/transactionType/contract* && mocha test/transactionType/cancelTransaction.js && mocha test/transactionType/feeDelegated*",
+    "etcTest": "mocha test/packages/caver.utils.js && mocha test/confirmationListener.js && mocha test/hashMessage.js && mocha test/iban.* && mocha test/randomHex.js && mocha test/sha3.js && mocha test/toChecksumAddress.js && mocha test/unitMap.js && mocha test/default* && mocha test/getNodeInfo.js && mocha test/eventEmitter.js && mocha test/packages/caver.klay.net.js && mocha test/getNetworkType.js && mocha test/invalidResponse.js && mocha test/isContractDeployment.js && mocha test/personal.js && mocha test/multiProviderTest.js && mocha test/subscription.js && mocha test/supportsSubscriptions.js && mocha test/contract.once.js && mocha test/setProvider.js",
+    "accountKeyTest": "mocha test/scenarioTest/accountKeyPublic.js && mocha test/scenarioTest/accountKeyMultiSig.js && mocha test/scenarioTest/accountKeyRoleBased.js",
     "intTxTest": "npm run intLEGACYTest && npm run intVTTest && npm run intVTMTest && npm run intACCUPTest && npm run intDEPLTest && npm run intEXETest && npm run intCANCELTest && npm run intFDTest && npm run intFDRTest",
     "intLEGACYTest": "mocha --grep INT-LEGACY/ test/intTest.js",
     "intVTTest": "mocha --grep INT-VT/ test/intTest.js",
@@ -33,6 +34,14 @@
     "klaytn sdk",
     "klaytn api"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/klaytn/caver-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/klaytn/caver-js/issues"
+  },
+  "homepage": "https://github.com/klaytn/caver-js",
   "author": "Klaytn Team",
   "license": "LGPL",
   "dependencies": {
@@ -55,7 +64,7 @@
     "oboe": "2.1.3",
     "request": "2.87.0",
     "requestretry": "^2.0.2",
-    "scrypt.js": "0.2.0",
+    "scryptsy": "2.1.0",
     "underscore": "^1.9.1",
     "utf8": "2.1.1",
     "uuid": "2.0.1",
