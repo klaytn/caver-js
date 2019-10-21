@@ -1752,6 +1752,32 @@ describe('caver.klay.accounts.combineSignatures', () => {
       expect(decoded.signatures.length).to.equals(3)
     }).timeout(200000)
   })
+
+  context('CAVERJS-UNIT-WALLET-387: input: not array', () => {
+    it('should throw error when parameter is not array', async () => {
+      let signResult = await caver.klay.accounts.signTransaction(feeDelegatedTx)
+
+      const expectedError = 'The parameter of the combineSignatures function must be an array of RLP encoded transaction strings.'
+      await expect(caver.klay.accounts.combineSignatures(signResult.rawTransaction, (error, result) => {
+        expect(error).not.to.be.undefined
+        expect(result).to.be.undefined
+      })).to.be.rejectedWith(expectedError)
+    }).timeout(200000)
+  })
+
+  context('CAVERJS-UNIT-WALLET-388: input: different RLP encoded transaction', () => {
+    it('should throw error when contents of transaction is not same', async () => {
+      let signResult = await caver.klay.accounts.signTransaction(feeDelegatedTx, sender.transactionKey[0])
+      feeDelegatedTx.value = 2
+      let signResult2 = await caver.klay.accounts.signTransaction(feeDelegatedTx, sender.transactionKey[2])
+
+      const expectedError = 'Failed to combineSignatures: Signatures that sign to different transaction cannot be combined.'
+      await expect(caver.klay.accounts.combineSignatures([signResult.rawTransaction, signResult2.rawTransaction], (error, result) => {
+        expect(error).not.to.be.undefined
+        expect(result).to.be.undefined
+      })).to.be.rejectedWith(expectedError)
+    }).timeout(200000)
+  })
 })
 
 describe('caver.klay.accounts.recoverTransaction', () => {

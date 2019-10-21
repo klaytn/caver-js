@@ -900,15 +900,24 @@ Accounts.prototype.getRawTransactionWithSignatures = function getRawTransactionW
  * 
  * @method combineSignatures
  * @param {Array} rawTransactions The array of raw transaction string to combine.
+ * @param {Function} callback The callback function to call.
  * @return {Object}
  */
-Accounts.prototype.combineSignatures = function combineSignatures(rawTransactions) {
+Accounts.prototype.combineSignatures = function combineSignatures(rawTransactions, callback) {
   let decodedTx
   let senders = []
   let feePayers = []
   let feePayer
 
-  if (!_.isArray(rawTransactions)) throw new Error(`The parameter of the combineSignatures function must be an array of RLP encoded transaction strings.`)
+  callback = callback || function () {}
+
+  let handleError = (e) => {
+    e = e instanceof Error? e : new Error(e)
+    if (callback) callback(e)
+    return Promise.reject(e)
+  }
+
+  if (!_.isArray(rawTransactions)) return handleError(`The parameter of the combineSignatures function must be an array of RLP encoded transaction strings.`)
   
   for (const raw of rawTransactions) {
     const { senderSignatures, feePayerSignatures, decodedTransaction } = extractSignatures(raw)
@@ -944,7 +953,7 @@ Accounts.prototype.combineSignatures = function combineSignatures(rawTransaction
           break
         }
       }
-      if (!isSame) throw new Error(`Failed to combineSignatures: Signatures that sign to different transaction cannot be combined.`)
+      if (!isSame) return handleError(`Failed to combineSignatures: Signatures that sign to different transaction cannot be combined.`)
     } else {
       decodedTx = decodedTransaction
     }
@@ -960,7 +969,7 @@ Accounts.prototype.combineSignatures = function combineSignatures(rawTransaction
       parsedTxObject.feePayerSignatures = feePayers
     }
   }
-  return this.getRawTransactionWithSignatures(parsedTxObject)
+  return this.getRawTransactionWithSignatures(parsedTxObject, callback)
 }
 
 /**
