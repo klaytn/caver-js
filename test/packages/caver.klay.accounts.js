@@ -2564,6 +2564,40 @@ describe('caver.klay.accounts.encrypt', () => {
       isKeystoreV4(result, testAccount)
     })
   })
+
+  context('CAVERJS-UNIT-WALLET-389: input: Account with AccountKeyMultiSig, password, option(pbkdf2)', () => {
+    it('should throw error when addresses are not matched', () => {
+      const password = 'password'
+
+      let testAccount = caver.klay.accounts.createWithAccountKey('0xf725a2950dc959638fa09f9d9b5426ad3dd8cd90', {
+        transactionKey: '0x7dc66dca0e5d56940c99ad01903a8ba5fd9e1f7a51a8ab07cf81ccd1d3c4be16',
+        updateKey: ['0x5fc3216454ab841ffa2bed0933a27bcdf2965238372bff3ec4fe56cbf5389a87', '0x79fe0616e7624314611b8e9c716b8d9c0c8c8c20f654021ff5fa7c46dc50709b'],
+        feePayerKey: '0xfac188dc156ef58d529ea14ac95379f502a390d5720a9575b87545e36b3f758e',
+      })
+      
+      let encryptOption = {
+        salt: 'e7c4605ad8200e0d93cd67f9d82fb9971e1a2763b22362017c2927231c2a733a',
+        iv: Buffer.from('38aa896fc128075425e512f01e4b206c', 'hex'),
+        kdf: 'pbkdf2',
+        dklen: 32,
+        c: 262144,
+        cipher: 'aes-128-ctr',
+        uuid: Buffer.from('e7c4605ad8200e0d93cd67f9d82fb997', 'hex'),
+      }
+
+      let result = caver.klay.accounts.encrypt(testAccount.keys, password, Object.assign({address: testAccount.address, encryptOption}))
+
+      isKeystoreV4(result, testAccount)
+
+      expect(result.keyring.length).to.equals(3)
+      expect(result.keyring[0].length).to.equals(1)
+      expect(result.keyring[1].length).to.equals(2)
+      expect(result.keyring[2].length).to.equals(1)
+
+      const decrypted = caver.klay.accounts.decrypt(result, password)
+      isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
+    })
+  })
 })
 
 describe('caver.klay.accounts.decrypt', () => {
