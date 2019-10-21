@@ -64,7 +64,7 @@ function checkHashMessage(hashed, originMessage) {
 }
 
 function isKeystoreV4(data, { address }) {
-  const objectKeys = ['version', 'id', 'address', 'keyRing']
+  const objectKeys = ['version', 'id', 'address', 'keyring']
   expect(Object.getOwnPropertyNames(data)).to.deep.equal(objectKeys)
 
   expect(data.version).to.equals(4)
@@ -2095,7 +2095,7 @@ describe('caver.klay.accounts.encrypt', () => {
       let result = caver.klay.accounts.encrypt(testAccount.keys, password, {address: testAccount.address})
 
       isKeystoreV4(result, testAccount)
-      expect(result.keyRing.length).to.equals(key.length)
+      expect(result.keyring.length).to.equals(key.length)
 
       const decrypted = caver.klay.accounts.decrypt(result, password)
       isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
@@ -2128,10 +2128,10 @@ describe('caver.klay.accounts.encrypt', () => {
       let result = caver.klay.accounts.encrypt(testAccount.keys, password, {address: testAccount.address})
 
       isKeystoreV4(result, testAccount)
-      expect(result.keyRing.length).to.equals(3)
-      expect(result.keyRing[0].length).to.equals(1)
-      expect(result.keyRing[1].length).to.equals(1)
-      expect(result.keyRing[2].length).to.equals(1)
+      expect(result.keyring.length).to.equals(3)
+      expect(result.keyring[0].length).to.equals(1)
+      expect(result.keyring[1].length).to.equals(1)
+      expect(result.keyring[2].length).to.equals(1)
 
       const decrypted = caver.klay.accounts.decrypt(result, password)
       isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
@@ -2152,10 +2152,10 @@ describe('caver.klay.accounts.encrypt', () => {
       let result = caver.klay.accounts.encrypt(testAccount.keys, password, {address: testAccount.address})
 
       isKeystoreV4(result, testAccount)
-      expect(result.keyRing.length).to.equals(3)
-      expect(result.keyRing[0].length).to.equals(key.transactionKey.length)
-      expect(result.keyRing[1].length).to.equals(key.updateKey.length)
-      expect(result.keyRing[2].length).to.equals(key.feePayerKey.length)
+      expect(result.keyring.length).to.equals(3)
+      expect(result.keyring[0].length).to.equals(key.transactionKey.length)
+      expect(result.keyring[1].length).to.equals(key.updateKey.length)
+      expect(result.keyring[2].length).to.equals(key.feePayerKey.length)
 
       const decrypted = caver.klay.accounts.decrypt(result, password)
       isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
@@ -2174,8 +2174,8 @@ describe('caver.klay.accounts.encrypt', () => {
       let result = caver.klay.accounts.encrypt(testAccount.keys, password, {address: testAccount.address})
 
       isKeystoreV4(result, testAccount)
-      expect(result.keyRing.length).to.equals(1)
-      expect(result.keyRing[0].length).to.equals(1)
+      expect(result.keyring.length).to.equals(1)
+      expect(result.keyring[0].length).to.equals(1)
 
       const decrypted = caver.klay.accounts.decrypt(result, password)
       isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
@@ -2194,9 +2194,9 @@ describe('caver.klay.accounts.encrypt', () => {
       let result = caver.klay.accounts.encrypt(testAccount.keys, password, {address: testAccount.address})
 
       isKeystoreV4(result, testAccount)
-      expect(result.keyRing.length).to.equals(2)
-      expect(result.keyRing[0].length).to.equals(0)
-      expect(result.keyRing[1].length).to.equals(1)
+      expect(result.keyring.length).to.equals(2)
+      expect(result.keyring[0].length).to.equals(0)
+      expect(result.keyring[1].length).to.equals(1)
 
       const decrypted = caver.klay.accounts.decrypt(result, password)
       isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
@@ -2215,10 +2215,10 @@ describe('caver.klay.accounts.encrypt', () => {
       let result = caver.klay.accounts.encrypt(testAccount.keys, password, {address: testAccount.address})
 
       isKeystoreV4(result, testAccount)
-      expect(result.keyRing.length).to.equals(3)
-      expect(result.keyRing[0].length).to.equals(0)
-      expect(result.keyRing[1].length).to.equals(0)
-      expect(result.keyRing[2].length).to.equals(1)
+      expect(result.keyring.length).to.equals(3)
+      expect(result.keyring[0].length).to.equals(0)
+      expect(result.keyring[1].length).to.equals(0)
+      expect(result.keyring[2].length).to.equals(1)
 
       const decrypted = caver.klay.accounts.decrypt(result, password)
       isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
@@ -2252,7 +2252,7 @@ describe('caver.klay.accounts.encrypt', () => {
       let result = caver.klay.accounts.encrypt(accountKey, password, {address: testAccount.address})
 
       isKeystoreV4(result, testAccount)
-      expect(result.keyRing.length).to.equals(1)
+      expect(result.keyring.length).to.equals(1)
 
       const decrypted = caver.klay.accounts.decrypt(result, password)
       isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
@@ -2282,7 +2282,7 @@ describe('caver.klay.accounts.encrypt', () => {
       let result = caver.klay.accounts.encrypt(accountKey, password, {address: testAccount.address})
 
       isKeystoreV4(result, testAccount)
-      expect(result.keyRing.length).to.equals(key.length)
+      expect(result.keyring.length).to.equals(key.length)
 
       const decrypted = caver.klay.accounts.decrypt(result, password)
       isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
@@ -2316,10 +2316,10 @@ describe('caver.klay.accounts.encrypt', () => {
       let result = caver.klay.accounts.encrypt(accountKey, password, {address: testAccount.address})
 
       isKeystoreV4(result, testAccount)
-      expect(result.keyRing.length).to.equals(3)
-      expect(result.keyRing[0].length).to.equals(1)
-      expect(result.keyRing[1].length).to.equals(key.updateKey.length)
-      expect(result.keyRing[2].length).to.equals(key.feePayerKey.length)
+      expect(result.keyring.length).to.equals(3)
+      expect(result.keyring[0].length).to.equals(1)
+      expect(result.keyring[1].length).to.equals(key.updateKey.length)
+      expect(result.keyring[2].length).to.equals(key.feePayerKey.length)
 
       const decrypted = caver.klay.accounts.decrypt(result, password)
       isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
@@ -2353,7 +2353,7 @@ describe('caver.klay.accounts.encrypt', () => {
       let result = caver.klay.accounts.encrypt(testAccount, password, {address: testAccount.address})
 
       isKeystoreV4(result, testAccount)
-      expect(result.keyRing.length).to.equals(1)
+      expect(result.keyring.length).to.equals(1)
 
       const decrypted = caver.klay.accounts.decrypt(result, password)
       isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
@@ -2384,7 +2384,7 @@ describe('caver.klay.accounts.encrypt', () => {
       let result = caver.klay.accounts.encrypt(accountKey, password, {address: testAccount.address})
 
       isKeystoreV4(result, testAccount)
-      expect(result.keyRing.length).to.equals(key.length)
+      expect(result.keyring.length).to.equals(key.length)
 
       const decrypted = caver.klay.accounts.decrypt(result, password)
       isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
@@ -2419,10 +2419,10 @@ describe('caver.klay.accounts.encrypt', () => {
       let result = caver.klay.accounts.encrypt(accountKey, password, {address: testAccount.address})
 
       isKeystoreV4(result, testAccount)
-      expect(result.keyRing.length).to.equals(3)
-      expect(result.keyRing[0].length).to.equals(1)
-      expect(result.keyRing[1].length).to.equals(key.updateKey.length)
-      expect(result.keyRing[2].length).to.equals(key.feePayerKey.length)
+      expect(result.keyring.length).to.equals(3)
+      expect(result.keyring[0].length).to.equals(1)
+      expect(result.keyring[1].length).to.equals(key.updateKey.length)
+      expect(result.keyring[2].length).to.equals(key.feePayerKey.length)
 
       const decrypted = caver.klay.accounts.decrypt(result, password)
       isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
@@ -2472,7 +2472,7 @@ describe('caver.klay.accounts.encrypt', () => {
         version: 4,
         id: 'e7c4605a-d820-4e0d-93cd-67f9d82fb997',
         address: '0xf725a2950dc959638fa09f9d9b5426ad3dd8cd90',
-        keyRing:[ 
+        keyring:[ 
           [ 
             { 
               ciphertext: '5e2f95f61d7af3bebf4ff9f5d5813690c80b0b5aaebd6e8b22d0f928ff06776a',
@@ -2543,10 +2543,10 @@ describe('caver.klay.accounts.encrypt', () => {
       expect(result.version).to.equals(expectedKeystore.version)
       expect(result.id).to.equals(expectedKeystore.id)
       expect(result.address).to.equals(expectedKeystore.address)
-      compareEncrypted(result.keyRing[0][0], expectedKeystore.keyRing[0][0])
-      compareEncrypted(result.keyRing[1][0], expectedKeystore.keyRing[1][0])
-      compareEncrypted(result.keyRing[1][1], expectedKeystore.keyRing[1][1])
-      compareEncrypted(result.keyRing[2][0], expectedKeystore.keyRing[2][0])
+      compareEncrypted(result.keyring[0][0], expectedKeystore.keyring[0][0])
+      compareEncrypted(result.keyring[1][0], expectedKeystore.keyring[1][0])
+      compareEncrypted(result.keyring[1][1], expectedKeystore.keyring[1][1])
+      compareEncrypted(result.keyring[2][0], expectedKeystore.keyring[2][0])
 
       function compareEncrypted(ret, exp) {
         expect(ret.ciphertext).to.equals(exp.ciphertext)
@@ -2562,6 +2562,40 @@ describe('caver.klay.accounts.encrypt', () => {
       }
 
       isKeystoreV4(result, testAccount)
+    })
+  })
+
+  context('CAVERJS-UNIT-WALLET-389: input: Account with AccountKeyMultiSig, password, option(pbkdf2)', () => {
+    it('should throw error when addresses are not matched', () => {
+      const password = 'password'
+
+      let testAccount = caver.klay.accounts.createWithAccountKey('0xf725a2950dc959638fa09f9d9b5426ad3dd8cd90', {
+        transactionKey: '0x7dc66dca0e5d56940c99ad01903a8ba5fd9e1f7a51a8ab07cf81ccd1d3c4be16',
+        updateKey: ['0x5fc3216454ab841ffa2bed0933a27bcdf2965238372bff3ec4fe56cbf5389a87', '0x79fe0616e7624314611b8e9c716b8d9c0c8c8c20f654021ff5fa7c46dc50709b'],
+        feePayerKey: '0xfac188dc156ef58d529ea14ac95379f502a390d5720a9575b87545e36b3f758e',
+      })
+      
+      let encryptOption = {
+        salt: 'e7c4605ad8200e0d93cd67f9d82fb9971e1a2763b22362017c2927231c2a733a',
+        iv: Buffer.from('38aa896fc128075425e512f01e4b206c', 'hex'),
+        kdf: 'pbkdf2',
+        dklen: 32,
+        c: 262144,
+        cipher: 'aes-128-ctr',
+        uuid: Buffer.from('e7c4605ad8200e0d93cd67f9d82fb997', 'hex'),
+      }
+
+      let result = caver.klay.accounts.encrypt(testAccount.keys, password, Object.assign({address: testAccount.address, encryptOption}))
+
+      isKeystoreV4(result, testAccount)
+
+      expect(result.keyring.length).to.equals(3)
+      expect(result.keyring[0].length).to.equals(1)
+      expect(result.keyring[1].length).to.equals(2)
+      expect(result.keyring[2].length).to.equals(1)
+
+      const decrypted = caver.klay.accounts.decrypt(result, password)
+      isAccount(decrypted, {keys: testAccount.keys, address: testAccount.address})
     })
   })
 })
@@ -2673,8 +2707,8 @@ describe('caver.klay.accounts.decrypt', () => {
       const key = caver.klay.accounts.create().privateKey
       const keystore = caver.klay.accounts.encrypt(key, password, { address: account.address })
       keystore.version = 3
-      keystore.crypto = keystore.keyRing[0]
-      delete keystore.keyRing
+      keystore.crypto = keystore.keyring[0]
+      delete keystore.keyring
       
       let result = caver.klay.accounts.decrypt(keystore, password)
       
@@ -2696,27 +2730,27 @@ describe('caver.klay.accounts.decrypt', () => {
   })
 
   context('CAVERJS-UNIT-WALLET-380: input: keystoreJsonV4 that encrypts Account, password', () => {
-    it('should throw error with invalid keystore v3 which defines crypto and keyRing', () => {
+    it('should throw error with invalid keystore v3 which defines crypto and keyring', () => {
       const password = 'klaytn!@'
       const key = caver.klay.accounts.create().privateKey
       const keystore = caver.klay.accounts.encrypt(key, password, { address: account.address })
       keystore.version = 3
-      keystore.crypto = keystore.keyRing[0]
+      keystore.crypto = keystore.keyring[0]
       
-      const expectedError = `Invalid key store format: 'crypto' can not be with 'keyRing'`
+      const expectedError = `Invalid key store format: 'crypto' can not be with 'keyring'`
       
       expect(() => caver.klay.accounts.decrypt(keystore, password)).to.throws(expectedError)
     })
   })
 
   context('CAVERJS-UNIT-WALLET-381: input: keystoreJsonV4 that encrypts Account, password', () => {
-    it('should throw error with invalid keystore v3 which defines crypto and keyRing', () => {
+    it('should throw error with invalid keystore v3 which defines crypto and keyring', () => {
       const password = 'klaytn!@'
       const key = caver.klay.accounts.create().privateKey
       const keystore = caver.klay.accounts.encrypt(key, password, { address: account.address })
-      keystore.crypto = keystore.keyRing[0]
+      keystore.crypto = keystore.keyring[0]
       
-      const expectedError = `Invalid key store format: 'crypto' can not be with 'keyRing'`
+      const expectedError = `Invalid key store format: 'crypto' can not be with 'keyring'`
       
       expect(() => caver.klay.accounts.decrypt(keystore, password)).to.throws(expectedError)
     })
@@ -2727,7 +2761,7 @@ describe('caver.klay.accounts.decrypt', () => {
       const password = 'klaytn!@'
       const key = caver.klay.accounts.create().privateKey
       const keystore = caver.klay.accounts.encrypt(key, password, { address: account.address })
-      keystore.keyRing = [[], [], [], []]
+      keystore.keyring = [[], [], [], []]
       
       const expectedError = `Invalid key store format`
       
@@ -2741,7 +2775,7 @@ describe('caver.klay.accounts.decrypt', () => {
         version: 4,
         id: '55da3f9c-6444-4fc1-abfa-f2eabfc57501',
         address: '0x86bce8c859f5f304aa30adb89f2f7b6ee5a0d6e2',
-        keyRing:[ 
+        keyring:[ 
           [ 
             { 
               ciphertext: '93dd2c777abd9b80a0be8e1eb9739cbf27c127621a5d3f81e7779e47d3bb22f6',
