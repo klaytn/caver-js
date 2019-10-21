@@ -1116,29 +1116,29 @@ Accounts.prototype.decrypt = function (v3Keystore, password, nonStrict) {
     }
 
     if (json.crypto) {
-      if (json.keyRing) throw new Error(`Invalid key store format: 'crypto' can not be with 'keyRing'`)
-      json.keyRing = [json.crypto]
+      if (json.keyring) throw new Error(`Invalid key store format: 'crypto' can not be with 'keyring'`)
+      json.keyring = [json.crypto]
       delete json.crypto
     }
 
-    if (_.isArray(json.keyRing[0]) && json.keyRing.length > 3) {
+    if (_.isArray(json.keyring[0]) && json.keyring.length > 3) {
       throw new Error(`Invalid key store format`)
     }
 
     let accountKey = {}
     
     // AccountKeyRoleBased format
-    if (_.isArray(json.keyRing[0])) {
-      let transactionKey = decryptKey(json.keyRing[0])
+    if (_.isArray(json.keyring[0])) {
+      let transactionKey = decryptKey(json.keyring[0])
       if (transactionKey) accountKey.transactionKey = transactionKey
 
-      let updateKey = decryptKey(json.keyRing[1])
+      let updateKey = decryptKey(json.keyring[1])
       if (updateKey) accountKey.updateKey = updateKey
 
-      let feePayerKey = decryptKey(json.keyRing[2])
+      let feePayerKey = decryptKey(json.keyring[2])
       if (feePayerKey) accountKey.feePayerKey = feePayerKey
     } else {
-      accountKey = decryptKey(json.keyRing)
+      accountKey = decryptKey(json.keyring)
     }
 
     function decryptKey(encryptedArray) {
@@ -1278,24 +1278,24 @@ Accounts.prototype.encrypt = function (key, password, options) {
 
     if (!account) account = this.createWithAccountKey(address, key)
 
-    let keyRing
+    let keyring
 
     switch(account.accountKeyType) {
       case AccountKeyEnum.ACCOUNT_KEY_PUBLIC:
       case AccountKeyEnum.ACCOUNT_KEY_MULTISIG:
-        keyRing = encryptKey(account.keys)
+        keyring = encryptKey(account.keys)
         break
       case AccountKeyEnum.ACCOUNT_KEY_ROLEBASED:
-        keyRing = []
+        keyring = []
         let transactionKey = encryptKey(account.transactionKey)
         let updateKey = encryptKey(account.updateKey)
         let feePayerKey = encryptKey(account.feePayerKey)
-        keyRing.push(transactionKey)
-        keyRing.push(updateKey)
-        keyRing.push(feePayerKey)
-        for (i = keyRing.length-1; i >=0; i --) {
-          if (keyRing[i].length !== 0) break
-          keyRing = keyRing.slice(0, i)
+        keyring.push(transactionKey)
+        keyring.push(updateKey)
+        keyring.push(feePayerKey)
+        for (i = keyring.length-1; i >=0; i --) {
+          if (keyring[i].length !== 0) break
+          keyring = keyring.slice(0, i)
         }
         break
     }
@@ -1365,7 +1365,7 @@ Accounts.prototype.encrypt = function (key, password, options) {
         version: 4,
         id: uuid.v4({ random: options.uuid || cryp.randomBytes(16) }),
         address: account.address.toLowerCase(),
-        keyRing
+        keyring
     };
 };
 
