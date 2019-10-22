@@ -24,86 +24,84 @@
  * @date 2017
  */
 
-var core = require('../../../caver-core');
-var Method = require('../../../caver-core-method');
-var utils = require('../../../caver-utils');
-var Net = require('../../../caver-net');
+var core = require('../../../caver-core')
+var Method = require('../../../caver-core-method')
+var utils = require('../../../caver-utils')
+var Net = require('../../../caver-net')
 
-var formatters = require('../../../caver-core-helpers').formatters;
+var formatters = require('../../../caver-core-helpers').formatters
 const rpc = require('../../../caver-rtm').rpc
 
 var Personal = function Personal(...args) {
-    var _this = this;
+    var _this = this
 
     // sets _requestmanager
-    core.packageInit(this, args);
+    core.packageInit(this, args)
 
-    this.net = new Net(this.currentProvider);
+    this.net = new Net(this.currentProvider)
 
-    var defaultAccount = null;
-    var defaultBlock = 'latest';
+    var defaultAccount = null
+    var defaultBlock = 'latest'
 
     Object.defineProperty(this, 'defaultAccount', {
-        get: function () {
-            return defaultAccount;
+        get: function() {
+            return defaultAccount
         },
-        set: function (val) {
-            if(val) {
-              defaultAccount = utils.toChecksumAddress(formatters.inputAddressFormatter(val));
+        set: function(val) {
+            if (val) {
+                defaultAccount = utils.toChecksumAddress(formatters.inputAddressFormatter(val))
             }
 
             // update defaultBlock
             methods.forEach(function(method) {
-                method.defaultAccount = defaultAccount;
-            });
+                method.defaultAccount = defaultAccount
+            })
 
-            return val;
+            return val
         },
-        enumerable: true
-    });
+        enumerable: true,
+    })
     Object.defineProperty(this, 'defaultBlock', {
-        get: function () {
-            return defaultBlock;
+        get: function() {
+            return defaultBlock
         },
-        set: function (val) {
-          if (!utils.isValidBlockNumberCandidate(val)) {
-            throw(new Error('Invalid default block number.'))
-            return
-          }
-          defaultBlock = val;
+        set: function(val) {
+            if (!utils.isValidBlockNumberCandidate(val)) {
+                throw new Error('Invalid default block number.')
+            }
+            defaultBlock = val
 
-          // update defaultBlock
-          methods.forEach(function(method) {
-              method.defaultBlock = defaultBlock;
-          });
+            // update defaultBlock
+            methods.forEach(function(method) {
+                method.defaultBlock = defaultBlock
+            })
 
-          return val;
+            return val
         },
-        enumerable: true
-    });
-
+        enumerable: true,
+    })
 
     var methods = [
-      rpc.personal.getAccounts,
-      rpc.personal.newAccount,
-      rpc.personal.unlockAccount,
-      rpc.personal.lockAccount,
-      rpc.personal.importRawKey,
-      rpc.personal.sendTransaction,
-      rpc.personal.signTransaction,
-      rpc.personal.sign,
-      rpc.personal.ecRecover,
-      rpc.personal.replaceRawKey,
-      rpc.personal.sendValueTransfer,
-      rpc.personal.sendAccountUpdate,
-    ];
+        rpc.personal.getAccounts,
+        rpc.personal.newAccount,
+        rpc.personal.unlockAccount,
+        rpc.personal.lockAccount,
+        rpc.personal.importRawKey,
+        rpc.personal.sendTransaction,
+        rpc.personal.signTransaction,
+        rpc.personal.sign,
+        rpc.personal.ecRecover,
+        rpc.personal.replaceRawKey,
+        rpc.personal.sendValueTransfer,
+        rpc.personal.sendAccountUpdate,
+    ]
     methods.forEach(function(method) {
         method = new Method(method)
-        method.attachToObject(_this);
-        method.setRequestManager(_this._requestManager);
-        method.defaultBlock = _this.defaultBlock;
-        method.defaultAccount = _this.defaultAccount;
-    });
-};
+        method.attachToObject(_this)
+        method.setRequestManager(_this._requestManager)
+        method.defaultBlock = _this.defaultBlock
+        method.defaultAccount = _this.defaultAccount
+    })
+}
 
-module.exports = Personal;
+module.exports = Personal
