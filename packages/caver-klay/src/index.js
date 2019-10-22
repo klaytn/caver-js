@@ -40,88 +40,87 @@ const getNetworkType = require('./getNetworkType.js')
 
 const rpcCalls = require('../../caver-rtm')
 
-const {decodeFromRawTransaction} = require('../caver-klay-accounts/src/makeRawTransaction')
+const { decodeFromRawTransaction } = require('../caver-klay-accounts/src/makeRawTransaction')
 
 var Klay = function Klay(...args) {
-    var _this = this;
+    var _this = this
 
     // sets _requestmanager
-    core.packageInit(this, args);
+    core.packageInit(this, args)
 
     // overwrite setProvider
-    var setProvider = this.setProvider;
-    this.setProvider = function (...args) {
-        setProvider.apply(_this, args);
-        _this.net.setProvider.apply(_this, args);
-        _this.personal.setProvider.apply(_this, args);
-        _this.accounts.setProvider.apply(_this, args);
-        _this.Contract.setProvider(_this.currentProvider, _this.accounts);
-    };
+    var setProvider = this.setProvider
+    this.setProvider = function(...args) {
+        setProvider.apply(_this, args)
+        _this.net.setProvider.apply(_this, args)
+        _this.personal.setProvider.apply(_this, args)
+        _this.accounts.setProvider.apply(_this, args)
+        _this.Contract.setProvider(_this.currentProvider, _this.accounts)
+    }
 
-    var defaultAccount = null;
-    var defaultBlock = 'latest';
+    var defaultAccount = null
+    var defaultBlock = 'latest'
 
     Object.defineProperty(this, 'defaultAccount', {
-        get: function () {
-            return defaultAccount;
+        get: function() {
+            return defaultAccount
         },
-        set: function (val) {
-            if(val) {
-                defaultAccount = utils.toChecksumAddress(formatters.inputAddressFormatter(val));
+        set: function(val) {
+            if (val) {
+                defaultAccount = utils.toChecksumAddress(formatters.inputAddressFormatter(val))
             }
 
             // also set on the Contract object
-            _this.Contract.defaultAccount = defaultAccount;
-            _this.personal.defaultAccount = defaultAccount;
+            _this.Contract.defaultAccount = defaultAccount
+            _this.personal.defaultAccount = defaultAccount
 
             // update defaultBlock
             methods.forEach(function(method) {
-                method.defaultAccount = defaultAccount;
-            });
+                method.defaultAccount = defaultAccount
+            })
 
-            return val;
+            return val
         },
-        enumerable: true
-    });
+        enumerable: true,
+    })
     Object.defineProperty(this, 'defaultBlock', {
-        get: function () {
-            return defaultBlock;
+        get: function() {
+            return defaultBlock
         },
-        set: function (val) {
+        set: function(val) {
             if (!utils.isValidBlockNumberCandidate(val)) {
-              throw(new Error('Invalid default block number.'))
-              return
+                throw new Error('Invalid default block number.')
             }
-            defaultBlock = val;
+            defaultBlock = val
             // also set on the Contract object
-            _this.Contract.defaultBlock = defaultBlock;
-            _this.personal.defaultBlock = defaultBlock;
+            _this.Contract.defaultBlock = defaultBlock
+            _this.personal.defaultBlock = defaultBlock
 
             // update defaultBlock
             methods.forEach(function(method) {
-                method.defaultBlock = defaultBlock;
-            });
+                method.defaultBlock = defaultBlock
+            })
 
-            return val;
+            return val
         },
-        enumerable: true
-    });
+        enumerable: true,
+    })
 
-    this.clearSubscriptions = _this._requestManager.clearSubscriptions;
+    this.clearSubscriptions = _this._requestManager.clearSubscriptions
 
-    this.decodeTransaction = decodeFromRawTransaction;
+    this.decodeTransaction = decodeFromRawTransaction
 
     // add net
-    this.net = new Net(this.currentProvider);
+    this.net = new Net(this.currentProvider)
     // add chain detection
-    this.net.getNetworkType = getNetworkType.bind(this);
+    this.net.getNetworkType = getNetworkType.bind(this)
 
     // add accounts
-    this.accounts = new Accounts(this.currentProvider);
+    this.accounts = new Accounts(this.currentProvider)
 
     // add personal
-    this.personal = new Personal(this.currentProvider);
-    this.personal.defaultAccount = this.defaultAccount;
+    this.personal = new Personal(this.currentProvider)
+    this.personal.defaultAccount = this.defaultAccount
 
     // create a proxy Contract type for this instance, as a Contract's provider
     // is stored as a class member rather than an instance variable. If we do
@@ -129,29 +128,29 @@ var Klay = function Klay(...args) {
     // caver-klay would subsequently change the provider for _all_ contract
     // instances!
     var Contract = function Contract() {
-        BaseContract.apply(this, arguments);
-    };
+        BaseContract.apply(this, arguments)
+    }
 
     Contract.setProvider = function() {
-        BaseContract.setProvider.apply(this, arguments);
-    };
+        BaseContract.setProvider.apply(this, arguments)
+    }
 
     // make our proxy Contract inherit from caver-klay-contract so that it has all
     // the right functionality and so that instanceof and friends work properly
-    Contract.prototype = Object.create(BaseContract.prototype);
-    Contract.prototype.constructor = Contract;
+    Contract.prototype = Object.create(BaseContract.prototype)
+    Contract.prototype.constructor = Contract
 
     // add contract
-    this.Contract = Contract;
-    this.Contract.defaultAccount = this.defaultAccount;
-    this.Contract.defaultBlock = this.defaultBlock;
-    this.Contract.setProvider(this.currentProvider, this.accounts);
+    this.Contract = Contract
+    this.Contract.defaultAccount = this.defaultAccount
+    this.Contract.defaultBlock = this.defaultBlock
+    this.Contract.setProvider(this.currentProvider, this.accounts)
 
     // add IBAN
-    this.Iban = utils.Iban;
+    this.Iban = utils.Iban
 
     // add ABI
-    this.abi = abi;
+    this.abi = abi
 
     var methods = [
         ...rpcCalls.map(item => new Method(item)),
@@ -160,76 +159,77 @@ var Klay = function Klay(...args) {
             name: 'subscribe',
             type: 'eth',
             subscriptions: {
-                'newBlockHeaders': {
+                newBlockHeaders: {
                     // TODO rename on RPC side?
                     subscriptionName: 'newHeads', // replace subscription with this name
                     params: 0,
-                    outputFormatter: formatters.outputBlockFormatter
+                    outputFormatter: formatters.outputBlockFormatter,
                 },
-                'pendingTransactions': {
+                pendingTransactions: {
                     subscriptionName: 'newPendingTransactions', // replace subscription with this name
-                    params: 0
+                    params: 0,
                 },
-                'logs': {
+                logs: {
                     params: 1,
                     inputFormatter: [formatters.inputLogFormatter],
                     outputFormatter: formatters.outputLogFormatter,
                     // DUBLICATE, also in caver-klay-contract
-                    subscriptionHandler: function (output) {
+                    subscriptionHandler: function(output) {
                         this.emit('data', output)
 
-                        if (_.isFunction(this.callback))
-                          this.callback(null, output, this)
-                    }
+                        if (_.isFunction(this.callback)) {
+                            this.callback(null, output, this)
+                        }
+                    },
                 },
-                'syncing': {
+                syncing: {
                     params: 0,
                     outputFormatter: formatters.outputSyncingFormatter,
-                    subscriptionHandler: function (output) {
-                        var _this = this;
+                    subscriptionHandler: function(output) {
+                        var _this = this
 
                         // fire TRUE at start
-                        if(this._isSyncing !== true) {
-                            this._isSyncing = true;
-                            this.emit('changed', _this._isSyncing);
+                        if (this._isSyncing !== true) {
+                            this._isSyncing = true
+                            this.emit('changed', _this._isSyncing)
 
                             if (_.isFunction(this.callback)) {
-                                this.callback(null, _this._isSyncing, this);
+                                this.callback(null, _this._isSyncing, this)
                             }
 
-                            setTimeout(function () {
-                                _this.emit('data', output);
+                            setTimeout(function() {
+                                _this.emit('data', output)
 
                                 if (_.isFunction(_this.callback)) {
-                                    _this.callback(null, output, _this);
+                                    _this.callback(null, output, _this)
                                 }
-                            }, 0);
+                            }, 0)
 
                             // fire sync status
                         } else {
-                            this.emit('data', output);
+                            this.emit('data', output)
                             if (_.isFunction(_this.callback)) {
-                                this.callback(null, output, this);
+                                this.callback(null, output, this)
                             }
 
                             // wait for some time before fireing the FALSE
-                            clearTimeout(this._isSyncingTimeout);
-                            this._isSyncingTimeout = setTimeout(function () {
-                                if(output.currentBlock > output.highestBlock - 200) {
-                                    _this._isSyncing = false;
-                                    _this.emit('changed', _this._isSyncing);
+                            clearTimeout(this._isSyncingTimeout)
+                            this._isSyncingTimeout = setTimeout(function() {
+                                if (output.currentBlock > output.highestBlock - 200) {
+                                    _this._isSyncing = false
+                                    _this.emit('changed', _this._isSyncing)
 
                                     if (_.isFunction(_this.callback)) {
-                                        _this.callback(null, _this._isSyncing, _this);
+                                        _this.callback(null, _this._isSyncing, _this)
                                     }
                                 }
-                            }, 500);
+                            }, 500)
                         }
-                    }
-                }
-            }
-        })
-    ];
+                    },
+                },
+            },
+        }),
+    ]
 
     methods.forEach(function(method) {
         method.attachToObject(_this)
@@ -237,7 +237,7 @@ var Klay = function Klay(...args) {
         method.setRequestManager(_this._requestManager, _this.accounts)
         method.defaultBlock = _this.defaultBlock
         method.defaultAccount = _this.defaultAccount
-    });
-};
+    })
+}
 
-module.exports = Klay;
+module.exports = Klay

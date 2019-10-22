@@ -30,70 +30,69 @@ const Method = require('../../caver-core-method')
 const utils = require('../../caver-utils')
 
 // extend
-const extend = (pkg) => {
-  const ex = (extension) => {
-    let extendedObject = pkg
+const extend = pkg => {
+    const ex = extension => {
+        let extendedObject = pkg
 
-    if (extension.property) {
-      extendedObject = pkg[extension.property] = pkg[extension.property] || {}
-    }
-
-    if (extension.methods) {
-      extension.methods.forEach((method) => {
-        if(!(method instanceof Method)) {
-          method = new Method(method)
+        if (extension.property) {
+            extendedObject = pkg[extension.property] = pkg[extension.property] || {}
         }
 
-        method.attachToObject(extendedObject)
-        method.setRequestManager(pkg._requestManager)
-      })
+        if (extension.methods) {
+            extension.methods.forEach(method => {
+                if (!(method instanceof Method)) {
+                    method = new Method(method)
+                }
+
+                method.attachToObject(extendedObject)
+                method.setRequestManager(pkg._requestManager)
+            })
+        }
+
+        return pkg
     }
 
-    return pkg
-  }
+    ex.formatters = formatters
+    ex.utils = utils
+    ex.Method = Method
 
-  ex.formatters = formatters
-  ex.utils = utils
-  ex.Method = Method
-
-  return ex
+    return ex
 }
 
 module.exports = {
-  packageInit: function (pkg, [provider, net]) {
-    if (!pkg) throw new Error('You need to instantiate using the "new" keyword.')
+    packageInit: function(pkg, [provider, net]) {
+        if (!pkg) throw new Error('You need to instantiate using the "new" keyword.')
 
-    // make property of pkg._provider, which can properly set providers
-    Object.defineProperty(pkg, 'currentProvider', {
-        get: function () {
-            return pkg._provider;
-        },
-        set: function (value) {
-            return pkg.setProvider(value);
-        },
-        enumerable: true,
-        configurable: true
-    });
+        // make property of pkg._provider, which can properly set providers
+        Object.defineProperty(pkg, 'currentProvider', {
+            get: function() {
+                return pkg._provider
+            },
+            set: function(value) {
+                return pkg.setProvider(value)
+            },
+            enumerable: true,
+            configurable: true,
+        })
 
+        if (provider && provider._requestManager) {
+            pkg._requestManager = new Manager(provider.currentProvider)
+            // set requestmanager on package
+        } else {
+            pkg._requestManager = new Manager(provider, net)
+        }
 
-    if (provider && provider._requestManager) {
-      pkg._requestManager = new Manager(provider.currentProvider)
-    // set requestmanager on package
-    } else {
-      pkg._requestManager = new Manager(provider, net)
-    }
+        pkg.providers = Manager.providers
 
-    pkg.providers = Manager.providers
+        pkg._provider = pkg._requestManager.provider
 
-    pkg._provider = pkg._requestManager.provider
-    
-    // add SETPROVIDER function (don't overwrite if already existing)
-    if (!pkg.setProvider) {
-      pkg.setProvider = (provider, net) => pkg._provider = pkg._requestManager.setProvider(provider, net).provider
-    }
+        // add SETPROVIDER function (don't overwrite if already existing)
+        if (!pkg.setProvider) {
+            pkg.setProvider = (provider, net) => (pkg._provider = pkg._requestManager.setProvider(provider, net).provider)
+        }
 
-    // attach batch request creation
-    pkg.BatchRequest = BatchManager.bind(null, pkg._requestManager)
-  },
-  providers: Manager.providers,
+        // attach batch request creation
+        pkg.BatchRequest = BatchManager.bind(null, pkg._requestManager)
+    },
+    providers: Manager.providers,
 }

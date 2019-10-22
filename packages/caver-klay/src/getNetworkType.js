@@ -24,41 +24,41 @@
  * @date 2017
  */
 
-var _ = require('underscore');
+var _ = require('underscore')
 
-var getNetworkType = function (callback) {
-    var _this = this,
-        id;
+var getNetworkType = function(callback) {
+    var _this = this
+    var id
 
-    return this.net.getId()
-        .then(function (givenId) {
+    return this.net
+        .getId()
+        .then(function(givenId) {
+            id = givenId
 
-            id = givenId;
-
-            return _this.getBlock(0);
+            return _this.getBlock(0)
         })
-        .then(function (genesis) {
-            var returnValue = 'private';
-            
+        .then(function(genesis) {
+            var returnValue = 'private'
+
             if (genesis.hash === '0xe33ff05ceec2581ca9496f38a2bf9baad5d4eed629e896ccb33d1dc991bc4b4a' && id === 1001) {
-                returnValue = 'baobab';
+                returnValue = 'baobab'
             }
             if (genesis.hash === '0xc72e5293c3c3ba38ed8ae910f780e4caaa9fb95e79784f7ab74c3c262ea7137e' && id === 8217) {
-                returnValue = 'cypress';
+                returnValue = 'cypress'
             }
 
             if (_.isFunction(callback)) {
-                callback(null, returnValue);
+                callback(null, returnValue)
             }
-            return returnValue;
+            return returnValue
         })
-        .catch(function (err) {
+        .catch(function(err) {
             if (_.isFunction(callback)) {
-                callback(err);
+                callback(err)
             } else {
-                throw err;
+                throw err
             }
-        });
-};
+        })
+}
 
-module.exports = getNetworkType;
+module.exports = getNetworkType
