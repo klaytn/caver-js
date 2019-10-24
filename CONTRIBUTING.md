@@ -73,6 +73,14 @@ For the coding style of JavaScript, please refer to the following websites:
 - https://www.w3schools.com/js/js_conventions.asp
 - https://google.github.io/styleguide/jsguide.html
 
+caver-js uses eslint and prettier to prevent errors and to unify code format.
+
+If you have written code to contribute to caver-js, run the `npm run lint` script to see the results of linting.
+If there is an error in the result of linting, you must fix it.
+Otherwise, the Circle CI process will fail.
+
+Formatting errors with prettier can be easily fixed by running the `npm run lintFix` script.
+
 ## Contributor License Agreement (CLA)
 
 Keep in mind when you submit your pull request, you'll need to sign the CLA via [CLA-Assistant](https://cla-assistant.io/klaytn/caver-js) for legal purposes. You will have to sign the CLA just one time, either as an individual or corporation.
