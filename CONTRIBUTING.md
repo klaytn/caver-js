@@ -78,7 +78,7 @@ caver-js uses eslint with prettier. The linting rules inherit from airbnb.
 Before you submit a pull request, please run `npm run lint` and correct any errors.
 Otherwise, the test on CircleCI will fail, and this prevents merging.
 
-Formatting errors with prettier can be easily fixed by running the `npm run lintFix` script.
+Formatting errors can be easily fixed by running `npm run lintFix`.
 
 ## Contributor License Agreement (CLA)
 
