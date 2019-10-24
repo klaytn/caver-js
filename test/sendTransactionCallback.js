@@ -19,17 +19,19 @@
 const { expect } = require('chai')
 const assert = require('assert')
 
-var Caver = require('../index.js')
+const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
+
 const caver = new Caver(testRPCURL)
 
-var senderPrvKey, senderAddress
-var receiver
+let senderPrvKey
+let senderAddress
+let receiver
 
 before(() => {
     senderPrvKey =
         process.env.privateKey && String(process.env.privateKey).indexOf('0x') === -1
-            ? '0x' + process.env.privateKey
+            ? `0x${process.env.privateKey}`
             : process.env.privateKey
 
     const sender = caver.klay.accounts.wallet.add(senderPrvKey)

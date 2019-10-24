@@ -16,10 +16,11 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-var RLP = require('eth-lib/lib/rlp')
-var Bytes = require('eth-lib/lib/bytes')
-var utils = require('../../../../caver-utils')
-var helpers = require('../../../../caver-core-helpers')
+const RLP = require('eth-lib/lib/rlp')
+const Bytes = require('eth-lib/lib/bytes')
+const utils = require('../../../../caver-utils')
+const helpers = require('../../../../caver-core-helpers')
+
 const {
     ACCOUNT_UPDATE_TYPE_TAG,
 
@@ -38,7 +39,14 @@ function rlpEncodeForAccountUpdate(transaction) {
     const accountKey = resolveRawKeyToAccountKey(transaction)
 
     return RLP.encode([
-        RLP.encode([ACCOUNT_UPDATE_TYPE_TAG, Bytes.fromNat(transaction.nonce), Bytes.fromNat(transaction.gasPrice), Bytes.fromNat(transaction.gas), transaction.from.toLowerCase(), accountKey]),
+        RLP.encode([
+            ACCOUNT_UPDATE_TYPE_TAG,
+            Bytes.fromNat(transaction.nonce),
+            Bytes.fromNat(transaction.gasPrice),
+            Bytes.fromNat(transaction.gas),
+            transaction.from.toLowerCase(),
+            accountKey,
+        ]),
         Bytes.fromNat(transaction.chainId || '0x1'),
         '0x',
         '0x',
@@ -47,67 +55,80 @@ function rlpEncodeForAccountUpdate(transaction) {
 
 function rlpEncodeForFeeDelegatedAccountUpdate(transaction) {
     if (transaction.senderRawTransaction) {
-        const typeDetacehdRawTransaction = '0x' + transaction.senderRawTransaction.slice(4)
+        const typeDetacehdRawTransaction = `0x${transaction.senderRawTransaction.slice(4)}`
 
         const [nonce, gasPrice, gas, from, accountKey, [[v, r, s]]] = utils.rlpDecode(typeDetacehdRawTransaction)
 
         return RLP.encode([
-            RLP.encode([FEE_DELEGATED_ACCOUNT_UPDATE_TYPE_TAG, Bytes.fromNat(nonce), Bytes.fromNat(gasPrice), Bytes.fromNat(gas), from.toLowerCase(), accountKey]),
+            RLP.encode([
+                FEE_DELEGATED_ACCOUNT_UPDATE_TYPE_TAG,
+                Bytes.fromNat(nonce),
+                Bytes.fromNat(gasPrice),
+                Bytes.fromNat(gas),
+                from.toLowerCase(),
+                accountKey,
+            ]),
             transaction.feePayer.toLowerCase(),
             Bytes.fromNat(transaction.chainId || '0x1'),
             '0x',
             '0x',
         ])
-    } else {
-        const accountKey = resolveRawKeyToAccountKey(transaction)
-
-        return RLP.encode([
-            RLP.encode([
-                FEE_DELEGATED_ACCOUNT_UPDATE_TYPE_TAG,
-                Bytes.fromNat(transaction.nonce),
-                Bytes.fromNat(transaction.gasPrice),
-                Bytes.fromNat(transaction.gas),
-                transaction.from.toLowerCase(),
-                accountKey,
-            ]),
-            Bytes.fromNat(transaction.chainId || '0x1'),
-            '0x',
-            '0x',
-        ])
     }
+    const accountKey = resolveRawKeyToAccountKey(transaction)
+
+    return RLP.encode([
+        RLP.encode([
+            FEE_DELEGATED_ACCOUNT_UPDATE_TYPE_TAG,
+            Bytes.fromNat(transaction.nonce),
+            Bytes.fromNat(transaction.gasPrice),
+            Bytes.fromNat(transaction.gas),
+            transaction.from.toLowerCase(),
+            accountKey,
+        ]),
+        Bytes.fromNat(transaction.chainId || '0x1'),
+        '0x',
+        '0x',
+    ])
 }
 
 function rlpEncodeForFeeDelegatedAccountUpdateWithRatio(transaction) {
     if (transaction.senderRawTransaction) {
-        const typeDetacehdRawTransaction = '0x' + transaction.senderRawTransaction.slice(4)
+        const typeDetacehdRawTransaction = `0x${transaction.senderRawTransaction.slice(4)}`
 
         const [nonce, gasPrice, gas, from, accountKey, feeRatio, [[v, r, s]]] = utils.rlpDecode(typeDetacehdRawTransaction)
 
         return RLP.encode([
-            RLP.encode([FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO_TYPE_TAG, Bytes.fromNat(nonce), Bytes.fromNat(gasPrice), Bytes.fromNat(gas), from.toLowerCase(), accountKey, Bytes.fromNat(feeRatio)]),
+            RLP.encode([
+                FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO_TYPE_TAG,
+                Bytes.fromNat(nonce),
+                Bytes.fromNat(gasPrice),
+                Bytes.fromNat(gas),
+                from.toLowerCase(),
+                accountKey,
+                Bytes.fromNat(feeRatio),
+            ]),
             transaction.feePayer.toLowerCase(),
             Bytes.fromNat(transaction.chainId || '0x1'),
             '0x',
             '0x',
         ])
-    } else {
-        const accountKey = resolveRawKeyToAccountKey(transaction)
-
-        return RLP.encode([
-            RLP.encode([
-                FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO_TYPE_TAG,
-                Bytes.fromNat(transaction.nonce),
-                Bytes.fromNat(transaction.gasPrice),
-                Bytes.fromNat(transaction.gas),
-                transaction.from.toLowerCase(),
-                accountKey,
-                Bytes.fromNat(transaction.feeRatio),
-            ]),
-            Bytes.fromNat(transaction.chainId || '0x1'),
-            '0x',
-            '0x',
-        ])
     }
+    const accountKey = resolveRawKeyToAccountKey(transaction)
+
+    return RLP.encode([
+        RLP.encode([
+            FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO_TYPE_TAG,
+            Bytes.fromNat(transaction.nonce),
+            Bytes.fromNat(transaction.gasPrice),
+            Bytes.fromNat(transaction.gas),
+            transaction.from.toLowerCase(),
+            accountKey,
+            Bytes.fromNat(transaction.feeRatio),
+        ]),
+        Bytes.fromNat(transaction.chainId || '0x1'),
+        '0x',
+        '0x',
+    ])
 }
 
 function resolveRawKeyToAccountKey(transaction) {
@@ -134,7 +155,10 @@ function resolveRawKeyToAccountKey(transaction) {
             return [Bytes.fromNat(utils.numberToHex(weight)), compressedPublicKey]
         })
 
-        return ACCOUNT_KEY_WEIGHTED_MULTISIG_TAG + RLP.encode([Bytes.fromNat(utils.numberToHex(threshold)), encodedMultisigPublicKeys]).slice(2)
+        return (
+            ACCOUNT_KEY_WEIGHTED_MULTISIG_TAG +
+            RLP.encode([Bytes.fromNat(utils.numberToHex(threshold)), encodedMultisigPublicKeys]).slice(2)
+        )
     }
 
     if (transaction.publicKey) {
@@ -147,11 +171,17 @@ function resolveRawKeyToAccountKey(transaction) {
         // Create a new object so as not to damage the input transaction object.
         const roleBasedObject = {}
 
-        roleBasedObject.roleTransactionKey = transaction.roleTransactionKey ? resolveRawKeyToAccountKey(transaction.roleTransactionKey) : ACCOUNT_KEY_NIL_TAG
-        roleBasedObject.roleAccountUpdateKey = transaction.roleAccountUpdateKey ? resolveRawKeyToAccountKey(transaction.roleAccountUpdateKey) : ACCOUNT_KEY_NIL_TAG
-        roleBasedObject.roleFeePayerKey = transaction.roleFeePayerKey ? resolveRawKeyToAccountKey(transaction.roleFeePayerKey) : ACCOUNT_KEY_NIL_TAG
+        roleBasedObject.roleTransactionKey = transaction.roleTransactionKey
+            ? resolveRawKeyToAccountKey(transaction.roleTransactionKey)
+            : ACCOUNT_KEY_NIL_TAG
+        roleBasedObject.roleAccountUpdateKey = transaction.roleAccountUpdateKey
+            ? resolveRawKeyToAccountKey(transaction.roleAccountUpdateKey)
+            : ACCOUNT_KEY_NIL_TAG
+        roleBasedObject.roleFeePayerKey = transaction.roleFeePayerKey
+            ? resolveRawKeyToAccountKey(transaction.roleFeePayerKey)
+            : ACCOUNT_KEY_NIL_TAG
 
-        var keys = [roleBasedObject.roleTransactionKey, roleBasedObject.roleAccountUpdateKey, roleBasedObject.roleFeePayerKey]
+        const keys = [roleBasedObject.roleTransactionKey, roleBasedObject.roleAccountUpdateKey, roleBasedObject.roleFeePayerKey]
         return ACCOUNT_KEY_ROLE_BASED_TAG + RLP.encode(keys).slice(2)
     }
 
@@ -167,20 +197,20 @@ function parseAccountKey(transaction) {
     } else if (key.startsWith(ACCOUNT_KEY_FAIL_TAG)) {
         transaction.failKey = true
     } else if (key.startsWith(ACCOUNT_KEY_PUBLIC_TAG)) {
-        transaction.publicKey = RLP.decode('0x' + key.slice(ACCOUNT_KEY_PUBLIC_TAG.length))
+        transaction.publicKey = RLP.decode(`0x${key.slice(ACCOUNT_KEY_PUBLIC_TAG.length)}`)
     } else if (key.startsWith(ACCOUNT_KEY_WEIGHTED_MULTISIG_TAG)) {
-        var [threshold, multiSigkeys] = RLP.decode('0x' + key.slice(ACCOUNT_KEY_WEIGHTED_MULTISIG_TAG.length))
-        multiSigkeys = multiSigkeys.map(key => {
-            return { weight: utils.hexToNumber(key[0]), publicKey: key[1] }
+        let [threshold, multiSigkeys] = RLP.decode(`0x${key.slice(ACCOUNT_KEY_WEIGHTED_MULTISIG_TAG.length)}`)
+        multiSigkeys = multiSigkeys.map(k => {
+            return { weight: utils.hexToNumber(k[0]), publicKey: k[1] }
         })
         transaction.multisig = {
             threshold: utils.hexToNumber(threshold),
             keys: multiSigkeys,
         }
     } else if (key.startsWith(ACCOUNT_KEY_ROLE_BASED_TAG)) {
-        var keys = RLP.decode('0x' + key.slice(ACCOUNT_KEY_ROLE_BASED_TAG.length))
-        keys.map(key => {
-            if (key.startsWith(ACCOUNT_KEY_ROLE_BASED_TAG)) throw new Error('Nested role based key.')
+        const keys = RLP.decode(`0x${key.slice(ACCOUNT_KEY_ROLE_BASED_TAG.length)}`)
+        keys.map(k => {
+            if (k.startsWith(ACCOUNT_KEY_ROLE_BASED_TAG)) throw new Error('Nested role based key.')
         })
 
         if (keys.length > 0 && !keys[0].startsWith(ACCOUNT_KEY_NIL_TAG))

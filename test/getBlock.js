@@ -17,11 +17,12 @@
 */
 
 const { expect } = require('chai')
-var Caver = require('../index.js')
+const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
+
 const caver = new Caver(testRPCURL)
 
-describe('get block', done => {
+describe('get block', () => {
     it('should have specific property', async () => {
         const blockInfo = await caver.klay.getBlock(1)
         expect(blockInfo.receiptsRoot).to.exist

@@ -24,7 +24,7 @@
  * @return {Error}
  */
 
-var utils = require('../../caver-utils')
+const utils = require('../../caver-utils')
 
 function validateParams(tx) {
     let error
@@ -41,7 +41,7 @@ function validateParams(tx) {
 
     const isValidateType = validateTxType(tx.type)
     if (!isValidateType) {
-        return new Error('The transaction type [' + tx.type + '] is not supported')
+        return new Error(`The transaction type [${tx.type}] is not supported`)
     }
 
     error = validateTxObjectWithType(tx)
@@ -191,7 +191,7 @@ function validateLegacy(transaction) {
         return new Error('"codeFormat" cannot be used with LEGACY transaction')
     }
 
-    var error = validateNonFeeDelegated(transaction)
+    const error = validateNonFeeDelegated(transaction)
     if (error) return error
 
     return validateNotAccountTransaction(transaction)
@@ -200,13 +200,13 @@ function validateLegacy(transaction) {
 function validateNonFeeDelegated(transaction) {
     const type = transaction.type ? transaction.type : 'LEGACY'
     if (transaction.feePayer !== undefined) {
-        return new Error('"feePayer" cannot be used with ' + type + ' transaction')
+        return new Error(`"feePayer" cannot be used with ${type} transaction`)
     }
     if (transaction.feeRatio !== undefined) {
-        return new Error('"feeRatio" cannot be used with ' + type + ' transaction')
+        return new Error(`"feeRatio" cannot be used with ${type} transaction`)
     }
     if (transaction.feePayerSignatures !== undefined) {
-        return new Error('"feePayerSignatures" cannot be used with ' + type + ' transaction')
+        return new Error(`"feePayerSignatures" cannot be used with ${type} transaction`)
     }
 }
 
@@ -215,60 +215,59 @@ function validateFeeDelegated(transaction) {
         if (transaction.feeRatio === undefined) {
             return new Error('"feeRatio" is missing')
         }
-    } else {
-        if (transaction.feeRatio !== undefined) {
-            return new Error('"feeRatio" cannot be used with ' + transaction.type + ' transaction')
-        }
+    } else if (transaction.feeRatio !== undefined) {
+        return new Error(`"feeRatio" cannot be used with ${transaction.type} transaction`)
     }
 }
 
 function validateNotAccountTransaction(transaction) {
     const type = transaction.type ? transaction.type : 'LEGACY'
     if (transaction.key !== undefined) {
-        return new Error('"key" cannot be used with ' + type + ' transaction')
+        return new Error(`"key" cannot be used with ${type} transaction`)
     }
     if (transaction.legacyKey !== undefined) {
-        return new Error('"legacyKey" cannot be used with ' + type + ' transaction')
+        return new Error(`"legacyKey" cannot be used with ${type} transaction`)
     }
     if (transaction.publicKey !== undefined) {
-        return new Error('"publicKey" cannot be used with ' + type + ' transaction')
+        return new Error(`"publicKey" cannot be used with ${type} transaction`)
     }
     if (transaction.multisig !== undefined) {
-        return new Error('"multisig" cannot be used with ' + type + ' transaction')
+        return new Error(`"multisig" cannot be used with ${type} transaction`)
     }
     if (transaction.roleTransactionKey !== undefined) {
-        return new Error('"roleTransactionKey" cannot be used with ' + type + ' transaction')
+        return new Error(`"roleTransactionKey" cannot be used with ${type} transaction`)
     }
     if (transaction.roleAccountUpdateKey !== undefined) {
-        return new Error('"roleAccountUpdateKey" cannot be used with ' + type + ' transaction')
+        return new Error(`"roleAccountUpdateKey" cannot be used with ${type} transaction`)
     }
     if (transaction.roleFeePayerKey !== undefined) {
-        return new Error('"roleFeePayerKey" cannot be used with ' + type + ' transaction')
+        return new Error(`"roleFeePayerKey" cannot be used with ${type} transaction`)
     }
     if (transaction.failKey !== undefined) {
-        return new Error('"failKey" cannot be used with ' + type + ' transaction')
+        return new Error(`"failKey" cannot be used with ${type} transaction`)
     }
 }
 
 function checkValueTransferEssential(transaction) {
     if (transaction.to === undefined) {
         return new Error('"to" is missing')
-    } else if (!utils.isAddress(transaction.to)) {
+    }
+    if (!utils.isAddress(transaction.to)) {
         return new Error(`Invalid address of to: ${transaction.to}`)
     }
     if (transaction.value === undefined) {
         return new Error('"value" is missing')
     }
     if (transaction.codeFormat !== undefined) {
-        return new Error('"codeFormat" cannot be used with ' + transaction.type + ' transaction')
+        return new Error(`"codeFormat" cannot be used with ${transaction.type} transaction`)
     }
     if (transaction.data !== undefined) {
-        return new Error('"data" cannot be used with ' + transaction.type + ' transaction')
+        return new Error(`"data" cannot be used with ${transaction.type} transaction`)
     }
 }
 
 function validateValueTransfer(transaction) {
-    var error = checkValueTransferEssential(transaction)
+    let error = checkValueTransferEssential(transaction)
     if (error) return error
 
     error = validateNonFeeDelegated(transaction)
@@ -278,7 +277,7 @@ function validateValueTransfer(transaction) {
 }
 
 function validateFeeDelegatedValueTransfer(transaction) {
-    var error = checkValueTransferEssential(transaction)
+    let error = checkValueTransferEssential(transaction)
     if (error) return error
 
     error = validateFeeDelegated(transaction)
@@ -294,7 +293,8 @@ function validateFeeDelegatedValueTransferWithRatio(transaction) {
 function checkValueTransferMemoEssential(transaction) {
     if (transaction.to === undefined) {
         return new Error('"to" is missing')
-    } else if (!utils.isAddress(transaction.to)) {
+    }
+    if (!utils.isAddress(transaction.to)) {
         return new Error(`Invalid address of to: ${transaction.to}`)
     }
     if (transaction.value === undefined) {
@@ -304,12 +304,12 @@ function checkValueTransferMemoEssential(transaction) {
         return new Error('"data" is missing')
     }
     if (transaction.codeFormat !== undefined) {
-        return new Error('"codeFormat" cannot be used with ' + transaction.type + ' transaction')
+        return new Error(`"codeFormat" cannot be used with ${transaction.type} transaction`)
     }
 }
 
 function validateValueTransferMemo(transaction) {
-    var error = checkValueTransferMemoEssential(transaction)
+    let error = checkValueTransferMemoEssential(transaction)
     if (error) return error
 
     error = validateNonFeeDelegated(transaction)
@@ -319,7 +319,7 @@ function validateValueTransferMemo(transaction) {
 }
 
 function validateFeeDelegatedValueTransferMemo(transaction) {
-    var error = checkValueTransferMemoEssential(transaction)
+    let error = checkValueTransferMemoEssential(transaction)
     if (error) return error
 
     error = validateFeeDelegated(transaction)
@@ -334,10 +334,10 @@ function validateFeeDelegatedValueTransferMemoWithRatio(transaction) {
 
 function validateAccountTransaction(transaction) {
     if (transaction.data !== undefined) {
-        return new Error('"data" cannot be used with ' + transaction.type + ' transaction')
+        return new Error(`"data" cannot be used with ${transaction.type} transaction`)
     }
     if (transaction.codeFormat !== undefined) {
-        return new Error('"codeFormat" cannot be used with ' + transaction.type + ' transaction')
+        return new Error(`"codeFormat" cannot be used with ${transaction.type} transaction`)
     }
 
     if (
@@ -350,10 +350,10 @@ function validateAccountTransaction(transaction) {
         !transaction.roleFeePayerKey &&
         transaction.failKey === undefined
     ) {
-        return new Error('Missing key information with ' + transaction.type + ' transaction')
+        return new Error(`Missing key information with ${transaction.type} transaction`)
     }
 
-    const duplicatedKeyInfo = 'The key parameter to be used for ' + transaction.type + ' is duplicated.'
+    const duplicatedKeyInfo = `The key parameter to be used for ${transaction.type} is duplicated.`
     if (transaction.key) {
         if (
             transaction.legacyKey !== undefined ||
@@ -405,15 +405,15 @@ function validateAccountTransaction(transaction) {
 
 function checkUpdateEssential(transaction) {
     if (transaction.to !== undefined) {
-        return new Error('"to" cannot be used with ' + transaction.type + ' transaction')
+        return new Error(`"to" cannot be used with ${transaction.type} transaction`)
     }
     if (transaction.value !== undefined) {
-        return new Error('"value" cannot be used with ' + transaction.type + ' transaction')
+        return new Error(`"value" cannot be used with ${transaction.type} transaction`)
     }
 }
 
 function validateAccountUpdate(transaction) {
-    var error = checkUpdateEssential(transaction)
+    let error = checkUpdateEssential(transaction)
     if (error) return error
 
     error = validateAccountTransaction(transaction)
@@ -423,7 +423,7 @@ function validateAccountUpdate(transaction) {
 }
 
 function validateFeeDelegatedAccountUpdate(transaction) {
-    var error = checkUpdateEssential(transaction)
+    let error = checkUpdateEssential(transaction)
     if (error) return error
 
     error = validateAccountTransaction(transaction)
@@ -444,7 +444,7 @@ function checkDeployEssential(transaction) {
         return new Error('"data" is missing')
     }
     if (transaction.to !== undefined && transaction.to !== '0x') {
-        return new Error('"to" cannot be used with ' + transaction.type + ' transaction')
+        return new Error(`"to" cannot be used with ${transaction.type} transaction`)
     }
     if (transaction.codeFormat !== undefined && !validateCodeFormat(transaction.codeFormat)) {
         return new Error(`The codeFormat(${transaction.codeFormat}) is invalid.`)
@@ -452,7 +452,7 @@ function checkDeployEssential(transaction) {
 }
 
 function validateSmartContractDeploy(transaction) {
-    var error = checkDeployEssential(transaction)
+    let error = checkDeployEssential(transaction)
     if (error) return error
 
     error = validateNonFeeDelegated(transaction)
@@ -462,7 +462,7 @@ function validateSmartContractDeploy(transaction) {
 }
 
 function validateFeeDelegatedSmartContractDeploy(transaction) {
-    var error = checkDeployEssential(transaction)
+    let error = checkDeployEssential(transaction)
     if (error) return error
 
     error = validateNotAccountTransaction(transaction)
@@ -478,19 +478,20 @@ function validateFeeDelegatedSmartContractDeployWithRatio(transaction) {
 function checkExecutionEssential(transaction) {
     if (transaction.to === undefined) {
         return new Error('"to" is missing')
-    } else if (!utils.isAddress(transaction.to)) {
+    }
+    if (!utils.isAddress(transaction.to)) {
         return new Error(`Invalid address of to: ${transaction.to}`)
     }
     if (transaction.data === undefined) {
         return new Error('"data" is missing')
     }
     if (transaction.codeFormat !== undefined) {
-        return new Error('"codeFormat" cannot be used with ' + transaction.type + ' transaction')
+        return new Error(`"codeFormat" cannot be used with ${transaction.type} transaction`)
     }
 }
 
 function validateSmartContractExecution(transaction) {
-    var error = checkExecutionEssential(transaction)
+    let error = checkExecutionEssential(transaction)
     if (error) return error
 
     error = validateNonFeeDelegated(transaction)
@@ -500,7 +501,7 @@ function validateSmartContractExecution(transaction) {
 }
 
 function validateFeeDelegatedSmartContractExecution(transaction) {
-    var error = checkExecutionEssential(transaction)
+    let error = checkExecutionEssential(transaction)
     if (error) return error
 
     error = validateNotAccountTransaction(transaction)
@@ -515,21 +516,21 @@ function validateFeeDelegatedSmartContractExecutionWithRatio(transaction) {
 
 function checkCacncelEssential(transaction) {
     if (transaction.to !== undefined) {
-        return new Error('"to" cannot be used with ' + transaction.type + ' transaction')
+        return new Error(`"to" cannot be used with ${transaction.type} transaction`)
     }
     if (transaction.value !== undefined) {
-        return new Error('"value" cannot be used with ' + transaction.type + ' transaction')
+        return new Error(`"value" cannot be used with ${transaction.type} transaction`)
     }
     if (transaction.data !== undefined) {
-        return new Error('"data" cannot be used with ' + transaction.type + ' transaction')
+        return new Error(`"data" cannot be used with ${transaction.type} transaction`)
     }
     if (transaction.codeFormat !== undefined) {
-        return new Error('"codeFormat" cannot be used with ' + transaction.type + ' transaction')
+        return new Error(`"codeFormat" cannot be used with ${transaction.type} transaction`)
     }
 }
 
 function validateCancel(transaction) {
-    var error = checkCacncelEssential(transaction)
+    let error = checkCacncelEssential(transaction)
     if (error) return error
 
     error = validateNonFeeDelegated(transaction)
@@ -539,7 +540,7 @@ function validateCancel(transaction) {
 }
 
 function validateFeeDelegatedCancel(transaction) {
-    var error = checkCacncelEssential(transaction)
+    let error = checkCacncelEssential(transaction)
     if (error) return error
 
     error = validateNotAccountTransaction(transaction)

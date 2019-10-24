@@ -19,21 +19,24 @@
 const { expect } = require('chai')
 const testRPCURL = require('./testrpc')
 
-var Caver = require('../index.js')
+const Caver = require('../index.js')
+
 const caver = new Caver(testRPCURL)
 
-var senderPrvKey, payerPrvKey
-var senderAddress, payerAddress
-var receiver
+let senderPrvKey
+let payerPrvKey
+let senderAddress
+let payerAddress
+let receiver
 
 before(() => {
     senderPrvKey =
         process.env.privateKey && String(process.env.privateKey).indexOf('0x') === -1
-            ? '0x' + process.env.privateKey
+            ? `0x${process.env.privateKey}`
             : process.env.privateKey
     payerPrvKey =
         process.env.privateKey2 && String(process.env.privateKey2).indexOf('0x') === -1
-            ? '0x' + process.env.privateKey2
+            ? `0x${process.env.privateKey2}`
             : process.env.privateKey2
 
     caver.klay.accounts.wallet.add(senderPrvKey)
@@ -47,7 +50,7 @@ before(() => {
     receiver = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
 })
 
-describe('get transaction', done => {
+describe('get transaction', () => {
     it('CAVERJS-UNIT-TX-565 : getTransaction should return information of transaction.', async () => {
         const txObj = {
             from: senderAddress,

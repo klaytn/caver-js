@@ -20,8 +20,15 @@ const { expect } = require('./extendedChai')
 
 const testRPCURL = require('./testrpc')
 
-var Caver = require('../index.js')
+const Caver = require('../index.js')
+
 const caver = new Caver(testRPCURL)
+
+function coverInitialForTest(tx) {
+    tx.to = tx.to || '0x'
+    tx.data = tx.data || '0x'
+    return tx
+}
 
 describe('caver.utils.isContractDeployment', () => {
     it('CAVERJS-UNIT-ETC-054: LEGACY (type X / deploy x)', () => {
@@ -380,9 +387,3 @@ describe('caver.utils.isContractDeployment', () => {
         expect(caver.utils.isContractDeployment(coverInitialForTest(txObject))).to.false
     })
 })
-
-function coverInitialForTest(tx) {
-    tx.to = tx.to || '0x'
-    tx.data = tx.data || '0x'
-    return tx
-}

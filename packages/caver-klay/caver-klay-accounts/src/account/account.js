@@ -61,7 +61,9 @@ class Account {
                 return this.accountKey.defaultKey
             },
             set: function(privateKeyInput) {
-                throw new Error('The privateKey cannot be modified. The privateKey is set to default key of accountKey, so update accountKey to modify the privateKey.')
+                throw new Error(
+                    'The privateKey cannot be modified. The privateKey is set to default key of accountKey, so update accountKey to modify the privateKey.'
+                )
             },
             enumerable: true,
         })
@@ -70,15 +72,19 @@ class Account {
     get keys() {
         return this.accountKey.keys
     }
+
     get accountKeyType() {
         return this.accountKey.type
     }
+
     get transactionKey() {
         return this.accountKey.transactionKey
     }
+
     get updateKey() {
         return this.accountKey.updateKey
     }
+
     get feePayerKey() {
         return this.accountKey.feePayerKey
     }

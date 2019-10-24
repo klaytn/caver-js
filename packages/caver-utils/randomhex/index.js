@@ -33,13 +33,13 @@ function randomHex(size, callback) {
         if (isCallback) {
             crypto.randomBytes(size, (err, result) => {
                 if (!err) {
-                    callback(null, '0x' + result.toString('hex'))
+                    callback(null, `0x${result.toString('hex')}`)
                 } else {
                     callback(err)
                 }
             })
         } else {
-            return '0x' + crypto.randomBytes(size).toString('hex')
+            return `0x${crypto.randomBytes(size).toString('hex')}`
         }
 
         // If environment is in browser
@@ -48,16 +48,15 @@ function randomHex(size, callback) {
         if (typeof crypto !== 'undefined') {
             cryptoLib = crypto
         } else if (typeof msCrypto !== 'undefined') {
+            /* eslint-disable no-undef */
             cryptoLib = msCrypto
         }
 
         if (cryptoLib && cryptoLib.getRandomValues) {
             const randomBytes = cryptoLib.getRandomValues(new Uint8Array(size))
-            const returnValue =
-                '0x' +
-                Array.from(randomBytes)
-                    .map(arr => arr.toString(16))
-                    .join('')
+            const returnValue = `0x${Array.from(randomBytes)
+                .map(arr => arr.toString(16))
+                .join('')}`
 
             if (isCallback) {
                 callback(null, returnValue)

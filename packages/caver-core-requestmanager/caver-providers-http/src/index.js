@@ -26,9 +26,9 @@
  * @date 2015
  */
 
-var errors = require('../../../caver-core-helpers').errors
+const XHR2 = require('xhr2-cookies').XMLHttpRequest
 
-var XHR2 = require('xhr2-cookies').XMLHttpRequest
+const errors = require('../../../caver-core-helpers').errors
 
 /**
  * HttpProvider should be used to send rpc calls over http
@@ -38,7 +38,7 @@ var XHR2 = require('xhr2-cookies').XMLHttpRequest
  * @param       {object} options
  * @constructor
  */
-var HttpProvider = function HttpProvider(host, options) {
+const HttpProvider = function HttpProvider(host, options) {
     options = options || {}
     this.host = host || 'http://localhost:8545'
     this.timeout = options.timeout || 0
@@ -50,7 +50,7 @@ var HttpProvider = function HttpProvider(host, options) {
  * _prepareRequest create request instance
  */
 HttpProvider.prototype._prepareRequest = function() {
-    var request = new XHR2()
+    const request = new XHR2()
 
     request.open('POST', this.host, true)
     request.setRequestHeader('Content-Type', 'application/json')
@@ -73,10 +73,10 @@ HttpProvider.prototype._prepareRequest = function() {
  * @param {Function} callback triggered on end with (err, result)
  */
 HttpProvider.prototype.send = function(payload, callback) {
-    var _this = this
-    var request = this._prepareRequest()
-    var host = this.host
-    var timer
+    const _this = this
+    const request = this._prepareRequest()
+    const host = this.host
+    let timer
 
     request.onreadystatechange = function() {
         /**
@@ -93,8 +93,8 @@ HttpProvider.prototype.send = function(payload, callback) {
         }
 
         if (request.readyState === 4 && request.timeout !== 1) {
-            var result = request.responseText
-            var error = null
+            let result = request.responseText
+            let error = null
 
             if (request.response === null) {
                 error = errors.InvalidResponse(request.response)

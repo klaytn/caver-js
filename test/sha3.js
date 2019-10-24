@@ -17,12 +17,12 @@
 */
 
 const { expect } = require('chai')
-const testRPCURL = require('./testrpc')
 const BN = require('bn.js')
+const Caver = require('../index.js')
+const testRPCURL = require('./testrpc')
 
 describe('sha3', done => {
     it('CAVERJS-UNIT-ETC-010, CAVERJS-UNIT-ETC-011, CAVERJS-UNIT-ETC-012 : should not throw an error when argument is number type', async () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         expect(() => caver.utils.sha3(234)).not.to.throw()
@@ -33,7 +33,6 @@ describe('sha3', done => {
     })
 
     it('CAVERJS-UNIT-ETC-013, CAVERJS-UNIT-ETC-014 : should return null when argument is number type', async () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         expect(caver.utils.sha3(234)).to.equal(null)
@@ -42,7 +41,6 @@ describe('sha3', done => {
     })
 
     it('CAVERJS-UNIT-ETC-015 : sha3(number string) should return same result with sha3(bignumber instance)', async () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         expect(caver.utils.sha3('234')).to.equal(caver.utils.sha3(new BN('234')))
@@ -51,7 +49,6 @@ describe('sha3', done => {
 
 describe('klay.sha3', () => {
     it('should not throw an error when argument is number type', async () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         const ret = await caver.klay.sha3('0xea')

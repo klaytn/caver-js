@@ -36,7 +36,8 @@ const mergeEmitterProp = obj => {
 }
 
 function PromiEvent(promiseOnly) {
-    let resolve, reject
+    let resolve
+    let reject
     const promiseInstance = new Promise((resolver, rejecter) => {
         resolve = resolver
         reject = rejecter

@@ -20,7 +20,8 @@ const { expect } = require('./extendedChai')
 
 const testRPCURL = require('./testrpc')
 
-var Caver = require('../index.js')
+const Caver = require('../index.js')
+
 const caver = new Caver(testRPCURL)
 
 describe('caver.klay.accounts.privateKeyToPublicKey', () => {

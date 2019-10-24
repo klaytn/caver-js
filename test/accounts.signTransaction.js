@@ -18,11 +18,11 @@
 
 const { expect } = require('./extendedChai')
 
+const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 
 describe('caver.klay.accounts.signTransaction', () => {
     it('CAVERJS-UNIT-TX-001 : should be rejected when data field is missing for contract creation tx', () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         const { privateKey } = caver.klay.accounts.create()

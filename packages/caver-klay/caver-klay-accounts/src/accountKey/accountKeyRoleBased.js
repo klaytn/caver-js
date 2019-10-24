@@ -21,7 +21,13 @@ class AccountKeyRoleBased {
     }
 
     get defaultKey() {
-        const definedKey = this._transactionKey ? this._transactionKey : this._updateKey ? this._updateKey : this._feePayerKey ? this._feePayerKey : undefined
+        const definedKey = this._transactionKey
+            ? this._transactionKey
+            : this._updateKey
+            ? this._updateKey
+            : this._feePayerKey
+            ? this._feePayerKey
+            : undefined
 
         if (!definedKey) throw new Error('There is no key defined in AccountKeyRoleBased.')
 
@@ -93,9 +99,8 @@ function validateKeyObject(keyObject) {
                 p = parsed.privateKey
                 if (!utils.isValidPrivateKey(p)) throw new Error(`Failed to create AccountKeyRoleBased. Invalid private key : ${p}`)
             }
-        } else {
-            if (!utils.isValidPrivateKey(keyObject[role])) throw new Error(`Failed to create AccountKeyRoleBased. Invalid private key : ${keyObject[role]}`)
-        }
+        } else if (!utils.isValidPrivateKey(keyObject[role]))
+            throw new Error(`Failed to create AccountKeyRoleBased. Invalid private key : ${keyObject[role]}`)
     })
 }
 

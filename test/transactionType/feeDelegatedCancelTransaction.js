@@ -17,14 +17,15 @@
 */
 
 require('it-each')({ testPerIteration: true })
-const { expect } = require('../extendedChai')
 const assert = require('assert')
+const { expect } = require('../extendedChai')
 
 const testRPCURL = require('../testrpc')
 const Caver = require('../../index.js')
 
 let caver
-let senderAddress, senderPrvKey
+let senderAddress
+let senderPrvKey
 let payerPrvKey
 let testAccount
 
@@ -32,12 +33,12 @@ before(() => {
     caver = new Caver(testRPCURL)
     senderPrvKey =
         process.env.privateKey && String(process.env.privateKey).indexOf('0x') === -1
-            ? '0x' + process.env.privateKey
+            ? `0x${process.env.privateKey}`
             : process.env.privateKey
 
     payerPrvKey =
         process.env.privateKey2 && String(process.env.privateKey2).indexOf('0x') === -1
-            ? '0x' + process.env.privateKey2
+            ? `0x${process.env.privateKey2}`
             : process.env.privateKey2
 
     const sender = caver.klay.accounts.wallet.add(senderPrvKey)
@@ -47,7 +48,7 @@ before(() => {
 })
 
 describe('FEE_DELEGATED_CANCEL transaction', () => {
-    var cancelObject
+    let cancelObject
 
     beforeEach(() => {
         cancelObject = {

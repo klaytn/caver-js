@@ -43,14 +43,14 @@ const Iban = require('../iban')
  * @param {Function} callback
  * @return {Object} the emitter
  */
-var _fireError = function(error, emitter, reject, callback) {
+const _fireError = function(error, emitter, reject, callback) {
     // add data if given
     if (_.isObject(error) && !(error instanceof Error) && error.data) {
         if (_.isObject(error.data) || _.isArray(error.data)) {
             error.data = JSON.stringify(error.data, null, 2)
         }
 
-        error = error.message + '\n' + error.data
+        error = `${error.message}\n${error.data}`
     }
 
     if (_.isString(error)) {
@@ -90,12 +90,12 @@ var _fireError = function(error, emitter, reject, callback) {
  * @param {Object} json
  * @return {String} full function/event name
  */
-var _jsonInterfaceMethodToString = function(json) {
+const _jsonInterfaceMethodToString = function(json) {
     if (_.isObject(json) && json.name && json.name.indexOf('(') !== -1) {
         return json.name
     }
 
-    return json.name + '(' + _flattenTypes(false, json.inputs).join(',') + ')'
+    return `${json.name}(${_flattenTypes(false, json.inputs).join(',')})`
 }
 
 /**
@@ -105,19 +105,19 @@ var _jsonInterfaceMethodToString = function(json) {
  * @param {String} hex
  * @returns {String} ascii string representation of hex value
  */
-var hexToAscii = function(hex) {
+const hexToAscii = function(hex) {
     if (!utils.isHexStrict(hex)) {
         throw new Error('The parameter must be a valid HEX string.')
     }
 
-    var str = ''
-    var i = 0
-    var l = hex.length
+    let str = ''
+    let i = 0
+    const l = hex.length
     if (hex.substring(0, 2) === '0x') {
         i = 2
     }
     for (; i < l; i += 2) {
-        var code = parseInt(hex.substr(i, 2), 16)
+        const code = parseInt(hex.substr(i, 2), 16)
         str += String.fromCharCode(code)
     }
 
@@ -131,18 +131,18 @@ var hexToAscii = function(hex) {
  * @param {String} str
  * @returns {String} hex representation of input string
  */
-var asciiToHex = function(str) {
+const asciiToHex = function(str) {
     if (!str) {
         return '0x00'
     }
-    var hex = ''
-    for (var i = 0; i < str.length; i++) {
-        var code = str.charCodeAt(i)
-        var n = code.toString(16)
-        hex += n.length < 2 ? '0' + n : n
+    let hex = ''
+    for (let i = 0; i < str.length; i++) {
+        const code = str.charCodeAt(i)
+        const n = code.toString(16)
+        hex += n.length < 2 ? `0${n}` : n
     }
 
-    return '0x' + hex
+    return `0x${hex}`
 }
 
 /**
@@ -153,14 +153,11 @@ var asciiToHex = function(str) {
  * @returns {BN} value of the unit (in Wei)
  * @throws error if the unit is not correct:w
  */
-var getUnitValue = function(unit) {
+const getUnitValue = function(unit) {
     unit = unit ? unit.toLowerCase() : 'ether'
     if (!ethjsUnit.unitMap[unit]) {
         throw new Error(
-            'This unit "' +
-                unit +
-                '" doesn\'t exist, please use the one of the following units' +
-                JSON.stringify(ethjsUnit.unitMap, null, 2)
+            `This unit "${unit}" doesn't exist, please use the one of the following units${JSON.stringify(ethjsUnit.unitMap, null, 2)}`
         )
     }
     return unit
@@ -187,7 +184,7 @@ var getUnitValue = function(unit) {
  * @param {String} unit the unit to convert to, default ether
  * @return {String|Object} When given a BN object it returns one as well, otherwise a number
  */
-var fromWei = function(number, unit) {
+const fromWei = function(number, unit) {
     unit = getUnitValue(unit)
 
     if (!utils.isBN(number) && !_.isString(number)) {
@@ -219,7 +216,7 @@ var fromWei = function(number, unit) {
  * @param {String} unit the unit to convert from, default ether
  * @return {String|Object} When given a BN object it returns one as well, otherwise a number
  */
-var toWei = function(number, unit) {
+const toWei = function(number, unit) {
     unit = getUnitValue(unit)
 
     if (!utils.isBN(number) && !_.isString(number)) {
@@ -230,7 +227,7 @@ var toWei = function(number, unit) {
 }
 
 // For Klay unit
-var unitKlayMap = {
+const unitKlayMap = {
     peb: '1',
     kpeb: '1000',
     Mpeb: '1000000',
@@ -244,7 +241,7 @@ var unitKlayMap = {
     GKLAY: '1000000000000000000000000000',
 }
 
-var unitKlayToEthMap = {
+const unitKlayToEthMap = {
     peb: 'wei',
     kpeb: 'kwei',
     Mpeb: 'mwei',
@@ -257,17 +254,17 @@ var unitKlayToEthMap = {
     MKLAY: 'mether',
     GKLAY: 'gether',
 }
-var getKlayUnitValue = function(unit) {
+const getKlayUnitValue = function(unit) {
     unit = unit || 'KLAY'
     if (!unitKlayMap[unit]) {
         throw new Error(
-            'This unit "' + unit + '" doesn\'t exist, please use the one of the following units' + JSON.stringify(unitKlayMap, null, 2)
+            `This unit "${unit}" doesn't exist, please use the one of the following units${JSON.stringify(unitKlayMap, null, 2)}`
         )
     }
     return unit
 }
 
-var fromPeb = function(number, unit) {
+const fromPeb = function(number, unit) {
     // kaly unit to eth unit
     unit = getKlayUnitValue(unit)
     unit = unitKlayToEthMap[unit]
@@ -281,7 +278,7 @@ var fromPeb = function(number, unit) {
     return utils.isBN(number) ? ethjsUnit.fromWei(number, unit) : ethjsUnit.fromWei(number, unit).toString(10)
 }
 
-var toPeb = function(number, unit) {
+const toPeb = function(number, unit) {
     // kaly unit to eth unit
     unit = getKlayUnitValue(unit)
     unit = unitKlayToEthMap[unit]
@@ -310,18 +307,18 @@ function tryNumberToString(number) {
  * @param {String} address the given HEX address
  * @return {String}
  */
-var toChecksumAddress = function(address) {
+const toChecksumAddress = function(address) {
     if (typeof address === 'undefined') return ''
 
     if (!/^(0x)?[0-9a-f]{40}$/i.test(address)) {
-        throw new Error('Given address "' + address + '" is not a valid Klaytn address.')
+        throw new Error(`Given address "${address}" is not a valid Klaytn address.`)
     }
 
     address = address.toLowerCase().replace(/^0x/i, '')
-    var addressHash = utils.sha3(address).replace(/^0x/i, '')
-    var checksumAddress = '0x'
+    const addressHash = utils.sha3(address).replace(/^0x/i, '')
+    let checksumAddress = '0x'
 
-    for (var i = 0; i < address.length; i++) {
+    for (let i = 0; i < address.length; i++) {
         // If ith character is 9 to f then make it uppercase
         if (parseInt(addressHash[i], 16) > 7) {
             checksumAddress += address[i].toUpperCase()
@@ -346,25 +343,25 @@ const isHexParameter = a => {
  * @return {Array} parameters as strings
  */
 function _flattenTypes(includeTuple, puts) {
-    var types = []
+    const types = []
     puts.forEach(function(param) {
         if (typeof param.components === 'object') {
             if (param.type.substring(0, 5) !== 'tuple') {
                 throw new Error('components found but type is not tuple; report on GitHub')
             }
-            var suffix = ''
-            var arrayBracket = param.type.indexOf('[')
+            let suffix = ''
+            const arrayBracket = param.type.indexOf('[')
             if (arrayBracket >= 0) {
                 suffix = param.type.substring(arrayBracket)
             }
-            var result = _flattenTypes(includeTuple, param.components)
+            const result = _flattenTypes(includeTuple, param.components)
 
             if (_.isArray(result) && includeTuple) {
-                types.push('tuple(' + result.join(',') + ')' + suffix)
+                types.push(`tuple(${result.join(',')})${suffix}`)
             } else if (!includeTuple) {
-                types.push('(' + result.join(',') + ')' + suffix)
+                types.push(`(${result.join(',')})${suffix}`)
             } else {
-                types.push('(' + result + ')')
+                types.push(`(${result})`)
             }
         } else {
             types.push(param.type)
@@ -379,7 +376,7 @@ function _flattenTypes(includeTuple, puts) {
  * @param {String} string
  * @return {bool}
  */
-var isHexPrefixed = function(str) {
+const isHexPrefixed = function(str) {
     if (typeof str !== 'string') return false
     return str.slice(0, 2) === '0x'
 }
@@ -390,10 +387,10 @@ var isHexPrefixed = function(str) {
  * @param {String} string
  * @return {String}
  */
-var addHexPrefix = function(str) {
+const addHexPrefix = function(str) {
     if (typeof str !== 'string') return str
 
-    return isHexPrefixed(str) ? str : '0x' + str
+    return isHexPrefixed(str) ? str : `0x${str}`
 }
 
 /**
@@ -402,7 +399,7 @@ var addHexPrefix = function(str) {
  * @param {String} string
  * @return {String}
  */
-var stripHexPrefix = function(str) {
+const stripHexPrefix = function(str) {
     if (typeof str !== 'string') return str
 
     return isHexPrefixed(str) ? str.slice(2) : str
@@ -415,7 +412,7 @@ var stripHexPrefix = function(str) {
  * @param {Buffer|Array|String|Number|BN|Object} input
  * @return {Buffer}
  */
-var toBuffer = function(input) {
+const toBuffer = function(input) {
     if (Buffer.isBuffer(input)) return input
     if (input === null || input === undefined) return Buffer.alloc(0)
     if (Array.isArray(input)) return Buffer.from(input)
@@ -442,7 +439,7 @@ var toBuffer = function(input) {
  * @param {Number|String|BN} num
  * @return {Buffer}
  */
-var numberToBuffer = function(num) {
+const numberToBuffer = function(num) {
     return Buffer.from(stripHexPrefix(utils.makeEven(utils.numberToHex(num))), 'hex')
 }
 

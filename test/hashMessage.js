@@ -18,11 +18,11 @@
 
 const { expect } = require('./extendedChai')
 
+const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 
 describe('caver.klay.accounts.hashMessage', done => {
     it('CAVERJS-UNIT-ETC-003 : should have same value with utf8ToHex', async () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         const rawStringHashed = caver.klay.accounts.hashMessage('Hello World')
@@ -31,12 +31,11 @@ describe('caver.klay.accounts.hashMessage', done => {
     })
 
     it('CAVERJS-UNIT-ETC-004 : should have same value with caver.utils.sha3 containing prefix message', () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         const rawMessage = 'Hello World'
         const rawStringHashed = caver.klay.accounts.hashMessage(rawMessage)
-        const sha3StringHashed = caver.utils.sha3('\x19Klaytn Signed Message:\n' + rawMessage.length + rawMessage)
+        const sha3StringHashed = caver.utils.sha3(`\x19Klaytn Signed Message:\n${rawMessage.length}${rawMessage}`)
 
         expect(rawStringHashed).to.equal(sha3StringHashed)
     })

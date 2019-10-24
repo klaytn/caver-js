@@ -16,9 +16,9 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-var RLP = require('eth-lib/lib/rlp')
-var Bytes = require('eth-lib/lib/bytes')
-var helpers = require('../../../../caver-core-helpers')
+const RLP = require('eth-lib/lib/rlp')
+const Bytes = require('eth-lib/lib/bytes')
+const helpers = require('../../../../caver-core-helpers')
 
 const { CHAIN_DATA_ANCHORING_TYPE_TAG } = helpers.constants
 

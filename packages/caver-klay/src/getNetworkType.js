@@ -24,11 +24,11 @@
  * @date 2017
  */
 
-var _ = require('underscore')
+const _ = require('underscore')
 
-var getNetworkType = function(callback) {
-    var _this = this
-    var id
+const getNetworkType = function(callback) {
+    const _this = this
+    let id
 
     return this.net
         .getId()
@@ -38,7 +38,7 @@ var getNetworkType = function(callback) {
             return _this.getBlock(0)
         })
         .then(function(genesis) {
-            var returnValue = 'private'
+            let returnValue = 'private'
 
             if (genesis.hash === '0xe33ff05ceec2581ca9496f38a2bf9baad5d4eed629e896ccb33d1dc991bc4b4a' && id === 1001) {
                 returnValue = 'baobab'

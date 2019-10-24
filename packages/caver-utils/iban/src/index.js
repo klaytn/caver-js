@@ -27,13 +27,13 @@
  * @date 2015
  */
 
-var utils = require('../../src/index.js')
-var BigNumber = require('bn.js')
+const BigNumber = require('bn.js')
+const utils = require('../../src/index.js')
 
-var leftPad = function(string, bytes) {
-    var result = string
+const leftPad = function(string, bytes) {
+    let result = string
     while (result.length < bytes * 2) {
-        result = '0' + result
+        result = `0${result}`
     }
     return result
 }
@@ -46,9 +46,9 @@ var leftPad = function(string, bytes) {
  * @param {String} iban the IBAN
  * @returns {String} the prepared IBAN
  */
-var iso13616Prepare = function(iban) {
-    var A = 'A'.charCodeAt(0)
-    var Z = 'Z'.charCodeAt(0)
+const iso13616Prepare = function(iban) {
+    const A = 'A'.charCodeAt(0)
+    const Z = 'Z'.charCodeAt(0)
 
     iban = iban.toUpperCase()
     iban = iban.substr(4) + iban.substr(0, 4)
@@ -56,13 +56,12 @@ var iso13616Prepare = function(iban) {
     return iban
         .split('')
         .map(function(n) {
-            var code = n.charCodeAt(0)
+            const code = n.charCodeAt(0)
             if (code >= A && code <= Z) {
                 // A = 10, B = 11, ... Z = 35
                 return code - A + 10
-            } else {
-                return n
             }
+            return n
         })
         .join('')
 }
@@ -74,9 +73,9 @@ var iso13616Prepare = function(iban) {
  * @param {String} iban
  * @returns {Number}
  */
-var mod9710 = function(iban) {
-    var remainder = iban
-    var block
+const mod9710 = function(iban) {
+    let remainder = iban
+    let block
 
     while (remainder.length > 2) {
         block = remainder.slice(0, 9)
@@ -91,7 +90,7 @@ var mod9710 = function(iban) {
  *
  * @param {String} iban
  */
-var Iban = function Iban(iban) {
+const Iban = function Iban(iban) {
     this._iban = iban
 }
 
@@ -132,14 +131,14 @@ Iban.toIban = function(address) {
  */
 Iban.fromAddress = function(address) {
     if (!utils.isAddress(address)) {
-        throw new Error('Provided address is not a valid address: ' + address)
+        throw new Error(`Provided address is not a valid address: ${address}`)
     }
 
     address = address.replace('0x', '').replace('0X', '')
 
-    var asBn = new BigNumber(address, 16)
-    var base36 = asBn.toString(36)
-    var padded = leftPad(base36, 15)
+    const asBn = new BigNumber(address, 16)
+    const base36 = asBn.toString(36)
+    const padded = leftPad(base36, 15)
     return Iban.fromBban(padded.toUpperCase())
 }
 
@@ -153,10 +152,10 @@ Iban.fromAddress = function(address) {
  * @returns {Iban} the IBAN object
  */
 Iban.fromBban = function(bban) {
-    var countryCode = 'XE'
+    const countryCode = 'XE'
 
-    var remainder = mod9710(iso13616Prepare(countryCode + '00' + bban))
-    var checkDigit = ('0' + (98 - remainder)).slice(-2)
+    const remainder = mod9710(iso13616Prepare(`${countryCode}00${bban}`))
+    const checkDigit = `0${98 - remainder}`.slice(-2)
 
     return new Iban(countryCode + checkDigit + bban)
 }
@@ -169,7 +168,7 @@ Iban.fromBban = function(bban) {
  * @return {Iban} the IBAN object
  */
 Iban.createIndirect = function(options) {
-    return Iban.fromBban('ETH' + options.institution + options.identifier)
+    return Iban.fromBban(`ETH${options.institution}${options.identifier}`)
 }
 
 /**
@@ -180,7 +179,7 @@ Iban.createIndirect = function(options) {
  * @return {Boolean} true if it is valid IBAN
  */
 Iban.isValid = function(iban) {
-    var i = new Iban(iban)
+    const i = new Iban(iban)
     return i.isValid()
 }
 
@@ -255,8 +254,8 @@ Iban.prototype.client = function() {
  */
 Iban.prototype.toAddress = function() {
     if (this.isDirect()) {
-        var base36 = this._iban.substr(4)
-        var asBn = new BigNumber(base36, 36)
+        const base36 = this._iban.substr(4)
+        const asBn = new BigNumber(base36, 36)
         return utils.toChecksumAddress(asBn.toString(16, 20))
     }
 

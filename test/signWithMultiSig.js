@@ -20,10 +20,12 @@ const { expect } = require('chai')
 
 const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
+
 const caver = new Caver(testRPCURL)
 
 let sender
-let multiSigAccount, multiSigKeys
+let multiSigAccount
+let multiSigKeys
 
 const createMultiSigAccount = async () => {
     multiSigAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
@@ -65,7 +67,7 @@ before(function(done) {
 
     const senderPrvKey =
         process.env.privateKey && String(process.env.privateKey).indexOf('0x') === -1
-            ? '0x' + process.env.privateKey
+            ? `0x${process.env.privateKey}`
             : process.env.privateKey
 
     sender = caver.klay.accounts.wallet.add(senderPrvKey)

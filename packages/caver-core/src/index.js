@@ -88,7 +88,7 @@ module.exports = {
 
         // add SETPROVIDER function (don't overwrite if already existing)
         if (!pkg.setProvider) {
-            pkg.setProvider = (provider, net) => (pkg._provider = pkg._requestManager.setProvider(provider, net).provider)
+            pkg.setProvider = (p, n) => (pkg._provider = pkg._requestManager.setProvider(p, n).provider)
         }
 
         // attach batch request creation

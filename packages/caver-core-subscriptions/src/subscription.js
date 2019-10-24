@@ -24,9 +24,9 @@
  * @date 2017
  */
 
-var _ = require('underscore')
-var errors = require('../../caver-core-helpers').errors
-var EventEmitter = require('eventemitter3')
+const _ = require('underscore')
+const EventEmitter = require('eventemitter3')
+const errors = require('../../caver-core-helpers').errors
 
 function Subscription(options) {
     EventEmitter.call(this)
@@ -68,7 +68,7 @@ Subscription.prototype._extractCallback = function(args) {
  * @throws {Error} if it is not
  */
 Subscription.prototype._validateArgs = function(args) {
-    var subscription = this.options.subscription
+    let subscription = this.options.subscription
 
     if (!subscription) {
         subscription = {}
@@ -91,7 +91,7 @@ Subscription.prototype._validateArgs = function(args) {
  * @return {Array}
  */
 Subscription.prototype._formatInput = function(args) {
-    var subscription = this.options.subscription
+    const subscription = this.options.subscription
 
     if (!subscription) {
         return args
@@ -101,7 +101,7 @@ Subscription.prototype._formatInput = function(args) {
         return args
     }
 
-    var formattedArgs = subscription.inputFormatter.map(function(formatter, index) {
+    const formattedArgs = subscription.inputFormatter.map(function(formatter, index) {
         return formatter ? formatter(args[index]) : args[index]
     })
 
@@ -116,7 +116,7 @@ Subscription.prototype._formatInput = function(args) {
  * @return {Object}
  */
 Subscription.prototype._formatOutput = function(result) {
-    var subscription = this.options.subscription
+    const subscription = this.options.subscription
 
     return subscription && subscription.outputFormatter && result ? subscription.outputFormatter(result) : result
 }
@@ -134,7 +134,7 @@ Subscription.prototype._formatOutput = function(result) {
  *
  */
 Subscription.prototype._toPayload = function(args) {
-    var params = []
+    let params = []
     this.callback = this._extractCallback(args)
 
     if (!this.subscriptionMethod) {
@@ -160,7 +160,7 @@ Subscription.prototype._toPayload = function(args) {
     }
 
     return {
-        method: this.options.type + '_subscribe',
+        method: `${this.options.type}_subscribe`,
         params: params,
     }
 }
@@ -187,23 +187,25 @@ Subscription.prototype.unsubscribe = function(callback) {
  * @return {Object}
  */
 Subscription.prototype.subscribe = function() {
-    var _this = this
-    var args = Array.prototype.slice.call(arguments)
-    var payload = this._toPayload(args)
+    const _this = this
+    const args = Array.prototype.slice.call(arguments)
+    const payload = this._toPayload(args)
 
     if (!payload) {
         return this
     }
 
     if (!this.options.requestManager.provider) {
-        var err1 = new Error('No provider set.')
+        const err1 = new Error('No provider set.')
         this.callback(err1, null, this)
         this.emit('error', err1)
         return this
     }
 
     if (!this.options.requestManager.provider.on) {
-        var err2 = new Error("The current provider doesn't support subscriptions: " + this.options.requestManager.provider.constructor.name)
+        const err2 = new Error(
+            `The current provider doesn't support subscriptions: ${this.options.requestManager.provider.constructor.name}`
+        )
         this.callback(err2, null, this)
         this.emit('error', err2)
         return this
@@ -216,7 +218,12 @@ Subscription.prototype.subscribe = function() {
     this.options.params = payload.params[1]
 
     // get past logs, if fromBlock is available
-    if (payload.params[0] === 'logs' && _.isObject(payload.params[1]) && Object.prototype.hasOwnProperty.call(payload.params[1], 'fromBlock') && isFinite(payload.params[1].fromBlock)) {
+    if (
+        payload.params[0] === 'logs' &&
+        _.isObject(payload.params[1]) &&
+        Object.prototype.hasOwnProperty.call(payload.params[1], 'fromBlock') &&
+        isFinite(payload.params[1].fromBlock)
+    ) {
         // send the subscription request
         this.options.requestManager.send(
             {
@@ -226,7 +233,7 @@ Subscription.prototype.subscribe = function() {
             function(err, logs) {
                 if (!err) {
                     logs.forEach(function(log) {
-                        var output = _this._formatOutput(log)
+                        const output = _this._formatOutput(log)
                         _this.callback(null, output, _this)
                         _this.emit('data', output)
                     })
@@ -252,20 +259,19 @@ Subscription.prototype.subscribe = function() {
             _this.id = result
 
             // call callback on notifications
-            _this.options.requestManager.addSubscription(_this.id, payload.params[0], _this.options.type, function(err, result) {
-                if (!err) {
-                    if (!_.isArray(result)) {
-                        result = [result]
+            _this.options.requestManager.addSubscription(_this.id, payload.params[0], _this.options.type, function(error, ret) {
+                if (!error) {
+                    if (!_.isArray(ret)) {
+                        ret = [ret]
                     }
 
-                    result.forEach(function(resultItem) {
-                        var output = _this._formatOutput(resultItem)
+                    ret.forEach(function(resultItem) {
+                        const output = _this._formatOutput(resultItem)
 
                         if (_.isFunction(_this.options.subscription.subscriptionHandler)) {
                             return _this.options.subscription.subscriptionHandler.call(_this, output)
-                        } else {
-                            _this.emit('data', output)
                         }
+                        _this.emit('data', output)
 
                         // call the callback, last so that unsubscribe there won't affect the emit above
                         if (_.isFunction(_this.callback)) {
@@ -290,11 +296,11 @@ Subscription.prototype.subscribe = function() {
                             _this.subscribe(_this.callback)
                         })
                     }
-                    _this.emit('error', err)
+                    _this.emit('error', error)
 
                     // call the callback, last so that unsubscribe there won't affect the emit above
                     if (_.isFunction(_this.callback)) {
-                        _this.callback(err, null, _this)
+                        _this.callback(error, null, _this)
                     }
                 }
             })

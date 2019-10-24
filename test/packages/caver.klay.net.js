@@ -19,7 +19,6 @@
 const testRPCURL = require('../testrpc')
 const { expect } = require('../extendedChai')
 
-const setting = require('./setting')
 const Caver = require('../../index.js')
 
 let caver
@@ -36,7 +35,7 @@ describe('CAVERJS-UNIT-ETC-044: caver.klay.net.getId', () => {
     })
 
     context('input: callback', () => {
-        it('should return networkId set in setting.js', (done) => {
+        it('should return networkId set in setting.js', done => {
             caver.klay.net.getId((err, data) => {
                 const networkId = data
                 expect(networkId).to.be.a('number')
@@ -78,7 +77,7 @@ describe('CAVERJS-UNIT-ETC-047: caver.klay.net.peerCountByType', () => {
             const peerCountByType = await caver.klay.net.peerCountByType()
 
             expect(peerCountByType.total).not.to.be.undefined
-            expect(typeof (peerCountByType.total)).to.equals('number')
+            expect(typeof peerCountByType.total).to.equals('number')
         })
     })
 })

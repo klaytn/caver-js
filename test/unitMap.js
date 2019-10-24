@@ -17,30 +17,27 @@
 */
 
 const { expect } = require('chai')
+const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 
 describe('CAVERJS-UNIT-ETC-017 : unit map', done => {
     it('unit map should have `klay` property', async () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         expect(caver.utils.unitMap).to.have.property('KLAY')
     })
 
     it('fromPeb can receive number type parameter', () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
         expect(() => caver.utils.fromPeb(1000)).not.to.throw()
     })
 
     it('toPeb can receive number type parameter', () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
         expect(() => caver.utils.toPeb(1)).not.to.throw()
     })
 
     it('unitmap should have correct mapping', () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
         /*
             Peb      = 1    // official notation 'peb'

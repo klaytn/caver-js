@@ -17,8 +17,9 @@
 */
 
 const { expect } = require('chai')
-var Caver = require('../index.js')
+const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
+
 const caver = new Caver(testRPCURL)
 
 describe('get transaction count', () => {

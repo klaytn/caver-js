@@ -19,11 +19,13 @@
 const { expect } = require('chai')
 const websocketURL = require('./testWebsocket')
 
-var Caver = require('../index.js')
+const Caver = require('../index.js')
+
 const caver = new Caver(websocketURL)
 
-var senderPrvKey, senderAddress
-var receiver
+let senderPrvKey
+let senderAddress
+let receiver
 
 // If you are using websocket provider, subscribe the 'newBlockHeaders' event through the subscriptions object after sending the transaction.
 // When receiving the 'newBlockHeaders' event, it queries the transaction receipt.
@@ -43,7 +45,7 @@ var receiver
 before(() => {
     senderPrvKey =
         process.env.privateKey && String(process.env.privateKey).indexOf('0x') === -1
-            ? '0x' + process.env.privateKey
+            ? `0x${process.env.privateKey}`
             : process.env.privateKey
 
     senderAddress = caver.klay.accounts.wallet.add(senderPrvKey).address

@@ -17,22 +17,22 @@
 */
 
 require('it-each')({ testPerIteration: true })
-const { expect } = require('../extendedChai')
 const assert = require('assert')
+const { expect } = require('../extendedChai')
 
 const testRPCURL = require('../testrpc')
 const Caver = require('../../index.js')
 
 let caver
-var senderPrvKey
-var senderAddress
-var testAccount
+let senderPrvKey
+let senderAddress
+let testAccount
 
 before(() => {
     caver = new Caver(testRPCURL)
     senderPrvKey =
         process.env.privateKey && String(process.env.privateKey).indexOf('0x') === -1
-            ? '0x' + process.env.privateKey
+            ? `0x${process.env.privateKey}`
             : process.env.privateKey
 
     caver.klay.accounts.wallet.add(senderPrvKey)
@@ -44,7 +44,7 @@ before(() => {
 })
 
 describe('VALUE_TRANSFER transaction', () => {
-    var valueTransferObject
+    let valueTransferObject
 
     beforeEach(() => {
         valueTransferObject = {
@@ -59,7 +59,7 @@ describe('VALUE_TRANSFER transaction', () => {
     it('If transaction object has all essential value, sendTransaction should not return error', async () => {
         const tx = Object.assign({}, valueTransferObject)
 
-        var result
+        let result
         await caver.klay
             .sendTransaction(tx)
             .then(() => (result = true))
@@ -73,7 +73,7 @@ describe('VALUE_TRANSFER transaction', () => {
         const tx = Object.assign({}, valueTransferObject)
         delete tx.from
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -94,7 +94,7 @@ describe('VALUE_TRANSFER transaction', () => {
         const tx = Object.assign({}, valueTransferObject)
         delete tx.to
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -115,7 +115,7 @@ describe('VALUE_TRANSFER transaction', () => {
         const tx = Object.assign({}, valueTransferObject)
         delete tx.value
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -136,7 +136,7 @@ describe('VALUE_TRANSFER transaction', () => {
         const tx = Object.assign({}, valueTransferObject)
         delete tx.gas
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -156,7 +156,7 @@ describe('VALUE_TRANSFER transaction', () => {
     it('CAVERJS-UNIT-TX-025 : If transaction object has unnecessary feePayer field, signTransaction should throw error', async () => {
         const tx = Object.assign({ feePayer: testAccount.address }, valueTransferObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -175,7 +175,7 @@ describe('VALUE_TRANSFER transaction', () => {
     it('CAVERJS-UNIT-TX-026 : If transaction object has unnecessary feeRatio field, signTransaction should throw error', async () => {
         const tx = Object.assign({ feeRatio: 20 }, valueTransferObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -200,7 +200,7 @@ describe('VALUE_TRANSFER transaction', () => {
             valueTransferObject
         )
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -250,7 +250,7 @@ describe('VALUE_TRANSFER transaction', () => {
         }
         const tx = Object.assign({ multisig }, valueTransferObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -298,7 +298,7 @@ describe('VALUE_TRANSFER transaction', () => {
         }
         const tx = Object.assign({ roleTransactionKey }, valueTransferObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -325,7 +325,7 @@ describe('VALUE_TRANSFER transaction', () => {
         }
         const tx = Object.assign({ roleAccountUpdateKey }, valueTransferObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -352,7 +352,7 @@ describe('VALUE_TRANSFER transaction', () => {
         }
         const tx = Object.assign({ roleFeePayerKey }, valueTransferObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -375,7 +375,7 @@ describe('VALUE_TRANSFER transaction', () => {
     it('CAVERJS-UNIT-TX-032 : If transaction object has unnecessary failKey field, signTransaction should throw error', async () => {
         const tx = Object.assign({ failKey: true }, valueTransferObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -394,7 +394,7 @@ describe('VALUE_TRANSFER transaction', () => {
     it('CAVERJS-UNIT-TX-033 : If transaction object has unnecessary codeFormat field, signTransaction should throw error', async () => {
         const tx = Object.assign({ codeFormat: 'EVM' }, valueTransferObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -415,7 +415,7 @@ describe('VALUE_TRANSFER transaction', () => {
             '0x6080604052348015600f57600080fd5b5060e98061001e6000396000f300608060405260043610603f576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff168063954ab4b2146044575b600080fd5b348015604f57600080fd5b5060566058565b005b7f90a042becc42ba1b13a5d545701bf5ceff20b24d9e5cc63b67f96ef814d80f0933604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a15600a165627a7a723058200ebb53e9d575350ceb2d92263b7d4920888706b5221f024e7bbc10e3dbb8e18d0029'
         const tx = Object.assign({ data }, valueTransferObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))

@@ -1,22 +1,20 @@
 #!/usr/bin/env node
 
-'use strict'
+const path = require('path')
 
-var path = require('path')
+const del = require('del')
+const gulp = require('gulp')
+const browserify = require('browserify')
+const uglify = require('gulp-uglify')
+const babel = require('gulp-babel')
+const rename = require('gulp-rename')
+const source = require('vinyl-source-stream')
+const exorcist = require('exorcist')
+const streamify = require('gulp-streamify')
 
-var del = require('del')
-var gulp = require('gulp')
-var browserify = require('browserify')
-var uglify = require('gulp-uglify')
-var babel = require('gulp-babel')
-var rename = require('gulp-rename')
-var source = require('vinyl-source-stream')
-var exorcist = require('exorcist')
-var streamify = require('gulp-streamify')
+const DEST = path.join(__dirname, 'dist/')
 
-var DEST = path.join(__dirname, 'dist/')
-
-var packages = [
+const packages = [
     {
         fileName: 'caver',
         expose: 'Caver',
@@ -71,7 +69,7 @@ var packages = [
     },
 ]
 
-var browserifyOptions = {
+const browserifyOptions = {
     debug: true,
     derequire: true,
     insertGlobalVars: false, // jshint ignore:line
@@ -79,7 +77,7 @@ var browserifyOptions = {
     bundleExternal: true,
 }
 
-var ugliyOptions = {
+const ugliyOptions = {
     compress: {
         dead_code: true, // jshint ignore:line
         drop_debugger: true, // jshint ignore:line
@@ -98,14 +96,14 @@ gulp.task(
 )
 
 packages.forEach(function(pckg, i) {
-    var prevPckg = !i ? 'clean' : packages[i - 1].fileName
+    const prevPckg = !i ? 'clean' : packages[i - 1].fileName
 
     gulp.task(
         pckg.fileName,
         gulp.series(prevPckg, function() {
             browserifyOptions.standalone = pckg.expose
 
-            var pipe = browserify(browserifyOptions)
+            const pipe = browserify(browserifyOptions)
                 .require(pckg.src, { expose: pckg.expose })
                 .require('bn.js', { expose: 'BN' }) // expose it to dapp developers
                 .add(pckg.src)
@@ -118,8 +116,8 @@ packages.forEach(function(pckg, i) {
 
             return pipe
                 .bundle()
-                .pipe(exorcist(path.join(DEST, pckg.fileName + '.js.map')))
-                .pipe(source(pckg.fileName + '.js'))
+                .pipe(exorcist(path.join(DEST, `${pckg.fileName}.js.map`)))
+                .pipe(source(`${pckg.fileName}.js`))
                 .pipe(
                     streamify(
                         babel({
@@ -143,7 +141,7 @@ packages.forEach(function(pckg, i) {
                 .on('error', function(err) {
                     console.error(err)
                 })
-                .pipe(rename(pckg.fileName + '.min.js'))
+                .pipe(rename(`${pckg.fileName}.min.js`))
                 .pipe(gulp.dest(DEST))
         })
     )

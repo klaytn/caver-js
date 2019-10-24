@@ -18,11 +18,11 @@
 
 const { expect } = require('./extendedChai')
 
+const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 
 describe('wallet instance default wallet name', done => {
     it('should return valid default wallet name', async () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         caver.klay.accounts.wallet.add(caver.klay.accounts.create())

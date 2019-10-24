@@ -17,10 +17,11 @@
 */
 
 const { expect } = require('chai')
-const testRPCURL = require('./testrpc')
 const BN = require('bn.js')
+const testRPCURL = require('./testrpc')
 
-var Caver = require('../index.js')
+const Caver = require('../index.js')
+
 const caver = new Caver(testRPCURL)
 
 describe('accounts.privateKeyToAccount', done => {

@@ -28,7 +28,12 @@ const {
     rlpEncodeForFeeDelegatedValueTransferMemoWithRatio,
 } = require('./valueTransfer')
 
-const { rlpEncodeForAccountUpdate, rlpEncodeForFeeDelegatedAccountUpdate, rlpEncodeForFeeDelegatedAccountUpdateWithRatio, parseAccountKey } = require('./account')
+const {
+    rlpEncodeForAccountUpdate,
+    rlpEncodeForFeeDelegatedAccountUpdate,
+    rlpEncodeForFeeDelegatedAccountUpdateWithRatio,
+    parseAccountKey,
+} = require('./account')
 
 const {
     rlpEncodeForContractDeploy,

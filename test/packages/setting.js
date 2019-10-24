@@ -22,7 +22,7 @@ const setting = {
     gas: 900000,
     gasPrice: 25000000000,
     fromAddress: '0x11d54a1ad94909e234a39a3e8d9ff169ba3d0941',
-    toAddress: '0x30d8d4217145ba3f6cde24ec28c64c9120f2bdfb'
+    toAddress: '0x30d8d4217145ba3f6cde24ec28c64c9120f2bdfb',
 }
 
 module.exports = setting

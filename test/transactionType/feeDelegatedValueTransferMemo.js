@@ -17,26 +17,28 @@
 */
 
 require('it-each')({ testPerIteration: true })
-const { expect } = require('../extendedChai')
 const assert = require('assert')
+const { expect } = require('../extendedChai')
 
 const testRPCURL = require('../testrpc')
 const Caver = require('../../index.js')
 
 let caver
-var senderPrvKey, payerPrvKey
-var senderAddress, payerAddress
-var testAccount
+let senderPrvKey
+let payerPrvKey
+let senderAddress
+let payerAddress
+let testAccount
 
 before(() => {
     caver = new Caver(testRPCURL)
     senderPrvKey =
         process.env.privateKey && String(process.env.privateKey).indexOf('0x') === -1
-            ? '0x' + process.env.privateKey
+            ? `0x${process.env.privateKey}`
             : process.env.privateKey
     payerPrvKey =
         process.env.privateKey2 && String(process.env.privateKey2).indexOf('0x') === -1
-            ? '0x' + process.env.privateKey2
+            ? `0x${process.env.privateKey2}`
             : process.env.privateKey2
 
     caver.klay.accounts.wallet.add(senderPrvKey)
@@ -51,7 +53,7 @@ before(() => {
 })
 
 describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
-    var feeDelegatedValueTransferMemoObject
+    let feeDelegatedValueTransferMemoObject
 
     beforeEach(() => {
         feeDelegatedValueTransferMemoObject = {
@@ -67,7 +69,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
     it('If transaction object has all essential value, sendTransaction should not return error', async () => {
         const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(async ret => {
@@ -89,7 +91,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
         const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
         delete tx.from
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -111,7 +113,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
         const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
         delete tx.to
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -133,7 +135,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
         const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
         delete tx.value
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -155,7 +157,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
         const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
         delete tx.gas
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -177,7 +179,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
         const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
         delete tx.data
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -216,7 +218,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
     it('CAVERJS-UNIT-TX-086 : If transaction object has unnecessary feeRatio field, signTransaction should throw error', async () => {
         const tx = Object.assign({ feeRatio: 20 }, feeDelegatedValueTransferMemoObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -242,7 +244,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
             feeDelegatedValueTransferMemoObject
         )
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -293,7 +295,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
         }
         const tx = Object.assign({ multisig }, feeDelegatedValueTransferMemoObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -342,7 +344,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
         }
         const tx = Object.assign({ roleTransactionKey }, feeDelegatedValueTransferMemoObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -370,7 +372,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
         }
         const tx = Object.assign({ roleAccountUpdateKey }, feeDelegatedValueTransferMemoObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -398,7 +400,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
         }
         const tx = Object.assign({ roleFeePayerKey }, feeDelegatedValueTransferMemoObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -422,7 +424,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
     it('CAVERJS-UNIT-TX-092 : If transaction object has unnecessary failKey field, signTransaction should throw error', async () => {
         const tx = Object.assign({ failKey: true }, feeDelegatedValueTransferMemoObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -442,7 +444,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
     it('CAVERJS-UNIT-TX-093 : If transaction object has unnecessary codeFormat field, signTransaction should throw error', async () => {
         const tx = Object.assign({ codeFormat: 'EVM' }, feeDelegatedValueTransferMemoObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))

@@ -24,15 +24,15 @@
  * @date 2017
  */
 
-var _ = require('underscore')
-var errors = require('../../caver-core-helpers').errors
+const _ = require('underscore')
+const errors = require('../../caver-core-helpers').errors
 const middleware = require('../../caver-middleware')
 
-var Jsonrpc = require('./jsonrpc.js')
+const Jsonrpc = require('./jsonrpc.js')
 
-var BatchManager = require('./batch.js')
+const BatchManager = require('./batch.js')
 
-var RequestManager = function RequestManager(provider, net) {
+const RequestManager = function RequestManager(provider, net) {
     this.provider = null
     this.providers = RequestManager.providers
 
@@ -53,7 +53,7 @@ RequestManager.providers = {
  * @param {Object} p
  */
 RequestManager.prototype.setProvider = function(p, net) {
-    var _this = this
+    const _this = this
 
     if (p && typeof p === 'string' && this.providers) {
         // HTTP
@@ -68,7 +68,7 @@ RequestManager.prototype.setProvider = function(p, net) {
         } else if (p && typeof net === 'object' && typeof net.connect === 'function') {
             p = new this.providers.IpcProvider(p, net)
         } else if (p) {
-            throw new Error('Can\'t autodetect provider for "' + p + '"')
+            throw new Error(`Can't autodetect provider for "${p}"`)
         }
     }
 
@@ -118,7 +118,7 @@ RequestManager.prototype.send = function(data, callback) {
         return callback(errors.InvalidProvider())
     }
 
-    var payload = Jsonrpc.toPayload(data.method, data.params)
+    const payload = Jsonrpc.toPayload(data.method, data.params)
 
     const isMiddlewareExist = middleware.getMiddlewares().length !== 0
 
@@ -128,10 +128,10 @@ RequestManager.prototype.send = function(data, callback) {
     middleware.applyMiddleware(payload, 'outbound', sendRPC(this.provider))
 
     function sendRPC(provider) {
-        return function(payload) {
-            provider[provider.sendAsync ? 'sendAsync' : 'send'](payload, function(err, result) {
+        return function(p) {
+            provider[provider.sendAsync ? 'sendAsync' : 'send'](p, function(err, result) {
                 // Attach inbound middleware
-                if (isMiddlewareExist) middleware.applyMiddleware(payload, 'inbound')
+                if (isMiddlewareExist) middleware.applyMiddleware(p, 'inbound')
                 /**
                  * result = json rpc response object
                  * {
@@ -143,10 +143,8 @@ RequestManager.prototype.send = function(data, callback) {
                  *
                  * Reference: https://www.jsonrpc.org/specification
                  */
-                if (result && result.id && payload.id !== result.id) {
-                    return callback(
-                        new Error('Wrong response id "' + result.id + '" (expected: "' + payload.id + '") in ' + JSON.stringify(payload))
-                    )
+                if (result && result.id && p.id !== result.id) {
+                    return callback(new Error(`Wrong response id "${result.id}" (expected: "${p.id}") in ${JSON.stringify(p)}`))
                 }
 
                 if (err) {
@@ -179,7 +177,7 @@ RequestManager.prototype.sendBatch = function(data, callback) {
         return callback(errors.InvalidProvider())
     }
 
-    var payload = Jsonrpc.toBatchPayload(data)
+    const payload = Jsonrpc.toBatchPayload(data)
     this.provider[this.provider.sendAsync ? 'sendAsync' : 'send'](payload, function(err, results) {
         if (err) {
             return callback(err)
@@ -210,7 +208,7 @@ RequestManager.prototype.addSubscription = function(id, name, type, callback) {
             name: name,
         }
     } else {
-        throw new Error("The provider doesn't support subscriptions: " + this.provider.constructor.name)
+        throw new Error(`The provider doesn't support subscriptions: ${this.provider.constructor.name}`)
     }
 }
 
@@ -222,12 +220,12 @@ RequestManager.prototype.addSubscription = function(id, name, type, callback) {
  * @param {Function} callback   fired once the subscription is removed
  */
 RequestManager.prototype.removeSubscription = function(id, callback) {
-    var _this = this
+    const _this = this
 
     if (this.subscriptions[id]) {
         this.send(
             {
-                method: this.subscriptions[id].type + '_unsubscribe',
+                method: `${this.subscriptions[id].type}_unsubscribe`,
                 params: [id],
             },
             callback
@@ -244,7 +242,7 @@ RequestManager.prototype.removeSubscription = function(id, callback) {
  * @method reset
  */
 RequestManager.prototype.clearSubscriptions = function(keepIsSyncing) {
-    var _this = this
+    const _this = this
 
     // uninstall all subscriptions
     Object.keys(this.subscriptions).forEach(function(id) {

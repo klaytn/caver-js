@@ -16,10 +16,9 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-var RLP = require('eth-lib/lib/rlp')
-var utils = require('../../../caver-utils')
-
-var Hash = require('eth-lib/lib/hash')
+const RLP = require('eth-lib/lib/rlp')
+const Hash = require('eth-lib/lib/hash')
+const utils = require('../../../caver-utils')
 
 const {
     rlpEncodeForLegacyTransaction,
@@ -50,7 +49,9 @@ const {
 const creationNotSupportError = 'ACCOUNT_CREATION transaction type is not supported yet.'
 
 function encodeRLPByTxType(transaction) {
-    transaction.type = transaction.senderRawTransaction ? utils.getTxTypeStringFromRawTransaction(transaction.senderRawTransaction) : transaction.type
+    transaction.type = transaction.senderRawTransaction
+        ? utils.getTxTypeStringFromRawTransaction(transaction.senderRawTransaction)
+        : transaction.type
 
     switch (transaction.type) {
         case 'ACCOUNT_CREATION':
@@ -105,7 +106,9 @@ function makeRawTransaction(rlpEncoded, sig, transaction) {
     const decodedValues = RLP.decode(rlpEncoded)
     let rawTx
 
-    transaction.type = transaction.senderRawTransaction ? utils.getTxTypeStringFromRawTransaction(transaction.senderRawTransaction) : transaction.type
+    transaction.type = transaction.senderRawTransaction
+        ? utils.getTxTypeStringFromRawTransaction(transaction.senderRawTransaction)
+        : transaction.type
 
     switch (transaction.type) {
         case 'ACCOUNT_CREATION':
@@ -196,12 +199,12 @@ function refineSignatures(sigArray) {
     const set = new Set()
     let result = []
     for (const sig of sigArray) {
-        if (sig.length === 0 || utils.isEmptySig(sig)) continue
-
-        const sigString = sig.join('')
-        if (!set.has(sigString)) {
-            set.add(sigString, true)
-            result.push(sig)
+        if (sig.length > 0 && !utils.isEmptySig(sig)) {
+            const sigString = sig.join('')
+            if (!set.has(sigString)) {
+                set.add(sigString, true)
+                result.push(sig)
+            }
         }
     }
 
@@ -225,7 +228,8 @@ function extractSignatures(rawTransaction) {
 function splitFeePayer(rawTransaction) {
     const typeString = utils.getTxTypeStringFromRawTransaction(rawTransaction)
 
-    if (!typeString || !typeString.includes('FEE_DELEGATED')) throw new Error(`Failed to split fee payer: not a fee delegated transaction type('${typeString || 'LEGACY'}')`)
+    if (!typeString || !typeString.includes('FEE_DELEGATED'))
+        throw new Error(`Failed to split fee payer: not a fee delegated transaction type('${typeString || 'LEGACY'}')`)
 
     const txType = rawTransaction.slice(0, 4)
     const decodedValues = RLP.decode(utils.addHexPrefix(rawTransaction.slice(4)))
@@ -255,13 +259,13 @@ function decodeFromRawTransaction(rawTransaction, type) {
 }
 
 function _decodeFromRawTransaction(rawTransaction, type) {
-    var typeString = type
+    let typeString = type
     if (typeString === undefined || typeString !== 'LEGACY') {
         typeString = utils.getTxTypeStringFromRawTransaction(rawTransaction)
         if (typeString === undefined) {
             typeString = 'LEGACY'
         } else {
-            rawTransaction = '0x' + rawTransaction.slice(4)
+            rawTransaction = `0x${rawTransaction.slice(4)}`
         }
     }
 
@@ -381,7 +385,9 @@ function _decodeFromRawTransaction(rawTransaction, type) {
             }
         }
         case 'FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO': {
-            const [nonce, gasPrice, gas, to, value, from, data, feeRatio, signatures, feePayer, feePayerSignatures] = RLP.decode(rawTransaction)
+            const [nonce, gasPrice, gas, to, value, from, data, feeRatio, signatures, feePayer, feePayerSignatures] = RLP.decode(
+                rawTransaction
+            )
             return {
                 type: typeString,
                 nonce,
@@ -482,7 +488,20 @@ function _decodeFromRawTransaction(rawTransaction, type) {
             }
         }
         case 'FEE_DELEGATED_SMART_CONTRACT_DEPLOY': {
-            const [nonce, gasPrice, gas, to, value, from, data, humanReadable, codeFormat, signatures, feePayer, feePayerSignatures] = RLP.decode(rawTransaction)
+            const [
+                nonce,
+                gasPrice,
+                gas,
+                to,
+                value,
+                from,
+                data,
+                humanReadable,
+                codeFormat,
+                signatures,
+                feePayer,
+                feePayerSignatures,
+            ] = RLP.decode(rawTransaction)
             return {
                 type: typeString,
                 nonce,
@@ -506,7 +525,21 @@ function _decodeFromRawTransaction(rawTransaction, type) {
             }
         }
         case 'FEE_DELEGATED_SMART_CONTRACT_DEPLOY_WITH_RATIO': {
-            const [nonce, gasPrice, gas, to, value, from, data, humanReadable, feeRatio, codeFormat, signatures, feePayer, feePayerSignatures] = RLP.decode(rawTransaction)
+            const [
+                nonce,
+                gasPrice,
+                gas,
+                to,
+                value,
+                from,
+                data,
+                humanReadable,
+                feeRatio,
+                codeFormat,
+                signatures,
+                feePayer,
+                feePayerSignatures,
+            ] = RLP.decode(rawTransaction)
             return {
                 type: typeString,
                 nonce,
@@ -570,7 +603,9 @@ function _decodeFromRawTransaction(rawTransaction, type) {
             }
         }
         case 'FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO': {
-            const [nonce, gasPrice, gas, to, value, from, data, feeRatio, signatures, feePayer, feePayerSignatures] = RLP.decode(rawTransaction)
+            const [nonce, gasPrice, gas, to, value, from, data, feeRatio, signatures, feePayer, feePayerSignatures] = RLP.decode(
+                rawTransaction
+            )
             return {
                 type: typeString,
                 nonce,
@@ -674,15 +709,15 @@ function overwriteSignature(rawTransaction, txObj, signature, feePayerSignature)
     }
 
     if (txObj.type === 'LEGACY') {
-        var decodeLegacy = RLP.decode(rawTransaction)
+        let decodeLegacy = RLP.decode(rawTransaction)
         decodeLegacy = decodeLegacy.slice(0, 6).concat(signature)
         return RLP.encode(decodeLegacy)
     }
 
-    var type = rawTransaction.slice(0, 4)
-    const typeDetached = '0x' + rawTransaction.slice(4)
+    const type = rawTransaction.slice(0, 4)
+    const typeDetached = `0x${rawTransaction.slice(4)}`
 
-    var data = RLP.decode(typeDetached)
+    const data = RLP.decode(typeDetached)
     if (txObj.type.includes('FEE_DELEGATED')) {
         data[data.length - 3] = [signature]
         data[data.length - 1] = [feePayerSignature]
@@ -697,10 +732,10 @@ function getSenderTxHash(rawTransaction) {
     const typeString = utils.getTxTypeStringFromRawTransaction(rawTransaction)
     if (typeString === undefined || !typeString.includes('FEE_DELEGATED')) return Hash.keccak256(rawTransaction)
 
-    var type = rawTransaction.slice(0, 4)
-    const typeDetached = '0x' + rawTransaction.slice(4)
+    const type = rawTransaction.slice(0, 4)
+    const typeDetached = `0x${rawTransaction.slice(4)}`
 
-    var data = RLP.decode(typeDetached)
+    const data = RLP.decode(typeDetached)
 
     return Hash.keccak256(type + RLP.encode(data.slice(0, data.length - 2)).slice(2))
 }

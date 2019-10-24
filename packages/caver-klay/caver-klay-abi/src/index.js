@@ -25,11 +25,11 @@
  * @date 2017
  */
 
-var _ = require('underscore')
-var utils = require('../../../caver-utils')
+const _ = require('underscore')
+const EthersAbi = require('ethers/utils/abi-coder').AbiCoder
+const utils = require('../../../caver-utils')
 
-var EthersAbi = require('ethers/utils/abi-coder').AbiCoder
-var ethersAbiCoder = new EthersAbi(function(type, value) {
+const ethersAbiCoder = new EthersAbi(function(type, value) {
     if (type.match(/^u?int/) && !_.isArray(value) && (!_.isObject(value) || value.constructor.name !== 'BN')) {
         return value.toString()
     }
@@ -42,7 +42,7 @@ function Result() {}
 /**
  * ABICoder prototype should be used to encode/decode solidity params of any type
  */
-var ABICoder = function() {}
+const ABICoder = function() {}
 
 /**
  * Encodes the function name to its ABI representation, which are the first 4 bytes of the sha3 of the function name including  types.
@@ -140,11 +140,11 @@ ABICoder.prototype.encodeContractDeploy = function(jsonInterface, bytecode, ...a
  * @return {Array}
  */
 ABICoder.prototype.mapTypes = function(types) {
-    var self = this
-    var mappedTypes = []
+    const self = this
+    const mappedTypes = []
     types.forEach(function(type) {
         if (self.isSimplifiedStructFormat(type)) {
-            var structName = Object.keys(type)[0]
+            const structName = Object.keys(type)[0]
             mappedTypes.push(
                 Object.assign(self.mapStructNameAndType(structName), {
                     components: self.mapStructToCoderFormat(type[structName]),
@@ -179,7 +179,7 @@ ABICoder.prototype.isSimplifiedStructFormat = function(type) {
  * @return {{type: string, name: *}}
  */
 ABICoder.prototype.mapStructNameAndType = function(structName) {
-    var type = 'tuple'
+    let type = 'tuple'
 
     if (structName.indexOf('[]') > -1) {
         type = 'tuple[]'
@@ -197,8 +197,8 @@ ABICoder.prototype.mapStructNameAndType = function(structName) {
  * @return {Array}
  */
 ABICoder.prototype.mapStructToCoderFormat = function(struct) {
-    var self = this
-    var components = []
+    const self = this
+    const components = []
     Object.keys(struct).forEach(function(key) {
         if (typeof struct[key] === 'object') {
             components.push(
@@ -256,12 +256,12 @@ ABICoder.prototype.decodeParameters = function(outputs, bytes) {
         throw new Error("Returned values aren't valid, did it run Out of Gas?")
     }
 
-    var res = ethersAbiCoder.decode(this.mapTypes(outputs), '0x' + bytes.replace(/0x/i, ''))
-    var returnValue = new Result()
+    const res = ethersAbiCoder.decode(this.mapTypes(outputs), `0x${bytes.replace(/0x/i, '')}`)
+    const returnValue = new Result()
     returnValue.__length__ = 0
 
     outputs.forEach(function(output, i) {
-        var decodedValue = res[returnValue.__length__]
+        let decodedValue = res[returnValue.__length__]
         decodedValue = decodedValue === '0x' ? null : decodedValue
 
         returnValue[i] = decodedValue
@@ -286,14 +286,14 @@ ABICoder.prototype.decodeParameters = function(outputs, bytes) {
  * @return {Array} array of plain params
  */
 ABICoder.prototype.decodeLog = function(inputs, data, topics) {
-    var _this = this
+    const _this = this
     topics = _.isArray(topics) ? topics : [topics]
 
     data = data || ''
 
-    var notIndexedInputs = []
-    var indexedParams = []
-    var topicCount = 0
+    const notIndexedInputs = []
+    const indexedParams = []
+    let topicCount = 0
 
     // TODO check for anonymous logs?
 
@@ -310,10 +310,10 @@ ABICoder.prototype.decodeLog = function(inputs, data, topics) {
         }
     })
 
-    var nonIndexedData = data
-    var notIndexedParams = nonIndexedData ? this.decodeParameters(notIndexedInputs, nonIndexedData) : []
+    const nonIndexedData = data
+    const notIndexedParams = nonIndexedData ? this.decodeParameters(notIndexedInputs, nonIndexedData) : []
 
-    var returnValue = new Result()
+    const returnValue = new Result()
     returnValue.__length__ = 0
 
     inputs.forEach(function(res, i) {
@@ -336,6 +336,6 @@ ABICoder.prototype.decodeLog = function(inputs, data, topics) {
     return returnValue
 }
 
-var coder = new ABICoder()
+const coder = new ABICoder()
 
 module.exports = coder

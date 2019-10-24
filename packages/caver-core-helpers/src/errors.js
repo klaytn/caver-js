@@ -26,6 +26,7 @@
  */
 
 const constants = require('./constants')
+
 const hasErrorMessage = result => !!result && !!result.error && !!result.error.message
 
 module.exports = {
@@ -49,8 +50,8 @@ module.exports = {
     blockHashNull: new Error('blockHash null'),
     contractCouldntBeStored: new Error("The contract code couldn't be stored, please check your gas limit."),
     receiptDidntContainContractAddress: new Error("The transaction receipt didn't contain a contract address."),
-    transactionReverted: receiptJSON => new Error('Transaction has been reverted by the EVM:\n' + receiptJSON),
-    transactionRanOutOfGas: receiptJSON => new Error('Transaction ran out of gas. Please provide more gas:\n' + receiptJSON),
+    transactionReverted: receiptJSON => new Error(`Transaction has been reverted by the EVM:\n${receiptJSON}`),
+    transactionRanOutOfGas: receiptJSON => new Error(`Transaction ran out of gas. Please provide more gas:\n${receiptJSON}`),
     invalidGasPrice: () => new Error(`Invalid gas price. Please provide valid gas price: ${constants.VALID_GAS_PRICE}`),
     invalidGasLimit: () => new Error('Invalid gas limit. Please provide valid gas.'),
     invalidData: () => new Error('Invalid data. Please provide valid hex-strict data.'),

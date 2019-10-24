@@ -22,9 +22,30 @@ const testRPCURL = require('./testrpc')
 
 const { parseAccountKey } = require('../packages/caver-klay/caver-klay-accounts/src/transactionType/account')
 
-var Caver = require('../index.js')
+const Caver = require('../index.js')
+
 const caver = new Caver(testRPCURL)
 
+function isEqualMultiSigKey(multisig1, multisig2) {
+    if (multisig1.keys.length !== multisig2.keys.length) return false
+    if (multisig1.threshold !== multisig2.threshold) return false
+
+    multisig1.keys = multisig1.keys.map(k => {
+        k.publicKey = caver.utils.compressPublicKey(k.publicKey)
+        return k
+    })
+    multisig2.keys = multisig2.keys.map(k => {
+        k.publicKey = caver.utils.compressPublicKey(k.publicKey)
+        return k
+    })
+
+    for (let i = 0; i < multisig1.keys.length; i++) {
+        if (multisig1.keys[i].weight !== multisig2.keys[i].weight) return false
+        if (multisig1.keys[i].publicKey !== multisig2.keys[i].publicKey) return false
+    }
+
+    return true
+}
 describe('parseAccountKey', () => {
     it('CAVERJS-UNIT-SER-027: parseAccountKey with legacyKey', () => {
         const txObj = { accountKey: '0x01c0' }
@@ -426,24 +447,3 @@ describe('parseAccountKey', () => {
         expect(() => parseAccountKey(txObj)).to.throws('Nested role based key.')
     })
 })
-
-function isEqualMultiSigKey(multisig1, multisig2) {
-    if (multisig1.keys.length !== multisig2.keys.length) return false
-    if (multisig1.threshold !== multisig2.threshold) return false
-
-    multisig1.keys = multisig1.keys.map(k => {
-        k.publicKey = caver.utils.compressPublicKey(k.publicKey)
-        return k
-    })
-    multisig2.keys = multisig2.keys.map(k => {
-        k.publicKey = caver.utils.compressPublicKey(k.publicKey)
-        return k
-    })
-
-    for (var i = 0; i < multisig1.keys.length; i++) {
-        if (multisig1.keys[i].weight !== multisig2.keys[i].weight) return false
-        if (multisig1.keys[i].publicKey !== multisig2.keys[i].publicKey) return false
-    }
-
-    return true
-}

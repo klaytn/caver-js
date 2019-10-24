@@ -18,6 +18,7 @@
 
 const { expect } = require('./extendedChai')
 
+const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 
 describe('caver.klay.accounts.recover', done => {
@@ -29,7 +30,6 @@ describe('caver.klay.accounts.recover', done => {
          * c. recover with message, v, r, s
          */
 
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         const message = 'Some data'
@@ -46,7 +46,6 @@ describe('caver.klay.accounts.recover', done => {
     })
 
     it('CAVERJS-UNIT-WALLET-020 : messageHash argument can be used as a first argument with preFixed = true', () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         const privateKey = '0x4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318'

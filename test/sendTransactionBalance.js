@@ -17,21 +17,22 @@
 */
 
 const { expect } = require('chai')
-const { errors } = require('../packages/caver-core-helpers')
 const fetch = require('node-fetch')
+const { errors } = require('../packages/caver-core-helpers')
 
 const testRPCURL = require('./testrpc')
-var Caver = require('../index.js')
-var caver = new Caver(testRPCURL)
+const Caver = require('../index.js')
 
-var senderPrvKey
-var senderAddress
-var receiver
+const caver = new Caver(testRPCURL)
+
+let senderPrvKey
+let senderAddress
+let receiver
 
 before(() => {
     senderPrvKey =
         process.env.privateKey && String(process.env.privateKey).indexOf('0x') === -1
-            ? '0x' + process.env.privateKey
+            ? `0x${process.env.privateKey}`
             : process.env.privateKey
 
     caver.klay.accounts.wallet.add(senderPrvKey)
@@ -44,7 +45,7 @@ before(() => {
 
 describe('send transaction should be applied to balance', () => {
     it('should be given transferred balance', async () => {
-        var balance = await caver.klay.getBalance(receiver.address)
+        let balance = await caver.klay.getBalance(receiver.address)
         expect(balance).to.equals('0')
 
         const txObj = {
