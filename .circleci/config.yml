@@ -10,8 +10,38 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - run: npm install
-      - run: npm test
+      - run: 
+          name: "Install caver-js for testing"
+          command: npm install
+      - run:
+          name: "Lint check"
+          command: |
+            npm run lint > lintOutput.txt
+            cat lintOutput.txt
+
+            problems=`echo grep -c 'problems' lintOutput.txt | wc -l`
+            echo $problems
+
+            if [ $problems -gt 0 ]; then
+              errorString=$(cat lintOutput.txt | grep problems | grep -Eoh "\([0-9]*")
+              errorCount=`echo ${errorString/\(/''}`
+
+              if [[ $errorCount -gt 0 ]]; then
+                cat lintOutput.txt
+
+                echo "$errorCount errors were found while checking linting. Please fix linting errors."
+                echo "You can run 'npm run lint' or 'npm run lintFix' script. 'npm run lintFix' will automatic fix your formatting errors"
+                
+                rm lintOutput.txt
+                exit 1
+              fi 
+            fi
+            
+            echo "Linting check pass"
+            rm lintOutput.txt
+      - run: 
+          name: "Run test code"
+          command: npm test
 
   tag_verify:
     <<: *defaults
