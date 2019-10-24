@@ -73,7 +73,7 @@ For the coding style of JavaScript, please refer to the following websites:
 - https://www.w3schools.com/js/js_conventions.asp
 - https://google.github.io/styleguide/jsguide.html
 
-caver-js uses eslint and prettier to prevent errors and to unify code format.
+caver-js uses eslint with prettier. The linting rules inherit from airbnb.
 
 If you have written code to contribute to caver-js, run the `npm run lint` script to see the results of linting.
 If there is an error in the result of linting, you must fix it.
