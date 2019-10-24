@@ -19,16 +19,17 @@
     Modified and improved for the caver-js development.
 */
 
-var chai = require('chai')
-var Iban = require('../packages/caver-utils/iban/src/index.js')
-var assert = chai.assert
+const chai = require('chai')
+const Iban = require('../packages/caver-utils/iban/src/index.js')
 
-var tests = [{ institution: 'XREG', identifier: 'GAVOFYORK', expected: 'XE81ETHXREGGAVOFYORK' }]
+const assert = chai.assert
+
+const tests = [{ institution: 'XREG', identifier: 'GAVOFYORK', expected: 'XE81ETHXREGGAVOFYORK' }]
 
 describe('caver-utils/iban/src/index', function() {
     describe('createIndirect', function() {
         tests.forEach(function(test) {
-            it('CAVERJS-UNIT-ETC-005 : shoud create indirect iban: ' + test.expected, function() {
+            it(`CAVERJS-UNIT-ETC-005 : shoud create indirect iban: ${test.expected}`, function() {
                 assert.deepEqual(
                     Iban.createIndirect({
                         institution: test.institution,

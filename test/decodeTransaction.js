@@ -19,10 +19,13 @@
 const { expect } = require('chai')
 const testRPCURL = require('./testrpc')
 
-var Caver = require('../index.js')
+const Caver = require('../index.js')
+
 const caver = new Caver(testRPCURL)
 
-var sender, payer, receiver
+let sender
+let payer
+let receiver
 
 before(() => {
     sender = caver.klay.accounts.wallet.add(caver.klay.accounts.create())

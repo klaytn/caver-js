@@ -19,13 +19,13 @@
 const { expect } = require('chai')
 
 const testRPCURL = require('./testrpc')
-var Caver = require('../index.js')
+const Caver = require('../index.js')
 
-describe('MutatedInstance', done => {
+describe('MutatedInstance', () => {
     it('should be different method provider host', done => {
-        var caver1 = new Caver('http://www.naver.com')
+        const caver1 = new Caver('http://www.naver.com')
 
-        var caver2 = new Caver(testRPCURL)
+        const caver2 = new Caver(testRPCURL)
 
         expect(caver1.klay.getBlockNumber.method.requestManager.provider.host).to.not.eql(
             caver2.klay.getBlockNumber.method.requestManager.provider.host
@@ -34,9 +34,9 @@ describe('MutatedInstance', done => {
     })
 
     it('should be different method provider object', done => {
-        var caver1 = new Caver('http://www.naver.com')
+        const caver1 = new Caver('http://www.naver.com')
 
-        var caver2 = new Caver(testRPCURL)
+        const caver2 = new Caver(testRPCURL)
 
         expect(caver1.klay.getBlockNumber.method.requestManager.provider).to.not.eql(
             caver2.klay.getBlockNumber.method.requestManager.provider

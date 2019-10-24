@@ -24,6 +24,8 @@
  * @date 2017
  */
 
+const _ = require('underscore')
+
 const core = require('../../caver-core')
 const { formatters } = require('../../caver-core-helpers')
 const Subscriptions = require('../../caver-core-subscriptions').subscriptions
@@ -31,7 +33,6 @@ const Method = require('../../caver-core-method')
 const utils = require('../../caver-utils')
 const Net = require('../../caver-net')
 
-const _ = require('underscore')
 const Personal = require('../caver-klay-personal')
 const BaseContract = require('../caver-klay-contract')
 const Accounts = require('../caver-klay-accounts')
@@ -42,24 +43,24 @@ const rpcCalls = require('../../caver-rtm')
 
 const { decodeFromRawTransaction } = require('../caver-klay-accounts/src/makeRawTransaction')
 
-var Klay = function Klay(...args) {
-    var _this = this
+const Klay = function Klay(...args) {
+    const _this = this
 
     // sets _requestmanager
     core.packageInit(this, args)
 
     // overwrite setProvider
-    var setProvider = this.setProvider
-    this.setProvider = function(...args) {
-        setProvider.apply(_this, args)
-        _this.net.setProvider.apply(_this, args)
-        _this.personal.setProvider.apply(_this, args)
-        _this.accounts.setProvider.apply(_this, args)
+    const setProvider = this.setProvider
+    this.setProvider = function(...arg) {
+        setProvider.apply(_this, arg)
+        _this.net.setProvider.apply(_this, arg)
+        _this.personal.setProvider.apply(_this, arg)
+        _this.accounts.setProvider.apply(_this, arg)
         _this.Contract.setProvider(_this.currentProvider, _this.accounts)
     }
 
-    var defaultAccount = null
-    var defaultBlock = 'latest'
+    let defaultAccount = null
+    let defaultBlock = 'latest'
 
     Object.defineProperty(this, 'defaultAccount', {
         get: function() {
@@ -127,7 +128,7 @@ var Klay = function Klay(...args) {
     // not create this proxy type, changing the provider in one instance of
     // caver-klay would subsequently change the provider for _all_ contract
     // instances!
-    var Contract = function Contract() {
+    const Contract = function Contract() {
         BaseContract.apply(this, arguments)
     }
 
@@ -152,7 +153,7 @@ var Klay = function Klay(...args) {
     // add ABI
     this.abi = abi
 
-    var methods = [
+    const methods = [
         ...rpcCalls.map(item => new Method(item)),
         // subscriptions
         new Subscriptions({
@@ -186,7 +187,7 @@ var Klay = function Klay(...args) {
                     params: 0,
                     outputFormatter: formatters.outputSyncingFormatter,
                     subscriptionHandler: function(output) {
-                        var _this = this
+                        const _this = this /* eslint-disable-line no-shadow */
 
                         // fire TRUE at start
                         if (this._isSyncing !== true) {

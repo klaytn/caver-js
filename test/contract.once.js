@@ -20,16 +20,17 @@ const { expect } = require('./extendedChai')
 
 const websocketURL = require('./testWebsocket')
 
-var Caver = require('../index.js')
+const Caver = require('../index.js')
+
 const caver = new Caver(websocketURL)
 
-var senderPrvKey
-var senderAddress
+let senderPrvKey
+let senderAddress
 
 before(() => {
     senderPrvKey =
         process.env.privateKey && String(process.env.privateKey).indexOf('0x') === -1
-            ? '0x' + process.env.privateKey
+            ? `0x${process.env.privateKey}`
             : process.env.privateKey
 
     caver.klay.accounts.wallet.add(senderPrvKey)
@@ -72,7 +73,7 @@ describe('caver.klay.contract.once', () => {
             gas: 100000000,
             value: 0,
         })
-        var dataVariable
+        let dataVariable
         newInstance.once('callevent', (error, data) => {
             expect(error).to.be.null
             dataVariable = data

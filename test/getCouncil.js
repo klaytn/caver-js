@@ -21,9 +21,9 @@ const { expect } = require('./extendedChai')
 
 const testRPCURL = require('./testrpc')
 
-var Caver = require('../index.js')
+const Caver = require('../index.js')
 
-var caver = new Caver(testRPCURL)
+const caver = new Caver(testRPCURL)
 
 describe('getCouncil from Node', () => {
     it('should throw an error on "pending" tag', done => {

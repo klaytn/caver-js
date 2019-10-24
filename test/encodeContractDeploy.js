@@ -18,11 +18,11 @@
 
 const { expect } = require('./extendedChai')
 
+const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 
 describe('caver.klay.abi.encodeContractDeploy', done => {
     it('CAVERJS-UNIT-SER-024 : Should be same with expected deploy input', () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         const abi1 = [
@@ -179,7 +179,6 @@ describe('caver.klay.abi.encodeContractDeploy', done => {
     })
 
     it('CAVERJS-UNIT-TX-002 : Should throw an error for invalid argument length', () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         const abi1 = [
@@ -297,7 +296,6 @@ describe('caver.klay.abi.encodeContractDeploy', done => {
     })
 
     it('CAVERJS-UNIT-TX-003 : Should throw an error for invalid argument type', () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         const abi1 = [
@@ -415,7 +413,6 @@ describe('caver.klay.abi.encodeContractDeploy', done => {
     })
 
     it('CAVERJS-UNIT-TX-004 : Should not throw an error for valid argument type', () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         const abi1 = [

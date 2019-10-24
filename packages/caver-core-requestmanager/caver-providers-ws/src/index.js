@@ -24,12 +24,13 @@
  * @date 2017
  */
 
-var _ = require('underscore')
-var errors = require('../../../caver-core-helpers').errors
+const _ = require('underscore')
+const errors = require('../../../caver-core-helpers').errors
 
-var Ws = null
-var _btoa = null
-var parseURL = null
+let Ws = null
+let _btoa = null
+let parseURL = null
+/* eslint-disable no-undef */
 if (typeof window !== 'undefined' && typeof window.WebSocket !== 'undefined') {
     Ws = window.WebSocket
     _btoa = btoa
@@ -39,14 +40,14 @@ if (typeof window !== 'undefined' && typeof window.WebSocket !== 'undefined') {
 } else {
     Ws = require('websocket').w3cwebsocket
     _btoa = function(str) {
-        return Buffer(str).toString('base64')
+        return Buffer.from(str).toString('base64')
     }
-    var url = require('url')
+    const url = require('url')
     if (url.URL) {
         // Use the new Node 6+ API for parsing URLs that supports username/password
-        var newURL = url.URL
-        parseURL = function(url) {
-            return new newURL(url)
+        const newURL = url.URL
+        parseURL = function(u) {
+            return new newURL(u)
         }
     } else {
         parseURL = require('url').parse
@@ -54,8 +55,8 @@ if (typeof window !== 'undefined' && typeof window.WebSocket !== 'undefined') {
 }
 // Default connection ws://localhost:8546
 
-var WebsocketProvider = function WebsocketProvider(url, options) {
-    var _this = this
+const WebsocketProvider = function WebsocketProvider(url, options) {
+    const _this = this
     this.responseCallbacks = {}
     this.notificationCallbacks = []
 
@@ -65,15 +66,15 @@ var WebsocketProvider = function WebsocketProvider(url, options) {
     // The w3cwebsocket implementation does not support Basic Auth
     // username/password in the URL. So generate the basic auth header, and
     // pass through with any additional headers supplied in constructor
-    var parsedURL = parseURL(url)
-    var headers = options.headers || {}
-    var protocol = options.protocol || undefined
+    const parsedURL = parseURL(url)
+    const headers = options.headers || {}
+    const protocol = options.protocol || undefined
     if (parsedURL.username && parsedURL.password) {
-        headers.authorization = 'Basic ' + _btoa(parsedURL.username + ':' + parsedURL.password)
+        headers.authorization = `Basic ${_btoa(`${parsedURL.username}:${parsedURL.password}`)}`
     }
 
     // Allow a custom client configuration
-    var clientConfig = options.clientConfig || undefined
+    const clientConfig = options.clientConfig || undefined
 
     this.connection = new Ws(url, protocol, undefined, headers, undefined, clientConfig)
     this.reconnect = () => new Ws(url, protocol, undefined, headers, undefined, clientConfig)
@@ -82,10 +83,10 @@ var WebsocketProvider = function WebsocketProvider(url, options) {
 
     // LISTEN FOR CONNECTION RESPONSES
     this.connection.onmessage = function(e) {
-        var data = typeof e.data === 'string' ? e.data : ''
+        const data = typeof e.data === 'string' ? e.data : ''
 
         _this._parseResponse(data).forEach(function(result) {
-            var id = null
+            let id = null
 
             // get the id which matches the returned id
             if (_.isArray(result)) {
@@ -121,7 +122,7 @@ var WebsocketProvider = function WebsocketProvider(url, options) {
  @method addDefaultEvents
  */
 WebsocketProvider.prototype.addDefaultEvents = function() {
-    var _this = this
+    const _this = this
 
     this.connection.onerror = function() {
         _this._timeout()
@@ -143,14 +144,14 @@ WebsocketProvider.prototype.addDefaultEvents = function() {
  Will parse the response and make an array out of it.
 
  @method _parseResponse
- @param {String} data
+ @param {String} response
  */
-WebsocketProvider.prototype._parseResponse = function(data) {
-    var _this = this
-    var returnValues = []
+WebsocketProvider.prototype._parseResponse = function(response) {
+    const _this = this
+    const returnValues = []
 
     // DE-CHUNKER
-    var dechunkedData = data
+    const dechunkedData = response
         .replace(/\}[\n\r]?\{/g, '}|--|{') // }{
         .replace(/\}\][\n\r]?\[\{/g, '}]|--|[{') // }][{
         .replace(/\}[\n\r]?\[\{/g, '}|--|[{') // }[{
@@ -163,7 +164,7 @@ WebsocketProvider.prototype._parseResponse = function(data) {
             data = _this.lastChunk + data
         }
 
-        var result = null
+        let result = null
 
         try {
             result = JSON.parse(data)
@@ -199,13 +200,13 @@ WebsocketProvider.prototype._parseResponse = function(data) {
  @method _addResponseCallback
  */
 WebsocketProvider.prototype._addResponseCallback = function(payload, callback) {
-    var id = payload.id || payload[0].id
-    var method = payload.method || payload[0].method
+    const id = payload.id || payload[0].id
+    const method = payload.method || payload[0].method
 
     this.responseCallbacks[id] = callback
     this.responseCallbacks[id].method = method
 
-    var _this = this
+    const _this = this
 
     // schedule triggering the error response if a custom timeout is set
     if (this._customTimeout) {
@@ -224,7 +225,7 @@ WebsocketProvider.prototype._addResponseCallback = function(payload, callback) {
  @method _timeout
  */
 WebsocketProvider.prototype._timeout = function() {
-    for (var key in this.responseCallbacks) {
+    for (const key in this.responseCallbacks) {
         if (Object.prototype.hasOwnProperty.call(this.responseCallbacks, key)) {
             this.responseCallbacks[key](errors.InvalidConnection('on WS'))
             delete this.responseCallbacks[key]
@@ -233,7 +234,7 @@ WebsocketProvider.prototype._timeout = function() {
 }
 
 WebsocketProvider.prototype.send = function(payload, callback) {
-    var _this = this
+    const _this = this
 
     if (this.connection.readyState === this.connection.CONNECTING) {
         setTimeout(function() {
@@ -307,7 +308,7 @@ WebsocketProvider.prototype.on = function(type, callback) {
  @param {Function} callback   the callback to call
  */
 WebsocketProvider.prototype.removeListener = function(type, callback) {
-    var _this = this
+    const _this = this
 
     switch (type) {
         case 'data':

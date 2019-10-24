@@ -18,11 +18,11 @@
 
 const { expect } = require('./extendedChai')
 
+const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 
 describe('caver.utils.isCompressedPublicKey', done => {
     it('CAVERJS-UNIT-SER-022 : Should return compressed public key if the argument is uncompressed public key', () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         const uncompressedPublicKey1 =
@@ -49,7 +49,6 @@ describe('caver.utils.isCompressedPublicKey', done => {
     })
 
     it('CAVERJS-UNIT-SER-023 : Should return same one with the argument if the argument is compressed public key', () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         const compressedPublicKey1 = '0x02dbac81e8486d68eac4e6ef9db617f7fbd79a04a3b323c982a09cdfc61f0ae0e8'

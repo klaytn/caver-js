@@ -24,12 +24,12 @@
  * @date 2017
  */
 
-var _ = require('underscore')
-var errors = require('../../../caver-core-helpers').errors
-var oboe = require('oboe')
+const _ = require('underscore')
+const oboe = require('oboe')
+const errors = require('../../../caver-core-helpers').errors
 
-var IpcProvider = function IpcProvider(path, net) {
-    var _this = this
+const IpcProvider = function IpcProvider(path, net) {
+    const _this = this
     this.responseCallbacks = {}
     this.notificationCallbacks = []
     this.path = path
@@ -39,8 +39,8 @@ var IpcProvider = function IpcProvider(path, net) {
     this.addDefaultEvents()
 
     // LISTEN FOR CONNECTION RESPONSES
-    var callback = function(result) {
-        var id = null
+    const callback = function(result) {
+        let id = null
 
         // get the id which matches the returned id
         if (_.isArray(result)) {
@@ -55,9 +55,9 @@ var IpcProvider = function IpcProvider(path, net) {
 
         // notification
         if (!id && result.method.indexOf('_subscription') !== -1) {
-            _this.notificationCallbacks.forEach(function(callback) {
-                if (_.isFunction(callback)) {
-                    callback(result)
+            _this.notificationCallbacks.forEach(function(cb) {
+                if (_.isFunction(cb)) {
+                    cb(result)
                 }
             })
 
@@ -84,7 +84,7 @@ Will add the error and end event to timeout existing calls
 @method addDefaultEvents
 */
 IpcProvider.prototype.addDefaultEvents = function() {
-    var _this = this
+    const _this = this
 
     this.connection.on('connect', function() {})
 
@@ -110,35 +110,35 @@ IpcProvider.prototype.addDefaultEvents = function() {
  @param {String} data
  */
 IpcProvider.prototype._parseResponse = function(data) {
-    var _this = this
-    var returnValues = []
+    const _this = this
+    const returnValues = []
 
     // DE-CHUNKER
-    var dechunkedData = data
+    const dechunkedData = data
         .replace(/\}[\n\r]?\{/g, '}|--|{') // }{
         .replace(/\}\][\n\r]?\[\{/g, '}]|--|[{') // }][{
         .replace(/\}[\n\r]?\[\{/g, '}|--|[{') // }[{
         .replace(/\}\][\n\r]?\{/g, '}]|--|{') // }]{
         .split('|--|')
 
-    dechunkedData.forEach(function(data) {
+    dechunkedData.forEach(function(d) {
         // prepend the last chunk
         if (_this.lastChunk) {
-            data = _this.lastChunk + data
+            d = _this.lastChunk + d
         }
 
-        var result = null
+        let result = null
 
         try {
-            result = JSON.parse(data)
+            result = JSON.parse(d)
         } catch (e) {
-            _this.lastChunk = data
+            _this.lastChunk = d
 
             // start timeout to cancel all requests
             clearTimeout(_this.lastChunkTimeout)
             _this.lastChunkTimeout = setTimeout(function() {
                 _this._timeout()
-                throw errors.InvalidResponse(data)
+                throw errors.InvalidResponse(d)
             }, 1000 * 15)
 
             return
@@ -163,8 +163,8 @@ which will be called if a response matching the response Id will arrive.
 @method _addResponseCallback
 */
 IpcProvider.prototype._addResponseCallback = function(payload, callback) {
-    var id = payload.id || payload[0].id
-    var method = payload.method || payload[0].method
+    const id = payload.id || payload[0].id
+    const method = payload.method || payload[0].method
 
     this.responseCallbacks[id] = callback
     this.responseCallbacks[id].method = method
@@ -176,7 +176,7 @@ Timeout all requests when the end/error event is fired
 @method _timeout
 */
 IpcProvider.prototype._timeout = function() {
-    for (var key in this.responseCallbacks) {
+    for (const key in this.responseCallbacks) {
         if (Object.prototype.hasOwnProperty.call(this.responseCallbacks, key)) {
             this.responseCallbacks[key](errors.InvalidConnection('on IPC'))
             delete this.responseCallbacks[key]
@@ -250,7 +250,7 @@ Removes event listener
 @param {Function} callback   the callback to call
 */
 IpcProvider.prototype.removeListener = function(type, callback) {
-    var _this = this
+    const _this = this
 
     switch (type) {
         case 'data':

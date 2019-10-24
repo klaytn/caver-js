@@ -17,11 +17,11 @@
 */
 
 const { expect } = require('./extendedChai')
+const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 
 describe('caver.klay.net', () => {
     it('caver.klay.net.getId should return number type network id', done => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         caver.klay.net.getId().then(res => {
@@ -31,7 +31,6 @@ describe('caver.klay.net', () => {
     })
 
     it('caver.klay.net.getPeerCount should return number type peer count', done => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
         caver.klay.net.getPeerCount().then(res => {
             expect(res).be.a('number')

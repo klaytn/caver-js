@@ -19,17 +19,18 @@
     Modified and improved for the caver-js development.
 */
 
-var chai = require('chai')
-var Iban = require('../packages/caver-utils/iban/src/index.js')
-var assert = chai.assert
+const chai = require('chai')
+const Iban = require('../packages/caver-utils/iban/src/index.js')
 
-var tests = [{ direct: 'XE7338O073KYGTWWZN0F2WZ0R8PX5ZPPZS', address: '0x00c5496aEe77C1bA1f0854206A26DdA82a81D6D8' }]
+const assert = chai.assert
+
+const tests = [{ direct: 'XE7338O073KYGTWWZN0F2WZ0R8PX5ZPPZS', address: '0x00c5496aEe77C1bA1f0854206A26DdA82a81D6D8' }]
 
 describe('caver-utils/iban', function() {
     describe('toAddress', function() {
         tests.forEach(function(test) {
-            it('CAVERJS-UNIT-ETC-008 : shoud transform iban to address: ' + test.address, function() {
-                var iban = new Iban(test.direct)
+            it(`CAVERJS-UNIT-ETC-008 : shoud transform iban to address: ${test.address}`, function() {
+                const iban = new Iban(test.direct)
                 assert.deepEqual(iban.toAddress(), test.address)
             })
         })

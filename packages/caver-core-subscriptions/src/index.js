@@ -38,8 +38,8 @@ Subscriptions.prototype.setRequestManager = function(requestManager) {
 }
 
 Subscriptions.prototype.attachToObject = function(obj) {
-    var func = this.buildCall()
-    var name = this.name.split('.')
+    const func = this.buildCall()
+    const name = this.name.split('.')
     if (name.length > 1) {
         obj[name[0]] = obj[name[0]] || {}
         obj[name[0]][name[1]] = func
@@ -49,14 +49,14 @@ Subscriptions.prototype.attachToObject = function(obj) {
 }
 
 Subscriptions.prototype.buildCall = function() {
-    var _this = this
+    const _this = this
 
     return function() {
         if (!_this.subscriptions[arguments[0]]) {
-            console.warn('Subscription ' + JSON.stringify(arguments[0]) + " doesn't exist. Subscribing anyway.")
+            console.warn(`Subscription ${JSON.stringify(arguments[0])} doesn't exist. Subscribing anyway.`)
         }
 
-        var subscription = new Subscription({
+        const subscription = new Subscription({
             subscription: _this.subscriptions[arguments[0]],
             requestManager: _this.requestManager,
             type: _this.type,

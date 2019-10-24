@@ -18,6 +18,7 @@
 
 const { expect } = require('chai')
 const fetch = require('node-fetch')
+const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 
 const abi = [
@@ -46,7 +47,6 @@ const contractAddress = '0xbde8566f50b932189b76141f0a9ce029779cdb36'
 
 describe('Instantiating Contract instance ', () => {
     it('CAVERJS-UNIT-TX-005 : Should throw an error with invalid `from` property', () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         const contractInstance = new caver.klay.Contract(abi, contractAddress)
@@ -58,7 +58,6 @@ describe('Instantiating Contract instance ', () => {
     })
 
     it('CAVERJS-UNIT-TX-006 : Should throw an error with invalid `gasPrice` property', () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         const contractInstance = new caver.klay.Contract(abi, contractAddress)
@@ -79,7 +78,6 @@ describe('Instantiating Contract instance ', () => {
     })
 
     it('CAVERJS-UNIT-TX-007 : Should throw an error with invalid `gas` property', () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         const contractInstance = new caver.klay.Contract(abi, contractAddress)
@@ -99,7 +97,6 @@ describe('Instantiating Contract instance ', () => {
     })
 
     it('CAVERJS-UNIT-TX-008 : Should throw an error with invalid `data` property', () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         const contractInstance = new caver.klay.Contract(abi, contractAddress)

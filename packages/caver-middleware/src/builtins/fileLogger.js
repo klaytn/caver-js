@@ -24,11 +24,11 @@ const DEFAULT_FILE_NAME = 'rpcLogs'
 const DEFAULT_FILE_EXTENSION = 'log'
 
 const guaranteeFilePath = filePath => {
-    return filePath.slice(-1) !== '/' ? filePath + '/' : filePath
+    return filePath.slice(-1) !== '/' ? `${filePath}/` : filePath
 }
 
 const appendToFile = (filePath, contents) => {
-    fs.appendFileSync(filePath, contents + '\n', err => {
+    fs.appendFileSync(filePath, `${contents}\n`, err => {
         if (err) throw err
     })
 }

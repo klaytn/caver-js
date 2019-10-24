@@ -24,37 +24,45 @@
  * @date 2017
  */
 
-var _ = require('underscore')
-var core = require('../../../caver-core')
-var Method = require('../../../caver-core-method')
-var Promise = require('any-promise')
+const _ = require('underscore')
+const Promise = require('any-promise')
 // account, hash, rlp, nat, bytes library will be used from 'eth-lib' temporarily.
-var AccountLib = require('eth-lib/lib/account')
-var Hash = require('eth-lib/lib/hash')
-var RLP = require('eth-lib/lib/rlp')
-var Nat = require('eth-lib/lib/nat')
-var Bytes = require('eth-lib/lib/bytes')
-var cryp = typeof global === 'undefined' ? require('crypto-browserify') : require('crypto')
-var scrypt = require('./scrypt')
-var uuid = require('uuid')
-var utils = require('../../../caver-utils')
-var helpers = require('../../../caver-core-helpers')
-const { encodeRLPByTxType, makeRawTransaction, getSenderTxHash, decodeFromRawTransaction, splitFeePayer, extractSignatures } = require('./makeRawTransaction')
+const AccountLib = require('eth-lib/lib/account')
+const Hash = require('eth-lib/lib/hash')
+const RLP = require('eth-lib/lib/rlp')
+const Nat = require('eth-lib/lib/nat')
+const Bytes = require('eth-lib/lib/bytes')
+const cryp = typeof global === 'undefined' ? require('crypto-browserify') : require('crypto')
+const uuid = require('uuid')
+const elliptic = require('elliptic')
+const scrypt = require('./scrypt')
+const utils = require('../../../caver-utils')
+const helpers = require('../../../caver-core-helpers')
 
-var elliptic = require('elliptic')
-var secp256k1 = new elliptic.ec('secp256k1')
+const Method = require('../../../caver-core-method')
+const core = require('../../../caver-core')
+const {
+    encodeRLPByTxType,
+    makeRawTransaction,
+    getSenderTxHash,
+    decodeFromRawTransaction,
+    splitFeePayer,
+    extractSignatures,
+} = require('./makeRawTransaction')
+
+const secp256k1 = new elliptic.ec('secp256k1')
 
 const AccountKeyPublic = require('./accountKey/accountKeyPublic')
 const AccountKeyMultiSig = require('./accountKey/accountKeyMultiSig')
 const AccountKeyRoleBased = require('./accountKey/accountKeyRoleBased')
-const AccountKeyEnum = require('./accountKey/accountKeyEnum').AccountKeyEnum
+const { AccountKeyEnum } = require('./accountKey/accountKeyEnum')
 
 const Account = require('./account/account')
 const AccountForUpdate = require('./account/accountForUpdate')
 
-const rpc = require('../../../caver-rtm').rpc
+const { rpc } = require('../../../caver-rtm')
 
-var isNot = function(value) {
+const isNot = function(value) {
     return _.isUndefined(value) || _.isNull(value)
 }
 
@@ -157,8 +165,8 @@ function resolveArgsForFeePayerSignTransaction(args) {
     return { tx, privateKey, feePayer, callback }
 }
 
-var Accounts = function Accounts(...args) {
-    var _this = this
+const Accounts = function Accounts(...args) {
+    const _this = this
 
     // sets _requestmanager
     core.packageInit(this, args)
@@ -167,7 +175,7 @@ var Accounts = function Accounts(...args) {
     delete this.BatchRequest
     delete this.extend
 
-    var _klaytnCall = [rpc.getChainId, rpc.getGasPrice, rpc.getTransactionCount]
+    const _klaytnCall = [rpc.getChainId, rpc.getGasPrice, rpc.getTransactionCount]
     // attach methods to this._klaytnCall
     this._klaytnCall = {}
     _.each(_klaytnCall, function(method) {
@@ -180,7 +188,7 @@ var Accounts = function Accounts(...args) {
 }
 
 Accounts.prototype._addAccountFunctions = function(account) {
-    var _this = this
+    const _this = this
 
     // add sign functions
     account.signTransaction = function signTransaction(tx, callback) {
@@ -221,7 +229,8 @@ Accounts.prototype._determineAddress = function _determineAddress(legacyAccount,
             throw new Error('The address received as the input value is invalid.')
         }
         return userInputAddress
-    } else if (addressFromKey) {
+    }
+    if (addressFromKey) {
         if (!utils.isAddress(addressFromKey)) {
             throw new Error('The address extracted from the private key is invalid.')
         }
@@ -332,9 +341,9 @@ Accounts.prototype.createAccountKeyMultiSig = function createAccountKeyMultiSig(
         throw new Error('Creating a AccountKeyMultiSig requires an array of private key string.')
     }
 
-    for (let p of privateKeys) {
-        const parsed = utils.parsePrivateKey(p)
-        p = parsed.privateKey
+    for (let i = 0; i < privateKeys.length; i++) {
+        const parsed = utils.parsePrivateKey(privateKeys[i])
+        const p = parsed.privateKey
         if (!utils.isValidPrivateKey(p)) {
             throw new Error(`Failed to create AccountKeyMultiSig. Invalid private key : ${p}`)
         }
@@ -557,17 +566,17 @@ Accounts.prototype.isDecoupled = function isDecoupled(key, userInputAddress) {
  * @return {Object}
  */
 Accounts.prototype.getLegacyAccount = function getLegacyAccount(key) {
-    var { privateKey, address: klaytnWalletKeyAddress, isHumanReadable } = utils.parsePrivateKey(key)
+    const parsed = utils.parsePrivateKey(key)
 
-    if (!utils.isValidPrivateKey(privateKey)) {
+    if (!utils.isValidPrivateKey(parsed.privateKey)) {
         throw new Error('Invalid private key')
     }
 
-    privateKey = utils.addHexPrefix(privateKey)
+    const privateKey = utils.addHexPrefix(parsed.privateKey)
 
     const account = this._addAccountFunctions(Account.fromObject(AccountLib.fromPrivate(privateKey)))
 
-    return { legacyAccount: account, klaytnWalletKeyAddress }
+    return { legacyAccount: account, klaytnWalletKeyAddress: parsed.address }
 }
 
 /**
@@ -587,7 +596,10 @@ Accounts.prototype.signTransaction = function signTransaction() {
     let isFeePayer = false
     let existedSenderSignatures = []
     let existedFeePayerSignatures = []
-    let result, tx, privateKey, callback
+    let result
+    let tx
+    let privateKey
+    let callback
 
     const handleError = e => {
         e = e instanceof Error ? e : new Error(e)
@@ -626,7 +638,9 @@ Accounts.prototype.signTransaction = function signTransaction() {
             if (feePayer !== '0x') {
                 // The feePayer inside the tx object does not match the feePayer information contained in the senderRawTransaction.
                 if (feePayer.toLowerCase() !== tx.feePayer.toLowerCase()) {
-                    return handleError(`Invalid feePayer: The fee payer(${feePayer}) included in the transaction does not match the fee payer(${tx.feePayer}) you want to sign.`)
+                    return handleError(
+                        `Invalid feePayer: The fee payer(${feePayer}) included in the transaction does not match the fee payer(${tx.feePayer}) you want to sign.`
+                    )
                 }
                 existedFeePayerSignatures = existedFeePayerSignatures.concat(feePayerSignatures)
             }
@@ -689,12 +703,12 @@ Accounts.prototype.signTransaction = function signTransaction() {
         }
     }
 
-    function signed(tx) {
+    function signed(txObject) {
         try {
             // Guarantee all property in transaction is hex.
-            tx = helpers.formatters.inputCallFormatter(tx)
+            txObject = helpers.formatters.inputCallFormatter(txObject)
 
-            const transaction = coverInitialTxValue(tx)
+            const transaction = coverInitialTxValue(txObject)
 
             const rlpEncoded = encodeRLPByTxType(transaction)
 
@@ -702,8 +716,8 @@ Accounts.prototype.signTransaction = function signTransaction() {
 
             const sigs = isFeePayer ? existedFeePayerSignatures : existedSenderSignatures
 
-            for (const privateKey of privateKeys) {
-                const signature = AccountLib.makeSigner(Nat.toNumber(transaction.chainId || '0x1') * 2 + 35)(messageHash, privateKey)
+            for (const p of privateKeys) {
+                const signature = AccountLib.makeSigner(Nat.toNumber(transaction.chainId || '0x1') * 2 + 35)(messageHash, p)
                 const [v, r, s] = AccountLib.decodeSignature(signature).map(sig => utils.makeEven(utils.trimLeadingZero(sig)))
                 sigs.push([v, r, s])
             }
@@ -711,11 +725,11 @@ Accounts.prototype.signTransaction = function signTransaction() {
             const { rawTransaction, signatures, feePayerSignatures } = makeRawTransaction(rlpEncoded, sigs, transaction)
 
             result = {
-                messageHash: messageHash,
+                messageHash,
                 v: sigs[0][0],
                 r: sigs[0][1],
                 s: sigs[0][2],
-                rawTransaction: rawTransaction,
+                rawTransaction,
                 txHash: Hash.keccak256(rawTransaction),
                 senderTxHash: getSenderTxHash(rawTransaction),
             }
@@ -742,7 +756,7 @@ Accounts.prototype.signTransaction = function signTransaction() {
     if (isFeePayer) {
         return Promise.all([isNot(tx.chainId) ? _this._klaytnCall.getChainId() : tx.chainId]).then(function(args) {
             if (isNot(args[0])) {
-                throw new Error('"chainId" couldn\'t be fetched: ' + JSON.stringify(args))
+                throw new Error(`"chainId" couldn't be fetched: ${JSON.stringify(args)}`)
             }
             return signed(_.extend(tx, { chainId: args[0] }))
         })
@@ -755,7 +769,7 @@ Accounts.prototype.signTransaction = function signTransaction() {
         isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from) : tx.nonce,
     ]).then(function(args) {
         if (isNot(args[0]) || isNot(args[1]) || isNot(args[2])) {
-            throw new Error('One of the values "chainId", "gasPrice", or "nonce" couldn\'t be fetched: ' + JSON.stringify(args))
+            throw new Error(`One of the values "chainId", "gasPrice", or "nonce" couldn't be fetched: ${JSON.stringify(args)}`)
         }
         return signed(
             _.extend(tx, {
@@ -780,7 +794,10 @@ Accounts.prototype.signTransaction = function signTransaction() {
  */
 Accounts.prototype.feePayerSignTransaction = function feePayerSignTransaction() {
     const _this = this
-    let tx, feePayer, privateKey, callback
+    let tx
+    let feePayer
+    let privateKey
+    let callback
 
     const handleError = e => {
         e = e instanceof Error ? e : new Error(e)
@@ -831,7 +848,7 @@ Accounts.prototype.feePayerSignTransaction = function feePayerSignTransaction() 
         isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from) : tx.nonce,
     ]).then(function(args) {
         if (isNot(args[0]) || isNot(args[1]) || isNot(args[2])) {
-            throw new Error('One of the values "chainId", "gasPrice", or "nonce" couldn\'t be fetched: ' + JSON.stringify(args))
+            throw new Error(`One of the values "chainId", "gasPrice", or "nonce" couldn't be fetched: ${JSON.stringify(args)}`)
         }
         let transaction = _.extend(tx, {
             chainId: args[0],
@@ -859,8 +876,8 @@ Accounts.prototype.feePayerSignTransaction = function feePayerSignTransaction() 
  * @return {Object}
  */
 Accounts.prototype.getRawTransactionWithSignatures = function getRawTransactionWithSignatures(tx, callback) {
-    var _this = this
-    var result
+    const _this = this
+    let result
 
     callback = callback || function() {}
 
@@ -901,12 +918,12 @@ Accounts.prototype.getRawTransactionWithSignatures = function getRawTransactionW
         tx = decoded
     }
 
-    function signed(tx) {
+    function signed(txObject) {
         try {
             // Guarantee all property in transaction is hex.
-            tx = helpers.formatters.inputCallFormatter(tx)
+            txObject = helpers.formatters.inputCallFormatter(txObject)
 
-            const transaction = coverInitialTxValue(tx)
+            const transaction = coverInitialTxValue(txObject)
 
             const rlpEncoded = encodeRLPByTxType(transaction)
 
@@ -917,7 +934,7 @@ Accounts.prototype.getRawTransactionWithSignatures = function getRawTransactionW
             const { rawTransaction, signatures, feePayerSignatures } = makeRawTransaction(rlpEncoded, sigs, transaction)
 
             result = {
-                rawTransaction: rawTransaction,
+                rawTransaction,
                 txHash: Hash.keccak256(rawTransaction),
                 senderTxHash: getSenderTxHash(rawTransaction),
             }
@@ -949,7 +966,7 @@ Accounts.prototype.getRawTransactionWithSignatures = function getRawTransactionW
         isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from) : tx.nonce,
     ]).then(function(args) {
         if (isNot(args[0]) || isNot(args[1]) || isNot(args[2])) {
-            throw new Error('One of the values "chainId", "gasPrice", or "nonce" couldn\'t be fetched: ' + JSON.stringify(args))
+            throw new Error(`One of the values "chainId", "gasPrice", or "nonce" couldn't be fetched: ${JSON.stringify(args)}`)
         }
         return signed(
             _.extend(tx, {
@@ -1000,7 +1017,16 @@ Accounts.prototype.combineSignatures = function combineSignatures(rawTransaction
             let isSame = true
             const keys = Object.keys(decodedTx)
             for (const key of keys) {
-                if (key === 'v' || key === 'r' || key === 's' || key === 'signatures' || key === 'payerV' || key === 'payerR' || key === 'payerS' || key === 'feePayerSignatures') {
+                if (
+                    key === 'v' ||
+                    key === 'r' ||
+                    key === 's' ||
+                    key === 'signatures' ||
+                    key === 'payerV' ||
+                    key === 'payerR' ||
+                    key === 'payerS' ||
+                    key === 'feePayerSignatures'
+                ) {
                     continue
                 }
 
@@ -1010,7 +1036,7 @@ Accounts.prototype.combineSignatures = function combineSignatures(rawTransaction
                     if (decodedTransaction[key] === '0x') {
                         continue
                     } else {
-                        // set feePayer variable with valid feePayer address(not '0x')
+                        // set feePayer letiable with valid feePayer address(not '0x')
                         feePayer = decodedTransaction[key]
                         if (decodedTx[key] === '0x') {
                             // set feePayer field to decodedTx for comparing feePayer address with other transactions
@@ -1053,23 +1079,23 @@ Accounts.prototype.recoverTransaction = function recoverTransaction(rawTx) {
         throw new Error('recoverTransaction only supports transactions of type "LEGACY".')
     }
 
-    var values = RLP.decode(rawTx)
+    const values = RLP.decode(rawTx)
 
     // If the leading zero is trimmed, it will be filled with a valid length of '0'.
     const arr = values.slice(7, 9).map(sig => {
         sig = sig.replace('0x', '')
         while (sig.length < 64) {
-            sig = '0' + sig
+            sig = `0${sig}`
         }
-        return '0x' + sig
+        return `0x${sig}`
     })
     arr.unshift(values[6])
 
-    var signature = AccountLib.encodeSignature(arr)
-    var recovery = Bytes.toNumber(values[6])
-    var extraData = recovery < 35 ? [] : [Bytes.fromNumber((recovery - 35) >> 1), '0x', '0x']
-    var signingData = values.slice(0, 6).concat(extraData)
-    var signingDataHex = RLP.encode(signingData)
+    const signature = AccountLib.encodeSignature(arr)
+    const recovery = Bytes.toNumber(values[6])
+    const extraData = recovery < 35 ? [] : [Bytes.fromNumber((recovery - 35) >> 1), '0x', '0x']
+    const signingData = values.slice(0, 6).concat(extraData)
+    const signingDataHex = RLP.encode(signingData)
 
     return AccountLib.recover(Hash.keccak256(signingDataHex), signature)
 }
@@ -1088,7 +1114,7 @@ Accounts.prototype.recoverTransaction = function recoverTransaction(rawTx) {
 Accounts.prototype.hashMessage = function hashMessage(data) {
     const message = utils.isHexStrict(data) ? utils.hexToBytes(data) : data
     const messageBuffer = Buffer.from(message)
-    const preamble = '\x19Klaytn Signed Message:\n' + message.length
+    const preamble = `\x19Klaytn Signed Message:\n${message.length}`
     const preambleBuffer = Buffer.from(preamble)
     // klayMessage is concatenated buffer (preambleBuffer + messageBuffer)
     const klayMessage = Buffer.concat([preambleBuffer, messageBuffer])
@@ -1138,7 +1164,7 @@ Accounts.prototype.sign = function sign(data, privateKey) {
  * and assumed to be already prefixed.
  */
 Accounts.prototype.recover = function recover(message, signature, preFixed) {
-    var args = [].slice.apply(arguments)
+    const args = [].slice.apply(arguments)
 
     if (_.isObject(message)) {
         return this.recover(message.messageHash, AccountLib.encodeSignature([message.v, message.r, message.s]), true)
@@ -1175,7 +1201,7 @@ Accounts.prototype.decrypt = function(v3Keystore, password, nonStrict) {
         throw new Error('No password given.')
     }
 
-    var json = _.isObject(v3Keystore) ? v3Keystore : JSON.parse(nonStrict ? v3Keystore.toLowerCase() : v3Keystore)
+    const json = _.isObject(v3Keystore) ? v3Keystore : JSON.parse(nonStrict ? v3Keystore.toLowerCase() : v3Keystore)
 
     if (json.version !== 3 && json.version !== 4) {
         console.warn('This is not a V3 or V4 wallet.')
@@ -1220,8 +1246,8 @@ Accounts.prototype.decrypt = function(v3Keystore, password, nonStrict) {
 
         const decryptedArray = []
         for (const encrypted of encryptedArray) {
-            var derivedKey
-            var kdfparams
+            let derivedKey
+            let kdfparams
             /**
              * Supported kdf modules are the following:
              * 1) pbkdf2
@@ -1231,7 +1257,14 @@ Accounts.prototype.decrypt = function(v3Keystore, password, nonStrict) {
                 kdfparams = encrypted.kdfparams
 
                 // FIXME: support progress reporting callback
-                derivedKey = scrypt(Buffer.from(password), Buffer.from(kdfparams.salt, 'hex'), kdfparams.n, kdfparams.r, kdfparams.p, kdfparams.dklen)
+                derivedKey = scrypt(
+                    Buffer.from(password),
+                    Buffer.from(kdfparams.salt, 'hex'),
+                    kdfparams.n,
+                    kdfparams.r,
+                    kdfparams.p,
+                    kdfparams.dklen
+                )
             } else if (encrypted.kdf === 'pbkdf2') {
                 kdfparams = encrypted.kdfparams
 
@@ -1239,20 +1272,26 @@ Accounts.prototype.decrypt = function(v3Keystore, password, nonStrict) {
                     throw new Error('Unsupported parameters to PBKDF2')
                 }
 
-                derivedKey = cryp.pbkdf2Sync(Buffer.from(password), Buffer.from(kdfparams.salt, 'hex'), kdfparams.c, kdfparams.dklen, 'sha256')
+                derivedKey = cryp.pbkdf2Sync(
+                    Buffer.from(password),
+                    Buffer.from(kdfparams.salt, 'hex'),
+                    kdfparams.c,
+                    kdfparams.dklen,
+                    'sha256'
+                )
             } else {
                 throw new Error('Unsupported key derivation scheme')
             }
 
-            var ciphertext = Buffer.from(encrypted.ciphertext, 'hex')
+            const ciphertext = Buffer.from(encrypted.ciphertext, 'hex')
 
-            var mac = utils.sha3(Buffer.concat([derivedKey.slice(16, 32), ciphertext])).replace('0x', '')
+            const mac = utils.sha3(Buffer.concat([derivedKey.slice(16, 32), ciphertext])).replace('0x', '')
             if (mac !== encrypted.mac) {
                 throw new Error('Key derivation failed - possibly wrong password')
             }
 
-            var decipher = cryp.createDecipheriv(encrypted.cipher, derivedKey.slice(0, 16), Buffer.from(encrypted.cipherparams.iv, 'hex'))
-            decryptedArray.push('0x' + Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('hex'))
+            const decipher = cryp.createDecipheriv(encrypted.cipher, derivedKey.slice(0, 16), Buffer.from(encrypted.cipherparams.iv, 'hex'))
+            decryptedArray.push(`0x${Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('hex')}`)
         }
         return decryptedArray.length === 1 ? decryptedArray[0] : decryptedArray
     }
@@ -1336,7 +1375,8 @@ Accounts.prototype.encrypt = function(key, password, options) {
      */
     options = options || {}
 
-    let address, account
+    let address
+    let account
 
     if (key instanceof Account) {
         if (options.address && options.address !== key.address) {
@@ -1356,7 +1396,10 @@ Accounts.prototype.encrypt = function(key, password, options) {
 
     if (!account) account = this.createWithAccountKey(address, key)
 
-    let keyring, transactionKey, updateKey, feePayerKey
+    let keyring
+    let transactionKey
+    let updateKey
+    let feePayerKey
 
     switch (account.accountKeyType) {
         case AccountKeyEnum.ACCOUNT_KEY_PUBLIC:
@@ -1376,6 +1419,8 @@ Accounts.prototype.encrypt = function(key, password, options) {
                 keyring = keyring.slice(0, i)
             }
             break
+        default:
+            throw new Error(`Unsupported account key type: ${account.accountKeyType}`)
     }
 
     function encryptKey(privateKey) {
@@ -1385,13 +1430,13 @@ Accounts.prototype.encrypt = function(key, password, options) {
 
         const privateKeyArray = _.isArray(privateKey) ? privateKey : [privateKey]
 
-        for (const privateKey of privateKeyArray) {
-            var salt = options.salt || cryp.randomBytes(32)
-            var iv = options.iv || cryp.randomBytes(16)
+        for (let i = 0; i < privateKeyArray.length; i++) {
+            const salt = options.salt || cryp.randomBytes(32)
+            const iv = options.iv || cryp.randomBytes(16)
 
-            var derivedKey
-            var kdf = options.kdf || 'scrypt'
-            var kdfparams = {
+            let derivedKey
+            const kdf = options.kdf || 'scrypt'
+            const kdfparams = {
                 dklen: options.dklen || 32,
                 salt: salt.toString('hex'),
             }
@@ -1415,14 +1460,14 @@ Accounts.prototype.encrypt = function(key, password, options) {
                 throw new Error('Unsupported kdf')
             }
 
-            var cipher = cryp.createCipheriv(options.cipher || 'aes-128-ctr', derivedKey.slice(0, 16), iv)
+            const cipher = cryp.createCipheriv(options.cipher || 'aes-128-ctr', derivedKey.slice(0, 16), iv)
             if (!cipher) {
                 throw new Error('Unsupported cipher')
             }
 
-            var ciphertext = Buffer.concat([cipher.update(Buffer.from(privateKey.replace('0x', ''), 'hex')), cipher.final()])
+            const ciphertext = Buffer.concat([cipher.update(Buffer.from(privateKeyArray[i].replace('0x', ''), 'hex')), cipher.final()])
 
-            var mac = utils.sha3(Buffer.concat([derivedKey.slice(16, 32), Buffer.from(ciphertext, 'hex')])).replace('0x', '')
+            const mac = utils.sha3(Buffer.concat([derivedKey.slice(16, 32), Buffer.from(ciphertext, 'hex')])).replace('0x', '')
 
             encryptedArray.push({
                 ciphertext: ciphertext.toString('hex'),
@@ -1430,8 +1475,8 @@ Accounts.prototype.encrypt = function(key, password, options) {
                     iv: iv.toString('hex'),
                 },
                 cipher: options.cipher || 'aes-128-ctr',
-                kdf: kdf,
-                kdfparams: kdfparams,
+                kdf,
+                kdfparams,
                 mac: mac.toString('hex'),
             })
         }
@@ -1461,9 +1506,9 @@ Accounts.prototype.privateKeyToPublicKey = function(privateKey, compressed = fal
     let publicKey
 
     if (!compressed) {
-        publicKey = '0x' + ecKey.getPublic(false, 'hex').slice(2)
+        publicKey = `0x${ecKey.getPublic(false, 'hex').slice(2)}`
     } else {
-        publicKey = '0x' + ecKey.getPublic(true, 'hex')
+        publicKey = `0x${ecKey.getPublic(true, 'hex')}`
     }
 
     return publicKey
@@ -1516,14 +1561,13 @@ Wallet.prototype._findSafeIndex = function(pointer) {
     pointer = pointer || 0
     if (_.has(this, pointer)) {
         return this._findSafeIndex(pointer + 1)
-    } else {
-        return pointer
     }
+    return pointer
 }
 
 Wallet.prototype._currentIndexes = function() {
-    var keys = Object.keys(this)
-    var indexes = keys
+    const keys = Object.keys(this)
+    const indexes = keys
         .map(function(key) {
             return parseInt(key)
         })
@@ -1535,7 +1579,7 @@ Wallet.prototype._currentIndexes = function() {
 }
 
 Wallet.prototype.create = function(numberOfAccounts, entropy) {
-    for (var i = 0; i < numberOfAccounts; ++i) {
+    for (let i = 0; i < numberOfAccounts; ++i) {
         this.add(this._accounts.create(entropy).privateKey)
     }
     return this
@@ -1588,7 +1632,7 @@ Wallet.prototype.add = function(account, userInputAddress) {
     }
 
     if (this[accountForWallet.address]) {
-        throw new Error('Account exists with ' + accountForWallet.address)
+        throw new Error(`Account exists with ${accountForWallet.address}`)
     }
 
     accountForWallet.index = this._findSafeIndex()
@@ -1622,12 +1666,14 @@ Wallet.prototype.updatePrivateKey = function(privateKey, address) {
 
     // If failed to find account through address, return error
     const accountExists = !!this[address]
-    if (!accountExists) throw new Error('Failed to find account with ' + address)
+    if (!accountExists) throw new Error(`Failed to find account with ${address}`)
 
     const account = this[address]
 
     if (account.accountKeyType !== AccountKeyEnum.ACCOUNT_KEY_PUBLIC) {
-        throw new Error('Account using AccountKeyMultiSig or AccountKeyRoleBased must be updated using the caver.klay.accounts.updateAccountKey function.')
+        throw new Error(
+            'Account using AccountKeyMultiSig or AccountKeyRoleBased must be updated using the caver.klay.accounts.updateAccountKey function.'
+        )
     }
 
     const parsed = utils.parsePrivateKey(privateKey)
@@ -1667,7 +1713,7 @@ Wallet.prototype.updateAccountKey = function updateAccountKey(address, accountKe
 
     // If failed to find account through address, return error
     const accountExists = !!this[address]
-    if (!accountExists) throw new Error('Failed to find account with ' + address)
+    if (!accountExists) throw new Error(`Failed to find account with ${address}`)
 
     const account = this[address]
 
@@ -1684,7 +1730,7 @@ Wallet.prototype.updateAccountKey = function updateAccountKey(address, accountKe
 }
 
 Wallet.prototype.remove = function(addressOrIndex) {
-    var account = this[addressOrIndex]
+    const account = this[addressOrIndex]
 
     if (account && account.address) {
         // address
@@ -1715,14 +1761,13 @@ Wallet.prototype.remove = function(addressOrIndex) {
         this.length--
 
         return true
-    } else {
-        return false
     }
+    return false
 }
 
 Wallet.prototype.clear = function() {
-    var _this = this
-    var indexes = this._currentIndexes()
+    const _this = this
+    const indexes = this._currentIndexes()
 
     indexes.forEach(function(index) {
         _this.remove(index)
@@ -1756,10 +1801,10 @@ Wallet.prototype.clear = function() {
     ]
  */
 Wallet.prototype.encrypt = function(password, options) {
-    var _this = this
-    var indexes = this._currentIndexes()
+    const _this = this
+    const indexes = this._currentIndexes()
 
-    var accounts = indexes.map(function(index) {
+    const accounts = indexes.map(function(index) {
         return _this[index].encrypt(password, options)
     })
 
@@ -1808,10 +1853,10 @@ Wallet.prototype.encrypt = function(password, options) {
   }
  */
 Wallet.prototype.decrypt = function(encryptedWallet, password) {
-    var _this = this
+    const _this = this
 
     encryptedWallet.forEach(function(keystore) {
-        var account = _this._accounts.decrypt(keystore, password)
+        const account = _this._accounts.decrypt(keystore, password)
 
         if (!account) {
             throw new Error("Couldn't decrypt the keystore. Maybe wrong password?")
@@ -1827,6 +1872,7 @@ Wallet.prototype.decrypt = function(encryptedWallet, password) {
 }
 
 Wallet.prototype.save = function(password, keyName) {
+    /* eslint-disable-next-line no-undef */
     localStorage.setItem(keyName || this.defaultKeyName, JSON.stringify(this.encrypt(password)))
 
     return true
@@ -1843,7 +1889,8 @@ Wallet.prototype.save = function(password, keyName) {
     }
  */
 Wallet.prototype.load = function(password, keyName) {
-    var keystore = localStorage.getItem(keyName || this.defaultKeyName)
+    /* eslint-disable-next-line no-undef */
+    let keystore = localStorage.getItem(keyName || this.defaultKeyName)
 
     if (keystore) {
         try {
@@ -1886,13 +1933,13 @@ Wallet.prototype.getAccount = function(input) {
 }
 
 function genKlaytnWalletKeyStringFromAccount(account) {
-    var addressString = account.address
-    var privateKey = account.privateKey
+    let addressString = account.address
+    let { privateKey } = account
 
-    privateKey = privateKey.slice(0, 2) === '0x' ? privateKey : '0x' + privateKey
-    addressString = addressString.slice(0, 2) === '0x' ? addressString : '0x' + addressString
+    privateKey = privateKey.slice(0, 2) === '0x' ? privateKey : `0x${privateKey}`
+    addressString = addressString.slice(0, 2) === '0x' ? addressString : `0x${addressString}`
 
-    return privateKey + '0x00' + addressString
+    return `${privateKey}0x00${addressString}`
 }
 
 module.exports = Accounts

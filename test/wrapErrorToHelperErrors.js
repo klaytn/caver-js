@@ -21,28 +21,23 @@ const { errors } = require('../packages/caver-core-helpers')
 
 const testRPCURL = require('./testrpc')
 
-var Caver = require('../index.js')
+const Caver = require('../index.js')
+
 const caver = new Caver(testRPCURL)
 
-describe('wrap error to core-helper/errors', (done) => {
-    it('should be thrown property missing error when "call" missing', (done) => {
-        expect(() => new caver.Method({ name: 'hi' }))
-            .to
-            .throw(errors.needNameCallPropertyToCreateMethod)
+describe('wrap error to core-helper/errors', () => {
+    it('should be thrown property missing error when "call" missing', done => {
+        expect(() => new caver.Method({ name: 'hi' })).to.throw(errors.needNameCallPropertyToCreateMethod)
         done()
     })
 
-    it('should be thrown property missing error when "name" missing', (done) => {
-        expect(() => new caver.Method({ call: 'hi' }))
-            .to
-            .throw(errors.needNameCallPropertyToCreateMethod)
+    it('should be thrown property missing error when "name" missing', done => {
+        expect(() => new caver.Method({ call: 'hi' })).to.throw(errors.needNameCallPropertyToCreateMethod)
         done()
     })
 
-    it('should not be thrown property missing error when "name", "call" existing', (done) => {
-        expect(() => new caver.Method({ name: 'hi', call: 'hi' }))
-            .not.to
-            .throw(errors.needNameCallPropertyToCreateMethod)
+    it('should not be thrown property missing error when "name", "call" existing', done => {
+        expect(() => new caver.Method({ name: 'hi', call: 'hi' })).not.to.throw(errors.needNameCallPropertyToCreateMethod)
         done()
     })
 })

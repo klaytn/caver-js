@@ -18,10 +18,10 @@
 
 const { expect } = require('chai')
 const fetch = require('node-fetch')
+const Caver = require('../index.js')
 
 describe('caver middleware', () => {
     it('when sendTransaction, does it logs?', async () => {
-        var Caver = require('../index.js')
         const caver = new Caver('http://aspen.klaytn.com')
 
         caver.use(caver.middleware.builtin.rpcFilter(['klay_gasPrice'], 'exclude'))

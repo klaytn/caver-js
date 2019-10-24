@@ -21,13 +21,40 @@ const chaiAsPromised = require('chai-as-promised')
 
 chai.use(chaiAsPromised)
 
-var Caver = require('../index.js')
+const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
+
 const caver = new Caver(testRPCURL)
 
 const { expect } = chai
 
-describe('get block with consensus info', done => {
+function checkKeyExistence(info) {
+    if (info === undefined) return false
+    if (info.blockscore === undefined) return false
+    if (info.committee === undefined) return false
+    if (info.extraData === undefined) return false
+    if (info.gasUsed === undefined) return false
+    if (info.governanceData === undefined) return false
+    if (info.hash === undefined) return false
+    if (info.logsBloom === undefined) return false
+    if (info.number === undefined) return false
+    if (info.parentHash === undefined) return false
+    if (info.proposer === undefined) return false
+    if (info.receiptsRoot === undefined) return false
+    if (info.reward === undefined) return false
+    if (info.size === undefined) return false
+    if (info.stateRoot === undefined) return false
+    if (info.timestamp === undefined) return false
+    if (info.timestampFoS === undefined) return false
+    if (info.totalBlockScore === undefined) return false
+    if (info.transactions === undefined) return false
+    if (info.transactionsRoot === undefined) return false
+    if (info.voteData === undefined) return false
+
+    return true
+}
+
+describe('get block with consensus info', () => {
     it('Call on exist block', async () => {
         const blockInfo = await caver.klay.getBlockWithConsensusInfo(0)
         expect(checkKeyExistence(blockInfo)).to.equals(true)
@@ -89,29 +116,3 @@ describe('get block with consensus info', done => {
         expect(() => caver.klay.getBlockWithConsensusInfo(invalid)).to.throw(expectedErrorMessage)
     })
 })
-
-function checkKeyExistence(info) {
-    if (info === undefined) return false
-    if (info.blockscore === undefined) return false
-    if (info.committee === undefined) return false
-    if (info.extraData === undefined) return false
-    if (info.gasUsed === undefined) return false
-    if (info.governanceData === undefined) return false
-    if (info.hash === undefined) return false
-    if (info.logsBloom === undefined) return false
-    if (info.number === undefined) return false
-    if (info.parentHash === undefined) return false
-    if (info.proposer === undefined) return false
-    if (info.receiptsRoot === undefined) return false
-    if (info.reward === undefined) return false
-    if (info.size === undefined) return false
-    if (info.stateRoot === undefined) return false
-    if (info.timestamp === undefined) return false
-    if (info.timestampFoS === undefined) return false
-    if (info.totalBlockScore === undefined) return false
-    if (info.transactions === undefined) return false
-    if (info.transactionsRoot === undefined) return false
-    if (info.voteData === undefined) return false
-
-    return true
-}

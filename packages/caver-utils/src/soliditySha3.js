@@ -24,78 +24,90 @@
  * @date 2017
  */
 
-var _ = require('underscore')
-var BN = require('bn.js')
-var utils = require('./utils.js')
+const _ = require('underscore')
+const BN = require('bn.js')
+const utils = require('./utils.js')
 
-var _elementaryName = function(name) {
+const _elementaryName = function(name) {
     if (name.startsWith('int[')) {
-        return 'int256' + name.slice(3)
-    } else if (name === 'int') {
+        return `int256${name.slice(3)}`
+    }
+    if (name === 'int') {
         return 'int256'
-    } else if (name.startsWith('uint[')) {
-        return 'uint256' + name.slice(4)
-    } else if (name === 'uint') {
+    }
+    if (name.startsWith('uint[')) {
+        return `uint256${name.slice(4)}`
+    }
+    if (name === 'uint') {
         return 'uint256'
-    } else if (name.startsWith('fixed[')) {
-        return 'fixed128x128' + name.slice(5)
-    } else if (name === 'fixed') {
+    }
+    if (name.startsWith('fixed[')) {
+        return `fixed128x128${name.slice(5)}`
+    }
+    if (name === 'fixed') {
         return 'fixed128x128'
-    } else if (name.startsWith('ufixed[')) {
-        return 'ufixed128x128' + name.slice(6)
-    } else if (name === 'ufixed') {
+    }
+    if (name.startsWith('ufixed[')) {
+        return `ufixed128x128${name.slice(6)}`
+    }
+    if (name === 'ufixed') {
         return 'ufixed128x128'
     }
     return name
 }
 
 // Parse N from type<N>
-var _parseTypeN = function(type) {
-    var typesize = /^\D+(\d+).*$/.exec(type)
+const _parseTypeN = function(type) {
+    const typesize = /^\D+(\d+).*$/.exec(type)
     return typesize ? parseInt(typesize[1], 10) : null
 }
 
 // Parse N from type[<N>]
-var _parseTypeNArray = function(type) {
-    var arraySize = /^\D+\d*\[(\d+)\]$/.exec(type)
+const _parseTypeNArray = function(type) {
+    const arraySize = /^\D+\d*\[(\d+)\]$/.exec(type)
     return arraySize ? parseInt(arraySize[1], 10) : null
 }
 
-var _parseNumber = function(arg) {
-    var type = typeof arg
+const _parseNumber = function(arg) {
+    const type = typeof arg
     if (type === 'string') {
         if (utils.isHexStrict(arg)) {
             return new BN(arg.replace(/0x/i, ''), 16)
-        } else {
-            return new BN(arg, 10)
         }
-    } else if (type === 'number') {
-        return new BN(arg)
-    } else if (utils.isBigNumber(arg)) {
-        return new BN(arg.toString(10))
-    } else if (utils.isBN(arg)) {
-        return arg
-    } else {
-        throw new Error(arg + ' is not a number')
+        return new BN(arg, 10)
     }
+    if (type === 'number') {
+        return new BN(arg)
+    }
+    if (utils.isBigNumber(arg)) {
+        return new BN(arg.toString(10))
+    }
+    if (utils.isBN(arg)) {
+        return arg
+    }
+    throw new Error(`${arg} is not a number`)
 }
 
 /* eslint-disable complexity */
-var _solidityPack = function(type, value, arraySize) {
-    var size, num
+const _solidityPack = function(type, value, arraySize) {
+    let size
+    let num
     type = _elementaryName(type)
 
     if (type === 'bytes') {
         if (value.replace(/^0x/i, '').length % 2 !== 0) {
-            throw new Error('Invalid bytes characters ' + value.length)
+            throw new Error(`Invalid bytes characters ${value.length}`)
         }
 
         return value
-    } else if (type === 'string') {
+    }
+    if (type === 'string') {
         return utils.utf8ToHex(value)
-    } else if (type === 'bool') {
+    }
+    if (type === 'bool') {
         return value ? '01' : '00'
-    } else if (type.startsWith('address')) {
+    }
+    if (type.startsWith('address')) {
         if (arraySize) {
             size = 64
         } else {
@@ -103,7 +115,7 @@ var _solidityPack = function(type, value, arraySize) {
         }
 
         if (!utils.isAddress(value)) {
-            throw new Error(value + ' is not a valid address, or the checksum is invalid.')
+            throw new Error(`${value} is not a valid address, or the checksum is invalid.`)
         }
 
         return utils.leftPad(value.toLowerCase(), size)
@@ -122,56 +134,57 @@ var _solidityPack = function(type, value, arraySize) {
         }
 
         if (size < 1 || size > 32 || size < value.replace(/^0x/i, '').length / 2) {
-            throw new Error('Invalid bytes' + size + ' for ' + value)
+            throw new Error(`Invalid bytes${size} for ${value}`)
         }
 
         return utils.rightPad(value, size * 2)
-    } else if (type.startsWith('uint')) {
+    }
+    if (type.startsWith('uint')) {
         if (size % 8 || size < 8 || size > 256) {
-            throw new Error('Invalid uint' + size + ' size')
+            throw new Error(`Invalid uint${size} size`)
         }
 
         num = _parseNumber(value)
         if (num.bitLength() > size) {
-            throw new Error('Supplied uint exceeds width: ' + size + ' vs ' + num.bitLength())
+            throw new Error(`Supplied uint exceeds width: ${size} vs ${num.bitLength()}`)
         }
 
         if (num.lt(new BN(0))) {
-            throw new Error('Supplied uint ' + num.toString() + ' is negative')
+            throw new Error(`Supplied uint ${num.toString()} is negative`)
         }
 
         return size ? utils.leftPad(num.toString('hex'), (size / 8) * 2) : num
-    } else if (type.startsWith('int')) {
+    }
+    if (type.startsWith('int')) {
         if (size % 8 || size < 8 || size > 256) {
-            throw new Error('Invalid int' + size + ' size')
+            throw new Error(`Invalid int${size} size`)
         }
 
         num = _parseNumber(value)
         if (num.bitLength() > size) {
-            throw new Error('Supplied int exceeds width: ' + size + ' vs ' + num.bitLength())
+            throw new Error(`Supplied int exceeds width: ${size} vs ${num.bitLength()}`)
         }
 
         if (num.lt(new BN(0))) {
             return num.toTwos(size).toString('hex')
-        } else {
-            return size ? utils.leftPad(num.toString('hex'), (size / 8) * 2) : num
         }
-    } else {
-        // FIXME: support all other types
-        throw new Error('Unsupported or invalid type: ' + type)
+        return size ? utils.leftPad(num.toString('hex'), (size / 8) * 2) : num
     }
+    // FIXME: support all other types
+    throw new Error(`Unsupported or invalid type: ${type}`)
 }
 /* eslint-enable complexity */
 
 /* eslint-disable complexity */
-var _processSoliditySha3Args = function(arg) {
+const _processSoliditySha3Args = function(arg) {
     if (_.isArray(arg)) {
         throw new Error('Autodetection of array types is not supported.')
     }
 
-    var type
-    var value = ''
-    var hexArg, arraySize
+    let type
+    let value = ''
+    let hexArg
+    let arraySize
 
     // if type is given
     if (
@@ -202,7 +215,7 @@ var _processSoliditySha3Args = function(arg) {
     if (_.isArray(value)) {
         arraySize = _parseTypeNArray(type)
         if (arraySize && value.length !== arraySize) {
-            throw new Error(type + ' is not matching the given array ' + JSON.stringify(value))
+            throw new Error(`${type} is not matching the given array ${JSON.stringify(value)}`)
         } else {
             arraySize = value.length
         }
@@ -215,10 +228,9 @@ var _processSoliditySha3Args = function(arg) {
                 .replace('0x', '')
         })
         return hexArg.join('')
-    } else {
-        hexArg = _solidityPack(type, value, arraySize)
-        return hexArg.toString('hex').replace('0x', '')
     }
+    hexArg = _solidityPack(type, value, arraySize)
+    return hexArg.toString('hex').replace('0x', '')
 }
 /* eslint-enable complexity */
 
@@ -228,12 +240,12 @@ var _processSoliditySha3Args = function(arg) {
  * @method soliditySha3
  * @return {Object} the sha3
  */
-var soliditySha3 = function() {
-    var args = Array.prototype.slice.call(arguments)
+const soliditySha3 = function() {
+    const args = Array.prototype.slice.call(arguments)
 
-    var hexArgs = _.map(args, _processSoliditySha3Args)
+    const hexArgs = _.map(args, _processSoliditySha3Args)
 
-    return utils.sha3('0x' + hexArgs.join(''))
+    return utils.sha3(`0x${hexArgs.join('')}`)
 }
 
 module.exports = soliditySha3

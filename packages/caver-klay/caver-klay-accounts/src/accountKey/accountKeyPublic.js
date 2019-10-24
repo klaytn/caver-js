@@ -15,15 +15,19 @@ class AccountKeyPublic {
     get defaultKey() {
         return this._key
     }
+
     get keys() {
         return this._key
     }
+
     get transactionKey() {
         return this._key
     }
+
     get updateKey() {
         return this._key
     }
+
     get feePayerKey() {
         return this._key
     }

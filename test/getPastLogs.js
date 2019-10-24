@@ -16,13 +16,11 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const { expect } = require('chai')
+const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
-const BN = require('bn.js')
 
 describe('getPastLogs', done => {
     it('should contain id and removed field', async () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         caver.klay.getPastLogs({
@@ -32,7 +30,6 @@ describe('getPastLogs', done => {
     })
 
     it('should not throw an error with number type `fromBlock`', async () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         caver.klay.getPastLogs({
@@ -42,7 +39,6 @@ describe('getPastLogs', done => {
     })
 
     it('should not throw an error with number type `toBlock`', async () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         caver.klay.getPastLogs({

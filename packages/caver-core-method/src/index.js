@@ -175,7 +175,7 @@ function validateArgs(args) {
  * @return {Array}
  */
 function formatInput(args) {
-    var _this = this
+    const _this = this
 
     // If inputFormatter is not defined, or empty just return original args.
     if (!this.inputFormatter || _.isEmpty(this.inputFormatter)) {
@@ -197,7 +197,7 @@ function formatInput(args) {
  * @return {Object}
  */
 function formatOutput(result) {
-    var _this = this
+    const _this = this
 
     // If outputFormatter is defined, calling outputFormatter,
     // If not, just return original res.
@@ -279,26 +279,24 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
     // 2. A transaction object containing signatures or feePayerSignatures
     //    : call 'getRawTransactionWithSignatures', then call 'klay_sendRawTransaction' with result of getRawTransactionWithSignatures
     if (method && method.accounts && payload.method === 'klay_sendRawTransaction') {
-        var transaction = payload.params[0]
+        const transaction = payload.params[0]
         if (typeof transaction !== 'string' && _.isObject(transaction)) {
             if (transaction.rawTransaction) {
                 return sendSignedTx(transaction)
-            } else {
-                return method.accounts
-                    .getRawTransactionWithSignatures(transaction)
-                    .then(sendSignedTx)
-                    .catch(e => {
-                        sendTxCallback(e)
-                    })
             }
+            return method.accounts
+                .getRawTransactionWithSignatures(transaction)
+                .then(sendSignedTx)
+                .catch(e => {
+                    sendTxCallback(e)
+                })
         }
     }
 
     if (method && method.accounts && method.accounts.wallet && method.accounts.wallet.length) {
-        let error
         switch (payload.method) {
             case 'klay_sendTransaction': {
-                var tx = payload.params[0]
+                const tx = payload.params[0]
 
                 let error
                 if (!_.isObject(tx)) {
@@ -335,7 +333,8 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
                         .catch(e => {
                             sendTxCallback(e)
                         })
-                } else if (tx.signatures) {
+                }
+                if (tx.signatures) {
                     // If signatures is defined inside of the transaction object,
                     // get rawTransaction string from signed transaction object and send to network
                     return method.accounts
@@ -383,8 +382,8 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
 }
 
 const buildSendFunc = (method, isSendTx) => (...args) => {
-    var defer = utils.promiEvent(!isSendTx)
-    var payload = method.toPayload(args)
+    const defer = utils.promiEvent(!isSendTx)
+    const payload = method.toPayload(args)
 
     const sendTxCallback = buildSendTxCallbackFunc(defer, method, payload, isSendTx)
     const sendSignedTx = buildSendSignedTxFunc(method, payload, sendTxCallback)
@@ -416,8 +415,8 @@ const buildSendFunc = (method, isSendTx) => (...args) => {
 }
 
 function buildCall() {
-    var method = this
-    var isSendTx =
+    const method = this
+    const isSendTx =
         method.call === 'klay_sendTransaction' ||
         method.call === 'klay_sendRawTransaction' ||
         method.call === 'personal_sendTransaction' ||
@@ -511,7 +510,7 @@ const kickoffConfirmation = mutableConfirmationPack => {
 }
 
 // start watching for confirmation depending on the support features of the provider
-var startWatching = function(mutableConfirmationPack, existingReceipt) {
+const startWatching = function(mutableConfirmationPack, existingReceipt) {
     const { _klaytnCall, intervalId, method } = mutableConfirmationPack
     // if provider allows PUB/SUB
     if (method.requestManager.provider.supportsSubscriptions()) {
@@ -523,7 +522,7 @@ var startWatching = function(mutableConfirmationPack, existingReceipt) {
 
 // fire "receipt" and confirmation events and resolve after
 
-var checkConfirmation = function(mutableConfirmationPack, existingReceipt, isPolling, err, blockHeader, sub) {
+const checkConfirmation = function(mutableConfirmationPack, existingReceipt, isPolling, err, blockHeader, sub) {
     const {
         // L1
         intervalId,
@@ -600,26 +599,22 @@ const countTimeout = (mutableConfirmationPack, isPolling, sub) => {
             mutableConfirmationPack.promiseResolved = true
             utils._fireError(
                 new Error(
-                    'Transaction was not mined within' +
-                        POLLINGTIMEOUT +
-                        ' seconds, please make sure your transaction was properly sent. Be aware that it might still be mined!'
+                    `Transaction was not mined within${POLLINGTIMEOUT} seconds, please make sure your transaction was properly sent. Be aware that it might still be mined!`
                 ),
                 defer.eventEmitter,
                 defer.reject
             )
         }
-    } else {
-        if (mutableConfirmationPack.timeoutCount - 1 >= TIMEOUTBLOCK) {
-            sub.unsubscribe()
-            mutableConfirmationPack.promiseResolved = true
-            utils._fireError(
-                new Error(
-                    'Transaction was not mined within 50 blocks, please make sure your transaction was properly sent. Be aware that it might still be mined!'
-                ),
-                defer.eventEmitter,
-                defer.reject
-            )
-        }
+    } else if (mutableConfirmationPack.timeoutCount - 1 >= TIMEOUTBLOCK) {
+        sub.unsubscribe()
+        mutableConfirmationPack.promiseResolved = true
+        utils._fireError(
+            new Error(
+                'Transaction was not mined within 50 blocks, please make sure your transaction was properly sent. Be aware that it might still be mined!'
+            ),
+            defer.eventEmitter,
+            defer.reject
+        )
     }
 }
 

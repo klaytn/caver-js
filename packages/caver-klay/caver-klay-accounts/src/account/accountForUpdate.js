@@ -31,9 +31,11 @@ function keyFormatter(keyForUpdate, options) {
                 break
         }
     } else if (Array.isArray(keyForUpdate)) {
-        if (!options || !options.threshold || !options.weight) throw new Error('For AccountKeyMultiSig, threshold and weight should be defined in options object.')
+        if (!options || !options.threshold || !options.weight)
+            throw new Error('For AccountKeyMultiSig, threshold and weight should be defined in options object.')
         if (!Array.isArray(options.weight)) throw new Error('The weight should be defined as a array.')
-        if (options.weight.length !== keyForUpdate.length) throw new Error('The length of keys in AccountKeyMultiSig and the length of weight array do not match.')
+        if (options.weight.length !== keyForUpdate.length)
+            throw new Error('The length of keys in AccountKeyMultiSig and the length of weight array do not match.')
 
         keyObject.multisig = {
             threshold: options.threshold,
@@ -52,7 +54,8 @@ function keyFormatter(keyForUpdate, options) {
             weightSum += options.weight[i]
         }
 
-        if (weightSum < options.threshold) throw new Error('Invalid options for AccountKeyMultiSig: The sum of weights is less than the threshold.')
+        if (weightSum < options.threshold)
+            throw new Error('Invalid options for AccountKeyMultiSig: The sum of weights is less than the threshold.')
     } else {
         for (const key in keyForUpdate) {
             if (!isValidRole(key)) throw new Error(`Invalid role is defined: ${key}`)

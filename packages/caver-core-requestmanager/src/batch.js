@@ -24,10 +24,10 @@
  * @date 2015
  */
 
-var Jsonrpc = require('./jsonrpc')
-var errors = require('../../caver-core-helpers').errors
+const Jsonrpc = require('./jsonrpc')
+const errors = require('../../caver-core-helpers').errors
 
-var Batch = function(requestManager) {
+const Batch = function(requestManager) {
     this.requestManager = requestManager
     this.requests = []
 }
@@ -37,7 +37,7 @@ Batch.prototype.add = function(request) {
 }
 
 Batch.prototype.execute = function() {
-    var requests = this.requests
+    const requests = this.requests
     this.requestManager.sendBatch(requests, function(err, results) {
         results = results || []
 

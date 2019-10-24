@@ -25,9 +25,9 @@
  * @date 2017
  */
 
-var _ = require('underscore')
-var utils = require('../../caver-utils')
-var validateParams = require('../../caver-core-helpers/src/validateFunction').validateParams
+const _ = require('underscore')
+const utils = require('../../caver-utils')
+const validateParams = require('../../caver-core-helpers/src/validateFunction').validateParams
 
 /**
  * Should the format output to a big number
@@ -36,21 +36,22 @@ var validateParams = require('../../caver-core-helpers/src/validateFunction').va
  * @param {String|Number|BigNumber} number
  * @returns {BigNumber} object
  */
-var outputBigNumberFormatter = function(number) {
+const outputBigNumberFormatter = function(number) {
     return utils.toBN(number).toString(10)
 }
 
-var inputDefaultBlockNumberFormatter = function(blockNumber) {
+const inputDefaultBlockNumberFormatter = function(blockNumber) {
     if (this && (blockNumber === undefined || blockNumber === null)) {
         return utils.parsePredefinedBlockNumber(this.defaultBlock) || 'latest'
     }
     return inputBlockNumberFormatter(blockNumber)
 }
 
-var inputBlockNumberFormatter = function(blockNumber) {
+const inputBlockNumberFormatter = function(blockNumber) {
     if (blockNumber === undefined) {
         return undefined
-    } else if (utils.isPredefinedBlockNumber(blockNumber)) {
+    }
+    if (utils.isPredefinedBlockNumber(blockNumber)) {
         return utils.parsePredefinedBlockNumber(blockNumber)
     }
     return utils.isHexStrict(blockNumber)
@@ -67,7 +68,7 @@ var inputBlockNumberFormatter = function(blockNumber) {
  * @param {Object} transaction options
  * @returns object
  */
-var _txInputFormatter = function(options) {
+const _txInputFormatter = function(options) {
     if (options.from) {
         options.from = inputAddressFormatter(options.from)
     }
@@ -120,10 +121,10 @@ var _txInputFormatter = function(options) {
  * @param {Object} transaction options
  * @returns object
  */
-var inputCallFormatter = function(options) {
+const inputCallFormatter = function(options) {
     options = _txInputFormatter(options)
 
-    var from = options.from || (this ? this.defaultAccount : null)
+    const from = options.from || (this ? this.defaultAccount : null)
 
     if (from) {
         options.from = inputAddressFormatter(from)
@@ -139,7 +140,7 @@ var inputCallFormatter = function(options) {
  * @param {Object} options
  * @returns object
  */
-var inputTransactionFormatter = function(options) {
+const inputTransactionFormatter = function(options) {
     options = _txInputFormatter(options)
 
     // If senderRawTransaction' exist in transaction, it means object is fee payer transaction format like below
@@ -182,7 +183,7 @@ var inputTransactionFormatter = function(options) {
  * @param {Object} options
  * @returns object
  */
-var inputPersonalTransactionFormatter = function(options) {
+const inputPersonalTransactionFormatter = function(options) {
     options = _txInputFormatter(options)
 
     // check from, only if not number, or object
@@ -210,7 +211,7 @@ var inputPersonalTransactionFormatter = function(options) {
  * @param {String} data
  * @returns {String}
  */
-var inputSignFormatter = function(data) {
+const inputSignFormatter = function(data) {
     return utils.isHexStrict(data) ? data : utils.utf8ToHex(data)
 }
 
@@ -221,7 +222,7 @@ var inputSignFormatter = function(data) {
  * @param {Object} tx
  * @returns {Object}
  */
-var outputTransactionFormatter = function(tx) {
+const outputTransactionFormatter = function(tx) {
     if (!tx) return null
 
     if (tx.blockNumber !== undefined) {
@@ -258,9 +259,9 @@ var outputTransactionFormatter = function(tx) {
  * @param {Object} receipt
  * @returns {Object}
  */
-var outputTransactionReceiptFormatter = function(receipt) {
+const outputTransactionReceiptFormatter = function(receipt) {
     if (typeof receipt !== 'object' || receipt === null) {
-        throw new Error('Received receipt is invalid: ' + receipt)
+        throw new Error(`Received receipt is invalid: ${receipt}`)
     }
 
     if (receipt.blockNumber !== undefined) {
@@ -280,7 +281,7 @@ var outputTransactionReceiptFormatter = function(receipt) {
     }
 
     if (typeof receipt.status !== 'undefined') {
-        receipt.status = Boolean(parseInt(receipt.status))
+        receipt.status = parseInt(receipt.status) === 1
     }
 
     return receipt
@@ -293,7 +294,7 @@ var outputTransactionReceiptFormatter = function(receipt) {
  * @param {Object} block
  * @returns {Object}
  */
-var outputBlockFormatter = function(block) {
+const outputBlockFormatter = function(block) {
     // transform to number
     block.gasLimit = utils.hexToNumber(block.gasLimit)
     block.gasUsed = utils.hexToNumber(block.gasUsed)
@@ -329,7 +330,7 @@ var outputBlockFormatter = function(block) {
  * inputLogFormatter's inner function
  * format topic values
  */
-var toTopic = function(value) {
+const toTopic = function(value) {
     if (value === null || typeof value === 'undefined') {
         return null
     }
@@ -339,9 +340,8 @@ var toTopic = function(value) {
     // If value is not hex string, return it
     if (value.indexOf('0x') === 0) {
         return value
-    } else {
-        return utils.fromUtf8(value)
     }
+    return utils.fromUtf8(value)
 }
 
 /**
@@ -351,7 +351,7 @@ var toTopic = function(value) {
  * @param {Object} log object
  * @returns {Object} log
  */
-var inputLogFormatter = function(options) {
+const inputLogFormatter = function(options) {
     // make sure topics, get converted to hex
     options.topics = (options.topics || []).map(topic => (_.isArray(topic) ? topic.map(toTopic) : toTopic(topic)))
 
@@ -377,7 +377,7 @@ var inputLogFormatter = function(options) {
  * @param {Object} log object
  * @returns {Object} log
  */
-var outputLogFormatter = function(log) {
+const outputLogFormatter = function(log) {
     // `removed` field is unnecessary,
     // since it isn't possible for block to be removed in Klaytn consensus scenario.
     delete log.removed
@@ -385,7 +385,7 @@ var outputLogFormatter = function(log) {
     // generate a custom log id
     if (typeof log.blockHash === 'string' && typeof log.transactionHash === 'string' && typeof log.logIndex === 'string') {
         const shaId = utils.sha3(log.blockHash.replace('0x', '') + log.transactionHash.replace('0x', '') + log.logIndex.replace('0x', ''))
-        log.id = 'log_' + shaId.replace('0x', '').substr(0, 8)
+        log.id = `log_${shaId.replace('0x', '').substr(0, 8)}`
     } else if (!log.id) {
         log.id = null
     }
@@ -413,7 +413,7 @@ var outputLogFormatter = function(log) {
  * @param {Object} transaction object
  * @returns {Object}
  */
-var inputPostFormatter = function(post) {
+const inputPostFormatter = function(post) {
     // post.payload = utils.toHex(post.payload);
 
     if (post.ttl) {
@@ -447,7 +447,7 @@ var inputPostFormatter = function(post) {
  * @param {Object}
  * @returns {Object}
  */
-var outputPostFormatter = function(post) {
+const outputPostFormatter = function(post) {
     post.expiry = utils.hexToNumber(post.expiry)
     post.sent = utils.hexToNumber(post.sent)
     post.ttl = utils.hexToNumber(post.ttl)
@@ -470,18 +470,19 @@ var outputPostFormatter = function(post) {
     return post
 }
 
-var inputAddressFormatter = function(address) {
-    var iban = new utils.Iban(address)
+const inputAddressFormatter = function(address) {
+    const iban = new utils.Iban(address)
     if (iban.isValid() && iban.isDirect()) {
         return iban.toAddress().toLowerCase()
-    } else if (utils.isAddress(address)) {
-        return '0x' + address.toLowerCase().replace('0x', '')
+    }
+    if (utils.isAddress(address)) {
+        return `0x${address.toLowerCase().replace('0x', '')}`
     }
 
     throw new Error(`Provided address "${address}" is invalid, the capitalization checksum test failed.`)
 }
 
-var outputSyncingFormatter = function(result) {
+const outputSyncingFormatter = function(result) {
     result.startingBlock = utils.hexToNumber(result.startingBlock)
     result.currentBlock = utils.hexToNumber(result.currentBlock)
     result.highestBlock = utils.hexToNumber(result.highestBlock)
@@ -493,7 +494,7 @@ var outputSyncingFormatter = function(result) {
     return result
 }
 
-var inputRawKeyFormatter = function(rawKey) {
+const inputRawKeyFormatter = function(rawKey) {
     if (rawKey.slice(0, 2) === '0x') rawKey = rawKey.slice(2)
     return rawKey
 }

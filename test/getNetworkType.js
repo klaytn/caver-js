@@ -19,7 +19,7 @@
 require('it-each')({ testPerIteration: true })
 const { expect } = require('./extendedChai')
 
-var Caver = require('../index.js')
+const Caver = require('../index.js')
 
 describe('getNetworkType', () => {
     it('CAVERJS-UNIT-ETC-049: cypress mainnet should return "cypress"', async () => {

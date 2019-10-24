@@ -17,22 +17,22 @@
 */
 
 require('it-each')({ testPerIteration: true })
-const { expect } = require('../extendedChai')
 const assert = require('assert')
+const { expect } = require('../extendedChai')
 
 const testRPCURL = require('../testrpc')
 const Caver = require('../../index.js')
 
 let caver
-var senderPrvKey
-var senderAddress
-var testAccount
+let senderPrvKey
+let senderAddress
+let testAccount
 
 before(() => {
     caver = new Caver(testRPCURL)
     senderPrvKey =
         process.env.privateKey && String(process.env.privateKey).indexOf('0x') === -1
-            ? '0x' + process.env.privateKey
+            ? `0x${process.env.privateKey}`
             : process.env.privateKey
 
     caver.klay.accounts.wallet.add(senderPrvKey)
@@ -44,7 +44,7 @@ before(() => {
 })
 
 describe('LEGACY transaction', () => {
-    var legacyObject
+    let legacyObject
 
     beforeEach(() => {
         legacyObject = {
@@ -60,7 +60,7 @@ describe('LEGACY transaction', () => {
         const tx = Object.assign({}, legacyObject)
         delete tx.data
 
-        var result
+        let result
         await caver.klay
             .sendTransaction(tx)
             .then(() => (result = true))
@@ -73,7 +73,7 @@ describe('LEGACY transaction', () => {
         const tx = Object.assign({}, legacyObject)
         delete tx.to
 
-        var result
+        let result
         await caver.klay
             .sendTransaction(tx)
             .then(() => (result = true))
@@ -87,7 +87,7 @@ describe('LEGACY transaction', () => {
         const tx = Object.assign({}, legacyObject)
         delete tx.from
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -108,7 +108,7 @@ describe('LEGACY transaction', () => {
         const tx = Object.assign({}, legacyObject)
         delete tx.gas
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -130,7 +130,7 @@ describe('LEGACY transaction', () => {
         delete tx.to
         delete tx.data
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -151,7 +151,7 @@ describe('LEGACY transaction', () => {
     it('CAVERJS-UNIT-TX-012 : If transaction object has unnecessary feePayer field, signTransaction should throw error', async () => {
         const tx = Object.assign({ feePayer: testAccount.address }, legacyObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -170,7 +170,7 @@ describe('LEGACY transaction', () => {
     it('CAVERJS-UNIT-TX-013 : If transaction object has unnecessary feeRatio field, signTransaction should throw error', async () => {
         const tx = Object.assign({ feeRatio: 20 }, legacyObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -195,7 +195,7 @@ describe('LEGACY transaction', () => {
             legacyObject
         )
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -245,7 +245,7 @@ describe('LEGACY transaction', () => {
         }
         const tx = Object.assign({ multisig }, legacyObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -293,7 +293,7 @@ describe('LEGACY transaction', () => {
         }
         const tx = Object.assign({ roleTransactionKey }, legacyObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -320,7 +320,7 @@ describe('LEGACY transaction', () => {
         }
         const tx = Object.assign({ roleAccountUpdateKey }, legacyObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -347,7 +347,7 @@ describe('LEGACY transaction', () => {
         }
         const tx = Object.assign({ roleFeePayerKey }, legacyObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -370,7 +370,7 @@ describe('LEGACY transaction', () => {
     it('CAVERJS-UNIT-TX-019 : If transaction object has unnecessary failKey field, signTransaction should throw error', async () => {
         const tx = Object.assign({ failKey: true }, legacyObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -389,7 +389,7 @@ describe('LEGACY transaction', () => {
     it('CAVERJS-UNIT-TX-020 : If transaction object has unnecessary codeFormat field, signTransaction should throw error', async () => {
         const tx = Object.assign({ codeFormat: 'EVM' }, legacyObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))

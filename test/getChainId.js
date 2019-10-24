@@ -17,11 +17,11 @@
 */
 
 const { expect } = require('./extendedChai')
+const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 
 describe('caver.klay.net.getChainId', () => {
     it('Should return number type chain id', async () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
         const chainId = await caver.klay.getChainId()
         expect(chainId).be.a('number')

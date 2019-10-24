@@ -27,7 +27,7 @@
  */
 
 // Initialize Jsonrpc as a simple object with utility functions.
-var Jsonrpc = {
+const Jsonrpc = {
     messageId: 0,
 }
 
@@ -41,7 +41,7 @@ var Jsonrpc = {
  */
 Jsonrpc.toPayload = function(method, params) {
     if (!method) {
-        throw new Error('JSONRPC method should be specified for params: "' + JSON.stringify(params) + '"!')
+        throw new Error(`JSONRPC method should be specified for params: "${JSON.stringify(params)}"!`)
     }
 
     Jsonrpc.messageId++

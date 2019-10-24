@@ -17,23 +17,23 @@
 */
 
 require('it-each')({ testPerIteration: true })
-const { expect } = require('../extendedChai')
 const assert = require('assert')
+const { expect } = require('../extendedChai')
 
 const testRPCURL = require('../testrpc')
 const Caver = require('../../index.js')
 
 let caver
-var senderPrvKey
-var senderAddress
-var testAccount
+let senderPrvKey
+let senderAddress
+let testAccount
 
 before(() => {
     caver = new Caver(testRPCURL)
     if (process.env.privateKey) {
         senderPrvKey =
             process.env.privateKey && String(process.env.privateKey).indexOf('0x') === -1
-                ? '0x' + process.env.privateKey
+                ? `0x${process.env.privateKey}`
                 : process.env.privateKey
 
         caver.klay.accounts.wallet.add(senderPrvKey)
@@ -50,7 +50,7 @@ before(() => {
 })
 
 describe('SMART_CONTRACT_DEPLOY transaction', () => {
-    var deployObject
+    let deployObject
 
     beforeEach(() => {
         deployObject = {

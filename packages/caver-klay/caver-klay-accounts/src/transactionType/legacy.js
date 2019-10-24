@@ -16,8 +16,8 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-var RLP = require('eth-lib/lib/rlp')
-var Bytes = require('eth-lib/lib/bytes')
+const RLP = require('eth-lib/lib/rlp')
+const Bytes = require('eth-lib/lib/bytes')
 
 function rlpEncodeForLegacyTransaction(transaction) {
     return RLP.encode([

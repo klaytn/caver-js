@@ -19,12 +19,13 @@
     Modified and improved for the caver-js development.
 */
 
-var chai = require('chai')
-var Iban = require('../packages/caver-utils/iban/src/index.js')
-var assert = chai.assert
+const chai = require('chai')
+const Iban = require('../packages/caver-utils/iban/src/index.js')
 
-var tests = [
-    { obj: function() {}, is: false },
+const assert = chai.assert
+
+const tests = [
+    { obj() {}, is: false },
     { obj: () => {}, is: false },
     { obj: 'function', is: false },
     { obj: {}, is: false },
@@ -47,7 +48,7 @@ var tests = [
 describe('caver-utils/iban', function() {
     describe('isValid', function() {
         tests.forEach(function(test) {
-            it('CAVERJS-UNIT-ETC-007 : shoud test if value ' + test.obj + ' is iban: ' + test.is, function() {
+            it(`CAVERJS-UNIT-ETC-007 : shoud test if value ${test.obj} is iban: ${test.is}`, function() {
                 assert.equal(Iban.isValid(test.obj), test.is)
             })
         })

@@ -24,26 +24,26 @@
 // To execute a specific test,
 // $ mocha --grep INT-LEGACY/012 test/intTest.js
 require('it-each')({ testPerIteration: true })
-const { expect } = require('./extendedChai')
-var RLP = require('eth-lib/lib/rlp')
-var Bytes = require('eth-lib/lib/bytes')
+const RLP = require('eth-lib/lib/rlp')
+const Bytes = require('eth-lib/lib/bytes')
 const assert = require('assert')
-var Hash = require('eth-lib/lib/hash')
 
-const BigNumber = require('bignumber.js')
+const elliptic = require('elliptic')
 
-const testEnv = require('./klaytn-integration-tests/env.json')
-const Caver = require('../index.js')
+const secp256k1 = new elliptic.ec('secp256k1')
 
-var elliptic = require('elliptic')
-var secp256k1 = new elliptic.ec('secp256k1')
+const path = require('path')
+const fs = require('fs')
 
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
+const Caver = require('../index.js')
+const testEnv = require('./klaytn-integration-tests/env.json')
+const { expect } = require('./extendedChai')
 
 const { overwriteSignature, getSenderTxHash } = require('../packages/caver-klay/caver-klay-accounts/src/makeRawTransaction')
 
-var deployedContractAddr = {}
+const deployedContractAddr = {}
 
 let caver
 
@@ -55,14 +55,14 @@ function makePublicKey(x, y) {
         },
         pubEnc: 'hex',
     })
-    return '0x' + keyPair.getPublic(false, 'hex').slice(2)
+    return `0x${keyPair.getPublic(false, 'hex').slice(2)}`
 }
 
 function isJsonable(v) {
     try {
         return JSON.stringify(v) === JSON.stringify(JSON.parse(JSON.stringify(v)))
     } catch (e) {
-        /*console.error("not a dict",e);*/
+        /* console.error("not a dict",e); */
         return false
     }
 }
@@ -92,9 +92,9 @@ function replaceWithEnv(data) {
         if (elem === 'rawTransaction') return testEnv.rawTransaction
 
         const getRandomAccount = id => {
-            if (testEnv.random == undefined) testEnv.random = {}
-            if (testEnv.random[id] == undefined) {
-                acc = caver.klay.accounts.create()
+            if (testEnv.random === undefined) testEnv.random = {}
+            if (testEnv.random[id] === undefined) {
+                const acc = caver.klay.accounts.create()
                 caver.klay.accounts.wallet.add(acc.privateKey)
                 testEnv.random[id] = acc
             }
@@ -113,7 +113,7 @@ function replaceWithEnv(data) {
         }
 
         if (elem.startsWith('env.accounts')) {
-            k = elem.replace('env.accounts.', '')
+            const k = elem.replace('env.accounts.', '')
             return testEnv.accounts[k].address
         }
 
@@ -121,9 +121,9 @@ function replaceWithEnv(data) {
     }
 
     if (isDict(data)) {
-        for (var k in data) {
+        Object.keys(data).forEach(k => {
             data[k] = replaceWithEnv(data[k])
-        }
+        })
         return data
     }
 
@@ -147,7 +147,7 @@ function resetRandomAccounts() {
 }
 
 function makeMultisigKey(multisig) {
-    ret = {
+    const ret = {
         threshold: multisig.threshold,
         keys: [],
     }
@@ -164,7 +164,7 @@ function makeMultisigKey(multisig) {
 }
 
 function makeKey(key) {
-    ret = {}
+    let ret = {}
     switch (key.keyType) {
         case 0:
             // Nil key. DO NOTHING.
@@ -208,7 +208,7 @@ function makeKey(key) {
 function processAccountKey(tx) {
     if (tx.accountKey === undefined) return tx
 
-    k = makeKey(tx.accountKey)
+    const k = makeKey(tx.accountKey)
 
     tx = Object.assign(tx, k)
 
@@ -216,36 +216,36 @@ function processAccountKey(tx) {
 }
 
 async function processCall(t) {
-    contractAddr = deployedContractAddr[t.call.to].address
-    abi = deployedContractAddr[t.call.to].abi
-    contract = new caver.klay.Contract(abi, contractAddr)
+    const contractAddr = deployedContractAddr[t.call.to].address
+    const abi = deployedContractAddr[t.call.to].abi
+    const contract = new caver.klay.Contract(abi, contractAddr)
 
-    from = replaceWithEnv(t.call.from)
-    params = replaceWithEnv(t.call.params)
+    const from = replaceWithEnv(t.call.from)
+    const params = replaceWithEnv(t.call.params)
 
-    value = await contract.methods[t.call.method](...params).call({ from: from })
+    const value = await contract.methods[t.call.method](...params).call({ from })
     expect(value).to.equal(replaceWithEnv(t.expected.returns))
 }
 
 async function processSend(t) {
-    contractAddr = deployedContractAddr[t.send.to].address
-    abi = deployedContractAddr[t.send.to].abi
-    contract = new caver.klay.Contract(abi, contractAddr)
+    const contractAddr = deployedContractAddr[t.send.to].address
+    const abi = deployedContractAddr[t.send.to].abi
+    const contract = new caver.klay.Contract(abi, contractAddr)
 
-    from = replaceWithEnv(t.send.from)
-    params = replaceWithEnv(t.send.params)
+    const from = replaceWithEnv(t.send.from)
+    let params = replaceWithEnv(t.send.params)
 
-    var actual = true
-    var receipt = undefined
+    let actual = true
+    let receipt
 
     try {
-        receipt = await contract.methods[t.send.method](...params).send({ from: from, gas: t.send.gas })
+        receipt = await contract.methods[t.send.method](...params).send({ from, gas: t.send.gas })
     } catch (err) {
         // console.log(err)
-        receiptRaw = String(err).slice(String(err).indexOf('\n'))
+        const receiptRaw = String(err).slice(String(err).indexOf('\n'))
         try {
             receipt = JSON.parse(receiptRaw)
-        } catch (err) {
+        } catch (error) {
             actual = false
             receipt = undefined
         }
@@ -260,29 +260,31 @@ async function processSend(t) {
     }
 
     if (t.expected.rawEvents) {
-        for (var idx in t.expected.rawEvents) {
+        Object.keys(t.expected.rawEvents).forEach(idx => {
             expect(receipt.events[idx].raw.topics).to.deep.equal(t.expected.rawEvents[idx].topics)
             if (t.expected.rawEvents[idx].data.encodeParameters) {
                 params = replaceWithEnv(t.expected.rawEvents[idx].data.encodeParameters)
-                data = caver.klay.abi.encodeParameters(...params)
+                const data = caver.klay.abi.encodeParameters(...params)
                 expect(receipt.events[idx].raw.data).to.equal(data)
             }
-        }
+        })
     }
 
     if (t.expected.events) {
-        for (var e in t.expected.events) {
+        Object.keys(t.expected.events).forEach(e => {
             expect(receipt.events[e]).to.not.undefined
-            for (var k in t.expected.events[e]) {
-                expected = t.expected.events[e][k]
-                expected = replaceWithEnv(expected)
-                if (typeof receipt.events[e].returnValues[k] === 'string') {
-                    expect(String(receipt.events[e].returnValues[k]).toLowerCase()).to.equal(expected.toLowerCase())
-                } else {
-                    expect(receipt.events[e].returnValues[k]).to.equal(expected)
-                }
+            if (t.expected.events[e]) {
+                Object.keys(t.expected.events[e]).forEach(k => {
+                    let expected = t.expected.events[e][k]
+                    expected = replaceWithEnv(expected)
+                    if (typeof receipt.events[e].returnValues[k] === 'string') {
+                        expect(String(receipt.events[e].returnValues[k]).toLowerCase()).to.equal(expected.toLowerCase())
+                    } else {
+                        expect(receipt.events[e].returnValues[k]).to.equal(expected)
+                    }
+                })
             }
-        }
+        })
     }
 }
 
@@ -291,7 +293,7 @@ const getSignedRawTransaction = async t => {
         return t.rawTx
     }
 
-    var feePayer = t.tx.feePayer
+    let feePayer = t.tx.feePayer
     delete t.tx.feePayer
 
     t.tx.from = replaceWithEnv(t.tx.from)
@@ -300,14 +302,14 @@ const getSignedRawTransaction = async t => {
     }
     t.tx.to = replaceWithEnv(t.tx.to)
     t.tx.privateKey = replaceWithEnv(t.tx.privateKey)
-    privateKey = testEnv.sender.privateKey
+    let privateKey = testEnv.sender.privateKey
     if (t.tx.privateKey !== undefined) {
         privateKey = t.tx.privateKey
     }
     t.tx = processAccountKey(t.tx)
 
     const signedRawTx = await caver.klay.accounts.signTransaction(t.tx, privateKey)
-    rawTransaction = signedRawTx.rawTransaction
+    let rawTransaction = signedRawTx.rawTransaction
 
     if (t.tx.v !== undefined || t.tx.r !== undefined || t.tx.s !== undefined) {
         const txObj = caver.klay.decodeTransaction(rawTransaction, t.tx.type)
@@ -331,7 +333,7 @@ const getSignedRawTransaction = async t => {
         }
 
         t.tx.feePayerPrivateKey = replaceWithEnv(t.tx.feePayerPrivateKey)
-        feePayerPrivateKey = testEnv.feePayer.privateKey
+        let feePayerPrivateKey = testEnv.feePayer.privateKey
         if (t.tx.feePayerPrivateKey !== undefined) {
             feePayerPrivateKey = t.tx.feePayerPrivateKey
         }
@@ -366,8 +368,8 @@ const getSignedRawTransaction = async t => {
 async function processTransaction(t) {
     const rawTransaction = await getSignedRawTransaction(t)
 
-    var actual = undefined
-    var receipt = undefined
+    let actual
+    let receipt
 
     await caver.klay.sendSignedTransaction(rawTransaction).then(
         r => {
@@ -375,8 +377,8 @@ async function processTransaction(t) {
             // console.log(r)
             if (t.expected.receipt) {
                 if (t.expected.receipt.checkContractAddress) {
-                    addrHash = caver.utils.keccak256(RLP.encode([t.tx.from.toLowerCase(), Bytes.fromNat(t.tx.nonce)]))
-                    address = caver.utils.toChecksumAddress('0x' + addrHash.slice(-40))
+                    const addrHash = caver.utils.keccak256(RLP.encode([t.tx.from.toLowerCase(), Bytes.fromNat(t.tx.nonce)]))
+                    const address = caver.utils.toChecksumAddress(`0x${addrHash.slice(-40)}`)
                     expect(r.contractAddress).to.equal(address)
                 }
 
@@ -390,11 +392,11 @@ async function processTransaction(t) {
         },
         err => {
             // console.log(err)
-            receiptRaw = String(err).slice(String(err).indexOf('\n'))
+            const receiptRaw = String(err).slice(String(err).indexOf('\n'))
             actual = true
             try {
                 receipt = JSON.parse(receiptRaw)
-            } catch (err) {
+            } catch (error) {
                 receipt = undefined
                 actual = false
             }
@@ -473,38 +475,36 @@ before(() => {
     caver = new Caver(testEnv.URL)
     caver.klay.accounts.wallet.add(testEnv.sender.privateKey)
     if (testEnv.accounts) {
-        for (var acc in testEnv.accounts) {
+        Object.keys(testEnv.accounts).forEach(acc => {
             caver.klay.accounts.wallet.add(testEnv.accounts[acc].privateKey)
-        }
+        })
     }
 })
 
 it('solc check', async () => {
     const { stdout, stderr } = await exec('solc --version')
-    var regex = /Version: ([0-9]+.[0-9]+.[0-9]+)/
-    found = stdout.match(regex)
+    const regex = /Version: ([0-9]+.[0-9]+.[0-9]+)/
+    const found = stdout.match(regex)
     expect(found).to.not.null
 
-    version = found[1]
+    const version = found[1]
     expect(version).to.equal('0.5.0')
 })
 
 describe('Integration tests', () => {
-    const path = require('path')
-    const fs = require('fs')
     const directoryPath = path.join(__dirname, 'klaytn-integration-tests')
-    var intFiles = fs.readdirSync(directoryPath, { withFileTypes: true })
+    const intFiles = fs.readdirSync(directoryPath, { withFileTypes: true })
     intFiles.forEach(function(intf) {
-        if (intf.isDirectory() == false) return
+        if (intf.isDirectory() === false) return
         describe(`testing ${intf.name}`, () => {
-            const directoryPath = path.join(__dirname, 'klaytn-integration-tests/', intf.name)
-            var files = fs.readdirSync(directoryPath)
+            const dir = path.join(__dirname, 'klaytn-integration-tests/', intf.name)
+            const files = fs.readdirSync(dir)
             files.forEach(function(file) {
-                if (file.endsWith('.json') == false) return
+                if (file.endsWith('.json') === false) return
 
-                filename = path.join(directoryPath, file)
-                describe('fileName: ' + filename, () => {
-                    var tc = JSON.parse(fs.readFileSync(filename))
+                const filename = path.join(dir, file)
+                describe(`fileName: ${filename}`, () => {
+                    const tc = JSON.parse(fs.readFileSync(filename))
                     if (tc.skipJs) {
                         console.log(`Skip ${tc.tcID} / ${tc.tcName}`)
                         return
@@ -515,40 +515,38 @@ describe('Integration tests', () => {
                     })
 
                     it('make abi and bin', async () => {
-                        for (var k in tc.deploy) {
-                            const { stdout, stderr } = await exec(
-                                'solc --abi --bin --allow-paths . ' + path.join(directoryPath, tc.deploy[k].file)
-                            )
-                            var regex = `\n======= .*${tc.deploy[k].file}:${k} =======\nBinary: \n(.*)\nContract JSON ABI \n(.*)`
-                            found = stdout.match(regex)
+                        for (const k in tc.deploy) {
+                            const { stdout, stderr } = await exec(`solc --abi --bin --allow-paths . ${path.join(dir, tc.deploy[k].file)}`)
+                            const regex = `\n======= .*${tc.deploy[k].file}:${k} =======\nBinary: \n(.*)\nContract JSON ABI \n(.*)`
+                            const found = stdout.match(regex)
                             expect(found).to.not.null
 
-                            bin = found[1]
-                            abi = JSON.parse(found[2])
+                            const bin = found[1]
+                            const abi = JSON.parse(found[2])
 
-                            fromAddress = testEnv.sender.address
-                            gas = 100000000
+                            const fromAddress = testEnv.sender.address
+                            const gas = 100000000
 
-                            params = replaceWithEnv(tc.deploy[k].constructorParams)
-                            contractInstance = new caver.klay.Contract(abi)
+                            const params = replaceWithEnv(tc.deploy[k].constructorParams)
+                            const contractInstance = new caver.klay.Contract(abi)
                             const newContractInstance = await contractInstance
                                 .deploy({
-                                    data: '0x' + bin,
+                                    data: `0x${bin}`,
                                     arguments: params,
                                 })
                                 .send({
                                     from: fromAddress,
-                                    gas: gas,
+                                    gas,
                                     value: 0,
                                 })
 
                             expect(newContractInstance).to.not.null
-                            deployedContractAddr[k] = { address: newContractInstance.options.address, abi: abi }
+                            deployedContractAddr[k] = { address: newContractInstance.options.address, abi }
                         }
                     }).timeout(10000)
 
                     tc.test.forEach(function(t, idx) {
-                        it('testName:' + tc.tcName + '[' + idx + ']', async () => {
+                        it(`testName:${tc.tcName}[${idx}]`, async () => {
                             try {
                                 if (t.api !== undefined) {
                                     await processApi(t)
@@ -562,7 +560,7 @@ describe('Integration tests', () => {
                             } catch (err) {
                                 if (String(err).includes('AssertionError: expected')) throw err
 
-                                if (t.expected.status != false) {
+                                if (t.expected.status !== false) {
                                     console.log(err)
                                 }
                                 expect(t.expected.status).to.be.false

@@ -24,24 +24,24 @@
  * @date 2017
  */
 
-var core = require('../../../caver-core')
-var Method = require('../../../caver-core-method')
-var utils = require('../../../caver-utils')
-var Net = require('../../../caver-net')
+const core = require('../../../caver-core')
+const Method = require('../../../caver-core-method')
+const utils = require('../../../caver-utils')
+const Net = require('../../../caver-net')
 
-var formatters = require('../../../caver-core-helpers').formatters
+const formatters = require('../../../caver-core-helpers').formatters
 const rpc = require('../../../caver-rtm').rpc
 
-var Personal = function Personal(...args) {
-    var _this = this
+const Personal = function Personal(...args) {
+    const _this = this
 
     // sets _requestmanager
     core.packageInit(this, args)
 
     this.net = new Net(this.currentProvider)
 
-    var defaultAccount = null
-    var defaultBlock = 'latest'
+    let defaultAccount = null
+    let defaultBlock = 'latest'
 
     Object.defineProperty(this, 'defaultAccount', {
         get: function() {
@@ -81,7 +81,7 @@ var Personal = function Personal(...args) {
         enumerable: true,
     })
 
-    var methods = [
+    const methods = [
         rpc.personal.getAccounts,
         rpc.personal.newAccount,
         rpc.personal.unlockAccount,

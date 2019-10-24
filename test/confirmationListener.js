@@ -22,16 +22,16 @@ const fetch = require('node-fetch')
 const testRPCURL = require('./testrpc')
 const Caver = require('../index.js')
 
-var caver
-var senderPrvKey
-var senderAddress
-var testAccount
+let caver
+let senderPrvKey
+let senderAddress
+let testAccount
 
 before(() => {
     caver = new Caver(testRPCURL)
     senderPrvKey =
         process.env.privateKey && String(process.env.privateKey).indexOf('0x') === -1
-            ? '0x' + process.env.privateKey
+            ? `0x${process.env.privateKey}`
             : process.env.privateKey
 
     caver.klay.accounts.wallet.add(senderPrvKey)

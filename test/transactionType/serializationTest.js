@@ -140,7 +140,7 @@ describe('Value transfer: Fee Delegated Value Transfer', () => {
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(senderTransaction, privateKey)
 
         const feePayerTransaction = {
-            senderRawTransaction: senderRawTransaction,
+            senderRawTransaction,
             feePayer,
             chainId: '0x1',
         }
@@ -208,7 +208,7 @@ describe('Value transfer: Fee Delegated Value Transfer With Ratio', () => {
         expect(decoded.payerS).to.equals('0x')
 
         const feePayerTransaction = {
-            senderRawTransaction: senderRawTransaction,
+            senderRawTransaction,
             feePayer,
             chainId: '0x1',
         }
@@ -323,7 +323,7 @@ describe('Value transfer memo: Fee Delegated Value Transfer Memo', () => {
         expect(decoded.payerS).to.equals('0x')
 
         const feePayerTransaction = {
-            senderRawTransaction: senderRawTransaction,
+            senderRawTransaction,
             feePayer,
             chainId: '0x1',
         }
@@ -393,7 +393,7 @@ describe('Value transfer memo with ratio: Fee Delegated Value Transfer Memo With
         expect(decoded.payerS).to.equals('0x')
 
         const feePayerTransaction = {
-            senderRawTransaction: senderRawTransaction,
+            senderRawTransaction,
             feePayer,
             chainId: '0x1',
         }
@@ -507,7 +507,7 @@ describe('Account: Fee Delegated Account Update', () => {
         expect(decoded.payerS).to.equals('0x')
 
         const feePayerTransaction = {
-            senderRawTransaction: senderRawTransaction,
+            senderRawTransaction,
             feePayer,
             chainId: '0x7e3',
         }
@@ -575,7 +575,7 @@ describe('Account: Fee Delegated Account Update with ratio', () => {
         expect(decoded.payerS).to.equals('0x')
 
         const feePayerTransaction = {
-            senderRawTransaction: senderRawTransaction,
+            senderRawTransaction,
             feePayer,
             chainId: '0x1',
         }
@@ -692,7 +692,7 @@ describe('Contract: Fee Delegated Contract Deploy', () => {
         expect(decoded.payerS).to.equals('0x')
 
         const feePayerTransaction = {
-            senderRawTransaction: senderRawTransaction,
+            senderRawTransaction,
             feePayer,
             chainId: '0x1',
         }
@@ -764,7 +764,7 @@ describe('Contract: Fee Delegated Contract Deploy With Ratio', () => {
         expect(decoded.payerS).to.equals('0x')
 
         const feePayerTransaction = {
-            senderRawTransaction: senderRawTransaction,
+            senderRawTransaction,
             feePayer,
             chainId: '0x1',
         }
@@ -883,7 +883,7 @@ describe('Contract: Fee Delegated Contract Execution', () => {
         expect(decoded.payerS).to.equals('0x')
 
         const feePayerTransaction = {
-            senderRawTransaction: senderRawTransaction,
+            senderRawTransaction,
             feePayer,
             chainId: '0x1',
         }
@@ -954,7 +954,7 @@ describe('Contract: Fee Delegated Contract Execution With Ratio', () => {
         expect(decoded.payerS).to.equals('0x')
 
         const feePayerTransaction = {
-            senderRawTransaction: senderRawTransaction,
+            senderRawTransaction,
             feePayer,
             chainId: '0x1',
         }
@@ -1061,7 +1061,7 @@ describe('Cancel: Fee Delegated Cancel Transaction', () => {
         expect(decoded.payerS).to.equals('0x')
 
         const feePayerTransaction = {
-            senderRawTransaction: senderRawTransaction,
+            senderRawTransaction,
             feePayer,
             chainId: '0x1',
         }
@@ -1125,7 +1125,7 @@ describe('Cancel: Fee Delegated Cancel Transaction With Ratio', () => {
         expect(decoded.payerS).to.equals('0x')
 
         const feePayerTransaction = {
-            senderRawTransaction: senderRawTransaction,
+            senderRawTransaction,
             feePayer,
             chainId: '0x1',
         }

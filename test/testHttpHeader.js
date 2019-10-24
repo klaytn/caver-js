@@ -16,13 +16,15 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-var chai = require('chai')
-var chaiAsPromised = require('chai-as-promised')
+const chai = require('chai')
+const chaiAsPromised = require('chai-as-promised')
+
 chai.use(chaiAsPromised)
 const { expect } = require('chai')
 const nock = require('nock')
-var Caver = require('../index.js')
+const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
+
 const authorizationValue = 'WLRyv95rHM3urcccdS7v42tFElH7G7zG9sTeshf5'
 const option = {
     headers: [{ name: 'Authorization', value: authorizationValue }],

@@ -21,15 +21,19 @@ class AccountKeyMultiSig {
     get defaultKey() {
         return this._keys[0]
     }
+
     get keys() {
         return this._keys
     }
+
     get transactionKey() {
         return this._keys
     }
+
     get updateKey() {
         return this._keys
     }
+
     get feePayerKey() {
         return this._keys
     }

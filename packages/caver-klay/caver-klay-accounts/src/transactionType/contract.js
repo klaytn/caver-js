@@ -16,10 +16,10 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-var RLP = require('eth-lib/lib/rlp')
-var Bytes = require('eth-lib/lib/bytes')
-var utils = require('../../../../caver-utils')
-var helpers = require('../../../../caver-core-helpers')
+const RLP = require('eth-lib/lib/rlp')
+const Bytes = require('eth-lib/lib/bytes')
+const utils = require('../../../../caver-utils')
+const helpers = require('../../../../caver-core-helpers')
 
 const {
     SMART_CONTRACT_DEPLOY_TYPE_TAG,
@@ -80,9 +80,11 @@ function rlpEncodeForContractExecution(transaction) {
 
 function rlpEncodeForFeeDelegatedSmartContractDeploy(transaction) {
     if (transaction.senderRawTransaction) {
-        const typeDetacehdRawTransaction = '0x' + transaction.senderRawTransaction.slice(4)
+        const typeDetacehdRawTransaction = `0x${transaction.senderRawTransaction.slice(4)}`
 
-        const [nonce, gasPrice, gas, to, value, from, data, humanReadable, codeFormat, [[v, r, s]]] = utils.rlpDecode(typeDetacehdRawTransaction)
+        const [nonce, gasPrice, gas, to, value, from, data, humanReadable, codeFormat, [[v, r, s]]] = utils.rlpDecode(
+            typeDetacehdRawTransaction
+        )
 
         return RLP.encode([
             RLP.encode([
@@ -102,32 +104,33 @@ function rlpEncodeForFeeDelegatedSmartContractDeploy(transaction) {
             '0x',
             '0x',
         ])
-    } else {
-        return RLP.encode([
-            RLP.encode([
-                FEE_DELEGATED_SMART_CONTRACT_DEPLOY_TYPE_TAG,
-                Bytes.fromNat(transaction.nonce),
-                Bytes.fromNat(transaction.gasPrice),
-                Bytes.fromNat(transaction.gas),
-                transaction.to.toLowerCase(),
-                Bytes.fromNat(transaction.value),
-                transaction.from.toLowerCase(),
-                transaction.data,
-                Bytes.fromNat(transaction.humanReadable === true ? '0x1' : '0x0'),
-                Bytes.fromNat(getCodeFormatTag(transaction.codeFormat)),
-            ]),
-            Bytes.fromNat(transaction.chainId || '0x1'),
-            '0x',
-            '0x',
-        ])
     }
+    return RLP.encode([
+        RLP.encode([
+            FEE_DELEGATED_SMART_CONTRACT_DEPLOY_TYPE_TAG,
+            Bytes.fromNat(transaction.nonce),
+            Bytes.fromNat(transaction.gasPrice),
+            Bytes.fromNat(transaction.gas),
+            transaction.to.toLowerCase(),
+            Bytes.fromNat(transaction.value),
+            transaction.from.toLowerCase(),
+            transaction.data,
+            Bytes.fromNat(transaction.humanReadable === true ? '0x1' : '0x0'),
+            Bytes.fromNat(getCodeFormatTag(transaction.codeFormat)),
+        ]),
+        Bytes.fromNat(transaction.chainId || '0x1'),
+        '0x',
+        '0x',
+    ])
 }
 
 function rlpEncodeForFeeDelegatedSmartContractDeployWithRatio(transaction) {
     if (transaction.senderRawTransaction) {
-        const typeDetacehdRawTransaction = '0x' + transaction.senderRawTransaction.slice(4)
+        const typeDetacehdRawTransaction = `0x${transaction.senderRawTransaction.slice(4)}`
 
-        const [nonce, gasPrice, gas, to, value, from, data, humanReadable, feeRatio, codeFormat, [[v, r, s]]] = utils.rlpDecode(typeDetacehdRawTransaction)
+        const [nonce, gasPrice, gas, to, value, from, data, humanReadable, feeRatio, codeFormat, [[v, r, s]]] = utils.rlpDecode(
+            typeDetacehdRawTransaction
+        )
 
         return RLP.encode([
             RLP.encode([
@@ -148,31 +151,30 @@ function rlpEncodeForFeeDelegatedSmartContractDeployWithRatio(transaction) {
             '0x',
             '0x',
         ])
-    } else {
-        return RLP.encode([
-            RLP.encode([
-                FEE_DELEGATED_SMART_CONTRACT_DEPLOY_WITH_RATIO_TYPE_TAG,
-                Bytes.fromNat(transaction.nonce),
-                Bytes.fromNat(transaction.gasPrice),
-                Bytes.fromNat(transaction.gas),
-                transaction.to.toLowerCase(),
-                Bytes.fromNat(transaction.value),
-                transaction.from.toLowerCase(),
-                transaction.data,
-                Bytes.fromNat(transaction.humanReadable === true ? '0x1' : '0x0'),
-                Bytes.fromNat(transaction.feeRatio),
-                Bytes.fromNat(getCodeFormatTag(transaction.codeFormat)),
-            ]),
-            Bytes.fromNat(transaction.chainId || '0x1'),
-            '0x',
-            '0x',
-        ])
     }
+    return RLP.encode([
+        RLP.encode([
+            FEE_DELEGATED_SMART_CONTRACT_DEPLOY_WITH_RATIO_TYPE_TAG,
+            Bytes.fromNat(transaction.nonce),
+            Bytes.fromNat(transaction.gasPrice),
+            Bytes.fromNat(transaction.gas),
+            transaction.to.toLowerCase(),
+            Bytes.fromNat(transaction.value),
+            transaction.from.toLowerCase(),
+            transaction.data,
+            Bytes.fromNat(transaction.humanReadable === true ? '0x1' : '0x0'),
+            Bytes.fromNat(transaction.feeRatio),
+            Bytes.fromNat(getCodeFormatTag(transaction.codeFormat)),
+        ]),
+        Bytes.fromNat(transaction.chainId || '0x1'),
+        '0x',
+        '0x',
+    ])
 }
 
 function rlpEncodeForFeeDelegatedSmartContractExecution(transaction) {
     if (transaction.senderRawTransaction) {
-        const typeDetacehdRawTransaction = '0x' + transaction.senderRawTransaction.slice(4)
+        const typeDetacehdRawTransaction = `0x${transaction.senderRawTransaction.slice(4)}`
 
         const [nonce, gasPrice, gas, to, value, from, data, [[v, r, s]]] = utils.rlpDecode(typeDetacehdRawTransaction)
 
@@ -192,28 +194,27 @@ function rlpEncodeForFeeDelegatedSmartContractExecution(transaction) {
             '0x',
             '0x',
         ])
-    } else {
-        return RLP.encode([
-            RLP.encode([
-                FEE_DELEGATED_SMART_CONTRACT_EXECUTION_TYPE_TAG,
-                Bytes.fromNat(transaction.nonce),
-                Bytes.fromNat(transaction.gasPrice),
-                Bytes.fromNat(transaction.gas),
-                transaction.to.toLowerCase(),
-                Bytes.fromNat(transaction.value || '0x0'),
-                transaction.from.toLowerCase(),
-                transaction.data,
-            ]),
-            Bytes.fromNat(transaction.chainId || '0x1'),
-            '0x',
-            '0x',
-        ])
     }
+    return RLP.encode([
+        RLP.encode([
+            FEE_DELEGATED_SMART_CONTRACT_EXECUTION_TYPE_TAG,
+            Bytes.fromNat(transaction.nonce),
+            Bytes.fromNat(transaction.gasPrice),
+            Bytes.fromNat(transaction.gas),
+            transaction.to.toLowerCase(),
+            Bytes.fromNat(transaction.value || '0x0'),
+            transaction.from.toLowerCase(),
+            transaction.data,
+        ]),
+        Bytes.fromNat(transaction.chainId || '0x1'),
+        '0x',
+        '0x',
+    ])
 }
 
 function rlpEncodeForFeeDelegatedSmartContractExecutionWithRatio(transaction) {
     if (transaction.senderRawTransaction) {
-        const typeDetacehdRawTransaction = '0x' + transaction.senderRawTransaction.slice(4)
+        const typeDetacehdRawTransaction = `0x${transaction.senderRawTransaction.slice(4)}`
 
         const [nonce, gasPrice, gas, to, value, from, data, feeRatio, [[v, r, s]]] = utils.rlpDecode(typeDetacehdRawTransaction)
 
@@ -234,24 +235,23 @@ function rlpEncodeForFeeDelegatedSmartContractExecutionWithRatio(transaction) {
             '0x',
             '0x',
         ])
-    } else {
-        return RLP.encode([
-            RLP.encode([
-                FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO_TYPE_TAG,
-                Bytes.fromNat(transaction.nonce),
-                Bytes.fromNat(transaction.gasPrice),
-                Bytes.fromNat(transaction.gas),
-                transaction.to.toLowerCase(),
-                Bytes.fromNat(transaction.value || '0x0'),
-                transaction.from.toLowerCase(),
-                transaction.data,
-                Bytes.fromNat(transaction.feeRatio),
-            ]),
-            Bytes.fromNat(transaction.chainId || '0x1'),
-            '0x',
-            '0x',
-        ])
     }
+    return RLP.encode([
+        RLP.encode([
+            FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO_TYPE_TAG,
+            Bytes.fromNat(transaction.nonce),
+            Bytes.fromNat(transaction.gasPrice),
+            Bytes.fromNat(transaction.gas),
+            transaction.to.toLowerCase(),
+            Bytes.fromNat(transaction.value || '0x0'),
+            transaction.from.toLowerCase(),
+            transaction.data,
+            Bytes.fromNat(transaction.feeRatio),
+        ]),
+        Bytes.fromNat(transaction.chainId || '0x1'),
+        '0x',
+        '0x',
+    ])
 }
 
 module.exports = {

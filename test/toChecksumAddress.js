@@ -17,11 +17,11 @@
 */
 
 const { expect } = require('chai')
+const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 
 describe('Checksum address', done => {
     it('CAVERJS-UNIT-ETC-016 : should convert to vaild checksum address', async () => {
-        var Caver = require('../index.js')
         const caver = new Caver(testRPCURL)
 
         const address1 = '0xc1912fee45d61c87cc5ea59dae31190fffff232d'

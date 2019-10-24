@@ -33,7 +33,6 @@ global.rootRequire = name => require(`${__dirname}/packages/${name}/src/index.js
 
 const { packageInit, providers } = require('./packages/caver-core')
 const Klay = require('./packages/caver-klay')
-const Net = require('./packages/caver-net')
 const Method = require('./packages/caver-core-method')
 const middleware = require('./packages/caver-middleware')
 const utils = require('./packages/caver-utils')
@@ -59,9 +58,9 @@ function Caver(provider, net) {
 
     // overwrite package setProvider
     const setProvider = this.setProvider
-    this.setProvider = (provider, net) => {
-        setProvider.apply(this, [provider, net])
-        this.klay.setProvider(provider, net)
+    this.setProvider = (p, n) => {
+        setProvider.apply(this, [p, n])
+        this.klay.setProvider(p, n)
         return true
     }
 }

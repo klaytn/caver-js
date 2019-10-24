@@ -17,26 +17,28 @@
 */
 
 require('it-each')({ testPerIteration: true })
-const { expect } = require('../extendedChai')
 const assert = require('assert')
+const { expect } = require('../extendedChai')
 
 const testRPCURL = require('../testrpc')
 const Caver = require('../../index.js')
 
 let caver
-var senderPrvKey, payerPrvKey
-var senderAddress, payerAddress
-var testAccount
+let senderPrvKey
+let payerPrvKey
+let senderAddress
+let payerAddress
+let testAccount
 
 before(() => {
     caver = new Caver(testRPCURL)
     senderPrvKey =
         process.env.privateKey && String(process.env.privateKey).indexOf('0x') === -1
-            ? '0x' + process.env.privateKey
+            ? `0x${process.env.privateKey}`
             : process.env.privateKey
     payerPrvKey =
         process.env.privateKey2 && String(process.env.privateKey2).indexOf('0x') === -1
-            ? '0x' + process.env.privateKey2
+            ? `0x${process.env.privateKey2}`
             : process.env.privateKey2
 
     caver.klay.accounts.wallet.add(senderPrvKey)
@@ -51,7 +53,7 @@ before(() => {
 })
 
 describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', () => {
-    var feeDelegatedValueTransferMemoWithRatioObject
+    let feeDelegatedValueTransferMemoWithRatioObject
 
     beforeEach(() => {
         feeDelegatedValueTransferMemoWithRatioObject = {
@@ -68,7 +70,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', () => {
     it('If transaction object has all essential value, sendTransaction should not return error', async () => {
         const tx = Object.assign({}, feeDelegatedValueTransferMemoWithRatioObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(async ret => {
@@ -90,7 +92,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', () => {
         const tx = Object.assign({}, feeDelegatedValueTransferMemoWithRatioObject)
         delete tx.from
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -112,7 +114,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', () => {
         const tx = Object.assign({}, feeDelegatedValueTransferMemoWithRatioObject)
         delete tx.to
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -134,7 +136,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', () => {
         const tx = Object.assign({}, feeDelegatedValueTransferMemoWithRatioObject)
         delete tx.value
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -156,7 +158,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', () => {
         const tx = Object.assign({}, feeDelegatedValueTransferMemoWithRatioObject)
         delete tx.gas
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -178,7 +180,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', () => {
         const tx = Object.assign({}, feeDelegatedValueTransferMemoWithRatioObject)
         delete tx.data
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -218,7 +220,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', () => {
         const tx = Object.assign({}, feeDelegatedValueTransferMemoWithRatioObject)
         delete tx.feeRatio
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -245,7 +247,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', () => {
             feeDelegatedValueTransferMemoWithRatioObject
         )
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -296,7 +298,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', () => {
         }
         const tx = Object.assign({ multisig }, feeDelegatedValueTransferMemoWithRatioObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -345,7 +347,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', () => {
         }
         const tx = Object.assign({ roleTransactionKey }, feeDelegatedValueTransferMemoWithRatioObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -373,7 +375,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', () => {
         }
         const tx = Object.assign({ roleAccountUpdateKey }, feeDelegatedValueTransferMemoWithRatioObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -401,7 +403,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', () => {
         }
         const tx = Object.assign({ roleFeePayerKey }, feeDelegatedValueTransferMemoWithRatioObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -425,7 +427,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', () => {
     it('CAVERJS-UNIT-TX-107 : If transaction object has unnecessary failKey field, signTransaction should throw error', async () => {
         const tx = Object.assign({ failKey: true }, feeDelegatedValueTransferMemoWithRatioObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
@@ -445,7 +447,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', () => {
     it('CAVERJS-UNIT-TX-108 : If transaction object has unnecessary codeFormat field, signTransaction should throw error', async () => {
         const tx = Object.assign({ codeFormat: 'EVM' }, feeDelegatedValueTransferMemoWithRatioObject)
 
-        var result
+        let result
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
             .then(() => (result = false))
