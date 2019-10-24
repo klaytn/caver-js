@@ -10,8 +10,15 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - run: npm install
-      - run: npm test
+      - run: 
+          name: "Install caver-js for testing"
+          command: npm install
+      - run:
+          name: "Lint check"
+          command: npm run lint
+      - run: 
+          name: "Run test code"
+          command: npm test
 
   tag_verify:
     <<: *defaults
