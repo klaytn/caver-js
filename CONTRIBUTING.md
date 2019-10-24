@@ -76,7 +76,6 @@ For the coding style of JavaScript, please refer to the following websites:
 caver-js uses eslint with prettier. The linting rules inherit from airbnb.
 
 Before you submit a pull request, please run `npm run lint` and correct any errors.
-If there is an error in the result of linting, you must fix it.
 Otherwise, the Circle CI process will fail.
 
 Formatting errors with prettier can be easily fixed by running the `npm run lintFix` script.
