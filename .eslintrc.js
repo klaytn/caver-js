@@ -47,5 +47,6 @@ module.exports = {
         'prefer-const': 1,
         'no-multi-assign': 1,
         'class-methods-use-this': 1,
+        'import/no-unresolved': 1,
     },
 }
