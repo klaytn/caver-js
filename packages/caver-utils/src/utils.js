@@ -585,7 +585,8 @@ function isValidPrivateKey(privateKey) {
 
     // order n value in secp256k1. privateKey should be less than order n value.
     const VALID_PRIVATE_KEY_LIMIT = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141'
-    return privateKey.toUpperCase() < VALID_PRIVATE_KEY_LIMIT
+    const VALID_PRIVATE_LOWER_BOUND = '0000000000000000000000000000000000000000000000000000000000000000'
+    return VALID_PRIVATE_LOWER_BOUND < privateKey.toUpperCase() && privateKey.toUpperCase() < VALID_PRIVATE_KEY_LIMIT
 }
 
 // Check is 1)Number string or 2)Hex string or 3)Number.

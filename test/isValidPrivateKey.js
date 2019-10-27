@@ -30,6 +30,11 @@ describe('caver.utils.isValidPrivateKey', done => {
         expect(caver.utils.isValidPrivateKey('zzzz')).to.equal(false)
         expect(caver.utils.isValidPrivateKey('aaaa')).to.equal(false)
 
+        expect(caver.utils.isValidPrivateKey('0000000000000000000000000000000000000000000000000000000000000000')).to.equal(false)
+        expect(caver.utils.isValidPrivateKey('0x0000000000000000000000000000000000000000000000000000000000000000')).to.equal(false)
+        expect(caver.utils.isValidPrivateKey('0000000000000000000000000000000000000000000000000000000000000001')).to.equal(true)
+        expect(caver.utils.isValidPrivateKey('0x0000000000000000000000000000000000000000000000000000000000000001')).to.equal(true)
+
         expect(caver.utils.isValidPrivateKey('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364140')).to.equal(true)
         expect(caver.utils.isValidPrivateKey('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364140FF')).to.equal(false)
         expect(caver.utils.isValidPrivateKey('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364140')).to.equal(true)
