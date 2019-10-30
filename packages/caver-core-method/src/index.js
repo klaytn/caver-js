@@ -300,9 +300,8 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
 
                 let error
                 if (!_.isObject(tx)) {
-                    error = new Error('The transaction must be defined as an object.')
-                    sendTxCallback(error)
-                    return Promise.reject(error)
+                    sendTxCallback(new Error('The transaction must be defined as an object.'))
+                    return
                 }
 
                 let addressToUse = tx.from
@@ -321,7 +320,7 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
                     wallet = method.accounts.wallet.getAccount(addressToUse)
                 } catch (e) {
                     sendTxCallback(e)
-                    return Promise.reject(e)
+                    return
                 }
 
                 if (wallet && wallet.privateKey) {
@@ -348,15 +347,17 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
                 // If wallet was not found in caver-js wallet, then it has to use wallet in Node.
                 // Signing to transaction using wallet in Node supports only LEGACY transaction, so if transaction is not LEGACY, return error.
                 if (tx.feePayer !== undefined || (tx.type !== undefined && tx.type !== 'LEGACY')) {
-                    error = new Error('Only Legacy transactions can be signed on a Klaytn node!')
+                    error = new Error(
+                        `No private key found in the caver-js wallet. Trying to use the Klaytn node's wallet, but it only supports legacy transactions. Please add private key of ${addressToUse} to the caver-js wallet.`
+                    )
                     sendTxCallback(error)
-                    return Promise.reject(error)
+                    return
                 }
 
                 error = validateParams(tx)
                 if (error) {
                     sendTxCallback(error)
-                    return Promise.reject(error)
+                    return
                 }
                 break
             }

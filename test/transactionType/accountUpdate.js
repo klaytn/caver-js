@@ -2080,4 +2080,25 @@ describe('ACCOUNT_UPDATE transaction', () => {
 
         expect(() => caver.klay.signTransaction(tx)).to.throws(expectedError)
     }).timeout(200000)
+
+    it('CAVERJS-UNIT-TX-711: sendTransaction should throw error when try to use an account in Node with not LEGACY transaction', async () => {
+        const acctInNode = caver.klay.accounts.create()
+        const updator = caver.klay.accounts.createAccountForUpdateWithLegacyKey(acctInNode.address)
+
+        const tx = Object.assign({ key: updator }, accountUpdateObject)
+        tx.from = acctInNode.address
+
+        const expectedError = `No private key found in the caver-js wallet. Trying to use the Klaytn node's wallet, but it only supports legacy transactions. Please add private key of ${acctInNode.address.toLowerCase()} to the caver-js wallet.`
+
+        try {
+            await caver.klay.sendTransaction(tx, (error, result) => {
+                expect(error).not.to.be.null
+                expect(result).to.be.undefined
+                expect(error.message).to.equals(expectedError)
+            })
+            assert(false)
+        } catch (error) {
+            expect(error.message).to.equals(expectedError)
+        }
+    }).timeout(100000)
 })
