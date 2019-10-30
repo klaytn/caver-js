@@ -348,7 +348,7 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
                 // Signing to transaction using wallet in Node supports only LEGACY transaction, so if transaction is not LEGACY, return error.
                 if (tx.feePayer !== undefined || (tx.type !== undefined && tx.type !== 'LEGACY')) {
                     error = new Error(
-                        `no private key found in the caver-js wallet. Trying to use the Klaytn node's wallet, but it only supports legacy transactions. Please add private key of ${addressToUse} to the caver-js wallet.`
+                        `No private key found in the caver-js wallet. Trying to use the Klaytn node's wallet, but it only supports legacy transactions. Please add private key of ${addressToUse} to the caver-js wallet.`
                     )
                     sendTxCallback(error)
                     return
