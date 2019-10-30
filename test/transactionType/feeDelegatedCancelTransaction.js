@@ -538,7 +538,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
         const tx = Object.assign({}, cancelObject)
         tx.from = acctInNode.address
 
-        const expectedError = `no private key found in the caver-js wallet. Trying to use the Klaytn node's wallet, but it only supports legacy transactions. Please add private key of ${acctInNode.address.toLowerCase()} to the caver-js wallet.`
+        const expectedError = `No private key found in the caver-js wallet. Trying to use the Klaytn node's wallet, but it only supports legacy transactions. Please add private key of ${acctInNode.address.toLowerCase()} to the caver-js wallet.`
 
         try {
             await caver.klay.sendTransaction(tx, (error, result) => {
