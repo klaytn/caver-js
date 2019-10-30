@@ -588,4 +588,24 @@ describe('FEE_DELEGATED_SMART_CONTRACT_EXECUTION transaction', () => {
 
         expect(() => caver.klay.sendTransaction(feePayerTx)).to.throws(expectedError)
     }).timeout(200000)
+
+    it('CAVERJS-UNIT-TX-721: sendTransaction should throw error when try to use an account in Node with not LEGACY transaction', async () => {
+        const acctInNode = caver.klay.accounts.create()
+
+        const tx = Object.assign({}, executionObject)
+        tx.from = acctInNode.address
+
+        const expectedError = `Failed to send transaction: Only Legacy transactions can be signed on a Klaytn node. Please add an account(${acctInNode.address.toLowerCase()}) with caver.klay.accounts.wallet.add, or use a 'LEGACY' transaction.`
+
+        try {
+            await caver.klay.sendTransaction(tx, (error, result) => {
+                expect(error).not.to.be.null
+                expect(result).to.be.undefined
+                expect(error.message).to.equals(expectedError)
+            })
+            assert(false)
+        } catch (error) {
+            expect(error.message).to.equals(expectedError)
+        }
+    }).timeout(100000)
 })
