@@ -71,7 +71,8 @@
     "utf8": "2.1.1",
     "uuid": "2.0.1",
     "websocket": "^1.0.28",
-    "xhr2-cookies": "^1.1.0"
+    "xhr2-cookies": "^1.1.0",
+    "semver": "6.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.1.2",
