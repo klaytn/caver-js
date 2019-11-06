@@ -39,7 +39,7 @@ const util = require('util')
 const exec = util.promisify(require('child_process').exec)
 const Caver = require('../index.js')
 const testEnv = require('./klaytn-integration-tests/env.json')
-const testProfile = require('./klaytn-integration-tests/testProfile.json')
+const conf = require('./klaytn-integration-tests/conf.json')
 const { expect } = require('./extendedChai')
 
 const { overwriteSignature, getSenderTxHash } = require('../packages/caver-klay/caver-klay-accounts/src/makeRawTransaction')
@@ -489,7 +489,7 @@ async function checkSolidityVersion() {
     expect(found).to.not.null
 
     const version = found[1]
-    expect(version).to.equal(testProfile.solidity)
+    expect(version).to.equal(conf.solidity)
 }
 
 describe('Integration tests', () => {
