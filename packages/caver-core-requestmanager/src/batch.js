@@ -24,46 +24,47 @@
  * @date 2015
  */
 
-var Jsonrpc = require('./jsonrpc');
-var errors = require('../../caver-core-helpers').errors;
+const Jsonrpc = require('./jsonrpc')
+const errors = require('../../caver-core-helpers').errors
 
-var Batch = function (requestManager) {
-    this.requestManager = requestManager;
-    this.requests = [];
-};
+const Batch = function(requestManager) {
+    this.requestManager = requestManager
+    this.requests = []
+}
 
-Batch.prototype.add = function (request) {
-    this.requests.push(request);
-};
+Batch.prototype.add = function(request) {
+    this.requests.push(request)
+}
 
-Batch.prototype.execute = function () {
-    var requests = this.requests;
-    this.requestManager.sendBatch(requests, function (err, results) {
-        results = results || [];
-        
-        requests.map(function (request, index) {
-            return results[index] || {};
-        }).forEach(function (result, index) {
-          /**
-           * if callback is defined in requests[index]
-           * 1) Check result.error - if existed throw ErrorResponse.
-           * 2) Check result is valid json response object - if invalid throw InvalidResponse.
-           * 3) After passing 1) 2), if there is format method in requests[index] do formatting, and then callback.
-           */
-            if (requests[index].callback) {
+Batch.prototype.execute = function() {
+    const requests = this.requests
+    this.requestManager.sendBatch(requests, function(err, results) {
+        results = results || []
 
-                if (result && result.error) {
-                    return requests[index].callback(errors.ErrorResponse(result));
+        requests
+            .map(function(request, index) {
+                return results[index] || {}
+            })
+            .forEach(function(result, index) {
+                /**
+                 * if callback is defined in requests[index]
+                 * 1) Check result.error - if existed throw ErrorResponse.
+                 * 2) Check result is valid json response object - if invalid throw InvalidResponse.
+                 * 3) After passing 1) 2), if there is format method in requests[index] do formatting, and then callback.
+                 */
+                if (requests[index].callback) {
+                    if (result && result.error) {
+                        return requests[index].callback(errors.ErrorResponse(result))
+                    }
+
+                    if (!Jsonrpc.isValidResponse(result)) {
+                        return requests[index].callback(errors.InvalidResponse(result))
+                    }
+
+                    requests[index].callback(null, requests[index].format ? requests[index].format(result.result) : result.result)
                 }
+            })
+    })
+}
 
-                if (!Jsonrpc.isValidResponse(result)) {
-                    return requests[index].callback(errors.InvalidResponse(result));
-                }
-
-                requests[index].callback(null, (requests[index].format ? requests[index].format(result.result) : result.result));
-            }
-        });
-    });
-};
-
-module.exports = Batch;
+module.exports = Batch

@@ -27,47 +27,46 @@
 const Subscription = require('./subscription.js')
 
 function Subscriptions(options) {
-  this.name = options.name
-  this.type = options.type
-  this.subscriptions = options.subscriptions || {}
-  this.requestManager = null
-};
+    this.name = options.name
+    this.type = options.type
+    this.subscriptions = options.subscriptions || {}
+    this.requestManager = null
+}
 
-Subscriptions.prototype.setRequestManager = function (requestManager) {
-  this.requestManager = requestManager
-};
+Subscriptions.prototype.setRequestManager = function(requestManager) {
+    this.requestManager = requestManager
+}
 
-Subscriptions.prototype.attachToObject = function (obj) {
-    var func = this.buildCall()
-    var name = this.name.split('.');
+Subscriptions.prototype.attachToObject = function(obj) {
+    const func = this.buildCall()
+    const name = this.name.split('.')
     if (name.length > 1) {
-        obj[name[0]] = obj[name[0]] || {};
-        obj[name[0]][name[1]] = func;
+        obj[name[0]] = obj[name[0]] || {}
+        obj[name[0]][name[1]] = func
     } else {
-        obj[name[0]] = func;
+        obj[name[0]] = func
     }
-};
+}
 
 Subscriptions.prototype.buildCall = function() {
-    var _this = this;
+    const _this = this
 
-    return function(){
-        if(!_this.subscriptions[arguments[0]]) {
-            console.warn('Subscription '+ JSON.stringify(arguments[0]) +' doesn\'t exist. Subscribing anyway.');
+    return function() {
+        if (!_this.subscriptions[arguments[0]]) {
+            console.warn(`Subscription ${JSON.stringify(arguments[0])} doesn't exist. Subscribing anyway.`)
         }
 
-        var subscription = new Subscription({
+        const subscription = new Subscription({
             subscription: _this.subscriptions[arguments[0]],
             requestManager: _this.requestManager,
-            type: _this.type
-        });
-        
-        return subscription.subscribe.apply(subscription, arguments);
-    };
-};
+            type: _this.type,
+        })
 
+        return subscription.subscribe.apply(subscription, arguments)
+    }
+}
 
 module.exports = {
     subscriptions: Subscriptions,
-    subscription: Subscription
-};
+    subscription: Subscription,
+}

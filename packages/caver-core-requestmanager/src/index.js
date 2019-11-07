@@ -24,29 +24,27 @@
  * @date 2017
  */
 
-var _ = require('underscore')
-var errors = require('../../caver-core-helpers').errors
+const _ = require('underscore')
+const errors = require('../../caver-core-helpers').errors
 const middleware = require('../../caver-middleware')
 
-var Jsonrpc = require('./jsonrpc.js')
+const Jsonrpc = require('./jsonrpc.js')
 
-var BatchManager = require('./batch.js')
+const BatchManager = require('./batch.js')
 
-var RequestManager = function RequestManager(provider, net) {
-  this.provider = null;
-  this.providers = RequestManager.providers;
+const RequestManager = function RequestManager(provider, net) {
+    this.provider = null
+    this.providers = RequestManager.providers
 
-  this.setProvider(provider, net);
-  this.subscriptions = {};
-};
-
-RequestManager.providers = {
-  WebsocketProvider: require('../caver-providers-ws'),
-  HttpProvider: require('../caver-providers-http'),
-  IpcProvider: require('../caver-providers-ipc'),
+    this.setProvider(provider, net)
+    this.subscriptions = {}
 }
 
-
+RequestManager.providers = {
+    WebsocketProvider: require('../caver-providers-ws'),
+    HttpProvider: require('../caver-providers-http'),
+    IpcProvider: require('../caver-providers-ipc'),
+}
 
 /**
  * Should be used to set provider of request manager
@@ -54,57 +52,57 @@ RequestManager.providers = {
  * @method setProvider
  * @param {Object} p
  */
-RequestManager.prototype.setProvider = function (p, net) {
-  var _this = this;
+RequestManager.prototype.setProvider = function(p, net) {
+    const _this = this
 
-  if(p && typeof p === 'string' && this.providers) {
+    if (p && typeof p === 'string' && this.providers) {
+        // HTTP
+        if (/^http(s)?:\/\//i.test(p)) {
+            p = new this.providers.HttpProvider(p)
 
-      // HTTP
-      if(/^http(s)?:\/\//i.test(p)) {
-          p = new this.providers.HttpProvider(p);
+            // WS
+        } else if (/^ws(s)?:\/\//i.test(p)) {
+            p = new this.providers.WebsocketProvider(p)
 
-          // WS
-      } else if(/^ws(s)?:\/\//i.test(p)) {
-          p = new this.providers.WebsocketProvider(p);
+            // IPC
+        } else if (p && typeof net === 'object' && typeof net.connect === 'function') {
+            p = new this.providers.IpcProvider(p, net)
+        } else if (p) {
+            throw new Error(`Can't autodetect provider for "${p}"`)
+        }
+    }
 
-          // IPC
-      } else if(p && typeof net === 'object'  && typeof net.connect === 'function') {
-          p = new this.providers.IpcProvider(p, net);
+    if (this.provider) {
+        this.clearSubscriptions()
+    }
 
-      } else if(p) {
-          throw new Error('Can\'t autodetect provider for "'+ p +'"');
-      }
-  }
+    this.provider = p || null
 
-  if(this.provider)
-      this.clearSubscriptions();
+    // listen to incoming notifications
+    if (this.provider && this.provider.on) {
+        this.provider.on('data', function requestManagerNotification(result, deprecatedResult) {
+            result = result || deprecatedResult // this is for possible old providers, which may had the error first handler
 
+            // check for result.method, to prevent old providers errors to pass as result
+            if (
+                result.method &&
+                _this.subscriptions[result.params.subscription] &&
+                _this.subscriptions[result.params.subscription].callback
+            ) {
+                _this.subscriptions[result.params.subscription].callback(null, result.params.result)
+            }
+        })
+        // TODO add error, end, timeout, connect??
+        // this.provider.on('error', function requestManagerNotification(result){
+        //     Object.keys(_this.subscriptions).forEach(function(id){
+        //         if(_this.subscriptions[id].callback)
+        //             _this.subscriptions[id].callback(err);
+        //     });
+        // }
+    }
 
-  this.provider = p || null;
-
-  // listen to incoming notifications
-  if(this.provider && this.provider.on) {
-      this.provider.on('data', function requestManagerNotification(result, deprecatedResult){
-
-          result = result || deprecatedResult; // this is for possible old providers, which may had the error first handler
-
-          // check for result.method, to prevent old providers errors to pass as result
-          if(result.method && _this.subscriptions[result.params.subscription] && _this.subscriptions[result.params.subscription].callback) {
-              _this.subscriptions[result.params.subscription].callback(null, result.params.result);
-          }
-      });
-      // TODO add error, end, timeout, connect??
-      // this.provider.on('error', function requestManagerNotification(result){
-      //     Object.keys(_this.subscriptions).forEach(function(id){
-      //         if(_this.subscriptions[id].callback)
-      //             _this.subscriptions[id].callback(err);
-      //     });
-      // }
-  }
-
-  return this
-};
-
+    return this
+}
 
 /**
  * Should be used to asynchronously send request
@@ -113,14 +111,14 @@ RequestManager.prototype.setProvider = function (p, net) {
  * @param {Object} data
  * @param {Function} callback
  */
-RequestManager.prototype.send = function (data, callback) {
-    callback = callback || function(){};
+RequestManager.prototype.send = function(data, callback) {
+    callback = callback || function() {}
 
     if (!this.provider) {
-        return callback(errors.InvalidProvider());
+        return callback(errors.InvalidProvider())
     }
 
-    var payload = Jsonrpc.toPayload(data.method, data.params);
+    const payload = Jsonrpc.toPayload(data.method, data.params)
 
     const isMiddlewareExist = middleware.getMiddlewares().length !== 0
 
@@ -130,41 +128,42 @@ RequestManager.prototype.send = function (data, callback) {
     middleware.applyMiddleware(payload, 'outbound', sendRPC(this.provider))
 
     function sendRPC(provider) {
-      return function (payload) {
-        provider[provider.sendAsync ? 'sendAsync' : 'send'](payload, function (err, result) {
-            // Attach inbound middleware
-            if (isMiddlewareExist) middleware.applyMiddleware(payload, 'inbound')
-            /**
-             * result = json rpc response object
-             * {
-             *  jsonrpc: '2.0'
-             *  result: ...,
-             *  id: ...,
-             *  error: ...,
-             * }
-             *
-             * Reference: https://www.jsonrpc.org/specification
-             */
-            if (result && result.id && payload.id !== result.id)
-              return callback(
-                new Error('Wrong response id "' + result.id +
-                '" (expected: "' + payload.id + '") in ' +
-                JSON.stringify(payload)))
+        return function(p) {
+            provider[provider.sendAsync ? 'sendAsync' : 'send'](p, function(err, result) {
+                // Attach inbound middleware
+                if (isMiddlewareExist) middleware.applyMiddleware(p, 'inbound')
+                /**
+                 * result = json rpc response object
+                 * {
+                 *  jsonrpc: '2.0'
+                 *  result: ...,
+                 *  id: ...,
+                 *  error: ...,
+                 * }
+                 *
+                 * Reference: https://www.jsonrpc.org/specification
+                 */
+                if (result && result.id && p.id !== result.id) {
+                    return callback(new Error(`Wrong response id "${result.id}" (expected: "${p.id}") in ${JSON.stringify(p)}`))
+                }
 
-            if (err)
-              return callback(err)
+                if (err) {
+                    return callback(err)
+                }
 
-            if (result && result.error)
-              return callback(errors.ErrorResponse(result))
+                if (result && result.error) {
+                    return callback(errors.ErrorResponse(result))
+                }
 
-            if (!Jsonrpc.isValidResponse(result))
-              return callback(errors.InvalidResponse(result))
+                if (!Jsonrpc.isValidResponse(result)) {
+                    return callback(errors.InvalidResponse(result))
+                }
 
-            callback(null, result.result)
-        })
-      }
+                callback(null, result.result)
+            })
+        }
     }
-};
+}
 
 /**
  * Should be called to asynchronously send batch request
@@ -173,25 +172,24 @@ RequestManager.prototype.send = function (data, callback) {
  * @param {Array} batch data
  * @param {Function} callback
  */
-RequestManager.prototype.sendBatch = function (data, callback) {
+RequestManager.prototype.sendBatch = function(data, callback) {
     if (!this.provider) {
-        return callback(errors.InvalidProvider());
+        return callback(errors.InvalidProvider())
     }
 
-    var payload = Jsonrpc.toBatchPayload(data);
-    this.provider[this.provider.sendAsync ? 'sendAsync' : 'send'](payload, function (err, results) {
+    const payload = Jsonrpc.toBatchPayload(data)
+    this.provider[this.provider.sendAsync ? 'sendAsync' : 'send'](payload, function(err, results) {
         if (err) {
-            return callback(err);
+            return callback(err)
         }
 
         if (!_.isArray(results)) {
-            return callback(errors.InvalidResponse(results));
+            return callback(errors.InvalidResponse(results))
         }
 
-        callback(null, results);
-    });
-};
-
+        callback(null, results)
+    })
+}
 
 /**
  * Waits for notifications
@@ -202,18 +200,17 @@ RequestManager.prototype.sendBatch = function (data, callback) {
  * @param {String} type         the subscription namespace (eth, personal, etc)
  * @param {Function} callback   the callback to call for incoming notifications
  */
-RequestManager.prototype.addSubscription = function (id, name, type, callback) {
-    if(this.provider.on) {
+RequestManager.prototype.addSubscription = function(id, name, type, callback) {
+    if (this.provider.on) {
         this.subscriptions[id] = {
             callback: callback,
             type: type,
-            name: name
-        };
-
+            name: name,
+        }
     } else {
-        throw new Error('The provider doesn\'t support subscriptions: '+ this.provider.constructor.name);
+        throw new Error(`The provider doesn't support subscriptions: ${this.provider.constructor.name}`)
     }
-};
+}
 
 /**
  * Waits for notifications
@@ -222,43 +219,45 @@ RequestManager.prototype.addSubscription = function (id, name, type, callback) {
  * @param {String} id           the subscription id
  * @param {Function} callback   fired once the subscription is removed
  */
-RequestManager.prototype.removeSubscription = function (id, callback) {
-    var _this = this;
+RequestManager.prototype.removeSubscription = function(id, callback) {
+    const _this = this
 
-    if(this.subscriptions[id]) {
-
-        this.send({
-            method: this.subscriptions[id].type + '_unsubscribe',
-            params: [id]
-        }, callback);
+    if (this.subscriptions[id]) {
+        this.send(
+            {
+                method: `${this.subscriptions[id].type}_unsubscribe`,
+                params: [id],
+            },
+            callback
+        )
 
         // remove subscription
-        delete _this.subscriptions[id];
+        delete _this.subscriptions[id]
     }
-};
+}
 
 /**
  * Should be called to reset the subscriptions
  *
  * @method reset
  */
-RequestManager.prototype.clearSubscriptions = function (keepIsSyncing) {
-    var _this = this;
-
+RequestManager.prototype.clearSubscriptions = function(keepIsSyncing) {
+    const _this = this
 
     // uninstall all subscriptions
-    Object.keys(this.subscriptions).forEach(function(id){
-        if(!keepIsSyncing || _this.subscriptions[id].name !== 'syncing')
-            _this.removeSubscription(id);
-    });
-
+    Object.keys(this.subscriptions).forEach(function(id) {
+        if (!keepIsSyncing || _this.subscriptions[id].name !== 'syncing') {
+            _this.removeSubscription(id)
+        }
+    })
 
     //  reset notification callbacks etc.
-    if(this.provider.reset)
-        this.provider.reset();
-};
+    if (this.provider.reset) {
+        this.provider.reset()
+    }
+}
 
 module.exports = {
-  Manager: RequestManager,
-  BatchManager: BatchManager,
+    Manager: RequestManager,
+    BatchManager: BatchManager,
 }

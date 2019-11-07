@@ -26,9 +26,9 @@
  * @date 2015
  */
 
-var errors = require('../../../caver-core-helpers').errors;
+const XHR2 = require('xhr2-cookies').XMLHttpRequest
 
-var XHR2 = require('xhr2-cookies').XMLHttpRequest
+const errors = require('../../../caver-core-helpers').errors
 
 /**
  * HttpProvider should be used to send rpc calls over http
@@ -38,32 +38,32 @@ var XHR2 = require('xhr2-cookies').XMLHttpRequest
  * @param       {object} options
  * @constructor
  */
-var HttpProvider = function HttpProvider(host, options) {
-    options = options || {};
-    this.host = host || 'http://localhost:8545';
-    this.timeout = options.timeout || 0;
-    this.headers = options.headers;
-    this.connected = false;
-};
+const HttpProvider = function HttpProvider(host, options) {
+    options = options || {}
+    this.host = host || 'http://localhost:8545'
+    this.timeout = options.timeout || 0
+    this.headers = options.headers
+    this.connected = false
+}
 
 /**
  * _prepareRequest create request instance
  */
-HttpProvider.prototype._prepareRequest = function(){
-    var request = new XHR2();
+HttpProvider.prototype._prepareRequest = function() {
+    const request = new XHR2()
 
-    request.open('POST', this.host, true);
-    request.setRequestHeader('Content-Type','application/json');
-    request.timeout = this.timeout && this.timeout !== 1 ? this.timeout : 0;
+    request.open('POST', this.host, true)
+    request.setRequestHeader('Content-Type', 'application/json')
+    request.timeout = this.timeout && this.timeout !== 1 ? this.timeout : 0
 
-    if(this.headers) {
+    if (this.headers) {
         this.headers.forEach(function(header) {
-            request.setRequestHeader(header.name, header.value);
-        });
+            request.setRequestHeader(header.name, header.value)
+        })
     }
 
-    return request;
-};
+    return request
+}
 
 /**
  * Should be used to make async request
@@ -73,70 +73,70 @@ HttpProvider.prototype._prepareRequest = function(){
  * @param {Function} callback triggered on end with (err, result)
  */
 HttpProvider.prototype.send = function(payload, callback) {
-  var _this = this;
-  var request = this._prepareRequest();
-  var host = this.host;
-  var timer
+    const _this = this
+    const request = this._prepareRequest()
+    const host = this.host
+    let timer
 
-  request.onreadystatechange = function() {
-      /**
-       * readystate value
-       * 0: UNSENT - When client is created
-       * 1: OPENED - When request is opened
-       * 2: HEADERS_RECEIVED - When "send" is called and headers and status are available
-       * 3: LOADING - downloading
-       * 4: DONE - When receive response after operating request
-       */
+    request.onreadystatechange = function() {
+        /**
+         * readystate value
+         * 0: UNSENT - When client is created
+         * 1: OPENED - When request is opened
+         * 2: HEADERS_RECEIVED - When "send" is called and headers and status are available
+         * 3: LOADING - downloading
+         * 4: DONE - When receive response after operating request
+         */
 
-      if (request.readyState === 2){
-        clearTimeout(timer)
-      }
-      
-      if (request.readyState === 4 && request.timeout !== 1) {
-          var result = request.responseText;
-          var error = null;
-
-          if (request.response === null) {
-            error = errors.InvalidResponse(request.response)
+        if (request.readyState === 2) {
             clearTimeout(timer)
-          } else {
-            try {
-                result = JSON.parse(result);
-            } catch(e) {
-                console.error(`Invalid JSON RPC response: ${JSON.stringify(request.responseText)}`)
-                error = errors.InvalidResponse(request.responseText);
+        }
+
+        if (request.readyState === 4 && request.timeout !== 1) {
+            let result = request.responseText
+            let error = null
+
+            if (request.response === null) {
+                error = errors.InvalidResponse(request.response)
+                clearTimeout(timer)
+            } else {
+                try {
+                    result = JSON.parse(result)
+                } catch (e) {
+                    console.error(`Invalid JSON RPC response: ${JSON.stringify(request.responseText)}`)
+                    error = errors.InvalidResponse(request.responseText)
+                }
             }
-          }
-          
-          _this.connected = true;
-          callback(error, result);
-      }
-  };
+
+            _this.connected = true
+            callback(error, result)
+        }
+    }
 
     request.ontimeout = function() {
         console.error(`CONNECTION TIMEOUT: timeout of ${this.timeout}ms achived`)
-        _this.connected = false;
-        clearTimeout(timer);
-        callback(errors.ConnectionTimeout(this.timeout));
+        _this.connected = false
+        clearTimeout(timer)
+        callback(errors.ConnectionTimeout(this.timeout))
     }
 
     try {
         // Set timeout for connection
-        if (request.timeout !== 0){
+        if (request.timeout !== 0) {
             timer = setTimeout(function() {
-                if (request.status < 4){
+                if (request.status < 4) {
                     console.error(`CONNECTION ERROR: Couldn't connect to node ${host}`)
                     request.abort()
                     callback(errors.InvalidConnection(host))
                 }
             }, request.timeout)
         }
-        request.send(JSON.stringify(payload));
-    } catch(error) {
+        request.send(JSON.stringify(payload))
+    } catch (error) {
         console.error(`CONNECTION ERROR: Couldn't connect to node ${this.host}`)
-        this.connected = false;
-        clearTimeout(timer);
-        callback(errors.InvalidConnection(this.host));
+        this.connected = false
+        clearTimeout(timer)
+        callback(errors.InvalidConnection(this.host))
     }
 }
 
@@ -144,4 +144,4 @@ HttpProvider.prototype.supportsSubscriptions = function() {
     return false
 }
 
-module.exports = HttpProvider;
+module.exports = HttpProvider

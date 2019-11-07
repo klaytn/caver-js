@@ -23,23 +23,22 @@
  *
  * To initialize a contract use:
  *
- *  var Contract = require('web3-eth-contract');
+ *  let Contract = require('web3-eth-contract');
  *  Contract.setProvider('ws://localhost:8546');
- *  var contract = new Contract(abi, address, ...);
+ *  let contract = new Contract(abi, address, ...);
  *
  * @author Fabian Vogelsteller <fabian@ethereum.org>
  * @date 2017
  */
 
-var _ = require('underscore');
-var core = require('../../../caver-core');
-var Method = require('../../../caver-core-method');
-var utils = require('../../../caver-utils');
-var Subscription = require('../../../caver-core-subscriptions').subscription;
-var formatters = require('../../../caver-core-helpers').formatters;
-var errors = require('../../../caver-core-helpers').errors;
-var abi = require('../../caver-klay-abi');
-
+const _ = require('underscore')
+const core = require('../../../caver-core')
+const Method = require('../../../caver-core-method')
+const utils = require('../../../caver-utils')
+const Subscription = require('../../../caver-core-subscriptions').subscription
+const { formatters } = require('../../../caver-core-helpers')
+const { errors } = require('../../../caver-core-helpers')
+const abi = require('../../caver-klay-abi')
 
 /**
  * Should be called to create new contract instance
@@ -52,241 +51,239 @@ var abi = require('../../caver-klay-abi');
  */
 
 /**
- * var myContract = new cav.klay.Contract([...], '0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe', {
+ * let myContract = new cav.klay.Contract([...], '0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe', {
  *   from: '0x1234567890123456789012345678901234567891', // default from address
  *   gasPrice: '20000000000', // default gas price in wei, 20 gwei in this case
  *   data: '',(bytecode, when contract deploy)
  *   gas: 200000, (gas limit)
  * });
  */
-var Contract = function Contract(jsonInterface, address, options) {
-    var _this = this,
-        args = Array.prototype.slice.call(arguments);
+const Contract = function Contract(jsonInterface, address, options) {
+    const _this = this
+    const args = Array.prototype.slice.call(arguments)
 
-    if(!(this instanceof Contract)) {
-        throw new Error('Please use the "new" keyword to instantiate a cav.klay.contract() object!');
+    if (!(this instanceof Contract)) {
+        throw new Error('Please use the "new" keyword to instantiate a cav.klay.contract() object!')
     }
 
     // sets _requestmanager
-    core.packageInit(this, [this.constructor.currentProvider]);
+    core.packageInit(this, [this.constructor.currentProvider])
 
-    this.clearSubscriptions = this._requestManager.clearSubscriptions;
+    this.clearSubscriptions = this._requestManager.clearSubscriptions
 
-
-
-    if(!jsonInterface || !(Array.isArray(jsonInterface))) {
-        throw new Error('You must provide the json interface of the contract when instantiating a contract object.');
+    if (!jsonInterface || !Array.isArray(jsonInterface)) {
+        throw new Error('You must provide the json interface of the contract when instantiating a contract object.')
     }
 
     // create the options object
-    this.options = {};
+    this.options = {}
 
     // For Object.defineProperty setter / getter
-    let _from, _gasPrice, _gas, _data
+    let _from
+    let _gasPrice
+    let _gas
+    let _data
 
-    var lastArg = args[args.length - 1];
-    if(_.isObject(lastArg) && !_.isArray(lastArg)) {
-        options = lastArg;
-        this.options = _.extend(this.options, this._getOrSetDefaultOptions(options));
+    const lastArg = args[args.length - 1]
+    if (_.isObject(lastArg) && !_.isArray(lastArg)) {
+        options = lastArg
+        this.options = _.extend(this.options, this._getOrSetDefaultOptions(options))
 
-        if(_.isObject(address)) {
-            address = null;
+        if (_.isObject(address)) {
+            address = null
         }
     }
 
     // set address
     Object.defineProperty(this.options, 'address', {
-        set: function(value){
-            if(value) {
-                _this._address = utils.toChecksumAddress(formatters.inputAddressFormatter(value));
+        set(value) {
+            if (value) {
+                _this._address = utils.toChecksumAddress(formatters.inputAddressFormatter(value))
             }
         },
-        get: function(){
-            return _this._address;
+        get() {
+            return _this._address
         },
-        enumerable: true
-    });
+        enumerable: true,
+    })
 
     // add method and event signatures, when the jsonInterface gets set
     Object.defineProperty(this.options, 'jsonInterface', {
-        set: function(value){
-            _this.methods = {};
-            _this.events = {};
+        set(value) {
+            _this.methods = {}
+            _this.events = {}
 
             _this._jsonInterface = value.map(function(method) {
-                var func,
-                    funcName;
+                let func
+                let funcName
                 if (method.name) {
-                    funcName = utils._jsonInterfaceMethodToString(method);
+                    funcName = utils._jsonInterfaceMethodToString(method)
                 }
-
 
                 // function
                 if (method.type === 'function') {
-                    method.signature = abi.encodeFunctionSignature(funcName);
+                    method.signature = abi.encodeFunctionSignature(funcName)
                     func = _this._createTxObject.bind({
-                        method: method,
-                        parent: _this
-                    });
-
+                        method,
+                        parent: _this,
+                    })
 
                     // add method only if not one already exists
-                    if(!_this.methods[method.name]) {
-                        _this.methods[method.name] = func;
+                    if (!_this.methods[method.name]) {
+                        _this.methods[method.name] = func
                     } else {
-                        var cascadeFunc = _this._createTxObject.bind({
-                            method: method,
+                        const cascadeFunc = _this._createTxObject.bind({
+                            method,
                             parent: _this,
-                            nextMethod: _this.methods[method.name]
-                        });
-                        _this.methods[method.name] = cascadeFunc;
+                            nextMethod: _this.methods[method.name],
+                        })
+                        _this.methods[method.name] = cascadeFunc
                     }
 
                     // definitely add the method based on its signature
-                    _this.methods[method.signature] = func;
+                    _this.methods[method.signature] = func
 
                     // add method by name
-                    _this.methods[funcName] = func;
+                    _this.methods[funcName] = func
 
-                // event
+                    // event
                 } else if (method.type === 'event') {
-                    method.signature = abi.encodeEventSignature(funcName);
-                    var event = _this._on.bind(_this, method.signature);
+                    method.signature = abi.encodeEventSignature(funcName)
+                    const event = _this._on.bind(_this, method.signature)
 
                     // add method only if not already exists
-                    if(!_this.events[method.name] || _this.events[method.name].name === 'bound ')
-                        _this.events[method.name] = event;
+                    if (!_this.events[method.name] || _this.events[method.name].name === 'bound ') {
+                        _this.events[method.name] = event
+                    }
 
                     // definitely add the method based on its signature
-                    _this.events[method.signature] = event;
+                    _this.events[method.signature] = event
 
                     // add event by name
-                    _this.events[funcName] = event;
+                    _this.events[funcName] = event
                 }
 
-
-                return method;
-            });
+                return method
+            })
 
             // add allEvents
-            _this.events.allEvents = _this._on.bind(_this, 'allevents');
+            _this.events.allEvents = _this._on.bind(_this, 'allevents')
 
-            return _this._jsonInterface;
+            return _this._jsonInterface
         },
-        get: function(){
-            return _this._jsonInterface;
+        get() {
+            return _this._jsonInterface
         },
-        enumerable: true
-    });
+        enumerable: true,
+    })
 
     // get default account from the Class
-    var defaultAccount = this.constructor.defaultAccount;
-    var defaultBlock = this.constructor.defaultBlock || 'latest';
+    let { defaultAccount } = this.constructor
+    let defaultBlock = this.constructor.defaultBlock || 'latest'
 
     Object.defineProperty(this, 'defaultAccount', {
-        get: function () {
-            return defaultAccount;
+        get() {
+            return defaultAccount
         },
-        set: function (val) {
-            if(val) {
-                defaultAccount = utils.toChecksumAddress(formatters.inputAddressFormatter(val));
+        set(val) {
+            if (val) {
+                defaultAccount = utils.toChecksumAddress(formatters.inputAddressFormatter(val))
             }
 
-            return val;
+            return val
         },
-        enumerable: true
-    });
+        enumerable: true,
+    })
     Object.defineProperty(this, 'defaultBlock', {
-        get: function () {
-            return defaultBlock;
+        get() {
+            return defaultBlock
         },
-        set: function (val) {
-          if (!utils.isValidBlockNumberCandidate(val)) {
-            throw(new Error('Invalid default block number.'))
-            return
-          }
-          defaultBlock = val
+        set(val) {
+            if (!utils.isValidBlockNumberCandidate(val)) {
+                throw new Error('Invalid default block number.')
+            }
+            defaultBlock = val
 
-          return val
+            return val
         },
-        enumerable: true
-    });
+        enumerable: true,
+    })
 
     // Check for setting options property.
     Object.defineProperty(this.options, 'from', {
-        set: function (value) {
-          if (value) {
-            _this._from = utils.toChecksumAddress(formatters.inputAddressFormatter(value))
-          }
+        set(value) {
+            if (value) {
+                _this._from = utils.toChecksumAddress(formatters.inputAddressFormatter(value))
+            }
         },
-        get: function () {
-          return _this._from
+        get() {
+            return _this._from
         },
         enumerable: true,
     })
 
     Object.defineProperty(this.options, 'gasPrice', {
-        set: function (value) {
-          if (value) {
-            if (!utils.isValidNSHSN(value))
-              throw errors.invalidGasPrice()
-            _this._gasPrice = value
-          }
+        set(value) {
+            if (value) {
+                if (!utils.isValidNSHSN(value)) {
+                    throw errors.invalidGasPrice()
+                }
+                _this._gasPrice = value
+            }
         },
-        get: function () {
-          return _this._gasPrice
+        get() {
+            return _this._gasPrice
         },
         enumerable: true,
     })
 
     Object.defineProperty(this.options, 'gas', {
-        set: function (value) {
-          if (value) {
-            if (!utils.isValidNSHSN(value)) throw errors.invalidGasLimit()
-            _this._gas = value
-          }
+        set(value) {
+            if (value) {
+                if (!utils.isValidNSHSN(value)) throw errors.invalidGasLimit()
+                _this._gas = value
+            }
         },
-        get: function () {
-          return _this._gas
+        get() {
+            return _this._gas
         },
         enumerable: true,
     })
 
     Object.defineProperty(this.options, 'data', {
-        set: function (value) {
-          if (value) {
-            if (!utils.isHexStrict(value)) throw errors.invalidData()
-            _this._data = value
-          }
+        set(value) {
+            if (value) {
+                if (!utils.isHexStrict(value)) throw errors.invalidData()
+                _this._data = value
+            }
         },
-        get: function () {
-          return _this._data
+        get() {
+            return _this._data
         },
         enumerable: true,
     })
 
     // properties
-    this.methods = {};
-    this.events = {};
+    this.methods = {}
+    this.events = {}
 
-    this._address = null;
-    this._jsonInterface = [];
+    this._address = null
+    this._jsonInterface = []
 
     // set getter/setter properties
-    this.options.address = address;
-    this.options.jsonInterface = jsonInterface;
-
-};
+    this.options.address = address
+    this.options.jsonInterface = jsonInterface
+}
 
 Contract.setProvider = function(provider, accounts) {
     // Contract.currentProvider = provider;
-    core.packageInit(this, [provider]);
+    core.packageInit(this, [provider])
 
-    this._klayAccounts = accounts;
-};
+    this._klayAccounts = accounts
+}
 
-Contract.prototype.addAccounts = function (accounts) {
-  this._klayAccounts = accounts
+Contract.prototype.addAccounts = function(accounts) {
+    this._klayAccounts = accounts
 }
 
 /**
@@ -298,9 +295,9 @@ Contract.prototype.addAccounts = function (accounts) {
  */
 Contract.prototype._getCallback = function getCallback(args) {
     if (args && _.isFunction(args[args.length - 1])) {
-        return args.pop(); // modify the args array!
+        return args.pop() // modify the args array!
     }
-};
+}
 
 /**
  * Checks that no listener with name "newListener" or "removeListener" is added.
@@ -314,12 +311,11 @@ Contract.prototype._getCallback = function getCallback(args) {
  * this._checkListener('newListener', subOptions.event.name, subOptions.callback);
  * this._checkListener('removeListener', subOptions.event.name, subOptions.callback);
  */
-Contract.prototype._checkListener = function(type, event){
-    if(event === type) {
-        throw new Error('The event "'+ type +'" is a reserved event name, you can\'t use it.');
+Contract.prototype._checkListener = function(type, event) {
+    if (event === type) {
+        throw new Error(`The event "${type}" is a reserved event name, you can't use it.`)
     }
-};
-
+}
 
 /**
  * Use default values, if options are not available
@@ -329,25 +325,24 @@ Contract.prototype._checkListener = function(type, event){
  * @return {Object} the options with gaps filled by defaults
  */
 Contract.prototype._getOrSetDefaultOptions = function getOrSetDefaultOptions(options) {
-    var gasPrice = options.gasPrice ? String(options.gasPrice): null;
-    var from = options.from ? utils.toChecksumAddress(formatters.inputAddressFormatter(options.from)) : null;
+    const gasPrice = options.gasPrice ? String(options.gasPrice) : null
+    const from = options.from ? utils.toChecksumAddress(formatters.inputAddressFormatter(options.from)) : null
 
-    options.data = options.data || this.options.data;
+    options.data = options.data || this.options.data
 
-    options.from = from || this.options.from;
-    options.gasPrice = gasPrice || this.options.gasPrice;
+    options.from = from || this.options.from
+    options.gasPrice = gasPrice || this.options.gasPrice
 
     // If options.gas isn't set manually, use options.gasLimit, this.options.gas instead.
     if (typeof options.gas === 'undefined') {
-      options.gas = options.gasLimit || this.options.gas
+        options.gas = options.gasLimit || this.options.gas
     }
 
     // TODO replace with only gasLimit?
-    delete options.gasLimit;
+    delete options.gasLimit
 
-    return options;
-};
-
+    return options
+}
 
 /**
  * Should be used to encode indexed params and options to one final object
@@ -383,55 +378,57 @@ Contract.prototype._getOrSetDefaultOptions = function getOrSetDefaultOptions(opt
  * - This would mean filtering for anonymous, specific events by name is not possible.
  * - keccak256("burned(address,uint)") = 0x0970ce1235167a71...
  */
-Contract.prototype._encodeEventABI = function (event, options) {
-    options = options || {};
-    var filter = options.filter || {},
-        result = {};
+Contract.prototype._encodeEventABI = function(event, options) {
+    options = options || {}
+    const filter = options.filter || {}
+    const result = {}
 
-    ['fromBlock', 'toBlock'].filter(function (f) {
-        return options[f] !== undefined;
-    }).forEach(function (f) {
-        result[f] = formatters.inputBlockNumberFormatter(options[f]);
-    });
+    ;['fromBlock', 'toBlock']
+        .filter(function(f) {
+            return options[f] !== undefined
+        })
+        .forEach(function(f) {
+            result[f] = formatters.inputBlockNumberFormatter(options[f])
+        })
 
     // use given topics
-    if(_.isArray(options.topics)) {
-        result.topics = options.topics;
-    // create topics based on filter
+    if (_.isArray(options.topics)) {
+        result.topics = options.topics
+        // create topics based on filter
     } else {
-        result.topics = [];
+        result.topics = []
 
         // add event signature
         if (event && !event.anonymous && event.name !== 'ALLEVENTS') {
-            result.topics.push(event.signature);
+            result.topics.push(event.signature)
         }
 
         // add event topics (indexed arguments)
         if (event.name !== 'ALLEVENTS') {
-            var indexedTopics = event.inputs
-            .filter(i => i.indexed === true)
-            .map(i => {
-              var value = filter[i.name]
-              if (!value) return null
+            const indexedTopics = event.inputs
+                .filter(i => i.indexed === true)
+                .map(i => {
+                    const value = filter[i.name]
+                    if (!value) return null
 
-              // TODO: https://github.com/ethereum/web3.js/issues/344
+                    // TODO: https://github.com/ethereum/web3.js/issues/344
 
-              if (_.isArray(value)) {
-                return value.map((v) => abi.encodeParameter(i.type, v))
-              }
-              return abi.encodeParameter(i.type, value)
-            })
+                    if (_.isArray(value)) {
+                        return value.map(v => abi.encodeParameter(i.type, v))
+                    }
+                    return abi.encodeParameter(i.type, value)
+                })
 
-            result.topics = result.topics.concat(indexedTopics);
+            result.topics = result.topics.concat(indexedTopics)
         }
         if (!result.topics.length) delete result.topics
     }
-    if(this.options.address) {
-        result.address = this.options.address.toLowerCase();
+    if (this.options.address) {
+        result.address = this.options.address.toLowerCase()
     }
 
-    return result;
-};
+    return result
+}
 
 /**
  * Should be used to decode indexed params and options
@@ -441,45 +438,44 @@ Contract.prototype._encodeEventABI = function (event, options) {
  * @return {Object} result object with decoded indexed && not indexed params
  */
 
-Contract.prototype._decodeEventABI = function (data) {
-    var event = this;
+Contract.prototype._decodeEventABI = function(data) {
+    let event = this
 
-    data.data = data.data || '';
-    data.topics = data.topics || [];
-    var result = formatters.outputLogFormatter(data);
+    data.data = data.data || ''
+    data.topics = data.topics || []
+    const result = formatters.outputLogFormatter(data)
 
     // if allEvents get the right event
-    if(event.name === 'ALLEVENTS') {
-        event = event.jsonInterface.find(function (intf) {
-            return (intf.signature === data.topics[0]);
-        }) || {anonymous: true};
+    if (event.name === 'ALLEVENTS') {
+        event = event.jsonInterface.find(function(intf) {
+            return intf.signature === data.topics[0]
+        }) || { anonymous: true }
     }
 
     // create empty inputs if none are present (e.g. anonymous events on allEvents)
-    event.inputs = event.inputs || [];
+    event.inputs = event.inputs || []
 
-    var argTopics = event.anonymous ? data.topics : data.topics.slice(1);
+    const argTopics = event.anonymous ? data.topics : data.topics.slice(1)
 
-    result.returnValues = abi.decodeLog(event.inputs, data.data, argTopics);
-    delete result.returnValues.__length__;
+    result.returnValues = abi.decodeLog(event.inputs, data.data, argTopics)
+    delete result.returnValues.__length__
 
     // add name
-    result.event = event.name;
+    result.event = event.name
 
     // add signature
-    result.signature = (event.anonymous || !data.topics[0]) ? null : data.topics[0];
+    result.signature = event.anonymous || !data.topics[0] ? null : data.topics[0]
 
     // move the data and topics to "raw"
     result.raw = {
         data: result.data,
-        topics: result.topics
-    };
-    delete result.data;
-    delete result.topics;
+        topics: result.topics,
+    }
+    delete result.data
+    delete result.topics
 
-
-    return result;
-};
+    return result
+}
 
 /**
  * Encodes an ABI for a method, including signature or the method.
@@ -490,47 +486,56 @@ Contract.prototype._decodeEventABI = function (data) {
  * @param {String} the encoded ABI
  */
 Contract.prototype._encodeMethodABI = function _encodeMethodABI() {
-    var methodSignature = this._method.signature,
-        args = this.arguments || [];
+    const methodSignature = this._method.signature
+    const args = this.arguments || []
 
-    var signature = false,
-        paramsABI = this._parent.options.jsonInterface.filter(function (json) {
-            return ((methodSignature === 'constructor' && json.type === methodSignature) ||
-                ((json.signature === methodSignature || json.signature === methodSignature.replace('0x','') || json.name === methodSignature) && json.type === 'function'));
-        }).map(function (json) {
-            var inputLength = (_.isArray(json.inputs)) ? json.inputs.length : 0;
+    let signature = false
+    const paramsABI =
+        this._parent.options.jsonInterface
+            .filter(function(json) {
+                return (
+                    (methodSignature === 'constructor' && json.type === methodSignature) ||
+                    ((json.signature === methodSignature ||
+                        json.signature === methodSignature.replace('0x', '') ||
+                        json.name === methodSignature) &&
+                        json.type === 'function')
+                )
+            })
+            .map(function(json) {
+                const inputLength = _.isArray(json.inputs) ? json.inputs.length : 0
 
-            if (inputLength !== args.length) {
-                throw new Error('The number of arguments is not matching the methods required number. You need to pass '+ inputLength +' arguments.');
-            }
-            if (json.type === 'function') {
-                signature = json.signature;
-            }
-            return _.isArray(json.inputs) ? json.inputs : [];
-        }).map(function (inputs) {
-            return abi.encodeParameters(inputs, args).replace('0x','');
-        })[0] || ''; 
+                if (inputLength !== args.length) {
+                    throw new Error(
+                        `The number of arguments is not matching the methods required number. You need to pass ${inputLength} arguments.`
+                    )
+                }
+                if (json.type === 'function') {
+                    signature = json.signature
+                }
+                return _.isArray(json.inputs) ? json.inputs : []
+            })
+            .map(function(inputs) {
+                return abi.encodeParameters(inputs, args).replace('0x', '')
+            })[0] || ''
 
     // return constructor
-    if(methodSignature === 'constructor') {
-        if(!this._deployData)
-            throw new Error('The contract has no contract data option set. This is necessary to append the constructor parameters.');
-
-        return this._deployData + paramsABI;
-
-    // return method
-    } else {
-        var returnValue = (signature) ? signature + paramsABI : paramsABI;
-
-        if(!returnValue) {
-            throw new Error('Couldn\'t find a matching contract method named "'+ this._method.name +'".');
-        } else {
-            return returnValue;
+    if (methodSignature === 'constructor') {
+        if (!this._deployData) {
+            throw new Error('The contract has no contract data option set. This is necessary to append the constructor parameters.')
         }
+
+        return this._deployData + paramsABI
+
+        // return method
     }
+    const returnValue = signature ? signature + paramsABI : paramsABI
 
-};
-
+    if (!returnValue) {
+        throw new Error(`Couldn't find a matching contract method named "${this._method.name}".`)
+    } else {
+        return returnValue
+    }
+}
 
 /**
  * Decode method return values
@@ -540,22 +545,20 @@ Contract.prototype._encodeMethodABI = function _encodeMethodABI() {
  * @param {String} returnValues
  * @return {Object} decoded output return values
  */
-Contract.prototype._decodeMethodReturn = function (outputs, returnValues) {
+Contract.prototype._decodeMethodReturn = function(outputs, returnValues) {
     if (!returnValues) {
-        return null;
+        return null
     }
 
-    returnValues = returnValues.length >= 2 ? returnValues.slice(2) : returnValues;
-    var result = abi.decodeParameters(outputs, returnValues);
+    returnValues = returnValues.length >= 2 ? returnValues.slice(2) : returnValues
+    const result = abi.decodeParameters(outputs, returnValues)
 
     if (result.__length__ === 1) {
-        return result[0];
-    } else {
-        delete result.__length__;
-        return result;
+        return result[0]
     }
-};
-
+    delete result.__length__
+    return result
+}
 
 /**
  * Deploys a contract and fire events based on its state: transactionHash, receipt
@@ -568,31 +571,38 @@ Contract.prototype._decodeMethodReturn = function (outputs, returnValues) {
  * @return {Object} EventEmitter possible events are "error", "transactionHash" and "receipt"
  */
 
-Contract.prototype.deploy = function(options, callback){
-    options = options || {};
+Contract.prototype.deploy = function(options, callback) {
+    options = options || {}
 
-    options.arguments = options.arguments || [];
-    options = this._getOrSetDefaultOptions(options);
-
+    options.arguments = options.arguments || []
+    options = this._getOrSetDefaultOptions(options)
 
     // return error, if no "data" is specified
-    if(!options.data) {
-        return utils._fireError(new Error('No "data" specified in neither the given options, nor the default options.'), null, null, callback);
+    if (!options.data) {
+        return utils._fireError(
+            new Error('No "data" specified in neither the given options, nor the default options.'),
+            null,
+            null,
+            callback
+        )
     }
 
-    var constructor = _.find(this.options.jsonInterface, function (method) {
-        return (method.type === 'constructor');
-    }) || {};
-    constructor.signature = 'constructor';
+    const constructor =
+        _.find(this.options.jsonInterface, function(method) {
+            return method.type === 'constructor'
+        }) || {}
+    constructor.signature = 'constructor'
 
-    return this._createTxObject.apply({
-        method: constructor,
-        parent: this,
-        deployData: options.data,
-        _klayAccounts: this.constructor._klayAccounts
-    }, options.arguments);
-
-};
+    return this._createTxObject.apply(
+        {
+            method: constructor,
+            parent: this,
+            deployData: options.data,
+            _klayAccounts: this.constructor._klayAccounts,
+        },
+        options.arguments
+    )
+}
 
 /**
  * Gets the event signature and outputformatters
@@ -604,36 +614,39 @@ Contract.prototype.deploy = function(options, callback){
  * @return {Object} the event options object
  */
 Contract.prototype._generateEventOptions = function() {
-    var args = Array.prototype.slice.call(arguments);
+    const args = Array.prototype.slice.call(arguments)
 
     // get the callback
-    var callback = this._getCallback(args);
+    const callback = this._getCallback(args)
 
     // get the options
-    var options = (_.isObject(args[args.length - 1])) ? args.pop() : {};
+    const options = _.isObject(args[args.length - 1]) ? args.pop() : {}
 
-    var event = (_.isString(args[0])) ? args[0] : 'allevents';
-    event = (event.toLowerCase() === 'allevents') ? {
-            name: 'ALLEVENTS',
-            jsonInterface: this.options.jsonInterface 
-        } : this.options.jsonInterface.find(function (json) {
-            return (json.type === 'event' && (json.name === event || json.signature === '0x'+ event.replace('0x','')));
-        });
+    let event = _.isString(args[0]) ? args[0] : 'allevents'
+    event =
+        event.toLowerCase() === 'allevents'
+            ? {
+                  name: 'ALLEVENTS',
+                  jsonInterface: this.options.jsonInterface,
+              }
+            : this.options.jsonInterface.find(function(json) {
+                  return json.type === 'event' && (json.name === event || json.signature === `0x${event.replace('0x', '')}`)
+              })
 
     if (!event) {
-        throw new Error('Event "' + event.name + '" doesn\'t exist in this contract.');
+        throw new Error(`Event "${event.name}" doesn't exist in this contract.`)
     }
 
     if (!utils.isAddress(this.options.address)) {
-        throw new Error('This contract object doesn\'t have address set yet, please set an address first.');
+        throw new Error("This contract object doesn't have address set yet, please set an address first.")
     }
 
     return {
         params: this._encodeEventABI(event, options),
-        event: event,
-        callback: callback
-    };
-};
+        event,
+        callback,
+    }
+}
 
 /**
  * Adds event listeners and creates a subscription, and remove it once its fired.
@@ -642,9 +655,8 @@ Contract.prototype._generateEventOptions = function() {
  * @return {Object} the event subscription
  */
 Contract.prototype.clone = function() {
-    return new this.constructor(this.options.jsonInterface, this.options.address, this.options);
-};
-
+    return new this.constructor(this.options.jsonInterface, this.options.address, this.options)
+}
 
 /**
  * Adds event listeners and creates a subscription, and remove it once its fired.
@@ -684,29 +696,30 @@ Contract.prototype.clone = function() {
   }
  */
 Contract.prototype.once = function(event, options, callback) {
-    var args = Array.prototype.slice.call(arguments);
+    const args = Array.prototype.slice.call(arguments)
 
     // get the callback
-    callback = this._getCallback(args);
+    callback = this._getCallback(args)
 
     if (!callback) {
-        throw new Error('Once requires a callback as the second parameter.');
+        throw new Error('Once requires a callback as the second parameter.')
     }
 
     // don't allow fromBlock
-    if (options)
-        delete options.fromBlock;
+    if (options) {
+        delete options.fromBlock
+    }
 
     // don't return as once shouldn't provide "on"
-    this._on(event, options, function (err, res, sub) {
-        sub.unsubscribe();
-        if (_.isFunction(callback)){
-            callback(err, res, sub);
+    this._on(event, options, function(err, res, sub) {
+        sub.unsubscribe()
+        if (_.isFunction(callback)) {
+            callback(err, res, sub)
         }
-    });
+    })
 
-    return undefined;
-};
+    return undefined
+}
 
 /**
  * Adds event listeners and creates a subscription.
@@ -717,36 +730,36 @@ Contract.prototype.once = function(event, options, callback) {
  * @param {Function} callback
  * @return {Object} the event subscription
  */
-Contract.prototype._on = function(){
-    var subOptions = this._generateEventOptions.apply(this, arguments);
-
+Contract.prototype._on = function() {
+    const subOptions = this._generateEventOptions.apply(this, arguments)
 
     // prevent the event "newListener" and "removeListener" from being overwritten
-    this._checkListener('newListener', subOptions.event.name, subOptions.callback);
-    this._checkListener('removeListener', subOptions.event.name, subOptions.callback);
+    this._checkListener('newListener', subOptions.event.name, subOptions.callback)
+    this._checkListener('removeListener', subOptions.event.name, subOptions.callback)
 
     // TODO check if listener already exists? and reuse subscription if options are the same.
 
-    var subscription = new Subscription({
+    const subscription = new Subscription({
         subscription: {
             params: 1,
             inputFormatter: [formatters.inputLogFormatter],
             outputFormatter: this._decodeEventABI.bind(subOptions.event),
             // DUBLICATE, also in caver-klay
-            subscriptionHandler: function (output) {
+            subscriptionHandler(output) {
                 this.emit('data', output)
 
-                if (_.isFunction(this.callback))
-                  this.callback(null, output, this)
-            }
+                if (_.isFunction(this.callback)) {
+                    this.callback(null, output, this)
+                }
+            },
         },
         type: 'klay',
-        requestManager: this._requestManager
-    });
-    subscription.subscribe('logs', subOptions.params, subOptions.callback || function () {});
+        requestManager: this._requestManager,
+    })
+    subscription.subscribe('logs', subOptions.params, subOptions.callback || function() {})
 
-    return subscription;
-};
+    return subscription
+}
 
 /**
  * Get past events from contracts
@@ -790,24 +803,23 @@ Contract.prototype._on = function(){
       ...
   }]
  */
-Contract.prototype.getPastEvents = function(){
-    var subOptions = this._generateEventOptions.apply(this, arguments);
+Contract.prototype.getPastEvents = function() {
+    const subOptions = this._generateEventOptions.apply(this, arguments)
 
-    var getPastLogs = new Method({
+    let getPastLogs = new Method({
         name: 'getPastLogs',
         call: 'klay_getLogs',
         params: 1,
         inputFormatter: [formatters.inputLogFormatter],
-        outputFormatter: this._decodeEventABI.bind(subOptions.event)
-    });
-    getPastLogs.setRequestManager(this._requestManager);
-    var call = getPastLogs.buildCall();
+        outputFormatter: this._decodeEventABI.bind(subOptions.event),
+    })
+    getPastLogs.setRequestManager(this._requestManager)
+    const call = getPastLogs.buildCall()
 
-    getPastLogs = null;
+    getPastLogs = null
 
-    return call(subOptions.params, subOptions.callback);
-};
-
+    return call(subOptions.params, subOptions.callback)
+}
 
 /**
  * returns the an object with call, send, estimate functions
@@ -816,41 +828,38 @@ Contract.prototype.getPastEvents = function(){
  * @returns {Object} an object with functions to call the methods
  */
 
-Contract.prototype._createTxObject =  function _createTxObject(){
-    var args = Array.prototype.slice.call(arguments);
-    var txObject = {};
+Contract.prototype._createTxObject = function _createTxObject() {
+    const args = Array.prototype.slice.call(arguments)
+    const txObject = {}
 
-    if(this.method.type === 'function') {
-
-        txObject.call = this.parent._executeMethod.bind(txObject, 'call');
-        txObject.call.request = this.parent._executeMethod.bind(txObject, 'call', true); // to make batch requests
-
+    if (this.method.type === 'function') {
+        txObject.call = this.parent._executeMethod.bind(txObject, 'call')
+        txObject.call.request = this.parent._executeMethod.bind(txObject, 'call', true) // to make batch requests
     }
 
-    txObject.send = this.parent._executeMethod.bind(txObject, 'send');
-    txObject.send.request = this.parent._executeMethod.bind(txObject, 'send', true); // to make batch requests
-    txObject.encodeABI = this.parent._encodeMethodABI.bind(txObject);
-    txObject.estimateGas = this.parent._executeMethod.bind(txObject, 'estimate');
+    txObject.send = this.parent._executeMethod.bind(txObject, 'send')
+    txObject.send.request = this.parent._executeMethod.bind(txObject, 'send', true) // to make batch requests
+    txObject.encodeABI = this.parent._encodeMethodABI.bind(txObject)
+    txObject.estimateGas = this.parent._executeMethod.bind(txObject, 'estimate')
 
     if (args && this.method.inputs && args.length !== this.method.inputs.length) {
         if (this.nextMethod) {
-            return this.nextMethod.apply(null, args);
+            return this.nextMethod.apply(null, args)
         }
-        throw errors.InvalidNumberOfParams(args.length, this.method.inputs.length, this.method.name);
+        throw errors.InvalidNumberOfParams(args.length, this.method.inputs.length, this.method.name)
     }
 
-    txObject.arguments = args || [];
-    txObject._method = this.method;
-    txObject._parent = this.parent;
-    txObject._klayAccounts = this.parent.constructor._klayAccounts || this._klayAccounts;
+    txObject.arguments = args || []
+    txObject._method = this.method
+    txObject._parent = this.parent
+    txObject._klayAccounts = this.parent.constructor._klayAccounts || this._klayAccounts
 
-    if(this.deployData) {
-        txObject._deployData = this.deployData;
+    if (this.deployData) {
+        txObject._deployData = this.deployData
     }
 
-    return txObject;
-};
-
+    return txObject
+}
 
 /**
  * Generates the options for the execute call
@@ -860,39 +869,52 @@ Contract.prototype._createTxObject =  function _createTxObject(){
  * @param {Promise} defer
  */
 Contract.prototype._processExecuteArguments = function _processExecuteArguments(args, defer) {
-    var processedArgs = {};
+    const processedArgs = {}
 
-    processedArgs.type = args.shift();
+    processedArgs.type = args.shift()
 
     // get the callback
-    processedArgs.callback = this._parent._getCallback(args);
+    processedArgs.callback = this._parent._getCallback(args)
 
     // get block number to use for call
-    if(processedArgs.type === 'call' && args[args.length - 1] !== true && (_.isString(args[args.length - 1]) || isFinite(args[args.length - 1])))
-        processedArgs.defaultBlock = args.pop();
+    if (
+        processedArgs.type === 'call' &&
+        args[args.length - 1] !== true &&
+        (_.isString(args[args.length - 1]) || isFinite(args[args.length - 1]))
+    ) {
+        processedArgs.defaultBlock = args.pop()
+    }
 
     // get the options
-    processedArgs.options = (_.isObject(args[args.length - 1])) ? args.pop() : {};
+    processedArgs.options = _.isObject(args[args.length - 1]) ? args.pop() : {}
 
     // get the generateRequest argument for batch requests
-    processedArgs.generateRequest = (args[args.length - 1] === true)? args.pop() : false;
+    processedArgs.generateRequest = args[args.length - 1] === true ? args.pop() : false
 
-    processedArgs.options = this._parent._getOrSetDefaultOptions(processedArgs.options);
-    processedArgs.options.data = this.encodeABI();
+    processedArgs.options = this._parent._getOrSetDefaultOptions(processedArgs.options)
+    processedArgs.options.data = this.encodeABI()
 
     // add contract address
-    if(!this._deployData && !utils.isAddress(this._parent.options.address))
-        throw new Error('This contract object doesn\'t have address set yet, please set an address first.');
+    if (!this._deployData && !utils.isAddress(this._parent.options.address)) {
+        throw new Error("This contract object doesn't have address set yet, please set an address first.")
+    }
 
-    if(!this._deployData)
-        processedArgs.options.to = this._parent.options.address;
+    if (!this._deployData) {
+        processedArgs.options.to = this._parent.options.address
+    }
 
     // return error, if no "data" is specified
-    if(!processedArgs.options.data)
-        return utils._fireError(new Error('Couldn\'t find a matching contract method, or the number of parameters is wrong.'), defer.eventEmitter, defer.reject, processedArgs.callback);
+    if (!processedArgs.options.data) {
+        return utils._fireError(
+            new Error("Couldn't find a matching contract method, or the number of parameters is wrong."),
+            defer.eventEmitter,
+            defer.reject,
+            processedArgs.callback
+        )
+    }
 
-    return processedArgs;
-};
+    return processedArgs
+}
 
 /**
  * Executes a call, transact or estimateGas on a contract function
@@ -902,167 +924,168 @@ Contract.prototype._processExecuteArguments = function _processExecuteArguments(
  * @param {Boolean} makeRequest if true, it simply returns the request parameters, rather than executing it
  */
 
-Contract.prototype._executeMethod = function _executeMethod(){
-    var _this = this,
-        args = this._parent._processExecuteArguments.call(this, Array.prototype.slice.call(arguments), defer),
-        defer = utils.promiEvent((args.type !== 'send')),
-        klayAccounts = _this.constructor._klayAccounts || _this._klayAccounts;
+Contract.prototype._executeMethod = function _executeMethod() {
+    const _this = this
+    const args = this._parent._processExecuteArguments.call(this, Array.prototype.slice.call(arguments), defer)
+    var defer = utils.promiEvent(args.type !== 'send') /* eslint-disable-line no-var */
+    const klayAccounts = _this.constructor._klayAccounts || _this._klayAccounts
 
     // Not allow to specify options.gas to 0.
     if (args.options && args.options.gas === 0) {
-      throw errors.notAllowedZeroGas()
+        throw errors.notAllowedZeroGas()
     }
 
     // simple return request for batch requests
-    if(args.generateRequest) {
-
-        var payload = {
+    if (args.generateRequest) {
+        const payload = {
             params: [formatters.inputCallFormatter.call(this._parent, args.options)],
-            callback: args.callback
-        };
-
-        if(args.type === 'call') {
-            payload.params.push(formatters.inputDefaultBlockNumberFormatter.call(this._parent, args.defaultBlock));
-            payload.method = 'klay_call';
-            payload.format = this._parent._decodeMethodReturn.bind(null, this._method.outputs);
-        } else {
-            payload.method = 'klay_sendTransaction';
+            callback: args.callback,
         }
 
-        return payload;
+        if (args.type === 'call') {
+            payload.params.push(formatters.inputDefaultBlockNumberFormatter.call(this._parent, args.defaultBlock))
+            payload.method = 'klay_call'
+            payload.format = this._parent._decodeMethodReturn.bind(null, this._method.outputs)
+        } else {
+            payload.method = 'klay_sendTransaction'
+        }
 
-    } else {
+        return payload
+    }
+    switch (args.type) {
+        case 'estimate':
+            const estimateGas = new Method({
+                name: 'estimateGas',
+                call: 'klay_estimateGas',
+                params: 1,
+                inputFormatter: [formatters.inputCallFormatter],
+                outputFormatter: utils.hexToNumber,
+                requestManager: _this._parent._requestManager,
+                accounts: klayAccounts, // is klay.accounts (necessary for wallet signing)
+                defaultAccount: _this._parent.defaultAccount,
+                defaultBlock: _this._parent.defaultBlock,
+            }).createFunction()
 
-        switch (args.type) {
-            case 'estimate':
+            return estimateGas(args.options, args.callback)
 
-                var estimateGas = (new Method({
-                    name: 'estimateGas',
-                    call: 'klay_estimateGas',
-                    params: 1,
-                    inputFormatter: [formatters.inputCallFormatter],
-                    outputFormatter: utils.hexToNumber,
-                    requestManager: _this._parent._requestManager,
-                    accounts: klayAccounts, // is klay.accounts (necessary for wallet signing)
-                    defaultAccount: _this._parent.defaultAccount,
-                    defaultBlock: _this._parent.defaultBlock
-                })).createFunction();
+        case 'call':
+            // TODO check errors: missing "from" should give error on deploy and send, call ?
 
-                return estimateGas(args.options, args.callback);
+            const call = new Method({
+                name: 'call',
+                call: 'klay_call',
+                params: 2,
+                inputFormatter: [formatters.inputCallFormatter, formatters.inputDefaultBlockNumberFormatter],
+                // add output formatter for decoding
+                outputFormatter(result) {
+                    return _this._parent._decodeMethodReturn(_this._method.outputs, result)
+                },
+                requestManager: _this._parent._requestManager,
+                accounts: klayAccounts, // is klay.accounts (necessary for wallet signing)
+                defaultAccount: _this._parent.defaultAccount,
+                defaultBlock: _this._parent.defaultBlock,
+            }).createFunction()
 
-            case 'call':
+            return call(args.options, args.defaultBlock, args.callback)
 
-                // TODO check errors: missing "from" should give error on deploy and send, call ?
+        case 'send':
+            // return error, if no "from" is specified
+            if (!utils.isAddress(args.options.from)) {
+                return utils._fireError(
+                    new Error('No "from" address specified in neither the given options, nor the default options.'),
+                    defer.eventEmitter,
+                    defer.reject,
+                    args.callback
+                )
+            }
 
-                var call = (new Method({
-                    name: 'call',
-                    call: 'klay_call',
-                    params: 2,
-                    inputFormatter: [formatters.inputCallFormatter, formatters.inputDefaultBlockNumberFormatter],
-                    // add output formatter for decoding
-                    outputFormatter: function (result) {
-                        return _this._parent._decodeMethodReturn(_this._method.outputs, result);
-                    },
-                    requestManager: _this._parent._requestManager,
-                    accounts: klayAccounts, // is klay.accounts (necessary for wallet signing)
-                    defaultAccount: _this._parent.defaultAccount,
-                    defaultBlock: _this._parent.defaultBlock
-                })).createFunction();
+            if (_.isBoolean(this._method.payable) && !this._method.payable && args.options.value && args.options.value > 0) {
+                return utils._fireError(
+                    new Error('Can not send value to non-payable contract method or constructor'),
+                    defer.eventEmitter,
+                    defer.reject,
+                    args.callback
+                )
+            }
 
-                return call(args.options, args.defaultBlock, args.callback);
-
-            case 'send':
-
-                // return error, if no "from" is specified
-                if(!utils.isAddress(args.options.from)) {
-                    return utils._fireError(new Error('No "from" address specified in neither the given options, nor the default options.'), defer.eventEmitter, defer.reject, args.callback);
-                }
-
-                if (_.isBoolean(this._method.payable) && !this._method.payable && args.options.value && args.options.value > 0) {
-                    return utils._fireError(new Error('Can not send value to non-payable contract method or constructor'), defer.eventEmitter, defer.reject, args.callback);
-                }
-
-
-                // make sure receipt logs are decoded
-                var extraFormatters = {
-                    receiptFormatter: function (receipt) {
-                        if (_.isArray(receipt.logs)) {
-
-                            // decode logs
-                            var events = _.map(receipt.logs, function(log) {
-                                return _this._parent._decodeEventABI.call({
+            // make sure receipt logs are decoded
+            const extraFormatters = {
+                receiptFormatter(receipt) {
+                    if (_.isArray(receipt.logs)) {
+                        // decode logs
+                        const events = _.map(receipt.logs, function(log) {
+                            return _this._parent._decodeEventABI.call(
+                                {
                                     name: 'ALLEVENTS',
-                                    jsonInterface: _this._parent.options.jsonInterface
-                                }, log);
-                            });
+                                    jsonInterface: _this._parent.options.jsonInterface,
+                                },
+                                log
+                            )
+                        })
 
-                            // make log names keys
-                            receipt.events = {};
-                            var count = 0;
-                            events.forEach(function (ev) {
-                                if (ev.event) {
-                                    // if > 1 of the same event, don't overwrite any existing events
-                                    if (receipt.events[ev.event]) {
-                                        if (Array.isArray(receipt.events[ ev.event ])) {
-                                            receipt.events[ ev.event ].push(ev);
-                                        } else {
-                                            receipt.events[ev.event] = [receipt.events[ev.event], ev];
-                                        }
+                        // make log names keys
+                        receipt.events = {}
+                        let count = 0
+                        events.forEach(function(ev) {
+                            if (ev.event) {
+                                // if > 1 of the same event, don't overwrite any existing events
+                                if (receipt.events[ev.event]) {
+                                    if (Array.isArray(receipt.events[ev.event])) {
+                                        receipt.events[ev.event].push(ev)
                                     } else {
-                                        receipt.events[ ev.event ] = ev;
+                                        receipt.events[ev.event] = [receipt.events[ev.event], ev]
                                     }
                                 } else {
-                                    receipt.events[count] = ev;
-                                    count++;
+                                    receipt.events[ev.event] = ev
                                 }
-                            });
+                            } else {
+                                receipt.events[count] = ev
+                                count++
+                            }
+                        })
 
-                            delete receipt.logs;
-                        }
-                        return receipt;
-                    },
-                    contractDeployFormatter: function (receipt) {
-                        var newContract = _this._parent.clone();
-                        newContract.options.address = receipt.contractAddress;
-                        return newContract;
+                        delete receipt.logs
                     }
-                };
+                    return receipt
+                },
+                contractDeployFormatter(receipt) {
+                    const newContract = _this._parent.clone()
+                    newContract.options.address = receipt.contractAddress
+                    return newContract
+                },
+            }
 
-                if(args.options.type === undefined) {
-                    if(this._deployData !== undefined){
-                        args.options.type = "SMART_CONTRACT_DEPLOY"
-                    }else {
-                        args.options.type = "SMART_CONTRACT_EXECUTION"
-                    }   
+            if (args.options.type === undefined) {
+                if (this._deployData !== undefined) {
+                    args.options.type = 'SMART_CONTRACT_DEPLOY'
+                } else {
+                    args.options.type = 'SMART_CONTRACT_EXECUTION'
                 }
+            }
 
-                if (args.options.type !== 'SMART_CONTRACT_EXECUTION' && args.options.type !== 'SMART_CONTRACT_DEPLOY') {
-                    throw new Error('Unsupported transaction type. Please use SMART_CONTRACT_EXECUTION or SMART_CONTRACT_DEPLOY.')
-                } 
+            if (args.options.type !== 'SMART_CONTRACT_EXECUTION' && args.options.type !== 'SMART_CONTRACT_DEPLOY') {
+                throw new Error('Unsupported transaction type. Please use SMART_CONTRACT_EXECUTION or SMART_CONTRACT_DEPLOY.')
+            }
 
-                var sendTransaction = (new Method({
-                    name: 'sendTransaction',
-                    call: 'klay_sendTransaction',
-                    params: 1,
-                    inputFormatter: [formatters.inputTransactionFormatter],
-                    requestManager: _this._parent._requestManager,
-                    accounts: _this.constructor._klayAccounts || _this._klayAccounts, // is klay.accounts (necessary for wallet signing)
-                    defaultAccount: _this._parent.defaultAccount,
-                    defaultBlock: _this._parent.defaultBlock,
-                    extraFormatters: extraFormatters
-                })).createFunction();
+            const sendTransaction = new Method({
+                name: 'sendTransaction',
+                call: 'klay_sendTransaction',
+                params: 1,
+                inputFormatter: [formatters.inputTransactionFormatter],
+                requestManager: _this._parent._requestManager,
+                accounts: _this.constructor._klayAccounts || _this._klayAccounts, // is klay.accounts (necessary for wallet signing)
+                defaultAccount: _this._parent.defaultAccount,
+                defaultBlock: _this._parent.defaultBlock,
+                extraFormatters,
+            }).createFunction()
 
-                const fromInWallet = sendTransaction.method.accounts.wallet[args.options.from.toLowerCase()]
-                if (!fromInWallet || !fromInWallet.privateKey) {
-                    args.options.type = 'LEGACY'
-                }
+            const fromInWallet = sendTransaction.method.accounts.wallet[args.options.from.toLowerCase()]
+            if (!fromInWallet || !fromInWallet.privateKey) {
+                args.options.type = 'LEGACY'
+            }
 
-                return sendTransaction(args.options, args.callback);
-
-        }
-
+            return sendTransaction(args.options, args.callback)
     }
+}
 
-};
-
-module.exports = Contract;
+module.exports = Contract

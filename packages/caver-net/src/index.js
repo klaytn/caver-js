@@ -24,21 +24,21 @@
  * @date 2017
  */
 
-var core = require('../../caver-core')
-var utils = require('../../caver-utils')
+const core = require('../../caver-core')
+const utils = require('../../caver-utils')
 const rpc = require('../../caver-rtm').rpc
 const Method = require('../../caver-core-method')
 
-var Net = function Net(...args) {
-  var _this = this
+const Net = function Net(...args) {
+    const _this = this
 
-  core.packageInit(this, args)
-  const rpcCalls = [rpc.net.getId, rpc.net.isListening, rpc.net.getPeerCount, rpc.net.peerCountByType]
-  rpcCalls.forEach(function(method) {
-    method = new Method(method)
-    method.attachToObject(_this)
-    method.setRequestManager(_this._requestManager)
-  })
+    core.packageInit(this, args)
+    const rpcCalls = [rpc.net.getId, rpc.net.isListening, rpc.net.getPeerCount, rpc.net.peerCountByType]
+    rpcCalls.forEach(function(method) {
+        method = new Method(method)
+        method.attachToObject(_this)
+        method.setRequestManager(_this._requestManager)
+    })
 }
 
 module.exports = Net

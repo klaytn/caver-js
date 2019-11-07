@@ -1,5 +1,5 @@
 /*
-    Modifications copyright 2018 The caver-js Authors    
+    Modifications copyright 2018 The caver-js Authors
     This file is part of web3.js.
 
     web3.js is free software: you can redistribute it and/or modify
@@ -27,9 +27,9 @@
  */
 
 // Initialize Jsonrpc as a simple object with utility functions.
-var Jsonrpc = {
-    messageId: 0
-};
+const Jsonrpc = {
+    messageId: 0,
+}
 
 /**
  * Should be called to valid json create payload object
@@ -39,37 +39,39 @@ var Jsonrpc = {
  * @param {Array} params, an array of method params, optional
  * @returns {Object} valid jsonrpc payload object
  */
-Jsonrpc.toPayload = function (method, params) {
+Jsonrpc.toPayload = function(method, params) {
     if (!method) {
-        throw new Error('JSONRPC method should be specified for params: "'+ JSON.stringify(params) +'"!');
+        throw new Error(`JSONRPC method should be specified for params: "${JSON.stringify(params)}"!`)
     }
 
-    Jsonrpc.messageId++;
+    Jsonrpc.messageId++
 
     return {
         jsonrpc: '2.0',
         id: Jsonrpc.messageId,
         method: method,
-        params: params || []
-    };
-};
-
-Jsonrpc.isValidResponse = function (response) {
-    return Array.isArray(response) ? response.every(validateSingleMessage) : validateSingleMessage(response);
-
-    function validateSingleMessage(message){
-        return !!message &&
-        !message.error &&
-        message.jsonrpc === '2.0' &&
-        (typeof message.id === 'number' || typeof message.id === 'string') &&
-        message.result !== undefined; // only undefined is not valid json object
+        params: params || [],
     }
-};
+}
 
-Jsonrpc.toBatchPayload = function (messages) {
-    return messages.map(function (message) {
-        return Jsonrpc.toPayload(message.method, message.params);
-    });
-};
+Jsonrpc.isValidResponse = function(response) {
+    return Array.isArray(response) ? response.every(validateSingleMessage) : validateSingleMessage(response)
 
-module.exports = Jsonrpc;
+    function validateSingleMessage(message) {
+        return (
+            !!message &&
+            !message.error &&
+            message.jsonrpc === '2.0' &&
+            (typeof message.id === 'number' || typeof message.id === 'string') &&
+            message.result !== undefined
+        ) // only undefined is not valid json object
+    }
+}
+
+Jsonrpc.toBatchPayload = function(messages) {
+    return messages.map(function(message) {
+        return Jsonrpc.toPayload(message.method, message.params)
+    })
+}
+
+module.exports = Jsonrpc
