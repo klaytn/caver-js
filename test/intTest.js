@@ -500,7 +500,11 @@ describe('Integration tests', () => {
         describe(`testing ${intf.name}`, () => {
             before(function(done) {
                 // Check version of solidity compiler before INT-SOL integration test
-                if (intf.name === 'INT-SOL') checkSolidityVersion().then(done)
+                if (intf.name === 'INT-SOL') {
+                    checkSolidityVersion().then(done)
+                } else {
+                    done()
+                }
             })
 
             const dir = path.join(__dirname, 'klaytn-integration-tests/', intf.name)
