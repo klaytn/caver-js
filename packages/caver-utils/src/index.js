@@ -43,47 +43,45 @@ const Iban = require('../iban')
  * @param {Function} callback
  * @return {Object} the emitter
  */
-var _fireError = function (error, emitter, reject, callback) {
+const _fireError = function(error, emitter, reject, callback) {
     // add data if given
-    if(_.isObject(error) && !(error instanceof Error) &&  error.data) {
-        if(_.isObject(error.data) || _.isArray(error.data)) {
+    if (_.isObject(error) && !(error instanceof Error) && error.data) {
+        if (_.isObject(error.data) || _.isArray(error.data)) {
             error.data = JSON.stringify(error.data, null, 2)
         }
 
-        error = error.message +"\n"+ error.data;
+        error = `${error.message}\n${error.data}`
     }
 
-    if(_.isString(error)) {
-        error = new Error(error);
+    if (_.isString(error)) {
+        error = new Error(error)
     }
 
     if (_.isFunction(callback)) {
-        callback(error);
+        callback(error)
     }
     if (_.isFunction(reject)) {
         // suppress uncatched error if an error listener is present
         // OR suppress uncatched error if an callback listener is present
-        if (emitter &&
-            (_.isFunction(emitter.listeners) &&
-            emitter.listeners('error').length) || _.isFunction(callback)) {
-            emitter.catch(function(){});
+        if ((emitter && (_.isFunction(emitter.listeners) && emitter.listeners('error').length)) || _.isFunction(callback)) {
+            emitter.catch(function() {})
         }
         // reject later, to be able to return emitter
-        setTimeout(function () {
-            reject(error);
-        }, 1);
+        setTimeout(function() {
+            reject(error)
+        }, 1)
     }
 
-    if(emitter && _.isFunction(emitter.emit)) {
+    if (emitter && _.isFunction(emitter.emit)) {
         // emit later, to be able to return emitter
-        setTimeout(function () {
-            emitter.emit('error', error);
-            emitter.removeAllListeners();
-        }, 1);
+        setTimeout(function() {
+            emitter.emit('error', error)
+            emitter.removeAllListeners()
+        }, 1)
     }
 
-    return emitter;
-};
+    return emitter
+}
 
 /**
  * Should be used to create full function/event name from json abi
@@ -92,16 +90,13 @@ var _fireError = function (error, emitter, reject, callback) {
  * @param {Object} json
  * @return {String} full function/event name
  */
-var _jsonInterfaceMethodToString = function (json) {
+const _jsonInterfaceMethodToString = function(json) {
     if (_.isObject(json) && json.name && json.name.indexOf('(') !== -1) {
-        return json.name;
+        return json.name
     }
 
-    var typeName = json.inputs.map(function(i){return i.type; }).join(',');
-    return json.name + '(' + _flattenTypes(false, json.inputs).join(',') + ')'
-};
-
-
+    return `${json.name}(${_flattenTypes(false, json.inputs).join(',')})`
+}
 
 /**
  * Should be called to get ascii from it's hex representation
@@ -110,22 +105,24 @@ var _jsonInterfaceMethodToString = function (json) {
  * @param {String} hex
  * @returns {String} ascii string representation of hex value
  */
-var hexToAscii = function(hex) {
-    if (!utils.isHexStrict(hex))
-        throw new Error('The parameter must be a valid HEX string.');
+const hexToAscii = function(hex) {
+    if (!utils.isHexStrict(hex)) {
+        throw new Error('The parameter must be a valid HEX string.')
+    }
 
-    var str = "";
-    var i = 0, l = hex.length;
+    let str = ''
+    let i = 0
+    const l = hex.length
     if (hex.substring(0, 2) === '0x') {
-        i = 2;
+        i = 2
     }
-    for (; i < l; i+=2) {
-        var code = parseInt(hex.substr(i, 2), 16);
-        str += String.fromCharCode(code);
+    for (; i < l; i += 2) {
+        const code = parseInt(hex.substr(i, 2), 16)
+        str += String.fromCharCode(code)
     }
 
-    return str;
-};
+    return str
+}
 
 /**
  * Should be called to get hex representation (prefixed by 0x) of ascii string
@@ -134,20 +131,19 @@ var hexToAscii = function(hex) {
  * @param {String} str
  * @returns {String} hex representation of input string
  */
-var asciiToHex = function(str) {
-    if(!str)
-        return "0x00";
-    var hex = "";
-    for(var i = 0; i < str.length; i++) {
-        var code = str.charCodeAt(i);
-        var n = code.toString(16);
-        hex += n.length < 2 ? '0' + n : n;
+const asciiToHex = function(str) {
+    if (!str) {
+        return '0x00'
+    }
+    let hex = ''
+    for (let i = 0; i < str.length; i++) {
+        const code = str.charCodeAt(i)
+        const n = code.toString(16)
+        hex += n.length < 2 ? `0${n}` : n
     }
 
-    return "0x" + hex;
-};
-
-
+    return `0x${hex}`
+}
 
 /**
  * Returns value of unit in Wei
@@ -157,13 +153,15 @@ var asciiToHex = function(str) {
  * @returns {BN} value of the unit (in Wei)
  * @throws error if the unit is not correct:w
  */
-var getUnitValue = function (unit) {
-    unit = unit ? unit.toLowerCase() : 'ether';
+const getUnitValue = function(unit) {
+    unit = unit ? unit.toLowerCase() : 'ether'
     if (!ethjsUnit.unitMap[unit]) {
-        throw new Error('This unit "'+ unit +'" doesn\'t exist, please use the one of the following units' + JSON.stringify(ethjsUnit.unitMap, null, 2));
+        throw new Error(
+            `This unit "${unit}" doesn't exist, please use the one of the following units${JSON.stringify(ethjsUnit.unitMap, null, 2)}`
+        )
     }
-    return unit;
-};
+    return unit
+}
 
 /**
  * Takes a number of wei and converts it to any other ether unit.
@@ -186,15 +184,15 @@ var getUnitValue = function (unit) {
  * @param {String} unit the unit to convert to, default ether
  * @return {String|Object} When given a BN object it returns one as well, otherwise a number
  */
-var fromWei = function(number, unit) {
-    unit = getUnitValue(unit);
+const fromWei = function(number, unit) {
+    unit = getUnitValue(unit)
 
-    if(!utils.isBN(number) && !_.isString(number)) {
-        throw new Error('Please pass numbers as strings or BigNumber objects to avoid precision errors.');
+    if (!utils.isBN(number) && !_.isString(number)) {
+        throw new Error('Please pass numbers as strings or BigNumber objects to avoid precision errors.')
     }
 
-    return utils.isBN(number) ? ethjsUnit.fromWei(number, unit) : ethjsUnit.fromWei(number, unit).toString(10);
-};
+    return utils.isBN(number) ? ethjsUnit.fromWei(number, unit) : ethjsUnit.fromWei(number, unit).toString(10)
+}
 
 /**
  * Takes a number of a unit and converts it to wei.
@@ -218,86 +216,88 @@ var fromWei = function(number, unit) {
  * @param {String} unit the unit to convert from, default ether
  * @return {String|Object} When given a BN object it returns one as well, otherwise a number
  */
-var toWei = function(number, unit) {
-    unit = getUnitValue(unit);
+const toWei = function(number, unit) {
+    unit = getUnitValue(unit)
 
-    if(!utils.isBN(number) && !_.isString(number)) {
-        throw new Error('Please pass numbers as strings or BigNumber objects to avoid precision errors.');
+    if (!utils.isBN(number) && !_.isString(number)) {
+        throw new Error('Please pass numbers as strings or BigNumber objects to avoid precision errors.')
     }
 
-    return utils.isBN(number) ? ethjsUnit.toWei(number, unit) : ethjsUnit.toWei(number, unit).toString(10);
-};
+    return utils.isBN(number) ? ethjsUnit.toWei(number, unit) : ethjsUnit.toWei(number, unit).toString(10)
+}
 
 // For Klay unit
-var unitKlayMap = {
-    'peb': '1',
-    'kpeb': '1000',
-    'Mpeb': '1000000',
-    'Gpeb': '1000000000',
-    'Ston': '1000000000',
-    'uKLAY': '1000000000000',
-    'mKLAY': '1000000000000000',
-    'KLAY': '1000000000000000000',
-    'kKLAY': '1000000000000000000000',
-    'MKLAY': '1000000000000000000000000',
-    'GKLAY': '1000000000000000000000000000',
+const unitKlayMap = {
+    peb: '1',
+    kpeb: '1000',
+    Mpeb: '1000000',
+    Gpeb: '1000000000',
+    Ston: '1000000000',
+    uKLAY: '1000000000000',
+    mKLAY: '1000000000000000',
+    KLAY: '1000000000000000000',
+    kKLAY: '1000000000000000000000',
+    MKLAY: '1000000000000000000000000',
+    GKLAY: '1000000000000000000000000000',
 }
 
-var unitKlayToEthMap = {
-    'peb': 'wei',
-    'kpeb': 'kwei',
-    'Mpeb': 'mwei',
-    'Gpeb': 'gwei',
-    'Ston': 'gwei',
-    'uKLAY': 'microether',
-    'mKLAY': 'milliether',
-    'KLAY': 'ether',
-    'kKLAY': 'kether',
-    'MKLAY': 'mether',
-    'GKLAY': 'gether',
+const unitKlayToEthMap = {
+    peb: 'wei',
+    kpeb: 'kwei',
+    Mpeb: 'mwei',
+    Gpeb: 'gwei',
+    Ston: 'gwei',
+    uKLAY: 'microether',
+    mKLAY: 'milliether',
+    KLAY: 'ether',
+    kKLAY: 'kether',
+    MKLAY: 'mether',
+    GKLAY: 'gether',
 }
-var getKlayUnitValue = function (unit) {
-    unit = unit ? unit : 'KLAY';
+const getKlayUnitValue = function(unit) {
+    unit = unit || 'KLAY'
     if (!unitKlayMap[unit]) {
-        throw new Error('This unit "'+ unit +'" doesn\'t exist, please use the one of the following units' + JSON.stringify(unitKlayMap, null, 2));
+        throw new Error(
+            `This unit "${unit}" doesn't exist, please use the one of the following units${JSON.stringify(unitKlayMap, null, 2)}`
+        )
     }
-    return unit;
-};
+    return unit
+}
 
-var fromPeb = function(number, unit) {
+const fromPeb = function(number, unit) {
     // kaly unit to eth unit
-    unit = getKlayUnitValue(unit);
-    unit = unitKlayToEthMap[unit];
+    unit = getKlayUnitValue(unit)
+    unit = unitKlayToEthMap[unit]
 
-    unit = getUnitValue(unit);
+    unit = getUnitValue(unit)
 
     if (!utils.isBN(number) && !_.isString(number)) {
-      number = tryNumberToString(number)
+        number = tryNumberToString(number)
     }
 
-    return utils.isBN(number) ? ethjsUnit.fromWei(number, unit) : ethjsUnit.fromWei(number, unit).toString(10);
-};
+    return utils.isBN(number) ? ethjsUnit.fromWei(number, unit) : ethjsUnit.fromWei(number, unit).toString(10)
+}
 
-var toPeb = function(number, unit) {
+const toPeb = function(number, unit) {
     // kaly unit to eth unit
-    unit = getKlayUnitValue(unit);
-    unit = unitKlayToEthMap[unit];
+    unit = getKlayUnitValue(unit)
+    unit = unitKlayToEthMap[unit]
 
-    unit = getUnitValue(unit);
+    unit = getUnitValue(unit)
 
     if (!utils.isBN(number) && !_.isString(number)) {
-      number = tryNumberToString(number)
+        number = tryNumberToString(number)
     }
 
-    return utils.isBN(number) ? ethjsUnit.toWei(number, unit) : ethjsUnit.toWei(number, unit).toString(10);
-};
+    return utils.isBN(number) ? ethjsUnit.toWei(number, unit) : ethjsUnit.toWei(number, unit).toString(10)
+}
 
 function tryNumberToString(number) {
-  try {
-    return utils.toBN(number).toString(10)
-  } catch (e) {
-    throw new Error('Please pass numbers as strings or BigNumber objects to avoid precision errors.');
-  }
+    try {
+        return utils.toBN(number).toString(10)
+    } catch (e) {
+        throw new Error('Please pass numbers as strings or BigNumber objects to avoid precision errors.')
+    }
 }
 
 /**
@@ -307,30 +307,31 @@ function tryNumberToString(number) {
  * @param {String} address the given HEX address
  * @return {String}
  */
-var toChecksumAddress = function (address) {
-  if (typeof address === 'undefined') return ''
+const toChecksumAddress = function(address) {
+    if (typeof address === 'undefined') return ''
 
-  if (!/^(0x)?[0-9a-f]{40}$/i.test(address))
-    throw new Error('Given address "'+ address +'" is not a valid Klaytn address.')
-
-  address = address.toLowerCase().replace(/^0x/i,'')
-  var addressHash = utils.sha3(address).replace(/^0x/i,'')
-  var checksumAddress = '0x'
-
-  for (var i = 0; i < address.length; i++ ) {
-    // If ith character is 9 to f then make it uppercase
-    if (parseInt(addressHash[i], 16) > 7) {
-      checksumAddress += address[i].toUpperCase()
-    } else {
-      checksumAddress += address[i]
+    if (!/^(0x)?[0-9a-f]{40}$/i.test(address)) {
+        throw new Error(`Given address "${address}" is not a valid Klaytn address.`)
     }
-  }
-  return checksumAddress
+
+    address = address.toLowerCase().replace(/^0x/i, '')
+    const addressHash = utils.sha3(address).replace(/^0x/i, '')
+    let checksumAddress = '0x'
+
+    for (let i = 0; i < address.length; i++) {
+        // If ith character is 9 to f then make it uppercase
+        if (parseInt(addressHash[i], 16) > 7) {
+            checksumAddress += address[i].toUpperCase()
+        } else {
+            checksumAddress += address[i]
+        }
+    }
+    return checksumAddress
 }
 
-const isHexParameter = (a) => {
-  if (!_.isString(a) || !a.match(/^0x[0-9A-Fa-f]*$/)) return false
-  return true
+const isHexParameter = a => {
+    if (!_.isString(a) || !a.match(/^0x[0-9A-Fa-f]*$/)) return false
+    return true
 }
 
 /**
@@ -341,35 +342,33 @@ const isHexParameter = (a) => {
  * @param {Object} puts
  * @return {Array} parameters as strings
  */
-function _flattenTypes (includeTuple, puts) {
-  var types = []
-   puts.forEach(function(param) {
-     if (typeof param.components === 'object') {
-        if (param.type.substring(0, 5) !== 'tuple') {
-            throw new Error('components found but type is not tuple; report on GitHub');
-        }
-        var suffix = ''
-        var arrayBracket = param.type.indexOf('[')
-        if (arrayBracket >= 0) {
-          suffix = param.type.substring(arrayBracket)
-        }
-        var result = _flattenTypes(includeTuple, param.components)
+function _flattenTypes(includeTuple, puts) {
+    const types = []
+    puts.forEach(function(param) {
+        if (typeof param.components === 'object') {
+            if (param.type.substring(0, 5) !== 'tuple') {
+                throw new Error('components found but type is not tuple; report on GitHub')
+            }
+            let suffix = ''
+            const arrayBracket = param.type.indexOf('[')
+            if (arrayBracket >= 0) {
+                suffix = param.type.substring(arrayBracket)
+            }
+            const result = _flattenTypes(includeTuple, param.components)
 
-        if(_.isArray(result) && includeTuple) {
-          types.push('tuple(' + result.join(',') + ')' + suffix)
+            if (_.isArray(result) && includeTuple) {
+                types.push(`tuple(${result.join(',')})${suffix}`)
+            } else if (!includeTuple) {
+                types.push(`(${result.join(',')})${suffix}`)
+            } else {
+                types.push(`(${result})`)
+            }
+        } else {
+            types.push(param.type)
         }
-        else if(!includeTuple) {
-          types.push('(' + result.join(',') + ')' + suffix)
-        }
-        else {
-          types.push('(' + result + ')')
-        }
-    } else {
-      types.push(param.type)
-    }
-  })
-   return types;
-};
+    })
+    return types
+}
 
 /**
  *
@@ -377,9 +376,9 @@ function _flattenTypes (includeTuple, puts) {
  * @param {String} string
  * @return {bool}
  */
-var isHexPrefixed = function (str) {
-  if (typeof str !== 'string') return false
-  return str.slice(0, 2) === '0x'
+const isHexPrefixed = function(str) {
+    if (typeof str !== 'string') return false
+    return str.slice(0, 2) === '0x'
 }
 
 /**
@@ -388,60 +387,60 @@ var isHexPrefixed = function (str) {
  * @param {String} string
  * @return {String}
  */
-var addHexPrefix = function (str) {
-  if (typeof str !== 'string') return str
+const addHexPrefix = function(str) {
+    if (typeof str !== 'string') return str
 
-  return isHexPrefixed(str) ? str : '0x' + str
+    return isHexPrefixed(str) ? str : `0x${str}`
 }
 
 /**
- * 
+ *
  * @method stripHexPrefix
  * @param {String} string
  * @return {String}
  */
-var stripHexPrefix = function (str) {
-  if (typeof str !== 'string') return str
+const stripHexPrefix = function(str) {
+    if (typeof str !== 'string') return str
 
-  return isHexPrefixed(str) ? str.slice(2) : str
+    return isHexPrefixed(str) ? str.slice(2) : str
 }
 
 /**
  * Convert a input into a Buffer.
- * 
+ *
  * @method toBuffer
  * @param {Buffer|Array|String|Number|BN|Object} input
  * @return {Buffer}
  */
-var toBuffer = function (input) {
-  if (Buffer.isBuffer(input)) return input
-  if (input === null || input === undefined) return Buffer.alloc(0)
-  if (Array.isArray(input)) return Buffer.from(input)
-  if (utils.isBN(input)) return input.toArrayLike(Buffer)
-  if (_.isObject(input)) {
-    if (input.toArray && _.isFunction(input.toArray)) return Buffer.from(input.toArray())
-    throw new Error('To convert an object to a buffer, the toArray function must be implemented inside the object')
-  }
+const toBuffer = function(input) {
+    if (Buffer.isBuffer(input)) return input
+    if (input === null || input === undefined) return Buffer.alloc(0)
+    if (Array.isArray(input)) return Buffer.from(input)
+    if (utils.isBN(input)) return input.toArrayLike(Buffer)
+    if (_.isObject(input)) {
+        if (input.toArray && _.isFunction(input.toArray)) return Buffer.from(input.toArray())
+        throw new Error('To convert an object to a buffer, the toArray function must be implemented inside the object')
+    }
 
-  switch(typeof(input)) {
-    case 'string': 
-      if (isHexParameter(input)) return Buffer.from(stripHexPrefix(utils.makeEven(input)), 'hex')
-      throw new Error(`Failed to convert string to Buffer. 'toBuffer' function only supports 0x-prefixed hex string`)
-    case 'number':
-      return numberToBuffer(input)
-  }
-  throw new Error(`Not supported type with ${input}`)
+    switch (typeof input) {
+        case 'string':
+            if (isHexParameter(input)) return Buffer.from(stripHexPrefix(utils.makeEven(input)), 'hex')
+            throw new Error("Failed to convert string to Buffer. 'toBuffer' function only supports 0x-prefixed hex string")
+        case 'number':
+            return numberToBuffer(input)
+    }
+    throw new Error(`Not supported type with ${input}`)
 }
 
 /**
  * Convert a number to a Buffer.
- * 
+ *
  * @method numberToBuffer
  * @param {Number|String|BN} num
  * @return {Buffer}
  */
-var numberToBuffer = function (num) {
-  return Buffer.from(stripHexPrefix(utils.makeEven(utils.numberToHex(num))), 'hex')
+const numberToBuffer = function(num) {
+    return Buffer.from(stripHexPrefix(utils.makeEven(utils.numberToHex(num))), 'hex')
 }
 
 module.exports = {
@@ -543,4 +542,4 @@ module.exports = {
     isValidRole: utils.isValidRole,
 
     isEmptySig: utils.isEmptySig,
-};
+}

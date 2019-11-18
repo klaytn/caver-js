@@ -32,10 +32,10 @@ const constants = require('./constants')
 const validateFunction = require('./validateFunction')
 
 module.exports = {
-  errors,
-  formatters,
-  txErrorTable,
-  payloadTransformer,
-  constants,
-  validateFunction,
+    errors,
+    formatters,
+    txErrorTable,
+    payloadTransformer,
+    constants,
+    validateFunction,
 }

@@ -73,6 +73,13 @@ For the coding style of JavaScript, please refer to the following websites:
 - https://www.w3schools.com/js/js_conventions.asp
 - https://google.github.io/styleguide/jsguide.html
 
+caver-js uses eslint with prettier. The linting rules inherit from airbnb.
+
+Before you submit a pull request, please run `npm run lint` and correct any errors.
+Otherwise, the test on CircleCI will fail, and this prevents merging.
+
+Formatting errors can be easily fixed by running `npm run lintFix`.
+
 ## Contributor License Agreement (CLA)
 
 Keep in mind when you submit your pull request, you'll need to sign the CLA via [CLA-Assistant](https://cla-assistant.io/klaytn/caver-js) for legal purposes. You will have to sign the CLA just one time, either as an individual or corporation.
