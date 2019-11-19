@@ -75,21 +75,14 @@ jobs:
           command: |
               version=$(hub pr list -s open -L 10 -f "%H%n")
               echo $version
-
               if [[ $version == *"release/${CIRCLE_TAG%-*}"* ]]; then
                 echo "PR already exist"
               else
                 echo "hub pull-request -m "[Master] release/$CIRCLE_TAG QA Signoff" -b $CIRCLE_PROJECT_USERNAME:master -h $CIRCLE_PROJECT_USERNAME:${CIRCLE_TAG%-*}"
-                hub pull-request -b $CIRCLE_PROJECT_USERNAME:master -h $CIRCLE_PROJECT_USERNAME:release/${CIRCLE_TAG%-*} -r $GITHUB_reviewer -l circleci -F- <<EOF
-                [Master] release/${CIRCLE_TAG%-*} QA Sign-off
-
-                This PR is automatically created by CI to release a new official version of caver-js.
-
-                When this PR is approved by QA team, a new version will be released.
-              EOF
+                echo -e "[Master] release/${CIRCLE_TAG%-*} QA Sign-off\n\nThis PR is automatically created by CI to release a new official version of $CIRCLE_PROJECT_REPONAME.\n\nWhen this PR is approved by QA team, a new version will be released." | hub pull-request -b $CIRCLE_PROJECT_USERNAME:master -h $CIRCLE_PROJECT_USERNAME:release/${CIRCLE_TAG%-*} -r $GITHUB_reviewer -l circleci -F-
               fi
 
-  major_publish:
+  tagging_delete_branch:
     <<: *defaults
     steps:
       - add_ssh_keys
@@ -98,29 +91,54 @@ jobs:
           name: "Generate tag"
           command: |
               current_version=$(.circleci/version.sh)
-
               echo "git tag v$current_version"
-              git tag v$current_version
+              git config --global user.email "team.devops@groundx.xyz"
+              git config --global user.name "circleci-klaytn"
+              git tag -a v$current_version -m "$CIRCLE_STAGE"
               git push origin v$current_version
       - run:
-          name: "Authenticate with registry"
-          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/repo/.npmrc
-      - run:
-          name: "Publish major version and delete release branch"
+          name: "Delete release branch"
           command: |
-              version=v$(.circleci/version.sh)
-
-              echo "Publishing a major release! version=$version"
-              npm publish
-
+              version=$(.circleci/version.sh)
               #delete release branch. it trigger by merge title
               if [[ "release/v" = $(git log --oneline -1 | grep -o "release/v") ]]; then
                 echo "Delete branch release/$version"
                 git push origin --delete release/$version
               else
                 echo "Need to delete branch manually"
-              fi  
+              fi
 
+  major_publish:
+    <<: *defaults
+    steps:
+      - add_ssh_keys
+      - checkout
+      - run:
+          name: "Authenticate with registry"
+          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/repo/.npmrc
+      - run:
+          name: "Publish major version"
+          command: |
+              version=v$(.circleci/version.sh)
+
+              echo "Publishing a major release! version=$version"
+              npm publish
+
+
+  tagger_verify:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: "Verify tag and file verison match"
+          command: |
+              TAGGER=$(git for-each-ref --format='%(tagger)' refs/tags/$CIRCLE_TAG | sed 's/ .*//')
+              if [ $TAGGER == 'circleci-klaytn' ]; then
+                echo "Pass! Tagger is circleci-klaytn"
+              else
+                echo "only circleci-klaytn can tagging major version"
+                exit 1
+              fi
 
 workflows:
   version: 2
@@ -151,8 +169,24 @@ workflows:
             branches:
               ignore: /.*/
 
-      - major_publish:
+      - tagging_delete_branch:
           filters:
             branches:
               only: master
 
+      - tagger_verify:
+          filters:
+            tags:
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
+
+
+      - major_publish:
+          requires:
+            - tagger_verify
+          filters:
+            tags:
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
