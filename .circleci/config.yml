@@ -90,16 +90,16 @@ jobs:
       - run:
           name: "Generate tag"
           command: |
-              current_version=$(.circleci/version.sh)
-              echo "git tag v$current_version"
+              current_version=v$(.circleci/version.sh)
+              echo "git tag $current_version"
               git config --global user.email "team.devops@groundx.xyz"
               git config --global user.name "circleci-klaytn"
-              git tag -a v$current_version -m "$CIRCLE_STAGE"
-              git push origin v$current_version
+              git tag -a $current_version -m "$CIRCLE_STAGE"
+              git push origin $current_version
       - run:
           name: "Delete release branch"
           command: |
-              version=$(.circleci/version.sh)
+              version=v$(.circleci/version.sh)
               #delete release branch. it trigger by merge title
               if [[ "release/v" = $(git log --oneline -1 | grep -o "release/v") ]]; then
                 echo "Delete branch release/$version"
@@ -123,7 +123,6 @@ jobs:
 
               echo "Publishing a major release! version=$version"
               npm publish
-
 
   tagger_verify:
     <<: *defaults
@@ -156,7 +155,7 @@ workflows:
       - tag_verify:
           filters:
             tags:
-              only: /^v[0-9]+\.[0-9]+\.[0-9]+-.*/
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+.*/
             branches:
               ignore: /.*/
 
@@ -185,8 +184,10 @@ workflows:
       - major_publish:
           requires:
             - tagger_verify
+            - tag_verify
           filters:
             tags:
               only: /^v[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: /.*/
+
