@@ -180,7 +180,6 @@ workflows:
             branches:
               ignore: /.*/
 
-
       - major_publish:
           requires:
             - tagger_verify
@@ -190,4 +189,3 @@ workflows:
               only: /^v[0-9]+\.[0-9]+\.[0-9]+/
             branches:
               ignore: /.*/
-
