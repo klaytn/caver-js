@@ -192,8 +192,14 @@ Accounts.prototype._addAccountFunctions = function(account) {
 
     // add sign functions
     account.signTransaction = function signTransaction(tx, callback) {
-        return _this.signTransaction(tx, account.privateKey, callback)
+        const roleKey = _this._getRoleKey(tx, account)
+        return _this.signTransaction(tx, roleKey, callback)
     }
+
+    account.feePayerSignTransaction = function feePayerSignTransaction(tx, callback) {
+        return _this.feePayerSignTransaction(tx, account.address, account.feePayerKey, callback)
+    }
+
     account.sign = function sign(data) {
         return _this.sign(data, account.privateKey)
     }
