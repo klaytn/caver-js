@@ -1939,6 +1939,9 @@ Wallet.prototype.getAccount = function(input) {
 }
 
 function genKlaytnWalletKeyStringFromAccount(account) {
+    if (account.accountKeyType !== AccountKeyEnum.ACCOUNT_KEY_PUBLIC) {
+        throw new Error('The account cannot be exported in KlaytnWalletKey format. Use caver.klay.accounts.encrypt or account.encrypt.')
+    }
     let addressString = account.address
     let { privateKey } = account
 
