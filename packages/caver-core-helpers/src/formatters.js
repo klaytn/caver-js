@@ -260,7 +260,9 @@ const outputTransactionFormatter = function(tx) {
  * @returns {Object}
  */
 const outputTransactionReceiptFormatter = function(receipt) {
-    if (typeof receipt !== 'object' || receipt === null) {
+    if (!receipt) return null
+
+    if (typeof receipt !== 'object') {
         throw new Error(`Received receipt is invalid: ${receipt}`)
     }
 
