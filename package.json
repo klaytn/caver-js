@@ -25,7 +25,11 @@
     "intFDTest": "mocha --grep INT-FD/ test/intTest.js",
     "intFDRTest": "mocha --grep INT-FDR/ test/intTest.js",
     "intSIGVALITest": "mocha --grep INT-SIGVALI/ test/intTest.js",
-    "intAPITest": "mocha --grep INT-API/ test/intTest.js"
+    "intAPITest": "mocha --grep INT-API/ test/intTest.js",
+    "cover": "npm run build && nyc --silent mocha test/packages/caver.utils.js && nyc --silent --no-clean mocha test/packages/caver.klay.net.js && npm run cover:serialization && npm run cover:wallet && npm run cover:report",
+    "cover:serialization": "nyc --silent --no-clean npm run serTest",
+    "cover:wallet": "nyc --silent --no-clean npm run walletTest",
+    "cover:report": "nyc report --reporter=html --reporter=text"
   },
   "keywords": [
     "caver",
@@ -104,6 +108,7 @@
     "gulp-uglify": "^3.0.1",
     "jshint": "^2.9.7",
     "nock": "^10.0.6",
+    "nyc": "^14.1.1",
     "path": "^0.12.7",
     "prettier": "1.18.2",
     "rollup": "^0.66.6",
