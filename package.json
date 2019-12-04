@@ -29,7 +29,7 @@
     "cover": "npm run build && nyc --silent mocha test/packages/caver.utils.js && nyc --silent --no-clean mocha test/packages/caver.klay.net.js && npm run cover:serialization && npm run cover:wallet && npm run cover:report",
     "cover:serialization": "nyc --silent --no-clean npm run serTest",
     "cover:wallet": "nyc --silent --no-clean npm run walletTest",
-    "cover:report": "nyc report --reporter=html --reporter=text && start coverage/index.html"
+    "cover:report": "nyc report --reporter=html --reporter=text"
   },
   "keywords": [
     "caver",
