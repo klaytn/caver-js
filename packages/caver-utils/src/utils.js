@@ -24,7 +24,7 @@
  * @date 2017
  */
 
-const _ = require('underscore')
+const _ = require('lodash')
 const BN = require('bn.js')
 const numberToBN = require('number-to-bn')
 const utf8 = require('utf8')
