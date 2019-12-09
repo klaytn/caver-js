@@ -61,7 +61,11 @@ describe('caver.klay.accounts.signTransaction', () => {
             doneCount++
             if (blockNumber === -1) blockNumber = num
             if (doneCount >= 2) {
-                if (blockNumber !== num) return compareNonce()
+                if (blockNumber !== num) {
+                    doneCount = 0
+                    blockNumber = -1
+                    return compareNonce()
+                }
                 done()
             }
         }
