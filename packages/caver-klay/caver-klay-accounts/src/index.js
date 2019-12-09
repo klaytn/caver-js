@@ -24,7 +24,7 @@
  * @date 2017
  */
 
-const _ = require('underscore')
+const _ = require('lodash')
 const Promise = require('any-promise')
 // account, hash, rlp, nat, bytes library will be used from 'eth-lib' temporarily.
 const AccountLib = require('eth-lib/lib/account')

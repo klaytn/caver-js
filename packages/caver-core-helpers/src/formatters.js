@@ -25,7 +25,7 @@
  * @date 2017
  */
 
-const _ = require('underscore')
+const _ = require('lodash')
 const utils = require('../../caver-utils')
 const validateParams = require('../../caver-core-helpers/src/validateFunction').validateParams
 

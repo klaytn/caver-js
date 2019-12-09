@@ -24,7 +24,7 @@
  * @date 2017
  */
 
-const _ = require('underscore')
+const _ = require('lodash')
 
 const core = require('../../caver-core')
 const { formatters } = require('../../caver-core-helpers')

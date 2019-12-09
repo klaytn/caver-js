@@ -16,7 +16,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const { last } = require('underscore')
+const { last } = require('lodash')
 const builtinsMiddleware = require('./builtins')
 
 function Middleware() {

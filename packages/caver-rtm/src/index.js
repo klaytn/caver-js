@@ -16,7 +16,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const _ = require('underscore')
+const _ = require('lodash')
 const Method = require('../../caver-core-method')
 const formatters = require('../../caver-core-helpers').formatters
 const payloadTransformer = require('../../caver-core-helpers').payloadTransformer

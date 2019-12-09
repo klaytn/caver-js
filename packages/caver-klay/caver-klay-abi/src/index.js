@@ -25,7 +25,7 @@
  * @date 2017
  */
 
-const _ = require('underscore')
+const _ = require('lodash')
 const EthersAbi = require('ethers/utils/abi-coder').AbiCoder
 const utils = require('../../../caver-utils')
 
