@@ -54,61 +54,37 @@ describe('caver.klay.accounts.signTransaction', () => {
         expect(caver.klay.accounts.signTransaction(tx, testAccount.transactionKey)).to.eventually.rejected
     })
 
-    it('CAVERJS-UNIT-WALLET-396: should set nonce with pending block tag', done => {
-        let doneCount = 0
-        let blockNumber = -1
-        function countDone(num) {
-            doneCount++
-            if (blockNumber === -1) blockNumber = num
-            if (doneCount >= 2) {
-                if (blockNumber !== num) {
-                    doneCount = 0
-                    blockNumber = -1
-                    return compareNonce()
-                }
-                done()
-            }
+    it('CAVERJS-UNIT-WALLET-396: should set nonce with pending block tag', async () => {
+        // given
+        const baseNonce = await caver.klay.getTransactionCount(sender.address)
+        const txConfig = {
+            from: sender.address,
+            to: testAccount.address,
+            value: '0',
+            gas: 30000,
         }
 
-        compareNonce()
-
-        function compareNonce() {
-            caver.klay.getTransactionCount(sender.address).then(baseNonce => {
+        let nonce1
+        function sendTransactionTxHashHelper() {
+            return new Promise((resolve, reject) => {
                 caver.klay
-                    .sendTransaction({
-                        from: sender.address,
-                        to: testAccount.address,
-                        value: '1',
-                        gas: 30000,
+                    .sendTransaction({ ...txConfig })
+                    .on('transactionHash', transactionHash => {
+                        resolve(transactionHash)
                     })
-                    .on('transactionHash', hash1 => {
-                        caver.klay
-                            .sendTransaction({
-                                from: sender.address,
-                                to: testAccount.address,
-                                value: '1',
-                                gas: 30000,
-                            })
-                            .on('receipt', r2 => {
-                                const nonceInReceipt = caver.utils.hexToNumber(r2.nonce)
-                                expect(nonceInReceipt).to.equals(baseNonce + 1)
-                                countDone(r2.blockNumber)
-                            })
-                            .on('error', e => {
-                                assert(false)
-                                done()
-                            })
-                    })
-                    .on('receipt', r1 => {
-                        const nonceInReceipt = caver.utils.hexToNumber(r1.nonce)
-                        expect(nonceInReceipt).to.equals(baseNonce)
-                        countDone(r1.blockNumber)
-                    })
-                    .on('error', e => {
-                        assert(false)
-                        done()
+                    .on('receipt', receipt => {
+                        nonce1 = caver.utils.hexToNumber(receipt.nonce)
                     })
             })
         }
-    }).timeout(200000)
+
+        // when
+        const transactionHash = await sendTransactionTxHashHelper()
+        const receipt2 = await caver.klay.sendTransaction({ ...txConfig })
+        const nonce2 = caver.utils.hexToNumber(receipt2.nonce)
+
+        // then
+        expect(nonce1).to.equals(baseNonce)
+        expect(nonce2).to.equals(baseNonce + 1)
+    })
 })
