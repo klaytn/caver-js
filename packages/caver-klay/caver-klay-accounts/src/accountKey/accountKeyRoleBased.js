@@ -14,10 +14,7 @@ class AccountKeyRoleBased {
         this._transactionKey = makeAccountKey(keyObj.transactionKey)
         this._updateKey = makeAccountKey(keyObj.updateKey)
         this._feePayerKey = makeAccountKey(keyObj.feePayerKey)
-    }
-
-    get type() {
-        return AccountKeyEnum.ACCOUNT_KEY_ROLEBASED
+        this.type = AccountKeyEnum.ACCOUNT_KEY_ROLEBASED
     }
 
     get defaultKey() {
