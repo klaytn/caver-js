@@ -537,6 +537,7 @@ module.exports = {
     isValidPublicKey: utils.isValidPublicKey,
     isCompressedPublicKey: utils.isCompressedPublicKey,
     compressPublicKey: utils.compressPublicKey,
+    decompressPublicKey: utils.decompressPublicKey,
 
     // For account key
     isValidRole: utils.isValidRole,
