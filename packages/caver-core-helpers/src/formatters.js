@@ -25,7 +25,7 @@
  * @date 2017
  */
 
-const _ = require('underscore')
+const _ = require('lodash')
 const utils = require('../../caver-utils')
 const validateParams = require('../../caver-core-helpers/src/validateFunction').validateParams
 
@@ -260,7 +260,9 @@ const outputTransactionFormatter = function(tx) {
  * @returns {Object}
  */
 const outputTransactionReceiptFormatter = function(receipt) {
-    if (typeof receipt !== 'object' || receipt === null) {
+    if (!receipt) return null
+
+    if (typeof receipt !== 'object') {
         throw new Error(`Received receipt is invalid: ${receipt}`)
     }
 

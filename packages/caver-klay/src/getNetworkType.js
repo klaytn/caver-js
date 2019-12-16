@@ -24,7 +24,7 @@
  * @date 2017
  */
 
-const _ = require('underscore')
+const _ = require('lodash')
 
 const getNetworkType = function(callback) {
     const _this = this

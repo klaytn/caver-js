@@ -39,6 +39,7 @@ const util = require('util')
 const exec = util.promisify(require('child_process').exec)
 const Caver = require('../index.js')
 const testEnv = require('./klaytn-integration-tests/env.json')
+const conf = require('./klaytn-integration-tests/conf.json')
 const { expect } = require('./extendedChai')
 
 const { overwriteSignature, getSenderTxHash } = require('../packages/caver-klay/caver-klay-accounts/src/makeRawTransaction')
@@ -481,15 +482,15 @@ before(() => {
     }
 })
 
-it('solc check', async () => {
+async function checkSolidityVersion() {
     const { stdout, stderr } = await exec('solc --version')
     const regex = /Version: ([0-9]+.[0-9]+.[0-9]+)/
     const found = stdout.match(regex)
     expect(found).to.not.null
 
     const version = found[1]
-    expect(version).to.equal('0.5.0')
-})
+    expect(version).to.equal(conf.solidity)
+}
 
 describe('Integration tests', () => {
     const directoryPath = path.join(__dirname, 'klaytn-integration-tests')
@@ -497,6 +498,15 @@ describe('Integration tests', () => {
     intFiles.forEach(function(intf) {
         if (intf.isDirectory() === false) return
         describe(`testing ${intf.name}`, () => {
+            before(function(done) {
+                // Check version of solidity compiler before INT-SOL integration test
+                if (intf.name === 'INT-SOL') {
+                    checkSolidityVersion().then(done)
+                } else {
+                    done()
+                }
+            })
+
             const dir = path.join(__dirname, 'klaytn-integration-tests/', intf.name)
             const files = fs.readdirSync(dir)
             files.forEach(function(file) {

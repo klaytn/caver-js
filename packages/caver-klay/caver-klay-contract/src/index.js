@@ -31,7 +31,7 @@
  * @date 2017
  */
 
-const _ = require('underscore')
+const _ = require('lodash')
 const core = require('../../../caver-core')
 const Method = require('../../../caver-core-method')
 const utils = require('../../../caver-utils')

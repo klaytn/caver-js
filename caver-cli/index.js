@@ -18,7 +18,7 @@
 
 const fs = require('fs')
 const jsonFormat = require('json-format')
-const _ = require('underscore')
+const _ = require('lodash')
 const chalk = require('chalk')
 const figlet = require('figlet')
 const inquirer = require('inquirer')

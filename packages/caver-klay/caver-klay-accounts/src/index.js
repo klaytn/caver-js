@@ -24,7 +24,7 @@
  * @date 2017
  */
 
-const _ = require('underscore')
+const _ = require('lodash')
 const Promise = require('any-promise')
 // account, hash, rlp, nat, bytes library will be used from 'eth-lib' temporarily.
 const AccountLib = require('eth-lib/lib/account')
@@ -192,8 +192,14 @@ Accounts.prototype._addAccountFunctions = function(account) {
 
     // add sign functions
     account.signTransaction = function signTransaction(tx, callback) {
-        return _this.signTransaction(tx, account.privateKey, callback)
+        const roleKey = _this._getRoleKey(tx, account)
+        return _this.signTransaction(tx, roleKey, callback)
     }
+
+    account.feePayerSignTransaction = function feePayerSignTransaction(tx, callback) {
+        return _this.feePayerSignTransaction(tx, account.address, account.feePayerKey, callback)
+    }
+
     account.sign = function sign(data) {
         return _this.sign(data, account.privateKey)
     }
@@ -766,7 +772,7 @@ Accounts.prototype.signTransaction = function signTransaction() {
     return Promise.all([
         isNot(tx.chainId) ? _this._klaytnCall.getChainId() : tx.chainId,
         isNot(tx.gasPrice) ? _this._klaytnCall.getGasPrice() : tx.gasPrice,
-        isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from) : tx.nonce,
+        isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from, 'pending') : tx.nonce,
     ]).then(function(args) {
         if (isNot(args[0]) || isNot(args[1]) || isNot(args[2])) {
             throw new Error(`One of the values "chainId", "gasPrice", or "nonce" couldn't be fetched: ${JSON.stringify(args)}`)
@@ -845,7 +851,7 @@ Accounts.prototype.feePayerSignTransaction = function feePayerSignTransaction() 
     return Promise.all([
         isNot(tx.chainId) ? _this._klaytnCall.getChainId() : tx.chainId,
         isNot(tx.gasPrice) ? _this._klaytnCall.getGasPrice() : tx.gasPrice,
-        isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from) : tx.nonce,
+        isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from, 'pending') : tx.nonce,
     ]).then(function(args) {
         if (isNot(args[0]) || isNot(args[1]) || isNot(args[2])) {
             throw new Error(`One of the values "chainId", "gasPrice", or "nonce" couldn't be fetched: ${JSON.stringify(args)}`)
@@ -963,7 +969,7 @@ Accounts.prototype.getRawTransactionWithSignatures = function getRawTransactionW
     return Promise.all([
         isNot(tx.chainId) ? _this._klaytnCall.getChainId() : tx.chainId,
         isNot(tx.gasPrice) ? _this._klaytnCall.getGasPrice() : tx.gasPrice,
-        isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from) : tx.nonce,
+        isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from, 'pending') : tx.nonce,
     ]).then(function(args) {
         if (isNot(args[0]) || isNot(args[1]) || isNot(args[2])) {
             throw new Error(`One of the values "chainId", "gasPrice", or "nonce" couldn't be fetched: ${JSON.stringify(args)}`)
@@ -1933,6 +1939,9 @@ Wallet.prototype.getAccount = function(input) {
 }
 
 function genKlaytnWalletKeyStringFromAccount(account) {
+    if (account.accountKeyType !== AccountKeyEnum.ACCOUNT_KEY_PUBLIC) {
+        throw new Error('The account cannot be exported in KlaytnWalletKey format. Use caver.klay.accounts.encrypt or account.encrypt.')
+    }
     let addressString = account.address
     let { privateKey } = account
 

@@ -25,7 +25,7 @@
  * @date 2017
  */
 
-const _ = require('underscore')
+const _ = require('lodash')
 const ethjsUnit = require('ethjs-unit')
 const utils = require('./utils.js')
 const soliditySha3 = require('./soliditySha3.js')
@@ -537,6 +537,7 @@ module.exports = {
     isValidPublicKey: utils.isValidPublicKey,
     isCompressedPublicKey: utils.isCompressedPublicKey,
     compressPublicKey: utils.compressPublicKey,
+    decompressPublicKey: utils.decompressPublicKey,
 
     // For account key
     isValidRole: utils.isValidRole,

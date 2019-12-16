@@ -24,7 +24,7 @@
  * @date 2017
  */
 
-const _ = require('underscore')
+const _ = require('lodash')
 const BN = require('bn.js')
 const numberToBN = require('number-to-bn')
 const utf8 = require('utf8')
@@ -713,6 +713,20 @@ const compressPublicKey = uncompressedPublicKey => {
     return compressedPublicKey
 }
 
+const decompressPublicKey = compressedPublicKey => {
+    if (!isCompressedPublicKey(compressedPublicKey)) return compressedPublicKey
+
+    const compressedWithoutPrefix = compressedPublicKey.replace('0x', '')
+
+    const curve = secp256k1.curve
+    const decoded = curve.decodePoint(compressedWithoutPrefix, 'hex')
+
+    const xPoint = decoded.x.toString(16)
+    const yPoint = decoded.y.toString(16)
+
+    return `0x${xPoint}${yPoint}`
+}
+
 const isContractDeployment = txObject => {
     if (txObject.type) {
         if (txObject.type.includes('SMART_CONTRACT_DEPLOY')) return true
@@ -796,6 +810,7 @@ module.exports = {
     isValidPublicKey,
     isCompressedPublicKey,
     compressPublicKey,
+    decompressPublicKey,
     isTxHash,
     isTxHashStrict,
 

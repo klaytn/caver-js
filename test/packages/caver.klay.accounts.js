@@ -74,7 +74,16 @@ function compareAccountKey(keyFromAccount, key) {
 
 function isAccount(data, { keys, address } = {}) {
     // account object keys
-    const objectKeys = ['address', 'accountKey', 'privateKey', 'signTransaction', 'sign', 'encrypt', 'getKlaytnWalletKey']
+    const objectKeys = [
+        'address',
+        'accountKey',
+        'privateKey',
+        'signTransaction',
+        'feePayerSignTransaction',
+        'sign',
+        'encrypt',
+        'getKlaytnWalletKey',
+    ]
 
     expect(Object.getOwnPropertyNames(data)).to.deep.equal(objectKeys)
 
@@ -836,6 +845,64 @@ describe('caver.klay.accounts.signTransaction', () => {
             await expect(caver.klay.accounts.signTransaction(updateTx)).to.be.rejectedWith(errorMessage)
         })
     })
+
+    context('CAVERJS-UNIT-WALLET-390: sign transaction with signTransaction function in Account instance', () => {
+        it('should be signed with transactionKey', async () => {
+            const keyObject = {
+                transactionKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+            }
+            const roleBasedAddress = caver.klay.accounts.create().address
+            const roleBasedAccount = caver.klay.accounts.createWithAccountKey(roleBasedAddress, keyObject)
+
+            vtTx.from = roleBasedAddress
+
+            const result = await roleBasedAccount.signTransaction(vtTx)
+
+            expect(result.signatures.length).to.equals(2)
+            expect(result.feePayerSignatures).to.be.undefined
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-391: sign transaction with signTransaction function in Account instance', () => {
+        it('should be signed with updateKey', async () => {
+            const keyObject = {
+                updateKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+            }
+            const roleBasedAddress = caver.klay.accounts.create().address
+            const roleBasedAccount = caver.klay.accounts.createWithAccountKey(roleBasedAddress, keyObject)
+
+            const updateTx = {
+                type: 'ACCOUNT_UPDATE',
+                from: roleBasedAccount.address,
+                gas: 100000,
+                publicKey:
+                    '0x4255497c08282874319715c4f2752ffc205591cfe8c10d285bfa673273b47db74b35980432bc3e36a62e356b9a29e2d0a1650c8f350a1ef121c460473236a873',
+            }
+
+            const result = await roleBasedAccount.signTransaction(updateTx)
+
+            expect(result.signatures.length).to.equals(2)
+            expect(result.feePayerSignatures).to.be.undefined
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-392: sign transaction with signTransaction function in Account instance', () => {
+        it('should be signed with feePayerKey', async () => {
+            const keyObject = {
+                feePayerKey: [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey],
+            }
+            const roleBasedAddress = caver.klay.accounts.create().address
+            const roleBasedAccount = caver.klay.accounts.createWithAccountKey(roleBasedAddress, keyObject)
+
+            const rawTransaction =
+                '0x09f842819a8505d21dba00830dbba094d2553e0508d481892aa1b481b3ac29aba5c7fb4d01946f9a8851feca74f6694a12d11c9684f0b5c1d3b6c4c301808080c4c3018080'
+            const feePayerTx = { senderRawTransaction: rawTransaction, feePayer: roleBasedAccount.address }
+
+            const result = await roleBasedAccount.signTransaction(feePayerTx)
+
+            expect(result.feePayerSignatures.length).to.equals(2)
+        })
+    })
 })
 
 describe('caver.klay.accounts.feePayerSignTransaction', () => {
@@ -1476,6 +1543,17 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
             const errorMessage = "Failed to split fee payer: not a fee delegated transaction type('VALUE_TRANSFER')"
 
             await expect(caver.klay.accounts.feePayerSignTransaction(rawTransaction, feePayer.address)).to.be.rejectedWith(errorMessage)
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-393: use feePayerSignTransaciton in Account instance', () => {
+        it('should sign with feePayerKey to transaction as a fee payer', async () => {
+            const result = await feePayer.feePayerSignTransaction(txObj)
+
+            const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+            expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+            expect(result.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
         })
     })
 })
@@ -5975,6 +6053,145 @@ describe('caver.klay.accounts.wallet.updateAccountKey', () => {
             const expectedError = `Invalid address : ${invalidAddress}`
 
             expect(() => caver.klay.accounts.wallet.updateAccountKey(invalidAddress, updatePrivateKey)).to.throws(expectedError)
+        })
+    })
+})
+
+describe('caver.klay.accounts.wallet.getKlaytnWalletKey.', () => {
+    // Using private key for testing with getKlaytnWalletKey
+    context('CAVERJS-UNIT-WALLET-064 : getKlaytnWalletKey using wallet with private key. Access wallet by address', () => {
+        it('should return valid KlaytnWalletKey', () => {
+            const testPrivateKey = '0x600dfc414fe433881f6606c24955e4143df9d203ccb3e335efe970a4ad017d04'
+            const acct = caver.klay.accounts.wallet.add(testPrivateKey)
+            expect(acct.privateKey).equal('0x600dfc414fe433881f6606c24955e4143df9d203ccb3e335efe970a4ad017d04')
+            expect(acct.address).equal('0xee135d0b57c7ff81b198763cfd7c43f03a5f7622')
+
+            const ret = caver.klay.accounts.wallet.getKlaytnWalletKey(acct.address)
+            expect(ret).equal(
+                '0x600dfc414fe433881f6606c24955e4143df9d203ccb3e335efe970a4ad017d040x000xee135d0b57c7ff81b198763cfd7c43f03a5f7622'
+            )
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-065 : getKlaytnWalletKey using wallet with private key. Access wallet by index', () => {
+        it('should return valid KlaytnWalletKey', () => {
+            const testPrivateKey = '0x600dfc414fe433881f6606c24955e4143df9d203ccb3e335efe970a4ad017d04'
+            const acct = caver.klay.accounts.wallet.add(testPrivateKey)
+            expect(acct.privateKey).equal('0x600dfc414fe433881f6606c24955e4143df9d203ccb3e335efe970a4ad017d04')
+            expect(acct.address).equal('0xee135d0b57c7ff81b198763cfd7c43f03a5f7622')
+
+            const ret = caver.klay.accounts.wallet.getKlaytnWalletKey(acct.index)
+            expect(ret).equal(
+                '0x600dfc414fe433881f6606c24955e4143df9d203ccb3e335efe970a4ad017d040x000xee135d0b57c7ff81b198763cfd7c43f03a5f7622'
+            )
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-066 : getKlaytnWalletKey using account with private key.', () => {
+        it('should return valid KlaytnWalletKey', () => {
+            const testPrivateKey = '0x600dfc414fe433881f6606c24955e4143df9d203ccb3e335efe970a4ad017d04'
+            const acct = caver.klay.accounts.wallet.add(testPrivateKey)
+            expect(acct.privateKey).equal('0x600dfc414fe433881f6606c24955e4143df9d203ccb3e335efe970a4ad017d04')
+            expect(acct.address).equal('0xee135d0b57c7ff81b198763cfd7c43f03a5f7622')
+
+            const ret = acct.getKlaytnWalletKey()
+            expect(ret).equal(
+                '0x600dfc414fe433881f6606c24955e4143df9d203ccb3e335efe970a4ad017d040x000xee135d0b57c7ff81b198763cfd7c43f03a5f7622'
+            )
+        })
+    })
+
+    // Using KlaytnWalletKey for testing with getKlaytnWalletKey
+    context('CAVERJS-UNIT-WALLET-071 : getKlaytnWalletKey using wallet with KlaytnWalletKey. Access wallet by address', () => {
+        it('should return valid KlaytnWalletKey', () => {
+            const testPrivateKey =
+                '0x600dfc414fe433881f6606c24955e4143df9d203ccb3e335efe970a4ad017d040x000xee135d0b57c7ff81b198763cfd7c43f03a5f7622'
+            const acct = caver.klay.accounts.wallet.add(testPrivateKey)
+            expect(acct.privateKey).equal('0x600dfc414fe433881f6606c24955e4143df9d203ccb3e335efe970a4ad017d04')
+            expect(acct.address).equal('0xee135d0b57c7ff81b198763cfd7c43f03a5f7622')
+
+            const ret = caver.klay.accounts.wallet.getKlaytnWalletKey(acct.address)
+            expect(ret).equal(
+                '0x600dfc414fe433881f6606c24955e4143df9d203ccb3e335efe970a4ad017d040x000xee135d0b57c7ff81b198763cfd7c43f03a5f7622'
+            )
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-072 : getKlaytnWalletKey using wallet with KlaytnWalletKey. Access wallet by index', () => {
+        it('should return valid KlaytnWalletKey', () => {
+            const testPrivateKey =
+                '0x600dfc414fe433881f6606c24955e4143df9d203ccb3e335efe970a4ad017d040x000xee135d0b57c7ff81b198763cfd7c43f03a5f7622'
+            const acct = caver.klay.accounts.wallet.add(testPrivateKey)
+            expect(acct.privateKey).equal('0x600dfc414fe433881f6606c24955e4143df9d203ccb3e335efe970a4ad017d04')
+            expect(acct.address).equal('0xee135d0b57c7ff81b198763cfd7c43f03a5f7622')
+
+            const ret = caver.klay.accounts.wallet.getKlaytnWalletKey(acct.index)
+            expect(ret).equal(
+                '0x600dfc414fe433881f6606c24955e4143df9d203ccb3e335efe970a4ad017d040x000xee135d0b57c7ff81b198763cfd7c43f03a5f7622'
+            )
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-073 : getKlaytnWalletKey using account with KlaytnWalletKey.', () => {
+        it('should return valid KlaytnWalletKey', () => {
+            const testPrivateKey =
+                '0x600dfc414fe433881f6606c24955e4143df9d203ccb3e335efe970a4ad017d040x000xee135d0b57c7ff81b198763cfd7c43f03a5f7622'
+            const acct = caver.klay.accounts.wallet.add(testPrivateKey)
+            expect(acct.privateKey).equal('0x600dfc414fe433881f6606c24955e4143df9d203ccb3e335efe970a4ad017d04')
+            expect(acct.address).equal('0xee135d0b57c7ff81b198763cfd7c43f03a5f7622')
+
+            const ret = acct.getKlaytnWalletKey()
+            expect(ret).equal(
+                '0x600dfc414fe433881f6606c24955e4143df9d203ccb3e335efe970a4ad017d040x000xee135d0b57c7ff81b198763cfd7c43f03a5f7622'
+            )
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-394 : getKlaytnWalletKey using wallet with KlaytnWalletKey.', () => {
+        it('should throw error if accountKey of account is not AccountKeyPublic', () => {
+            const keys = [caver.klay.accounts.create().keys, caver.klay.accounts.create().keys, caver.klay.accounts.create().keys]
+            let multiSigAccount = caver.klay.accounts.createWithAccountKey(caver.klay.accounts.create().address, keys)
+            multiSigAccount = caver.klay.accounts.wallet.add(multiSigAccount)
+
+            expect(() => caver.klay.accounts.wallet.getKlaytnWalletKey(multiSigAccount.index)).to.throws(
+                'The account cannot be exported in KlaytnWalletKey format. Use caver.klay.accounts.encrypt or account.encrypt.'
+            )
+
+            const keyObject = {
+                transactionKey: caver.klay.accounts.create().keys,
+                updateKey: [caver.klay.accounts.create().keys, caver.klay.accounts.create().keys],
+                feePayerKey: caver.klay.accounts.create().keys,
+            }
+            let roleBasedAccount = caver.klay.accounts.createWithAccountKey(caver.klay.accounts.create().address, keyObject)
+            roleBasedAccount = caver.klay.accounts.wallet.add(roleBasedAccount)
+
+            expect(() => caver.klay.accounts.wallet.getKlaytnWalletKey(roleBasedAccount.index)).to.throws(
+                'The account cannot be exported in KlaytnWalletKey format. Use caver.klay.accounts.encrypt or account.encrypt.'
+            )
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-395 : getKlaytnWalletKey using account with KlaytnWalletKey.', () => {
+        it('should throw error if accountKey of account is not AccountKeyPublic', () => {
+            const keys = [caver.klay.accounts.create().keys, caver.klay.accounts.create().keys, caver.klay.accounts.create().keys]
+            let multiSigAccount = caver.klay.accounts.createWithAccountKey(caver.klay.accounts.create().address, keys)
+            multiSigAccount = caver.klay.accounts.wallet.add(multiSigAccount)
+
+            expect(() => multiSigAccount.getKlaytnWalletKey(multiSigAccount.index)).to.throws(
+                'The account cannot be exported in KlaytnWalletKey format. Use caver.klay.accounts.encrypt or account.encrypt.'
+            )
+
+            const keyObject = {
+                transactionKey: caver.klay.accounts.create().keys,
+                updateKey: [caver.klay.accounts.create().keys, caver.klay.accounts.create().keys],
+                feePayerKey: caver.klay.accounts.create().keys,
+            }
+            let roleBasedAccount = caver.klay.accounts.createWithAccountKey(caver.klay.accounts.create().address, keyObject)
+            roleBasedAccount = caver.klay.accounts.wallet.add(roleBasedAccount)
+
+            expect(() => roleBasedAccount.getKlaytnWalletKey(roleBasedAccount.index)).to.throws(
+                'The account cannot be exported in KlaytnWalletKey format. Use caver.klay.accounts.encrypt or account.encrypt.'
+            )
         })
     })
 })
