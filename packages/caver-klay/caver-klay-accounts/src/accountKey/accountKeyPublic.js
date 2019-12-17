@@ -6,10 +6,7 @@ class AccountKeyPublic {
 
         if (typeof key !== 'string') throw new Error('To create AccountKeyPublic, a private key strings is required.')
         this._key = key
-    }
-
-    get type() {
-        return AccountKeyEnum.ACCOUNT_KEY_PUBLIC
+        this.type = AccountKeyEnum.ACCOUNT_KEY_PUBLIC
     }
 
     get defaultKey() {

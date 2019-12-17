@@ -8,8 +8,8 @@ module.exports = {
     plugins: ['prettier'],
     rules: {
         'prettier/prettier': ['error'],
-        'radix': 0,
-        'eqeqeq': 0,
+        radix: 0,
+        eqeqeq: 0,
         'new-cap': 0,
         'no-empty': 0,
         'no-console': 0,
