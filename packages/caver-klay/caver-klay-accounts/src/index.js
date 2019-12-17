@@ -35,7 +35,7 @@ const Bytes = require('eth-lib/lib/bytes')
 const cryp = typeof global === 'undefined' ? require('crypto-browserify') : require('crypto')
 const uuid = require('uuid')
 const elliptic = require('elliptic')
-const scrypt = require('./scrypt')
+const scrypt = require('scrypt-shim')
 const utils = require('../../../caver-utils')
 const helpers = require('../../../caver-core-helpers')
 
