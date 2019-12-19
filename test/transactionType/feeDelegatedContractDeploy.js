@@ -17,8 +17,7 @@
 */
 
 require('it-each')({ testPerIteration: true })
-const assert = require('assert')
-const { expect } = require('../extendedChai')
+const { expect, assert } = require('../extendedChai')
 
 const testRPCURL = require('../testrpc')
 const Caver = require('../../index.js')

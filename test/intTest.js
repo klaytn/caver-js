@@ -26,7 +26,6 @@
 require('it-each')({ testPerIteration: true })
 const RLP = require('eth-lib/lib/rlp')
 const Bytes = require('eth-lib/lib/bytes')
-const assert = require('assert')
 
 const elliptic = require('elliptic')
 
@@ -40,7 +39,7 @@ const exec = util.promisify(require('child_process').exec)
 const Caver = require('../index.js')
 const testEnv = require('./klaytn-integration-tests/env.json')
 const conf = require('./klaytn-integration-tests/conf.json')
-const { expect } = require('./extendedChai')
+const { expect, assert } = require('./extendedChai')
 
 const { overwriteSignature, getSenderTxHash } = require('../packages/caver-klay/caver-klay-accounts/src/makeRawTransaction')
 
