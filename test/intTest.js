@@ -23,7 +23,6 @@
 //
 // To execute a specific test,
 // $ mocha --grep INT-LEGACY/012 test/intTest.js
-require('it-each')({ testPerIteration: true })
 const RLP = require('eth-lib/lib/rlp')
 const Bytes = require('eth-lib/lib/bytes')
 
