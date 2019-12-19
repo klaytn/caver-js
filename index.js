@@ -65,6 +65,7 @@ function Caver(provider, net) {
     }
 }
 
+Caver.utils = utils
 Caver.providers = providers
 
 module.exports = Caver
