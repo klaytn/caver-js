@@ -1,3 +1,5 @@
+[한국어](./CONTRIBUTING.ko.md)
+
 # Contributing Guidelines
 
 Thank you for your interest in contributing to caver-js. As an open source project, caver-js is always open to the developer community and we welcome your contribution. Please read the guideline below and follow it in all interactions with the project.
