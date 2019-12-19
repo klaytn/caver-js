@@ -16,13 +16,12 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const BN = require('bn.js')
 const { expect } = require('./extendedChai')
 
 const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 
-describe('utils.randomHex', done => {
+describe('utils.randomHex', () => {
     it('CAVERJS-UNIT-ETC-009 : Should throw an error with out of range size', async () => {
         const caver = new Caver(testRPCURL)
 

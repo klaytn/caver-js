@@ -22,7 +22,6 @@ module.exports = {
         'guard-for-in': 0,
         'prefer-spread': 0,
         'global-require': 0,
-        'no-unused-vars': 0,
         'no-multi-assign': 0,
         'no-await-in-loop': 0,
         'no-control-regex': 0,
@@ -42,7 +41,6 @@ module.exports = {
         'no-unused-expressions': 0,
         'import/no-dynamic-require': 0,
         'import/no-extraneous-dependencies': 0,
-
         'no-proto': 1,
         'prefer-const': 1,
         'no-multi-assign': 1,

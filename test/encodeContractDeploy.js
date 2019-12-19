@@ -21,7 +21,7 @@ const { expect } = require('./extendedChai')
 const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 
-describe('caver.klay.abi.encodeContractDeploy', done => {
+describe('caver.klay.abi.encodeContractDeploy', () => {
     it('CAVERJS-UNIT-SER-024 : Should be same with expected deploy input', () => {
         const caver = new Caver(testRPCURL)
 

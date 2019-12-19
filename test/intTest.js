@@ -1,17 +1,17 @@
 /*
     Copyright 2018 The caver-js Authors
     This file is part of the caver-js library.
- 
+
     The caver-js library is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
- 
+
     The caver-js library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU Lesser General Public License for more details.
- 
+
     You should have received a copy of the GNU Lesser General Public License
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -483,7 +483,7 @@ before(() => {
 })
 
 async function checkSolidityVersion() {
-    const { stdout, stderr } = await exec('solc --version')
+    const { stdout } = await exec('solc --version')
     const regex = /Version: ([0-9]+.[0-9]+.[0-9]+)/
     const found = stdout.match(regex)
     expect(found).to.not.null
@@ -526,7 +526,7 @@ describe('Integration tests', () => {
 
                     it('make abi and bin', async () => {
                         for (const k in tc.deploy) {
-                            const { stdout, stderr } = await exec(`solc --abi --bin --allow-paths . ${path.join(dir, tc.deploy[k].file)}`)
+                            const { stdout } = await exec(`solc --abi --bin --allow-paths . ${path.join(dir, tc.deploy[k].file)}`)
                             const regex = `\n======= .*${tc.deploy[k].file}:${k} =======\nBinary: \n(.*)\nContract JSON ABI \n(.*)`
                             const found = stdout.match(regex)
                             expect(found).to.not.null

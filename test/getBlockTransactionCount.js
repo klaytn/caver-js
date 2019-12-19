@@ -23,7 +23,7 @@ const testRPCURL = require('./testrpc')
 
 const caver = new Caver(testRPCURL)
 
-describe('get block transaction count', done => {
+describe('get block transaction count', () => {
     it('should not throw an error with "earliest" parameter', async () => {
         const blockTransactionCount = await caver.klay.getBlockTransactionCount('earliest')
         expect(blockTransactionCount).to.exist

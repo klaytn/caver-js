@@ -183,7 +183,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER transaction', () => {
     it('CAVERJS-UNIT-TX-040 : If transaction object missing senderRawTransaction, signTransaction should throw error', () => {
         const tx = Object.assign({}, feeDelegatedValueTransferObject)
 
-        caver.klay.accounts.signTransaction(tx, senderPrvKey).then(ret => {
+        caver.klay.accounts.signTransaction(tx, senderPrvKey).then(() => {
             expect(() => caver.klay.sendTransaction({ feePayer: payerAddress })).to.throws()
         })
     }).timeout(200000)

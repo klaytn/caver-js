@@ -379,7 +379,7 @@ describe('caver.klay.accounts.signTransaction', () => {
 
         it('should sign to transaction parameter with private key in wallet with callback', async () => {
             let isCalled = false
-            const signed = await caver.klay.accounts.signTransaction(txObj, (error, result) => (isCalled = true))
+            const signed = await caver.klay.accounts.signTransaction(txObj, () => (isCalled = true))
 
             const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'signatures']
             expect(Object.getOwnPropertyNames(signed)).to.deep.equal(keys)

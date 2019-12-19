@@ -26,7 +26,6 @@ const caver = new Caver(testRPCURL)
 
 let senderPrvKey
 let senderAddress
-let contractAddress
 
 before(() => {
     senderPrvKey =

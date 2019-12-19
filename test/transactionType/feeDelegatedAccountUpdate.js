@@ -36,7 +36,6 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE transaction', () => {
     let publicKey2
     let publicKey3
     let publicKey4
-    let privateKey
     let privateKey2
     let privateKey3
     let privateKey4

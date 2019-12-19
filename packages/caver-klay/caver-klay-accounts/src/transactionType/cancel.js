@@ -42,6 +42,7 @@ function rlpEncodeForFeeDelegatedCancel(transaction) {
     if (transaction.senderRawTransaction) {
         const typeDetacehdRawTransaction = `0x${transaction.senderRawTransaction.slice(4)}`
 
+        // eslint-disable-next-line no-unused-vars
         const [nonce, gasPrice, gas, from, [[v, r, s]]] = utils.rlpDecode(typeDetacehdRawTransaction)
 
         return RLP.encode([
@@ -76,6 +77,7 @@ function rlpEncodeForFeeDelegatedCancelWithRatio(transaction) {
     if (transaction.senderRawTransaction) {
         const typeDetacehdRawTransaction = `0x${transaction.senderRawTransaction.slice(4)}`
 
+        // eslint-disable-next-line no-unused-vars
         const [nonce, gasPrice, gas, from, feeRatio, [[v, r, s]]] = utils.rlpDecode(typeDetacehdRawTransaction)
 
         return RLP.encode([

@@ -297,7 +297,7 @@ describe('ACCOUNT_CREATION transaction', () => {
         let result
         await caver.klay
             .sendTransaction(tx)
-            .then(async receipt => {
+            .then(async () => {
                 await caver.klay
                     .getAccountKey(tx.to)
                     .then(key => {

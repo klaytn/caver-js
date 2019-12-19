@@ -71,6 +71,7 @@ function rlpEncodeForFeeDelegatedValueTransfer(transaction) {
         // fee payer rlp encoding.
         const typeDetacehdRawTransaction = `0x${transaction.senderRawTransaction.slice(4)}`
 
+        // eslint-disable-next-line no-unused-vars
         const [nonce, gasPrice, gas, to, value, from, [[v, r, s]]] = utils.rlpDecode(typeDetacehdRawTransaction)
 
         return RLP.encode([
@@ -110,6 +111,7 @@ function rlpEncodeForFeeDelegatedValueTransferWithRatio(transaction) {
         // fee payer rlp encoding.
         const typeDetacehdRawTransaction = `0x${transaction.senderRawTransaction.slice(4)}`
 
+        // eslint-disable-next-line no-unused-vars
         const [nonce, gasPrice, gas, to, value, from, feeRatio, [[v, r, s]]] = utils.rlpDecode(typeDetacehdRawTransaction)
 
         return RLP.encode([
@@ -151,6 +153,7 @@ function rlpEncodeForFeeDelegatedValueTransferMemo(transaction) {
         // fee payer rlp encoding.
         const typeDetacehdRawTransaction = `0x${transaction.senderRawTransaction.slice(4)}`
 
+        // eslint-disable-next-line no-unused-vars
         const [nonce, gasPrice, gas, to, value, from, data, [[v, r, s]]] = utils.rlpDecode(typeDetacehdRawTransaction)
 
         return RLP.encode([
@@ -192,6 +195,7 @@ function rlpEncodeForFeeDelegatedValueTransferMemoWithRatio(transaction) {
         // fee payer rlp encoding.
         const typeDetacehdRawTransaction = `0x${transaction.senderRawTransaction.slice(4)}`
 
+        // eslint-disable-next-line no-unused-vars
         const [nonce, gasPrice, gas, to, value, from, data, feeRatio, [[v, r, s]]] = utils.rlpDecode(typeDetacehdRawTransaction)
 
         return RLP.encode([

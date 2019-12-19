@@ -19,7 +19,7 @@
 const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 
-describe('getPastLogs', done => {
+describe('getPastLogs', () => {
     it('should contain id and removed field', async () => {
         const caver = new Caver(testRPCURL)
 
