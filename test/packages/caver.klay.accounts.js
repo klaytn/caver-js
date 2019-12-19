@@ -962,7 +962,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
             expect(result.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-274: input: tx object(signatures) and feePayer', () => {
         it('should sign with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
@@ -984,7 +984,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
             expect(decoded.signatures.length).to.equals(txObj.signatures.length)
             expect(decoded.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-275: input: tx object(feePayer/feePayerSignatures) and feePayer', () => {
         it('should append with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
@@ -1006,7 +1006,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
             const decoded = caver.klay.decodeTransaction(result.rawTransaction)
             expect(decoded.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length + 1)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-276: input: tx object(feePayerSignatures) and feePayer', () => {
         it('should set feePayer with value of feePayer parameter and append feePayerSignatures', async () => {
@@ -1027,7 +1027,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
             const decoded = caver.klay.decodeTransaction(result.rawTransaction)
             expect(decoded.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length + 1)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-277: input: tx object(signatures/feePayer/feePayerSignatures) and feePayer', () => {
         it('should append with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
@@ -1057,7 +1057,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
             expect(decoded.signatures.length).to.equals(txObj.signatures.length)
             expect(decoded.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length + 1)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-278: input: tx object(signatures/feePayer/feePayerSignatures), feePayer and privateKey', () => {
         it('should append with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
@@ -1087,7 +1087,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
             expect(decoded.signatures.length).to.equals(txObj.signatures.length)
             expect(decoded.feePayerSignatures.length).to.equals(2)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-279: input: tx object(feePayer), feePayer and privateKey', () => {
         it('should throw error when feePayer is not matched', async () => {
@@ -1097,7 +1097,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
             await expect(caver.klay.accounts.feePayerSignTransaction(txObj, feePayer.address)).to.be.rejectedWith(errorMessage)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-280: input: tx object(without nonce) and feePayer', () => {
         it('should return signature and rawTransaction', async () => {
@@ -1114,7 +1114,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
             const decoded = caver.klay.decodeTransaction(result.rawTransaction)
             expect(decoded.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-281: input: tx object(without nonce), feePayer and privateKey', () => {
         it('should return signature and rawTransaction', async () => {
@@ -1131,7 +1131,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
             const decoded = caver.klay.decodeTransaction(result.rawTransaction)
             expect(decoded.feePayerSignatures.length).to.equals(1)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-282: input: tx object(without gasPrice) and feePayer', () => {
         it('should return signature and rawTransaction', async () => {
@@ -1148,7 +1148,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
             const decoded = caver.klay.decodeTransaction(result.rawTransaction)
             expect(decoded.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-283: input: tx object(without gasPrice), feePayer and privateKey', () => {
         it('should return signature and rawTransaction', async () => {
@@ -1165,7 +1165,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
             const decoded = caver.klay.decodeTransaction(result.rawTransaction)
             expect(decoded.feePayerSignatures.length).to.equals(1)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-284: input: tx object(without chainId) and feePayer', () => {
         it('should return signature and rawTransaction', async () => {
@@ -1182,7 +1182,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
             const decoded = caver.klay.decodeTransaction(result.rawTransaction)
             expect(decoded.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-285: input: tx object(without chainId), feePayer and privateKey', () => {
         it('should return signature and rawTransaction', async () => {
@@ -1199,7 +1199,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
             const decoded = caver.klay.decodeTransaction(result.rawTransaction)
             expect(decoded.feePayerSignatures.length).to.equals(1)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-286: input: tx object, feePayer and invalid privateKey', () => {
         it('should throw error when private key is invalid', async () => {
@@ -1208,7 +1208,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
             await expect(caver.klay.accounts.feePayerSignTransaction(txObj, feePayer.address, invalid)).to.be.rejectedWith(errorMessage)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-287: input: tx object, invalid feePayer address', () => {
         it('should throw error when private key is invalid', async () => {
@@ -1217,7 +1217,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
             await expect(caver.klay.accounts.feePayerSignTransaction(txObj, invalid)).to.be.rejectedWith(errorMessage)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-288: input: tx object(without from) and feePayer', () => {
         it('should throw error when invalid transaction', async () => {
@@ -1227,7 +1227,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
             const errorMessage = '"from" is missing'
             await expect(caver.klay.accounts.feePayerSignTransaction(invalid, feePayer.address)).to.be.rejectedWith(errorMessage)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-289: input: tx object(without from), feePayer and privateKey', () => {
         it('should throw error when invalid transaction', async () => {
@@ -1239,7 +1239,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
                 caver.klay.accounts.feePayerSignTransaction(invalid, feePayer.address, feePayer.feePayerKey[0])
             ).to.be.rejectedWith(errorMessage)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-290: input: RLP encoded rawTransaction(without signatures) string and feePayer', () => {
         it('should sign with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
@@ -1250,7 +1250,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
             expect(result.feePayerSignatures.length).to.equals(3)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-291: input: RLP encoded rawTransaction(with signatures of sender) string and feePayer', () => {
         it('should sign with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
@@ -1265,7 +1265,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
             expect(decoded.signatures.length).to.equals(3)
             expect(decoded.feePayerSignatures.length).to.equals(3)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-292: input: RLP encoded rawTransaction(with signatures of fee payer) string and feePayer', () => {
         it('should append with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
@@ -1276,7 +1276,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
             expect(result.feePayerSignatures.length).to.equals(6)
         })
-    })
+    }).timeout(10000)
 
     context(
         'CAVERJS-UNIT-WALLET-293: input: RLP encoded rawTransaction(with signatures of sender and fee payer) string and feePayer',
@@ -1294,7 +1294,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
                 expect(decoded.feePayerSignatures.length).to.equals(6)
             })
         }
-    )
+    ).timeout(10000)
 
     context(
         'CAVERJS-UNIT-WALLET-294: input: RLP encoded rawTransaction(with signatures of sender and fee payer) string, feePayer and privateKey',
@@ -1312,7 +1312,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
                 expect(decoded.feePayerSignatures.length).to.equals(4)
             })
         }
-    )
+    ).timeout(10000)
 
     context(
         'CAVERJS-UNIT-WALLET-295: input: RLP encoded rawTransaction(with signatures of sender and fee payer) string with invalid feePayer',
@@ -1324,7 +1324,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
                 await expect(caver.klay.accounts.feePayerSignTransaction(withBothSig, invalid)).to.be.rejectedWith(errorMessage)
             })
         }
-    )
+    ).timeout(10000)
 
     context(
         'CAVERJS-UNIT-WALLET-296: input: RLP encoded rawTransaction(with signatures of sender and fee payer) string, feePayer and invalid private key',
@@ -1338,7 +1338,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
                 )
             })
         }
-    )
+    ).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-297: input: fee payer format transaction(without signatures) string and feePayer', () => {
         it('should sign with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
@@ -1353,7 +1353,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
             expect(result.feePayerSignatures.length).to.equals(3)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-298: input: fee payer format transaction(with signatures of sender) string and feePayer', () => {
         it('should sign with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
@@ -1372,7 +1372,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
             expect(decoded.signatures.length).to.equals(3)
             expect(decoded.feePayerSignatures.length).to.equals(3)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-299: input: fee payer format transaction(with signatures of fee payer) string and feePayer', () => {
         it('should append with feePayerKey of feePayer and return feePayerSignatures and rawTransaction', async () => {
@@ -1387,7 +1387,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
             expect(result.feePayerSignatures.length).to.equals(6)
         })
-    })
+    }).timeout(10000)
 
     context(
         'CAVERJS-UNIT-WALLET-300: input: fee payer format transaction(with signatures of sender and fee payer) string and feePayer',
@@ -1409,7 +1409,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
                 expect(decoded.feePayerSignatures.length).to.equals(6)
             })
         }
-    )
+    ).timeout(10000)
 
     context(
         'CAVERJS-UNIT-WALLET-301: input: fee payer format transaction(with signatures of sender and fee payer) string, feePayer and privateKey',
@@ -1431,7 +1431,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
                 expect(decoded.feePayerSignatures.length).to.equals(4)
             })
         }
-    )
+    ).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-302: input: fee payer tx object(without feePayer) and feePayer', () => {
         it('should set feePayer information through feePayer parameter', async () => {
@@ -1444,7 +1444,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
             expect(result.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-303: input: fee payer tx object(with 0x feePayer) and feePayer', () => {
         it('should set feePayer information through feePayer parameter', async () => {
@@ -1457,7 +1457,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
             expect(result.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
         })
-    })
+    }).timeout(10000)
 
     context(
         'CAVERJS-UNIT-WALLET-304: input: fee payer format transaction(with signatures of sender and fee payer) string with invalid feePayer',
@@ -1473,7 +1473,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
                 await expect(caver.klay.accounts.feePayerSignTransaction(feePayerTx, invalid)).to.be.rejectedWith(errorMessage)
             })
         }
-    )
+    ).timeout(10000)
 
     context(
         'CAVERJS-UNIT-WALLET-305: input: fee payer format transaction(with signatures of sender and fee payer) string with not matched feePayer',
@@ -1489,7 +1489,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
                 await expect(caver.klay.accounts.feePayerSignTransaction(feePayerTx, address)).to.be.rejectedWith(errorMessage)
             })
         }
-    )
+    ).timeout(10000)
 
     context(
         'CAVERJS-UNIT-WALLET-306: input: fee payer format transaction(with signatures of sender and fee payer) string, feePayer and invalid private key',
@@ -1507,7 +1507,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
                 )
             })
         }
-    )
+    ).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-376: input: non fee delegated transaction, fee payer address', () => {
         it('should throw error when private key is invalid', async () => {
@@ -1525,7 +1525,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
             await expect(caver.klay.accounts.feePayerSignTransaction(nonFeeDelegated, feePayer.address)).to.be.rejectedWith(errorMessage)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-377: input: non fee delegated transaction, fee payer address', () => {
         it('should throw error when private key is invalid', async () => {
@@ -1544,7 +1544,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
             await expect(caver.klay.accounts.feePayerSignTransaction(rawTransaction, feePayer.address)).to.be.rejectedWith(errorMessage)
         })
-    })
+    }).timeout(10000)
 
     context('CAVERJS-UNIT-WALLET-393: use feePayerSignTransaciton in Account instance', () => {
         it('should sign with feePayerKey to transaction as a fee payer', async () => {
@@ -1555,7 +1555,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
             expect(result.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
         })
-    })
+    }).timeout(10000)
 })
 
 describe('caver.klay.accounts.getRawTransactionWithSignatures', () => {

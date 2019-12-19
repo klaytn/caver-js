@@ -12,10 +12,7 @@ class AccountKeyMultiSig {
         if (isDuple(keys)) throw new Error('There is a duplicate key.')
 
         this._keys = keys
-    }
-
-    get type() {
-        return AccountKeyEnum.ACCOUNT_KEY_MULTISIG
+        this.type = AccountKeyEnum.ACCOUNT_KEY_MULTISIG
     }
 
     get defaultKey() {
