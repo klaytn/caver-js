@@ -367,6 +367,9 @@ const hexToBytes = function(hex) {
  */
 /* eslint-disable complexity */
 const toHex = function(value, returnType) {
+    if (Buffer.isBuffer(value)) {
+        return returnType ? 'buffer' : bufferToHex(value)
+    }
     if (isAddress(value)) {
         return returnType ? 'address' : `0x${value.toLowerCase().replace(/^0x/i, '')}`
     }
@@ -395,6 +398,49 @@ const toHex = function(value, returnType) {
     return returnType ? (value < 0 ? 'int256' : 'uint256') : numberToHex(value)
 }
 /* eslint-enable complexity */
+
+const bufferToHex = function(buf) {
+    buf = toBuffer(buf)
+    return `0x${buf.toString('hex')}`
+}
+
+/**
+ * Convert a input into a Buffer.
+ *
+ * @method toBuffer
+ * @param {Buffer|Array|String|Number|BN|Object} input
+ * @return {Buffer}
+ */
+const toBuffer = function(input) {
+    if (Buffer.isBuffer(input)) return input
+    if (input === null || input === undefined) return Buffer.alloc(0)
+    if (Array.isArray(input)) return Buffer.from(input)
+    if (isBN(input)) return input.toArrayLike(Buffer)
+    if (_.isObject(input)) {
+        if (input.toArray && _.isFunction(input.toArray)) return Buffer.from(input.toArray())
+        throw new Error('To convert an object to a buffer, the toArray function must be implemented inside the object')
+    }
+
+    switch (typeof input) {
+        case 'string':
+            if (isHexStrict(input)) return Buffer.from(makeEven(input).replace('0x', ''), 'hex')
+            throw new Error("Failed to convert string to Buffer. 'toBuffer' function only supports 0x-prefixed hex string")
+        case 'number':
+            return numberToBuffer(input)
+    }
+    throw new Error(`Not supported type with ${input}`)
+}
+
+/**
+ * Convert a number to a Buffer.
+ *
+ * @method numberToBuffer
+ * @param {Number|String|BN} num
+ * @return {Buffer}
+ */
+const numberToBuffer = function(num) {
+    return Buffer.from(makeEven(numberToHex(num)).replace('0x', ''), 'hex')
+}
 
 /**
  * Check if string is HEX, requires a 0x in front
@@ -782,6 +828,9 @@ module.exports = {
     hexToNumberString: hexToNumberString,
     numberToHex: numberToHex,
     toHex: toHex,
+    bufferToHex: bufferToHex,
+    toBuffer: toBuffer,
+    numberToBuffer: numberToBuffer,
     hexToBytes: hexToBytes,
     bytesToHex: bytesToHex,
     isHex: isHex,
