@@ -405,44 +405,6 @@ const stripHexPrefix = function(str) {
     return isHexPrefixed(str) ? str.slice(2) : str
 }
 
-/**
- * Convert a input into a Buffer.
- *
- * @method toBuffer
- * @param {Buffer|Array|String|Number|BN|Object} input
- * @return {Buffer}
- */
-const toBuffer = function(input) {
-    if (Buffer.isBuffer(input)) return input
-    if (input === null || input === undefined) return Buffer.alloc(0)
-    if (Array.isArray(input)) return Buffer.from(input)
-    if (utils.isBN(input)) return input.toArrayLike(Buffer)
-    if (_.isObject(input)) {
-        if (input.toArray && _.isFunction(input.toArray)) return Buffer.from(input.toArray())
-        throw new Error('To convert an object to a buffer, the toArray function must be implemented inside the object')
-    }
-
-    switch (typeof input) {
-        case 'string':
-            if (isHexParameter(input)) return Buffer.from(stripHexPrefix(utils.makeEven(input)), 'hex')
-            throw new Error("Failed to convert string to Buffer. 'toBuffer' function only supports 0x-prefixed hex string")
-        case 'number':
-            return numberToBuffer(input)
-    }
-    throw new Error(`Not supported type with ${input}`)
-}
-
-/**
- * Convert a number to a Buffer.
- *
- * @method numberToBuffer
- * @param {Number|String|BN} num
- * @return {Buffer}
- */
-const numberToBuffer = function(num) {
-    return Buffer.from(stripHexPrefix(utils.makeEven(utils.numberToHex(num))), 'hex')
-}
-
 module.exports = {
     _fireError: _fireError,
     _jsonInterfaceMethodToString: _jsonInterfaceMethodToString,
@@ -479,8 +441,9 @@ module.exports = {
     toHex: utils.toHex,
     toBN: utils.toBN,
 
-    toBuffer: toBuffer,
-    numberToBuffer: numberToBuffer,
+    toBuffer: utils.toBuffer,
+    numberToBuffer: utils.numberToBuffer,
+    bufferToHex: utils.bufferToHex,
 
     bytesToHex: utils.bytesToHex,
     hexToBytes: utils.hexToBytes,

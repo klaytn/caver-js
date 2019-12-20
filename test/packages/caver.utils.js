@@ -334,6 +334,14 @@ describe('CAVERJS-UNIT-ETC-117: caver.utils.toHex', () => {
             expected:
                 '0x0300000035c3a8c386c3954c5d127cc29dc38ec2bec29e1a37c2abc29b05321128c390c297590a3c100000000000006521c39f642fc3b1c3b5c3ac0c3a7ac2a6c38ec2a6c2b1c3a7c2b7c3b7c38dc2a2c38bc39f07362ac28508c28ec297c3b1c29ec3b94331c38955c380c3a9321ac393c28642c28c',
         },
+        {
+            value: Buffer.from('5b9ac8', 'hex'),
+            expected: '0x5b9ac8',
+        },
+        {
+            value: Buffer.alloc(0),
+            expected: '0x',
+        },
     ]
 
     it.each(tests, 'should return hexstring', test => {
@@ -1155,5 +1163,19 @@ describe('caver.utils.isEmptySig', () => {
         const expectedError = 'Invalid signatures length: 6'
         expect(() => caver.utils.isEmptySig(['0x01', '0x', '0x', '0x01', '0x', '0x'])).to.throws(expectedError)
         expect(() => caver.utils.isEmptySig([['0x01', '0x', '0x', '0x01', '0x', '0x']])).to.throws(expectedError)
+    })
+})
+
+describe('caver.utils.bufferToHex', () => {
+    it('CAVERJS-UNIT-ETC-181: caver.utils.bufferToHex should convert buffer to Hex', () => {
+        const buf = Buffer.from('5b9ac8', 'hex')
+        const ret = caver.utils.bufferToHex(buf)
+        expect(ret).to.equals('0x5b9ac8')
+    })
+
+    it('CAVERJS-UNIT-ETC-182: caver.utils.bufferToHex should convert empty buffer to Hex', () => {
+        const buf = Buffer.alloc(0)
+        const ret = caver.utils.bufferToHex(buf)
+        expect(ret).to.equals('0x')
     })
 })
