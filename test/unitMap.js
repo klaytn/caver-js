@@ -20,7 +20,7 @@ const { expect } = require('chai')
 const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 
-describe('CAVERJS-UNIT-ETC-017 : unit map', done => {
+describe('CAVERJS-UNIT-ETC-017 : unit map', () => {
     it('unit map should have `klay` property', async () => {
         const caver = new Caver(testRPCURL)
 

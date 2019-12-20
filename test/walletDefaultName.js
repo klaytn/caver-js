@@ -21,7 +21,7 @@ const { expect } = require('./extendedChai')
 const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 
-describe('wallet instance default wallet name', done => {
+describe('wallet instance default wallet name', () => {
     it('should return valid default wallet name', async () => {
         const caver = new Caver(testRPCURL)
 

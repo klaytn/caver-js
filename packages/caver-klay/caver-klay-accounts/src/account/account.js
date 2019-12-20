@@ -60,7 +60,7 @@ class Account {
             get: function() {
                 return this.accountKey.defaultKey
             },
-            set: function(privateKeyInput) {
+            set: function() {
                 throw new Error(
                     'The privateKey cannot be modified. The privateKey is set to default key of accountKey, so update accountKey to modify the privateKey.'
                 )

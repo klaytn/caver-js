@@ -25,7 +25,6 @@
  */
 
 const core = require('../../caver-core')
-const utils = require('../../caver-utils')
 const rpc = require('../../caver-rtm').rpc
 const Method = require('../../caver-core-method')
 

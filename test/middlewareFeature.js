@@ -16,7 +16,6 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const { expect } = require('chai')
 const fetch = require('node-fetch')
 const Caver = require('../index.js')
 
@@ -43,7 +42,7 @@ describe('caver middleware', () => {
         caver.klay.getBlockNumber()
         caver.klay.getBlockNumber()
 
-        const res = await fetch(`https://apiwallet.klaytn.com/faucet/?address=${caver.klay.accounts.wallet[0].address}`)
+        await fetch(`https://apiwallet.klaytn.com/faucet/?address=${caver.klay.accounts.wallet[0].address}`)
         caver.klay
             .sendTransaction({
                 from: caver.klay.accounts.wallet[0].address,
@@ -52,9 +51,10 @@ describe('caver middleware', () => {
                 chainId: '1000',
                 gas: '50000',
             })
-            .once('receipt', async receipt => {})
+            .once('receipt', async () => {})
         caver.klay.getBlockNumber()
         caver.klay.getBlockNumber()
         caver.klay.getBlockNumber()
+        // TODO : no assert or expect
     }).timeout(100000)
 })

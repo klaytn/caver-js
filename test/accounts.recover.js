@@ -21,7 +21,7 @@ const { expect } = require('./extendedChai')
 const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 
-describe('caver.klay.accounts.recover', done => {
+describe('caver.klay.accounts.recover', () => {
     it('CAVERJS-UNIT-WALLET-019 : should have same value for 3 different arguments definition', () => {
         /**
          * 3 different arguments definition for `caver.klay.accounts.recover`
@@ -35,7 +35,6 @@ describe('caver.klay.accounts.recover', done => {
         const message = 'Some data'
 
         const privateKey = '0x4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318'
-        const account = caver.klay.accounts.privateKeyToAccount(privateKey)
 
         const signed = caver.klay.accounts.sign('Some data', privateKey)
 
@@ -51,7 +50,7 @@ describe('caver.klay.accounts.recover', done => {
         const privateKey = '0x4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318'
         const signed = caver.klay.accounts.sign('Some data', privateKey)
 
-        const { messageHash, signature, v, r, s } = signed
+        const { messageHash, signature } = signed
 
         expect(caver.klay.accounts.recover(messageHash, signature, true)).to.equal(caver.klay.accounts.recover(signed))
     })

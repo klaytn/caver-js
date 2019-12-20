@@ -21,7 +21,7 @@ const { expect } = require('./extendedChai')
 const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 
-describe('caver.utils.isValidPrivateKey', done => {
+describe('caver.utils.isValidPrivateKey', () => {
     it('CAVERJS-UNIT-WALLET-086, CAVERJS-UNIT-WALLET-087 : should return false when given private key is invalid.', async () => {
         const caver = new Caver(testRPCURL)
 

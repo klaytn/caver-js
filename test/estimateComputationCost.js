@@ -16,7 +16,6 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-require('it-each')({ testPerIteration: true })
 const { expect } = require('./extendedChai')
 
 const Caver = require('../index.js')
@@ -26,7 +25,6 @@ const caver = new Caver(testRPCURL)
 
 let senderPrvKey
 let senderAddress
-let contractAddress
 
 before(() => {
     senderPrvKey =

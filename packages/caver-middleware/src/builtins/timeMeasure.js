@@ -16,7 +16,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const timeMeasure = (memoize => options => (data, next, bypass) => {
+const timeMeasure = (memoize => () => (data, next, bypass) => {
     if (!memoize[data.id]) {
         memoize[data.id] = new Date().getTime()
         bypass()

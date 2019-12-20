@@ -24,7 +24,7 @@ const Caver = require('../index.js')
 
 const caver = new Caver(testRPCURL)
 
-describe('Predefined block number', done => {
+describe('Predefined block number', () => {
     it('genesis', async () => {
         caver.klay.defaultBlock = 'genesis'
         const { address } = caver.klay.accounts.create()

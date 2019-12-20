@@ -25,7 +25,7 @@ beforeEach(() => {
     caver = new Caver(testRPCURL)
 })
 
-describe('get validators', done => {
+describe('get validators', () => {
     it('getValidators should throw error.', () => {
         expect(() => caver.klay.getValidators()).to.throw('caver.klay.getValidators is not a function')
     })

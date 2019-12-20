@@ -16,9 +16,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-require('it-each')({ testPerIteration: true })
-const assert = require('assert')
-const { expect } = require('../extendedChai')
+const { expect, assert } = require('../extendedChai')
 
 const testRPCURL = require('../testrpc')
 const Caver = require('../../index.js')
@@ -209,7 +207,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
     it('CAVERJS-UNIT-TX-085 : If transaction object missing senderRawTransaction, signTransaction should throw error', () => {
         const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
 
-        caver.klay.accounts.signTransaction(tx, senderPrvKey).then(ret => {
+        caver.klay.accounts.signTransaction(tx, senderPrvKey).then(() => {
             expect(() => caver.klay.sendTransaction({ feePayer: payerAddress })).to.throws()
         })
     }).timeout(200000)

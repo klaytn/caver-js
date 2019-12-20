@@ -21,7 +21,7 @@ const { expect } = require('./extendedChai')
 const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 
-describe('caver.klay.accounts.hashMessage', done => {
+describe('caver.klay.accounts.hashMessage', () => {
     it('CAVERJS-UNIT-ETC-003 : should have same value with utf8ToHex', async () => {
         const caver = new Caver(testRPCURL)
 

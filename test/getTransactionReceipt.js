@@ -56,7 +56,7 @@ describe('get transaction receipt', () => {
         caver.klay
             .getTransactionReceipt(invalidHash)
             .then(() => done(false))
-            .catch(ret => done())
+            .catch(() => done())
     }).timeout(100000)
 
     it('should throw an error without parameter', () => {
