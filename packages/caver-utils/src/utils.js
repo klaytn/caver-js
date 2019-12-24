@@ -705,12 +705,12 @@ const resolveSignature = signature => {
 const transformSignaturesToObject = signatures => {
     let isSingular = false
 
-    if (!signatures) throw new Error(`Failed to transform signatures to obejct: invalid signatures ${signatures}`)
+    if (!signatures) throw new Error(`Failed to transform signatures to object: invalid signatures ${signatures}`)
 
     // Input cases
     // case 1. '0xf1998...'
     // case 2. {V: '0x4e44', R: '0x1692a...', S: '0x277b9...'} or {v: '0x4e44', r: '0x1692a...', s: '0x277b9...'}
-    // case 3. ['0xf1998...', 0x53fe7...]
+    // case 3. ['0xf1998...', '0x53fe7...']
     // case 4. ['0x4e44', '0x1692a...', '0x277b9...']
     // case 5. [{V: '0x4e44', R: '0x1692a...', S: '0x277b9...'}, {v: '0x4e44', r: '0x1692a...', s: '0x277b9...'}]
     // case 6. [['0x4e44', '0x1692a...', '0x277b9...'], ['0x4e44', '0x1692a...', '0x277b9...']]
@@ -752,7 +752,7 @@ const transformSignaturesToObject = signatures => {
         }
 
         if (!sigObj.V || !sigObj.R || !sigObj.S) {
-            throw new Error(`Failed to transform signatures to obejct: invalid signature ${sig}`)
+            throw new Error(`Failed to transform signatures to object: invalid signature ${sig}`)
         }
 
         ret.push(sigObj)

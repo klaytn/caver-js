@@ -1316,10 +1316,10 @@ describe('caver.utils.transformSignaturesToObject', () => {
     it('CAVERJS-UNIT-ETC-190: should throw error when type is invalid', () => {
         expect(() => caver.utils.transformSignaturesToObject(1)).to.throws('Unsupported signature type: number')
         expect(() => caver.utils.transformSignaturesToObject(null)).to.throws(
-            'Failed to transform signatures to obejct: invalid signatures null'
+            'Failed to transform signatures to object: invalid signatures null'
         )
         expect(() => caver.utils.transformSignaturesToObject(undefined)).to.throws(
-            'Failed to transform signatures to obejct: invalid signatures undefined'
+            'Failed to transform signatures to object: invalid signatures undefined'
         )
     })
 
@@ -1329,12 +1329,12 @@ describe('caver.utils.transformSignaturesToObject', () => {
             S: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
         }
         expect(() => caver.utils.transformSignaturesToObject(signature)).to.throws(
-            `Failed to transform signatures to obejct: invalid signature`
+            `Failed to transform signatures to object: invalid signature`
         )
 
         signature = ['0x4e44', '0x1692a48f166e3ef146eba61cbd6b450926854bb340cf6f689239f27588159419']
         expect(() => caver.utils.transformSignaturesToObject(signature)).to.throws(
-            `Failed to transform signatures to obejct: invalid signature`
+            `Failed to transform signatures to object: invalid signature`
         )
     })
 })
