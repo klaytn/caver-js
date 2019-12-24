@@ -720,7 +720,7 @@ const transformSignaturesToObject = signatures => {
         isSingular = true
     } else if (_.isString(signatures[0])) {
         // This logic is performed for case 3 and case 4.
-        // In case 3, the signature string is contained in an array
+        // In case 3, the signature string is in the array.
         // In case 4, v, r, and s are included in the array
         // The signature string is a combination of v, r, and s, so length of signature string will be longer than 64.
         // The parameter is pushed to an array only in case 4 to form the array containing the multiple signatures.
