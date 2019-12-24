@@ -723,7 +723,7 @@ const transformSignaturesToObject = signatures => {
         // In case 3, the signature string is in the array.
         // In case 4, v, r, and s are separately included in the array.
         // The signature string is a combination of v, r, and s, so the length of the signature string will be longer than 64.
-        // The parameter is pushed to an array only in case 4 to form the array containing the multiple signatures.
+        // Hence, only case 4 will perform the below logic to form an array of signatures.
         const stripped = signatures[0].replace('0x', '')
         if (stripped.length <= 64) {
             signatures = [signatures]
