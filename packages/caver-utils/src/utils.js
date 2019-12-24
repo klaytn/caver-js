@@ -702,6 +702,77 @@ const resolveSignature = signature => {
     }
 }
 
+const transformSignaturesToObject = signatures => {
+    let isSingular = false
+
+    if (!signatures) throw new Error(`Failed to transform signatures to object: invalid signatures ${signatures}`)
+
+    // Input cases
+    // case 1. '0xf1998...'
+    // case 2. {V: '0x4e44', R: '0x1692a...', S: '0x277b9...'} or {v: '0x4e44', r: '0x1692a...', s: '0x277b9...'}
+    // case 3. ['0xf1998...', '0x53fe7...']
+    // case 4. ['0x4e44', '0x1692a...', '0x277b9...']
+    // case 5. [{V: '0x4e44', R: '0x1692a...', S: '0x277b9...'}, {v: '0x4e44', r: '0x1692a...', s: '0x277b9...'}]
+    // case 6. [['0x4e44', '0x1692a...', '0x277b9...'], ['0x4e44', '0x1692a...', '0x277b9...']]
+
+    // Transform a signature to an array of signatures to execute the same logic in the for loop below.
+    if (!_.isArray(signatures)) {
+        signatures = [signatures]
+        isSingular = true
+    } else if (_.isString(signatures[0])) {
+        // This logic is performed for case 3 and case 4.
+        // In case 3, the signature string is in the array.
+        // In case 4, v, r, and s are separately included in the array.
+        // The signature string is a combination of v, r, and s, so the length of the signature string will be longer than 64.
+        // Hence, only case 4 will perform the below logic to form an array of signatures.
+        const stripped = signatures[0].replace('0x', '')
+        if (stripped.length <= 64) {
+            signatures = [signatures]
+            isSingular = true
+        }
+    }
+
+    const ret = []
+
+    for (const sig of signatures) {
+        const sigObj = {}
+        if (_.isArray(sig)) {
+            if (sig.length !== 3) throw new Error(`Failed to transform signatures to object: invalid length of signature (${sig.length})`)
+            const [V, R, S] = sig
+            sigObj.V = V
+            sigObj.R = R
+            sigObj.S = S
+        } else if (_.isString(sig)) {
+            const decoded = Account.decodeSignature(sig).map(s => makeEven(trimLeadingZero(s)))
+            sigObj.V = decoded[0]
+            sigObj.R = decoded[1]
+            sigObj.S = decoded[2]
+        } else if (_.isObject(sig)) {
+            Object.keys(sig).map(key => {
+                if (key === 'v' || key === 'V') {
+                    sigObj.V = sig[key]
+                } else if (key === 'r' || key === 'R') {
+                    sigObj.R = sig[key]
+                } else if (key === 's' || key === 'S') {
+                    sigObj.S = sig[key]
+                } else {
+                    throw new Error(`Failed to transform signatures to object: invalid key(${key}) is defined in signature object.`)
+                }
+            })
+        } else {
+            throw new Error(`Unsupported signature type: ${typeof sig}`)
+        }
+
+        if (!sigObj.V || !sigObj.R || !sigObj.S) {
+            throw new Error(`Failed to transform signatures to object: invalid signature ${sig}`)
+        }
+
+        ret.push(sigObj)
+    }
+
+    return isSingular ? ret[0] : ret
+}
+
 const getTxTypeStringFromRawTransaction = rawTransaction => {
     if (typeof rawTransaction !== 'string') throw new Error('Invalid raw Tx', rawTransaction)
 
@@ -852,6 +923,7 @@ module.exports = {
     rlpDecode: rlpDecode,
     xyPointFromPublicKey: xyPointFromPublicKey,
     resolveSignature: resolveSignature,
+    transformSignaturesToObject: transformSignaturesToObject,
     getTxTypeStringFromRawTransaction,
     trimLeadingZero,
     makeEven,

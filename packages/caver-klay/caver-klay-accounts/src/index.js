@@ -359,7 +359,7 @@ Accounts.prototype.createAccountKeyMultiSig = function createAccountKeyMultiSig(
 }
 
 /**
- * createAccountKeyRoleBased creates AccountKeyRoleBased with an obejct of key.
+ * createAccountKeyRoleBased creates AccountKeyRoleBased with an object of key.
  *
  * @method createAccountKeyRoleBased
  * @param {Object} keyObject Object that defines key for each role to use when creating AccountKeyRoleBased.

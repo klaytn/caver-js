@@ -493,6 +493,7 @@ module.exports = {
     rlpDecode: utils.rlpDecode,
     xyPointFromPublicKey: utils.xyPointFromPublicKey,
     resolveSignature: utils.resolveSignature,
+    transformSignaturesToObject: utils.transformSignaturesToObject,
     getTxTypeStringFromRawTransaction: utils.getTxTypeStringFromRawTransaction,
     txTypeToString: utils.txTypeToString,
     trimLeadingZero: utils.trimLeadingZero,
