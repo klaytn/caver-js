@@ -720,7 +720,7 @@ const transformSignaturesToObject = signatures => {
         isSingular = true
     } else if (_.isString(signatures[0])) {
         const stripped = signatures[0].replace('0x', '')
-        if (stripped.length <= 4) {
+        if (stripped.length <= 64) {
             signatures = [signatures]
             isSingular = true
         }
