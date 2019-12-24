@@ -1332,9 +1332,27 @@ describe('caver.utils.transformSignaturesToObject', () => {
             `Failed to transform signatures to object: invalid signature`
         )
 
+        signature = {
+            V: '0x0fea',
+            invalidKey: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
+        }
+        expect(() => caver.utils.transformSignaturesToObject(signature)).to.throws(
+            'Failed to transform signatures to object: invalid key(invalidKey) is defined in signature object.'
+        )
+
         signature = ['0x4e44', '0x1692a48f166e3ef146eba61cbd6b450926854bb340cf6f689239f27588159419']
         expect(() => caver.utils.transformSignaturesToObject(signature)).to.throws(
-            `Failed to transform signatures to object: invalid signature`
+            `Failed to transform signatures to object: invalid length of signature (2)`
+        )
+
+        signature = [
+            '0x4e44',
+            '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
+            '0x1692a48f166e3ef146eba61cbd6b450926854bb340cf6f689239f27588159419',
+            '0x1692a48f166e3ef146eba61cbd6b450926854bb340cf6f689239f27588159419',
+        ]
+        expect(() => caver.utils.transformSignaturesToObject(signature)).to.throws(
+            `Failed to transform signatures to object: invalid length of signature (4)`
         )
     })
 })

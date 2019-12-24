@@ -731,6 +731,7 @@ const transformSignaturesToObject = signatures => {
     for (const sig of signatures) {
         const sigObj = {}
         if (_.isArray(sig)) {
+            if (sig.length !== 3) throw new Error(`Failed to transform signatures to object: invalid length of signature (${sig.length})`)
             const [V, R, S] = sig
             sigObj.V = V
             sigObj.R = R
@@ -743,9 +744,15 @@ const transformSignaturesToObject = signatures => {
             sigObj.S = decoded[2]
         } else if (_.isObject(sig)) {
             Object.keys(sig).map(key => {
-                if (key === 'v' || key === 'V') sigObj.V = sig[key]
-                if (key === 'r' || key === 'R') sigObj.R = sig[key]
-                if (key === 's' || key === 'S') sigObj.S = sig[key]
+                if (key === 'v' || key === 'V') {
+                    sigObj.V = sig[key]
+                } else if (key === 'r' || key === 'R') {
+                    sigObj.R = sig[key]
+                } else if (key === 's' || key === 'S') {
+                    sigObj.S = sig[key]
+                } else {
+                    throw new Error(`Failed to transform signatures to object: invalid key(${key}) is defined in signature object.`)
+                }
             })
         } else {
             throw new Error(`Unsupported signature type: ${typeof sig}`)
