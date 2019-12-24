@@ -715,6 +715,7 @@ const transformSignaturesToObject = signatures => {
     // case 5. [{V: '0x4e44', R: '0x1692a...', S: '0x277b9...'}, {v: '0x4e44', r: '0x1692a...', s: '0x277b9...'}]
     // case 6. [['0x4e44', '0x1692a...', '0x277b9...'], ['0x4e44', '0x1692a...', '0x277b9...']]
 
+    // Transform a signature to an array of signatures to execute the same logic in the for loop below.
     if (!_.isArray(signatures)) {
         signatures = [signatures]
         isSingular = true
