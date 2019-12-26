@@ -1229,9 +1229,7 @@ describe('caver.utils.transformSignaturesToObject', () => {
 
         const transformed = caver.utils.transformSignaturesToObject(signatureString)
 
-        Object.keys(expectedSignatures).map(key => {
-            expect(transformed[key]).to.equals(expectedSignatures[key])
-        })
+        expect(transformed).to.deep.equal(expectedSignatures)
     })
 
     it('CAVERJS-UNIT-ETC-186: should convert string format of signatures to object with multiple signatures', () => {
@@ -1255,9 +1253,7 @@ describe('caver.utils.transformSignaturesToObject', () => {
         const transformed = caver.utils.transformSignaturesToObject(signatureStrings)
 
         for (let i = 0; i < expectedSignatures.length; i++) {
-            Object.keys(expectedSignatures[i]).map(key => {
-                expect(transformed[i][key]).to.equals(expectedSignatures[i][key])
-            })
+            expect(transformed[i]).to.deep.equal(expectedSignatures[i])
         }
     })
 
@@ -1315,12 +1311,19 @@ describe('caver.utils.transformSignaturesToObject', () => {
 
     it('CAVERJS-UNIT-ETC-190: should throw error when type is invalid', () => {
         expect(() => caver.utils.transformSignaturesToObject(1)).to.throws('Unsupported signature type: number')
+        expect(() => caver.utils.transformSignaturesToObject([1])).to.throws('Unsupported signature type: number')
         expect(() => caver.utils.transformSignaturesToObject(null)).to.throws(
             'Failed to transform signatures to object: invalid signatures null'
         )
+        expect(() => caver.utils.transformSignaturesToObject([null])).to.throws('Unsupported signature type: object')
         expect(() => caver.utils.transformSignaturesToObject(undefined)).to.throws(
             'Failed to transform signatures to object: invalid signatures undefined'
         )
+        expect(() => caver.utils.transformSignaturesToObject([undefined])).to.throws('Unsupported signature type: undefined')
+        expect(() => caver.utils.transformSignaturesToObject(NaN)).to.throws(
+            'Failed to transform signatures to object: invalid signatures NaN'
+        )
+        expect(() => caver.utils.transformSignaturesToObject([NaN])).to.throws('Unsupported signature type: number')
     })
 
     it('CAVERJS-UNIT-ETC-191: should throw error when input does not have enough signature information', () => {
