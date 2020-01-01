@@ -68,7 +68,7 @@ const TRANSACTION_HASH_LENGTH = 66
  * @return {Boolean}
  */
 const isBN = function(object) {
-    return object instanceof BN || (object && object.constructor && object.constructor.name === 'BN')
+    return BN.isBN(object)
 }
 
 /**

@@ -74,6 +74,15 @@ describe('caver.utils.isBN', () => {
             expect(caver.utils.isBN(test.value)).to.be.equal(test.expected)
         })
     })
+
+    context('CAVERJS-UNIT-ETC-192: input: An object whose type is BN but not of type BN', () => {
+        it('caver.utils should return false', () => {
+            const notBn = {}
+            notBn.constructor = {}
+            notBn.constructor.name = 'BN'
+            expect(caver.utils.isBN(notBn)).to.be.equal(false)
+        })
+    })
 })
 
 describe('caver.utils.isBigNumber', () => {
