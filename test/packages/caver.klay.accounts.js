@@ -16,6 +16,9 @@
 	along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+require('it-each')({ testPerIteration: true })
+const BN = require('bn.js')
+
 const testRPCURL = require('../testrpc')
 const { expect } = require('../extendedChai')
 
@@ -104,11 +107,18 @@ function checkHashMessage(hashed, originMessage) {
     expect(hashed).to.equal(originHashed)
 }
 
-function isKeystoreV4(data, { address }) {
-    const objectKeys = ['version', 'id', 'address', 'keyring']
+function isKeystore(data, { address }, version = 4) {
+    const objectKeys = ['version', 'id', 'address']
+
+    if (version > 3) {
+        objectKeys.push('keyring')
+    } else {
+        objectKeys.push('crypto')
+    }
+
     expect(Object.getOwnPropertyNames(data)).to.deep.equal(objectKeys)
 
-    expect(data.version).to.equals(4)
+    expect(data.version).to.equals(version)
 
     expect(caver.utils.isAddress(data.address)).to.equal(true)
 
@@ -2249,7 +2259,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const result = caver.klay.accounts.encrypt(account.privateKey, password)
 
-            isKeystoreV4(result, account)
+            isKeystore(result, account)
 
             const decryptedAccount = caver.klay.accounts.decrypt(result, password)
             isAccount(decryptedAccount, { keys: account.keys, address: account.address })
@@ -2272,7 +2282,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const result = caver.klay.accounts.encrypt(account.getKlaytnWalletKey(), password)
 
-            isKeystoreV4(result, account)
+            isKeystore(result, account)
 
             const decryptedAccount = caver.klay.accounts.decrypt(result, password)
             isAccount(decryptedAccount, { keys: account.keys, address: account.address })
@@ -2285,7 +2295,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const result = caver.klay.accounts.encrypt(account.getKlaytnWalletKey(), password, { address: account.address })
 
-            isKeystoreV4(result, account)
+            isKeystore(result, account)
 
             const decryptedAccount = caver.klay.accounts.decrypt(result, password)
             isAccount(decryptedAccount, { keys: account.keys, address: account.address })
@@ -2311,7 +2321,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const result = caver.klay.accounts.encrypt(testAccount.getKlaytnWalletKey(), password)
 
-            isKeystoreV4(result, testAccount)
+            isKeystore(result, testAccount)
 
             const decryptedAccount = caver.klay.accounts.decrypt(result, password)
             isAccount(decryptedAccount, { keys: testAccount.keys, address: testAccount.address })
@@ -2326,7 +2336,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const result = caver.klay.accounts.encrypt(testAccount.getKlaytnWalletKey(), password, { address: testAccount.address })
 
-            isKeystoreV4(result, testAccount)
+            isKeystore(result, testAccount)
 
             const decryptedAccount = caver.klay.accounts.decrypt(result, password)
             isAccount(decryptedAccount, { keys: testAccount.keys, address: testAccount.address })
@@ -2359,7 +2369,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const result = caver.klay.accounts.encrypt(testAccount.keys, password, { address: testAccount.address })
 
-            isKeystoreV4(result, testAccount)
+            isKeystore(result, testAccount)
             expect(result.keyring.length).to.equals(key.length)
 
             const decrypted = caver.klay.accounts.decrypt(result, password)
@@ -2398,7 +2408,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
                 const result = caver.klay.accounts.encrypt(testAccount.keys, password, { address: testAccount.address })
 
-                isKeystoreV4(result, testAccount)
+                isKeystore(result, testAccount)
                 expect(result.keyring.length).to.equals(3)
                 expect(result.keyring[0].length).to.equals(1)
                 expect(result.keyring[1].length).to.equals(1)
@@ -2434,7 +2444,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
                 const result = caver.klay.accounts.encrypt(testAccount.keys, password, { address: testAccount.address })
 
-                isKeystoreV4(result, testAccount)
+                isKeystore(result, testAccount)
                 expect(result.keyring.length).to.equals(3)
                 expect(result.keyring[0].length).to.equals(key.transactionKey.length)
                 expect(result.keyring[1].length).to.equals(key.updateKey.length)
@@ -2457,7 +2467,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const result = caver.klay.accounts.encrypt(testAccount.keys, password, { address: testAccount.address })
 
-            isKeystoreV4(result, testAccount)
+            isKeystore(result, testAccount)
             expect(result.keyring.length).to.equals(1)
             expect(result.keyring[0].length).to.equals(1)
 
@@ -2477,7 +2487,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const result = caver.klay.accounts.encrypt(testAccount.keys, password, { address: testAccount.address })
 
-            isKeystoreV4(result, testAccount)
+            isKeystore(result, testAccount)
             expect(result.keyring.length).to.equals(2)
             expect(result.keyring[0].length).to.equals(0)
             expect(result.keyring[1].length).to.equals(1)
@@ -2498,7 +2508,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const result = caver.klay.accounts.encrypt(testAccount.keys, password, { address: testAccount.address })
 
-            isKeystoreV4(result, testAccount)
+            isKeystore(result, testAccount)
             expect(result.keyring.length).to.equals(3)
             expect(result.keyring[0].length).to.equals(0)
             expect(result.keyring[1].length).to.equals(0)
@@ -2535,7 +2545,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const result = caver.klay.accounts.encrypt(accountKey, password, { address: testAccount.address })
 
-            isKeystoreV4(result, testAccount)
+            isKeystore(result, testAccount)
             expect(result.keyring.length).to.equals(1)
 
             const decrypted = caver.klay.accounts.decrypt(result, password)
@@ -2565,7 +2575,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const result = caver.klay.accounts.encrypt(accountKey, password, { address: testAccount.address })
 
-            isKeystoreV4(result, testAccount)
+            isKeystore(result, testAccount)
             expect(result.keyring.length).to.equals(key.length)
 
             const decrypted = caver.klay.accounts.decrypt(result, password)
@@ -2603,7 +2613,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const result = caver.klay.accounts.encrypt(accountKey, password, { address: testAccount.address })
 
-            isKeystoreV4(result, testAccount)
+            isKeystore(result, testAccount)
             expect(result.keyring.length).to.equals(3)
             expect(result.keyring[0].length).to.equals(1)
             expect(result.keyring[1].length).to.equals(key.updateKey.length)
@@ -2644,7 +2654,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const result = caver.klay.accounts.encrypt(testAccount, password, { address: testAccount.address })
 
-            isKeystoreV4(result, testAccount)
+            isKeystore(result, testAccount)
             expect(result.keyring.length).to.equals(1)
 
             const decrypted = caver.klay.accounts.decrypt(result, password)
@@ -2677,7 +2687,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const result = caver.klay.accounts.encrypt(accountKey, password, { address: testAccount.address })
 
-            isKeystoreV4(result, testAccount)
+            isKeystore(result, testAccount)
             expect(result.keyring.length).to.equals(key.length)
 
             const decrypted = caver.klay.accounts.decrypt(result, password)
@@ -2718,7 +2728,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const result = caver.klay.accounts.encrypt(accountKey, password, { address: testAccount.address })
 
-            isKeystoreV4(result, testAccount)
+            isKeystore(result, testAccount)
             expect(result.keyring.length).to.equals(3)
             expect(result.keyring[0].length).to.equals(1)
             expect(result.keyring[1].length).to.equals(key.updateKey.length)
@@ -2870,7 +2880,7 @@ describe('caver.klay.accounts.encrypt', () => {
             compareEncrypted(result.keyring[1][1], expectedKeystore.keyring[1][1])
             compareEncrypted(result.keyring[2][0], expectedKeystore.keyring[2][0])
 
-            isKeystoreV4(result, testAccount)
+            isKeystore(result, testAccount)
         })
     })
 
@@ -2903,7 +2913,7 @@ describe('caver.klay.accounts.encrypt', () => {
                 Object.assign({ address: testAccount.address, encryptOption })
             )
 
-            isKeystoreV4(result, testAccount)
+            isKeystore(result, testAccount)
 
             expect(result.keyring.length).to.equals(3)
             expect(result.keyring[0].length).to.equals(1)
@@ -2912,6 +2922,269 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const decrypted = caver.klay.accounts.decrypt(result, password)
             isAccount(decrypted, { keys: testAccount.keys, address: testAccount.address })
+        })
+    })
+})
+
+describe('caver.klay.accounts.encryptV3', () => {
+    let account
+
+    beforeEach(() => {
+        account = caver.klay.accounts.create()
+    })
+
+    context('CAVERJS-UNIT-WALLET-399: input: privateKey, password', () => {
+        it('should encrypt password with privateKey', () => {
+            const password = 'klaytn!@'
+
+            const result = caver.klay.accounts.encryptV3(account.privateKey, password)
+
+            isKeystore(result, account, 3)
+
+            const decryptedAccount = caver.klay.accounts.decrypt(result, password)
+            isAccount(decryptedAccount, { keys: account.keys, address: account.address })
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-400: input: privateKey:invalid, password', () => {
+        it('should throw an error', () => {
+            const invalid = caver.utils.randomHex(31) // 31bytes
+            const password = 'klaytn!@'
+
+            const errorMessage = 'Invalid private key'
+            expect(() => caver.klay.accounts.encryptV3(invalid, password)).to.throw(errorMessage)
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-401: input: privateKey:KlaytnWalletKey, password', () => {
+        it('should encrypt password with privateKey', () => {
+            const password = 'klaytn!@'
+
+            const result = caver.klay.accounts.encryptV3(account.getKlaytnWalletKey(), password)
+
+            isKeystore(result, account, 3)
+
+            const decryptedAccount = caver.klay.accounts.decrypt(result, password)
+            isAccount(decryptedAccount, { keys: account.keys, address: account.address })
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-402: input: privateKey:KlaytnWalletKey, password, {address:valid}', () => {
+        it('should encrypt password with privateKey', () => {
+            const password = 'klaytn!@'
+
+            const result = caver.klay.accounts.encryptV3(account.getKlaytnWalletKey(), password, { address: account.address })
+
+            isKeystore(result, account, 3)
+
+            const decryptedAccount = caver.klay.accounts.decrypt(result, password)
+            isAccount(decryptedAccount, { keys: account.keys, address: account.address })
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-403: input: privateKey:KlaytnWalletKey, password, {address:invalid}', () => {
+        it('should throw an error', () => {
+            const password = 'klaytn!@'
+
+            const errorMessage = 'The address extracted from the private key does not match the address received as the input value.'
+            expect(() =>
+                caver.klay.accounts.encryptV3(account.getKlaytnWalletKey(), password, { address: caver.klay.accounts.create().address })
+            ).to.throw(errorMessage)
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-404: input: privateKey:KlaytnWalletKey(decoupled), password', () => {
+        it('should encrypt password with privateKey', () => {
+            const password = 'klaytn!@'
+
+            const testAccount = caver.klay.accounts.createWithAccountKey(account.address, caver.klay.accounts.create().privateKey)
+
+            const result = caver.klay.accounts.encryptV3(testAccount.getKlaytnWalletKey(), password)
+
+            isKeystore(result, testAccount, 3)
+
+            const decryptedAccount = caver.klay.accounts.decrypt(result, password)
+            isAccount(decryptedAccount, { keys: testAccount.keys, address: testAccount.address })
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-405: input: privateKey:KlaytnWalletKey(decoupled), password, {address:valid}', () => {
+        it('should encrypt password with privateKey', () => {
+            const password = 'klaytn!@'
+
+            const testAccount = caver.klay.accounts.createWithAccountKey(account.address, caver.klay.accounts.create().privateKey)
+
+            const result = caver.klay.accounts.encryptV3(testAccount.getKlaytnWalletKey(), password, { address: testAccount.address })
+
+            isKeystore(result, testAccount, 3)
+
+            const decryptedAccount = caver.klay.accounts.decrypt(result, password)
+            isAccount(decryptedAccount, { keys: testAccount.keys, address: testAccount.address })
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-406: input: privateKey:KlaytnWalletKey(decoupled), password, {address:invalid}', () => {
+        it('should encrypt password with privateKey', () => {
+            const password = 'klaytn!@'
+
+            const testAccount = caver.klay.accounts.createWithAccountKey(account.address, caver.klay.accounts.create().privateKey)
+
+            const errorMessage = 'The address extracted from the private key does not match the address received as the input value.'
+            expect(() =>
+                caver.klay.accounts.encryptV3(testAccount.getKlaytnWalletKey(), password, { address: caver.klay.accounts.create().address })
+            ).to.throw(errorMessage)
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-407: input: array of private key strings, password', () => {
+        it('should throw an error', () => {
+            const password = 'klaytn!@'
+
+            const key = [
+                caver.klay.accounts.create().privateKey,
+                caver.klay.accounts.create().privateKey,
+                caver.klay.accounts.create().privateKey,
+            ]
+            const testAccount = caver.klay.accounts.createWithAccountKey(account.address, key)
+
+            const errorMessage =
+                'Invalid parameter: encryptV3 only supports a single private key (also supports KlantnWalletKey format), or an instance of Account or AccountKeyPublic as a parameter. If you want to encrypt multiple keys, use caver.klay.accounts.encrypt which encrypts to keystore v4.'
+            expect(() => caver.klay.accounts.encryptV3(testAccount.keys, password)).to.throw(errorMessage)
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-408: input: array of private key strings, password, {address:valid}', () => {
+        it('should throw an error', () => {
+            const password = 'klaytn!@'
+
+            const key = [
+                caver.klay.accounts.create().privateKey,
+                caver.klay.accounts.create().privateKey,
+                caver.klay.accounts.create().privateKey,
+            ]
+            const testAccount = caver.klay.accounts.createWithAccountKey(account.address, key)
+
+            const errorMessage =
+                'Invalid parameter: encryptV3 only supports a single private key (also supports KlantnWalletKey format), or an instance of Account or AccountKeyPublic as a parameter. If you want to encrypt multiple keys, use caver.klay.accounts.encrypt which encrypts to keystore v4.'
+            expect(() => caver.klay.accounts.encryptV3(testAccount.keys, password, { address: testAccount.address })).to.throw(errorMessage)
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-409: input: key object, password', () => {
+        it('should throw an error', () => {
+            const password = 'klaytn!@'
+
+            const key = {
+                transactionKey: caver.klay.accounts.create().privateKey,
+                updateKey: caver.klay.accounts.create().privateKey,
+                feePayerKey: caver.klay.accounts.create().privateKey,
+            }
+            const testAccount = caver.klay.accounts.createWithAccountKey(account.address, key)
+
+            const errorMessage =
+                'Invalid parameter: encryptV3 only supports a single private key (also supports KlantnWalletKey format), or an instance of Account or AccountKeyPublic as a parameter. If you want to encrypt multiple keys, use caver.klay.accounts.encrypt which encrypts to keystore v4.'
+            expect(() => caver.klay.accounts.encryptV3(testAccount.keys, password)).to.throw(errorMessage)
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-410: input: key object, password, {address}', () => {
+        it('should throw an error', () => {
+            const password = 'klaytn!@'
+
+            const key = {
+                transactionKey: caver.klay.accounts.create().privateKey,
+                updateKey: caver.klay.accounts.create().privateKey,
+                feePayerKey: caver.klay.accounts.create().privateKey,
+            }
+            const testAccount = caver.klay.accounts.createWithAccountKey(account.address, key)
+
+            const errorMessage =
+                'Invalid parameter: encryptV3 only supports a single private key (also supports KlantnWalletKey format), or an instance of Account or AccountKeyPublic as a parameter. If you want to encrypt multiple keys, use caver.klay.accounts.encrypt which encrypts to keystore v4.'
+            expect(() => caver.klay.accounts.encryptV3(testAccount.keys, password, { address: testAccount.address })).to.throw(errorMessage)
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-411: input: AccountKeyPublic, password', () => {
+        it('should throw error', () => {
+            const password = 'klaytn!@'
+
+            const key = caver.klay.accounts.create().privateKey
+            const accountKey = caver.klay.accounts.createAccountKey(key)
+
+            const errorMessage = 'The address must be defined inside the options object.'
+            expect(() => caver.klay.accounts.encryptV3(accountKey, password)).to.throw(errorMessage)
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-412: input: AccountKeyMultiSig, password, {address}', () => {
+        it('should throw error', () => {
+            const password = 'klaytn!@'
+
+            const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+            const accountKey = caver.klay.accounts.createAccountKey(key)
+
+            const errorMessage =
+                'Invalid parameter: encryptV3 only supports a single private key (also supports KlantnWalletKey format), or an instance of Account or AccountKeyPublic as a parameter. If you want to encrypt multiple keys, use caver.klay.accounts.encrypt which encrypts to keystore v4.'
+            expect(() => caver.klay.accounts.encryptV3(accountKey, password, { address: account.address })).to.throw(errorMessage)
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-413: input: AccountKeyMultiSig, password', () => {
+        it('should throw error', () => {
+            const password = 'klaytn!@'
+
+            const key = [caver.klay.accounts.create().privateKey, caver.klay.accounts.create().privateKey]
+            const accountKey = caver.klay.accounts.createAccountKey(key)
+
+            const errorMessage =
+                'Invalid parameter: encryptV3 only supports a single private key (also supports KlantnWalletKey format), or an instance of Account or AccountKeyPublic as a parameter. If you want to encrypt multiple keys, use caver.klay.accounts.encrypt which encrypts to keystore v4.'
+            expect(() => caver.klay.accounts.encryptV3(accountKey, password)).to.throw(errorMessage)
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-414: input: AccountKeyRoleBased, password, {address}', () => {
+        it('should throw error', () => {
+            const password = 'klaytn!@'
+
+            const key = {
+                transactionKey: caver.klay.accounts.create().privateKey,
+                updateKey: caver.klay.accounts.create().privateKey,
+                feePayerKey: caver.klay.accounts.create().privateKey,
+            }
+            const accountKey = caver.klay.accounts.createAccountKey(key)
+
+            const errorMessage =
+                'Invalid parameter: encryptV3 only supports a single private key (also supports KlantnWalletKey format), or an instance of Account or AccountKeyPublic as a parameter. If you want to encrypt multiple keys, use caver.klay.accounts.encrypt which encrypts to keystore v4.'
+            expect(() => caver.klay.accounts.encryptV3(accountKey, password, { address: account.address })).to.throw(errorMessage)
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-415: input: AccountKeyRoleBased, password', () => {
+        it('should throw error', () => {
+            const password = 'klaytn!@'
+
+            const key = {
+                transactionKey: caver.klay.accounts.create().privateKey,
+                updateKey: caver.klay.accounts.create().privateKey,
+                feePayerKey: caver.klay.accounts.create().privateKey,
+            }
+            const accountKey = caver.klay.accounts.createAccountKey(key)
+
+            const errorMessage =
+                'Invalid parameter: encryptV3 only supports a single private key (also supports KlantnWalletKey format), or an instance of Account or AccountKeyPublic as a parameter. If you want to encrypt multiple keys, use caver.klay.accounts.encrypt which encrypts to keystore v4.'
+            expect(() => caver.klay.accounts.encryptV3(accountKey, password)).to.throw(errorMessage)
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-416: input: invalid parameter, password', () => {
+        const password = 'klaytn!@'
+
+        const invalidParameters = [1234, null, undefined, new BN('234'), -1]
+
+        const errorMessage =
+            'Invalid parameter: encryptV3 only supports a single private key (also supports KlantnWalletKey format), or an instance of Account or AccountKeyPublic as a parameter. If you want to encrypt multiple keys, use caver.klay.accounts.encrypt which encrypts to keystore v4.'
+        it.each(invalidParameters, 'should throw error', param => {
+            expect(() => caver.klay.accounts.encryptV3(param, password)).to.throw(errorMessage)
         })
     })
 })
@@ -2929,7 +3202,7 @@ describe('caver.klay.accounts.decrypt', () => {
             const keystoreJsonV4 = caver.klay.accounts.encrypt(account.privateKey, password)
 
             const result = caver.klay.accounts.decrypt(keystoreJsonV4, password)
-            isKeystoreV4(keystoreJsonV4, result)
+            isKeystore(keystoreJsonV4, result)
 
             isAccount(result, { keys: account.keys, address: account.address })
         })
@@ -5512,7 +5785,7 @@ describe('caver.klay.accounts.wallet.encrypt', () => {
 
             expect(result.length).to.equal(caver.klay.accounts.wallet.length)
             result.forEach((v, i) => {
-                isKeystoreV4(v, { address: caver.klay.accounts.wallet[i].address })
+                isKeystore(v, { address: caver.klay.accounts.wallet[i].address })
             })
             const decryptedWallet = caver.klay.accounts.wallet.decrypt(result, password)
             isWallet(decryptedWallet, { accounts: caver.klay.accounts.wallet })
@@ -5541,7 +5814,7 @@ describe('caver.klay.accounts.wallet.encrypt', () => {
 
             expect(result.length).to.equal(caver.klay.accounts.wallet.length)
             result.forEach((v, i) => {
-                isKeystoreV4(v, { address: caver.klay.accounts.wallet[i].address })
+                isKeystore(v, { address: caver.klay.accounts.wallet[i].address })
             })
             const decryptedWallet = caver.klay.accounts.wallet.decrypt(result, password)
             isWallet(decryptedWallet, { accounts: caver.klay.accounts.wallet })
