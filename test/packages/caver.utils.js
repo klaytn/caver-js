@@ -57,6 +57,7 @@ describe('caver.utils.isBN', () => {
             { value: new BN('ff', 16), expected: true },
             { value: new BN('377', 8), expected: true },
             { value: new BN('11111111', 2), expected: true },
+            { value: new BN(0), expected: true },
         ]
         it.each(tests, 'should return true', test => {
             expect(caver.utils.isBN(test.value)).to.be.equal(test.expected)
@@ -69,6 +70,10 @@ describe('caver.utils.isBN', () => {
             { value: 0xff, expected: false },
             { value: 0o377, expected: false },
             { value: 0b11111111, expected: false },
+            { value: function() {}, expected: false },
+            { value: 'function', expected: false },
+            { value: {}, expected: false },
+            { value: 'hello', expected: false },
         ]
         it.each(tests, 'should return false', test => {
             expect(caver.utils.isBN(test.value)).to.be.equal(test.expected)
