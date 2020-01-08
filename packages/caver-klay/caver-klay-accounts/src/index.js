@@ -921,11 +921,7 @@ Accounts.prototype.feePayerSignTransaction = function feePayerSignTransaction() 
         if (isNot(chainId) || isNot(gasPrice) || isNot(nonce)) {
             throw new Error(`One of the values "chainId", "gasPrice", or "nonce" couldn't be fetched: ${JSON.stringify(args)}`)
         }
-        let transaction = _.extend(tx, {
-            chainId,
-            gasPrice,
-            nonce,
-        })
+        let transaction = _.extend(tx, { chainId, gasPrice, nonce })
 
         transaction = helpers.formatters.inputCallFormatter(transaction)
         transaction = coverInitialTxValue(transaction)
