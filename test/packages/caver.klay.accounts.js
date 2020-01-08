@@ -1566,6 +1566,22 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
             expect(result.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
         })
     }).timeout(10000)
+
+    context('CAVERJS-UNIT-WALLET-417: input: tx object(different chainId), feePayer', () => {
+        it('should return different signature result when chainId is different', async () => {
+            const tx = Object.assign({}, txObj)
+
+            tx.chainId = 10000
+            const result1 = await caver.klay.accounts.feePayerSignTransaction(tx, feePayer.address, feePayer.feePayerKey[0])
+
+            tx.chainId = 20000
+            const result2 = await caver.klay.accounts.feePayerSignTransaction(tx, feePayer.address, feePayer.feePayerKey[0])
+
+            expect(result1.feePayerSignatures[0][0]).not.to.equals(result2.feePayerSignatures[0][0])
+            expect(result1.feePayerSignatures[0][1]).not.to.equals(result2.feePayerSignatures[0][1])
+            expect(result1.feePayerSignatures[0][2]).not.to.equals(result2.feePayerSignatures[0][2])
+        }).timeout(10000)
+    })
 })
 
 describe('caver.klay.accounts.getRawTransactionWithSignatures', () => {

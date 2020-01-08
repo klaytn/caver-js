@@ -930,7 +930,7 @@ Accounts.prototype.feePayerSignTransaction = function feePayerSignTransaction() 
         const sig = transaction.signatures ? transaction.signatures : [['0x01', '0x', '0x']]
         const { rawTransaction } = makeRawTransaction(rlpEncoded, sig, transaction)
 
-        return _this.signTransaction({ senderRawTransaction: rawTransaction, feePayer }, privateKey, callback)
+        return _this.signTransaction({ senderRawTransaction: rawTransaction, feePayer, chainId: args[0] }, privateKey, callback)
     })
 }
 
