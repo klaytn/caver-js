@@ -914,13 +914,17 @@ Accounts.prototype.feePayerSignTransaction = function feePayerSignTransaction() 
         isNot(tx.gasPrice) ? _this._klaytnCall.getGasPrice() : tx.gasPrice,
         isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from, 'pending') : tx.nonce,
     ]).then(function(args) {
-        if (isNot(args[0]) || isNot(args[1]) || isNot(args[2])) {
+        const chainId = args[0]
+        const gasPrice = args[1]
+        const nonce = args[2]
+
+        if (isNot(chainId) || isNot(gasPrice) || isNot(nonce)) {
             throw new Error(`One of the values "chainId", "gasPrice", or "nonce" couldn't be fetched: ${JSON.stringify(args)}`)
         }
         let transaction = _.extend(tx, {
-            chainId: args[0],
-            gasPrice: args[1],
-            nonce: args[2],
+            chainId,
+            gasPrice,
+            nonce,
         })
 
         transaction = helpers.formatters.inputCallFormatter(transaction)
@@ -930,7 +934,7 @@ Accounts.prototype.feePayerSignTransaction = function feePayerSignTransaction() 
         const sig = transaction.signatures ? transaction.signatures : [['0x01', '0x', '0x']]
         const { rawTransaction } = makeRawTransaction(rlpEncoded, sig, transaction)
 
-        return _this.signTransaction({ senderRawTransaction: rawTransaction, feePayer, chainId: args[0] }, privateKey, callback)
+        return _this.signTransaction({ senderRawTransaction: rawTransaction, feePayer, chainId }, privateKey, callback)
     })
 }
 
