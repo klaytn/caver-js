@@ -165,6 +165,55 @@ function resolveArgsForFeePayerSignTransaction(args) {
     return { tx, privateKey, feePayer, callback }
 }
 
+/**
+ * resolveArgsForSignTransactionWithHash parse arguments for signTransactionWithHash.
+ *
+ * @method resolveArgsForSignTransactionWithHash
+ * @param {Object} args Parameters of signTransactionWithHash.
+ * @return {Object}
+ */
+function resolveArgsForSignTransactionWithHash(args) {
+    if (args.length < 2 || args.length > 4) {
+        throw new Error('Invalid parameter: The number of parameters is invalid.')
+    }
+
+    const hash = args[0]
+    const privateKeys = args[1]
+    let chainId
+    let callback
+
+    if (!hash) {
+        throw new Error('Invalid parameter: The hash of transaction must be defined as a parameter.')
+    }
+
+    if (!utils.isTxHashStrict(hash)) {
+        throw new Error('Invalid parameter: The hash of transaction must be 0x-hex prefixed string format.')
+    }
+
+    if (!privateKeys || (!Array.isArray(privateKeys) && !_.isString(privateKeys))) {
+        throw new Error(`Invalid parameter: The private key should be a private key string or an array of private keys.`)
+    }
+
+    if (args.length === 3) {
+        if (_.isFunction(args[2])) {
+            callback = args[2]
+        } else {
+            chainId = args[2]
+        }
+    } else if (args.length === 4) {
+        if (args[2] && !_.isString(args[2]) && !_.isNumber(args[2])) {
+            throw new Error('Invalid parameter: The parameter for the chain id is invalid.')
+        }
+        chainId = args[2]
+        callback = args[3]
+    }
+
+    // For handling when callback is undefined.
+    callback = callback || function() {}
+
+    return { hash, privateKeys, chainId, callback }
+}
+
 function encryptKey(privateKey, password, options) {
     const encryptedArray = []
 
@@ -654,7 +703,7 @@ Accounts.prototype.getLegacyAccount = function getLegacyAccount(key) {
  * @method signTransaction
  * @param {String|Object} tx The transaction to sign.
  * @param {String|Array} privateKey The private key to use for signing.
- * @param {String} callback The callback function to call.
+ * @param {Function} callback The callback function to call.
  * @return {Object}
  */
 Accounts.prototype.signTransaction = function signTransaction() {
@@ -931,6 +980,71 @@ Accounts.prototype.feePayerSignTransaction = function feePayerSignTransaction() 
         const { rawTransaction } = makeRawTransaction(rlpEncoded, sig, transaction)
 
         return _this.signTransaction({ senderRawTransaction: rawTransaction, feePayer, chainId }, privateKey, callback)
+    })
+}
+
+/**
+ * signTransactionWithHash signs to transaction hash with private key(s).
+ *
+ * @method signTransactionWithHash
+ * @param {String} hash The hash of transaction to sign.
+ * @param {String|Array} privateKeys The private key(s) to use for signing.
+ * @param {String|Number} chainId The chain id of the network.
+ * @param {Function} callback The callback function to call.
+ * @return {Object}
+ */
+Accounts.prototype.signTransactionWithHash = function signTransactionWithHash() {
+    const _this = this
+    let hash
+    let privateKeys
+    let chainId
+    let callback
+
+    const handleError = e => {
+        e = e instanceof Error ? e : new Error(e)
+        if (callback) callback(e)
+        return Promise.reject(e)
+    }
+
+    try {
+        const resolved = resolveArgsForSignTransactionWithHash(arguments)
+        hash = resolved.hash
+        chainId = resolved.chainId
+        privateKeys = resolved.privateKeys
+        callback = resolved.callback
+    } catch (e) {
+        return handleError(e)
+    }
+
+    privateKeys = Array.isArray(privateKeys) ? privateKeys : [privateKeys]
+
+    function signWithHash(transactionHash, prvKeys, chain, callbackFunc) {
+        const result = []
+        chain = utils.numberToHex(chain)
+
+        try {
+            for (const privateKey of prvKeys) {
+                const p = utils.addHexPrefix(utils.parsePrivateKey(privateKey).privateKey)
+                if (!utils.isValidPrivateKey(p)) {
+                    return handleError(`Failed to sign transaction with hash: Invalid private key ${privateKey}`)
+                }
+
+                const signature = AccountLib.makeSigner(Nat.toNumber(chain || '0x1') * 2 + 35)(transactionHash, p)
+                const [v, r, s] = AccountLib.decodeSignature(signature).map(sig => utils.makeEven(utils.trimLeadingZero(sig)))
+
+                result.push(utils.transformSignaturesToObject([v, r, s]))
+            }
+        } catch (e) {
+            callbackFunc(e)
+            return Promise.reject(e)
+        }
+
+        callbackFunc(null, result)
+        return result
+    }
+
+    return Promise.resolve(isNot(chainId) ? _this._klaytnCall.getChainId() : chainId).then(id => {
+        return signWithHash(hash, privateKeys, id, callback)
     })
 }
 

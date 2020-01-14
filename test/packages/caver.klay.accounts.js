@@ -17,10 +17,12 @@
 */
 
 require('it-each')({ testPerIteration: true })
+
 const BN = require('bn.js')
+const Hash = require('eth-lib/lib/hash')
 
 const testRPCURL = require('../testrpc')
-const { expect } = require('../extendedChai')
+const { expect, assert } = require('../extendedChai')
 
 const setting = require('./setting')
 const Caver = require('../../index.js')
@@ -5130,6 +5132,323 @@ describe('caver.klay.accounts.createAccountForUpdateWithFailKey', () => {
             expect(accountForUpdate.address).to.equals(address)
             expect(accountForUpdate.keyForUpdate.failKey).to.be.true
             expect(typeof accountForUpdate.fillUpdateObject).to.equals('function')
+        })
+    })
+})
+
+describe('caver.klay.accounts.signTransactionWithHash', () => {
+    let account
+    let legacyTx
+    let vtTx
+    let legacyHash
+    let vtHash
+
+    function hashTx(txObj) {
+        const rlpEncoded = caver.klay.accounts.encodeRLPByTxType(txObj)
+        return Hash.keccak256(rlpEncoded)
+    }
+
+    beforeEach(function(done) {
+        this.timeout(100000)
+
+        account = caver.klay.accounts.create()
+
+        caver.klay.getChainId().then(chainId => {
+            chainId = caver.utils.numberToHex(chainId)
+
+            legacyTx = {
+                type: 'LEGACY',
+                from: account.address,
+                to: account.address,
+                value: '0x1',
+                data: '0x',
+                gasPrice: '0x5d21dba00',
+                gas: '0xdbba0',
+                nonce: '0x1',
+                chainId,
+            }
+            legacyHash = hashTx(legacyTx)
+
+            vtTx = {
+                type: 'VALUE_TRANSFER',
+                from: account.address,
+                to: account.address,
+                value: '0x1',
+                gasPrice: '0x5d21dba00',
+                gas: '0xdbba0',
+                nonce: '0x1',
+                chainId,
+            }
+            vtHash = hashTx(vtTx)
+            done()
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-418: input: hash, privateKey, chainId, callback', () => {
+        it('should return signing result', async () => {
+            let callbackCalled = false
+
+            const callback = (err, result) => {
+                if (err || !result) assert(false)
+                callbackCalled = true
+            }
+
+            const sig = await caver.klay.accounts.signTransactionWithHash(legacyHash, account.keys, legacyTx.chainId, callback)
+
+            expect(callbackCalled).to.be.true
+            expect(Array.isArray(sig)).to.be.true
+            expect(sig.length).to.equals(1)
+            expect(sig[0].V).not.to.be.undefined
+            expect(sig[0].R).not.to.be.undefined
+            expect(sig[0].S).not.to.be.undefined
+
+            const sigFromSignTransaction = await caver.klay.accounts.signTransaction(legacyTx, account.keys)
+
+            expect(sig[0].V).to.equals(sigFromSignTransaction.signatures[0])
+            expect(sig[0].R).to.equals(sigFromSignTransaction.signatures[1])
+            expect(sig[0].S).to.equals(sigFromSignTransaction.signatures[2])
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-419: input: hash, privateKeys, chainId, callback', () => {
+        it('should return signing result', async () => {
+            let callbackCalled = false
+
+            const callback = (err, result) => {
+                if (err || !result) assert(false)
+                callbackCalled = true
+            }
+
+            const privateKeys = [caver.klay.accounts.create().keys, account.keys]
+
+            const sig = await caver.klay.accounts.signTransactionWithHash(vtHash, privateKeys, vtTx.chainId, callback)
+
+            expect(callbackCalled).to.be.true
+            expect(Array.isArray(sig)).to.be.true
+            expect(sig.length).to.equals(2)
+            expect(sig[0].V).not.to.be.undefined
+            expect(sig[0].R).not.to.be.undefined
+            expect(sig[0].S).not.to.be.undefined
+            expect(sig[1].V).not.to.be.undefined
+            expect(sig[1].R).not.to.be.undefined
+            expect(sig[1].S).not.to.be.undefined
+
+            const sigFromSignTransaction = await caver.klay.accounts.signTransaction(vtTx, privateKeys)
+
+            expect(sig[0].V).to.equals(sigFromSignTransaction.signatures[0][0])
+            expect(sig[0].R).to.equals(sigFromSignTransaction.signatures[0][1])
+            expect(sig[0].S).to.equals(sigFromSignTransaction.signatures[0][2])
+            expect(sig[1].V).to.equals(sigFromSignTransaction.signatures[1][0])
+            expect(sig[1].R).to.equals(sigFromSignTransaction.signatures[1][1])
+            expect(sig[1].S).to.equals(sigFromSignTransaction.signatures[1][2])
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-420: input: hash, privateKey, chainId', () => {
+        it('should return signing result', async () => {
+            const sig = await caver.klay.accounts.signTransactionWithHash(legacyHash, account.keys, legacyTx.chainId)
+
+            expect(Array.isArray(sig)).to.be.true
+            expect(sig.length).to.equals(1)
+            expect(sig[0].V).not.to.be.undefined
+            expect(sig[0].R).not.to.be.undefined
+            expect(sig[0].S).not.to.be.undefined
+
+            const sigFromSignTransaction = await caver.klay.accounts.signTransaction(legacyTx, account.keys)
+
+            expect(sig[0].V).to.equals(sigFromSignTransaction.signatures[0])
+            expect(sig[0].R).to.equals(sigFromSignTransaction.signatures[1])
+            expect(sig[0].S).to.equals(sigFromSignTransaction.signatures[2])
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-421: input: hash, privateKeys, chainId', () => {
+        it('should return signing result', async () => {
+            const privateKeys = [caver.klay.accounts.create().keys, account.keys]
+
+            const sig = await caver.klay.accounts.signTransactionWithHash(vtHash, privateKeys, vtTx.chainId)
+
+            expect(Array.isArray(sig)).to.be.true
+            expect(sig.length).to.equals(2)
+            expect(sig[0].V).not.to.be.undefined
+            expect(sig[0].R).not.to.be.undefined
+            expect(sig[0].S).not.to.be.undefined
+            expect(sig[1].V).not.to.be.undefined
+            expect(sig[1].R).not.to.be.undefined
+            expect(sig[1].S).not.to.be.undefined
+
+            const sigFromSignTransaction = await caver.klay.accounts.signTransaction(vtTx, privateKeys)
+
+            expect(sig[0].V).to.equals(sigFromSignTransaction.signatures[0][0])
+            expect(sig[0].R).to.equals(sigFromSignTransaction.signatures[0][1])
+            expect(sig[0].S).to.equals(sigFromSignTransaction.signatures[0][2])
+            expect(sig[1].V).to.equals(sigFromSignTransaction.signatures[1][0])
+            expect(sig[1].R).to.equals(sigFromSignTransaction.signatures[1][1])
+            expect(sig[1].S).to.equals(sigFromSignTransaction.signatures[1][2])
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-422: input: hash, privateKey, different chainId', () => {
+        it('should sign with chainId parameter and return signing result', async () => {
+            let chainId = caver.utils.hexToNumber(legacyTx.chainId)
+            chainId += 1
+            const sig = await caver.klay.accounts.signTransactionWithHash(legacyHash, account.keys, chainId)
+            const sig2 = await caver.klay.accounts.signTransactionWithHash(legacyHash, account.keys, legacyTx.chainId)
+
+            expect(sig[0].V).not.to.equals(sig2[0].V)
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-423: input: hash, privateKey', () => {
+        it('should return signing result', async () => {
+            const sig = await caver.klay.accounts.signTransactionWithHash(legacyHash, account.keys)
+
+            expect(Array.isArray(sig)).to.be.true
+            expect(sig.length).to.equals(1)
+            expect(sig[0].V).not.to.be.undefined
+            expect(sig[0].R).not.to.be.undefined
+            expect(sig[0].S).not.to.be.undefined
+
+            const tx = Object.assign({}, legacyTx)
+            delete tx.chainId
+            const sigFromSignTransaction = await caver.klay.accounts.signTransaction(tx, account.keys)
+
+            expect(sig[0].V).to.equals(sigFromSignTransaction.signatures[0])
+            expect(sig[0].R).to.equals(sigFromSignTransaction.signatures[1])
+            expect(sig[0].S).to.equals(sigFromSignTransaction.signatures[2])
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-424: input: hash, privateKeys', () => {
+        it('should return signing result', async () => {
+            const privateKeys = [caver.klay.accounts.create().keys, account.keys]
+
+            const sig = await caver.klay.accounts.signTransactionWithHash(vtHash, privateKeys)
+
+            expect(Array.isArray(sig)).to.be.true
+            expect(sig.length).to.equals(2)
+            expect(sig[0].V).not.to.be.undefined
+            expect(sig[0].R).not.to.be.undefined
+            expect(sig[0].S).not.to.be.undefined
+            expect(sig[1].V).not.to.be.undefined
+            expect(sig[1].R).not.to.be.undefined
+            expect(sig[1].S).not.to.be.undefined
+
+            const tx = Object.assign({}, vtTx)
+            delete tx.chainId
+            const sigFromSignTransaction = await caver.klay.accounts.signTransaction(tx, privateKeys)
+
+            expect(sig[0].V).to.equals(sigFromSignTransaction.signatures[0][0])
+            expect(sig[0].R).to.equals(sigFromSignTransaction.signatures[0][1])
+            expect(sig[0].S).to.equals(sigFromSignTransaction.signatures[0][2])
+            expect(sig[1].V).to.equals(sigFromSignTransaction.signatures[1][0])
+            expect(sig[1].R).to.equals(sigFromSignTransaction.signatures[1][1])
+            expect(sig[1].S).to.equals(sigFromSignTransaction.signatures[1][2])
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-425: input: hash', () => {
+        it('should throw error when parameters are not enough', async () => {
+            const expectedError = 'Invalid parameter: The number of parameters is invalid.'
+            await expect(caver.klay.accounts.signTransactionWithHash(vtHash)).to.be.rejectedWith(expectedError)
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-426: input: hash, privateKeys, chainId, callback, one more param', () => {
+        it('should throw error when parameters are too many', async () => {
+            const expectedError = 'Invalid parameter: The number of parameters is invalid.'
+            await expect(
+                caver.klay.accounts.signTransactionWithHash(vtHash, account.keys, vtTx.chainId, () => {}, account.keys)
+            ).to.be.rejectedWith(expectedError)
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-427: input: invalid hash, private key', () => {
+        it('should throw error when hash is not defined', async () => {
+            const expectedError = 'Invalid parameter: The hash of transaction must be defined as a parameter.'
+
+            await expect(caver.klay.accounts.signTransactionWithHash(null, account.keys)).to.be.rejectedWith(expectedError)
+            await expect(caver.klay.accounts.signTransactionWithHash(undefined, account.keys)).to.be.rejectedWith(expectedError)
+            await expect(caver.klay.accounts.signTransactionWithHash('', account.keys)).to.be.rejectedWith(expectedError)
+        })
+
+        it('should throw error when hash is not 0x-hex prefixed', async () => {
+            const expectedError = 'Invalid parameter: The hash of transaction must be 0x-hex prefixed string format.'
+
+            await expect(caver.klay.accounts.signTransactionWithHash(vtHash.slice(2), account.keys)).to.be.rejectedWith(expectedError)
+        })
+
+        it('should throw error when hash is not transaction hash', async () => {
+            const expectedError = 'Invalid parameter: The hash of transaction must be 0x-hex prefixed string format.'
+
+            await expect(caver.klay.accounts.signTransactionWithHash('0x', account.keys)).to.be.rejectedWith(expectedError)
+            await expect(
+                caver.klay.accounts.signTransactionWithHash('0x2dfd75d0112787667907a81fbb50fae056a3c81f', account.keys)
+            ).to.be.rejectedWith(expectedError)
+        })
+
+        it('should throw error when hash is not hex prefixed string', async () => {
+            const expectedError = 'Invalid parameter: The hash of transaction must be 0x-hex prefixed string format.'
+
+            await expect(caver.klay.accounts.signTransactionWithHash(1, account.keys)).to.be.rejectedWith(expectedError)
+            await expect(caver.klay.accounts.signTransactionWithHash(vtTx, account.keys)).to.be.rejectedWith(expectedError)
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-428: input: hash, invalid private key', () => {
+        it('should throw error when private key is invalid', async () => {
+            const expectedError = 'Invalid parameter: The private key should be a private key string or an array of private keys.'
+
+            await expect(caver.klay.accounts.signTransactionWithHash(vtHash, 1)).to.be.rejectedWith(expectedError)
+            await expect(caver.klay.accounts.signTransactionWithHash(vtHash, null)).to.be.rejectedWith(expectedError)
+            await expect(caver.klay.accounts.signTransactionWithHash(vtHash, undefined)).to.be.rejectedWith(expectedError)
+            await expect(caver.klay.accounts.signTransactionWithHash(vtHash, {})).to.be.rejectedWith(expectedError)
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-429: input: hash, private key, invalid chainId, callback', () => {
+        it('should throw error when chainId is invalid', async () => {
+            const expectedError = 'Invalid parameter: The parameter for the chain id is invalid.'
+
+            await expect(caver.klay.accounts.signTransactionWithHash(vtHash, account.keys, {}, () => {})).to.be.rejectedWith(expectedError)
+            await expect(caver.klay.accounts.signTransactionWithHash(vtHash, account.keys, [], () => {})).to.be.rejectedWith(expectedError)
+        })
+    })
+
+    context('CAVERJS-UNIT-WALLET-430: input: hash, invalid private key chainId, callback', () => {
+        it('should throw error when error is occured during paring', async () => {
+            let privateKey = caver.utils.randomHex(31)
+            let expectedError = `Invalid private key(${privateKey.slice(2)})`
+
+            await expect(caver.klay.accounts.signTransactionWithHash(vtHash, privateKey, vtTx.chainId, () => {})).to.be.rejectedWith(
+                expectedError
+            )
+
+            privateKey = '1234'
+            expectedError = `Invalid private key(${privateKey})`
+            await expect(caver.klay.accounts.signTransactionWithHash(vtHash, privateKey, vtTx.chainId, () => {})).to.be.rejectedWith(
+                expectedError
+            )
+
+            privateKey = 'zzzz'
+            expectedError = `Invalid private key(${privateKey})`
+            await expect(caver.klay.accounts.signTransactionWithHash(vtHash, privateKey, vtTx.chainId, () => {})).to.be.rejectedWith(
+                expectedError
+            )
+        })
+
+        it('should throw error when isValidPrivateKey is false', async () => {
+            let privateKey = '0x0000000000000000000000000000000000000000000000000000000000000000'
+            let expectedError = `Failed to sign transaction with hash: Invalid private key ${privateKey}`
+            await expect(caver.klay.accounts.signTransactionWithHash(vtHash, privateKey, vtTx.chainId, () => {})).to.be.rejectedWith(
+                expectedError
+            )
+
+            privateKey = '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141'
+            expectedError = `Failed to sign transaction with hash: Invalid private key ${privateKey}`
+            await expect(caver.klay.accounts.signTransactionWithHash(vtHash, privateKey, vtTx.chainId, () => {})).to.be.rejectedWith(
+                expectedError
+            )
         })
     })
 })
