@@ -588,7 +588,7 @@ function parsePrivateKey(privateKey) {
 
     const parsedPrivateKey = privateKey.slice(0, 64)
 
-    if (!this.isHex(parsedPrivateKey)) {
+    if (!isHex(parsedPrivateKey)) {
         throw new Error('Invalid private key format : privateKey must be in hex format.')
     }
 
@@ -599,6 +599,8 @@ function parsePrivateKey(privateKey) {
             isHumanReadable: false,
         }
     }
+
+    if (!isKlaytnWalletKey(privateKey)) throw new Error(`Invalid KlaytnWalletKey format.`)
 
     const humanReadableFlag = privateKey.slice(66, 68)
     if (humanReadableFlag === '01') throw new Error('HumanReadableAddress is not supported yet.')
@@ -616,6 +618,24 @@ const isKlaytnWalletKey = privateKey => {
 
     if (privateKey.length !== 110) {
         return false
+    }
+
+    const splited = privateKey.split('0x')
+    if (splited.length !== 3) return false
+
+    for (let i = 0; i < splited.length; i++) {
+        if (!isHex(splited[i])) return false
+        switch (i) {
+            case 0:
+                if (splited[i].length !== 64 || !isValidPrivateKey(splited[i])) return false
+                break
+            case 1:
+                if (splited[i].length !== 2 || (splited[i] !== '00' && splited[i] !== '01')) return false
+                break
+            case 2:
+                if (splited[i].length !== 40 || !isAddress(splited[i])) return false
+                break
+        }
     }
 
     return true
