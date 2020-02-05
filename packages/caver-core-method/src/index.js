@@ -28,7 +28,6 @@
 const _ = require('lodash')
 const errors = require('../../caver-core-helpers').errors
 const formatters = require('../../caver-core-helpers').formatters
-const txErrorTable = require('../../caver-core-helpers').txErrorTable
 const utils = require('../../caver-utils')
 const Subscriptions = require('../../caver-core-subscriptions').subscriptions
 const validateParams = require('../../caver-core-helpers').validateFunction.validateParams
@@ -693,9 +692,9 @@ const checkForNormalTx = (mutableConfirmationPack, receipt, sub) => {
         const receiptJSON = JSON.stringify(receipt, null, 2)
 
         const { txError } = receipt
-        if (txError && txErrorTable[txError]) {
+        if (txError && errors.txErrorTable[txError]) {
             utils._fireError(
-                new Error(`${txErrorTable[txError]}\n ${receiptJSON}`),
+                new Error(`${errors.txErrorTable[txError]}\n ${receiptJSON}`),
                 mutableConfirmationPack.defer.eventEmitter,
                 mutableConfirmationPack.defer.reject
             )

@@ -48,5 +48,37 @@ describe('Error handling in Method package', () => {
         }
         const expectedError = `The contract code couldn't be stored, please check your gas limit.`
         await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
-    }).timeout(100000)
+    }).timeout(200000)
+
+    it('CAVERJS-UNIT-TX-730: should reject correct errors when fail to execute contract', async () => {
+        const receipt = await caver.klay.sendTransaction({
+            type: 'SMART_CONTRACT_DEPLOY',
+            from: sender.address,
+            data: deployedData,
+            gas: 200000,
+            value: 0,
+        })
+
+        let tx = {
+            type: 'SMART_CONTRACT_EXECUTION',
+            from: sender.address,
+            to: receipt.contractAddress,
+            data: '0xd14e62b80000000000000000000000000000000000000000000000000000000000000005',
+            gas: 25000,
+            value: 0,
+        }
+        let expectedError = `out of gas`
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+
+        tx = {
+            type: 'SMART_CONTRACT_EXECUTION',
+            from: sender.address,
+            to: receipt.contractAddress,
+            data: '0x6353586b00000000000000000000000090b3e9a3770481345a7f17f22f16d020bccfd33e',
+            gas: 40000,
+            value: 0,
+        }
+        expectedError = `evm: execution reverted`
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+    }).timeout(200000)
 })
