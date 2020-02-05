@@ -50,7 +50,7 @@ describe('Error handling in Method package', () => {
         await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-730: should reject correct errors when fail to execute contract', async () => {
+    it('CAVERJS-UNIT-TX-730: should throw expected errors when fail to execute contract', async () => {
         const receipt = await caver.klay.sendTransaction({
             type: 'SMART_CONTRACT_DEPLOY',
             from: sender.address,
