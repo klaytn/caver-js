@@ -270,7 +270,6 @@ const Contract = function Contract(jsonInterface, address, options) {
 }
 
 Contract.setProvider = function(provider, accounts) {
-    // Contract.currentProvider = provider;
     core.packageInit(this, [provider])
 
     this._klayAccounts = accounts
@@ -648,8 +647,8 @@ Contract.prototype._generateEventOptions = function() {
  * @method clone
  * @return {Object} the event subscription
  */
-Contract.prototype.clone = function() {
-    return new this.constructor(this.options.jsonInterface, this.options.address, this.options)
+Contract.prototype.clone = function(contractAddress = this.options.address) {
+    return new this.constructor(this.options.jsonInterface, contractAddress, this.options)
 }
 
 /**
@@ -1043,8 +1042,7 @@ Contract.prototype._executeMethod = function _executeMethod() {
                     return receipt
                 },
                 contractDeployFormatter(receipt) {
-                    const newContract = _this._parent.clone()
-                    newContract.options.address = receipt.contractAddress
+                    const newContract = _this._parent.clone(receipt.contractAddress)
                     return newContract
                 },
             }
