@@ -26,7 +26,6 @@
 
 const errors = require('./errors')
 const formatters = require('./formatters')
-const txErrorTable = require('./txErrorTable')
 const payloadTransformer = require('./payloadTransformer')
 const constants = require('./constants')
 const validateFunction = require('./validateFunction')
@@ -34,7 +33,6 @@ const validateFunction = require('./validateFunction')
 module.exports = {
     errors,
     formatters,
-    txErrorTable,
     payloadTransformer,
     constants,
     validateFunction,

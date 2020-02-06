@@ -28,7 +28,6 @@
 const _ = require('lodash')
 const errors = require('../../caver-core-helpers').errors
 const formatters = require('../../caver-core-helpers').formatters
-const txErrorTable = require('../../caver-core-helpers').txErrorTable
 const utils = require('../../caver-utils')
 const Subscriptions = require('../../caver-core-subscriptions').subscriptions
 const validateParams = require('../../caver-core-helpers').validateFunction.validateParams
@@ -579,7 +578,7 @@ const checkConfirmation = function(mutableConfirmationPack, existingReceipt, isP
 }
 
 const checkIsReceiptInBlock = receipt => {
-    if (receipt && !receipt.blockHash) throw txErrorTable.blockHashNull
+    if (receipt && !receipt.blockHash) throw errors.blockHashNull
 }
 
 const formatReceipt = (receipt, method) => {
@@ -633,7 +632,7 @@ const checkForContractDeployment = (mutableConfirmationPack, receipt, sub) => {
             mutableConfirmationPack.promiseResolved = true
         }
 
-        utils._fireError(txErrorTable.receiptDidntContainContractAddress, defer.eventEmitter, defer.reject)
+        utils._fireError(errors.receiptDidntContainContractAddress, defer.eventEmitter, defer.reject)
         return
     }
 
@@ -655,7 +654,7 @@ const checkForContractDeployment = (mutableConfirmationPack, receipt, sub) => {
             if (canUnsubscribe) defer.eventEmitter.removeAllListeners()
         } else {
             // code.length <= 2 means, contract code couldn't be stored.
-            utils._fireError(txErrorTable.contractCouldntBeStored, defer.eventEmitter, defer.reject)
+            utils._fireError(errors.contractCouldntBeStored, defer.eventEmitter, defer.reject)
         }
 
         if (canUnsubscribe) sub.unsubscribe()
@@ -693,27 +692,27 @@ const checkForNormalTx = (mutableConfirmationPack, receipt, sub) => {
         const receiptJSON = JSON.stringify(receipt, null, 2)
 
         const { txError } = receipt
-        if (txError && txErrorTable[txError]) {
+        if (txError && errors.txErrorTable[txError]) {
             utils._fireError(
-                new Error(`${txErrorTable[txError]}\n ${receiptJSON}`),
+                new Error(`${errors.txErrorTable[txError]}\n ${receiptJSON}`),
                 mutableConfirmationPack.defer.eventEmitter,
                 mutableConfirmationPack.defer.reject
             )
         } else if (receipt.status === false || receipt.status === '0x0') {
             utils._fireError(
-                txErrorTable.transactionReverted(receiptJSON),
+                errors.transactionReverted(receiptJSON),
                 mutableConfirmationPack.defer.eventEmitter,
                 mutableConfirmationPack.defer.reject
             )
         } else if (receipt.gasUsed >= gasProvided) {
             utils._fireError(
-                txErrorTable.transactionRanOutOfGas(receiptJSON),
+                errors.transactionRanOutOfGas(receiptJSON),
                 mutableConfirmationPack.defer.eventEmitter,
                 mutableConfirmationPack.defer.reject
             )
         } else {
             utils._fireError(
-                txErrorTable.transactionRanOutOfGas(receiptJSON),
+                errors.transactionRanOutOfGas(receiptJSON),
                 mutableConfirmationPack.defer.eventEmitter,
                 mutableConfirmationPack.defer.reject
             )
