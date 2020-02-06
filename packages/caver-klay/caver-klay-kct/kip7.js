@@ -16,10 +16,10 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const KIP5 = require('./kip5')
+const Contract = require('../caver-klay-contract')
 const { validateTokenInfoForDeploy, determineSendParams, kip7JsonInterface, kip7ByteCode } = require('./kctHelper')
 
-class KIP7 extends KIP5 {
+class KIP7 extends Contract {
     static deploy(tokenInfo, deployer) {
         validateTokenInfoForDeploy(tokenInfo)
 
@@ -34,8 +34,32 @@ class KIP7 extends KIP5 {
             .send({ from: deployer, gas: 3500000, value: 0 })
     }
 
-    constructor(tokenAddress) {
-        super(tokenAddress, kip7JsonInterface)
+    constructor(tokenAddress, abi = kip7JsonInterface) {
+        super(abi, tokenAddress)
+    }
+
+    name() {
+        return this.methods.name().call()
+    }
+
+    symbol() {
+        return this.methods.symbol().call()
+    }
+
+    decimals() {
+        return this.methods.decimals().call()
+    }
+
+    totalSupply() {
+        return this.methods.totalSupply().call()
+    }
+
+    balanceOf(account) {
+        return this.methods.balanceOf(account).call()
+    }
+
+    allowance(owner, spender) {
+        return this.methods.allowance(owner, spender).call()
     }
 
     clone(tokenAddress) {
@@ -52,6 +76,27 @@ class KIP7 extends KIP5 {
 
     paused() {
         return this.methods.paused().call()
+    }
+
+    async approve(spender, amount, sendParam = {}) {
+        const executableObj = this.methods.approve(spender, amount)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
+    }
+
+    async transfer(to, amount, sendParam = {}) {
+        const executableObj = this.methods.transfer(to, amount)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
+    }
+
+    async transferFrom(from, to, amount, sendParam = {}) {
+        const executableObj = this.methods.transferFrom(from, to, amount)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
     }
 
     async mint(account, amount, sendParam = {}) {

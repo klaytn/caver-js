@@ -67,7 +67,7 @@ before(function(done) {
 
 describe('caver.klay.KIP7', () => {
     context('caver.klay.KIP7.deploy', () => {
-        it('CAVERJS-UNIT-KCT-024: should deploy KIP7 token contract and return KIP7 instance', async () => {
+        it('CAVERJS-UNIT-KCT-001: should deploy KIP7 token contract and return KIP7 instance', async () => {
             const deployed = await caver.klay.KIP7.deploy(tokenInfo, sender.address)
 
             expect(deployed.options.address).not.to.be.undefined
@@ -80,21 +80,7 @@ describe('caver.klay.KIP7', () => {
             kip7Address = deployed.options.address
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-025: should deploy KIP7 token contract and return KIP7 instance with ERC20Extended alias', async () => {
-            const deployed = await caver.klay.ERC20Extended.deploy(tokenInfo, sender.address)
-
-            expect(deployed.options.address).not.to.be.undefined
-
-            const account = await caver.klay.getAccount(deployed.options.address)
-
-            expect(account.accType).to.equals(2)
-            expect(account.account.key.keyType).to.equals(3)
-
-            const kip7Account = await caver.klay.getAccount(kip7Address)
-            expect(account.account.codeHash).to.equals(kip7Account.account.codeHash)
-        }).timeout(200000)
-
-        it('CAVERJS-UNIT-KCT-026: should throw error when token information is insufficient or invalid', async () => {
+        it('CAVERJS-UNIT-KCT-002: should throw error when token information is insufficient or invalid', async () => {
             let expectedError = 'Invalid name of token'
             let insufficientToken = {}
             let invalidToken = { name: 1 }
@@ -122,7 +108,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.clone', () => {
-        it('CAVERJS-UNIT-KCT-027: should clone KIP7 instance with new token contract address', async () => {
+        it('CAVERJS-UNIT-KCT-003: should clone KIP7 instance with new token contract address', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const newTokenContract = caver.klay.accounts.create().address
@@ -134,7 +120,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.name', () => {
-        it('CAVERJS-UNIT-KCT-028: should call name method', async () => {
+        it('CAVERJS-UNIT-KCT-004: should call name method', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const name = await token.name()
@@ -144,7 +130,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.symbol', () => {
-        it('CAVERJS-UNIT-KCT-029: should call symbol method', async () => {
+        it('CAVERJS-UNIT-KCT-005: should call symbol method', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const symbol = await token.symbol()
@@ -154,7 +140,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.decimals', () => {
-        it('CAVERJS-UNIT-KCT-030: should call decimals method', async () => {
+        it('CAVERJS-UNIT-KCT-006: should call decimals method', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const decimals = await token.decimals()
@@ -164,7 +150,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.totalSupply', () => {
-        it('CAVERJS-UNIT-KCT-031: should call totalSupply method', async () => {
+        it('CAVERJS-UNIT-KCT-007: should call totalSupply method', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const totalSupply = await token.totalSupply()
@@ -174,7 +160,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.balanceOf', () => {
-        it('CAVERJS-UNIT-KCT-032: should call balanceOf method and deployer should have initialSupply', async () => {
+        it('CAVERJS-UNIT-KCT-008: should call balanceOf method and deployer should have initialSupply', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const balance = await token.balanceOf(sender.address)
@@ -182,7 +168,7 @@ describe('caver.klay.KIP7', () => {
             expect(balance).to.equals(String(tokenInfo.initialSupply))
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-033: should call balanceOf method and return 0 if account does not have any token', async () => {
+        it('CAVERJS-UNIT-KCT-009: should call balanceOf method and return 0 if account does not have any token', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const balance = await token.balanceOf(caver.klay.accounts.create().address)
@@ -192,7 +178,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.allowance', () => {
-        it('CAVERJS-UNIT-KCT-034: should call allowance method', async () => {
+        it('CAVERJS-UNIT-KCT-010: should call allowance method', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const allowance = await token.allowance(sender.address, testAccount.address)
@@ -201,7 +187,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.approve', () => {
-        it('CAVERJS-UNIT-KCT-035: should send transaction for calling approve method and set allowance without sendParams', async () => {
+        it('CAVERJS-UNIT-KCT-011: should send transaction for calling approve method and set allowance without sendParams', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const allowanceAmount = 10
@@ -222,7 +208,7 @@ describe('caver.klay.KIP7', () => {
             expect(Number(afterAllowance) - Number(originalAllowance)).to.equals(allowanceAmount)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-036: should send transaction for calling approve method and set allowance with sendParams(from)', async () => {
+        it('CAVERJS-UNIT-KCT-012: should send transaction for calling approve method and set allowance with sendParams(from)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const additionalAllowance = 10
@@ -242,7 +228,7 @@ describe('caver.klay.KIP7', () => {
             expect(Number(afterAllowance) - Number(originalAllowance)).to.equals(additionalAllowance)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-037: should send transaction for calling approve method and set allowance with sendParams(from, gas)', async () => {
+        it('CAVERJS-UNIT-KCT-013: should send transaction for calling approve method and set allowance with sendParams(from, gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const additionalAllowance = 10
@@ -264,7 +250,7 @@ describe('caver.klay.KIP7', () => {
             expect(Number(afterAllowance) - Number(originalAllowance)).to.equals(additionalAllowance)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-038: should send transaction for calling approve method and set allowance with sendParams(gas)', async () => {
+        it('CAVERJS-UNIT-KCT-014: should send transaction for calling approve method and set allowance with sendParams(gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const additionalAllowance = 10
@@ -292,7 +278,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.transfer', () => {
-        it('CAVERJS-UNIT-KCT-039: should send transaction to transfer token and trigger Transfer event without sendParams', async () => {
+        it('CAVERJS-UNIT-KCT-015: should send transaction to transfer token and trigger Transfer event without sendParams', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const transferAmount = 10
@@ -313,7 +299,7 @@ describe('caver.klay.KIP7', () => {
             expect(Number(afterBalance) - Number(originalBalance)).to.equals(transferAmount)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-040: should send transaction to transfer token and trigger Transfer event with sendParams(from)', async () => {
+        it('CAVERJS-UNIT-KCT-016: should send transaction to transfer token and trigger Transfer event with sendParams(from)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const transferAmount = 10
@@ -331,7 +317,7 @@ describe('caver.klay.KIP7', () => {
             expect(Number(afterBalance) - Number(originalBalance)).to.equals(transferAmount)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-041: should send transaction to transfer token and trigger Transfer event with sendParams(from, gas)', async () => {
+        it('CAVERJS-UNIT-KCT-017: should send transaction to transfer token and trigger Transfer event with sendParams(from, gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const transferAmount = 10
@@ -351,7 +337,7 @@ describe('caver.klay.KIP7', () => {
             expect(Number(afterBalance) - Number(originalBalance)).to.equals(transferAmount)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-042: should send transaction to transfer token and trigger Transfer event with sendParams(gas)', async () => {
+        it('CAVERJS-UNIT-KCT-018: should send transaction to transfer token and trigger Transfer event with sendParams(gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const transferAmount = 10
@@ -377,7 +363,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.transferFrom', () => {
-        it('CAVERJS-UNIT-KCT-043: should send transaction to transfer token and trigger Transfer event without sendParams', async () => {
+        it('CAVERJS-UNIT-KCT-019: should send transaction to transfer token and trigger Transfer event without sendParams', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const originalBalance = await token.balanceOf(receiver.address)
@@ -403,7 +389,7 @@ describe('caver.klay.KIP7', () => {
             expect(Number(afterBalance) - Number(originalBalance)).to.equals(allowanceAmount)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-044: should send transaction to transfer token and trigger Transfer event with sendParams(from)', async () => {
+        it('CAVERJS-UNIT-KCT-020: should send transaction to transfer token and trigger Transfer event with sendParams(from)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const originalBalance = await token.balanceOf(receiver.address)
@@ -429,7 +415,7 @@ describe('caver.klay.KIP7', () => {
             expect(Number(afterBalance) - Number(originalBalance)).to.equals(allowanceAmount)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-045: should send transaction to transfer token and trigger Transfer event with sendParams(from, gas)', async () => {
+        it('CAVERJS-UNIT-KCT-021: should send transaction to transfer token and trigger Transfer event with sendParams(from, gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const originalBalance = await token.balanceOf(receiver.address)
@@ -456,7 +442,7 @@ describe('caver.klay.KIP7', () => {
             expect(Number(afterBalance) - Number(originalBalance)).to.equals(allowanceAmount)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-046: should send transaction to transfer token and trigger Transfer event with sendParams(gas)', async () => {
+        it('CAVERJS-UNIT-KCT-022: should send transaction to transfer token and trigger Transfer event with sendParams(gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const originalBalance = await token.balanceOf(receiver.address)
@@ -486,7 +472,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.isMinter', () => {
-        it('CAVERJS-UNIT-KCT-047: should call isMinter method', async () => {
+        it('CAVERJS-UNIT-KCT-023: should call isMinter method', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             expect(await token.isMinter(sender.address)).to.be.true
@@ -495,7 +481,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.isPauser', () => {
-        it('CAVERJS-UNIT-KCT-048: should call isPauser method', async () => {
+        it('CAVERJS-UNIT-KCT-024: should call isPauser method', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             expect(await token.isPauser(sender.address)).to.be.true
@@ -504,7 +490,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.paused', () => {
-        it('CAVERJS-UNIT-KCT-049: should call paused method', async () => {
+        it('CAVERJS-UNIT-KCT-025: should call paused method', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             expect(await token.paused()).to.be.false
@@ -520,7 +506,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.mint', () => {
-        it('CAVERJS-UNIT-KCT-050: should send transaction for minting and trigger Transfer event without sendParams', async () => {
+        it('CAVERJS-UNIT-KCT-026: should send transaction for minting and trigger Transfer event without sendParams', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const originalSupply = await token.totalSupply()
@@ -541,7 +527,7 @@ describe('caver.klay.KIP7', () => {
             expect(Number(afterSupply) - Number(originalSupply)).to.equals(mintingAmount)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-051: should send transaction for minting and trigger Transfer event with sendParams(from)', async () => {
+        it('CAVERJS-UNIT-KCT-027: should send transaction for minting and trigger Transfer event with sendParams(from)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const originalSupply = await token.totalSupply()
@@ -559,7 +545,7 @@ describe('caver.klay.KIP7', () => {
             expect(Number(afterSupply) - Number(originalSupply)).to.equals(mintingAmount)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-052: should send transaction for minting and trigger Transfer event with sendParams(from, gas)', async () => {
+        it('CAVERJS-UNIT-KCT-028: should send transaction for minting and trigger Transfer event with sendParams(from, gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const originalSupply = await token.totalSupply()
@@ -579,7 +565,7 @@ describe('caver.klay.KIP7', () => {
             expect(Number(afterSupply) - Number(originalSupply)).to.equals(mintingAmount)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-053: should send transaction for minting and trigger Transfer event with sendParams(gas)', async () => {
+        it('CAVERJS-UNIT-KCT-029: should send transaction for minting and trigger Transfer event with sendParams(gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const originalSupply = await token.totalSupply()
@@ -603,7 +589,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.addMinter', () => {
-        it('CAVERJS-UNIT-KCT-054: should send transaction for adding minter and trigger MinterAdded event without sendParams', async () => {
+        it('CAVERJS-UNIT-KCT-030: should send transaction for adding minter and trigger MinterAdded event without sendParams', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const newMinter = caver.klay.accounts.create().address
@@ -622,7 +608,7 @@ describe('caver.klay.KIP7', () => {
             expect(await token.isMinter(newMinter)).to.be.true
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-055: should send transaction for adding minter and trigger MinterAdded event with sendParams(from)', async () => {
+        it('CAVERJS-UNIT-KCT-031: should send transaction for adding minter and trigger MinterAdded event with sendParams(from)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const newMinter = caver.klay.accounts.create().address
@@ -638,7 +624,7 @@ describe('caver.klay.KIP7', () => {
             expect(await token.isMinter(newMinter)).to.be.true
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-056: should send transaction for adding minter and trigger MinterAdded event with sendParams(from, gas)', async () => {
+        it('CAVERJS-UNIT-KCT-032: should send transaction for adding minter and trigger MinterAdded event with sendParams(from, gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const newMinter = caver.klay.accounts.create().address
@@ -656,7 +642,7 @@ describe('caver.klay.KIP7', () => {
             expect(await token.isMinter(newMinter)).to.be.true
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-057: should send transaction for adding minter and trigger MinterAdded event with sendParams(gas)', async () => {
+        it('CAVERJS-UNIT-KCT-033: should send transaction for adding minter and trigger MinterAdded event with sendParams(gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const newMinter = caver.klay.accounts.create().address
@@ -678,7 +664,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.renounceMinter', () => {
-        it('CAVERJS-UNIT-KCT-058: should send transaction for removing minter and trigger MinterRemoved event without sendParams', async () => {
+        it('CAVERJS-UNIT-KCT-034: should send transaction for removing minter and trigger MinterRemoved event without sendParams', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             await token.addMinter(testAccount.address, { from: sender.address })
@@ -697,7 +683,7 @@ describe('caver.klay.KIP7', () => {
             expect(await token.isMinter(testAccount.address)).to.be.false
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-059: should send transaction for removing minter and trigger MinterRemoved event with sendParams(from)', async () => {
+        it('CAVERJS-UNIT-KCT-035: should send transaction for removing minter and trigger MinterRemoved event with sendParams(from)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             await token.addMinter(testAccount.address, { from: sender.address })
@@ -713,7 +699,7 @@ describe('caver.klay.KIP7', () => {
             expect(await token.isMinter(testAccount.address)).to.be.false
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-060: should send transaction for removing minter and trigger MinterRemoved event with sendParams(from, gas)', async () => {
+        it('CAVERJS-UNIT-KCT-036: should send transaction for removing minter and trigger MinterRemoved event with sendParams(from, gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             await token.addMinter(testAccount.address, { from: sender.address })
@@ -731,7 +717,7 @@ describe('caver.klay.KIP7', () => {
             expect(await token.isMinter(testAccount.address)).to.be.false
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-061: should send transaction for removing minter and trigger MinterRemoved event with sendParams(gas)', async () => {
+        it('CAVERJS-UNIT-KCT-037: should send transaction for removing minter and trigger MinterRemoved event with sendParams(gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             await token.addMinter(testAccount.address, { from: sender.address })
@@ -753,7 +739,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.burn', () => {
-        it('CAVERJS-UNIT-KCT-062: should send transaction for burning and trigger Transfer event without sendParams', async () => {
+        it('CAVERJS-UNIT-KCT-038: should send transaction for burning and trigger Transfer event without sendParams', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const originalSupply = await token.totalSupply()
@@ -773,7 +759,7 @@ describe('caver.klay.KIP7', () => {
             expect(Number(originalSupply) - Number(afterSupply)).to.be.equals(burningAmount)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-063: should send transaction for burning and trigger Transfer event with sendParams(from)', async () => {
+        it('CAVERJS-UNIT-KCT-039: should send transaction for burning and trigger Transfer event with sendParams(from)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const originalSupply = await token.totalSupply()
@@ -790,7 +776,7 @@ describe('caver.klay.KIP7', () => {
             expect(Number(originalSupply) - Number(afterSupply)).to.be.equals(burningAmount)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-064: should send transaction for burning and trigger Transfer event with sendParams(from, gas)', async () => {
+        it('CAVERJS-UNIT-KCT-040: should send transaction for burning and trigger Transfer event with sendParams(from, gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const originalSupply = await token.totalSupply()
@@ -809,7 +795,7 @@ describe('caver.klay.KIP7', () => {
             expect(Number(originalSupply) - Number(afterSupply)).to.be.equals(burningAmount)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-065: should send transaction for burning and trigger Transfer event with sendParams(gas)', async () => {
+        it('CAVERJS-UNIT-KCT-041: should send transaction for burning and trigger Transfer event with sendParams(gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const originalSupply = await token.totalSupply()
@@ -832,7 +818,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.burnFrom', () => {
-        it('CAVERJS-UNIT-KCT-066: should send transaction for burning token and trigger Transfer event without sendParams', async () => {
+        it('CAVERJS-UNIT-KCT-042: should send transaction for burning token and trigger Transfer event without sendParams', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const originalSupply = await token.totalSupply()
@@ -857,7 +843,7 @@ describe('caver.klay.KIP7', () => {
             expect(Number(originalSupply) - Number(afterSupply)).to.be.equals(burningAmount)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-067: should send transaction for burning token and trigger Transfer event with sendParams(from)', async () => {
+        it('CAVERJS-UNIT-KCT-043: should send transaction for burning token and trigger Transfer event with sendParams(from)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const originalSupply = await token.totalSupply()
@@ -882,7 +868,7 @@ describe('caver.klay.KIP7', () => {
             expect(Number(originalSupply) - Number(afterSupply)).to.be.equals(burningAmount)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-068: should send transaction for burning token and trigger Transfer event with sendParams(from, gas)', async () => {
+        it('CAVERJS-UNIT-KCT-044: should send transaction for burning token and trigger Transfer event with sendParams(from, gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const originalSupply = await token.totalSupply()
@@ -908,7 +894,7 @@ describe('caver.klay.KIP7', () => {
             expect(Number(originalSupply) - Number(afterSupply)).to.be.equals(burningAmount)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-069: should send transaction for burning token and trigger Transfer event with sendParams(gas)', async () => {
+        it('CAVERJS-UNIT-KCT-045: should send transaction for burning token and trigger Transfer event with sendParams(gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const originalSupply = await token.totalSupply()
@@ -937,7 +923,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.addPauser', () => {
-        it('CAVERJS-UNIT-KCT-070: should send transaction for adding pauser and trigger PauserAdded event without sendParams', async () => {
+        it('CAVERJS-UNIT-KCT-046: should send transaction for adding pauser and trigger PauserAdded event without sendParams', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const newPauser = caver.klay.accounts.create().address
@@ -956,7 +942,7 @@ describe('caver.klay.KIP7', () => {
             expect(await token.isPauser(newPauser)).to.be.true
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-071: should send transaction for adding pauser and trigger PauserAdded event with sendParams(from)', async () => {
+        it('CAVERJS-UNIT-KCT-047: should send transaction for adding pauser and trigger PauserAdded event with sendParams(from)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const newPauser = caver.klay.accounts.create().address
@@ -972,7 +958,7 @@ describe('caver.klay.KIP7', () => {
             expect(await token.isPauser(newPauser)).to.be.true
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-072: should send transaction for adding pauser and trigger PauserAdded event with sendParams(from, gas)', async () => {
+        it('CAVERJS-UNIT-KCT-048: should send transaction for adding pauser and trigger PauserAdded event with sendParams(from, gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const newPauser = caver.klay.accounts.create().address
@@ -990,7 +976,7 @@ describe('caver.klay.KIP7', () => {
             expect(await token.isPauser(newPauser)).to.be.true
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-073: should send transaction for adding pauser and trigger PauserAdded event with sendParams(gas)', async () => {
+        it('CAVERJS-UNIT-KCT-049: should send transaction for adding pauser and trigger PauserAdded event with sendParams(gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const newPauser = caver.klay.accounts.create().address
@@ -1012,7 +998,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.pause', () => {
-        it('CAVERJS-UNIT-KCT-074: should send transaction for pausing without sendParams', async () => {
+        it('CAVERJS-UNIT-KCT-050: should send transaction for pausing without sendParams', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             // set deafult from address in kip7 instance
@@ -1027,7 +1013,7 @@ describe('caver.klay.KIP7', () => {
             await token.unpause({ from: sender.address })
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-075: should send transaction for pausing with sendParams(from)', async () => {
+        it('CAVERJS-UNIT-KCT-051: should send transaction for pausing with sendParams(from)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const doPause = await token.pause({ from: sender.address })
@@ -1039,7 +1025,7 @@ describe('caver.klay.KIP7', () => {
             await token.unpause({ from: sender.address })
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-076: should send transaction for pausing with sendParams(from, gas)', async () => {
+        it('CAVERJS-UNIT-KCT-052: should send transaction for pausing with sendParams(from, gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const customGasLimit = '0x30d40'
@@ -1053,7 +1039,7 @@ describe('caver.klay.KIP7', () => {
             await token.unpause({ from: sender.address })
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-077: should send transaction for pausing with sendParams(gas)', async () => {
+        it('CAVERJS-UNIT-KCT-053: should send transaction for pausing with sendParams(gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             // set deafult from address in kip7 instance
@@ -1071,7 +1057,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.unpause', () => {
-        it('CAVERJS-UNIT-KCT-078: should send transaction for unpausing without sendParams', async () => {
+        it('CAVERJS-UNIT-KCT-054: should send transaction for unpausing without sendParams', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             await token.pause({ from: sender.address })
@@ -1086,7 +1072,7 @@ describe('caver.klay.KIP7', () => {
             expect(await token.paused()).to.be.false
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-079: should send transaction for unpausing with sendParams(from)', async () => {
+        it('CAVERJS-UNIT-KCT-055: should send transaction for unpausing with sendParams(from)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             await token.pause({ from: sender.address })
@@ -1098,7 +1084,7 @@ describe('caver.klay.KIP7', () => {
             expect(await token.paused()).to.be.false
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-080: should send transaction for unpausing with sendParams(from, gas)', async () => {
+        it('CAVERJS-UNIT-KCT-056: should send transaction for unpausing with sendParams(from, gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             await token.pause({ from: sender.address })
@@ -1112,7 +1098,7 @@ describe('caver.klay.KIP7', () => {
             expect(await token.paused()).to.be.false
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-081: should send transaction for unpausing with sendParams(gas)', async () => {
+        it('CAVERJS-UNIT-KCT-057: should send transaction for unpausing with sendParams(gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             await token.pause({ from: sender.address })
@@ -1130,7 +1116,7 @@ describe('caver.klay.KIP7', () => {
     })
 
     context('KIP7.renouncePauser', () => {
-        it('CAVERJS-UNIT-KCT-082: should send transaction for removing pauser and trigger PauserRemoved event without sendParams', async () => {
+        it('CAVERJS-UNIT-KCT-058: should send transaction for removing pauser and trigger PauserRemoved event without sendParams', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             await token.addPauser(testAccount.address, { from: sender.address })
@@ -1149,7 +1135,7 @@ describe('caver.klay.KIP7', () => {
             expect(await token.isPauser(testAccount.address)).to.be.false
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-083: should send transaction for removing pauser and trigger PauserRemoved event with sendParams(from)', async () => {
+        it('CAVERJS-UNIT-KCT-059: should send transaction for removing pauser and trigger PauserRemoved event with sendParams(from)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             await token.addPauser(testAccount.address, { from: sender.address })
@@ -1165,7 +1151,7 @@ describe('caver.klay.KIP7', () => {
             expect(await token.isPauser(testAccount.address)).to.be.false
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-084: should send transaction for removing pauser and trigger PauserRemoved event with sendParams(from, gas)', async () => {
+        it('CAVERJS-UNIT-KCT-060: should send transaction for removing pauser and trigger PauserRemoved event with sendParams(from, gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             await token.addPauser(testAccount.address, { from: sender.address })
@@ -1183,7 +1169,7 @@ describe('caver.klay.KIP7', () => {
             expect(await token.isPauser(testAccount.address)).to.be.false
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-085: should send transaction for removing pauser and trigger PauserRemoved event with sendParams(gas)', async () => {
+        it('CAVERJS-UNIT-KCT-061: should send transaction for removing pauser and trigger PauserRemoved event with sendParams(gas)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             await token.addPauser(testAccount.address, { from: sender.address })
