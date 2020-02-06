@@ -56,6 +56,8 @@ jobs:
           name: "Publish package with rc tag"
           command: |
               echo "Publishing a release candidate! version=$CIRCLE_TAG"
+              npm install
+              npm run build
               npm publish --tag rc
       - run:
           name: "Push to release branch"
@@ -122,6 +124,8 @@ jobs:
               version=v$(.circleci/version.sh)
 
               echo "Publishing a major release! version=$version"
+              npm install
+              npm run build
               npm publish
 
   tagger_verify:
