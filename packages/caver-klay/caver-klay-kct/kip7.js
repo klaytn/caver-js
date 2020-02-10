@@ -51,7 +51,7 @@ class KIP7 extends Contract {
     }
 
     clone(tokenAddress = this.options.address) {
-        return new this.constructor(tokenAddress)
+        return new this.constructor(tokenAddress, this.options.jsonInterface)
     }
 
     name() {
