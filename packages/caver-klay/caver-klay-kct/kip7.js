@@ -50,6 +50,10 @@ class KIP7 extends Contract {
         super(abi, tokenAddress)
     }
 
+    clone(tokenAddress) {
+        return new this.constructor(tokenAddress)
+    }
+
     name() {
         return this.methods.name().call()
     }
@@ -72,10 +76,6 @@ class KIP7 extends Contract {
 
     allowance(owner, spender) {
         return this.methods.allowance(owner, spender).call()
-    }
-
-    clone(tokenAddress) {
-        return new this.constructor(tokenAddress)
     }
 
     isMinter(account) {
