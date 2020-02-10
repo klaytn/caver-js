@@ -16,8 +16,11 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+const _ = require('lodash')
+
 const Contract = require('../caver-klay-contract')
 const { validateTokenInfoForDeploy, determineSendParams, kip7JsonInterface, kip7ByteCode } = require('./kctHelper')
+const { isAddress } = require('../../caver-utils')
 
 class KIP7 extends Contract {
     static deploy(tokenInfo, deployer) {
@@ -35,6 +38,15 @@ class KIP7 extends Contract {
     }
 
     constructor(tokenAddress, abi = kip7JsonInterface) {
+        if (tokenAddress) {
+            if (_.isString(tokenAddress)) {
+                if (!isAddress(tokenAddress)) throw new Error(`Invalid token address ${tokenAddress}`)
+            } else {
+                abi = tokenAddress
+                tokenAddress = undefined
+            }
+        }
+
         super(abi, tokenAddress)
     }
 
