@@ -50,7 +50,7 @@ class KIP7 extends Contract {
         super(abi, tokenAddress)
     }
 
-    clone(tokenAddress) {
+    clone(tokenAddress = this.options.address) {
         return new this.constructor(tokenAddress)
     }
 
