@@ -97,15 +97,15 @@ class KIP7 extends Contract {
         return executableObj.send(sendParam)
     }
 
-    async transfer(to, amount, sendParam = {}) {
-        const executableObj = this.methods.transfer(to, amount)
+    async transfer(recipient, amount, sendParam = {}) {
+        const executableObj = this.methods.transfer(recipient, amount)
         sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
 
         return executableObj.send(sendParam)
     }
 
-    async transferFrom(from, to, amount, sendParam = {}) {
-        const executableObj = this.methods.transferFrom(from, to, amount)
+    async transferFrom(from, recipient, amount, sendParam = {}) {
+        const executableObj = this.methods.transferFrom(from, recipient, amount)
         sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
 
         return executableObj.send(sendParam)
