@@ -20,7 +20,7 @@ const _ = require('lodash')
 const BigNumber = require('bignumber.js')
 
 async function determineSendParams(executableObj, sendParam, defaultFrom) {
-    let { from, gas } = sendParam
+    let { from, gas, gasPrice, value } = sendParam
     from = from || defaultFrom
     if (!from) throw new Error(`'from' is missing. Pass the object that from field is defined in the last parameter.`)
 
@@ -32,7 +32,7 @@ async function determineSendParams(executableObj, sendParam, defaultFrom) {
         gas = Math.round(originalGas.times(bufferGas))
     }
 
-    return { from, gas }
+    return { from, gas, gasPrice, value }
 }
 
 function validateTokenInfoForDeploy(obj) {
