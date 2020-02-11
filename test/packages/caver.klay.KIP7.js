@@ -1288,12 +1288,12 @@ describe('caver.klay.KIP7', () => {
             // set deafult from address in kip7 instance
             token.options.from = sender.address
 
-            const increased = await token.decreaseAllowance(testAccount.address, decreasedAmount)
-            expect(increased.from).to.be.equals(sender.address.toLowerCase())
-            expect(increased.status).to.be.true
-            expect(increased.events).not.to.be.undefined
-            expect(increased.events.Approval).not.to.be.undefined
-            expect(increased.events.Approval.address).to.equals(kip7Address)
+            const decreased = await token.decreaseAllowance(testAccount.address, decreasedAmount)
+            expect(decreased.from).to.be.equals(sender.address.toLowerCase())
+            expect(decreased.status).to.be.true
+            expect(decreased.events).not.to.be.undefined
+            expect(decreased.events.Approval).not.to.be.undefined
+            expect(decreased.events.Approval.address).to.equals(kip7Address)
 
             const afterAllowance = await token.allowance(sender.address, testAccount.address)
 
@@ -1306,12 +1306,12 @@ describe('caver.klay.KIP7', () => {
             const decreasedAmount = 10
             const originalAllowance = await token.allowance(sender.address, testAccount.address)
 
-            const increased = await token.decreaseAllowance(testAccount.address, decreasedAmount, { from: sender.address })
-            expect(increased.from).to.be.equals(sender.address.toLowerCase())
-            expect(increased.status).to.be.true
-            expect(increased.events).not.to.be.undefined
-            expect(increased.events.Approval).not.to.be.undefined
-            expect(increased.events.Approval.address).to.equals(kip7Address)
+            const decreased = await token.decreaseAllowance(testAccount.address, decreasedAmount, { from: sender.address })
+            expect(decreased.from).to.be.equals(sender.address.toLowerCase())
+            expect(decreased.status).to.be.true
+            expect(decreased.events).not.to.be.undefined
+            expect(decreased.events.Approval).not.to.be.undefined
+            expect(decreased.events.Approval.address).to.equals(kip7Address)
 
             const afterAllowance = await token.allowance(sender.address, testAccount.address)
 
@@ -1326,15 +1326,15 @@ describe('caver.klay.KIP7', () => {
 
             const customGasLimit = '0x186a0'
 
-            const increased = await token.decreaseAllowance(testAccount.address, decreasedAmount, {
+            const decreased = await token.decreaseAllowance(testAccount.address, decreasedAmount, {
                 from: sender.address,
                 gas: customGasLimit,
             })
-            expect(increased.gas).to.equals(customGasLimit)
-            expect(increased.status).to.be.true
-            expect(increased.events).not.to.be.undefined
-            expect(increased.events.Approval).not.to.be.undefined
-            expect(increased.events.Approval.address).to.equals(kip7Address)
+            expect(decreased.gas).to.equals(customGasLimit)
+            expect(decreased.status).to.be.true
+            expect(decreased.events).not.to.be.undefined
+            expect(decreased.events.Approval).not.to.be.undefined
+            expect(decreased.events.Approval.address).to.equals(kip7Address)
 
             const afterAllowance = await token.allowance(sender.address, testAccount.address)
 
@@ -1352,13 +1352,13 @@ describe('caver.klay.KIP7', () => {
             // set deafult from address in kip7 instance
             token.options.from = sender.address
 
-            const increased = await token.decreaseAllowance(testAccount.address, decreasedAmount, { gas: customGasLimit })
-            expect(increased.from).to.be.equals(sender.address.toLowerCase())
-            expect(increased.gas).to.equals(customGasLimit)
-            expect(increased.status).to.be.true
-            expect(increased.events).not.to.be.undefined
-            expect(increased.events.Approval).not.to.be.undefined
-            expect(increased.events.Approval.address).to.equals(kip7Address)
+            const decreased = await token.decreaseAllowance(testAccount.address, decreasedAmount, { gas: customGasLimit })
+            expect(decreased.from).to.be.equals(sender.address.toLowerCase())
+            expect(decreased.gas).to.equals(customGasLimit)
+            expect(decreased.status).to.be.true
+            expect(decreased.events).not.to.be.undefined
+            expect(decreased.events.Approval).not.to.be.undefined
+            expect(decreased.events.Approval.address).to.equals(kip7Address)
 
             const afterAllowance = await token.allowance(sender.address, testAccount.address)
 
