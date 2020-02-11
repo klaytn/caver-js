@@ -153,8 +153,8 @@ class KIP7 extends Contract {
         return executableObj.send(sendParam)
     }
 
-    async burnFrom(from, amount, sendParam = {}) {
-        const executableObj = this.methods.burnFrom(from, amount)
+    async burnFrom(account, amount, sendParam = {}) {
+        const executableObj = this.methods.burnFrom(account, amount)
         sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
 
         return executableObj.send(sendParam)

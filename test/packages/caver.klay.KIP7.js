@@ -831,12 +831,12 @@ describe('caver.klay.KIP7', () => {
             // set deafult from address in kip7 instance
             token.options.from = testAccount.address
 
-            const transfered = await token.burnFrom(sender.address, burningAmount)
-            expect(transfered.from).to.be.equals(testAccount.address.toLowerCase())
-            expect(transfered.status).to.be.true
-            expect(transfered.events).not.to.be.undefined
-            expect(transfered.events.Transfer).not.to.be.undefined
-            expect(transfered.events.Transfer.address).to.equals(kip7Address)
+            const burned = await token.burnFrom(sender.address, burningAmount)
+            expect(burned.from).to.be.equals(testAccount.address.toLowerCase())
+            expect(burned.status).to.be.true
+            expect(burned.events).not.to.be.undefined
+            expect(burned.events.Transfer).not.to.be.undefined
+            expect(burned.events.Transfer.address).to.equals(kip7Address)
 
             expect(await token.allowance(sender.address, testAccount.address)).to.be.equals('0')
             const afterSupply = await token.totalSupply()
@@ -856,12 +856,12 @@ describe('caver.klay.KIP7', () => {
             // set deafult from address in kip7 instance
             token.options.from = testAccount.address
 
-            const transfered = await token.burnFrom(sender.address, burningAmount, { from: testAccount.address })
-            expect(transfered.from).to.be.equals(testAccount.address.toLowerCase())
-            expect(transfered.status).to.be.true
-            expect(transfered.events).not.to.be.undefined
-            expect(transfered.events.Transfer).not.to.be.undefined
-            expect(transfered.events.Transfer.address).to.equals(kip7Address)
+            const burned = await token.burnFrom(sender.address, burningAmount, { from: testAccount.address })
+            expect(burned.from).to.be.equals(testAccount.address.toLowerCase())
+            expect(burned.status).to.be.true
+            expect(burned.events).not.to.be.undefined
+            expect(burned.events.Transfer).not.to.be.undefined
+            expect(burned.events.Transfer.address).to.equals(kip7Address)
 
             expect(await token.allowance(sender.address, testAccount.address)).to.be.equals('0')
             const afterSupply = await token.totalSupply()
@@ -879,15 +879,15 @@ describe('caver.klay.KIP7', () => {
             expect(Number(originalAllowance)).to.be.equals(burningAmount)
 
             const customGasLimit = '0x186a0'
-            const transfered = await token.burnFrom(sender.address, burningAmount, {
+            const burned = await token.burnFrom(sender.address, burningAmount, {
                 from: testAccount.address,
                 gas: customGasLimit,
             })
-            expect(transfered.gas).to.equals(customGasLimit)
-            expect(transfered.status).to.be.true
-            expect(transfered.events).not.to.be.undefined
-            expect(transfered.events.Transfer).not.to.be.undefined
-            expect(transfered.events.Transfer.address).to.equals(kip7Address)
+            expect(burned.gas).to.equals(customGasLimit)
+            expect(burned.status).to.be.true
+            expect(burned.events).not.to.be.undefined
+            expect(burned.events.Transfer).not.to.be.undefined
+            expect(burned.events.Transfer.address).to.equals(kip7Address)
 
             expect(await token.allowance(sender.address, testAccount.address)).to.be.equals('0')
             const afterSupply = await token.totalSupply()
@@ -908,13 +908,13 @@ describe('caver.klay.KIP7', () => {
             token.options.from = testAccount.address
 
             const customGasLimit = '0x186a0'
-            const transfered = await token.burnFrom(sender.address, burningAmount, { gas: customGasLimit })
-            expect(transfered.from).to.be.equals(testAccount.address.toLowerCase())
-            expect(transfered.gas).to.equals(customGasLimit)
-            expect(transfered.status).to.be.true
-            expect(transfered.events).not.to.be.undefined
-            expect(transfered.events.Transfer).not.to.be.undefined
-            expect(transfered.events.Transfer.address).to.equals(kip7Address)
+            const burned = await token.burnFrom(sender.address, burningAmount, { gas: customGasLimit })
+            expect(burned.from).to.be.equals(testAccount.address.toLowerCase())
+            expect(burned.gas).to.equals(customGasLimit)
+            expect(burned.status).to.be.true
+            expect(burned.events).not.to.be.undefined
+            expect(burned.events.Transfer).not.to.be.undefined
+            expect(burned.events.Transfer.address).to.equals(kip7Address)
 
             expect(await token.allowance(sender.address, testAccount.address)).to.be.equals('0')
             const afterSupply = await token.totalSupply()
