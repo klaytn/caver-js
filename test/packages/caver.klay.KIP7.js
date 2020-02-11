@@ -1189,4 +1189,180 @@ describe('caver.klay.KIP7', () => {
             expect(await token.isPauser(testAccount.address)).to.be.false
         }).timeout(200000)
     })
+
+    context('KIP7.increaseAllowance', () => {
+        it('CAVERJS-UNIT-KCT-130: should send transaction for calling increaseAllowance method and increase allowance without sendParams', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const increasedAmount = 10
+            const originalAllowance = await token.allowance(sender.address, testAccount.address)
+
+            // set deafult from address in kip7 instance
+            token.options.from = sender.address
+
+            const increased = await token.increaseAllowance(testAccount.address, increasedAmount)
+            expect(increased.from).to.be.equals(sender.address.toLowerCase())
+            expect(increased.status).to.be.true
+            expect(increased.events).not.to.be.undefined
+            expect(increased.events.Approval).not.to.be.undefined
+            expect(increased.events.Approval.address).to.equals(kip7Address)
+
+            const afterAllowance = await token.allowance(sender.address, testAccount.address)
+
+            expect(Number(afterAllowance) - Number(originalAllowance)).to.equals(increasedAmount)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-131: should send transaction for calling increaseAllowance method and increase allowance with sendParams(from)', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const increasedAmount = 10
+            const originalAllowance = await token.allowance(sender.address, testAccount.address)
+
+            const increased = await token.increaseAllowance(testAccount.address, increasedAmount, { from: sender.address })
+            expect(increased.from).to.be.equals(sender.address.toLowerCase())
+            expect(increased.status).to.be.true
+            expect(increased.events).not.to.be.undefined
+            expect(increased.events.Approval).not.to.be.undefined
+            expect(increased.events.Approval.address).to.equals(kip7Address)
+
+            const afterAllowance = await token.allowance(sender.address, testAccount.address)
+
+            expect(Number(afterAllowance) - Number(originalAllowance)).to.equals(increasedAmount)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-132: should send transaction for calling increaseAllowance method and increase allowance with sendParams(from, gas)', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const increasedAmount = 10
+            const originalAllowance = await token.allowance(sender.address, testAccount.address)
+
+            const customGasLimit = '0x186a0'
+
+            const increased = await token.increaseAllowance(testAccount.address, increasedAmount, {
+                from: sender.address,
+                gas: customGasLimit,
+            })
+            expect(increased.gas).to.equals(customGasLimit)
+            expect(increased.status).to.be.true
+            expect(increased.events).not.to.be.undefined
+            expect(increased.events.Approval).not.to.be.undefined
+            expect(increased.events.Approval.address).to.equals(kip7Address)
+
+            const afterAllowance = await token.allowance(sender.address, testAccount.address)
+
+            expect(Number(afterAllowance) - Number(originalAllowance)).to.equals(increasedAmount)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-133: should send transaction for calling increaseAllowance method and increase allowance with sendParams(gas)', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const increasedAmount = 10
+            const originalAllowance = await token.allowance(sender.address, testAccount.address)
+
+            const customGasLimit = '0x186a0'
+
+            // set deafult from address in kip7 instance
+            token.options.from = sender.address
+
+            const increased = await token.increaseAllowance(testAccount.address, increasedAmount, { gas: customGasLimit })
+            expect(increased.from).to.be.equals(sender.address.toLowerCase())
+            expect(increased.gas).to.equals(customGasLimit)
+            expect(increased.status).to.be.true
+            expect(increased.events).not.to.be.undefined
+            expect(increased.events.Approval).not.to.be.undefined
+            expect(increased.events.Approval.address).to.equals(kip7Address)
+
+            const afterAllowance = await token.allowance(sender.address, testAccount.address)
+
+            expect(Number(afterAllowance) - Number(originalAllowance)).to.equals(increasedAmount)
+        }).timeout(200000)
+    })
+
+    context('KIP7.decreaseAllowance', () => {
+        it('CAVERJS-UNIT-KCT-134: should send transaction for calling decreaseAllowance method and decrease allowance without sendParams', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const decreasedAmount = 10
+            const originalAllowance = await token.allowance(sender.address, testAccount.address)
+
+            // set deafult from address in kip7 instance
+            token.options.from = sender.address
+
+            const increased = await token.decreaseAllowance(testAccount.address, decreasedAmount)
+            expect(increased.from).to.be.equals(sender.address.toLowerCase())
+            expect(increased.status).to.be.true
+            expect(increased.events).not.to.be.undefined
+            expect(increased.events.Approval).not.to.be.undefined
+            expect(increased.events.Approval.address).to.equals(kip7Address)
+
+            const afterAllowance = await token.allowance(sender.address, testAccount.address)
+
+            expect(Number(originalAllowance) - Number(afterAllowance)).to.equals(decreasedAmount)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-135: should send transaction for calling decreaseAllowance method and decrease allowance with sendParams(from)', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const decreasedAmount = 10
+            const originalAllowance = await token.allowance(sender.address, testAccount.address)
+
+            const increased = await token.decreaseAllowance(testAccount.address, decreasedAmount, { from: sender.address })
+            expect(increased.from).to.be.equals(sender.address.toLowerCase())
+            expect(increased.status).to.be.true
+            expect(increased.events).not.to.be.undefined
+            expect(increased.events.Approval).not.to.be.undefined
+            expect(increased.events.Approval.address).to.equals(kip7Address)
+
+            const afterAllowance = await token.allowance(sender.address, testAccount.address)
+
+            expect(Number(originalAllowance) - Number(afterAllowance)).to.equals(decreasedAmount)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-136: should send transaction for calling decreaseAllowance method and decrease allowance with sendParams(from, gas)', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const decreasedAmount = 10
+            const originalAllowance = await token.allowance(sender.address, testAccount.address)
+
+            const customGasLimit = '0x186a0'
+
+            const increased = await token.decreaseAllowance(testAccount.address, decreasedAmount, {
+                from: sender.address,
+                gas: customGasLimit,
+            })
+            expect(increased.gas).to.equals(customGasLimit)
+            expect(increased.status).to.be.true
+            expect(increased.events).not.to.be.undefined
+            expect(increased.events.Approval).not.to.be.undefined
+            expect(increased.events.Approval.address).to.equals(kip7Address)
+
+            const afterAllowance = await token.allowance(sender.address, testAccount.address)
+
+            expect(Number(originalAllowance) - Number(afterAllowance)).to.equals(decreasedAmount)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-137: should send transaction for calling decreaseAllowance method and decrease allowance with sendParams(gas)', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const decreasedAmount = 10
+            const originalAllowance = await token.allowance(sender.address, testAccount.address)
+
+            const customGasLimit = '0x186a0'
+
+            // set deafult from address in kip7 instance
+            token.options.from = sender.address
+
+            const increased = await token.decreaseAllowance(testAccount.address, decreasedAmount, { gas: customGasLimit })
+            expect(increased.from).to.be.equals(sender.address.toLowerCase())
+            expect(increased.gas).to.equals(customGasLimit)
+            expect(increased.status).to.be.true
+            expect(increased.events).not.to.be.undefined
+            expect(increased.events.Approval).not.to.be.undefined
+            expect(increased.events.Approval.address).to.equals(kip7Address)
+
+            const afterAllowance = await token.allowance(sender.address, testAccount.address)
+
+            expect(Number(originalAllowance) - Number(afterAllowance)).to.equals(decreasedAmount)
+        }).timeout(200000)
+    })
 })
