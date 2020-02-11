@@ -16,6 +16,8 @@
 	along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+const BigNumber = require('bignumber.js')
+
 const testRPCURL = require('../testrpc')
 const { expect } = require('../extendedChai')
 
@@ -77,6 +79,18 @@ describe('caver.klay.KIP7', () => {
             expect(account.accType).to.equals(2)
             expect(account.account.key.keyType).to.equals(3)
 
+            // Check deploy with string initial supply
+            const newTokenInfo = Object.assign({}, tokenInfo)
+            newTokenInfo.initialSupply = String(newTokenInfo.initialSupply)
+
+            const deployed2 = await caver.klay.KIP7.deploy(newTokenInfo, sender.address)
+            expect(deployed2.options.address).not.to.be.undefined
+
+            const account2 = await caver.klay.getAccount(deployed.options.address)
+
+            expect(account2.accType).to.equals(2)
+            expect(account2.account.key.keyType).to.equals(3)
+
             kip7Address = deployed.options.address
         }).timeout(200000)
 
@@ -101,7 +115,7 @@ describe('caver.klay.KIP7', () => {
 
             expectedError = 'Invalid initialSupply of token'
             insufficientToken = { name: 'Jasmine', symbol: 'JAS', decimals: 18 }
-            invalidToken = { name: 'Jasmine', symbol: 'JAS', decimals: 18, initialSupply: 'string' }
+            invalidToken = { name: 'Jasmine', symbol: 'JAS', decimals: 18, initialSupply: new BigNumber(1000000) }
             expect(() => caver.klay.KIP7.deploy(insufficientToken, sender.address)).to.throws(expectedError)
             expect(() => caver.klay.KIP7.deploy(invalidToken, sender.address)).to.throws(expectedError)
         }).timeout(200000)

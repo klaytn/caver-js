@@ -39,7 +39,8 @@ function validateTokenInfoForDeploy(obj) {
     if (!obj.name || !_.isString(obj.name)) throw new Error(`Invalid name of token`)
     if (!obj.symbol || !_.isString(obj.symbol)) throw new Error(`Invalid symbol of token`)
     if (obj.decimals === undefined || !_.isNumber(obj.decimals)) throw new Error(`Invalid decimals of token`)
-    if (obj.initialSupply === undefined || !_.isNumber(obj.initialSupply)) throw new Error(`Invalid initialSupply of token`)
+    if (obj.initialSupply === undefined || (!_.isNumber(obj.initialSupply) && !_.isString(obj.initialSupply)))
+        throw new Error(`Invalid initialSupply of token`)
 }
 
 const kip7JsonInterface = [
