@@ -1,4 +1,6 @@
 caver-klay-kct/contract
 =================
 
-caver-klay-kct/contract refers to the contract implementataion in [openzeppelin](https://github.com/OpenZeppelin/openzeppelin-contracts).
+Some files in `caver-klay-kct/contract` were derived from [openzeppelin](https://github.com/OpenZeppelin/openzeppelin-contracts).
+
+Files in `caver-klay-kct/contract` are licensed under the MIT license as described in `caver-klay-kct/contract/LICENSE`.
