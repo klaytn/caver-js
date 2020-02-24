@@ -26,6 +26,7 @@
 
 const _ = require('lodash')
 const BN = require('bn.js')
+const BigNumber = require('bignumber.js')
 const numberToBN = require('number-to-bn')
 const utf8 = require('utf8')
 const Hash = require('eth-lib/lib/hash')
@@ -78,7 +79,9 @@ const isBN = function(object) {
  * @param {Object} object
  * @return {Boolean}
  */
-const isBigNumber = object => object && object.constructor && object.constructor.name === 'BigNumber'
+const isBigNumber = function(num) {
+    return BigNumber.isBigNumber(num)
+}
 
 /**
  * Takes an input and transforms it into an BN
