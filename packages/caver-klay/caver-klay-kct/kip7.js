@@ -111,20 +111,6 @@ class KIP7 extends Contract {
         return executableObj.send(sendParam)
     }
 
-    async increaseAllowance(spender, addedValue, sendParam = {}) {
-        const executableObj = this.methods.increaseAllowance(spender, addedValue)
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
-
-        return executableObj.send(sendParam)
-    }
-
-    async decreaseAllowance(spender, subtractedValue, sendParam = {}) {
-        const executableObj = this.methods.decreaseAllowance(spender, subtractedValue)
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
-
-        return executableObj.send(sendParam)
-    }
-
     async mint(account, amount, sendParam = {}) {
         const executableObj = this.methods.mint(account, amount)
         sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
