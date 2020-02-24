@@ -95,28 +95,34 @@ describe('caver.klay.KIP7', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-002: should throw error when token information is insufficient or invalid', async () => {
-            let expectedError = 'Invalid name of token'
+            let expectedError = 'Failed to validate token info for deploy: Invalid name of token'
             let insufficientToken = {}
             let invalidToken = { name: 1 }
             expect(() => caver.klay.KIP7.deploy(insufficientToken, sender.address)).to.throws(expectedError)
             expect(() => caver.klay.KIP7.deploy(invalidToken, sender.address)).to.throws(expectedError)
 
-            expectedError = 'Invalid symbol of token'
+            expectedError = 'Failed to validate token info for deploy: Invalid symbol of token'
             insufficientToken = { name: 'Jasmine' }
             invalidToken = { name: 'Jasmine', symbol: 1 }
             expect(() => caver.klay.KIP7.deploy(insufficientToken, sender.address)).to.throws(expectedError)
             expect(() => caver.klay.KIP7.deploy(invalidToken, sender.address)).to.throws(expectedError)
 
-            expectedError = 'Invalid decimals of token'
+            expectedError = 'Failed to validate token info for deploy: Invalid decimals of token'
             insufficientToken = { name: 'Jasmine', symbol: 'JAS' }
             invalidToken = { name: 'Jasmine', symbol: 'JAS', decimals: [1234] }
             expect(() => caver.klay.KIP7.deploy(insufficientToken, sender.address)).to.throws(expectedError)
             expect(() => caver.klay.KIP7.deploy(invalidToken, sender.address)).to.throws(expectedError)
 
-            expectedError = 'Invalid initialSupply of token'
+            expectedError = 'Failed to validate token info for deploy: Invalid initialSupply of token'
             insufficientToken = { name: 'Jasmine', symbol: 'JAS', decimals: 18 }
-            invalidToken = { name: 'Jasmine', symbol: 'JAS', decimals: 18, initialSupply: 'invalid' }
             expect(() => caver.klay.KIP7.deploy(insufficientToken, sender.address)).to.throws(expectedError)
+
+            expectedError = 'Failed to validate token info for deploy: Failed to convert BigNumber(NaN) to String: NaN'
+            invalidToken = { name: 'Jasmine', symbol: 'JAS', decimals: 18, initialSupply: 'invalid' }
+            expect(() => caver.klay.KIP7.deploy(invalidToken, sender.address)).to.throws(expectedError)
+
+            expectedError = 'Failed to validate token info for deploy: Unsupported initialSupply type: object'
+            invalidToken = { name: 'Jasmine', symbol: 'JAS', decimals: 18, initialSupply: [1234] }
             expect(() => caver.klay.KIP7.deploy(invalidToken, sender.address)).to.throws(expectedError)
         }).timeout(200000)
     })

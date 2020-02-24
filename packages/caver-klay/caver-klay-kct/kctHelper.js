@@ -36,28 +36,36 @@ async function determineSendParams(executableObj, sendParam, defaultFrom) {
     return { from, gas, gasPrice: sendParam.gasPrice, value: sendParam.value }
 }
 
-const invalidInitialSupplyError = `Invalid initialSupply of token`
-
 function convertBigNumberToString(bigNumber) {
     const numberString = bigNumber.toString(10)
-    if (numberString === 'NaN') throw new Error(invalidInitialSupplyError)
+    if (numberString === 'NaN') throw new Error(`Failed to convert BigNumber(${bigNumber}) to String: ${numberString}`)
     return numberString
 }
 
 function validateTokenInfoForDeploy(obj) {
-    if (!obj.name || !_.isString(obj.name)) throw new Error(`Invalid name of token`)
-    if (!obj.symbol || !_.isString(obj.symbol)) throw new Error(`Invalid symbol of token`)
-    if (obj.decimals === undefined || !_.isNumber(obj.decimals)) throw new Error(`Invalid decimals of token`)
+    const errorFormat = 'Failed to validate token info for deploy: '
+    if (!obj.name || !_.isString(obj.name)) throw new Error(`${errorFormat}Invalid name of token`)
+    if (!obj.symbol || !_.isString(obj.symbol)) throw new Error(`${errorFormat}Invalid symbol of token`)
+    if (obj.decimals === undefined || !_.isNumber(obj.decimals)) throw new Error(`${errorFormat}Invalid decimals of token`)
 
-    if (obj.initialSupply === undefined) {
-        throw new Error(invalidInitialSupplyError)
-    } else if (_.isString(obj.initialSupply)) {
-        obj.initialSupply = new BigNumber(obj.initialSupply)
-        obj.initialSupply = convertBigNumberToString(obj.initialSupply)
-    } else if (isBigNumber(obj.initialSupply)) {
-        obj.initialSupply = convertBigNumberToString(obj.initialSupply)
-    } else if (!_.isNumber(obj.initialSupply)) {
-        throw new Error(invalidInitialSupplyError)
+    const invalidInitialSupplyError = `Invalid initialSupply of token`
+    const unsupportedInitialSupplyTypeError = `Unsupported initialSupply type: `
+    try {
+        if (obj.initialSupply === undefined) {
+            throw new Error(invalidInitialSupplyError)
+        } else if (_.isString(obj.initialSupply)) {
+            // To check if it is of type String representing Number,
+            // convert it to BigNumber and check the value.
+            obj.initialSupply = new BigNumber(obj.initialSupply)
+            obj.initialSupply = convertBigNumberToString(obj.initialSupply)
+        } else if (isBigNumber(obj.initialSupply)) {
+            obj.initialSupply = convertBigNumberToString(obj.initialSupply)
+        } else if (!_.isNumber(obj.initialSupply)) {
+            throw new Error(`${unsupportedInitialSupplyTypeError}${typeof obj.initialSupply}`)
+        }
+    } catch (e) {
+        // Catch the error here to add more details to the error message.
+        throw new Error(`${errorFormat}${e.message}`)
     }
 }
 
