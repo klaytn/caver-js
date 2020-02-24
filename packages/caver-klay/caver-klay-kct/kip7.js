@@ -27,9 +27,9 @@ class KIP7 extends Contract {
         validateTokenInfoForDeploy(tokenInfo)
 
         const { name, symbol, decimals, initialSupply } = tokenInfo
-        const erc20 = new KIP7()
+        const kip7 = new KIP7()
 
-        return erc20
+        return kip7
             .deploy({
                 data: kip7ByteCode,
                 arguments: [name, symbol, decimals, initialSupply],
