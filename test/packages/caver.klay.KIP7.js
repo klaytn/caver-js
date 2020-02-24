@@ -115,7 +115,7 @@ describe('caver.klay.KIP7', () => {
 
             expectedError = 'Invalid initialSupply of token'
             insufficientToken = { name: 'Jasmine', symbol: 'JAS', decimals: 18 }
-            invalidToken = { name: 'Jasmine', symbol: 'JAS', decimals: 18, initialSupply: 1000000 }
+            invalidToken = { name: 'Jasmine', symbol: 'JAS', decimals: 18, initialSupply: 'invalid' }
             expect(() => caver.klay.KIP7.deploy(insufficientToken, sender.address)).to.throws(expectedError)
             expect(() => caver.klay.KIP7.deploy(invalidToken, sender.address)).to.throws(expectedError)
         }).timeout(200000)

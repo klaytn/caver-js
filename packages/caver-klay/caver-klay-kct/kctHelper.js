@@ -36,13 +36,29 @@ async function determineSendParams(executableObj, sendParam, defaultFrom) {
     return { from, gas, gasPrice: sendParam.gasPrice, value: sendParam.value }
 }
 
+const invalidInitialSupplyError = `Invalid initialSupply of token`
+
+function convertBigNumberToString(bigNumber) {
+    const numberString = bigNumber.toString(10)
+    if (numberString === 'NaN') throw new Error(invalidInitialSupplyError)
+    return numberString
+}
+
 function validateTokenInfoForDeploy(obj) {
     if (!obj.name || !_.isString(obj.name)) throw new Error(`Invalid name of token`)
     if (!obj.symbol || !_.isString(obj.symbol)) throw new Error(`Invalid symbol of token`)
     if (obj.decimals === undefined || !_.isNumber(obj.decimals)) throw new Error(`Invalid decimals of token`)
-    if (obj.initialSupply === undefined || (!isBigNumber(obj.initialSupply) && !_.isString(obj.initialSupply)))
-        throw new Error(`Invalid initialSupply of token. The initialSupply must be of type BigNumber or String`)
-    if (isBigNumber(obj.initialSupply)) obj.initialSupply = obj.initialSupply.toString(10)
+
+    if (obj.initialSupply === undefined) {
+        throw new Error(invalidInitialSupplyError)
+    } else if (_.isString(obj.initialSupply)) {
+        obj.initialSupply = new BigNumber(obj.initialSupply)
+        obj.initialSupply = convertBigNumberToString(obj.initialSupply)
+    } else if (isBigNumber(obj.initialSupply)) {
+        obj.initialSupply = convertBigNumberToString(obj.initialSupply)
+    } else if (!_.isNumber(obj.initialSupply)) {
+        throw new Error(invalidInitialSupplyError)
+    }
 }
 
 const kip7JsonInterface = [
