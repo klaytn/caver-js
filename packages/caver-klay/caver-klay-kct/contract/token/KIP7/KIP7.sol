@@ -133,7 +133,7 @@ contract KIP7 is IKIP7 {
     }
 
      /**
-     * @dev Destoys `amount` tokens from `account`, reducing the
+     * @dev Destroys `amount` tokens from `account`, reducing the
      * total supply.
      *
      * Emits a `Transfer` event with `to` set to the zero address.
@@ -154,7 +154,7 @@ contract KIP7 is IKIP7 {
     /**
      * @dev Sets `amount` as the allowance of `spender` over the `owner`s tokens.
      *
-     * This is internal function is equivalent to `approve`, and can be used to
+     * This internal function is equivalent to `approve`, and can be used to
      * e.g. set automatic allowances for certain subsystems, etc.
      *
      * Emits an `Approval` event.
@@ -173,7 +173,7 @@ contract KIP7 is IKIP7 {
     }
 
     /**
-     * @dev Destoys `amount` tokens from `account`.`amount` is then deducted
+     * @dev Destroys `amount` tokens from `account`.`amount` is then deducted
      * from the caller's allowance.
      *
      * See `_burn` and `_approve`.

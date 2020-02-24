@@ -9,7 +9,7 @@ import "./KIP7.sol";
  */
 contract KIP7Burnable is KIP7 {
     /**
-     * @dev Destoys `amount` tokens from the caller.
+     * @dev Destroys `amount` tokens from the caller.
      *
      * See `KIP7._burn`.
      */
