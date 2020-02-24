@@ -18,9 +18,10 @@
 
 const _ = require('lodash')
 const BigNumber = require('bignumber.js')
+const { isBigNumber } = require('../../caver-utils')
 
 async function determineSendParams(executableObj, sendParam, defaultFrom) {
-    let { from, gas, gasPrice, value } = sendParam
+    let { from, gas } = sendParam
     from = from || defaultFrom
     if (!from) throw new Error(`'from' is missing. Pass the object that from field is defined in the last parameter.`)
 
@@ -32,15 +33,16 @@ async function determineSendParams(executableObj, sendParam, defaultFrom) {
         gas = Math.round(originalGas.times(bufferGas))
     }
 
-    return { from, gas, gasPrice, value }
+    return { from, gas, gasPrice: sendParam.gasPrice, value: sendParam.value }
 }
 
 function validateTokenInfoForDeploy(obj) {
     if (!obj.name || !_.isString(obj.name)) throw new Error(`Invalid name of token`)
     if (!obj.symbol || !_.isString(obj.symbol)) throw new Error(`Invalid symbol of token`)
     if (obj.decimals === undefined || !_.isNumber(obj.decimals)) throw new Error(`Invalid decimals of token`)
-    if (obj.initialSupply === undefined || (!_.isNumber(obj.initialSupply) && !_.isString(obj.initialSupply)))
-        throw new Error(`Invalid initialSupply of token`)
+    if (obj.initialSupply === undefined || (!isBigNumber(obj.initialSupply) && !_.isString(obj.initialSupply)))
+        throw new Error(`Invalid initialSupply of token. The initialSupply must be of type BigNumber or String`)
+    if (isBigNumber(obj.initialSupply)) obj.initialSupply = obj.initialSupply.toString(10)
 }
 
 const kip7JsonInterface = [
