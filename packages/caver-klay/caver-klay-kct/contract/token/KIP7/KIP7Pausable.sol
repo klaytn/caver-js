@@ -19,12 +19,4 @@ contract KIP7Pausable is KIP7, Pausable {
     function approve(address spender, uint256 value) public whenNotPaused returns (bool) {
         return super.approve(spender, value);
     }
-
-    function increaseAllowance(address spender, uint addedValue) public whenNotPaused returns (bool) {
-        return super.increaseAllowance(spender, addedValue);
-    }
-
-    function decreaseAllowance(address spender, uint subtractedValue) public whenNotPaused returns (bool) {
-        return super.decreaseAllowance(spender, subtractedValue);
-    }
 }
