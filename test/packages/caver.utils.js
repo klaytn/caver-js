@@ -114,6 +114,15 @@ describe('caver.utils.isBigNumber', () => {
             expect(caver.utils.isBigNumber(test.value)).to.be.equal(test.expected)
         })
     })
+
+    context('CAVERJS-UNIT-ETC-202: input: An object whose type is BigNumber but not of type BigNumber', () => {
+        it('caver.utils.isBigNumber should return false', () => {
+            const notBigNumber = {}
+            notBigNumber.constructor = {}
+            notBigNumber.constructor.name = 'BigNumber'
+            expect(caver.utils.isBigNumber(notBigNumber)).to.be.equal(false)
+        })
+    })
 })
 
 describe('caver.utils.sha3', () => {
