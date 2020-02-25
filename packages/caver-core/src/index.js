@@ -29,7 +29,8 @@ const formatters = require('../../caver-core-helpers').formatters
 const Method = require('../../caver-core-method')
 const utils = require('../../caver-utils')
 
-// extend
+// TODO : clarify what extend do
+// eslint-disable-next-line no-unused-vars
 const extend = pkg => {
     const ex = extension => {
         let extendedObject = pkg

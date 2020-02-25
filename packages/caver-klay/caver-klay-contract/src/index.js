@@ -78,12 +78,6 @@ const Contract = function Contract(jsonInterface, address, options) {
     // create the options object
     this.options = {}
 
-    // For Object.defineProperty setter / getter
-    let _from
-    let _gasPrice
-    let _gas
-    let _data
-
     const lastArg = args[args.length - 1]
     if (_.isObject(lastArg) && !_.isArray(lastArg)) {
         options = lastArg

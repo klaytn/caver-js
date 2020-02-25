@@ -16,8 +16,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const assert = require('assert')
-const { expect } = require('./extendedChai')
+const { expect, assert } = require('./extendedChai')
 const Caver = require('../index')
 
 let caver

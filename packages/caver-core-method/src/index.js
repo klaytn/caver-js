@@ -28,7 +28,6 @@
 const _ = require('lodash')
 const errors = require('../../caver-core-helpers').errors
 const formatters = require('../../caver-core-helpers').formatters
-const txErrorTable = require('../../caver-core-helpers').txErrorTable
 const utils = require('../../caver-utils')
 const Subscriptions = require('../../caver-core-subscriptions').subscriptions
 const validateParams = require('../../caver-core-helpers').validateFunction.validateParams
@@ -494,6 +493,7 @@ const addCustomSendMethod = mutableConfirmationPack => {
 }
 
 const kickoffConfirmation = mutableConfirmationPack => {
+    // eslint-disable-next-line no-unused-vars
     const { defer, promiseResolved, result, _klaytnCall } = mutableConfirmationPack
     // first check if we already have a confirmed transaction
 
@@ -505,13 +505,14 @@ const kickoffConfirmation = mutableConfirmationPack => {
                 checkConfirmation(mutableConfirmationPack, receipt, false)
             } else if (!promiseResolved) startWatching(mutableConfirmationPack, receipt)
         })
-        .catch(err => {
+        .catch(() => {
             if (!promiseResolved) startWatching(mutableConfirmationPack)
         })
 }
 
 // start watching for confirmation depending on the support features of the provider
 const startWatching = function(mutableConfirmationPack, existingReceipt) {
+    // eslint-disable-next-line no-unused-vars
     const { _klaytnCall, intervalId, method } = mutableConfirmationPack
     // if provider allows PUB/SUB
     if (method.requestManager.provider.supportsSubscriptions()) {
@@ -526,15 +527,15 @@ const startWatching = function(mutableConfirmationPack, existingReceipt) {
 const checkConfirmation = function(mutableConfirmationPack, existingReceipt, isPolling, err, blockHeader, sub) {
     const {
         // L1
-        intervalId,
+        intervalId, // eslint-disable-line no-unused-vars
         defer,
         method,
-        canUnsubscribe,
+        canUnsubscribe, // eslint-disable-line no-unused-vars
         _klaytnCall,
         // L2
         isContractDeployment,
-        promiseResolved,
-        timeoutCount,
+        promiseResolved, // eslint-disable-line no-unused-vars
+        timeoutCount, // eslint-disable-line no-unused-vars
         result,
     } = mutableConfirmationPack
 
@@ -577,7 +578,7 @@ const checkConfirmation = function(mutableConfirmationPack, existingReceipt, isP
 }
 
 const checkIsReceiptInBlock = receipt => {
-    if (receipt && !receipt.blockHash) throw txErrorTable.blockHashNull
+    if (receipt && !receipt.blockHash) throw errors.blockHashNull
 }
 
 const formatReceipt = (receipt, method) => {
@@ -588,6 +589,7 @@ const formatReceipt = (receipt, method) => {
 }
 
 const countTimeout = (mutableConfirmationPack, isPolling, sub) => {
+    // eslint-disable-next-line no-unused-vars
     const { defer, timeoutCount, promiseResolved } = mutableConfirmationPack
     // time out the transaction if not mined after 50 blocks
     mutableConfirmationPack.timeoutCount++
@@ -620,6 +622,7 @@ const countTimeout = (mutableConfirmationPack, isPolling, sub) => {
 }
 
 const checkForContractDeployment = (mutableConfirmationPack, receipt, sub) => {
+    // eslint-disable-next-line no-unused-vars
     const { defer, method, canUnsubscribe, _klaytnCall, promiseResolved } = mutableConfirmationPack
 
     // If contract address doesn't exist, fire error.
@@ -629,7 +632,7 @@ const checkForContractDeployment = (mutableConfirmationPack, receipt, sub) => {
             mutableConfirmationPack.promiseResolved = true
         }
 
-        utils._fireError(txErrorTable.receiptDidntContainContractAddress, defer.eventEmitter, defer.reject)
+        utils._fireError(errors.receiptDidntContainContractAddress, defer.eventEmitter, defer.reject)
         return
     }
 
@@ -651,7 +654,7 @@ const checkForContractDeployment = (mutableConfirmationPack, receipt, sub) => {
             if (canUnsubscribe) defer.eventEmitter.removeAllListeners()
         } else {
             // code.length <= 2 means, contract code couldn't be stored.
-            utils._fireError(txErrorTable.contractCouldntBeStored, defer.eventEmitter, defer.reject)
+            utils._fireError(errors.contractCouldntBeStored, defer.eventEmitter, defer.reject)
         }
 
         if (canUnsubscribe) sub.unsubscribe()
@@ -662,6 +665,7 @@ const checkForContractDeployment = (mutableConfirmationPack, receipt, sub) => {
 }
 
 const checkForNormalTx = (mutableConfirmationPack, receipt, sub) => {
+    // eslint-disable-next-line no-unused-vars
     const { defer, canUnsubscribe, promiseResolved, gasProvided } = mutableConfirmationPack
 
     if (
@@ -688,27 +692,27 @@ const checkForNormalTx = (mutableConfirmationPack, receipt, sub) => {
         const receiptJSON = JSON.stringify(receipt, null, 2)
 
         const { txError } = receipt
-        if (txError && txErrorTable[txError]) {
+        if (txError && errors.txErrorTable[txError]) {
             utils._fireError(
-                new Error(`${txErrorTable[txError]}\n ${receiptJSON}`),
+                new Error(`${errors.txErrorTable[txError]}\n ${receiptJSON}`),
                 mutableConfirmationPack.defer.eventEmitter,
                 mutableConfirmationPack.defer.reject
             )
         } else if (receipt.status === false || receipt.status === '0x0') {
             utils._fireError(
-                txErrorTable.transactionReverted(receiptJSON),
+                errors.transactionReverted(receiptJSON),
                 mutableConfirmationPack.defer.eventEmitter,
                 mutableConfirmationPack.defer.reject
             )
         } else if (receipt.gasUsed >= gasProvided) {
             utils._fireError(
-                txErrorTable.transactionRanOutOfGas(receiptJSON),
+                errors.transactionRanOutOfGas(receiptJSON),
                 mutableConfirmationPack.defer.eventEmitter,
                 mutableConfirmationPack.defer.reject
             )
         } else {
             utils._fireError(
-                txErrorTable.transactionRanOutOfGas(receiptJSON),
+                errors.transactionRanOutOfGas(receiptJSON),
                 mutableConfirmationPack.defer.eventEmitter,
                 mutableConfirmationPack.defer.reject
             )

@@ -16,9 +16,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-require('it-each')({ testPerIteration: true })
-const assert = require('assert')
-const { expect } = require('../extendedChai')
+const { expect, assert } = require('../extendedChai')
 
 const testRPCURL = require('../testrpc')
 const Caver = require('../../index.js')
@@ -297,7 +295,7 @@ describe('ACCOUNT_CREATION transaction', () => {
         let result
         await caver.klay
             .sendTransaction(tx)
-            .then(async receipt => {
+            .then(async () => {
                 await caver.klay
                     .getAccountKey(tx.to)
                     .then(key => {

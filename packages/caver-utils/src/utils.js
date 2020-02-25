@@ -26,6 +26,7 @@
 
 const _ = require('lodash')
 const BN = require('bn.js')
+const BigNumber = require('bignumber.js')
 const numberToBN = require('number-to-bn')
 const utf8 = require('utf8')
 const Hash = require('eth-lib/lib/hash')
@@ -68,7 +69,7 @@ const TRANSACTION_HASH_LENGTH = 66
  * @return {Boolean}
  */
 const isBN = function(object) {
-    return object instanceof BN || (object && object.constructor && object.constructor.name === 'BN')
+    return BN.isBN(object)
 }
 
 /**
@@ -78,7 +79,9 @@ const isBN = function(object) {
  * @param {Object} object
  * @return {Boolean}
  */
-const isBigNumber = object => object && object.constructor && object.constructor.name === 'BigNumber'
+const isBigNumber = function(num) {
+    return BigNumber.isBigNumber(num)
+}
 
 /**
  * Takes an input and transforms it into an BN
@@ -367,6 +370,9 @@ const hexToBytes = function(hex) {
  */
 /* eslint-disable complexity */
 const toHex = function(value, returnType) {
+    if (Buffer.isBuffer(value)) {
+        return returnType ? 'buffer' : bufferToHex(value)
+    }
     if (isAddress(value)) {
         return returnType ? 'address' : `0x${value.toLowerCase().replace(/^0x/i, '')}`
     }
@@ -395,6 +401,49 @@ const toHex = function(value, returnType) {
     return returnType ? (value < 0 ? 'int256' : 'uint256') : numberToHex(value)
 }
 /* eslint-enable complexity */
+
+const bufferToHex = function(buf) {
+    buf = toBuffer(buf)
+    return `0x${buf.toString('hex')}`
+}
+
+/**
+ * Convert a input into a Buffer.
+ *
+ * @method toBuffer
+ * @param {Buffer|Array|String|Number|BN|Object} input
+ * @return {Buffer}
+ */
+const toBuffer = function(input) {
+    if (Buffer.isBuffer(input)) return input
+    if (input === null || input === undefined) return Buffer.alloc(0)
+    if (Array.isArray(input)) return Buffer.from(input)
+    if (isBN(input)) return input.toArrayLike(Buffer)
+    if (_.isObject(input)) {
+        if (input.toArray && _.isFunction(input.toArray)) return Buffer.from(input.toArray())
+        throw new Error('To convert an object to a buffer, the toArray function must be implemented inside the object')
+    }
+
+    switch (typeof input) {
+        case 'string':
+            if (isHexStrict(input)) return Buffer.from(makeEven(input).replace('0x', ''), 'hex')
+            throw new Error("Failed to convert string to Buffer. 'toBuffer' function only supports 0x-prefixed hex string")
+        case 'number':
+            return numberToBuffer(input)
+    }
+    throw new Error(`Not supported type with ${input}`)
+}
+
+/**
+ * Convert a number to a Buffer.
+ *
+ * @method numberToBuffer
+ * @param {Number|String|BN} num
+ * @return {Buffer}
+ */
+const numberToBuffer = function(num) {
+    return Buffer.from(makeEven(numberToHex(num)).replace('0x', ''), 'hex')
+}
 
 /**
  * Check if string is HEX, requires a 0x in front
@@ -542,7 +591,7 @@ function parsePrivateKey(privateKey) {
 
     const parsedPrivateKey = privateKey.slice(0, 64)
 
-    if (!this.isHex(parsedPrivateKey)) {
+    if (!isHex(parsedPrivateKey)) {
         throw new Error('Invalid private key format : privateKey must be in hex format.')
     }
 
@@ -553,6 +602,8 @@ function parsePrivateKey(privateKey) {
             isHumanReadable: false,
         }
     }
+
+    if (!isKlaytnWalletKey(privateKey)) throw new Error(`Invalid KlaytnWalletKey format.`)
 
     const humanReadableFlag = privateKey.slice(66, 68)
     if (humanReadableFlag === '01') throw new Error('HumanReadableAddress is not supported yet.')
@@ -570,6 +621,24 @@ const isKlaytnWalletKey = privateKey => {
 
     if (privateKey.length !== 110) {
         return false
+    }
+
+    const splited = privateKey.split('0x')
+    if (splited.length !== 3) return false
+
+    for (let i = 0; i < splited.length; i++) {
+        if (!isHex(splited[i])) return false
+        switch (i) {
+            case 0:
+                if (splited[i].length !== 64 || !isValidPrivateKey(splited[i])) return false
+                break
+            case 1:
+                if (splited[i].length !== 2 || (splited[i] !== '00' && splited[i] !== '01')) return false
+                break
+            case 2:
+                if (splited[i].length !== 40 || !isAddress(splited[i])) return false
+                break
+        }
     }
 
     return true
@@ -654,6 +723,77 @@ const resolveSignature = signature => {
         const decoded = Account.decodeSignature(signature)
         return [v, decoded[1], decoded[2]]
     }
+}
+
+const transformSignaturesToObject = signatures => {
+    let isSingular = false
+
+    if (!signatures) throw new Error(`Failed to transform signatures to object: invalid signatures ${signatures}`)
+
+    // Input cases
+    // case 1. '0xf1998...'
+    // case 2. {V: '0x4e44', R: '0x1692a...', S: '0x277b9...'} or {v: '0x4e44', r: '0x1692a...', s: '0x277b9...'}
+    // case 3. ['0xf1998...', '0x53fe7...']
+    // case 4. ['0x4e44', '0x1692a...', '0x277b9...']
+    // case 5. [{V: '0x4e44', R: '0x1692a...', S: '0x277b9...'}, {v: '0x4e44', r: '0x1692a...', s: '0x277b9...'}]
+    // case 6. [['0x4e44', '0x1692a...', '0x277b9...'], ['0x4e44', '0x1692a...', '0x277b9...']]
+
+    // Transform a signature to an array of signatures to execute the same logic in the for loop below.
+    if (!_.isArray(signatures)) {
+        signatures = [signatures]
+        isSingular = true
+    } else if (_.isString(signatures[0])) {
+        // This logic is performed for case 3 and case 4.
+        // In case 3, the signature string is in the array.
+        // In case 4, v, r, and s are separately included in the array.
+        // The signature string is a combination of v, r, and s, so the length of the signature string will be longer than 64.
+        // Hence, only case 4 will perform the below logic to form an array of signatures.
+        const stripped = signatures[0].replace('0x', '')
+        if (stripped.length <= 64) {
+            signatures = [signatures]
+            isSingular = true
+        }
+    }
+
+    const ret = []
+
+    for (const sig of signatures) {
+        const sigObj = {}
+        if (_.isArray(sig)) {
+            if (sig.length !== 3) throw new Error(`Failed to transform signatures to object: invalid length of signature (${sig.length})`)
+            const [V, R, S] = sig
+            sigObj.V = V
+            sigObj.R = R
+            sigObj.S = S
+        } else if (_.isString(sig)) {
+            const decoded = Account.decodeSignature(sig).map(s => makeEven(trimLeadingZero(s)))
+            sigObj.V = decoded[0]
+            sigObj.R = decoded[1]
+            sigObj.S = decoded[2]
+        } else if (_.isObject(sig)) {
+            Object.keys(sig).map(key => {
+                if (key === 'v' || key === 'V') {
+                    sigObj.V = sig[key]
+                } else if (key === 'r' || key === 'R') {
+                    sigObj.R = sig[key]
+                } else if (key === 's' || key === 'S') {
+                    sigObj.S = sig[key]
+                } else {
+                    throw new Error(`Failed to transform signatures to object: invalid key(${key}) is defined in signature object.`)
+                }
+            })
+        } else {
+            throw new Error(`Unsupported signature type: ${typeof sig}`)
+        }
+
+        if (!sigObj.V || !sigObj.R || !sigObj.S) {
+            throw new Error(`Failed to transform signatures to object: invalid signature ${sig}`)
+        }
+
+        ret.push(sigObj)
+    }
+
+    return isSingular ? ret[0] : ret
 }
 
 const getTxTypeStringFromRawTransaction = rawTransaction => {
@@ -782,6 +922,9 @@ module.exports = {
     hexToNumberString: hexToNumberString,
     numberToHex: numberToHex,
     toHex: toHex,
+    bufferToHex: bufferToHex,
+    toBuffer: toBuffer,
+    numberToBuffer: numberToBuffer,
     hexToBytes: hexToBytes,
     bytesToHex: bytesToHex,
     isHex: isHex,
@@ -803,6 +946,7 @@ module.exports = {
     rlpDecode: rlpDecode,
     xyPointFromPublicKey: xyPointFromPublicKey,
     resolveSignature: resolveSignature,
+    transformSignaturesToObject: transformSignaturesToObject,
     getTxTypeStringFromRawTransaction,
     trimLeadingZero,
     makeEven,

@@ -38,7 +38,7 @@ const abi = [
     },
 ]
 
-describe('defaultBlock value should be set with valid value', done => {
+describe('defaultBlock value should be set with valid value', () => {
     it('Set with valid value', async () => {
         expect((caver.klay.defaultBlock = '1000')).to.exist
     })

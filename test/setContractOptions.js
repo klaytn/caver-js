@@ -17,7 +17,6 @@
 */
 
 const { expect } = require('chai')
-const fetch = require('node-fetch')
 const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 
@@ -53,7 +52,6 @@ describe('Instantiating Contract instance ', () => {
         const invalidFromAddress = -1
         expect(() => (contractInstance.options.from = invalidFromAddress)).to.throw()
 
-        const validFromAddress = -1
         expect(() => (contractInstance.options.from = '0xbde8566f50b932189b76141f0a9ce029779cdb36')).not.to.throw()
     })
 

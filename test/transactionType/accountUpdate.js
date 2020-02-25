@@ -16,9 +16,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-require('it-each')({ testPerIteration: true })
-const assert = require('assert')
-const { expect } = require('../extendedChai')
+const { expect, assert } = require('../extendedChai')
 
 const testRPCURL = require('../testrpc')
 const Caver = require('../../index.js')
@@ -30,12 +28,10 @@ let testAccount
 
 describe('ACCOUNT_UPDATE transaction', () => {
     let accountUpdateObject
-    let acct
     let publicKey
     let publicKey2
     let publicKey3
     let publicKey4
-    let privateKey
     let privateKey2
     let privateKey3
     let privateKey4

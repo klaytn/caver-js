@@ -57,6 +57,7 @@ describe('caver.utils.isBN', () => {
             { value: new BN('ff', 16), expected: true },
             { value: new BN('377', 8), expected: true },
             { value: new BN('11111111', 2), expected: true },
+            { value: new BN(0), expected: true },
         ]
         it.each(tests, 'should return true', test => {
             expect(caver.utils.isBN(test.value)).to.be.equal(test.expected)
@@ -69,9 +70,22 @@ describe('caver.utils.isBN', () => {
             { value: 0xff, expected: false },
             { value: 0o377, expected: false },
             { value: 0b11111111, expected: false },
+            { value: function() {}, expected: false },
+            { value: 'function', expected: false },
+            { value: {}, expected: false },
+            { value: 'hello', expected: false },
         ]
         it.each(tests, 'should return false', test => {
             expect(caver.utils.isBN(test.value)).to.be.equal(test.expected)
+        })
+    })
+
+    context('CAVERJS-UNIT-ETC-192: input: An object whose type is BN but not of type BN', () => {
+        it('caver.utils should return false', () => {
+            const notBn = {}
+            notBn.constructor = {}
+            notBn.constructor.name = 'BN'
+            expect(caver.utils.isBN(notBn)).to.be.equal(false)
         })
     })
 })
@@ -98,6 +112,15 @@ describe('caver.utils.isBigNumber', () => {
         ]
         it.each(tests, 'should return false', test => {
             expect(caver.utils.isBigNumber(test.value)).to.be.equal(test.expected)
+        })
+    })
+
+    context('CAVERJS-UNIT-ETC-202: input: An object whose type is BigNumber but not of type BigNumber', () => {
+        it('caver.utils.isBigNumber should return false', () => {
+            const notBigNumber = {}
+            notBigNumber.constructor = {}
+            notBigNumber.constructor.name = 'BigNumber'
+            expect(caver.utils.isBigNumber(notBigNumber)).to.be.equal(false)
         })
     })
 })
@@ -333,6 +356,14 @@ describe('CAVERJS-UNIT-ETC-117: caver.utils.toHex', () => {
                 '\u0003\u0000\u0000\u00005èÆÕL]\u0012|Î¾\u001a7«\u00052\u0011(ÐY\n<\u0010\u0000\u0000\u0000\u0000\u0000\u0000e!ßd/ñõì\f:z¦Î¦±ç·÷Í¢Ëß\u00076*\bñùC1ÉUÀé2\u001aÓB',
             expected:
                 '0x0300000035c3a8c386c3954c5d127cc29dc38ec2bec29e1a37c2abc29b05321128c390c297590a3c100000000000006521c39f642fc3b1c3b5c3ac0c3a7ac2a6c38ec2a6c2b1c3a7c2b7c3b7c38dc2a2c38bc39f07362ac28508c28ec297c3b1c29ec3b94331c38955c380c3a9321ac393c28642c28c',
+        },
+        {
+            value: Buffer.from('5b9ac8', 'hex'),
+            expected: '0x5b9ac8',
+        },
+        {
+            value: Buffer.alloc(0),
+            expected: '0x',
         },
     ]
 
@@ -1155,5 +1186,318 @@ describe('caver.utils.isEmptySig', () => {
         const expectedError = 'Invalid signatures length: 6'
         expect(() => caver.utils.isEmptySig(['0x01', '0x', '0x', '0x01', '0x', '0x'])).to.throws(expectedError)
         expect(() => caver.utils.isEmptySig([['0x01', '0x', '0x', '0x01', '0x', '0x']])).to.throws(expectedError)
+    })
+})
+
+describe('caver.utils.bufferToHex', () => {
+    it('CAVERJS-UNIT-ETC-181: caver.utils.bufferToHex should convert buffer to Hex', () => {
+        const buf = Buffer.from('5b9ac8', 'hex')
+        const ret = caver.utils.bufferToHex(buf)
+        expect(ret).to.equals('0x5b9ac8')
+    })
+
+    it('CAVERJS-UNIT-ETC-182: caver.utils.bufferToHex should convert empty buffer to Hex', () => {
+        const buf = Buffer.alloc(0)
+        const ret = caver.utils.bufferToHex(buf)
+        expect(ret).to.equals('0x')
+    })
+})
+
+describe('caver.utils.transformSignaturesToObject', () => {
+    it('CAVERJS-UNIT-ETC-183: should convert array format of signatures to object with single signature', () => {
+        const signature = [
+            '0x4e44',
+            '0x1692a48f166e3ef146eba61cbd6b450926854bb340cf6f689239f27588159419',
+            '0x277b9c6e97dfa6fdbcc15c201b5f7e05a2ef03f6247d9b9c541f98b8c4f1041a',
+        ]
+
+        const transformed = caver.utils.transformSignaturesToObject(signature)
+
+        expect(transformed.V).to.equals(signature[0])
+        expect(transformed.R).to.equals(signature[1])
+        expect(transformed.S).to.equals(signature[2])
+    })
+
+    it('CAVERJS-UNIT-ETC-184: should convert array format of signatures to object with multiple signatures', () => {
+        const signatures = [
+            [
+                '0x4e44',
+                '0x1692a48f166e3ef146eba61cbd6b450926854bb340cf6f689239f27588159419',
+                '0x277b9c6e97dfa6fdbcc15c201b5f7e05a2ef03f6247d9b9c541f98b8c4f1041a',
+            ],
+            [
+                '0x0fea',
+                '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f8',
+                '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
+            ],
+        ]
+
+        const transformed = caver.utils.transformSignaturesToObject(signatures)
+
+        for (let i = 0; i < signatures.length; i++) {
+            expect(transformed[i].V).to.equals(signatures[i][0])
+            expect(transformed[i].R).to.equals(signatures[i][1])
+            expect(transformed[i].S).to.equals(signatures[i][2])
+        }
+    })
+
+    it('CAVERJS-UNIT-ETC-185: should convert string format of signatures to object with single signature', () => {
+        const signatureString =
+            '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f815111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7fea'
+        const expectedSignatures = {
+            V: '0x0fea',
+            R: '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f8',
+            S: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
+        }
+
+        const transformed = caver.utils.transformSignaturesToObject(signatureString)
+
+        expect(transformed).to.deep.equal(expectedSignatures)
+    })
+
+    it('CAVERJS-UNIT-ETC-186: should convert string format of signatures to object with multiple signatures', () => {
+        const signatureStrings = [
+            '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f815111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7fea',
+            '0x53fe704c30cbddd8481035b01d0696120e960418e1d4f0f7e88d3de9354c6986299fdedce9ea38d62a69a63462af32122f3db70623a40fe9bfe815ae6ebfeb7d7f6',
+        ]
+        const expectedSignatures = [
+            {
+                V: '0x0fea',
+                R: '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f8',
+                S: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
+            },
+            {
+                V: '0x07f6',
+                R: '0x53fe704c30cbddd8481035b01d0696120e960418e1d4f0f7e88d3de9354c6986',
+                S: '0x299fdedce9ea38d62a69a63462af32122f3db70623a40fe9bfe815ae6ebfeb7d',
+            },
+        ]
+
+        const transformed = caver.utils.transformSignaturesToObject(signatureStrings)
+
+        for (let i = 0; i < expectedSignatures.length; i++) {
+            expect(transformed[i]).to.deep.equal(expectedSignatures[i])
+        }
+    })
+
+    it('CAVERJS-UNIT-ETC-187: should convert object(lowercase key) format of signatures to object with single signature', () => {
+        const signature = {
+            v: '0x0fea',
+            r: '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f8',
+            s: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
+        }
+
+        const transformed = caver.utils.transformSignaturesToObject(signature)
+
+        expect(transformed.V).to.equals(signature.v)
+        expect(transformed.R).to.equals(signature.r)
+        expect(transformed.S).to.equals(signature.s)
+    })
+
+    it('CAVERJS-UNIT-ETC-188: should convert object(uppercase key) format of signatures to object with single signature', () => {
+        const signature = {
+            V: '0x0fea',
+            R: '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f8',
+            S: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
+        }
+
+        const transformed = caver.utils.transformSignaturesToObject(signature)
+
+        expect(transformed.V).to.equals(signature.V)
+        expect(transformed.R).to.equals(signature.R)
+        expect(transformed.S).to.equals(signature.S)
+    })
+
+    it('CAVERJS-UNIT-ETC-189: should convert object format of signatures to object with multiple signatures', () => {
+        const signatures = [
+            {
+                v: '0x0fea',
+                r: '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f8',
+                s: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
+            },
+            {
+                V: '0x07f6',
+                R: '0x53fe704c30cbddd8481035b01d0696120e960418e1d4f0f7e88d3de9354c6986',
+                S: '0x299fdedce9ea38d62a69a63462af32122f3db70623a40fe9bfe815ae6ebfeb7d',
+            },
+        ]
+
+        const transformed = caver.utils.transformSignaturesToObject(signatures)
+
+        expect(transformed[0].V).to.equals(signatures[0].v)
+        expect(transformed[0].R).to.equals(signatures[0].r)
+        expect(transformed[0].S).to.equals(signatures[0].s)
+        expect(transformed[1].V).to.equals(signatures[1].V)
+        expect(transformed[1].R).to.equals(signatures[1].R)
+        expect(transformed[1].S).to.equals(signatures[1].S)
+    })
+
+    it('CAVERJS-UNIT-ETC-190: should throw error when type is invalid', () => {
+        expect(() => caver.utils.transformSignaturesToObject(1)).to.throws('Unsupported signature type: number')
+        expect(() => caver.utils.transformSignaturesToObject([1])).to.throws('Unsupported signature type: number')
+        expect(() => caver.utils.transformSignaturesToObject(null)).to.throws(
+            'Failed to transform signatures to object: invalid signatures null'
+        )
+        expect(() => caver.utils.transformSignaturesToObject([null])).to.throws('Unsupported signature type: object')
+        expect(() => caver.utils.transformSignaturesToObject(undefined)).to.throws(
+            'Failed to transform signatures to object: invalid signatures undefined'
+        )
+        expect(() => caver.utils.transformSignaturesToObject([undefined])).to.throws('Unsupported signature type: undefined')
+        expect(() => caver.utils.transformSignaturesToObject(NaN)).to.throws(
+            'Failed to transform signatures to object: invalid signatures NaN'
+        )
+        expect(() => caver.utils.transformSignaturesToObject([NaN])).to.throws('Unsupported signature type: number')
+    })
+
+    it('CAVERJS-UNIT-ETC-191: should throw error when input does not have enough signature information', () => {
+        let signature = {
+            V: '0x0fea',
+            S: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
+        }
+        expect(() => caver.utils.transformSignaturesToObject(signature)).to.throws(
+            `Failed to transform signatures to object: invalid signature`
+        )
+
+        signature = {
+            V: '0x0fea',
+            invalidKey: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
+        }
+        expect(() => caver.utils.transformSignaturesToObject(signature)).to.throws(
+            'Failed to transform signatures to object: invalid key(invalidKey) is defined in signature object.'
+        )
+
+        signature = ['0x4e44', '0x1692a48f166e3ef146eba61cbd6b450926854bb340cf6f689239f27588159419']
+        expect(() => caver.utils.transformSignaturesToObject(signature)).to.throws(
+            `Failed to transform signatures to object: invalid length of signature (2)`
+        )
+
+        signature = [
+            '0x4e44',
+            '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
+            '0x1692a48f166e3ef146eba61cbd6b450926854bb340cf6f689239f27588159419',
+            '0x1692a48f166e3ef146eba61cbd6b450926854bb340cf6f689239f27588159419',
+        ]
+        expect(() => caver.utils.transformSignaturesToObject(signature)).to.throws(
+            `Failed to transform signatures to object: invalid length of signature (4)`
+        )
+    })
+})
+
+describe('caver.utils.isKlaytnWalletKey', () => {
+    it('CAVERJS-UNIT-ETC-193: should return true when key parameter is in the format of KlaytnWalletKey', () => {
+        const key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+
+        const isKlaytnWalletKey = caver.utils.isKlaytnWalletKey(key)
+
+        expect(isKlaytnWalletKey).to.be.true
+    })
+
+    it('CAVERJS-UNIT-ETC-194: should return false when key is not in format of KlaytnWalletKey', () => {
+        // private key is not in hex
+        let key = '0xzza915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        let isKlaytnWalletKey = caver.utils.isKlaytnWalletKey(key)
+        expect(isKlaytnWalletKey).to.be.false
+
+        // human readable is not in hex
+        key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80xzz0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        isKlaytnWalletKey = caver.utils.isKlaytnWalletKey(key)
+        expect(isKlaytnWalletKey).to.be.false
+
+        // address is not in hex
+        key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebfzz'
+        isKlaytnWalletKey = caver.utils.isKlaytnWalletKey(key)
+        expect(isKlaytnWalletKey).to.be.false
+
+        // without '0x' separator
+        key = '45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d800a94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        isKlaytnWalletKey = caver.utils.isKlaytnWalletKey(key)
+        expect(isKlaytnWalletKey).to.be.false
+
+        // too many '0x'
+        key = '0x0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        isKlaytnWalletKey = caver.utils.isKlaytnWalletKey(key)
+        expect(isKlaytnWalletKey).to.be.false
+
+        // without '0x' for human readable
+        key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d8000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        isKlaytnWalletKey = caver.utils.isKlaytnWalletKey(key)
+        expect(isKlaytnWalletKey).to.be.false
+
+        // without '0x' for address
+        key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x00a94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        isKlaytnWalletKey = caver.utils.isKlaytnWalletKey(key)
+        expect(isKlaytnWalletKey).to.be.false
+    })
+
+    it('CAVERJS-UNIT-ETC-195: should return false when private key is invalid', () => {
+        // invalid length
+        let key = '0xa915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        let isKlaytnWalletKey = caver.utils.isKlaytnWalletKey(key)
+        expect(isKlaytnWalletKey).to.be.false
+
+        // invalid range
+        key = '0x00000000000000000000000000000000000000000000000000000000000000000x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        isKlaytnWalletKey = caver.utils.isKlaytnWalletKey(key)
+        expect(isKlaytnWalletKey).to.be.false
+    })
+
+    it('CAVERJS-UNIT-ETC-196: should return false when human readable is invalid', () => {
+        // invalid value
+        let key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x030xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        let isKlaytnWalletKey = caver.utils.isKlaytnWalletKey(key)
+        expect(isKlaytnWalletKey).to.be.false
+
+        // invalid length
+        key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x0000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        isKlaytnWalletKey = caver.utils.isKlaytnWalletKey(key)
+        expect(isKlaytnWalletKey).to.be.false
+    })
+
+    it('CAVERJS-UNIT-ETC-197: should return false when addresss is invalid', () => {
+        let key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf'
+        let isKlaytnWalletKey = caver.utils.isKlaytnWalletKey(key)
+        expect(isKlaytnWalletKey).to.be.false
+
+        key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0baf'
+        isKlaytnWalletKey = caver.utils.isKlaytnWalletKey(key)
+        expect(isKlaytnWalletKey).to.be.false
+    })
+})
+
+describe('caver.utils.parsePrivateKey', () => {
+    it('CAVERJS-UNIT-ETC-198: should return parsed private key, address and isHumanReadable when key parameter is single private key string', () => {
+        const key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d8'
+
+        const parsed = caver.utils.parsePrivateKey(key)
+
+        expect(parsed.privateKey).to.be.equals(key)
+        expect(parsed.address).to.be.equals('')
+        expect(parsed.isHumanReadable).to.be.false
+    })
+
+    it('CAVERJS-UNIT-ETC-199: should return parsed private key, address and isHumanReadable when key parameter is in format of KlaytnWalletKey', () => {
+        const key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+
+        const parsed = caver.utils.parsePrivateKey(key)
+
+        expect(parsed.privateKey).to.be.equals('0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d8')
+        expect(parsed.address).to.be.equals('0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b')
+        expect(parsed.isHumanReadable).to.be.false
+    })
+
+    it('CAVERJS-UNIT-ETC-200: should throw error when humanReadable flag is true', () => {
+        const key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x010xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+
+        const expectedError = 'HumanReadableAddress is not supported yet.'
+
+        expect(() => caver.utils.parsePrivateKey(key)).to.throws(expectedError)
+    })
+
+    it('CAVERJS-UNIT-ETC-201: should throw error when key is in invalid format of KlaytnWalletKey', () => {
+        const key = '0x00000000000000000000000000000000000000000000000000000000000000000x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+
+        const expectedError = 'Invalid KlaytnWalletKey format.'
+
+        expect(() => caver.utils.parsePrivateKey(key)).to.throws(expectedError)
     })
 })

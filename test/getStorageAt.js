@@ -19,7 +19,7 @@
 const { expect } = require('chai')
 const Caver = require('../index.js')
 
-describe('get storage at', done => {
+describe('get storage at', () => {
     it('should not throw an error with string type parameter', async () => {
         const caver = new Caver('http://aspen.klaytn.com')
         const stroageInfo = await caver.klay.getStorageAt('0x9e6df5dbc96b2d4f5bee35fd99d832361360c82a', '1')

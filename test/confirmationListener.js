@@ -17,7 +17,6 @@
 */
 
 const { expect } = require('chai')
-const fetch = require('node-fetch')
 
 const testRPCURL = require('./testrpc')
 const Caver = require('../index.js')

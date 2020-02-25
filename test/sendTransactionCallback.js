@@ -16,8 +16,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const { expect } = require('chai')
-const assert = require('assert')
+const { expect, assert } = require('./extendedChai')
 
 const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')

@@ -17,14 +17,13 @@
 */
 
 const { expect } = require('chai')
-const BN = require('bn.js')
 const testRPCURL = require('./testrpc')
 
 const Caver = require('../index.js')
 
 const caver = new Caver(testRPCURL)
 
-describe('accounts.privateKeyToAccount', done => {
+describe('accounts.privateKeyToAccount', () => {
     it('CAVERJS-UNIT-WALLET-088 : should return same address even `0x` is missing', async () => {
         const { address: address1 } = caver.klay.accounts.privateKeyToAccount(
             '0xd7a522fd98344f2f0a0515949ba610c6e9f8bf39266256d964078da9960527d5'

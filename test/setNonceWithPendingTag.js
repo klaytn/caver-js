@@ -16,7 +16,6 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const assert = require('assert')
 const { expect } = require('./extendedChai')
 
 const Caver = require('../index.js')
@@ -99,7 +98,7 @@ describe('caver.klay.accounts.getRawTransactionWithSignatures', () => {
 })
 
 function sendTransactionTxHashHelper(tx) {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
         caver.klay.sendTransaction({ ...tx }).on('transactionHash', transactionHash => {
             resolve(transactionHash)
         })

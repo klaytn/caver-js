@@ -165,6 +165,116 @@ function resolveArgsForFeePayerSignTransaction(args) {
     return { tx, privateKey, feePayer, callback }
 }
 
+/**
+ * resolveArgsForSignTransactionWithHash parse arguments for signTransactionWithHash.
+ *
+ * @method resolveArgsForSignTransactionWithHash
+ * @param {Object} args Parameters of signTransactionWithHash.
+ * @return {Object}
+ */
+function resolveArgsForSignTransactionWithHash(args) {
+    if (args.length < 2 || args.length > 4) {
+        throw new Error('Invalid parameter: The number of parameters is invalid.')
+    }
+
+    const hash = args[0]
+    const privateKeys = args[1]
+    let chainId
+    let callback
+
+    if (!hash) {
+        throw new Error('Invalid parameter: The hash of transaction must be defined as a parameter.')
+    }
+
+    if (!utils.isTxHashStrict(hash)) {
+        throw new Error('Invalid parameter: The hash of transaction must be 0x-hex prefixed string format.')
+    }
+
+    if (!privateKeys || (!Array.isArray(privateKeys) && !_.isString(privateKeys))) {
+        throw new Error(`Invalid parameter: The private key should be a private key string or an array of private keys.`)
+    }
+
+    if (args.length === 3) {
+        if (_.isFunction(args[2])) {
+            callback = args[2]
+        } else {
+            chainId = args[2]
+        }
+    } else if (args.length === 4) {
+        if (args[2] && !_.isString(args[2]) && !_.isNumber(args[2])) {
+            throw new Error('Invalid parameter: The parameter for the chain id is invalid.')
+        }
+        chainId = args[2]
+        callback = args[3]
+    }
+
+    // For handling when callback is undefined.
+    callback = callback || function() {}
+
+    return { hash, privateKeys, chainId, callback }
+}
+
+function encryptKey(privateKey, password, options) {
+    const encryptedArray = []
+
+    if (!privateKey) return encryptedArray
+
+    const privateKeyArray = _.isArray(privateKey) ? privateKey : [privateKey]
+
+    for (let i = 0; i < privateKeyArray.length; i++) {
+        const salt = options.salt || cryp.randomBytes(32)
+        const iv = options.iv || cryp.randomBytes(16)
+
+        let derivedKey
+        const kdf = options.kdf || 'scrypt'
+        const kdfparams = {
+            dklen: options.dklen || 32,
+            salt: salt.toString('hex'),
+        }
+
+        /**
+         * Supported kdf modules are the following:
+         * 1) pbkdf2
+         * 2) scrypt - default
+         */
+        if (kdf === 'pbkdf2') {
+            kdfparams.c = options.c || 262144
+            kdfparams.prf = 'hmac-sha256'
+            derivedKey = cryp.pbkdf2Sync(Buffer.from(password), salt, kdfparams.c, kdfparams.dklen, 'sha256')
+        } else if (kdf === 'scrypt') {
+            // FIXME: support progress reporting callback
+            kdfparams.n = options.n || 4096 // 2048 4096 8192 16384
+            kdfparams.r = options.r || 8
+            kdfparams.p = options.p || 1
+            derivedKey = scrypt(Buffer.from(password), salt, kdfparams.n, kdfparams.r, kdfparams.p, kdfparams.dklen)
+        } else {
+            throw new Error('Unsupported kdf')
+        }
+
+        const cipher = cryp.createCipheriv(options.cipher || 'aes-128-ctr', derivedKey.slice(0, 16), iv)
+        if (!cipher) {
+            throw new Error('Unsupported cipher')
+        }
+
+        const ciphertext = Buffer.concat([cipher.update(Buffer.from(privateKeyArray[i].replace('0x', ''), 'hex')), cipher.final()])
+
+        const mac = utils.sha3(Buffer.concat([derivedKey.slice(16, 32), Buffer.from(ciphertext, 'hex')])).replace('0x', '')
+
+        encryptedArray.push({
+            ciphertext: ciphertext.toString('hex'),
+            cipherparams: {
+                iv: iv.toString('hex'),
+            },
+            cipher: options.cipher || 'aes-128-ctr',
+            kdf,
+            kdfparams,
+            mac: mac.toString('hex'),
+        })
+    }
+
+    return encryptedArray
+}
+
 const Accounts = function Accounts(...args) {
     const _this = this
 
@@ -359,7 +469,7 @@ Accounts.prototype.createAccountKeyMultiSig = function createAccountKeyMultiSig(
 }
 
 /**
- * createAccountKeyRoleBased creates AccountKeyRoleBased with an obejct of key.
+ * createAccountKeyRoleBased creates AccountKeyRoleBased with an object of key.
  *
  * @method createAccountKeyRoleBased
  * @param {Object} keyObject Object that defines key for each role to use when creating AccountKeyRoleBased.
@@ -593,7 +703,7 @@ Accounts.prototype.getLegacyAccount = function getLegacyAccount(key) {
  * @method signTransaction
  * @param {String|Object} tx The transaction to sign.
  * @param {String|Array} privateKey The private key to use for signing.
- * @param {String} callback The callback function to call.
+ * @param {Function} callback The callback function to call.
  * @return {Object}
  */
 Accounts.prototype.signTransaction = function signTransaction() {
@@ -853,14 +963,14 @@ Accounts.prototype.feePayerSignTransaction = function feePayerSignTransaction() 
         isNot(tx.gasPrice) ? _this._klaytnCall.getGasPrice() : tx.gasPrice,
         isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from, 'pending') : tx.nonce,
     ]).then(function(args) {
-        if (isNot(args[0]) || isNot(args[1]) || isNot(args[2])) {
+        const chainId = args[0]
+        const gasPrice = args[1]
+        const nonce = args[2]
+
+        if (isNot(chainId) || isNot(gasPrice) || isNot(nonce)) {
             throw new Error(`One of the values "chainId", "gasPrice", or "nonce" couldn't be fetched: ${JSON.stringify(args)}`)
         }
-        let transaction = _.extend(tx, {
-            chainId: args[0],
-            gasPrice: args[1],
-            nonce: args[2],
-        })
+        let transaction = _.extend(tx, { chainId, gasPrice, nonce })
 
         transaction = helpers.formatters.inputCallFormatter(transaction)
         transaction = coverInitialTxValue(transaction)
@@ -869,7 +979,72 @@ Accounts.prototype.feePayerSignTransaction = function feePayerSignTransaction() 
         const sig = transaction.signatures ? transaction.signatures : [['0x01', '0x', '0x']]
         const { rawTransaction } = makeRawTransaction(rlpEncoded, sig, transaction)
 
-        return _this.signTransaction({ senderRawTransaction: rawTransaction, feePayer }, privateKey, callback)
+        return _this.signTransaction({ senderRawTransaction: rawTransaction, feePayer, chainId }, privateKey, callback)
+    })
+}
+
+/**
+ * signTransactionWithHash signs to transaction hash with private key(s).
+ *
+ * @method signTransactionWithHash
+ * @param {String} hash The hash of transaction to sign.
+ * @param {String|Array} privateKeys The private key(s) to use for signing.
+ * @param {String|Number} chainId The chain id of the network.
+ * @param {Function} callback The callback function to call.
+ * @return {Object}
+ */
+Accounts.prototype.signTransactionWithHash = function signTransactionWithHash() {
+    const _this = this
+    let hash
+    let privateKeys
+    let chainId
+    let callback
+
+    const handleError = e => {
+        e = e instanceof Error ? e : new Error(e)
+        if (callback) callback(e)
+        return Promise.reject(e)
+    }
+
+    try {
+        const resolved = resolveArgsForSignTransactionWithHash(arguments)
+        hash = resolved.hash
+        chainId = resolved.chainId
+        privateKeys = resolved.privateKeys
+        callback = resolved.callback
+    } catch (e) {
+        return handleError(e)
+    }
+
+    privateKeys = Array.isArray(privateKeys) ? privateKeys : [privateKeys]
+
+    function signWithHash(transactionHash, prvKeys, chain, callbackFunc) {
+        const result = []
+        chain = utils.numberToHex(chain)
+
+        try {
+            for (const privateKey of prvKeys) {
+                const p = utils.addHexPrefix(utils.parsePrivateKey(privateKey).privateKey)
+                if (!utils.isValidPrivateKey(p)) {
+                    return handleError(`Failed to sign transaction with hash: Invalid private key ${privateKey}`)
+                }
+
+                const signature = AccountLib.makeSigner(Nat.toNumber(chain || '0x1') * 2 + 35)(transactionHash, p)
+                const [v, r, s] = AccountLib.decodeSignature(signature).map(sig => utils.makeEven(utils.trimLeadingZero(sig)))
+
+                result.push(utils.transformSignaturesToObject([v, r, s]))
+            }
+        } catch (e) {
+            callbackFunc(e)
+            return Promise.reject(e)
+        }
+
+        callbackFunc(null, result)
+        return result
+    }
+
+    return Promise.resolve(isNot(chainId) ? _this._klaytnCall.getChainId() : chainId).then(id => {
+        return signWithHash(hash, privateKeys, id, callback)
     })
 }
 
@@ -1305,28 +1480,8 @@ Accounts.prototype.decrypt = function(v3Keystore, password, nonStrict) {
     return this.createWithAccountKey(json.address, accountKey)
 }
 
-/**
- * cav.klay.accounts.encrypt(privateKey, password);
- * cav.klay.accounts.encrypt('0x4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318', 'test!')
-    > {
-        version: 3,
-        id: '04e9bcbb-96fa-497b-94d1-14df4cd20af6',
-        address: '2c7536e3605d9c16a7a3d7b1898e529396a65c23',
-        crypto: {
-            ciphertext: 'a1c25da3ecde4e6a24f3697251dd15d6208520efc84ad97397e906e6df24d251',
-            cipherparams: { iv: '2885df2b63f7ef247d753c82fa20038a' },
-            cipher: 'aes-128-ctr',
-            kdf: 'scrypt',
-            kdfparams: {
-                dklen: 32,
-                salt: '4531b3c174cc3ff32a6a7a85d6761b410db674807b2d216d022318ceee50be10',
-                n: 262144,
-                r: 8,
-                p: 1
-            },
-            mac: 'b8b010fff37f9ae5559a352a185e86f9b9c1d7f7a9f1bd4e82a5dd35468fc7f6'
-        }
-    }
+/*
+    The fields of kdfparams are described below.
 
     `dklen` is the desired length of the derived key
     `salt` - A string of characters that modifies the hash to protect against Rainbow table attacks
@@ -1334,30 +1489,12 @@ Accounts.prototype.decrypt = function(v3Keystore, password, nonStrict) {
     `r` - The blocksize parameter, which fine-tunes sequential memory read size and performance. 8 is commonly used.
     `p` - Parallelization parameter
     `c` - the number of iterations desired
-
-    {
-      "address":"9e1023dbce2d6304f5011a4db56a8ed7ba271650",
-      "crypto":{"cipher":"aes-128-ctr",
-      "ciphertext":"0f1158156a26e5135e107522639bb2b549acf159a12097c02fc2d73b97841000",
-      "version":3,
-      "cipherparams":{"iv":"e15c86e8797c37bffd2ebfa68a532595"},
-      "kdf":"scrypt",
-      "kdfparams":{
-        "dklen":32,
-        "n":262144,
-        "p":1,
-        "r":8,
-        "salt":"e7c4605ad8200e0d93cd67f9d82fb9971e1a2763b22362017c2927231c2a733a"
-      },
-      "mac":"d2ad144ef6060ac01d711d691ff56e11d4deffc85a08de0dde27c28c23959251"},
-      "id":"dfde6a32-4b0e-404f-8b9f-2b18f279fe21",
-    }
  */
 /**
- * encrypt encrypts an account and returns a key store object.
+ * encrypt encrypts an account and returns a key store v4 object.
  *
- * @method privateKeyToAccount
- * @param {String} key The key parameter can be either normal private key or KlaytnWalletKey format.
+ * @method encrypt
+ * @param {String} key The key parameter can be a raw key format(private key string, KlaytnWalletKey, array of private keys or object with keys by roles) or an instance of Account or AccountKey.
  * @param {String} password The password to be used for account encryption. The encrypted key store can be decrypted with this password.
  * @param {Object} options The options to use when encrypt an account.
  * @return {Object}
@@ -1410,13 +1547,13 @@ Accounts.prototype.encrypt = function(key, password, options) {
     switch (account.accountKeyType) {
         case AccountKeyEnum.ACCOUNT_KEY_PUBLIC:
         case AccountKeyEnum.ACCOUNT_KEY_MULTISIG:
-            keyring = encryptKey(account.keys)
+            keyring = encryptKey(account.keys, password, options)
             break
         case AccountKeyEnum.ACCOUNT_KEY_ROLEBASED:
             keyring = []
-            transactionKey = encryptKey(account.transactionKey)
-            updateKey = encryptKey(account.updateKey)
-            feePayerKey = encryptKey(account.feePayerKey)
+            transactionKey = encryptKey(account.transactionKey, password, options)
+            updateKey = encryptKey(account.updateKey, password, options)
+            feePayerKey = encryptKey(account.feePayerKey, password, options)
             keyring.push(transactionKey)
             keyring.push(updateKey)
             keyring.push(feePayerKey)
@@ -1429,72 +1566,62 @@ Accounts.prototype.encrypt = function(key, password, options) {
             throw new Error(`Unsupported account key type: ${account.accountKeyType}`)
     }
 
-    function encryptKey(privateKey) {
-        const encryptedArray = []
-
-        if (!privateKey) return encryptedArray
-
-        const privateKeyArray = _.isArray(privateKey) ? privateKey : [privateKey]
-
-        for (let i = 0; i < privateKeyArray.length; i++) {
-            const salt = options.salt || cryp.randomBytes(32)
-            const iv = options.iv || cryp.randomBytes(16)
-
-            let derivedKey
-            const kdf = options.kdf || 'scrypt'
-            const kdfparams = {
-                dklen: options.dklen || 32,
-                salt: salt.toString('hex'),
-            }
-
-            /**
-             * Supported kdf modules are the following:
-             * 1) pbkdf2
-             * 2) scrypt - default
-             */
-            if (kdf === 'pbkdf2') {
-                kdfparams.c = options.c || 262144
-                kdfparams.prf = 'hmac-sha256'
-                derivedKey = cryp.pbkdf2Sync(Buffer.from(password), salt, kdfparams.c, kdfparams.dklen, 'sha256')
-            } else if (kdf === 'scrypt') {
-                // FIXME: support progress reporting callback
-                kdfparams.n = options.n || 4096 // 2048 4096 8192 16384
-                kdfparams.r = options.r || 8
-                kdfparams.p = options.p || 1
-                derivedKey = scrypt(Buffer.from(password), salt, kdfparams.n, kdfparams.r, kdfparams.p, kdfparams.dklen)
-            } else {
-                throw new Error('Unsupported kdf')
-            }
-
-            const cipher = cryp.createCipheriv(options.cipher || 'aes-128-ctr', derivedKey.slice(0, 16), iv)
-            if (!cipher) {
-                throw new Error('Unsupported cipher')
-            }
-
-            const ciphertext = Buffer.concat([cipher.update(Buffer.from(privateKeyArray[i].replace('0x', ''), 'hex')), cipher.final()])
-
-            const mac = utils.sha3(Buffer.concat([derivedKey.slice(16, 32), Buffer.from(ciphertext, 'hex')])).replace('0x', '')
-
-            encryptedArray.push({
-                ciphertext: ciphertext.toString('hex'),
-                cipherparams: {
-                    iv: iv.toString('hex'),
-                },
-                cipher: options.cipher || 'aes-128-ctr',
-                kdf,
-                kdfparams,
-                mac: mac.toString('hex'),
-            })
-        }
-
-        return encryptedArray
-    }
-
     return {
         version: 4,
         id: uuid.v4({ random: options.uuid || cryp.randomBytes(16) }),
         address: account.address.toLowerCase(),
         keyring,
+    }
+}
+
+/**
+ * encryptV3 encrypts an account and returns a key store v3 object.
+ *
+ * @method encryptV3
+ * @param {String} key The key parameter can be a normal private key(KlaytnWalletKey format also supported) or an instance of Account or AccountKeyPublic.
+ * @param {String} password The password to be used for account encryption. The encrypted key store can be decrypted with this password.
+ * @param {Object} options The options to use when encrypt an account.
+ * @return {Object}
+ */
+Accounts.prototype.encryptV3 = function(key, password, options) {
+    options = options || {}
+
+    let address
+    let account
+    const notSupportedType =
+        'Invalid parameter: encryptV3 only supports a single private key (also supports KlantnWalletKey format), or an instance of Account or AccountKeyPublic as a parameter. If you want to encrypt multiple keys, use caver.klay.accounts.encrypt which encrypts to keystore v4.'
+
+    if (key instanceof Account) {
+        if (options.address && options.address !== key.address) {
+            throw new Error('Address in account is not matched with address in options object')
+        }
+        if (key.accountKeyType !== AccountKeyEnum.ACCOUNT_KEY_PUBLIC) throw new Error(notSupportedType)
+
+        address = key.address
+        account = key
+    } else if (_.isString(key)) {
+        account = this.privateKeyToAccount(key, options.address)
+        address = account.address
+    } else if (Account.isAccountKey(key)) {
+        if (key.type !== AccountKeyEnum.ACCOUNT_KEY_PUBLIC) throw new Error(notSupportedType)
+        if (!options.address) {
+            throw new Error('The address must be defined inside the options object.')
+        }
+
+        address = options.address
+    } else {
+        throw new Error(notSupportedType)
+    }
+
+    if (!account) account = this.createWithAccountKey(address, key)
+
+    const crypto = encryptKey(account.keys, password, options)
+
+    return {
+        version: 3,
+        id: uuid.v4({ random: options.uuid || cryp.randomBytes(16) }),
+        address: account.address.toLowerCase(),
+        crypto: crypto[0],
     }
 }
 

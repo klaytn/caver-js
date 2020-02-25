@@ -1,17 +1,17 @@
 /*
     Copyright 2018 The caver-js Authors
     This file is part of the caver-js library.
- 
+
     The caver-js library is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
- 
+
     The caver-js library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU Lesser General Public License for more details.
- 
+
     You should have received a copy of the GNU Lesser General Public License
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
@@ -23,10 +23,8 @@
 //
 // To execute a specific test,
 // $ mocha --grep INT-LEGACY/012 test/intTest.js
-require('it-each')({ testPerIteration: true })
 const RLP = require('eth-lib/lib/rlp')
 const Bytes = require('eth-lib/lib/bytes')
-const assert = require('assert')
 
 const elliptic = require('elliptic')
 
@@ -40,7 +38,7 @@ const exec = util.promisify(require('child_process').exec)
 const Caver = require('../index.js')
 const testEnv = require('./klaytn-integration-tests/env.json')
 const conf = require('./klaytn-integration-tests/conf.json')
-const { expect } = require('./extendedChai')
+const { expect, assert } = require('./extendedChai')
 
 const { overwriteSignature, getSenderTxHash } = require('../packages/caver-klay/caver-klay-accounts/src/makeRawTransaction')
 
@@ -483,7 +481,7 @@ before(() => {
 })
 
 async function checkSolidityVersion() {
-    const { stdout, stderr } = await exec('solc --version')
+    const { stdout } = await exec('solc --version')
     const regex = /Version: ([0-9]+.[0-9]+.[0-9]+)/
     const found = stdout.match(regex)
     expect(found).to.not.null
@@ -526,7 +524,7 @@ describe('Integration tests', () => {
 
                     it('make abi and bin', async () => {
                         for (const k in tc.deploy) {
-                            const { stdout, stderr } = await exec(`solc --abi --bin --allow-paths . ${path.join(dir, tc.deploy[k].file)}`)
+                            const { stdout } = await exec(`solc --abi --bin --allow-paths . ${path.join(dir, tc.deploy[k].file)}`)
                             const regex = `\n======= .*${tc.deploy[k].file}:${k} =======\nBinary: \n(.*)\nContract JSON ABI \n(.*)`
                             const found = stdout.match(regex)
                             expect(found).to.not.null

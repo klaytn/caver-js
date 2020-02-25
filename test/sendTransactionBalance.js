@@ -17,8 +17,6 @@
 */
 
 const { expect } = require('chai')
-const fetch = require('node-fetch')
-const { errors } = require('../packages/caver-core-helpers')
 
 const testRPCURL = require('./testrpc')
 const Caver = require('../index.js')

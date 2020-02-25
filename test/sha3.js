@@ -21,7 +21,7 @@ const BN = require('bn.js')
 const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 
-describe('sha3', done => {
+describe('sha3', () => {
     it('CAVERJS-UNIT-ETC-010, CAVERJS-UNIT-ETC-011, CAVERJS-UNIT-ETC-012 : should not throw an error when argument is number type', async () => {
         const caver = new Caver(testRPCURL)
 

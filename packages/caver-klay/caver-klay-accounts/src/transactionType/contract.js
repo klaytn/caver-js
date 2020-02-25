@@ -82,6 +82,7 @@ function rlpEncodeForFeeDelegatedSmartContractDeploy(transaction) {
     if (transaction.senderRawTransaction) {
         const typeDetacehdRawTransaction = `0x${transaction.senderRawTransaction.slice(4)}`
 
+        // eslint-disable-next-line no-unused-vars
         const [nonce, gasPrice, gas, to, value, from, data, humanReadable, codeFormat, [[v, r, s]]] = utils.rlpDecode(
             typeDetacehdRawTransaction
         )
@@ -128,6 +129,7 @@ function rlpEncodeForFeeDelegatedSmartContractDeployWithRatio(transaction) {
     if (transaction.senderRawTransaction) {
         const typeDetacehdRawTransaction = `0x${transaction.senderRawTransaction.slice(4)}`
 
+        // eslint-disable-next-line no-unused-vars
         const [nonce, gasPrice, gas, to, value, from, data, humanReadable, feeRatio, codeFormat, [[v, r, s]]] = utils.rlpDecode(
             typeDetacehdRawTransaction
         )
@@ -176,6 +178,7 @@ function rlpEncodeForFeeDelegatedSmartContractExecution(transaction) {
     if (transaction.senderRawTransaction) {
         const typeDetacehdRawTransaction = `0x${transaction.senderRawTransaction.slice(4)}`
 
+        // eslint-disable-next-line no-unused-vars
         const [nonce, gasPrice, gas, to, value, from, data, [[v, r, s]]] = utils.rlpDecode(typeDetacehdRawTransaction)
 
         return RLP.encode([
@@ -216,6 +219,7 @@ function rlpEncodeForFeeDelegatedSmartContractExecutionWithRatio(transaction) {
     if (transaction.senderRawTransaction) {
         const typeDetacehdRawTransaction = `0x${transaction.senderRawTransaction.slice(4)}`
 
+        // eslint-disable-next-line no-unused-vars
         const [nonce, gasPrice, gas, to, value, from, data, feeRatio, [[v, r, s]]] = utils.rlpDecode(typeDetacehdRawTransaction)
 
         return RLP.encode([
