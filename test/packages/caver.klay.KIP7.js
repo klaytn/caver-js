@@ -117,11 +117,11 @@ describe('caver.klay.KIP7', () => {
             insufficientToken = { name: 'Jasmine', symbol: 'JAS', decimals: 18 }
             expect(() => caver.klay.KIP7.deploy(insufficientToken, sender.address)).to.throws(expectedError)
 
-            expectedError = 'Failed to validate token info for deploy: Failed to convert BigNumber(NaN) to String: NaN'
+            expectedError = 'Failed to validate token info for deploy: Failed to convert to number string: invalid paramter value'
             invalidToken = { name: 'Jasmine', symbol: 'JAS', decimals: 18, initialSupply: 'invalid' }
             expect(() => caver.klay.KIP7.deploy(invalidToken, sender.address)).to.throws(expectedError)
 
-            expectedError = 'Failed to validate token info for deploy: Unsupported initialSupply type: object'
+            expectedError = 'Failed to validate token info for deploy: Failed to convert to number string: unsupported type'
             invalidToken = { name: 'Jasmine', symbol: 'JAS', decimals: 18, initialSupply: [1234] }
             expect(() => caver.klay.KIP7.deploy(invalidToken, sender.address)).to.throws(expectedError)
         }).timeout(200000)
@@ -216,8 +216,8 @@ describe('caver.klay.KIP7', () => {
             // set deafult from address in kip7 instance
             token.options.from = sender.address
 
-            const approved = await token.approve(testAccount.address, allowanceAmount)
-            expect(approved.from).to.be.equals(sender.address.toLowerCase())
+            const approved = await token.approve(testAccount.address, new BigNumber(allowanceAmount))
+            expect(approved.from).to.equals(sender.address.toLowerCase())
             expect(approved.status).to.be.true
             expect(approved.events).not.to.be.undefined
             expect(approved.events.Approval).not.to.be.undefined
@@ -234,10 +234,10 @@ describe('caver.klay.KIP7', () => {
             const additionalAllowance = 10
             const originalAllowance = await token.allowance(sender.address, testAccount.address)
 
-            const newAllowance = additionalAllowance + Number(originalAllowance)
+            const newAllowance = originalAllowance.plus(new BigNumber(additionalAllowance))
 
             const approved = await token.approve(testAccount.address, newAllowance, { from: sender.address })
-            expect(approved.from).to.be.equals(sender.address.toLowerCase())
+            expect(approved.from).to.equals(sender.address.toLowerCase())
             expect(approved.status).to.be.true
             expect(approved.events).not.to.be.undefined
             expect(approved.events.Approval).not.to.be.undefined
@@ -254,7 +254,7 @@ describe('caver.klay.KIP7', () => {
             const additionalAllowance = 10
             const originalAllowance = await token.allowance(sender.address, testAccount.address)
 
-            const newAllowance = additionalAllowance + Number(originalAllowance)
+            const newAllowance = originalAllowance.plus(new BigNumber(additionalAllowance))
 
             const customGasLimit = '0x186a0'
 
@@ -276,15 +276,15 @@ describe('caver.klay.KIP7', () => {
             const additionalAllowance = 10
             const originalAllowance = await token.allowance(sender.address, testAccount.address)
 
-            const newAllowance = additionalAllowance + Number(originalAllowance)
+            const newAllowance = originalAllowance.plus(new BigNumber(additionalAllowance))
 
             const customGasLimit = '0x186a0'
 
             // set deafult from address in kip7 instance
             token.options.from = sender.address
 
-            const approved = await token.approve(testAccount.address, newAllowance, { gas: customGasLimit })
-            expect(approved.from).to.be.equals(sender.address.toLowerCase())
+            const approved = await token.approve(testAccount.address, newAllowance.toString(10), { gas: customGasLimit })
+            expect(approved.from).to.equals(sender.address.toLowerCase())
             expect(approved.gas).to.equals(customGasLimit)
             expect(approved.status).to.be.true
             expect(approved.events).not.to.be.undefined
@@ -307,8 +307,8 @@ describe('caver.klay.KIP7', () => {
             // set deafult from address in kip7 instance
             token.options.from = sender.address
 
-            const transfered = await token.transfer(testAccount.address, transferAmount)
-            expect(transfered.from).to.be.equals(sender.address.toLowerCase())
+            const transfered = await token.transfer(testAccount.address, new BigNumber(transferAmount))
+            expect(transfered.from).to.equals(sender.address.toLowerCase())
             expect(transfered.status).to.be.true
             expect(transfered.events).not.to.be.undefined
             expect(transfered.events.Transfer).not.to.be.undefined
@@ -322,11 +322,11 @@ describe('caver.klay.KIP7', () => {
         it('CAVERJS-UNIT-KCT-016: should send transaction to transfer token and trigger Transfer event with sendParams(from)', async () => {
             const token = new caver.klay.KIP7(kip7Address)
 
-            const transferAmount = 10
+            const transferAmount = new BigNumber(10)
             const originalBalance = await token.balanceOf(testAccount.address)
 
-            const transfered = await token.transfer(testAccount.address, transferAmount, { from: sender.address })
-            expect(transfered.from).to.be.equals(sender.address.toLowerCase())
+            const transfered = await token.transfer(testAccount.address, transferAmount.toString(10), { from: sender.address })
+            expect(transfered.from).to.equals(sender.address.toLowerCase())
             expect(transfered.status).to.be.true
             expect(transfered.events).not.to.be.undefined
             expect(transfered.events.Transfer).not.to.be.undefined
@@ -369,7 +369,7 @@ describe('caver.klay.KIP7', () => {
             token.options.from = sender.address
 
             const transfered = await token.transfer(testAccount.address, transferAmount, { gas: customGasLimit })
-            expect(transfered.from).to.be.equals(sender.address.toLowerCase())
+            expect(transfered.from).to.equals(sender.address.toLowerCase())
             expect(transfered.gas).to.equals(customGasLimit)
             expect(transfered.status).to.be.true
             expect(transfered.events).not.to.be.undefined
@@ -396,15 +396,15 @@ describe('caver.klay.KIP7', () => {
             // set deafult from address in kip7 instance
             token.options.from = testAccount.address
 
-            const transfered = await token.transferFrom(sender.address, receiver.address, allowanceAmount)
-            expect(transfered.from).to.be.equals(testAccount.address.toLowerCase())
+            const transfered = await token.transferFrom(sender.address, receiver.address, new BigNumber(allowanceAmount))
+            expect(transfered.from).to.equals(testAccount.address.toLowerCase())
             expect(transfered.status).to.be.true
             expect(transfered.events).not.to.be.undefined
             expect(transfered.events.Transfer).not.to.be.undefined
             expect(transfered.events.Transfer.address).to.equals(kip7Address)
 
             const afterBalance = await token.balanceOf(receiver.address)
-            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.be.equals('0')
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.equals('0')
 
             expect(afterBalance.minus(originalBalance).eq(allowanceAmount)).to.be.true
         }).timeout(200000)
@@ -414,7 +414,7 @@ describe('caver.klay.KIP7', () => {
 
             const originalBalance = await token.balanceOf(receiver.address)
 
-            const allowanceAmount = 10000
+            const allowanceAmount = new BigNumber(10000)
             await token.approve(testAccount.address, allowanceAmount, { from: sender.address })
             const originalAllowance = await token.allowance(sender.address, testAccount.address)
             expect(originalAllowance.eq(allowanceAmount)).to.be.true
@@ -422,15 +422,17 @@ describe('caver.klay.KIP7', () => {
             // set deafult from address in kip7 instance
             token.options.from = testAccount.address
 
-            const transfered = await token.transferFrom(sender.address, receiver.address, allowanceAmount, { from: testAccount.address })
-            expect(transfered.from).to.be.equals(testAccount.address.toLowerCase())
+            const transfered = await token.transferFrom(sender.address, receiver.address, allowanceAmount.toString(10), {
+                from: testAccount.address,
+            })
+            expect(transfered.from).to.equals(testAccount.address.toLowerCase())
             expect(transfered.status).to.be.true
             expect(transfered.events).not.to.be.undefined
             expect(transfered.events.Transfer).not.to.be.undefined
             expect(transfered.events.Transfer.address).to.equals(kip7Address)
 
             const afterBalance = await token.balanceOf(receiver.address)
-            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.be.equals('0')
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.equals('0')
 
             expect(afterBalance.minus(originalBalance).eq(allowanceAmount)).to.be.true
         }).timeout(200000)
@@ -457,7 +459,7 @@ describe('caver.klay.KIP7', () => {
             expect(transfered.events.Transfer.address).to.equals(kip7Address)
 
             const afterBalance = await token.balanceOf(receiver.address)
-            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.be.equals('0')
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.equals('0')
 
             expect(afterBalance.minus(originalBalance).eq(allowanceAmount)).to.be.true
         }).timeout(200000)
@@ -477,7 +479,7 @@ describe('caver.klay.KIP7', () => {
 
             const customGasLimit = '0x186a0'
             const transfered = await token.transferFrom(sender.address, receiver.address, allowanceAmount, { gas: customGasLimit })
-            expect(transfered.from).to.be.equals(testAccount.address.toLowerCase())
+            expect(transfered.from).to.equals(testAccount.address.toLowerCase())
             expect(transfered.gas).to.equals(customGasLimit)
             expect(transfered.status).to.be.true
             expect(transfered.events).not.to.be.undefined
@@ -485,7 +487,7 @@ describe('caver.klay.KIP7', () => {
             expect(transfered.events.Transfer.address).to.equals(kip7Address)
 
             const afterBalance = await token.balanceOf(receiver.address)
-            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.be.equals('0')
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.equals('0')
 
             expect(afterBalance.minus(originalBalance).eq(allowanceAmount)).to.be.true
         }).timeout(200000)
@@ -535,8 +537,8 @@ describe('caver.klay.KIP7', () => {
             token.options.from = sender.address
 
             const mintingAmount = 10000
-            const minted = await token.mint(testAccount.address, mintingAmount)
-            expect(minted.from).to.be.equals(sender.address.toLowerCase())
+            const minted = await token.mint(testAccount.address, new BigNumber(mintingAmount))
+            expect(minted.from).to.equals(sender.address.toLowerCase())
             expect(minted.status).to.be.true
             expect(minted.events).not.to.be.undefined
             expect(minted.events.Transfer).not.to.be.undefined
@@ -552,9 +554,9 @@ describe('caver.klay.KIP7', () => {
 
             const originalSupply = await token.totalSupply()
 
-            const mintingAmount = 10000
-            const minted = await token.mint(testAccount.address, mintingAmount, { from: sender.address })
-            expect(minted.from).to.be.equals(sender.address.toLowerCase())
+            const mintingAmount = new BigNumber(10000)
+            const minted = await token.mint(testAccount.address, mintingAmount.toString(10), { from: sender.address })
+            expect(minted.from).to.equals(sender.address.toLowerCase())
             expect(minted.status).to.be.true
             expect(minted.events).not.to.be.undefined
             expect(minted.events.Transfer).not.to.be.undefined
@@ -574,7 +576,7 @@ describe('caver.klay.KIP7', () => {
             const customGasLimit = '0x30d40'
             const minted = await token.mint(testAccount.address, mintingAmount, { from: sender.address, gas: customGasLimit })
             expect(minted.gas).to.equals(customGasLimit)
-            expect(minted.from).to.be.equals(sender.address.toLowerCase())
+            expect(minted.from).to.equals(sender.address.toLowerCase())
             expect(minted.status).to.be.true
             expect(minted.events).not.to.be.undefined
             expect(minted.events.Transfer).not.to.be.undefined
@@ -596,7 +598,7 @@ describe('caver.klay.KIP7', () => {
             const mintingAmount = 10000
             const customGasLimit = '0x30d40'
             const minted = await token.mint(testAccount.address, mintingAmount, { gas: customGasLimit })
-            expect(minted.from).to.be.equals(sender.address.toLowerCase())
+            expect(minted.from).to.equals(sender.address.toLowerCase())
             expect(minted.status).to.be.true
             expect(minted.events).not.to.be.undefined
             expect(minted.events.Transfer).not.to.be.undefined
@@ -619,7 +621,7 @@ describe('caver.klay.KIP7', () => {
             token.options.from = sender.address
 
             const minterAdded = await token.addMinter(newMinter)
-            expect(minterAdded.from).to.be.equals(sender.address.toLowerCase())
+            expect(minterAdded.from).to.equals(sender.address.toLowerCase())
             expect(minterAdded.status).to.be.true
             expect(minterAdded.events).not.to.be.undefined
             expect(minterAdded.events.MinterAdded).not.to.be.undefined
@@ -635,7 +637,7 @@ describe('caver.klay.KIP7', () => {
             expect(await token.isMinter(newMinter)).to.be.false
 
             const minterAdded = await token.addMinter(newMinter, { from: sender.address })
-            expect(minterAdded.from).to.be.equals(sender.address.toLowerCase())
+            expect(minterAdded.from).to.equals(sender.address.toLowerCase())
             expect(minterAdded.status).to.be.true
             expect(minterAdded.events).not.to.be.undefined
             expect(minterAdded.events.MinterAdded).not.to.be.undefined
@@ -653,7 +655,7 @@ describe('caver.klay.KIP7', () => {
             const customGasLimit = '0x30d40'
             const minterAdded = await token.addMinter(newMinter, { from: sender.address, gas: customGasLimit })
             expect(minterAdded.gas).to.equals(customGasLimit)
-            expect(minterAdded.from).to.be.equals(sender.address.toLowerCase())
+            expect(minterAdded.from).to.equals(sender.address.toLowerCase())
             expect(minterAdded.status).to.be.true
             expect(minterAdded.events).not.to.be.undefined
             expect(minterAdded.events.MinterAdded).not.to.be.undefined
@@ -673,7 +675,7 @@ describe('caver.klay.KIP7', () => {
 
             const customGasLimit = '0x30d40'
             const minterAdded = await token.addMinter(newMinter, { gas: customGasLimit })
-            expect(minterAdded.from).to.be.equals(sender.address.toLowerCase())
+            expect(minterAdded.from).to.equals(sender.address.toLowerCase())
             expect(minterAdded.status).to.be.true
             expect(minterAdded.events).not.to.be.undefined
             expect(minterAdded.events.MinterAdded).not.to.be.undefined
@@ -694,7 +696,7 @@ describe('caver.klay.KIP7', () => {
             token.options.from = testAccount.address
 
             const minterRemoved = await token.renounceMinter()
-            expect(minterRemoved.from).to.be.equals(testAccount.address.toLowerCase())
+            expect(minterRemoved.from).to.equals(testAccount.address.toLowerCase())
             expect(minterRemoved.status).to.be.true
             expect(minterRemoved.events).not.to.be.undefined
             expect(minterRemoved.events.MinterRemoved).not.to.be.undefined
@@ -710,7 +712,7 @@ describe('caver.klay.KIP7', () => {
             expect(await token.isMinter(testAccount.address)).to.be.true
 
             const minterRemoved = await token.renounceMinter({ from: testAccount.address })
-            expect(minterRemoved.from).to.be.equals(testAccount.address.toLowerCase())
+            expect(minterRemoved.from).to.equals(testAccount.address.toLowerCase())
             expect(minterRemoved.status).to.be.true
             expect(minterRemoved.events).not.to.be.undefined
             expect(minterRemoved.events.MinterRemoved).not.to.be.undefined
@@ -728,7 +730,7 @@ describe('caver.klay.KIP7', () => {
             const customGasLimit = '0x30d40'
             const minterRemoved = await token.renounceMinter({ from: testAccount.address, gas: customGasLimit })
             expect(minterRemoved.gas).to.equals(customGasLimit)
-            expect(minterRemoved.from).to.be.equals(testAccount.address.toLowerCase())
+            expect(minterRemoved.from).to.equals(testAccount.address.toLowerCase())
             expect(minterRemoved.status).to.be.true
             expect(minterRemoved.events).not.to.be.undefined
             expect(minterRemoved.events.MinterRemoved).not.to.be.undefined
@@ -748,7 +750,7 @@ describe('caver.klay.KIP7', () => {
 
             const customGasLimit = '0x30d40'
             const minterRemoved = await token.renounceMinter({ gas: customGasLimit })
-            expect(minterRemoved.from).to.be.equals(testAccount.address.toLowerCase())
+            expect(minterRemoved.from).to.equals(testAccount.address.toLowerCase())
             expect(minterRemoved.status).to.be.true
             expect(minterRemoved.events).not.to.be.undefined
             expect(minterRemoved.events.MinterRemoved).not.to.be.undefined
@@ -768,8 +770,8 @@ describe('caver.klay.KIP7', () => {
             token.options.from = sender.address
 
             const burningAmount = 1000
-            const burned = await token.burn(burningAmount)
-            expect(burned.from).to.be.equals(sender.address.toLowerCase())
+            const burned = await token.burn(new BigNumber(burningAmount))
+            expect(burned.from).to.equals(sender.address.toLowerCase())
             expect(burned.status).to.be.true
             expect(burned.events).not.to.be.undefined
             expect(burned.events.Transfer).not.to.be.undefined
@@ -784,9 +786,9 @@ describe('caver.klay.KIP7', () => {
 
             const originalSupply = await token.totalSupply()
 
-            const burningAmount = 1000
-            const burned = await token.burn(burningAmount, { from: sender.address })
-            expect(burned.from).to.be.equals(sender.address.toLowerCase())
+            const burningAmount = new BigNumber(1000)
+            const burned = await token.burn(burningAmount.toString(10), { from: sender.address })
+            expect(burned.from).to.equals(sender.address.toLowerCase())
             expect(burned.status).to.be.true
             expect(burned.events).not.to.be.undefined
             expect(burned.events.Transfer).not.to.be.undefined
@@ -805,7 +807,7 @@ describe('caver.klay.KIP7', () => {
             const customGasLimit = '0x30d40'
             const burned = await token.burn(burningAmount, { from: sender.address, gas: customGasLimit })
             expect(burned.gas).to.equals(customGasLimit)
-            expect(burned.from).to.be.equals(sender.address.toLowerCase())
+            expect(burned.from).to.equals(sender.address.toLowerCase())
             expect(burned.status).to.be.true
             expect(burned.events).not.to.be.undefined
             expect(burned.events.Transfer).not.to.be.undefined
@@ -826,7 +828,7 @@ describe('caver.klay.KIP7', () => {
             const burningAmount = 1000
             const customGasLimit = '0x30d40'
             const burned = await token.burn(burningAmount, { gas: customGasLimit })
-            expect(burned.from).to.be.equals(sender.address.toLowerCase())
+            expect(burned.from).to.equals(sender.address.toLowerCase())
             expect(burned.status).to.be.true
             expect(burned.events).not.to.be.undefined
             expect(burned.events.Transfer).not.to.be.undefined
@@ -844,21 +846,21 @@ describe('caver.klay.KIP7', () => {
             const originalSupply = await token.totalSupply()
 
             const burningAmount = 10000
-            await token.approve(testAccount.address, burningAmount, { from: sender.address })
+            await token.approve(testAccount.address, new BigNumber(burningAmount), { from: sender.address })
             const originalAllowance = await token.allowance(sender.address, testAccount.address)
-            expect(originalAllowance.toNumber()).to.be.equals(burningAmount)
+            expect(originalAllowance.toNumber()).to.equals(burningAmount)
 
             // set deafult from address in kip7 instance
             token.options.from = testAccount.address
 
             const burned = await token.burnFrom(sender.address, burningAmount)
-            expect(burned.from).to.be.equals(testAccount.address.toLowerCase())
+            expect(burned.from).to.equals(testAccount.address.toLowerCase())
             expect(burned.status).to.be.true
             expect(burned.events).not.to.be.undefined
             expect(burned.events.Transfer).not.to.be.undefined
             expect(burned.events.Transfer.address).to.equals(kip7Address)
 
-            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.be.equals('0')
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.equals('0')
             const afterSupply = await token.totalSupply()
             expect(originalSupply.minus(afterSupply).eq(burningAmount)).to.be.true
         }).timeout(200000)
@@ -868,22 +870,22 @@ describe('caver.klay.KIP7', () => {
 
             const originalSupply = await token.totalSupply()
 
-            const burningAmount = 10000
-            await token.approve(testAccount.address, burningAmount, { from: sender.address })
+            const burningAmount = new BigNumber(10000)
+            await token.approve(testAccount.address, burningAmount.toString(10), { from: sender.address })
             const originalAllowance = await token.allowance(sender.address, testAccount.address)
-            expect(originalAllowance.toNumber()).to.be.equals(burningAmount)
+            expect(originalAllowance.eq(burningAmount)).to.be.true
 
             // set deafult from address in kip7 instance
             token.options.from = testAccount.address
 
             const burned = await token.burnFrom(sender.address, burningAmount, { from: testAccount.address })
-            expect(burned.from).to.be.equals(testAccount.address.toLowerCase())
+            expect(burned.from).to.equals(testAccount.address.toLowerCase())
             expect(burned.status).to.be.true
             expect(burned.events).not.to.be.undefined
             expect(burned.events.Transfer).not.to.be.undefined
             expect(burned.events.Transfer.address).to.equals(kip7Address)
 
-            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.be.equals('0')
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.equals('0')
             const afterSupply = await token.totalSupply()
             expect(originalSupply.minus(afterSupply).eq(burningAmount)).to.be.true
         }).timeout(200000)
@@ -896,7 +898,7 @@ describe('caver.klay.KIP7', () => {
             const burningAmount = 10000
             await token.approve(testAccount.address, burningAmount, { from: sender.address })
             const originalAllowance = await token.allowance(sender.address, testAccount.address)
-            expect(originalAllowance.toNumber()).to.be.equals(burningAmount)
+            expect(originalAllowance.toNumber()).to.equals(burningAmount)
 
             const customGasLimit = '0x186a0'
             const burned = await token.burnFrom(sender.address, burningAmount, {
@@ -909,7 +911,7 @@ describe('caver.klay.KIP7', () => {
             expect(burned.events.Transfer).not.to.be.undefined
             expect(burned.events.Transfer.address).to.equals(kip7Address)
 
-            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.be.equals('0')
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.equals('0')
             const afterSupply = await token.totalSupply()
             expect(originalSupply.minus(afterSupply).eq(burningAmount)).to.be.true
         }).timeout(200000)
@@ -922,21 +924,21 @@ describe('caver.klay.KIP7', () => {
             const burningAmount = 10000
             await token.approve(testAccount.address, burningAmount, { from: sender.address })
             const originalAllowance = await token.allowance(sender.address, testAccount.address)
-            expect(originalAllowance.toNumber()).to.be.equals(burningAmount)
+            expect(originalAllowance.toNumber()).to.equals(burningAmount)
 
             // set deafult from address in kip7 instance
             token.options.from = testAccount.address
 
             const customGasLimit = '0x186a0'
             const burned = await token.burnFrom(sender.address, burningAmount, { gas: customGasLimit })
-            expect(burned.from).to.be.equals(testAccount.address.toLowerCase())
+            expect(burned.from).to.equals(testAccount.address.toLowerCase())
             expect(burned.gas).to.equals(customGasLimit)
             expect(burned.status).to.be.true
             expect(burned.events).not.to.be.undefined
             expect(burned.events.Transfer).not.to.be.undefined
             expect(burned.events.Transfer.address).to.equals(kip7Address)
 
-            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.be.equals('0')
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.equals('0')
             const afterSupply = await token.totalSupply()
             expect(originalSupply.minus(afterSupply).eq(burningAmount)).to.be.true
         }).timeout(200000)
@@ -953,7 +955,7 @@ describe('caver.klay.KIP7', () => {
             token.options.from = sender.address
 
             const pauserAdded = await token.addPauser(newPauser)
-            expect(pauserAdded.from).to.be.equals(sender.address.toLowerCase())
+            expect(pauserAdded.from).to.equals(sender.address.toLowerCase())
             expect(pauserAdded.status).to.be.true
             expect(pauserAdded.events).not.to.be.undefined
             expect(pauserAdded.events.PauserAdded).not.to.be.undefined
@@ -969,7 +971,7 @@ describe('caver.klay.KIP7', () => {
             expect(await token.isPauser(newPauser)).to.be.false
 
             const pauserAdded = await token.addPauser(newPauser, { from: sender.address })
-            expect(pauserAdded.from).to.be.equals(sender.address.toLowerCase())
+            expect(pauserAdded.from).to.equals(sender.address.toLowerCase())
             expect(pauserAdded.status).to.be.true
             expect(pauserAdded.events).not.to.be.undefined
             expect(pauserAdded.events.PauserAdded).not.to.be.undefined
@@ -987,7 +989,7 @@ describe('caver.klay.KIP7', () => {
             const customGasLimit = '0x30d40'
             const pauserAdded = await token.addPauser(newPauser, { from: sender.address, gas: customGasLimit })
             expect(pauserAdded.gas).to.equals(customGasLimit)
-            expect(pauserAdded.from).to.be.equals(sender.address.toLowerCase())
+            expect(pauserAdded.from).to.equals(sender.address.toLowerCase())
             expect(pauserAdded.status).to.be.true
             expect(pauserAdded.events).not.to.be.undefined
             expect(pauserAdded.events.PauserAdded).not.to.be.undefined
@@ -1007,7 +1009,7 @@ describe('caver.klay.KIP7', () => {
 
             const customGasLimit = '0x30d40'
             const pauserAdded = await token.addPauser(newPauser, { gas: customGasLimit })
-            expect(pauserAdded.from).to.be.equals(sender.address.toLowerCase())
+            expect(pauserAdded.from).to.equals(sender.address.toLowerCase())
             expect(pauserAdded.status).to.be.true
             expect(pauserAdded.events).not.to.be.undefined
             expect(pauserAdded.events.PauserAdded).not.to.be.undefined
@@ -1025,7 +1027,7 @@ describe('caver.klay.KIP7', () => {
             token.options.from = sender.address
 
             const doPause = await token.pause()
-            expect(doPause.from).to.be.equals(sender.address.toLowerCase())
+            expect(doPause.from).to.equals(sender.address.toLowerCase())
             expect(doPause.status).to.be.true
             expect(doPause.events).not.to.be.undefined
             expect(doPause.events.Paused).not.to.be.undefined
@@ -1040,7 +1042,7 @@ describe('caver.klay.KIP7', () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const doPause = await token.pause({ from: sender.address })
-            expect(doPause.from).to.be.equals(sender.address.toLowerCase())
+            expect(doPause.from).to.equals(sender.address.toLowerCase())
             expect(doPause.status).to.be.true
             expect(doPause.events).not.to.be.undefined
             expect(doPause.events.Paused).not.to.be.undefined
@@ -1057,7 +1059,7 @@ describe('caver.klay.KIP7', () => {
             const customGasLimit = '0x30d40'
             const doPause = await token.pause({ from: sender.address, gas: customGasLimit })
             expect(doPause.gas).to.equals(customGasLimit)
-            expect(doPause.from).to.be.equals(sender.address.toLowerCase())
+            expect(doPause.from).to.equals(sender.address.toLowerCase())
             expect(doPause.status).to.be.true
             expect(doPause.events).not.to.be.undefined
             expect(doPause.events.Paused).not.to.be.undefined
@@ -1076,7 +1078,7 @@ describe('caver.klay.KIP7', () => {
 
             const customGasLimit = '0x30d40'
             const doPause = await token.pause({ gas: customGasLimit })
-            expect(doPause.from).to.be.equals(sender.address.toLowerCase())
+            expect(doPause.from).to.equals(sender.address.toLowerCase())
             expect(doPause.status).to.be.true
             expect(doPause.events).not.to.be.undefined
             expect(doPause.events.Paused).not.to.be.undefined
@@ -1098,7 +1100,7 @@ describe('caver.klay.KIP7', () => {
             token.options.from = sender.address
 
             const doUnpause = await token.unpause()
-            expect(doUnpause.from).to.be.equals(sender.address.toLowerCase())
+            expect(doUnpause.from).to.equals(sender.address.toLowerCase())
             expect(doUnpause.status).to.be.true
             expect(doUnpause.events).not.to.be.undefined
             expect(doUnpause.events.Unpaused).not.to.be.undefined
@@ -1113,7 +1115,7 @@ describe('caver.klay.KIP7', () => {
             await token.pause({ from: sender.address })
 
             const doUnpause = await token.unpause({ from: sender.address })
-            expect(doUnpause.from).to.be.equals(sender.address.toLowerCase())
+            expect(doUnpause.from).to.equals(sender.address.toLowerCase())
             expect(doUnpause.status).to.be.true
             expect(doUnpause.events).not.to.be.undefined
             expect(doUnpause.events.Unpaused).not.to.be.undefined
@@ -1130,7 +1132,7 @@ describe('caver.klay.KIP7', () => {
             const customGasLimit = '0x30d40'
             const doUnpause = await token.unpause({ from: sender.address, gas: customGasLimit })
             expect(doUnpause.gas).to.equals(customGasLimit)
-            expect(doUnpause.from).to.be.equals(sender.address.toLowerCase())
+            expect(doUnpause.from).to.equals(sender.address.toLowerCase())
             expect(doUnpause.status).to.be.true
             expect(doUnpause.events).not.to.be.undefined
             expect(doUnpause.events.Unpaused).not.to.be.undefined
@@ -1149,7 +1151,7 @@ describe('caver.klay.KIP7', () => {
 
             const customGasLimit = '0x30d40'
             const doUnpause = await token.unpause({ gas: customGasLimit })
-            expect(doUnpause.from).to.be.equals(sender.address.toLowerCase())
+            expect(doUnpause.from).to.equals(sender.address.toLowerCase())
             expect(doUnpause.status).to.be.true
             expect(doUnpause.events).not.to.be.undefined
             expect(doUnpause.events.Unpaused).not.to.be.undefined
@@ -1170,7 +1172,7 @@ describe('caver.klay.KIP7', () => {
             token.options.from = testAccount.address
 
             const pauserRemoved = await token.renouncePauser()
-            expect(pauserRemoved.from).to.be.equals(testAccount.address.toLowerCase())
+            expect(pauserRemoved.from).to.equals(testAccount.address.toLowerCase())
             expect(pauserRemoved.status).to.be.true
             expect(pauserRemoved.events).not.to.be.undefined
             expect(pauserRemoved.events.PauserRemoved).not.to.be.undefined
@@ -1186,7 +1188,7 @@ describe('caver.klay.KIP7', () => {
             expect(await token.isPauser(testAccount.address)).to.be.true
 
             const pauserRemoved = await token.renouncePauser({ from: testAccount.address })
-            expect(pauserRemoved.from).to.be.equals(testAccount.address.toLowerCase())
+            expect(pauserRemoved.from).to.equals(testAccount.address.toLowerCase())
             expect(pauserRemoved.status).to.be.true
             expect(pauserRemoved.events).not.to.be.undefined
             expect(pauserRemoved.events.PauserRemoved).not.to.be.undefined
@@ -1204,7 +1206,7 @@ describe('caver.klay.KIP7', () => {
             const customGasLimit = '0x30d40'
             const pauserRemoved = await token.renouncePauser({ from: testAccount.address, gas: customGasLimit })
             expect(pauserRemoved.gas).to.equals(customGasLimit)
-            expect(pauserRemoved.from).to.be.equals(testAccount.address.toLowerCase())
+            expect(pauserRemoved.from).to.equals(testAccount.address.toLowerCase())
             expect(pauserRemoved.status).to.be.true
             expect(pauserRemoved.events).not.to.be.undefined
             expect(pauserRemoved.events.PauserRemoved).not.to.be.undefined
@@ -1224,7 +1226,7 @@ describe('caver.klay.KIP7', () => {
 
             const customGasLimit = '0x30d40'
             const pauserRemoved = await token.renouncePauser({ gas: customGasLimit })
-            expect(pauserRemoved.from).to.be.equals(testAccount.address.toLowerCase())
+            expect(pauserRemoved.from).to.equals(testAccount.address.toLowerCase())
             expect(pauserRemoved.status).to.be.true
             expect(pauserRemoved.events).not.to.be.undefined
             expect(pauserRemoved.events.PauserRemoved).not.to.be.undefined

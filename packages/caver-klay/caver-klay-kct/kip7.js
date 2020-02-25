@@ -20,7 +20,7 @@ const _ = require('lodash')
 const BigNumber = require('bignumber.js')
 
 const Contract = require('../caver-klay-contract')
-const { validateTokenInfoForDeploy, determineSendParams, kip7JsonInterface, kip7ByteCode } = require('./kctHelper')
+const { validateTokenInfoForDeploy, determineSendParams, kip7JsonInterface, kip7ByteCode, formatParamForUint256 } = require('./kctHelper')
 const { isAddress } = require('../../caver-utils')
 
 class KIP7 extends Contract {
@@ -101,28 +101,28 @@ class KIP7 extends Contract {
     }
 
     async approve(spender, amount, sendParam = {}) {
-        const executableObj = this.methods.approve(spender, amount)
+        const executableObj = this.methods.approve(spender, formatParamForUint256(amount))
         sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
 
         return executableObj.send(sendParam)
     }
 
     async transfer(recipient, amount, sendParam = {}) {
-        const executableObj = this.methods.transfer(recipient, amount)
+        const executableObj = this.methods.transfer(recipient, formatParamForUint256(amount))
         sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
 
         return executableObj.send(sendParam)
     }
 
     async transferFrom(sender, recipient, amount, sendParam = {}) {
-        const executableObj = this.methods.transferFrom(sender, recipient, amount)
+        const executableObj = this.methods.transferFrom(sender, recipient, formatParamForUint256(amount))
         sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
 
         return executableObj.send(sendParam)
     }
 
     async mint(account, amount, sendParam = {}) {
-        const executableObj = this.methods.mint(account, amount)
+        const executableObj = this.methods.mint(account, formatParamForUint256(amount))
         sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
 
         return executableObj.send(sendParam)
@@ -143,14 +143,14 @@ class KIP7 extends Contract {
     }
 
     async burn(amount, sendParam = {}) {
-        const executableObj = this.methods.burn(amount)
+        const executableObj = this.methods.burn(formatParamForUint256(amount))
         sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
 
         return executableObj.send(sendParam)
     }
 
     async burnFrom(account, amount, sendParam = {}) {
-        const executableObj = this.methods.burnFrom(account, amount)
+        const executableObj = this.methods.burnFrom(account, formatParamForUint256(amount))
         sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
 
         return executableObj.send(sendParam)

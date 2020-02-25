@@ -36,9 +36,22 @@ async function determineSendParams(executableObj, sendParam, defaultFrom) {
     return { from, gas, gasPrice: sendParam.gasPrice, value: sendParam.value }
 }
 
-function convertBigNumberToString(bigNumber) {
-    const numberString = bigNumber.toString(10)
-    if (numberString === 'NaN') throw new Error(`Failed to convert BigNumber(${bigNumber}) to String: ${numberString}`)
+function formatParamForUint256(param) {
+    return convertToNumberString(param)
+}
+
+function convertToNumberString(value) {
+    let numberString
+    if (_.isString(value)) value = new BigNumber(value)
+
+    const errorMsg = `Failed to convert to number string: `
+    if (isBigNumber(value) || _.isNumber(value)) {
+        numberString = value.toString(10)
+        if (numberString === 'NaN') throw new Error(`${errorMsg}invalid paramter value`)
+    } else {
+        throw new Error(`${errorMsg}unsupported type`)
+    }
+
     return numberString
 }
 
@@ -48,20 +61,11 @@ function validateTokenInfoForDeploy(obj) {
     if (!obj.symbol || !_.isString(obj.symbol)) throw new Error(`${errorFormat}Invalid symbol of token`)
     if (obj.decimals === undefined || !_.isNumber(obj.decimals)) throw new Error(`${errorFormat}Invalid decimals of token`)
 
-    const invalidInitialSupplyError = `Invalid initialSupply of token`
-    const unsupportedInitialSupplyTypeError = `Unsupported initialSupply type: `
     try {
         if (obj.initialSupply === undefined) {
-            throw new Error(invalidInitialSupplyError)
-        } else if (_.isString(obj.initialSupply)) {
-            // To check if it is of type String representing Number,
-            // convert it to BigNumber and check the value.
-            obj.initialSupply = new BigNumber(obj.initialSupply)
-            obj.initialSupply = convertBigNumberToString(obj.initialSupply)
-        } else if (isBigNumber(obj.initialSupply)) {
-            obj.initialSupply = convertBigNumberToString(obj.initialSupply)
-        } else if (!_.isNumber(obj.initialSupply)) {
-            throw new Error(`${unsupportedInitialSupplyTypeError}${typeof obj.initialSupply}`)
+            throw new Error(`Invalid initialSupply of token: ${obj.initialSupply}`)
+        } else {
+            obj.initialSupply = convertToNumberString(obj.initialSupply)
         }
     } catch (e) {
         // Catch the error here to add more details to the error message.
@@ -274,4 +278,5 @@ module.exports = {
     kip7ByteCode,
     determineSendParams,
     validateTokenInfoForDeploy,
+    formatParamForUint256,
 }
