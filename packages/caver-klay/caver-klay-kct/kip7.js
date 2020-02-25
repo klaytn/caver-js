@@ -17,6 +17,7 @@
 */
 
 const _ = require('lodash')
+const BigNumber = require('bignumber.js')
 
 const Contract = require('../caver-klay-contract')
 const { validateTokenInfoForDeploy, determineSendParams, kip7JsonInterface, kip7ByteCode } = require('./kctHelper')
@@ -54,40 +55,49 @@ class KIP7 extends Contract {
         return new this.constructor(tokenAddress, this.options.jsonInterface)
     }
 
-    name() {
-        return this.methods.name().call()
+    async name() {
+        const name = await this.methods.name().call()
+        return name
     }
 
-    symbol() {
-        return this.methods.symbol().call()
+    async symbol() {
+        const symbol = await this.methods.symbol().call()
+        return symbol
     }
 
-    decimals() {
-        return this.methods.decimals().call()
+    async decimals() {
+        const decimals = await this.methods.decimals().call()
+        return Number(decimals)
     }
 
-    totalSupply() {
-        return this.methods.totalSupply().call()
+    async totalSupply() {
+        const totalSupply = await this.methods.totalSupply().call()
+        return new BigNumber(totalSupply)
     }
 
-    balanceOf(account) {
-        return this.methods.balanceOf(account).call()
+    async balanceOf(account) {
+        const balance = await this.methods.balanceOf(account).call()
+        return new BigNumber(balance)
     }
 
-    allowance(owner, spender) {
-        return this.methods.allowance(owner, spender).call()
+    async allowance(owner, spender) {
+        const allowance = await this.methods.allowance(owner, spender).call()
+        return new BigNumber(allowance)
     }
 
-    isMinter(account) {
-        return this.methods.isMinter(account).call()
+    async isMinter(account) {
+        const isMinter = await this.methods.isMinter(account).call()
+        return isMinter
     }
 
-    isPauser(account) {
-        return this.methods.isPauser(account).call()
+    async isPauser(account) {
+        const isPauser = await this.methods.isPauser(account).call()
+        return isPauser
     }
 
-    paused() {
-        return this.methods.paused().call()
+    async paused() {
+        const isPaused = await this.methods.paused().call()
+        return isPaused
     }
 
     async approve(spender, amount, sendParam = {}) {

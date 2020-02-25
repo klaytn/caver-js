@@ -165,7 +165,7 @@ describe('caver.klay.KIP7', () => {
 
             const decimals = await token.decimals()
 
-            expect(decimals).to.equals(String(tokenInfo.decimals))
+            expect(decimals).to.equals(tokenInfo.decimals)
         }).timeout(200000)
     })
 
@@ -175,7 +175,7 @@ describe('caver.klay.KIP7', () => {
 
             const totalSupply = await token.totalSupply()
 
-            expect(totalSupply).to.equals(String(tokenInfo.initialSupply))
+            expect(totalSupply.eq(tokenInfo.initialSupply)).to.be.true
         }).timeout(200000)
     })
 
@@ -185,7 +185,7 @@ describe('caver.klay.KIP7', () => {
 
             const balance = await token.balanceOf(sender.address)
 
-            expect(balance).to.equals(String(tokenInfo.initialSupply))
+            expect(balance.eq(tokenInfo.initialSupply)).to.be.true
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-009: should call balanceOf method and return 0 if account does not have any token', async () => {
@@ -193,7 +193,7 @@ describe('caver.klay.KIP7', () => {
 
             const balance = await token.balanceOf(caver.klay.accounts.create().address)
 
-            expect(balance).to.equals('0')
+            expect(balance.toString()).to.equals('0')
         }).timeout(200000)
     })
 
@@ -202,7 +202,7 @@ describe('caver.klay.KIP7', () => {
             const token = new caver.klay.KIP7(kip7Address)
 
             const allowance = await token.allowance(sender.address, testAccount.address)
-            expect(allowance).to.equals('0')
+            expect(allowance.toString()).to.equals('0')
         }).timeout(200000)
     })
 
@@ -225,7 +225,7 @@ describe('caver.klay.KIP7', () => {
 
             const afterAllowance = await token.allowance(sender.address, testAccount.address)
 
-            expect(Number(afterAllowance) - Number(originalAllowance)).to.equals(allowanceAmount)
+            expect(afterAllowance.minus(originalAllowance).eq(allowanceAmount)).to.be.true
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-012: should send transaction for calling approve method and set allowance with sendParams(from)', async () => {
@@ -245,7 +245,7 @@ describe('caver.klay.KIP7', () => {
 
             const afterAllowance = await token.allowance(sender.address, testAccount.address)
 
-            expect(Number(afterAllowance) - Number(originalAllowance)).to.equals(additionalAllowance)
+            expect(afterAllowance.minus(originalAllowance).eq(additionalAllowance)).to.be.true
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-013: should send transaction for calling approve method and set allowance with sendParams(from, gas)', async () => {
@@ -267,7 +267,7 @@ describe('caver.klay.KIP7', () => {
 
             const afterAllowance = await token.allowance(sender.address, testAccount.address)
 
-            expect(Number(afterAllowance) - Number(originalAllowance)).to.equals(additionalAllowance)
+            expect(afterAllowance.minus(originalAllowance).eq(additionalAllowance)).to.be.true
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-014: should send transaction for calling approve method and set allowance with sendParams(gas)', async () => {
@@ -293,7 +293,7 @@ describe('caver.klay.KIP7', () => {
 
             const afterAllowance = await token.allowance(sender.address, testAccount.address)
 
-            expect(Number(afterAllowance) - Number(originalAllowance)).to.equals(additionalAllowance)
+            expect(afterAllowance.minus(originalAllowance).eq(additionalAllowance)).to.be.true
         }).timeout(200000)
     })
 
@@ -316,7 +316,7 @@ describe('caver.klay.KIP7', () => {
 
             const afterBalance = await token.balanceOf(testAccount.address)
 
-            expect(Number(afterBalance) - Number(originalBalance)).to.equals(transferAmount)
+            expect(afterBalance.minus(originalBalance).eq(transferAmount)).to.be.true
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-016: should send transaction to transfer token and trigger Transfer event with sendParams(from)', async () => {
@@ -334,7 +334,7 @@ describe('caver.klay.KIP7', () => {
 
             const afterBalance = await token.balanceOf(testAccount.address)
 
-            expect(Number(afterBalance) - Number(originalBalance)).to.equals(transferAmount)
+            expect(afterBalance.minus(originalBalance).eq(transferAmount)).to.be.true
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-017: should send transaction to transfer token and trigger Transfer event with sendParams(from, gas)', async () => {
@@ -354,7 +354,7 @@ describe('caver.klay.KIP7', () => {
 
             const afterBalance = await token.balanceOf(testAccount.address)
 
-            expect(Number(afterBalance) - Number(originalBalance)).to.equals(transferAmount)
+            expect(afterBalance.minus(originalBalance).eq(transferAmount)).to.be.true
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-018: should send transaction to transfer token and trigger Transfer event with sendParams(gas)', async () => {
@@ -378,7 +378,7 @@ describe('caver.klay.KIP7', () => {
 
             const afterBalance = await token.balanceOf(testAccount.address)
 
-            expect(Number(afterBalance) - Number(originalBalance)).to.equals(transferAmount)
+            expect(afterBalance.minus(originalBalance).eq(transferAmount)).to.be.true
         }).timeout(200000)
     })
 
@@ -391,7 +391,7 @@ describe('caver.klay.KIP7', () => {
             const allowanceAmount = 10000
             await token.approve(testAccount.address, allowanceAmount, { from: sender.address })
             const originalAllowance = await token.allowance(sender.address, testAccount.address)
-            expect(Number(originalAllowance)).to.be.equals(allowanceAmount)
+            expect(originalAllowance.eq(allowanceAmount)).to.be.true
 
             // set deafult from address in kip7 instance
             token.options.from = testAccount.address
@@ -404,9 +404,9 @@ describe('caver.klay.KIP7', () => {
             expect(transfered.events.Transfer.address).to.equals(kip7Address)
 
             const afterBalance = await token.balanceOf(receiver.address)
-            expect(await token.allowance(sender.address, testAccount.address)).to.be.equals('0')
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.be.equals('0')
 
-            expect(Number(afterBalance) - Number(originalBalance)).to.equals(allowanceAmount)
+            expect(afterBalance.minus(originalBalance).eq(allowanceAmount)).to.be.true
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-020: should send transaction to transfer token and trigger Transfer event with sendParams(from)', async () => {
@@ -417,7 +417,7 @@ describe('caver.klay.KIP7', () => {
             const allowanceAmount = 10000
             await token.approve(testAccount.address, allowanceAmount, { from: sender.address })
             const originalAllowance = await token.allowance(sender.address, testAccount.address)
-            expect(Number(originalAllowance)).to.be.equals(allowanceAmount)
+            expect(originalAllowance.eq(allowanceAmount)).to.be.true
 
             // set deafult from address in kip7 instance
             token.options.from = testAccount.address
@@ -430,9 +430,9 @@ describe('caver.klay.KIP7', () => {
             expect(transfered.events.Transfer.address).to.equals(kip7Address)
 
             const afterBalance = await token.balanceOf(receiver.address)
-            expect(await token.allowance(sender.address, testAccount.address)).to.be.equals('0')
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.be.equals('0')
 
-            expect(Number(afterBalance) - Number(originalBalance)).to.equals(allowanceAmount)
+            expect(afterBalance.minus(originalBalance).eq(allowanceAmount)).to.be.true
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-021: should send transaction to transfer token and trigger Transfer event with sendParams(from, gas)', async () => {
@@ -443,7 +443,7 @@ describe('caver.klay.KIP7', () => {
             const allowanceAmount = 10000
             await token.approve(testAccount.address, allowanceAmount, { from: sender.address })
             const originalAllowance = await token.allowance(sender.address, testAccount.address)
-            expect(Number(originalAllowance)).to.be.equals(allowanceAmount)
+            expect(originalAllowance.eq(allowanceAmount)).to.be.true
 
             const customGasLimit = '0x186a0'
             const transfered = await token.transferFrom(sender.address, receiver.address, allowanceAmount, {
@@ -457,9 +457,9 @@ describe('caver.klay.KIP7', () => {
             expect(transfered.events.Transfer.address).to.equals(kip7Address)
 
             const afterBalance = await token.balanceOf(receiver.address)
-            expect(await token.allowance(sender.address, testAccount.address)).to.be.equals('0')
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.be.equals('0')
 
-            expect(Number(afterBalance) - Number(originalBalance)).to.equals(allowanceAmount)
+            expect(afterBalance.minus(originalBalance).eq(allowanceAmount)).to.be.true
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-022: should send transaction to transfer token and trigger Transfer event with sendParams(gas)', async () => {
@@ -470,7 +470,7 @@ describe('caver.klay.KIP7', () => {
             const allowanceAmount = 10000
             await token.approve(testAccount.address, allowanceAmount, { from: sender.address })
             const originalAllowance = await token.allowance(sender.address, testAccount.address)
-            expect(Number(originalAllowance)).to.be.equals(allowanceAmount)
+            expect(originalAllowance.eq(allowanceAmount)).to.be.true
 
             // set deafult from address in kip7 instance
             token.options.from = testAccount.address
@@ -485,9 +485,9 @@ describe('caver.klay.KIP7', () => {
             expect(transfered.events.Transfer.address).to.equals(kip7Address)
 
             const afterBalance = await token.balanceOf(receiver.address)
-            expect(await token.allowance(sender.address, testAccount.address)).to.be.equals('0')
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.be.equals('0')
 
-            expect(Number(afterBalance) - Number(originalBalance)).to.equals(allowanceAmount)
+            expect(afterBalance.minus(originalBalance).eq(allowanceAmount)).to.be.true
         }).timeout(200000)
     })
 
@@ -544,7 +544,7 @@ describe('caver.klay.KIP7', () => {
 
             const afterSupply = await token.totalSupply()
 
-            expect(Number(afterSupply) - Number(originalSupply)).to.equals(mintingAmount)
+            expect(afterSupply.minus(originalSupply).eq(mintingAmount)).to.be.true
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-027: should send transaction for minting and trigger Transfer event with sendParams(from)', async () => {
@@ -562,7 +562,7 @@ describe('caver.klay.KIP7', () => {
 
             const afterSupply = await token.totalSupply()
 
-            expect(Number(afterSupply) - Number(originalSupply)).to.equals(mintingAmount)
+            expect(afterSupply.minus(originalSupply).eq(mintingAmount)).to.be.true
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-028: should send transaction for minting and trigger Transfer event with sendParams(from, gas)', async () => {
@@ -582,7 +582,7 @@ describe('caver.klay.KIP7', () => {
 
             const afterSupply = await token.totalSupply()
 
-            expect(Number(afterSupply) - Number(originalSupply)).to.equals(mintingAmount)
+            expect(afterSupply.minus(originalSupply).eq(mintingAmount)).to.be.true
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-029: should send transaction for minting and trigger Transfer event with sendParams(gas)', async () => {
@@ -604,7 +604,7 @@ describe('caver.klay.KIP7', () => {
 
             const afterSupply = await token.totalSupply()
 
-            expect(Number(afterSupply) - Number(originalSupply)).to.equals(mintingAmount)
+            expect(afterSupply.minus(originalSupply).eq(mintingAmount)).to.be.true
         }).timeout(200000)
     })
 
@@ -776,7 +776,7 @@ describe('caver.klay.KIP7', () => {
             expect(burned.events.Transfer.address).to.equals(kip7Address)
 
             const afterSupply = await token.totalSupply()
-            expect(Number(originalSupply) - Number(afterSupply)).to.be.equals(burningAmount)
+            expect(originalSupply.minus(afterSupply).eq(burningAmount)).to.be.true
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-039: should send transaction for burning and trigger Transfer event with sendParams(from)', async () => {
@@ -793,7 +793,7 @@ describe('caver.klay.KIP7', () => {
             expect(burned.events.Transfer.address).to.equals(kip7Address)
 
             const afterSupply = await token.totalSupply()
-            expect(Number(originalSupply) - Number(afterSupply)).to.be.equals(burningAmount)
+            expect(originalSupply.minus(afterSupply).eq(burningAmount)).to.be.true
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-040: should send transaction for burning and trigger Transfer event with sendParams(from, gas)', async () => {
@@ -812,7 +812,7 @@ describe('caver.klay.KIP7', () => {
             expect(burned.events.Transfer.address).to.equals(kip7Address)
 
             const afterSupply = await token.totalSupply()
-            expect(Number(originalSupply) - Number(afterSupply)).to.be.equals(burningAmount)
+            expect(originalSupply.minus(afterSupply).eq(burningAmount)).to.be.true
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-041: should send transaction for burning and trigger Transfer event with sendParams(gas)', async () => {
@@ -833,7 +833,7 @@ describe('caver.klay.KIP7', () => {
             expect(burned.events.Transfer.address).to.equals(kip7Address)
 
             const afterSupply = await token.totalSupply()
-            expect(Number(originalSupply) - Number(afterSupply)).to.be.equals(burningAmount)
+            expect(originalSupply.minus(afterSupply).eq(burningAmount)).to.be.true
         }).timeout(200000)
     })
 
@@ -846,7 +846,7 @@ describe('caver.klay.KIP7', () => {
             const burningAmount = 10000
             await token.approve(testAccount.address, burningAmount, { from: sender.address })
             const originalAllowance = await token.allowance(sender.address, testAccount.address)
-            expect(Number(originalAllowance)).to.be.equals(burningAmount)
+            expect(originalAllowance.toNumber()).to.be.equals(burningAmount)
 
             // set deafult from address in kip7 instance
             token.options.from = testAccount.address
@@ -858,9 +858,9 @@ describe('caver.klay.KIP7', () => {
             expect(burned.events.Transfer).not.to.be.undefined
             expect(burned.events.Transfer.address).to.equals(kip7Address)
 
-            expect(await token.allowance(sender.address, testAccount.address)).to.be.equals('0')
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.be.equals('0')
             const afterSupply = await token.totalSupply()
-            expect(Number(originalSupply) - Number(afterSupply)).to.be.equals(burningAmount)
+            expect(originalSupply.minus(afterSupply).eq(burningAmount)).to.be.true
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-043: should send transaction for burning token and trigger Transfer event with sendParams(from)', async () => {
@@ -871,7 +871,7 @@ describe('caver.klay.KIP7', () => {
             const burningAmount = 10000
             await token.approve(testAccount.address, burningAmount, { from: sender.address })
             const originalAllowance = await token.allowance(sender.address, testAccount.address)
-            expect(Number(originalAllowance)).to.be.equals(burningAmount)
+            expect(originalAllowance.toNumber()).to.be.equals(burningAmount)
 
             // set deafult from address in kip7 instance
             token.options.from = testAccount.address
@@ -883,9 +883,9 @@ describe('caver.klay.KIP7', () => {
             expect(burned.events.Transfer).not.to.be.undefined
             expect(burned.events.Transfer.address).to.equals(kip7Address)
 
-            expect(await token.allowance(sender.address, testAccount.address)).to.be.equals('0')
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.be.equals('0')
             const afterSupply = await token.totalSupply()
-            expect(Number(originalSupply) - Number(afterSupply)).to.be.equals(burningAmount)
+            expect(originalSupply.minus(afterSupply).eq(burningAmount)).to.be.true
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-044: should send transaction for burning token and trigger Transfer event with sendParams(from, gas)', async () => {
@@ -896,7 +896,7 @@ describe('caver.klay.KIP7', () => {
             const burningAmount = 10000
             await token.approve(testAccount.address, burningAmount, { from: sender.address })
             const originalAllowance = await token.allowance(sender.address, testAccount.address)
-            expect(Number(originalAllowance)).to.be.equals(burningAmount)
+            expect(originalAllowance.toNumber()).to.be.equals(burningAmount)
 
             const customGasLimit = '0x186a0'
             const burned = await token.burnFrom(sender.address, burningAmount, {
@@ -909,9 +909,9 @@ describe('caver.klay.KIP7', () => {
             expect(burned.events.Transfer).not.to.be.undefined
             expect(burned.events.Transfer.address).to.equals(kip7Address)
 
-            expect(await token.allowance(sender.address, testAccount.address)).to.be.equals('0')
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.be.equals('0')
             const afterSupply = await token.totalSupply()
-            expect(Number(originalSupply) - Number(afterSupply)).to.be.equals(burningAmount)
+            expect(originalSupply.minus(afterSupply).eq(burningAmount)).to.be.true
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-045: should send transaction for burning token and trigger Transfer event with sendParams(gas)', async () => {
@@ -922,7 +922,7 @@ describe('caver.klay.KIP7', () => {
             const burningAmount = 10000
             await token.approve(testAccount.address, burningAmount, { from: sender.address })
             const originalAllowance = await token.allowance(sender.address, testAccount.address)
-            expect(Number(originalAllowance)).to.be.equals(burningAmount)
+            expect(originalAllowance.toNumber()).to.be.equals(burningAmount)
 
             // set deafult from address in kip7 instance
             token.options.from = testAccount.address
@@ -936,9 +936,9 @@ describe('caver.klay.KIP7', () => {
             expect(burned.events.Transfer).not.to.be.undefined
             expect(burned.events.Transfer.address).to.equals(kip7Address)
 
-            expect(await token.allowance(sender.address, testAccount.address)).to.be.equals('0')
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.be.equals('0')
             const afterSupply = await token.totalSupply()
-            expect(Number(originalSupply) - Number(afterSupply)).to.be.equals(burningAmount)
+            expect(originalSupply.minus(afterSupply).eq(burningAmount)).to.be.true
         }).timeout(200000)
     })
 
