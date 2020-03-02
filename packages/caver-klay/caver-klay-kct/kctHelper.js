@@ -23,7 +23,7 @@ const { isBigNumber } = require('../../caver-utils')
 async function determineSendParams(executableObj, sendParam, defaultFrom) {
     let { from, gas } = sendParam
     from = from || defaultFrom
-    if (!from) throw new Error(`'from' is missing. Pass the object that from field is defined in the last parameter.`)
+    if (!from) throw new Error(`'from' is missing. Please pass the sender's address via third parameter.`)
 
     if (gas === undefined) {
         const estimated = await executableObj.estimateGas({ from })
