@@ -41,16 +41,12 @@ function formatParamForUint256(param) {
 }
 
 function convertToNumberString(value) {
-    let numberString
-    if (_.isString(value)) value = new BigNumber(value)
+    if (!isBigNumber(value) && !_.isNumber(value) && !_.isString(value)) throw new Error(`unsupported type`)
 
-    const errorMsg = `Failed to convert to number string: `
-    if (isBigNumber(value) || _.isNumber(value)) {
-        numberString = value.toString(10)
-        if (numberString === 'NaN') throw new Error(`${errorMsg}invalid paramter value`)
-    } else {
-        throw new Error(`${errorMsg}unsupported type`)
-    }
+    const bn = new BigNumber(value)
+    const numberString = bn.toString(10)
+
+    if (numberString === 'NaN') throw new Error(`invalid paramter value`)
 
     return numberString
 }

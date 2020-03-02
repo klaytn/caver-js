@@ -117,11 +117,11 @@ describe('caver.klay.KIP7', () => {
             insufficientToken = { name: 'Jasmine', symbol: 'JAS', decimals: 18 }
             expect(() => caver.klay.KIP7.deploy(insufficientToken, sender.address)).to.throws(expectedError)
 
-            expectedError = 'Failed to validate token info for deploy: Failed to convert to number string: invalid paramter value'
+            expectedError = 'Failed to validate token info for deploy: invalid paramter value'
             invalidToken = { name: 'Jasmine', symbol: 'JAS', decimals: 18, initialSupply: 'invalid' }
             expect(() => caver.klay.KIP7.deploy(invalidToken, sender.address)).to.throws(expectedError)
 
-            expectedError = 'Failed to validate token info for deploy: Failed to convert to number string: unsupported type'
+            expectedError = 'Failed to validate token info for deploy: unsupported type'
             invalidToken = { name: 'Jasmine', symbol: 'JAS', decimals: 18, initialSupply: [1234] }
             expect(() => caver.klay.KIP7.deploy(invalidToken, sender.address)).to.throws(expectedError)
         }).timeout(200000)
