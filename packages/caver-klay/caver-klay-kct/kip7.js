@@ -25,7 +25,7 @@ const { isAddress } = require('../../caver-utils')
 
 class KIP7 extends Contract {
     /**
-     * deploy deploys KIP7 token contract to Klaytn network.
+     * deploy deploys KIP-7 token contract to Klaytn network.
      * `const deployedContract = await caver.klay.KIP7.deploy({
      *      name: 'TokenName',
      *      symbol: 'TKN',
@@ -35,7 +35,7 @@ class KIP7 extends Contract {
      *
      * @method deploy
      * @param {Object} tokenInfo The object that defines the name, symbol, decimals, and initialSupply of the token to deploy.
-     * @param {String} privateKey The private key string that will be used to create AccountKeyPublic.
+     * @param {String} privateKey The address of the account to deploy the KIP-7 token contract.
      * @return {Object}
      */
     static deploy(tokenInfo, deployer) {
@@ -187,8 +187,8 @@ class KIP7 extends Contract {
      * @param {String} spender The address of the account to use on behalf of owner for the amount to be set in allowance.
      * @param {BigNumber|String|Number} amount The amount of tokens the spender allows to use on behalf of the owner.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP7 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP7 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-7 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-7 abi.
      */
     async approve(spender, amount, sendParam = {}) {
         const executableObj = this.methods.approve(spender, formatParamForUint256(amount))
@@ -204,8 +204,8 @@ class KIP7 extends Contract {
      * @param {String} recipient The address of the account to receive the token.
      * @param {BigNumber|String|Number} amount The amount of tokens you want to transfer.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP7 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP7 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-7 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-7 abi.
      */
     async transfer(recipient, amount, sendParam = {}) {
         const executableObj = this.methods.transfer(recipient, formatParamForUint256(amount))
@@ -223,8 +223,8 @@ class KIP7 extends Contract {
      * @param {String} recipient The address of the account to receive the token.
      * @param {BigNumber|String|Number} amount The amount of tokens you want to transfer.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP7 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP7 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-7 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-7 abi.
      */
     async transferFrom(sender, recipient, amount, sendParam = {}) {
         const executableObj = this.methods.transferFrom(sender, recipient, formatParamForUint256(amount))
@@ -241,8 +241,8 @@ class KIP7 extends Contract {
      * @param {String} account The address of the account to which the minted token will be allocated.
      * @param {BigNumber|String|Number} amount The amount of tokens to mint.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP7 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP7 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-7 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-7 abi.
      */
     async mint(account, amount, sendParam = {}) {
         const executableObj = this.methods.mint(account, formatParamForUint256(amount))
@@ -258,8 +258,8 @@ class KIP7 extends Contract {
      * @method addMinter
      * @param {String} account The address of account to add as minter.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP7 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP7 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-7 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-7 abi.
      */
     async addMinter(account, sendParam = {}) {
         const executableObj = this.methods.addMinter(account)
@@ -274,8 +274,8 @@ class KIP7 extends Contract {
      *
      * @method renounceMinter
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP7 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP7 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-7 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-7 abi.
      */
     async renounceMinter(sendParam = {}) {
         const executableObj = this.methods.renounceMinter()
@@ -290,8 +290,8 @@ class KIP7 extends Contract {
      * @method burn
      * @param {BigNumber|String|Number} amount The amount of tokens to destroy.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP7 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP7 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-7 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-7 abi.
      */
     async burn(amount, sendParam = {}) {
         const executableObj = this.methods.burn(formatParamForUint256(amount))
@@ -307,8 +307,8 @@ class KIP7 extends Contract {
      * @param {String} account The address of the account that owns the token to be burned with allowance mechanism.
      * @param {BigNumber|String|Number} amount The amount of tokens to destroy.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP7 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP7 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-7 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-7 abi.
      */
     async burnFrom(account, amount, sendParam = {}) {
         const executableObj = this.methods.burnFrom(account, formatParamForUint256(amount))
@@ -324,8 +324,8 @@ class KIP7 extends Contract {
      * @method addPauser
      * @param {String} account The address of account to add as pauser.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP7 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP7 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-7 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-7 abi.
      */
     async addPauser(account, sendParam = {}) {
         const executableObj = this.methods.addPauser(account)
@@ -340,8 +340,8 @@ class KIP7 extends Contract {
      *
      * @method pause
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP7 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP7 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-7 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-7 abi.
      */
     async pause(sendParam = {}) {
         const executableObj = this.methods.pause()
@@ -358,8 +358,8 @@ class KIP7 extends Contract {
      * @param {String} spender The address of the account to use on behalf of owner for the amount to be set in allowance.
      * @param {BigNumber|String|Number} amount The amount of tokens the spender allows to use on behalf of the owner.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP7 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP7 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-7 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-7 abi.
      */
     async unpause(sendParam = {}) {
         const executableObj = this.methods.unpause()
@@ -374,8 +374,8 @@ class KIP7 extends Contract {
      *
      * @method renouncePauser
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP7 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP7 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-7 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-7 abi.
      */
     async renouncePauser(sendParam = {}) {
         const executableObj = this.methods.renouncePauser()
