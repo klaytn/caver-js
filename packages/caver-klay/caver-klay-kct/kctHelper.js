@@ -46,7 +46,7 @@ function convertToNumberString(value) {
     const bn = new BigNumber(value)
     const numberString = bn.toString(10)
 
-    if (numberString === 'NaN') throw new Error(`invalid paramter value`)
+    if (numberString === 'NaN') throw new Error(`invalid parameter value`)
 
     return numberString
 }
