@@ -61,7 +61,7 @@ const extend = pkg => {
 }
 
 module.exports = {
-    packageInit: function(pkg, [provider, net]) {
+    packageInit: function(pkg, args) {
         if (!pkg) throw new Error('You need to instantiate using the "new" keyword.')
 
         // make property of pkg._provider, which can properly set providers
@@ -76,20 +76,28 @@ module.exports = {
             configurable: true,
         })
 
-        if (provider && provider._requestManager) {
-            pkg._requestManager = new Manager(provider.currentProvider)
-            // set requestmanager on package
+        // inherit from parent package or create a new RequestManager
+        if (args[0] && args[0]._requestManager) {
+            pkg._requestManager = args[0]._requestManager
         } else {
-            pkg._requestManager = new Manager(provider, net)
+            pkg._requestManager = new Manager(args[0], args[1])
         }
 
         pkg.providers = Manager.providers
-
         pkg._provider = pkg._requestManager.provider
 
         // add SETPROVIDER function (don't overwrite if already existing)
         if (!pkg.setProvider) {
-            pkg.setProvider = (p, n) => (pkg._provider = pkg._requestManager.setProvider(p, n).provider)
+            pkg.setProvider = function(provider, net) {
+                pkg._requestManager.setProvider(provider, net)
+                pkg._provider = pkg._requestManager.provider
+                return true
+            }
+        }
+
+        pkg.setRequestManager = function(manager) {
+            pkg._requestManager = manager
+            pkg._provider = manager.provider
         }
 
         // attach batch request creation
