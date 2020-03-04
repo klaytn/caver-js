@@ -267,7 +267,7 @@ const Klay = function Klay(...args) {
 
     methods.forEach(function(method) {
         method.attachToObject(_this)
-        // second param is the eth.accounts module (necessary for signing transactions locally)
+        // second param is the klay.accounts module (necessary for signing transactions locally)
         method.setRequestManager(_this._requestManager, _this.accounts)
         method.defaultBlock = _this.defaultBlock
         method.defaultAccount = _this.defaultAccount
