@@ -1,14 +1,24 @@
 pragma solidity ^0.5.0;
 
 import "./IKIP7.sol";
+import "../../introspection/KIP13.sol";
 
 /**
  * @dev Optional functions from the KIP7 standard.
  */
-contract KIP7Detailed is IKIP7 {
+contract KIP7Detailed is KIP13, IKIP7 {
     string private _name;
     string private _symbol;
     uint8 private _decimals;
+
+    /*
+     *     bytes4(keccak256('name()')) == 0x06fdde03
+     *     bytes4(keccak256('symbol()')) == 0x95d89b41
+     *     bytes4(keccak256('decimals()')) == 0x313ce567
+     *
+     *     => 0x06fdde03 ^ 0x95d89b41 ^ 0x313ce567 == 0xa219a025
+     */
+    bytes4 private constant _INTERFACE_ID_KIP7_DETAILED = 0xa219a025;
 
     /**
      * @dev Sets the values for `name`, `symbol`, and `decimals`. All three of
@@ -19,6 +29,9 @@ contract KIP7Detailed is IKIP7 {
         _name = name;
         _symbol = symbol;
         _decimals = decimals;
+
+        // register the supported interfaces to conform to KIP7 via KIP13
+        _registerInterface(_INTERFACE_ID_KIP7_DETAILED);
     }
 
     /**
