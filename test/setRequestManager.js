@@ -27,15 +27,22 @@ const expect = chai.expect
 const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 const { Manager } = require('../packages/caver-core-requestmanager/src/index')
+const { kip7JsonInterface } = require('../packages/caver-klay/caver-klay-kct/kctHelper')
 
 describe('setRequestManager', () => {
     it('CAVERJS-UNIT-ETC-203: should call setRequestManager with each pacakge instead of setProvider', () => {
         const setProviderSpy = sinon.spy(Manager.prototype, 'setProvider')
 
-        const caver = new Caver(testRPCURL)
+        const originalProvider = new Caver.providers.HttpProvider(testRPCURL)
+        const caver = new Caver(originalProvider)
 
         expect(caver).not.to.be.undefined
         expect(setProviderSpy).to.have.been.calledOnce
+
+        const contract = new caver.klay.Contract(kip7JsonInterface)
+
+        expect(contract.currentProvider).to.deep.equals(originalProvider)
+        expect(caver.klay.currentProvider).to.deep.equals(originalProvider)
 
         const setKlayRequestManager = sinon.spy(caver.klay, 'setRequestManager')
         const setNetRequestManager = sinon.spy(caver.klay.net, 'setRequestManager')
@@ -44,12 +51,14 @@ describe('setRequestManager', () => {
         const setKlayProvider = sinon.spy(caver.klay, 'setProvider')
 
         const newProvider = new Caver.providers.HttpProvider('https://api.baobab.klaytn.net:8651/')
-        caver.setProvider(newProvider)
+        caver.klay.setProvider(newProvider)
 
         expect(setKlayRequestManager).to.have.been.calledOnce
         expect(setNetRequestManager).to.have.been.calledOnce
         expect(setPersonalRequestManager).to.have.been.calledOnce
         expect(setAccountsRequestManager).to.have.been.calledOnce
-        expect(setKlayProvider).not.to.have.been.calledOnce
+        expect(setKlayProvider).to.have.been.calledOnce
+        expect(contract.currentProvider).to.deep.equals(newProvider)
+        expect(caver.klay.currentProvider).to.deep.equals(newProvider)
     })
 })
