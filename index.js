@@ -42,6 +42,8 @@ const helpers = require('./packages/caver-core-helpers')
 const { version } = require('./package.json')
 
 function Caver(provider, net) {
+    const _this = this
+
     this.use = middleware.registerMiddleware.bind(middleware)
     // sets _requestmanager etc
     packageInit(this, [provider, net])
@@ -60,7 +62,7 @@ function Caver(provider, net) {
     const setProvider = this.setProvider
     this.setProvider = (p, n) => {
         setProvider.apply(this, [p, n])
-        this.klay.setProvider(p, n)
+        _this.klay.setRequestManager(_this._requestManager)
         return true
     }
 }

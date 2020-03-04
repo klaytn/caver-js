@@ -50,14 +50,25 @@ const Klay = function Klay(...args) {
     // sets _requestmanager
     core.packageInit(this, args)
 
+    // overwrite package setRequestManager
+    const setRequestManager = this.setRequestManager
+    this.setRequestManager = function(manager) {
+        setRequestManager(manager)
+
+        _this.net.setRequestManager(manager)
+        _this.personal.setRequestManager(manager)
+        _this.accounts.setRequestManager(manager)
+        _this.Contract._requestManager = _this._requestManager
+        _this.Contract.currentProvider = _this._provider
+
+        return true
+    }
+
     // overwrite setProvider
     const setProvider = this.setProvider
     this.setProvider = function(...arg) {
         setProvider.apply(_this, arg)
-        _this.net.setProvider.apply(_this, arg)
-        _this.personal.setProvider.apply(_this, arg)
-        _this.accounts.setProvider.apply(_this, arg)
-        _this.Contract.setProvider(_this.currentProvider, _this.accounts)
+        _this.setRequestManager(_this._requestManager)
     }
 
     let defaultAccount = null
@@ -113,15 +124,15 @@ const Klay = function Klay(...args) {
     this.decodeTransaction = decodeFromRawTransaction
 
     // add net
-    this.net = new Net(this.currentProvider)
+    this.net = new Net(this)
     // add chain detection
     this.net.getNetworkType = getNetworkType.bind(this)
 
     // add accounts
-    this.accounts = new Accounts(this.currentProvider)
+    this.accounts = new Accounts(this)
 
     // add personal
-    this.personal = new Personal(this.currentProvider)
+    this.personal = new Personal(this)
     this.personal.defaultAccount = this.defaultAccount
 
     // create a proxy Contract type for this instance, as a Contract's provider
@@ -129,8 +140,20 @@ const Klay = function Klay(...args) {
     // not create this proxy type, changing the provider in one instance of
     // caver-klay would subsequently change the provider for _all_ contract
     // instances!
+    const self = this
     const Contract = function Contract() {
         BaseContract.apply(this, arguments)
+
+        // when Klay.setProvider is called, call packageInit
+        // on all contract instances instantiated via this Klay
+        // instances. This will update the currentProvider for
+        // the contract instances
+        const _this = this // eslint-disable-line no-shadow
+        const setProvider = self.setProvider // eslint-disable-line no-shadow
+        self.setProvider = function() {
+            setProvider.apply(self, arguments)
+            core.packageInit(_this, [self])
+        }
     }
 
     Contract.setProvider = function() {
@@ -146,12 +169,16 @@ const Klay = function Klay(...args) {
     this.Contract = Contract
     this.Contract.defaultAccount = this.defaultAccount
     this.Contract.defaultBlock = this.defaultBlock
-    this.Contract.setProvider(this.currentProvider, this.accounts)
+    this.Contract._requestManager = this._requestManager
+    this.Contract._klayAccounts = this.accounts
+    this.Contract.currentProvider = this._requestManager.provider
 
     this.KIP7 = KIP7
     this.KIP7.defaultAccount = this.defaultAccount
     this.KIP7.defaultBlock = this.defaultBlock
-    this.KIP7.setProvider(this.currentProvider, this.accounts)
+    this.KIP7._requestManager = this._requestManager
+    this.KIP7._klayAccounts = this.accounts
+    this.KIP7.currentProvider = this._requestManager.provider
 
     // add IBAN
     this.Iban = utils.Iban
@@ -240,7 +267,7 @@ const Klay = function Klay(...args) {
 
     methods.forEach(function(method) {
         method.attachToObject(_this)
-        // second param means is klay.accounts (necessary for wallet signing)
+        // second param is the klay.accounts module (necessary for signing transactions locally)
         method.setRequestManager(_this._requestManager, _this.accounts)
         method.defaultBlock = _this.defaultBlock
         method.defaultAccount = _this.defaultAccount
