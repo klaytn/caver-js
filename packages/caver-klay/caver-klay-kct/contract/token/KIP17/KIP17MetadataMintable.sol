@@ -21,14 +21,14 @@ contract KIP17MetadataMintable is KIP13, KIP17, KIP17Metadata, MinterRole {
      *
      *     => 0x06fdde03 ^ 0x95d89b41 ^ 0xc87b56dd ^ 0x50bb4e7f ^ 0xaa271e1a ^ 0x983b2d56 ^ 0x98650275 == 0xa19c6cd9
      */
-    bytes4 private constant _INTERFACE_ID_KIP17_MINTABLE = 0xa19c6cd9;
+    bytes4 private constant _INTERFACE_ID_KIP17_METADATA_MINTABLE = 0xa19c6cd9;
 
     /**
      * @dev Constructor function.
      */
     constructor () public {
         // register the supported interface to conform to KIP17Mintable via KIP13
-        _registerInterface(_INTERFACE_ID_KIP17_MINTABLE);
+        _registerInterface(_INTERFACE_ID_KIP17_METADATA_MINTABLE);
     }
 
     /**
