@@ -5,7 +5,7 @@ pragma solidity ^0.5.0;
  * [KIP](https://klaytn.github.io/kips/KIPs/kip-interface_query_standard).
  *
  * Implementers can declare support of contract interfaces, which can then be
- * queried by others (`KIP13Checker`).
+ * queried by others.
  *
  * For an implementation, see `KIP13`.
  */
