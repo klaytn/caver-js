@@ -31,6 +31,7 @@ contract IKIP17 is IKIP13 {
      * NFT by either `approve` or `setApproveForAll`.
      */
     function safeTransferFrom(address from, address to, uint256 tokenId) public;
+
     /**
      * @dev Transfers a specific NFT (`tokenId`) from one account (`from`) to
      * another (`to`).
