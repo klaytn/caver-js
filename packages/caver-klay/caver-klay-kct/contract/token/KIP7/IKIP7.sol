@@ -4,7 +4,7 @@ import "../../introspection/IKIP13.sol";
 
 /**
  * @dev Interface of the KIP7 standard as defined in the KIP. Does not include
- * the optional functions; to access them see `KIP7Detailed`.
+ * the optional functions; to access them see `KIP7Metadata`.
  */
 contract IKIP7 is IKIP13 {
     /**
