@@ -2,6 +2,7 @@ pragma solidity ^0.5.0;
 
 import "./IKIP7.sol";
 import "../../math/SafeMath.sol";
+import "../../introspection/KIP13.sol";
 
 /**
  * @dev Implementation of the `IKIP7` interface.
@@ -19,7 +20,7 @@ import "../../math/SafeMath.sol";
  * by listening to said events. Other implementations of the KIP may not emit
  * these events, as it isn't required by the specification.
  */
-contract KIP7 is IKIP7 {
+contract KIP7 is KIP13, IKIP7 {
     using SafeMath for uint256;
 
     mapping (address => uint256) private _balances;
@@ -27,6 +28,23 @@ contract KIP7 is IKIP7 {
     mapping (address => mapping (address => uint256)) private _allowances;
 
     uint256 private _totalSupply;
+
+    /*
+     *     bytes4(keccak256('totalSupply()')) == 0x18160ddd
+     *     bytes4(keccak256('balanceOf(address)')) == 0x70a08231
+     *     bytes4(keccak256('transfer(address,uint256)')) == 0xa9059cbb
+     *     bytes4(keccak256('allowance(address,address)')) == 0xdd62ed3e
+     *     bytes4(keccak256('approve(address,uint256)')) == 0x095ea7b3
+     *     bytes4(keccak256('transferFrom(address,address,uint256)')) == 0x23b872dd
+     *
+     *     => 0x18160ddd ^ 0x70a08231 ^ 0xa9059cbb ^ 0xdd62ed3e ^ 0x095ea7b3 ^ 0x23b872dd == 0x36372b07
+     */
+    bytes4 private constant _INTERFACE_ID_KIP7 = 0x36372b07;
+
+    constructor () public {
+        // register the supported interfaces to conform to KIP17 via KIP13
+        _registerInterface(_INTERFACE_ID_KIP7);
+    }
 
     /**
      * @dev See `IKIP7.totalSupply`.

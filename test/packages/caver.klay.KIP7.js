@@ -1235,4 +1235,24 @@ describe('caver.klay.KIP7', () => {
             expect(await token.isPauser(testAccount.address)).to.be.false
         }).timeout(200000)
     })
+
+    context('KIP7.supportsInterface', () => {
+        it('CAVERJS-UNIT-KCT-139: should return true if interfaceId is supported', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            // KIP7
+            expect(await token.supportsInterface('0x36372b07')).to.be.true
+            // KIP7Burnable
+            expect(await token.supportsInterface('0x3b5a0bf8')).to.be.true
+            // KIP7Detailed
+            expect(await token.supportsInterface('0xa219a025')).to.be.true
+            // KIP7Mintable
+            expect(await token.supportsInterface('0xeab83e20')).to.be.true
+            // KIP7Pausable
+            expect(await token.supportsInterface('0x0baef171')).to.be.true
+
+            // Unsupported interfaceId
+            expect(await token.supportsInterface('0x3a2820fe')).to.be.false
+        }).timeout(200000)
+    })
 })

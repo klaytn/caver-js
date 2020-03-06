@@ -1,10 +1,12 @@
 pragma solidity ^0.5.0;
 
+import "../../introspection/IKIP13.sol";
+
 /**
  * @dev Interface of the KIP7 standard as defined in the KIP. Does not include
- * the optional functions; to access them see `KIP7Detailed`.
+ * the optional functions; to access them see `KIP7Metadata`.
  */
-interface IKIP7 {
+contract IKIP7 is IKIP13 {
     /**
      * @dev Returns the amount of tokens in existence.
      */
