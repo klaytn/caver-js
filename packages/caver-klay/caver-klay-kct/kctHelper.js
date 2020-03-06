@@ -20,11 +20,6 @@ const _ = require('lodash')
 const BigNumber = require('bignumber.js')
 const { isBigNumber } = require('../../caver-utils')
 
-const KCT_TYPE = {
-    FUNGIBLE: 'Fungible',
-    NONFUNGIBLE: 'NonFungible',
-}
-
 async function determineSendParams(executableObj, sendParam, defaultFrom) {
     let { from, gas } = sendParam
     from = from || defaultFrom
@@ -56,26 +51,32 @@ function convertToNumberString(value) {
     return numberString
 }
 
-function validateTokenInfoForDeploy(obj, type = KCT_TYPE.FUNGIBLE) {
-    const errorFormat = 'Failed to validate token info for deploy: '
-    if (!obj.name || !_.isString(obj.name)) throw new Error(`${errorFormat}Invalid name of token`)
-    if (!obj.symbol || !_.isString(obj.symbol)) throw new Error(`${errorFormat}Invalid symbol of token`)
+const errForDeployParamValidation = 'Failed to validate token info for deploy: '
 
-    // decimals and initialSupply are only required parameters when deploying KIP-7 tokens.
-    if (type === KCT_TYPE.FUNGIBLE) {
-        if (obj.decimals === undefined || !_.isNumber(obj.decimals)) throw new Error(`${errorFormat}Invalid decimals of token`)
+function _validateCommonParam(obj) {
+    if (!obj.name || !_.isString(obj.name)) throw new Error(`${errForDeployParamValidation}Invalid name of token`)
+    if (!obj.symbol || !_.isString(obj.symbol)) throw new Error(`${errForDeployParamValidation}Invalid symbol of token`)
+}
 
-        try {
-            if (obj.initialSupply === undefined) {
-                throw new Error(`Invalid initialSupply of token: ${obj.initialSupply}`)
-            } else {
-                obj.initialSupply = convertToNumberString(obj.initialSupply)
-            }
-        } catch (e) {
-            // Catch the error here to add more details to the error message.
-            throw new Error(`${errorFormat}${e.message}`)
+function validateDeployParameterForKIP7(obj) {
+    _validateCommonParam(obj)
+
+    if (obj.decimals === undefined || !_.isNumber(obj.decimals)) throw new Error(`${errForDeployParamValidation}Invalid decimals of token`)
+
+    try {
+        if (obj.initialSupply === undefined) {
+            throw new Error(`Invalid initialSupply of token: ${obj.initialSupply}`)
+        } else {
+            obj.initialSupply = convertToNumberString(obj.initialSupply)
         }
+    } catch (e) {
+        // Catch the error here to add more details to the error message.
+        throw new Error(`${errForDeployParamValidation}${e.message}`)
     }
+}
+
+function validateDeployParameterForKIP17(obj) {
+    _validateCommonParam(obj)
 }
 
 // KIP-7 token contract source code
@@ -567,9 +568,9 @@ module.exports = {
     kip7JsonInterface,
     kip7ByteCode,
     determineSendParams,
-    validateTokenInfoForDeploy,
+    validateDeployParameterForKIP7,
+    validateDeployParameterForKIP17,
     formatParamForUint256,
     kip17JsonInterface,
     kip17ByteCode,
-    KCT_TYPE,
 }
