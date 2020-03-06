@@ -20,7 +20,13 @@ const _ = require('lodash')
 const BigNumber = require('bignumber.js')
 
 const Contract = require('../caver-klay-contract')
-const { validateTokenInfoForDeploy, determineSendParams, kip7JsonInterface, kip7ByteCode, formatParamForUint256 } = require('./kctHelper')
+const {
+    validateDeployParameterForKIP7,
+    determineSendParams,
+    kip7JsonInterface,
+    kip7ByteCode,
+    formatParamForUint256,
+} = require('./kctHelper')
 const { isAddress } = require('../../caver-utils')
 
 class KIP7 extends Contract {
@@ -39,7 +45,7 @@ class KIP7 extends Contract {
      * @return {Object}
      */
     static deploy(tokenInfo, deployer) {
-        validateTokenInfoForDeploy(tokenInfo)
+        validateDeployParameterForKIP7(tokenInfo)
 
         const { name, symbol, decimals, initialSupply } = tokenInfo
         const kip7 = new KIP7()
