@@ -21,8 +21,7 @@ const BigNumber = require('bignumber.js')
 
 const Contract = require('../caver-klay-contract/src')
 const {
-    KCT_TYPE,
-    validateTokenInfoForDeploy,
+    validateDeployParameterForKIP17,
     kip17JsonInterface,
     kip17ByteCode,
     determineSendParams,
@@ -45,7 +44,7 @@ class KIP17 extends Contract {
      * @return {Object}
      */
     static deploy(tokenInfo, deployer) {
-        validateTokenInfoForDeploy(tokenInfo, KCT_TYPE.NONFUNGIBLE)
+        validateDeployParameterForKIP17(tokenInfo)
 
         const { name, symbol } = tokenInfo
         const kip17 = new KIP17()
