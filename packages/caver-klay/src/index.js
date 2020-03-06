@@ -36,6 +36,7 @@ const Net = require('../../caver-net')
 const Personal = require('../caver-klay-personal')
 const BaseContract = require('../caver-klay-contract')
 const KIP7 = require('../caver-klay-kct/kip7')
+const KIP17 = require('../caver-klay-kct/kip17')
 const Accounts = require('../caver-klay-accounts')
 const abi = require('../caver-klay-abi')
 const getNetworkType = require('./getNetworkType.js')
@@ -179,6 +180,13 @@ const Klay = function Klay(...args) {
     this.KIP7._requestManager = this._requestManager
     this.KIP7._klayAccounts = this.accounts
     this.KIP7.currentProvider = this._requestManager.provider
+
+    this.KIP17 = KIP17
+    this.KIP17.defaultAccount = this.defaultAccount
+    this.KIP17.defaultBlock = this.defaultBlock
+    this.KIP17._requestManager = this._requestManager
+    this.KIP17._klayAccounts = this.accounts
+    this.KIP17.currentProvider = this._requestManager.provider
 
     // add IBAN
     this.Iban = utils.Iban
