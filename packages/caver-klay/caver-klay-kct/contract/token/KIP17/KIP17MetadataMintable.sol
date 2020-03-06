@@ -11,17 +11,14 @@ import "../../introspection/KIP13.sol";
  */
 contract KIP17MetadataMintable is KIP13, KIP17, KIP17Metadata, MinterRole {
     /*
-     *     bytes4(keccak256('name()')) == 0x06fdde03
-     *     bytes4(keccak256('symbol()')) == 0x95d89b41
-     *     bytes4(keccak256('tokenURI(uint256)')) == 0xc87b56dd
      *     bytes4(keccak256('mintWithTokenURI(address,uint256,string)')) == 0x50bb4e7f
      *     bytes4(keccak256('isMinter(address)')) == 0xaa271e1a
      *     bytes4(keccak256('addMinter(address)')) == 0x983b2d56
      *     bytes4(keccak256('renounceMinter()')) == 0x98650275
      *
-     *     => 0x06fdde03 ^ 0x95d89b41 ^ 0xc87b56dd ^ 0x50bb4e7f ^ 0xaa271e1a ^ 0x983b2d56 ^ 0x98650275 == 0xa19c6cd9
+     *     => 0x50bb4e7f ^ 0xaa271e1a ^ 0x983b2d56 ^ 0x98650275 == 0xfac27f46
      */
-    bytes4 private constant _INTERFACE_ID_KIP17_METADATA_MINTABLE = 0xa19c6cd9;
+    bytes4 private constant _INTERFACE_ID_KIP17_METADATA_MINTABLE = 0xfac27f46;
 
     /**
      * @dev Constructor function.
