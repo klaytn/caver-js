@@ -9,6 +9,8 @@ import "../../introspection/KIP13.sol";
  * which have permission to mint (create) new tokens as they see fit.
  *
  * At construction, the deployer of the contract is the only minter.
+ *
+ * See http://kips.klaytn.com/KIPs/kip-7-fungible_token
  */
 contract KIP7Mintable is KIP13, KIP7, MinterRole {
     /*

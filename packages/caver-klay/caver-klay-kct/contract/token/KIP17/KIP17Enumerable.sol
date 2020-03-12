@@ -6,7 +6,7 @@ import "../../introspection/KIP13.sol";
 
 /**
  * @title KIP-17 Non-Fungible Token with optional enumeration extension logic
- * @dev See https://klaytn.github.io/kips/KIPs/kip-17-non_fungible_token
+ * @dev See http://kips.klaytn.com/KIPs/kip-17-non_fungible_token
  */
 contract KIP17Enumerable is KIP13, KIP17, IKIP17Enumerable {
     // Mapping from owner to list of owned token IDs

@@ -4,6 +4,7 @@ pragma solidity ^0.5.0;
  * @title KIP17 token receiver interface
  * @dev Interface for any contract that wants to support safeTransfers
  * from KIP17 asset contracts.
+ * @dev see http://kips.klaytn.com/KIPs/kip-17-non_fungible_token
  */
 contract IKIP17Receiver {
     /**

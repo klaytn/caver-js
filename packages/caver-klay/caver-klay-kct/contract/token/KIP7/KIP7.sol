@@ -19,6 +19,8 @@ import "../../introspection/KIP13.sol";
  * This allows applications to reconstruct the allowance for all accounts just
  * by listening to said events. Other implementations of the KIP may not emit
  * these events, as it isn't required by the specification.
+ *
+ * See http://kips.klaytn.com/KIPs/kip-7-fungible_token
  */
 contract KIP7 is KIP13, IKIP7 {
     using SafeMath for uint256;

@@ -7,6 +7,8 @@ import "../../introspection/KIP13.sol";
  * @dev Extension of `KIP7` that allows token holders to destroy both their own
  * tokens and those that they have an allowance for, in a way that can be
  * recognized off-chain (via event analysis).
+ *
+ * See http://kips.klaytn.com/KIPs/kip-7-fungible_token
  */
 contract KIP7Burnable is KIP13, KIP7 {
     /*

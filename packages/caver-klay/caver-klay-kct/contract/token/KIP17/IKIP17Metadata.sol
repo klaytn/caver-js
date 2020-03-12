@@ -4,7 +4,7 @@ import "./IKIP17.sol";
 
 /**
  * @title KIP-17 Non-Fungible Token Standard, optional metadata extension
- * @dev See https://klaytn.github.io/kips/KIPs/kip-17-non_fungible_token
+ * @dev See http://kips.klaytn.com/KIPs/kip-17-non_fungible_token
  */
 contract IKIP17Metadata is IKIP17 {
     function name() external view returns (string memory);

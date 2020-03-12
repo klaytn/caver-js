@@ -7,6 +7,7 @@ import "../../introspection/KIP13.sol";
 /**
  * @title Pausable token
  * @dev KIP7 modified with pausable transfers.
+ * See http://kips.klaytn.com/KIPs/kip-7-fungible_token
  */
 contract KIP7Pausable is KIP13, KIP7, Pausable {
     /*
