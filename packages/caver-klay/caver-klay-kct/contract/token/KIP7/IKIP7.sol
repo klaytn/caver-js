@@ -5,6 +5,7 @@ import "../../introspection/IKIP13.sol";
 /**
  * @dev Interface of the KIP7 standard as defined in the KIP. Does not include
  * the optional functions; to access them see `KIP7Metadata`.
+ * See http://kips.klaytn.com/KIPs/kip-7-fungible_token
  */
 contract IKIP7 is IKIP13 {
     /**

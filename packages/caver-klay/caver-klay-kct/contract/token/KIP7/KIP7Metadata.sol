@@ -5,6 +5,7 @@ import "../../introspection/KIP13.sol";
 
 /**
  * @dev Optional functions from the KIP7 standard.
+ * See http://kips.klaytn.com/KIPs/kip-7-fungible_token
  */
 contract KIP7Metadata is KIP13, IKIP7 {
     string private _name;

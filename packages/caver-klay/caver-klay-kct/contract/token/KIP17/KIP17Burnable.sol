@@ -6,6 +6,7 @@ import "../../introspection/KIP13.sol";
 /**
  * @title KIP17 Burnable Token
  * @dev KIP17 Token that can be irreversibly burned (destroyed).
+ * See http://kips.klaytn.com/KIPs/kip-17-non_fungible_token
  */
 contract KIP17Burnable is KIP13, KIP17 {
     /*

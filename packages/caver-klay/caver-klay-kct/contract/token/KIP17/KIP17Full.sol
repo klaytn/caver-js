@@ -8,7 +8,7 @@ import "./KIP17Metadata.sol";
  * @title Full KIP-17 Token
  * This implementation includes all the required and some optional functionality of the KIP-17 standard
  * Moreover, it includes approve all functionality using operator terminology
- * @dev see https://klaytn.github.io/kips/KIPs/kip-17-non_fungible_token
+ * @dev see http://kips.klaytn.com/KIPs/kip-17-non_fungible_token
  */
 contract KIP17Full is KIP17, KIP17Enumerable, KIP17Metadata {
     constructor (string memory name, string memory symbol) public KIP17Metadata(name, symbol) {
