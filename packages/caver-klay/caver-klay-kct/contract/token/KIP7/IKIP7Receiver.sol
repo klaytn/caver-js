@@ -9,7 +9,7 @@ contract IKIP7Receiver {
     /**
      * @notice Handle the receipt of KIP-7 token
      * @dev The KIP-7 smart contract calls this function on the recipient
-     *  after a `transfer`. This function MAY throw to revert and reject the
+     *  after a `safeTransfer`. This function MAY throw to revert and reject the
      *  transfer. Return of other than the magic value MUST result in the
      *  transaction being reverted.
      *  Note: the contract address is always the message sender.
