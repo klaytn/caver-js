@@ -55,7 +55,7 @@ contract KIP7 is KIP13, IKIP7 {
     bytes4 private constant _INTERFACE_ID_KIP7 = 0x65787371;
 
     constructor () public {
-        // register the supported interfaces to conform to KIP17 via KIP13
+        // register the supported interfaces to conform to KIP7 via KIP13
         _registerInterface(_INTERFACE_ID_KIP7);
     }
 
