@@ -3,6 +3,8 @@ pragma solidity ^0.5.0;
 import "./IKIP7.sol";
 import "../../math/SafeMath.sol";
 import "../../introspection/KIP13.sol";
+import "../../utils/Address.sol";
+import "./IKIP7Receiver.sol";
 
 /**
  * @dev Implementation of the `IKIP7` interface.
@@ -24,6 +26,11 @@ import "../../introspection/KIP13.sol";
  */
 contract KIP7 is KIP13, IKIP7 {
     using SafeMath for uint256;
+    using Address for address;
+
+    // Equals to `bytes4(keccak256("onKIP7Received(address,address,uint256,bytes)"))`
+    // which can be also obtained as `IKIP7Receiver(0).onKIP7Received.selector`
+    bytes4 private constant _KIP7_RECEIVED = 0x9d188c22;
 
     mapping (address => uint256) private _balances;
 
@@ -38,13 +45,17 @@ contract KIP7 is KIP13, IKIP7 {
      *     bytes4(keccak256('allowance(address,address)')) == 0xdd62ed3e
      *     bytes4(keccak256('approve(address,uint256)')) == 0x095ea7b3
      *     bytes4(keccak256('transferFrom(address,address,uint256)')) == 0x23b872dd
+     *     bytes4(keccak256("safeTransfer(address,uint256)")) == 0x423f6cef
+     *     bytes4(keccak256("safeTransfer(address,uint256,bytes)")) == 0xeb795549
+     *     bytes4(keccak256("safeTransferFrom(address,address,uint256)")) == 0x42842e0e
+     *     bytes4(keccak256("safeTransferFrom(address,address,uint256,bytes)")) == 0xb88d4fde
      *
-     *     => 0x18160ddd ^ 0x70a08231 ^ 0xa9059cbb ^ 0xdd62ed3e ^ 0x095ea7b3 ^ 0x23b872dd == 0x36372b07
+     *     => 0x18160ddd ^ 0x70a08231 ^ 0xa9059cbb ^ 0xdd62ed3e ^ 0x095ea7b3 ^ 0x23b872dd ^ 0x423f6cef ^ 0xeb795549 ^ 0x42842e0e ^ 0xb88d4fde == 0x65787371
      */
-    bytes4 private constant _INTERFACE_ID_KIP7 = 0x36372b07;
+    bytes4 private constant _INTERFACE_ID_KIP7 = 0x65787371;
 
     constructor () public {
-        // register the supported interfaces to conform to KIP17 via KIP13
+        // register the supported interfaces to conform to KIP7 via KIP13
         _registerInterface(_INTERFACE_ID_KIP7);
     }
 
@@ -110,6 +121,38 @@ contract KIP7 is KIP13, IKIP7 {
         _transfer(sender, recipient, amount);
         _approve(sender, msg.sender, _allowances[sender][msg.sender].sub(amount));
         return true;
+    }
+
+    /**
+    * @dev  Moves `amount` tokens from the caller's account to `recipient`.
+    */
+    function safeTransfer(address recipient, uint256 amount) public {
+        safeTransfer(recipient, amount, "");
+    }
+
+    /**
+    * @dev Moves `amount` tokens from the caller's account to `recipient`.
+    */
+    function safeTransfer(address recipient, uint256 amount, bytes memory data) public {
+        transfer(recipient, amount);
+        require(_checkOnKIP7Received(msg.sender, recipient, amount, data), "KIP7: transfer to non KIP7Receiver implementer");
+    }
+
+    /**
+    * @dev Moves `amount` tokens from `sender` to `recipient` using the allowance mechanism.
+    * `amount` is then deducted from the caller's allowance.
+    */
+    function safeTransferFrom(address sender, address recipient, uint256 amount) public {
+        safeTransferFrom(sender, recipient, amount, "");
+    }
+
+    /**
+    * @dev Moves `amount` tokens from `sender` to `recipient` using the allowance mechanism.
+    * `amount` is then deducted from the caller's allowance.
+    */
+    function safeTransferFrom(address sender, address recipient, uint256 amount, bytes memory data) public {
+        transferFrom(sender, recipient, amount);
+        require(_checkOnKIP7Received(sender, recipient, amount, data), "KIP7: transfer to non KIP7Receiver implementer");
     }
 
     /**
@@ -201,5 +244,20 @@ contract KIP7 is KIP13, IKIP7 {
     function _burnFrom(address account, uint256 amount) internal {
         _burn(account, amount);
         _approve(account, msg.sender, _allowances[account][msg.sender].sub(amount));
+    }
+
+    /**
+     * @dev Internal function to invoke `onKIP7Received` on a target address.
+     * The call is not executed if the target address is not a contract.
+     */
+    function _checkOnKIP7Received(address sender, address recipient, uint256 amount, bytes memory _data)
+        internal returns (bool)
+    {
+        if (!recipient.isContract()) {
+            return true;
+        }
+
+        bytes4 retval = IKIP7Receiver(recipient).onKIP7Received(msg.sender, sender, amount, _data);
+        return (retval == _KIP7_RECEIVED);
     }
 }
