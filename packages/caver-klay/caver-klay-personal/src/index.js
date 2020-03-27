@@ -38,7 +38,7 @@ const Personal = function Personal(...args) {
     // sets _requestmanager
     core.packageInit(this, args)
 
-    this.net = new Net(this.currentProvider)
+    this.net = new Net(this)
 
     let defaultAccount = null
     let defaultBlock = 'latest'

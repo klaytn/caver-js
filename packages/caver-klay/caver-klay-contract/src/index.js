@@ -270,7 +270,6 @@ const Contract = function Contract(jsonInterface, address, options) {
 }
 
 Contract.setProvider = function(provider, accounts) {
-    // Contract.currentProvider = provider;
     core.packageInit(this, [provider])
 
     this._klayAccounts = accounts
@@ -302,8 +301,8 @@ Contract.prototype._getCallback = function getCallback(args) {
  * @return {Object} the contract instance
  */
 /**
- * this._checkListener('newListener', subOptions.event.name, subOptions.callback);
- * this._checkListener('removeListener', subOptions.event.name, subOptions.callback);
+ * this._checkListener('newListener', subOptions.event.name);
+ * this._checkListener('removeListener', subOptions.event.name);
  */
 Contract.prototype._checkListener = function(type, event) {
     if (event === type) {
@@ -648,8 +647,8 @@ Contract.prototype._generateEventOptions = function() {
  * @method clone
  * @return {Object} the event subscription
  */
-Contract.prototype.clone = function() {
-    return new this.constructor(this.options.jsonInterface, this.options.address, this.options)
+Contract.prototype.clone = function(contractAddress = this.options.address) {
+    return new this.constructor(this.options.jsonInterface, contractAddress, this.options)
 }
 
 /**
@@ -728,8 +727,8 @@ Contract.prototype._on = function() {
     const subOptions = this._generateEventOptions.apply(this, arguments)
 
     // prevent the event "newListener" and "removeListener" from being overwritten
-    this._checkListener('newListener', subOptions.event.name, subOptions.callback)
-    this._checkListener('removeListener', subOptions.event.name, subOptions.callback)
+    this._checkListener('newListener', subOptions.event.name)
+    this._checkListener('removeListener', subOptions.event.name)
 
     // TODO check if listener already exists? and reuse subscription if options are the same.
 
@@ -1043,8 +1042,7 @@ Contract.prototype._executeMethod = function _executeMethod() {
                     return receipt
                 },
                 contractDeployFormatter(receipt) {
-                    const newContract = _this._parent.clone()
-                    newContract.options.address = receipt.contractAddress
+                    const newContract = _this._parent.clone(receipt.contractAddress)
                     return newContract
                 },
             }
