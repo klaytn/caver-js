@@ -88,9 +88,9 @@ this methods introduces
 {% endapi-method-spec %}
 {% endapi-method %}
 
-1. Read this [contributing document](contributing.md).
-2. Sign [Contributor Licensing Agreement \(CLA\)](contributing.md#contributor-license-agreement-cla).
-3. Submit an issue with proper [labeling](contributing.md#usage-of-labels).
+1. Read this [contributing document](./).
+2. Sign [Contributor Licensing Agreement \(CLA\)](./#contributor-license-agreement-cla).
+3. Submit an issue with proper [labeling](./#usage-of-labels).
 4. Please wait until the label changes to `contribution welcome` - otherwise, it is not ready to be worked on.
 5. After the label changed to `contribution welcome`, you can start working on the implementation. To avoid any duplicate efforts, it is recommended to update the issue so that other developers see someone working on the issue.
 6. Before making a PR, please make sure you fully tested the code. It is highly recommended to provide the test code as well. After submitting the PR, wait for code review and approval. The reviewer may ask you for additional commits or changes.
@@ -101,9 +101,9 @@ this methods introduces
 
 There are various ways to contribute and participate. Please read the guidelines below regarding the process of each type of contribution.
 
-* [Issues and Bugs](contributing.md#issues-and-bugs)
-* [Feature Requests](contributing.md#feature-requests)
-* [Code Contribution](contributing.md#code-contribution)
+* [Issues and Bugs](./#issues-and-bugs)
+* [Feature Requests](./#feature-requests)
+* [Code Contribution](./#code-contribution)
 
 ### Issues and Bugs
 
@@ -120,11 +120,11 @@ When you report a bug, please make sure that your report has the following infor
 * A clear and complete description of the issue.
 * Code and/or screen captures are highly recommended.
 
-After confirming your report meets the above criteria, [submit the issue](https://github.com/klaytn/caver-js/issues). Please use [labels](contributing.md#usage-of-labels) to categorize your issue.
+After confirming your report meets the above criteria, [submit the issue](https://github.com/klaytn/caver-js/issues). Please use [labels](./#usage-of-labels) to categorize your issue.
 
 ### Feature Requests
 
-You can also use the [issue tracker](https://github.com/klaytn/caver-js/issues) to request a new feature or enhancement. Note that any code contribution without an issue link will not be accepted. Please submit an issue explaining your proposal first so that Klaytn community can fully understand and discuss the idea. Please use [labels](contributing.md#usage-of-labels) for your feature request as well.
+You can also use the [issue tracker](https://github.com/klaytn/caver-js/issues) to request a new feature or enhancement. Note that any code contribution without an issue link will not be accepted. Please submit an issue explaining your proposal first so that Klaytn community can fully understand and discuss the idea. Please use [labels](./#usage-of-labels) for your feature request as well.
 
 #### Usage of Labels
 

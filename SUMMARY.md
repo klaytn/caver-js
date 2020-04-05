@@ -15,5 +15,6 @@
     * [--questions-and-others](.github/issue_template/questions-and-others.md)
     * [---bug-report](.github/issue_template/bug-report.md)
   * [PULL\_REQUEST\_TEMPLATE](.github/pull_request_template.md)
-* [Contributing Guidelines](contributing.md)
+* [Contributing Guidelines](contributing/README.md)
+  * [Untitled](contributing/untitled.md)
 
