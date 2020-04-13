@@ -34,7 +34,7 @@ const tokenInfo = {
     name: 'Jasmine',
     symbol: 'JAS',
     decimals: 18,
-    initialSupply: new BigNumber(100000),
+    initialSupply: new BigNumber(1000000000000000000),
 }
 
 const prepareTestSetting = () => {
@@ -479,6 +479,449 @@ describe('caver.klay.KIP7', () => {
 
             const customGasLimit = '0x186a0'
             const transfered = await token.transferFrom(sender.address, receiver.address, allowanceAmount, { gas: customGasLimit })
+            expect(transfered.from).to.equals(testAccount.address.toLowerCase())
+            expect(transfered.gas).to.equals(customGasLimit)
+            expect(transfered.status).to.be.true
+            expect(transfered.events).not.to.be.undefined
+            expect(transfered.events.Transfer).not.to.be.undefined
+            expect(transfered.events.Transfer.address).to.equals(kip7Address)
+
+            const afterBalance = await token.balanceOf(receiver.address)
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.equals('0')
+
+            expect(afterBalance.minus(originalBalance).eq(allowanceAmount)).to.be.true
+        }).timeout(200000)
+    })
+
+    context('KIP7.safeTransfer', () => {
+        it('CAVERJS-UNIT-KCT-144: should send token via safeTransfer without data and trigger Transfer event without sendParams', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const originalBalance = await token.balanceOf(receiver.address)
+
+            // set deafult from address in kip7 instance
+            token.options.from = sender.address
+
+            const transferAmount = new BigNumber(10)
+            const transfered = await token.safeTransfer(receiver.address, new BigNumber(transferAmount))
+            expect(transfered.from).to.equals(sender.address.toLowerCase())
+            expect(transfered.status).to.be.true
+            expect(transfered.events).not.to.be.undefined
+            expect(transfered.events.Transfer).not.to.be.undefined
+            expect(transfered.events.Transfer.address).to.equals(kip7Address)
+
+            const afterBalance = await token.balanceOf(receiver.address)
+
+            expect(afterBalance.minus(originalBalance).eq(transferAmount)).to.be.true
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-145: should send token via safeTransfer without data and trigger Transfer event with sendParams(from)', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const originalBalance = await token.balanceOf(receiver.address)
+
+            const transferAmount = new BigNumber(10)
+            const transfered = await token.safeTransfer(receiver.address, transferAmount.toString(10), {
+                from: sender.address,
+            })
+            expect(transfered.from).to.equals(sender.address.toLowerCase())
+            expect(transfered.status).to.be.true
+            expect(transfered.events).not.to.be.undefined
+            expect(transfered.events.Transfer).not.to.be.undefined
+            expect(transfered.events.Transfer.address).to.equals(kip7Address)
+
+            const afterBalance = await token.balanceOf(receiver.address)
+
+            expect(afterBalance.minus(originalBalance).eq(transferAmount)).to.be.true
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-146: should send token via safeTransfer without data and trigger Transfer event with sendParams(from, gas)', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const originalBalance = await token.balanceOf(receiver.address)
+
+            const customGasLimit = '0x249f0'
+            const transferAmount = new BigNumber(10)
+            const transfered = await token.safeTransfer(receiver.address, transferAmount, {
+                from: sender.address,
+                gas: customGasLimit,
+            })
+            expect(transfered.gas).to.equals(customGasLimit)
+            expect(transfered.status).to.be.true
+            expect(transfered.events).not.to.be.undefined
+            expect(transfered.events.Transfer).not.to.be.undefined
+            expect(transfered.events.Transfer.address).to.equals(kip7Address)
+
+            const afterBalance = await token.balanceOf(receiver.address)
+
+            expect(afterBalance.minus(originalBalance).eq(transferAmount)).to.be.true
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-147: should send token via safeTransfer without data and trigger Transfer event with sendParams(gas)', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const originalBalance = await token.balanceOf(receiver.address)
+
+            // set deafult from address in kip7 instance
+            token.options.from = sender.address
+
+            const customGasLimit = '0x249f0'
+            const transferAmount = new BigNumber(10)
+            const transfered = await token.safeTransfer(receiver.address, transferAmount, { gas: customGasLimit })
+            expect(transfered.from).to.equals(sender.address.toLowerCase())
+            expect(transfered.gas).to.equals(customGasLimit)
+            expect(transfered.status).to.be.true
+            expect(transfered.events).not.to.be.undefined
+            expect(transfered.events.Transfer).not.to.be.undefined
+            expect(transfered.events.Transfer.address).to.equals(kip7Address)
+
+            const afterBalance = await token.balanceOf(receiver.address)
+
+            expect(afterBalance.minus(originalBalance).eq(transferAmount)).to.be.true
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-148: should send token via safeTransfer with data and trigger Transfer event without sendParams', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const originalBalance = await token.balanceOf(receiver.address)
+
+            // set deafult from address in kip7 instance
+            token.options.from = sender.address
+
+            const data = Buffer.from('buffered data')
+            const transferAmount = new BigNumber(10)
+            const transfered = await token.safeTransfer(receiver.address, transferAmount, data)
+            const encodedParamters = caver.klay.abi.encodeParameters(
+                ['address', 'uint256', 'bytes'],
+                [receiver.address, transferAmount.toString(10), data]
+            )
+            expect(transfered.input.slice(10)).to.equals(encodedParamters.slice(2))
+            expect(transfered.from).to.equals(sender.address.toLowerCase())
+            expect(transfered.status).to.be.true
+            expect(transfered.events).not.to.be.undefined
+            expect(transfered.events.Transfer).not.to.be.undefined
+            expect(transfered.events.Transfer.address).to.equals(kip7Address)
+
+            const afterBalance = await token.balanceOf(receiver.address)
+
+            expect(afterBalance.minus(originalBalance).eq(transferAmount)).to.be.true
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-149: should send token via safeTransfer with data and trigger Transfer event with sendParams(from)', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const originalBalance = await token.balanceOf(receiver.address)
+
+            // set deafult from address in kip7 instance
+            token.options.from = sender.address
+
+            const data = Buffer.from('buffered data')
+            const transferAmount = new BigNumber(10)
+            const transfered = await token.safeTransfer(receiver.address, transferAmount.toString(10), data, {
+                from: sender.address,
+            })
+            const encodedParamters = caver.klay.abi.encodeParameters(
+                ['address', 'uint256', 'bytes'],
+                [receiver.address, transferAmount.toString(10), data]
+            )
+            expect(transfered.input.slice(10)).to.equals(encodedParamters.slice(2))
+            expect(transfered.from).to.equals(sender.address.toLowerCase())
+            expect(transfered.status).to.be.true
+            expect(transfered.events).not.to.be.undefined
+            expect(transfered.events.Transfer).not.to.be.undefined
+            expect(transfered.events.Transfer.address).to.equals(kip7Address)
+
+            const afterBalance = await token.balanceOf(receiver.address)
+
+            expect(afterBalance.minus(originalBalance).eq(transferAmount)).to.be.true
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-150: should send token via safeTransfer with data and trigger Transfer event with sendParams(from, gas)', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const originalBalance = await token.balanceOf(receiver.address)
+
+            const customGasLimit = '0x30d40'
+            const data = Buffer.from('buffered data')
+            const transferAmount = new BigNumber(10)
+            const transfered = await token.safeTransfer(receiver.address, transferAmount, data, {
+                from: sender.address,
+                gas: customGasLimit,
+            })
+            const encodedParamters = caver.klay.abi.encodeParameters(
+                ['address', 'uint256', 'bytes'],
+                [receiver.address, transferAmount.toString(10), data]
+            )
+            expect(transfered.input.slice(10)).to.equals(encodedParamters.slice(2))
+            expect(transfered.gas).to.equals(customGasLimit)
+            expect(transfered.status).to.be.true
+            expect(transfered.events).not.to.be.undefined
+            expect(transfered.events.Transfer).not.to.be.undefined
+            expect(transfered.events.Transfer.address).to.equals(kip7Address)
+
+            const afterBalance = await token.balanceOf(receiver.address)
+
+            expect(afterBalance.minus(originalBalance).eq(transferAmount)).to.be.true
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-151: should send token via safeTransfer with data and trigger Transfer event with sendParams(gas)', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const originalBalance = await token.balanceOf(receiver.address)
+
+            // set deafult from address in kip7 instance
+            token.options.from = sender.address
+
+            const customGasLimit = '0x30d40'
+            const data = Buffer.from('buffered data')
+            const transferAmount = new BigNumber(10)
+            const transfered = await token.safeTransfer(receiver.address, transferAmount, data, {
+                gas: customGasLimit,
+            })
+            const encodedParamters = caver.klay.abi.encodeParameters(
+                ['address', 'uint256', 'bytes'],
+                [receiver.address, transferAmount.toString(10), data]
+            )
+            expect(transfered.input.slice(10)).to.equals(encodedParamters.slice(2))
+            expect(transfered.from).to.equals(sender.address.toLowerCase())
+            expect(transfered.gas).to.equals(customGasLimit)
+            expect(transfered.status).to.be.true
+            expect(transfered.events).not.to.be.undefined
+            expect(transfered.events.Transfer).not.to.be.undefined
+            expect(transfered.events.Transfer.address).to.equals(kip7Address)
+
+            const afterBalance = await token.balanceOf(receiver.address)
+
+            expect(afterBalance.minus(originalBalance).eq(transferAmount)).to.be.true
+        }).timeout(200000)
+    })
+
+    context('KIP7.safeTransferFrom', () => {
+        it('CAVERJS-UNIT-KCT-152: should send token via safeTransferFrom without data and trigger Transfer event without sendParams', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const originalBalance = await token.balanceOf(receiver.address)
+
+            const allowanceAmount = 10000
+            await token.approve(testAccount.address, allowanceAmount, { from: sender.address })
+            const originalAllowance = await token.allowance(sender.address, testAccount.address)
+            expect(originalAllowance.eq(allowanceAmount)).to.be.true
+
+            // set deafult from address in kip7 instance
+            token.options.from = testAccount.address
+
+            const transfered = await token.safeTransferFrom(sender.address, receiver.address, new BigNumber(allowanceAmount))
+            expect(transfered.from).to.equals(testAccount.address.toLowerCase())
+            expect(transfered.status).to.be.true
+            expect(transfered.events).not.to.be.undefined
+            expect(transfered.events.Transfer).not.to.be.undefined
+            expect(transfered.events.Transfer.address).to.equals(kip7Address)
+
+            const afterBalance = await token.balanceOf(receiver.address)
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.equals('0')
+
+            expect(afterBalance.minus(originalBalance).eq(allowanceAmount)).to.be.true
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-153: should send token via safeTransferFrom without data and trigger Transfer event with sendParams(from)', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const originalBalance = await token.balanceOf(receiver.address)
+
+            const allowanceAmount = new BigNumber(10000)
+            await token.approve(testAccount.address, allowanceAmount, { from: sender.address })
+            const originalAllowance = await token.allowance(sender.address, testAccount.address)
+            expect(originalAllowance.eq(allowanceAmount)).to.be.true
+
+            const transfered = await token.safeTransferFrom(sender.address, receiver.address, allowanceAmount.toString(10), {
+                from: testAccount.address,
+            })
+            expect(transfered.from).to.equals(testAccount.address.toLowerCase())
+            expect(transfered.status).to.be.true
+            expect(transfered.events).not.to.be.undefined
+            expect(transfered.events.Transfer).not.to.be.undefined
+            expect(transfered.events.Transfer.address).to.equals(kip7Address)
+
+            const afterBalance = await token.balanceOf(receiver.address)
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.equals('0')
+
+            expect(afterBalance.minus(originalBalance).eq(allowanceAmount)).to.be.true
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-154: should send token via safeTransferFrom without data and trigger Transfer event with sendParams(from, gas)', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const originalBalance = await token.balanceOf(receiver.address)
+
+            const allowanceAmount = 10000
+            await token.approve(testAccount.address, allowanceAmount, { from: sender.address })
+            const originalAllowance = await token.allowance(sender.address, testAccount.address)
+            expect(originalAllowance.eq(allowanceAmount)).to.be.true
+
+            const customGasLimit = '0x249f0'
+            const transfered = await token.safeTransferFrom(sender.address, receiver.address, allowanceAmount, {
+                from: testAccount.address,
+                gas: customGasLimit,
+            })
+            expect(transfered.gas).to.equals(customGasLimit)
+            expect(transfered.status).to.be.true
+            expect(transfered.events).not.to.be.undefined
+            expect(transfered.events.Transfer).not.to.be.undefined
+            expect(transfered.events.Transfer.address).to.equals(kip7Address)
+
+            const afterBalance = await token.balanceOf(receiver.address)
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.equals('0')
+
+            expect(afterBalance.minus(originalBalance).eq(allowanceAmount)).to.be.true
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-155: should send token via safeTransferFrom without data and trigger Transfer event with sendParams(gas)', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const originalBalance = await token.balanceOf(receiver.address)
+
+            const allowanceAmount = 10000
+            await token.approve(testAccount.address, allowanceAmount, { from: sender.address })
+            const originalAllowance = await token.allowance(sender.address, testAccount.address)
+            expect(originalAllowance.eq(allowanceAmount)).to.be.true
+
+            // set deafult from address in kip7 instance
+            token.options.from = testAccount.address
+
+            const customGasLimit = '0x249f0'
+            const transfered = await token.safeTransferFrom(sender.address, receiver.address, allowanceAmount, { gas: customGasLimit })
+            expect(transfered.from).to.equals(testAccount.address.toLowerCase())
+            expect(transfered.gas).to.equals(customGasLimit)
+            expect(transfered.status).to.be.true
+            expect(transfered.events).not.to.be.undefined
+            expect(transfered.events.Transfer).not.to.be.undefined
+            expect(transfered.events.Transfer.address).to.equals(kip7Address)
+
+            const afterBalance = await token.balanceOf(receiver.address)
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.equals('0')
+
+            expect(afterBalance.minus(originalBalance).eq(allowanceAmount)).to.be.true
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-156: should send token via safeTransferFrom with data and trigger Transfer event without sendParams', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const originalBalance = await token.balanceOf(receiver.address)
+
+            const allowanceAmount = 10000
+            await token.approve(testAccount.address, allowanceAmount, { from: sender.address })
+            const originalAllowance = await token.allowance(sender.address, testAccount.address)
+            expect(originalAllowance.eq(allowanceAmount)).to.be.true
+
+            // set deafult from address in kip7 instance
+            token.options.from = testAccount.address
+
+            const data = Buffer.from('buffered data')
+            const transfered = await token.safeTransferFrom(sender.address, receiver.address, new BigNumber(allowanceAmount), data)
+            const encodedParamters = caver.klay.abi.encodeParameters(
+                ['address', 'address', 'uint256', 'bytes'],
+                [sender.address, receiver.address, allowanceAmount, data]
+            )
+            expect(transfered.input.slice(10)).to.equals(encodedParamters.slice(2))
+            expect(transfered.from).to.equals(testAccount.address.toLowerCase())
+            expect(transfered.status).to.be.true
+            expect(transfered.events).not.to.be.undefined
+            expect(transfered.events.Transfer).not.to.be.undefined
+            expect(transfered.events.Transfer.address).to.equals(kip7Address)
+
+            const afterBalance = await token.balanceOf(receiver.address)
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.equals('0')
+
+            expect(afterBalance.minus(originalBalance).eq(allowanceAmount)).to.be.true
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-157: should send token via safeTransferFrom with data and trigger Transfer event with sendParams(from)', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const originalBalance = await token.balanceOf(receiver.address)
+
+            const allowanceAmount = new BigNumber(10000)
+            await token.approve(testAccount.address, allowanceAmount, { from: sender.address })
+            const originalAllowance = await token.allowance(sender.address, testAccount.address)
+            expect(originalAllowance.eq(allowanceAmount)).to.be.true
+
+            const data = Buffer.from('buffered data')
+            const transfered = await token.safeTransferFrom(sender.address, receiver.address, allowanceAmount.toString(10), data, {
+                from: testAccount.address,
+            })
+            const encodedParamters = caver.klay.abi.encodeParameters(
+                ['address', 'address', 'uint256', 'bytes'],
+                [sender.address, receiver.address, allowanceAmount.toString(10), data]
+            )
+            expect(transfered.input.slice(10)).to.equals(encodedParamters.slice(2))
+            expect(transfered.from).to.equals(testAccount.address.toLowerCase())
+            expect(transfered.status).to.be.true
+            expect(transfered.events).not.to.be.undefined
+            expect(transfered.events.Transfer).not.to.be.undefined
+            expect(transfered.events.Transfer.address).to.equals(kip7Address)
+
+            const afterBalance = await token.balanceOf(receiver.address)
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.equals('0')
+
+            expect(afterBalance.minus(originalBalance).eq(allowanceAmount)).to.be.true
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-158: should send token via safeTransferFrom with data and trigger Transfer event with sendParams(from, gas)', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const originalBalance = await token.balanceOf(receiver.address)
+
+            const allowanceAmount = 10000
+            await token.approve(testAccount.address, allowanceAmount, { from: sender.address })
+            const originalAllowance = await token.allowance(sender.address, testAccount.address)
+            expect(originalAllowance.eq(allowanceAmount)).to.be.true
+
+            const customGasLimit = '0x30d40'
+            const data = Buffer.from('buffered data')
+            const transfered = await token.safeTransferFrom(sender.address, receiver.address, allowanceAmount, data, {
+                from: testAccount.address,
+                gas: customGasLimit,
+            })
+            const encodedParamters = caver.klay.abi.encodeParameters(
+                ['address', 'address', 'uint256', 'bytes'],
+                [sender.address, receiver.address, allowanceAmount, data]
+            )
+            expect(transfered.input.slice(10)).to.equals(encodedParamters.slice(2))
+            expect(transfered.gas).to.equals(customGasLimit)
+            expect(transfered.status).to.be.true
+            expect(transfered.events).not.to.be.undefined
+            expect(transfered.events.Transfer).not.to.be.undefined
+            expect(transfered.events.Transfer.address).to.equals(kip7Address)
+
+            const afterBalance = await token.balanceOf(receiver.address)
+            expect((await token.allowance(sender.address, testAccount.address)).toString()).to.equals('0')
+
+            expect(afterBalance.minus(originalBalance).eq(allowanceAmount)).to.be.true
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-159: should send token via safeTransferFrom with data and trigger Transfer event with sendParams(gas)', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            const originalBalance = await token.balanceOf(receiver.address)
+
+            const allowanceAmount = 10000
+            await token.approve(testAccount.address, allowanceAmount, { from: sender.address })
+            const originalAllowance = await token.allowance(sender.address, testAccount.address)
+            expect(originalAllowance.eq(allowanceAmount)).to.be.true
+
+            // set deafult from address in kip7 instance
+            token.options.from = testAccount.address
+
+            const customGasLimit = '0x30d40'
+            const data = Buffer.from('buffered data')
+            const transfered = await token.safeTransferFrom(sender.address, receiver.address, allowanceAmount, data, {
+                gas: customGasLimit,
+            })
+            const encodedParamters = caver.klay.abi.encodeParameters(
+                ['address', 'address', 'uint256', 'bytes'],
+                [sender.address, receiver.address, allowanceAmount, data]
+            )
+            expect(transfered.input.slice(10)).to.equals(encodedParamters.slice(2))
             expect(transfered.from).to.equals(testAccount.address.toLowerCase())
             expect(transfered.gas).to.equals(customGasLimit)
             expect(transfered.status).to.be.true
@@ -1233,6 +1676,26 @@ describe('caver.klay.KIP7', () => {
             expect(pauserRemoved.events.PauserRemoved.address).to.equals(kip7Address)
 
             expect(await token.isPauser(testAccount.address)).to.be.false
+        }).timeout(200000)
+    })
+
+    context('KIP7.supportsInterface', () => {
+        it('CAVERJS-UNIT-KCT-139: should return true if interfaceId is supported', async () => {
+            const token = new caver.klay.KIP7(kip7Address)
+
+            // KIP7
+            expect(await token.supportsInterface('0x65787371')).to.be.true
+            // KIP7Burnable
+            expect(await token.supportsInterface('0x3b5a0bf8')).to.be.true
+            // KIP7Detailed
+            expect(await token.supportsInterface('0xa219a025')).to.be.true
+            // KIP7Mintable
+            expect(await token.supportsInterface('0xeab83e20')).to.be.true
+            // KIP7Pausable
+            expect(await token.supportsInterface('0x4d5507ff')).to.be.true
+
+            // Unsupported interfaceId
+            expect(await token.supportsInterface('0x3a2820fe')).to.be.false
         }).timeout(200000)
     })
 })

@@ -20,8 +20,14 @@ const _ = require('lodash')
 const BigNumber = require('bignumber.js')
 
 const Contract = require('../caver-klay-contract')
-const { validateTokenInfoForDeploy, determineSendParams, kip7JsonInterface, kip7ByteCode, formatParamForUint256 } = require('./kctHelper')
-const { isAddress } = require('../../caver-utils')
+const {
+    validateDeployParameterForKIP7,
+    determineSendParams,
+    kip7JsonInterface,
+    kip7ByteCode,
+    formatParamForUint256,
+} = require('./kctHelper')
+const { isAddress, toBuffer, isHexStrict, toHex } = require('../../caver-utils')
 
 class KIP7 extends Contract {
     /**
@@ -39,7 +45,7 @@ class KIP7 extends Contract {
      * @return {Object}
      */
     static deploy(tokenInfo, deployer) {
-        validateTokenInfoForDeploy(tokenInfo)
+        validateDeployParameterForKIP7(tokenInfo)
 
         const { name, symbol, decimals, initialSupply } = tokenInfo
         const kip7 = new KIP7()
@@ -49,7 +55,7 @@ class KIP7 extends Contract {
                 data: kip7ByteCode,
                 arguments: [name, symbol, decimals, initialSupply],
             })
-            .send({ from: deployer, gas: 3500000, value: 0 })
+            .send({ from: deployer, gas: 4000000, value: 0 })
     }
 
     constructor(tokenAddress, abi = kip7JsonInterface) {
@@ -74,6 +80,17 @@ class KIP7 extends Contract {
      */
     clone(tokenAddress = this.options.address) {
         return new this.constructor(tokenAddress, this.options.jsonInterface)
+    }
+
+    /**
+     * supportsInterface checks whether interface is supported or not.
+     *
+     * @method supportsInterface
+     * @return {Boolean}
+     */
+    async supportsInterface(interfaceId) {
+        const supported = await this.methods.supportsInterface(interfaceId).call()
+        return supported
     }
 
     /**
@@ -228,6 +245,75 @@ class KIP7 extends Contract {
      */
     async transferFrom(sender, recipient, amount, sendParam = {}) {
         const executableObj = this.methods.transferFrom(sender, recipient, formatParamForUint256(amount))
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
+    }
+
+    /**
+     * safeTransfer safely transfers tokens to another address.
+     *
+     * @method safeTransfer
+     * @param {String} recipient The address of the account to receive the token.
+     * @param {BigNumber|String|Number} amount The amount of tokens you want to transfer.
+     * @param {Buffer|String|Number} data The optional data to send along with the call.
+     * @param {Object} sendParam An object with defined parameters for sending a transaction.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-7 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-7 abi.
+     */
+    async safeTransfer(recipient, amount, data, sendParam = {}) {
+        if (data && _.isObject(data)) {
+            if (data.gas !== undefined || data.from !== undefined) {
+                if (Object.keys(sendParam).length > 0) throw new Error(`Invalid parameters`)
+                sendParam = data
+                data = undefined
+            }
+        }
+
+        if (data && !_.isBuffer(data)) {
+            if (_.isString(data) && !isHexStrict(data)) data = toHex(data)
+            data = toBuffer(data)
+        }
+
+        const executableObj = data
+            ? this.methods.safeTransfer(recipient, formatParamForUint256(amount), data)
+            : this.methods.safeTransfer(recipient, formatParamForUint256(amount))
+
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
+    }
+
+    /**
+     * safeTransferFrom safely transfers tokens to another address.
+     *
+     * @method safeTransferFrom
+     * @param {String} sender The address of the account that owns the token to be sent with allowance mechanism.
+     * @param {String} recipient The address of the account to receive the token.
+     * @param {BigNumber|String|Number} amount The amount of tokens you want to transfer.
+     * @param {Buffer|String|Number} data The optional data to send along with the call.
+     * @param {Object} sendParam An object with defined parameters for sending a transaction.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-7 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-7 abi.
+     */
+    async safeTransferFrom(sender, recipient, amount, data, sendParam = {}) {
+        if (data && _.isObject(data)) {
+            if (data.gas !== undefined || data.from !== undefined) {
+                if (Object.keys(sendParam).length > 0) throw new Error(`Invalid parameters`)
+                sendParam = data
+                data = undefined
+            }
+        }
+
+        if (data && !_.isBuffer(data)) {
+            if (_.isString(data) && !isHexStrict(data)) data = toHex(data)
+            data = toBuffer(data)
+        }
+
+        const executableObj = data
+            ? this.methods.safeTransferFrom(sender, recipient, formatParamForUint256(amount), data)
+            : this.methods.safeTransferFrom(sender, recipient, formatParamForUint256(amount))
+
         sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
 
         return executableObj.send(sendParam)
