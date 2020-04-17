@@ -38,7 +38,7 @@ const utils = require('../../../caver-utils')
 const Subscription = require('../../../caver-core-subscriptions').subscription
 const { formatters } = require('../../../caver-core-helpers')
 const { errors } = require('../../../caver-core-helpers')
-const abi = require('../../caver-klay-abi')
+const abi = require('../../../caver-abi')
 
 /**
  * Should be called to create new contract instance

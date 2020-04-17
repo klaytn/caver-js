@@ -38,7 +38,7 @@ const BaseContract = require('../caver-klay-contract')
 const KIP7 = require('../caver-klay-kct/kip7')
 const KIP17 = require('../caver-klay-kct/kip17')
 const Accounts = require('../caver-klay-accounts')
-const abi = require('../caver-klay-abi')
+const abi = require('../../caver-abi')
 const getNetworkType = require('./getNetworkType.js')
 
 const rpcCalls = require('../../caver-rtm')
