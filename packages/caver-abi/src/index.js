@@ -27,7 +27,7 @@
 
 const _ = require('lodash')
 const EthersAbi = require('ethers/utils/abi-coder').AbiCoder
-const utils = require('../../../caver-utils')
+const utils = require('../../caver-utils')
 
 const ethersAbiCoder = new EthersAbi(function(type, value) {
     if (type.match(/^u?int/) && !_.isArray(value) && (!_.isObject(value) || value.constructor.name !== 'BN')) {
