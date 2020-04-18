@@ -54,7 +54,7 @@ class AccountKeyDecoder {
             return AccountKeyRoleBased.decode(rlpEncodedKey)
         }
 
-        throw new Error(`Inavlid RLP-encoded account key string: ${rlpEncodedKey}`)
+        throw new Error(`Invalid RLP-encoded account key string: ${rlpEncodedKey}`)
     }
 }
 

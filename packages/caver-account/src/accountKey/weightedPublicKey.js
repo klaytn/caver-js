@@ -26,7 +26,7 @@ const utils = require('../../../caver-utils')
 class WeightedPublicKey {
     /**
      * Create an instance of WeightedPublicKey.
-     * @param {number} weight - The weight of key.
+     * @param {number} weight - The weight of the key.
      * @param {string} publicKey - The public key string.
      */
     constructor(weight, publicKey) {
@@ -62,8 +62,8 @@ class WeightedPublicKey {
      * @return {string}
      */
     encodeToBytes() {
-        if (this.weight === undefined) throw new Error('weight should be specified for multisig account')
-        if (this.publicKey === undefined) throw new Error('publicKey should be specified for multisig account')
+        if (this.weight === undefined) throw new Error('weight should be specified for a multisig account')
+        if (this.publicKey === undefined) throw new Error('publicKey should be specified for a multisig account')
 
         const compressedPublicKey = utils.compressPublicKey(this.publicKey)
         return [Bytes.fromNat(utils.numberToHex(this.weight)), compressedPublicKey]

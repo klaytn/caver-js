@@ -99,8 +99,8 @@ class AccountKeyWeightedMultiSig {
      * @return {string}
      */
     getRLPEncoding() {
-        if (this.threshold === undefined) throw new Error('threshold should be specified for multisig account')
-        if (this.weightedPublicKeys.length === 0) throw new Error('weightedPublicKeys should be specified for multisig account')
+        if (this.threshold === undefined) throw new Error('threshold should be specified for a multisig account')
+        if (this.weightedPublicKeys.length === 0) throw new Error('weightedPublicKeys should be specified for a multisig account')
 
         const encodedMultisigPublicKeys = []
         for (const weightedPublicKey of this.weightedPublicKeys) {
