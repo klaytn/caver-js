@@ -32,7 +32,7 @@ class AccountKeyFail {
     static decode(rlpEncodedKey) {
         rlpEncodedKey = utils.addHexPrefix(rlpEncodedKey)
         if (!rlpEncodedKey.startsWith(ACCOUNT_KEY_TAG.ACCOUNT_KEY_FAIL_TAG))
-            throw new Error(`Cannot decode to AccountKeyFail: ${rlpEncodedKey}`)
+            throw new Error(`Cannot decode to AccountKeyFail. The prefix must be ${ACCOUNT_KEY_TAG.ACCOUNT_KEY_FAIL_TAG}: ${rlpEncodedKey}`)
 
         return new AccountKeyFail()
     }

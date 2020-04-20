@@ -35,7 +35,9 @@ class AccountKeyWeightedMultiSig {
     static decode(rlpEncodedKey) {
         rlpEncodedKey = utils.addHexPrefix(rlpEncodedKey)
         if (!rlpEncodedKey.startsWith(ACCOUNT_KEY_TAG.ACCOUNT_KEY_WEIGHTED_MULTISIG_TAG))
-            throw new Error(`Cannot decode to AccountKeyWeightedMultiSig: ${rlpEncodedKey}`)
+            throw new Error(
+                `Cannot decode to AccountKeyWeightedMultiSig. The prefix must be ${ACCOUNT_KEY_TAG.ACCOUNT_KEY_WEIGHTED_MULTISIG_TAG}: ${rlpEncodedKey}`
+            )
 
         const [threshold, multiSigkeys] = RLP.decode(`0x${rlpEncodedKey.slice(ACCOUNT_KEY_TAG.ACCOUNT_KEY_WEIGHTED_MULTISIG_TAG.length)}`)
         const weightedPublicKeys = multiSigkeys.map(wieghtedPublicKey => {

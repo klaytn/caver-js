@@ -32,7 +32,9 @@ class AccountKeyLegacy {
     static decode(rlpEncodedKey) {
         rlpEncodedKey = utils.addHexPrefix(rlpEncodedKey)
         if (!rlpEncodedKey.startsWith(ACCOUNT_KEY_TAG.ACCOUNT_KEY_LEGACY_TAG))
-            throw new Error(`Cannot decode to AccountKeyLegacy: ${rlpEncodedKey}`)
+            throw new Error(
+                `Cannot decode to AccountKeyLegacy. The prefix must be ${ACCOUNT_KEY_TAG.ACCOUNT_KEY_LEGACY_TAG}: ${rlpEncodedKey}`
+            )
 
         return new AccountKeyLegacy()
     }

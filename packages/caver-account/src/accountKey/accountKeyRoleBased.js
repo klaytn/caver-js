@@ -51,7 +51,9 @@ class AccountKeyRoleBased {
     static decode(rlpEncodedKey) {
         rlpEncodedKey = utils.addHexPrefix(rlpEncodedKey)
         if (!rlpEncodedKey.startsWith(ACCOUNT_KEY_TAG.ACCOUNT_KEY_ROLE_BASED_TAG))
-            throw new Error(`Cannot decode to AccountKeyRoleBased: ${rlpEncodedKey}`)
+            throw new Error(
+                `Cannot decode to AccountKeyRoleBased. The prefix must be ${ACCOUNT_KEY_TAG.ACCOUNT_KEY_ROLE_BASED_TAG}: ${rlpEncodedKey}`
+            )
 
         const keys = RLP.decode(`0x${rlpEncodedKey.slice(ACCOUNT_KEY_TAG.ACCOUNT_KEY_ROLE_BASED_TAG.length)}`)
         const accountKeys = []

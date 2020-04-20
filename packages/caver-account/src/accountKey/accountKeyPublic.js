@@ -33,7 +33,9 @@ class AccountKeyPublic {
     static decode(rlpEncodedKey) {
         rlpEncodedKey = utils.addHexPrefix(rlpEncodedKey)
         if (!rlpEncodedKey.startsWith(ACCOUNT_KEY_TAG.ACCOUNT_KEY_PUBLIC_TAG))
-            throw new Error(`Cannot decode to AccountKeyPublic: ${rlpEncodedKey}`)
+            throw new Error(
+                `Cannot decode to AccountKeyPublic. The prefix must be ${ACCOUNT_KEY_TAG.ACCOUNT_KEY_PUBLIC_TAG}: ${rlpEncodedKey}`
+            )
 
         const publicKey = RLP.decode(`0x${rlpEncodedKey.slice(ACCOUNT_KEY_TAG.ACCOUNT_KEY_PUBLIC_TAG.length)}`)
         return new AccountKeyPublic(publicKey)
