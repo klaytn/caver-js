@@ -24,6 +24,20 @@ const AccountKeyFail = require('./accountKeyFail')
 const utils = require('../../../caver-utils')
 const { ACCOUNT_KEY_TAG } = require('./accountKeyHelper')
 
+function isValidAccountKeysFormat(roleBasedAccountKeys) {
+    for (const accountKey of roleBasedAccountKeys) {
+        if (
+            !(accountKey instanceof AccountKeyLegacy) &&
+            !(accountKey instanceof AccountKeyPublic) &&
+            !(accountKey instanceof AccountKeyFail) &&
+            !(accountKey instanceof AccountKeyWeightedMultiSig)
+        ) {
+            return false
+        }
+    }
+    return true
+}
+
 /**
  * Representing an AccountKeyRoleBased.
  * @class
@@ -87,20 +101,22 @@ class AccountKeyRoleBased {
 
     /**
      * Create an instance of AccountKeyRoleBased.
-     * @param {Array.<Array.<AccountKeyLegacy|AccountKeyPublic|AccountKeyFail|AccountKeyWeightedMultiSig>>} accountKeyArray - A two-dimensional array containing arrays of instances of AccountKeyPublic or AccountKeyWeightedMultiSig for each role.
+     * @param {Array.<AccountKeyLegacy|AccountKeyPublic|AccountKeyFail|AccountKeyWeightedMultiSig>} accountKeyArray - An array containing arrays of instances of AccountKeyPublic or AccountKeyWeightedMultiSig for each role.
      */
     constructor(accountKeyArray) {
+        if (!isValidAccountKeysFormat(accountKeyArray)) throw new Error(`Invalid account keys format`)
         this._accountKeys = accountKeyArray
     }
 
     /**
-     * @type {Array.<Array.<AccountKeyLegacy|AccountKeyPublic|AccountKeyFail|AccountKeyWeightedMultiSig>>}
+     * @type {Array.<AccountKeyLegacy|AccountKeyPublic|AccountKeyFail|AccountKeyWeightedMultiSig>}
      */
     get accountKeys() {
         return this._accountKeys
     }
 
     set accountkeys(keys) {
+        if (!isValidAccountKeysFormat(keys)) throw new Error(`Invalid account keys format`)
         this._accountKeys = keys
     }
 
