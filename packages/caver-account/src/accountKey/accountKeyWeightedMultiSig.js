@@ -68,6 +68,10 @@ class AccountKeyWeightedMultiSig {
      */
     constructor(threshold, weightedPublicKeys) {
         this._threshold = utils.hexToNumber(threshold)
+
+        for (const wp of weightedPublicKeys) {
+            if (!(wp instanceof WeightedPublicKey)) throw new Error(`Invalid type of weighted public keys.`)
+        }
         this._weightedPublicKeys = weightedPublicKeys || []
     }
 
@@ -91,7 +95,7 @@ class AccountKeyWeightedMultiSig {
 
     set weightedPublicKeys(wps) {
         for (const wp of wps) {
-            if (!(wp instanceof WeightedPublicKey)) throw new Error(`Invalid type of weighted public key.`)
+            if (!(wp instanceof WeightedPublicKey)) throw new Error(`Invalid type of weighted public keys.`)
         }
         this._weightedPublicKeys = wps
     }
