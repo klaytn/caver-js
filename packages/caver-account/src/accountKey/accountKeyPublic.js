@@ -49,6 +49,7 @@ class AccountKeyPublic {
      * @param {string} publicKey - The address of account.
      */
     constructor(publicKey) {
+        if (!utils.isValidPublicKey(publicKey)) throw new Error(`Invalid public key: ${publicKey}`)
         this._publicKey = publicKey
     }
 
