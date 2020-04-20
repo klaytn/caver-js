@@ -807,18 +807,19 @@ const getTxTypeStringFromRawTransaction = rawTransaction => {
 }
 
 const isValidPublicKey = publicKey => {
-    publicKey = publicKey.replace('0x', '')
+    let pubString = publicKey.replace('0x', '')
 
-    if (publicKey.length !== 66 && publicKey.length !== 128) return false
+    if (pubString.length !== 66 && pubString.length !== 128) return false
 
-    if (publicKey.length === 66 && !isCompressedPublicKey(publicKey)) return false
+    if (pubString.length === 66 && !isCompressedPublicKey(pubString)) return false
 
-    if (publicKey.length === 128) {
-        const xyPoints = xyPointFromPublicKey(publicKey)
-        if (xyPoints === undefined || !xyPoints.length) return false
-    }
+    if (pubString.length === 66) pubString = decompressPublicKey(pubString)
 
-    return true
+    const xyPoints = xyPointFromPublicKey(pubString)
+    if (xyPoints === undefined || !xyPoints.length || xyPoints.length !== 2) return false
+
+    const point = secp256k1.curve.point(xyPoints[0].slice(2), xyPoints[1].slice(2), true)
+    return secp256k1.keyFromPublic(point).validate().result
 }
 
 const isCompressedPublicKey = publicKey => {
