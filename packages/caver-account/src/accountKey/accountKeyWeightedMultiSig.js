@@ -40,7 +40,7 @@ class AccountKeyWeightedMultiSig {
             )
 
         const [threshold, multiSigkeys] = RLP.decode(`0x${rlpEncodedKey.slice(ACCOUNT_KEY_TAG.ACCOUNT_KEY_WEIGHTED_MULTISIG_TAG.length)}`)
-        const weightedPublicKeys = multiSigkeys.map(wieghtedPublicKey => {
+        const weightedPublicKeys = multiSigkeys.map(weightedPublicKey => {
             return new WeightedPublicKey(weightedPublicKey[0], weightedPublicKey[1])
         })
         return new AccountKeyWeightedMultiSig(threshold, weightedPublicKeys)
