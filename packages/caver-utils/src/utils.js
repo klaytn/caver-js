@@ -835,7 +835,7 @@ const compressPublicKey = uncompressedPublicKey => {
 
     const xyPoints = xyPointFromPublicKey(uncompressedPublicKey)
 
-    if (xyPoints === undefined || !xyPoints.length) {
+    if (xyPoints === undefined || !xyPoints.length || xyPoints.length !== 2) {
         throw new Error('invalid public key')
     }
 
@@ -861,11 +861,9 @@ const decompressPublicKey = compressedPublicKey => {
 
     const curve = secp256k1.curve
     const decoded = curve.decodePoint(compressedWithoutPrefix, 'hex')
+    const hexEncoded = decoded.encode('hex').slice(2)
 
-    const xPoint = decoded.x.toString(16)
-    const yPoint = decoded.y.toString(16)
-
-    return `0x${xPoint}${yPoint}`
+    return `0x${hexEncoded}`
 }
 
 const isContractDeployment = txObject => {
