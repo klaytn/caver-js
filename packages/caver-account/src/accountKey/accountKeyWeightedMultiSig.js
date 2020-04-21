@@ -61,7 +61,7 @@ class AccountKeyWeightedMultiSig {
         }
         if (!_.isArray(options.weight)) throw new Error(`weight should be an array that stores the weight of each public key.`)
         if (publicKeyArray.length !== options.weight.length) {
-            throw new Error(`The length of public keys and the length of weight array do not match.`)
+            throw new Error(`The length of public keys is not equal to the length of weight array.`)
         }
 
         const weightedPublicKeys = []
