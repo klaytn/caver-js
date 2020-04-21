@@ -27,6 +27,7 @@ const { ACCOUNT_KEY_TAG } = require('./accountKeyHelper')
 function isValidAccountKeysFormat(roleBasedAccountKeys) {
     for (const accountKey of roleBasedAccountKeys) {
         if (
+            accountKey !== undefined &&
             !(accountKey instanceof AccountKeyLegacy) &&
             !(accountKey instanceof AccountKeyPublic) &&
             !(accountKey instanceof AccountKeyFail) &&
