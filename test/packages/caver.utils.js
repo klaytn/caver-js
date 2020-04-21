@@ -1126,6 +1126,14 @@ describe('caver.utils.isValidPublicKey', () => {
         const isValid = caver.utils.isValidPublicKey(compressed)
         expect(isValid).to.be.false
     })
+
+    it('CAVERJS-UNIT-ETC-204: caver.utils.isValidPublicKey should false when point is not on curve', () => {
+        const pub =
+            '0x4be11ff42d8fc1954fb9ed52296db1657564c5e38517764664fb7cf4306a1e163a2686aa755dd0291aa2f291c3560ef4bf4b46c671983ff3e23f11a1b744ff4a'
+
+        const isValid = caver.utils.isValidPublicKey(pub)
+        expect(isValid).to.be.false
+    })
 })
 
 describe('caver.utils.isValidRole', () => {
