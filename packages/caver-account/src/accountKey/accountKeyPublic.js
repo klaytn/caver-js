@@ -48,7 +48,9 @@ class AccountKeyPublic {
      * @return {AccountKeyPublic}
      */
     static fromXYPoint(x, y) {
-        const pubKey = utils.addHexPrefix(x) + utils.stripHexPrefix(y)
+        const xPoint = utils.leftPad(utils.stripHexPrefix(x), 64)
+        const yPoint = utils.leftPad(utils.stripHexPrefix(y), 64)
+        const pubKey = `0x${xPoint + yPoint}`
         return new AccountKeyPublic(pubKey)
     }
 
