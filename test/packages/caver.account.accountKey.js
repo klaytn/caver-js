@@ -498,22 +498,7 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
 
     context('CAVERJS-UNIT-ACCOUNT-054: caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions', () => {
         it('should create AccountKeyRoleBased instances and return with AccountKeyLegacy', () => {
-            let pubs = [
-                new caver.account.accountKey.accountKeyLegacy(),
-                [],
-                [
-                    '0x91245244462b3eee6436d3dc0ba3f69ef413fe2296c729733eff891a55f70c02f2b0870653417943e795e7c8694c4f8be8af865b7a0224d1dec0bf8a1bf1b5a6',
-                    '0x77e05dd93cdd6362f8648447f33d5676cbc5f42f4c4946ae1ad62bd4c0c4f3570b1a104b67d1cd169bbf61dd557f15ab5ee8b661326096954caddadf34ae6ac8',
-                    '0xd3bb14320d87eed081ae44740b5abbc52bac2c7ccf85b6281a0fc69f3ba4c171cc4bd2ba7f0c969cd72bfa49c854d8ac2cf3d0edea7f0ce0fd31cf080374935d',
-                    '0xcfa4d1bee51e59e6842b136ff95b9d01385f94bed13c4be8996c6d20cb732c3ee47cd2b6bbb917658c5fd3d02b0ddf1242b1603d1acbde7812a7d9d684ed37a9',
-                ],
-            ]
-            const options = [{}, {}, { threshold: 3, weight: [1, 1, 2, 2] }]
-            let accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)
-
-            isAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey: pubs, exepectedOptions: options })
-
-            pubs = [
+            const pubs = [
                 [new caver.account.accountKey.accountKeyLegacy()],
                 [],
                 [
@@ -523,7 +508,8 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
                     '0xcfa4d1bee51e59e6842b136ff95b9d01385f94bed13c4be8996c6d20cb732c3ee47cd2b6bbb917658c5fd3d02b0ddf1242b1603d1acbde7812a7d9d684ed37a9',
                 ],
             ]
-            accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)
+            const options = [{}, {}, { threshold: 3, weight: [1, 1, 2, 2] }]
+            const accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)
 
             isAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey: pubs, exepectedOptions: options })
         })
@@ -531,22 +517,7 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
 
     context('CAVERJS-UNIT-ACCOUNT-055: caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions', () => {
         it('should create AccountKeyRoleBased instances and return with AccountKeyFail', () => {
-            let pubs = [
-                new caver.account.accountKey.accountKeyFail(),
-                [],
-                [
-                    '0x91245244462b3eee6436d3dc0ba3f69ef413fe2296c729733eff891a55f70c02f2b0870653417943e795e7c8694c4f8be8af865b7a0224d1dec0bf8a1bf1b5a6',
-                    '0x77e05dd93cdd6362f8648447f33d5676cbc5f42f4c4946ae1ad62bd4c0c4f3570b1a104b67d1cd169bbf61dd557f15ab5ee8b661326096954caddadf34ae6ac8',
-                    '0xd3bb14320d87eed081ae44740b5abbc52bac2c7ccf85b6281a0fc69f3ba4c171cc4bd2ba7f0c969cd72bfa49c854d8ac2cf3d0edea7f0ce0fd31cf080374935d',
-                    '0xcfa4d1bee51e59e6842b136ff95b9d01385f94bed13c4be8996c6d20cb732c3ee47cd2b6bbb917658c5fd3d02b0ddf1242b1603d1acbde7812a7d9d684ed37a9',
-                ],
-            ]
-            const options = [{}, {}, { threshold: 3, weight: [1, 1, 2, 2] }]
-            let accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)
-
-            isAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey: pubs, exepectedOptions: options })
-
-            pubs = [
+            const pubs = [
                 [new caver.account.accountKey.accountKeyFail()],
                 [],
                 [
@@ -556,7 +527,8 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
                     '0xcfa4d1bee51e59e6842b136ff95b9d01385f94bed13c4be8996c6d20cb732c3ee47cd2b6bbb917658c5fd3d02b0ddf1242b1603d1acbde7812a7d9d684ed37a9',
                 ],
             ]
-            accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)
+            const options = [{}, {}, { threshold: 3, weight: [1, 1, 2, 2] }]
+            const accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)
 
             isAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey: pubs, exepectedOptions: options })
         })
@@ -565,7 +537,7 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
     context('CAVERJS-UNIT-ACCOUNT-056: caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions', () => {
         it('should throw error when options is defined with AccountKeyLegacy or AccountKeyFail', () => {
             let pubs = [
-                new caver.account.accountKey.accountKeyLegacy(),
+                [new caver.account.accountKey.accountKeyLegacy()],
                 [],
                 [
                     '0x91245244462b3eee6436d3dc0ba3f69ef413fe2296c729733eff891a55f70c02f2b0870653417943e795e7c8694c4f8be8af865b7a0224d1dec0bf8a1bf1b5a6',
@@ -581,7 +553,7 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
             )
 
             pubs = [
-                new caver.account.accountKey.accountKeyFail(),
+                [new caver.account.accountKey.accountKeyFail()],
                 [],
                 [
                     '0x91245244462b3eee6436d3dc0ba3f69ef413fe2296c729733eff891a55f70c02f2b0870653417943e795e7c8694c4f8be8af865b7a0224d1dec0bf8a1bf1b5a6',
