@@ -100,6 +100,8 @@ class AccountKeyRoleBased {
             // To handle instance of AccountKeyLegacy or AccountKeyFail
             if (!_.isArray(roleBasedPubArray[i])) {
                 if (roleBasedPubArray[i] instanceof AccountKeyLegacy || roleBasedPubArray[i] instanceof AccountKeyFail) {
+                    if (Object.keys(options[i]).length !== 0)
+                        throw new Error(`Invalid optinos: AccountKeyLegacy or AccountKeyFail cannot have options.`)
                     accountKeys.push(roleBasedPubArray[i])
                     continue
                 } else {
