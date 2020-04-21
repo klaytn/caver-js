@@ -25,6 +25,18 @@ const AccountKeyFail = require('./accountKey/accountKeyFail')
 const AccountKeyWeightedMultiSig = require('./accountKey/accountKeyWeightedMultiSig')
 const AccountKeyRoleBased = require('./accountKey/accountKeyRoleBased')
 
+function isAccountKeyInstance(accountKey) {
+    if (
+        !(accountKey instanceof AccountKeyLegacy) &&
+        !(accountKey instanceof AccountKeyPublic) &&
+        !(accountKey instanceof AccountKeyFail) &&
+        !(accountKey instanceof AccountKeyWeightedMultiSig) &&
+        !(accountKey instanceof AccountKeyRoleBased)
+    )
+        return false
+
+    return true
+}
 /**
  * Representing an Account which includes information for account update.
  * @class
@@ -136,7 +148,13 @@ class Account {
      * @param {AccountKeyLegacy|AccountKeyPublic|AccountKeyFail|AccountKeyWeightedMultiSig|AccountKeyRoleBased} accountKey - The accountKey of account.
      */
     constructor(address, accountKey) {
-        this._address = address
+        if (!utils.isAddress(address)) throw new Error(`Invalid address : ${address}`)
+        if (!isAccountKeyInstance(accountKey))
+            throw new Error(
+                `Invalid accountKey. accountKey should be an instance of AccountKeyLegacy, AccountKeyPublic, AccountKeyFail, AccountKeyWeightedMultiSig or AccountKeyRoleBased`
+            )
+
+        this._address = utils.addHexPrefix(address)
         this._accountKey = accountKey
     }
 
@@ -161,15 +179,9 @@ class Account {
     }
 
     set accountKey(accountKey) {
-        if (
-            !(accountKey instanceof AccountKeyLegacy) &&
-            !(accountKey instanceof AccountKeyPublic) &&
-            !(accountKey instanceof AccountKeyFail) &&
-            !(accountKey instanceof AccountKeyWeightedMultiSig) &&
-            !(accountKey instanceof AccountKeyRoleBased)
-        )
+        if (!isAccountKeyInstance(accountKey))
             throw new Error(
-                `Invalid accountKey. accountKey should be instance of AccountKeyLegacy, AccountKeyPublic, AccountKeyFail, AccountKeyWeightedMultiSig or AccountKeyRoleBased`
+                `Invalid accountKey. accountKey should be an instance of AccountKeyLegacy, AccountKeyPublic, AccountKeyFail, AccountKeyWeightedMultiSig or AccountKeyRoleBased`
             )
 
         this._accountKey = accountKey
