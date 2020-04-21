@@ -110,7 +110,7 @@ class AccountKeyRoleBased {
             if (roleBasedPubArray[i].length === 1) {
                 if (roleBasedPubArray[i][0] instanceof AccountKeyLegacy || roleBasedPubArray[i][0] instanceof AccountKeyFail) {
                     if (Object.keys(options[i]).length !== 0)
-                        throw new Error(`Invalid optinos: AccountKeyLegacy or AccountKeyFail cannot have options.`)
+                        throw new Error(`Invalid options: AccountKeyLegacy or AccountKeyFail cannot have options.`)
 
                     accountKeys.push(roleBasedPubArray[i][0])
                     continue
