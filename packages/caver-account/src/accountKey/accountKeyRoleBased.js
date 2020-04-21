@@ -16,6 +16,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+const _ = require('lodash')
 const RLP = require('eth-lib/lib/rlp')
 const AccountKeyWeightedMultiSig = require('./accountKeyWeightedMultiSig')
 const AccountKeyLegacy = require('./accountKeyLegacy')
@@ -25,6 +26,8 @@ const utils = require('../../../caver-utils')
 const { ACCOUNT_KEY_TAG } = require('./accountKeyHelper')
 
 function isValidAccountKeysFormat(roleBasedAccountKeys) {
+    if (!_.isArray(roleBasedAccountKeys)) return false
+
     for (const accountKey of roleBasedAccountKeys) {
         if (
             accountKey !== undefined &&
