@@ -84,25 +84,51 @@ class AccountKeyRoleBased {
 
     /**
      * Creates an instance of AccountKeyRoleBased.
-     * @param {Array.<Array.<string>>} roleBasedPubArray - An array of public key strings.
+     * @param {Array.<AccountKeyLegacy|AccountKeyFail|Array.<string>>} roleBasedPubArray - An array of public key strings.
      * @param {Array.<object>} options - An array of options which defines threshold and weight.
      * @return {AccountKeyRoleBased}
      */
-    static fromRoleBasedPublicKeysAndOptions(roleBasedPubArray, options) {
+    static fromRoleBasedPublicKeysAndOptions(roleBasedPubArray, options = [{}, {}, {}]) {
         const accountKeys = []
         // Format will be like below
-        // publicKeyArray = [[pub, pub], [pub], [pub, pub, pub]]
+        // keyArray = [[pub, pub], [pub], [pub, pub, pub]]
+        // keyArray = [accountKeyLegacy, accountKeyFail, [pub, pub, pub]]
+        // keyArray = [accountKeyLegacy, accountKeyFail, [pub]]
+        // keyArray = [[accountKeyLegacy], [accountKeyFail], [pub, pub, pub]]
         // options = [{threshold: 1, weight: [1,1]}, {}, {threshold: 1, weight: [1,1,1]}]
         for (let i = 0; i < roleBasedPubArray.length; i++) {
-            if (roleBasedPubArray[i].length > 0) {
-                if (roleBasedPubArray[i].length === 1 && Object.keys(options[i]).length === 0) {
-                    accountKeys.push(AccountKeyPublic.fromPublicKey(roleBasedPubArray[i][0]))
+            // To handle instance of AccountKeyLegacy or AccountKeyFail
+            if (!_.isArray(roleBasedPubArray[i])) {
+                if (roleBasedPubArray[i] instanceof AccountKeyLegacy || roleBasedPubArray[i] instanceof AccountKeyFail) {
+                    accountKeys.push(roleBasedPubArray[i])
+                    continue
                 } else {
-                    accountKeys.push(AccountKeyWeightedMultiSig.fromPublicKeysAndOptions(roleBasedPubArray[i], options[i]))
+                    throw new Error(`In order to create AccountKeyRoleBased, each role must be defined as an array of public key strings.`)
                 }
-            } else {
-                accountKeys.push(undefined)
             }
+
+            // Empty key array means AccountKeyNil
+            if (roleBasedPubArray[i].length === 0) {
+                if (Object.keys(options[i]).length !== 0) throw new Error(`Invalid options: AccountKeyNil cannot have options.`)
+                accountKeys.push(undefined)
+                continue
+            }
+
+            if (roleBasedPubArray[i].length === 1) {
+                if (roleBasedPubArray[i][0] instanceof AccountKeyLegacy || roleBasedPubArray[i][0] instanceof AccountKeyFail) {
+                    if (Object.keys(options[i]).length !== 0)
+                        throw new Error(`Invalid optinos: AccountKeyLegacy or AccountKeyFail cannot have options.`)
+
+                    accountKeys.push(roleBasedPubArray[i][0])
+                    continue
+                }
+                if (Object.keys(options[i]).length === 0) {
+                    accountKeys.push(AccountKeyPublic.fromPublicKey(roleBasedPubArray[i][0]))
+                    continue
+                }
+            }
+
+            accountKeys.push(AccountKeyWeightedMultiSig.fromPublicKeysAndOptions(roleBasedPubArray[i], options[i]))
         }
         return new AccountKeyRoleBased(accountKeys)
     }
