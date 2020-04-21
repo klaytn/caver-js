@@ -26,7 +26,7 @@ const utils = require('../../../caver-utils')
 const { ACCOUNT_KEY_TAG } = require('./accountKeyHelper')
 const { KEY_ROLE } = require('../../../caver-keyring/src/keyringHelper/keyringHelper')
 
-function isValidAccountKeysFormat(roleBasedAccountKeys) {
+function isArrayOfAccountKeyFormat(roleBasedAccountKeys) {
     if (!_.isArray(roleBasedAccountKeys)) return false
     if (roleBasedAccountKeys.length > KEY_ROLE.ROLE_LAST) return false
 
@@ -96,7 +96,7 @@ class AccountKeyRoleBased {
         for (let i = 0; i < roleBasedPubArray.length; i++) {
             if (roleBasedPubArray[i].length > 0) {
                 if (roleBasedPubArray[i].length === 1 && Object.keys(options[i]).length === 0) {
-                    accountKeys.push(new AccountKeyPublic(roleBasedPubArray[i][0]))
+                    accountKeys.push(AccountKeyPublic.fromPublicKey(roleBasedPubArray[i][0]))
                 } else {
                     accountKeys.push(AccountKeyWeightedMultiSig.fromPublicKeysAndOptions(roleBasedPubArray[i], options[i]))
                 }
@@ -112,7 +112,7 @@ class AccountKeyRoleBased {
      * @param {Array.<AccountKeyLegacy|AccountKeyPublic|AccountKeyFail|AccountKeyWeightedMultiSig>} accountKeyArray - An array containing arrays of instances of AccountKeyPublic or AccountKeyWeightedMultiSig for each role.
      */
     constructor(accountKeyArray) {
-        if (!isValidAccountKeysFormat(accountKeyArray)) throw new Error(`Invalid role-based account key`)
+        if (!isArrayOfAccountKeyFormat(accountKeyArray)) throw new Error(`Invalid role-based account key format.`)
         this._accountKeys = accountKeyArray
     }
 
@@ -124,7 +124,7 @@ class AccountKeyRoleBased {
     }
 
     set accountkeys(keys) {
-        if (!isValidAccountKeysFormat(keys)) throw new Error(`Invalid role-based account key`)
+        if (!isArrayOfAccountKeyFormat(keys)) throw new Error(`Invalid role-based account key format.`)
         this._accountKeys = keys
     }
 
