@@ -2812,7 +2812,7 @@ describe('caver.klay.accounts.encrypt', () => {
                 keyring: [
                     [
                         {
-                            ciphertext: '5e2f95f61d7af3bebf4ff9f5d5813690c80b0b5aaebd6e8b22d0f928ff06776a',
+                            ciphertext: 'b3126f30cb419a63f367ea2313c3cf1a27ef9f08fc9a5da50aec2b93f5afbef4',
                             cipherparams: { iv: '38aa896fc128075425e512f01e4b206c' },
                             cipher: 'aes-128-ctr',
                             kdf: 'scrypt',
@@ -2823,12 +2823,12 @@ describe('caver.klay.accounts.encrypt', () => {
                                 r: 8,
                                 p: 1,
                             },
-                            mac: 'fb86255428e24ba701201d5815f2f2114214cbd34fe4bc7a24b948a8ceac9f9b',
+                            mac: 'df371741da37e778a820905f5a43f60aabd904ad81012e4c58c9eb7160cde38b',
                         },
                     ],
                     [
                         {
-                            ciphertext: '7c2ad958478c213549fdb9fd7619c6f8c7034618c83e3ab229af6332d9fa53fb',
+                            ciphertext: '9117239e91b748e805d5aa2bb05b3f7228e7d24a9a19099c0193b189d3539a65',
                             cipherparams: { iv: '38aa896fc128075425e512f01e4b206c' },
                             cipher: 'aes-128-ctr',
                             kdf: 'scrypt',
@@ -2839,10 +2839,10 @@ describe('caver.klay.accounts.encrypt', () => {
                                 r: 8,
                                 p: 1,
                             },
-                            mac: 'e6c3897772916c69f7c778ac2e0e60b786c55f17367c68b086486bd68fea9517',
+                            mac: 'ded3da00062f4e04b8248c8c6c37299c205b8e48d26c5187586dfa49959a9f9a',
                         },
                         {
-                            ciphertext: '5a17fe2af445e63ed2cdda6834d030a9391998000941c79318ab49bff092b9e7',
+                            ciphertext: 'b72a04ec227e8fe39ee5c9bef292c923d6fd0c525b66f4bd30979b04fa3b7079',
                             cipherparams: { iv: '38aa896fc128075425e512f01e4b206c' },
                             cipher: 'aes-128-ctr',
                             kdf: 'scrypt',
@@ -2853,12 +2853,12 @@ describe('caver.klay.accounts.encrypt', () => {
                                 r: 8,
                                 p: 1,
                             },
-                            mac: '633f91994f33541fbf1c3c3e973e539c12f1dd98f2757f64e3b63de986f367e0',
+                            mac: '28090ffbce196b3b2640eec40ed2964071ef1a7f5d72f4db279589115a85a94d',
                         },
                     ],
                     [
                         {
-                            ciphertext: 'd92870e0064950a7e148f5be8ce8c4c0373684f58d1f50f95524701a47fdbcf2',
+                            ciphertext: '34158a26d072397aad60e6684aaa3d4ad8d210a7df3863d77d18a2a14d54756c',
                             cipherparams: { iv: '38aa896fc128075425e512f01e4b206c' },
                             cipher: 'aes-128-ctr',
                             kdf: 'scrypt',
@@ -2869,7 +2869,7 @@ describe('caver.klay.accounts.encrypt', () => {
                                 r: 8,
                                 p: 1,
                             },
-                            mac: 'b2f0245036e7bbdea712819dfbe019c8bfb237684c67d61fa82638868a7ae752',
+                            mac: '210d28df835312ff82042b77402a6b105cdb6576a379ebae22076b5c5bfdf66f',
                         },
                     ],
                 ],
@@ -2928,7 +2928,7 @@ describe('caver.klay.accounts.encrypt', () => {
             const result = caver.klay.accounts.encrypt(
                 testAccount.keys,
                 password,
-                Object.assign({ address: testAccount.address, encryptOption })
+                Object.assign({ address: testAccount.address }, encryptOption)
             )
 
             isKeystore(result, testAccount)
