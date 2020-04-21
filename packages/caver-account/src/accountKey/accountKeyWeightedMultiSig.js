@@ -55,9 +55,7 @@ class AccountKeyWeightedMultiSig {
      */
     static fromPublicKeysAndOptions(publicKeyArray, options) {
         if (options === undefined || options.threshold === undefined || options.weight === undefined) {
-            throw new Error(
-                `Invalid options object. For AccountKeyWeightedMultiSig, the second parameter 'options' should be defined.`
-            )
+            throw new Error(`Invalid options object. For AccountKeyWeightedMultiSig, the second parameter 'options' should be defined.`)
         }
         if (!_.isArray(options.weight)) throw new Error(`weight should be an array that stores the weight of each public key.`)
         if (publicKeyArray.length !== options.weight.length) {
