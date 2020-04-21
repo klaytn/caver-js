@@ -63,7 +63,7 @@ class AccountKeyPublic {
 
     /**
      * Creates an instance of AccountKeyPublic.
-     * @param {string} publicKey - The address of account.
+     * @param {string} publicKey - a public key
      */
     constructor(publicKey) {
         if (!utils.isValidPublicKey(publicKey)) throw new Error(`Invalid public key: ${publicKey}`)
