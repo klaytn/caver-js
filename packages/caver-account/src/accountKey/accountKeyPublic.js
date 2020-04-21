@@ -98,12 +98,7 @@ class AccountKeyPublic {
      * @return {object}
      */
     getXYPoint() {
-        const publicKeyString = this.publicKey.replace('0x', '')
-        if (publicKeyString.length !== 128) throw Error('Invalid public key')
-
-        const x = `0x${publicKeyString.slice(0, 64).replace(/^0+/, '')}`
-        const y = `0x${publicKeyString.slice(64).replace(/^0+/, '')}`
-
+        const [x, y] = utils.xyPointFromPublicKey(this.publicKey)
         return { x, y }
     }
 }
