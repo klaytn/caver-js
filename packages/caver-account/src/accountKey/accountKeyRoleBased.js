@@ -92,21 +92,12 @@ class AccountKeyRoleBased {
         const accountKeys = []
         // Format will be like below
         // keyArray = [[pub, pub], [pub], [pub, pub, pub]]
-        // keyArray = [accountKeyLegacy, accountKeyFail, [pub, pub, pub]]
-        // keyArray = [accountKeyLegacy, accountKeyFail, [pub]]
         // keyArray = [[accountKeyLegacy], [accountKeyFail], [pub, pub, pub]]
         // options = [{threshold: 1, weight: [1,1]}, {}, {threshold: 1, weight: [1,1,1]}]
         for (let i = 0; i < roleBasedPubArray.length; i++) {
             // To handle instance of AccountKeyLegacy or AccountKeyFail
             if (!_.isArray(roleBasedPubArray[i])) {
-                if (roleBasedPubArray[i] instanceof AccountKeyLegacy || roleBasedPubArray[i] instanceof AccountKeyFail) {
-                    if (Object.keys(options[i]).length !== 0)
-                        throw new Error(`Invalid optinos: AccountKeyLegacy or AccountKeyFail cannot have options.`)
-                    accountKeys.push(roleBasedPubArray[i])
-                    continue
-                } else {
-                    throw new Error(`In order to create AccountKeyRoleBased, each role must be defined as an array of public key strings.`)
-                }
+                throw new Error(`Invalid format of keys: Each role should define the key to use in an array form.`)
             }
 
             // Empty key array means AccountKeyNil
