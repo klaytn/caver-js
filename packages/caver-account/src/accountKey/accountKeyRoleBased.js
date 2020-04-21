@@ -119,7 +119,7 @@ class AccountKeyRoleBased {
     }
 
     set accountkeys(keys) {
-        if (!isValidAccountKeysFormat(keys)) throw new Error(`Invalid account keys format`)
+        if (!isValidAccountKeysFormat(keys)) throw new Error(`Invalid role-based account key`)
         this._accountKeys = keys
     }
 
