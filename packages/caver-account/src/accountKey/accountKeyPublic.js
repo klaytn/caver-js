@@ -41,18 +41,33 @@ class AccountKeyPublic {
         return new AccountKeyPublic(publicKey)
     }
 
+    /**
+     * Creates AccountKeyPublic instance from x, y point
+     * @param {string} x - The x point.
+     * @param {string} y - The y point.
+     * @return {AccountKeyPublic}
+     */
     static fromXYPoint(x, y) {
         const pubKey = utils.addHexPrefix(x) + utils.stripHexPrefix(y)
         return new AccountKeyPublic(pubKey)
     }
 
     /**
-     * Create an instance of AccountKeyPublic.
+     * Creates AccountKeyPublic instance from public key string
+     * @param {string} pubKey - The public key string. This can be in format of compressed or decompressed.
+     * @return {AccountKeyPublic}
+     */
+    static fromPublicKey(pubKey) {
+        return new AccountKeyPublic(pubKey)
+    }
+
+    /**
+     * Creates an instance of AccountKeyPublic.
      * @param {string} publicKey - The address of account.
      */
     constructor(publicKey) {
         if (!utils.isValidPublicKey(publicKey)) throw new Error(`Invalid public key: ${publicKey}`)
-        this._publicKey = publicKey
+        this._publicKey = utils.addHexPrefix(publicKey)
     }
 
     /**
@@ -64,7 +79,7 @@ class AccountKeyPublic {
 
     set publicKey(p) {
         if (!utils.isValidPublicKey(p)) throw new Error(`Invalid public key: ${p}`)
-        this._publicKey = p
+        this._publicKey = utils.addHexPrefix(p)
     }
 
     /**
