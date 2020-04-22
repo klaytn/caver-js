@@ -468,8 +468,7 @@ describe('caver.account.createWithAccountKeyWeightedMultiSig', () => {
                 '0x77e05dd93cdd6362f8648447f33d5676cbc5f42f4c4946ae1ad62bd4c0c4f3570b1a104b67d1cd169bbf61dd557f15ab5ee8b661326096954caddadf34ae6ac8',
             ]
 
-            const expectedError =
-                'options is undefined. To create Account instance with AccountKeyWeightedMultiSig options should be defined.'
+            const expectedError = `The variable 'options' is undefined. To create an Account instance with AccountKeyWeightedMultiSig, 'options' should be defined.`
             expect(() => caver.account.createWithAccountKeyWeightedMultiSig(address, pubs)).to.throw(expectedError)
         })
     })
@@ -524,7 +523,7 @@ describe('caver.account.createWithAccountKeyRoleBased', () => {
                 ],
             ]
 
-            const expectedError = 'options is undefined. To create Account instance with AccountKeyRoleBased options should be defined.'
+            const expectedError = `The variable 'options' is undefined. To create an Account instance with AccountKeyRoleBased, 'options' should be defined.`
             expect(() => caver.account.createWithAccountKeyRoleBased(address, pubs)).to.throw(expectedError)
         })
     })

@@ -547,7 +547,7 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
                 ],
             ]
             const options = [{ threshold: 3, weight: [1, 1, 2, 2] }, {}, { threshold: 3, weight: [1, 1, 2, 2] }]
-            const expectedError = `Invalid optinos: AccountKeyLegacy or AccountKeyFail cannot have options.`
+            const expectedError = `Invalid options: AccountKeyLegacy or AccountKeyFail cannot have options.`
             expect(() => caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)).to.throw(
                 expectedError
             )
