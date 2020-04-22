@@ -94,7 +94,7 @@ class Account {
     }
 
     /**
-     * creates an Account instance which has AccountKeyFail as an accountKey
+     * creates an Account instance which has AccountKeyPublic as an accountKey
      *
      * @param {string} address The address of Account.
      * @param {string} publicKey The public key string.
@@ -105,7 +105,7 @@ class Account {
     }
 
     /**
-     * creates an Account instance which has AccountKeyPublic as an accountKey
+     * creates an Account instance which has AccountKeyFail as an accountKey
      *
      * @param {string} address The address of Account.
      * @return {Account}
