@@ -16,12 +16,316 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+const _ = require('lodash')
 const Keyring = require('./keyring/keyring')
+const TransactionHasher = require('../../caver-transaction/src/transactionHasher/transactionHasher')
+const { KEY_ROLE } = require('./keyring/keyringHelper')
+const utils = require('../../caver-utils')
 
-// TODO: This will be implemented soon.
+/**
+ * representing a Keyring container which manage keyrings.
+ * @class
+ */
 class KeyringContainer {
-    constructor() {
+    /**
+     * creates a keyringContainer.
+     * @param {Array.<Keyring>} keyrings - The keyrings to manage in keyringContainer.
+     */
+    constructor(keyrings) {
+        keyrings = keyrings || []
+        this._length = 0
+        this._addressToIndex = new Map()
+        this._setInitialState(keyrings)
+
         this.keyring = Keyring
+    }
+
+    _setInitialState(keyrings) {
+        for (const keyring of keyrings) {
+            this.add(keyring)
+        }
+    }
+
+    _findSafeIndex(pointer) {
+        pointer = pointer || 0
+        if (_.has(this, pointer)) {
+            return this._findSafeIndex(pointer + 1)
+        }
+        return pointer
+    }
+
+    _currentIndexes() {
+        const keys = Object.keys(this)
+        const indexes = keys
+            .map(function(key) {
+                return parseInt(key)
+            })
+            .filter(function(n) {
+                return n < 9e20
+            })
+
+        return indexes
+    }
+
+    /**
+     * @type {number}
+     */
+    get length() {
+        return this._length
+    }
+
+    /**
+     * generates keyrings in the keyringContainer with randomly generated key pairs.
+     *
+     * @param {number} numberOfKeyrings The number of accounts to create.
+     * @param {string} [entropy] A random string to increase entropy. If undefined, a random string will be generated using randomHex.
+     * @return {KeyringContainer}
+     */
+    generate(numberOfKeyrings, entropy) {
+        for (let i = 0; i < numberOfKeyrings; ++i) {
+            this.add(Keyring.generate(entropy))
+        }
+        return this
+    }
+
+    /**
+     * creates keyring with parameters in the keyringContainer.
+     *
+     * @param {string} address The address of the keyring.
+     * @param {string|Array.<string>|Array.<Array.<string>>} key Private key string(s) to use in keyring. If different keys are used for each role, key must be defined as a two-dimensional array.
+     * @return {Keyring}
+     */
+    newKeyring(address, key) {
+        // The format of key parameter can be
+        // 1. single private key string   => `0x{private key}`
+        // 2. multiple private key string =>[`0x{private key}`, `0x{private key}`, ...]
+        // 3. role based private keys     => [[`0x{private key}`, `0x{private key}`, ...], [], [`0x{private key}`]]
+
+        let keyring
+
+        if (_.isString(key)) keyring = Keyring.createWithSingleKey(address, key)
+
+        if (_.isArray(key)) {
+            if (key.length === 0) throw new Error(`Insufficient private key information: Empty array`)
+            if (_.isArray(key[0])) {
+                keyring = Keyring.createWithRoleBasedKey(address, key)
+            } else {
+                keyring = Keyring.createWithMultipleKey(address, key)
+            }
+        }
+
+        if (!(keyring instanceof Keyring)) throw new Error(`Unsupported type : ${typeof key}`)
+
+        return this.add(keyring)
+    }
+
+    /**
+     * updates the keyring inside the keyringContainer.
+     * Query the keyring to be updated from keyringContainer with the keyring's address,
+     * and an error occurs when the keyring is not found in the keyringContainer.
+     *
+     * @param {Keyring} keyring The keyring with new key.
+     * @return {Keyring}
+     */
+    updateKeyring(keyring) {
+        const idx = this._addressToIndex.get(keyring.address.toLowerCase())
+        if (idx === undefined) throw new Error(`Failed to find keyring to update`)
+
+        this[idx].key = keyring.copy().key
+        return this[idx]
+    }
+
+    /**
+     * querys the keyring address, and return.
+     *
+     * @param {string} address The address of keyring to query.
+     * @return {Keyring}
+     */
+    getKeyring(address) {
+        if (!utils.isAddress(address))
+            throw new Error(`Invalid address ${address}. To get keyring from wallet, you need to pass valid address string as a parameter.`)
+
+        const idx = this._addressToIndex.get(address.toLowerCase())
+
+        return this[idx]
+    }
+
+    /**
+     * addes keyring to keyringContainer.
+     *
+     * @param {Keyring} keyring A keyring instance to add to keyringContainer.
+     * @return {Keyring}
+     */
+    add(keyring) {
+        if (this._addressToIndex.get(keyring.address.toLowerCase()) !== undefined) throw new Error(`Duplicate Account ${keyring.address}`)
+
+        const keyringToAdd = keyring.copy()
+
+        keyringToAdd.index = this._findSafeIndex()
+        this[keyringToAdd.index] = keyringToAdd
+
+        this._length++
+        this._addressToIndex.set(keyringToAdd.address.toLowerCase(), keyringToAdd.index)
+
+        return this[keyringToAdd.index]
+    }
+
+    /**
+     * deletes keyring from keyringContainer.
+     *
+     * @param {string|number} addressOrIndex An address of keyring or an index of keyring in keyringContainer.
+     * @return {boolean}
+     */
+    remove(addressOrIndex) {
+        let keyringToRemove
+        if (_.isNumber(addressOrIndex)) {
+            keyringToRemove = this[addressOrIndex]
+        } else if (utils.isAddress(addressOrIndex)) {
+            keyringToRemove = this.getKeyring(addressOrIndex)
+        } else {
+            throw new Error(`To remove keyring, parameter should be address string or index.`)
+        }
+
+        if (keyringToRemove === undefined) return false
+
+        this._addressToIndex.delete(keyringToRemove.address.toLowerCase())
+        this[keyringToRemove.index].key = null
+        delete this[keyringToRemove.index]
+
+        this._length--
+
+        return true
+    }
+
+    /**
+     * signs with data and returns result object that includes `signsture`, `message` and `messageHash`
+     *
+     * @param {string} address An address of keyring in keyringContainer.
+     * @param {string} data The data string to sign.
+     * @param {number} [role] A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
+     * @param {number} [index] An index of key to use for signing.
+     * @return {object}
+     */
+    signMessage(address, data, role, index) {
+        const keyring = this.getKeyring(address)
+        if (keyring === undefined) throw new Error(`Failed to find keyring from wallet with ${address}`)
+        return keyring.signMessage(data, role, index)
+    }
+
+    /**
+     * signs the transaction using one key and return the transactionHash
+     *
+     * @param {string} address An address of keyring in keyringContainer.
+     * @param {Transaction} transaction A transaction object.
+     * @param {number} [index] An index of key to use for signing.
+     * @param {function} [hasher] A function to return hash of transaction.
+     * @return {string}
+     */
+    async signWithKey(address, transaction, index, hasher) {
+        // Optional parameter processing
+        // (address transaction) / (address transaction index) / (address transaction hasher) / (address transaction index hasher)
+        if (_.isFunction(index) && hasher === undefined) {
+            hasher = index
+            index = 0
+        }
+        if (index === undefined) index = 0
+        if (!_.isNumber(index)) throw new Error(`Invalid index type: ${typeof index}`)
+        if (hasher === undefined) hasher = TransactionHasher.getHashForSigning
+
+        if (!transaction.from) transaction.from = address
+
+        await transaction.fillAndFormatTransaction()
+        const hash = hasher(transaction)
+        const role = transaction.type.includes('ACCOUNT_UPDATE') ? KEY_ROLE.ROLE_ACCOUNT_UPDATE_KEY : KEY_ROLE.ROLE_TRANSACTION_KEY
+
+        const keyring = this.getKeyring(address)
+        if (keyring === undefined) throw new Error(`Failed to find keyring from wallet with ${address}`)
+        const sig = keyring.signWithKey(hash, transaction.chainId, role, index)
+
+        transaction.appendSignatures(sig)
+
+        return hash
+    }
+
+    /**
+     * signs the transaction using keys and return the transactionHash
+     *
+     * @param {string} address An address of keyring in keyringContainer.
+     * @param {Transaction} transaction A transaction object.
+     * @param {function} [hasher] A function to return hash of transaction.
+     * @return {string}
+     */
+    async signWithKeys(address, transaction, hasher = TransactionHasher.getHashForSigning) {
+        if (!transaction.from) transaction.from = address
+
+        await transaction.fillAndFormatTransaction()
+        const hash = hasher(transaction)
+        const role = transaction.type.includes('ACCOUNT_UPDATE') ? KEY_ROLE.ROLE_ACCOUNT_UPDATE_KEY : KEY_ROLE.ROLE_TRANSACTION_KEY
+
+        const keyring = this.getKeyring(address)
+        if (keyring === undefined) throw new Error(`Failed to find keyring from wallet with ${address}`)
+        const sigs = keyring.signWithKeys(hash, transaction.chainId, role)
+
+        transaction.appendSignatures(sigs)
+
+        return hash
+    }
+
+    /**
+     * signs the transaction as a fee payer using one key and return the transactionHash
+     *
+     * @param {string} address An address of keyring in keyringContainer.
+     * @param {Transaction} transaction A transaction object. This should be `FEE_DELEGATED` type.
+     * @param {number} [index] An index of key to use for signing.
+     * @param {function} [hasher] A function to return hash of transaction.
+     * @return {string}
+     */
+    async signFeePayerWithKey(address, transaction, index, hasher) {
+        // Optional parameter processing
+        // (address transaction) / (address transaction index) / (address transaction hasher) / (address transaction index hasher)
+        if (_.isFunction(index) && hasher === undefined) {
+            hasher = index
+            index = 0
+        }
+        if (index === undefined) index = 0
+        if (!_.isNumber(index)) throw new Error(`Invalid index type: ${typeof index}`)
+        if (hasher === undefined) hasher = TransactionHasher.getHashForFeePayerSigning
+
+        if (!transaction.feePayer || transaction.feePayer === '0x') transaction.feePayer = address
+
+        await transaction.fillAndFormatTransaction()
+        const hash = hasher(transaction)
+
+        const keyring = this.getKeyring(address)
+        if (keyring === undefined) throw new Error(`Failed to find keyring from wallet with ${address}`)
+        const sig = keyring.signWithKey(hash, transaction.chainId, KEY_ROLE.ROLE_FEE_PAYER_KEY, index)
+
+        transaction.appendFeePayerSignatures(sig)
+
+        return hash
+    }
+
+    /**
+     * signs the transaction as a fee payer using keys and return the transactionHash
+     *
+     * @param {string} address An address of keyring in keyringContainer.
+     * @param {Transaction} transaction A transaction object. This should be `FEE_DELEGATED` type.
+     * @param {function} [hasher] A function to return hash of transaction.
+     * @return {string}
+     */
+    async signFeePayerWithKeys(address, transaction, hasher = TransactionHasher.getHashForFeePayerSigning) {
+        if (!transaction.feePayer || transaction.feePayer === '0x') transaction.feePayer = address
+
+        await transaction.fillAndFormatTransaction()
+        const hash = hasher(transaction)
+
+        const keyring = this.getKeyring(address)
+        if (keyring === undefined) throw new Error(`Failed to find keyring from wallet with ${address}`)
+        const sigs = keyring.signWithKeys(hash, transaction.chainId, KEY_ROLE.ROLE_FEE_PAYER_KEY)
+
+        transaction.appendFeePayerSignatures(sigs)
+
+        return hash
     }
 }
 
