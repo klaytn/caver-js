@@ -113,7 +113,7 @@ function checkEqualWithPublicKey(pub1, pub2) {
 }
 
 describe('caver.account.create', () => {
-    context('CAVERJS-UNIT-ACCOUNT-001: address: valid address / accountKey: decompressed public key string', () => {
+    context('CAVERJS-UNIT-ACCOUNT-001: address: valid address / accountKey: uncompressed public key string', () => {
         it('should generate account instances with AccountKeyPublic', () => {
             const createWithAccoutnKeyPublicSpy = sinon.spy(caver.account, 'createWithAccountKeyPublic')
             const address = '0xf43dcbb903a0b4b48a7dfa8a370a63f0a731708d'
@@ -152,7 +152,7 @@ describe('caver.account.create', () => {
         })
     })
 
-    context('CAVERJS-UNIT-ACCOUNT-003: address: valid address / accountKey: decompressed public key strings', () => {
+    context('CAVERJS-UNIT-ACCOUNT-003: address: valid address / accountKey: uncompressed public key strings', () => {
         it('should generate account instances with AccountKeyWeightedMultiSig', () => {
             const createWithAccountKeyWeightedMultiSigSpy = sinon.spy(caver.account, 'createWithAccountKeyWeightedMultiSig')
             const address = '0xab9825316619a0720ad891135e92adb84fd74fc1'
@@ -198,7 +198,7 @@ describe('caver.account.create', () => {
         })
     })
 
-    context('CAVERJS-UNIT-ACCOUNT-004: address: valid address / accountKey: role based decompressed public key strings', () => {
+    context('CAVERJS-UNIT-ACCOUNT-004: address: valid address / accountKey: role based uncompressed public key strings', () => {
         it('should generate account instances with AccountKeyRoleBased', () => {
             const createWithAccountKeyRoleBasedSpy = sinon.spy(caver.account, 'createWithAccountKeyRoleBased')
             const address = '0xab9825316619a0720ad891135e92adb84fd74fc1'
@@ -402,7 +402,7 @@ describe('caver.account.createWithAccountKeyLegacy', () => {
 })
 
 describe('caver.account.createWithAccountKeyPublic', () => {
-    context('CAVERJS-UNIT-ACCOUNT-012: address: valid address / accountKey: single decompressed public key string', () => {
+    context('CAVERJS-UNIT-ACCOUNT-012: address: valid address / accountKey: single uncompressed public key string', () => {
         it('should generate account instances with AccountKeyPublic', () => {
             const address = '0xf43dcbb903a0b4b48a7dfa8a370a63f0a731708d'
             const pub =

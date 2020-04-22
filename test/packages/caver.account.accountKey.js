@@ -172,7 +172,7 @@ describe('caver.account.accountKey.accountKeyPublic', () => {
     })
 
     context('CAVERJS-UNIT-ACCOUNT-034: caver.account.accountKey.accountKeyPublic.fromPublicKey', () => {
-        it('should create AccountKeyPublic instance and return with decompressed public key string', () => {
+        it('should create AccountKeyPublic instance and return with uncompressed public key string', () => {
             const pubKey =
                 '0x022dfe0d7c496d954037ab15afd3352008f6c5bfe972850b7b321e96721f4bf11f7e6aa508dd50af53e190dcd4a2559aa1c3ef3f78b97b97e2928ac33e038464'
             const accountKey = caver.account.accountKey.accountKeyPublic.fromPublicKey(pubKey)
@@ -402,7 +402,7 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
     })
 
     context('CAVERJS-UNIT-ACCOUNT-050: caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions', () => {
-        it('should create AccountKeyRoleBased instances and return with decompressed public key strings', () => {
+        it('should create AccountKeyRoleBased instances and return with uncompressed public key strings', () => {
             const pubs = [
                 [
                     '0xb86b2787e8c7accd7d2d82678c9bef047a0aafd72a6e690817506684e8513c9af36becba90c8de06fd06da16492263267a63720985f94fc5a027d0a26d25e6ae',
