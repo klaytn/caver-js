@@ -906,6 +906,17 @@ const isEmptySig = sig => {
     return isEmpty(sig)
 }
 
+const hashMessage = data => {
+    const message = isHexStrict(data) ? hexToBytes(data) : data
+    const messageBuffer = Buffer.from(message)
+    const preamble = `\x19Klaytn Signed Message:\n${message.length}`
+    const preambleBuffer = Buffer.from(preamble)
+    // klayMessage is concatenated buffer (preambleBuffer + messageBuffer)
+    const klayMessage = Buffer.concat([preambleBuffer, messageBuffer])
+    // Finally, run keccak256 on klayMessage.
+    return Hash.keccak256(klayMessage)
+}
+
 module.exports = {
     BN: BN,
     isBN: isBN,
@@ -960,4 +971,6 @@ module.exports = {
     isValidRole: isValidRole,
 
     isEmptySig: isEmptySig,
+
+    hashMessage: hashMessage,
 }

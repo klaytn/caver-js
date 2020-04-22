@@ -507,4 +507,6 @@ module.exports = {
     isValidRole: utils.isValidRole,
 
     isEmptySig: utils.isEmptySig,
+
+    hashMessage: utils.hashMessage,
 }
