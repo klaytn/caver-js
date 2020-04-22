@@ -45,7 +45,7 @@ beforeEach(() => {
     caver = new Caver(testRPCURL)
 })
 
-function isAccountKey(accountKey, expectedAccountKeyType, options = {}) {
+function testAccountKey(accountKey, expectedAccountKeyType, options = {}) {
     const { expectedAccountKey, exepectedOptions } = options
     switch (expectedAccountKeyType) {
         case 'AccountKeyLegacy':
