@@ -124,7 +124,9 @@ class Account {
      */
     static createWithAccountKeyWeightedMultiSig(address, publicKeyArray, options) {
         if (options === undefined)
-            throw new Error(`The variable 'options' is undefined. To create an Account instance with AccountKeyWeightedMultiSig, 'options' should be defined.`)
+            throw new Error(
+                `The variable 'options' is undefined. To create an Account instance with AccountKeyWeightedMultiSig, 'options' should be defined.`
+            )
         return new Account(address, AccountKeyWeightedMultiSig.fromPublicKeysAndOptions(publicKeyArray, options))
     }
 
@@ -138,7 +140,9 @@ class Account {
      */
     static createWithAccountKeyRoleBased(address, roledBasedPublicKeyArray, options) {
         if (options === undefined)
-            throw new Error(`The variable 'options' is undefined. To create an Account instance with AccountKeyRoleBased, 'options' should be defined.`)
+            throw new Error(
+                `The variable 'options' is undefined. To create an Account instance with AccountKeyRoleBased, 'options' should be defined.`
+            )
         return new Account(address, AccountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(roledBasedPublicKeyArray, options))
     }
 
