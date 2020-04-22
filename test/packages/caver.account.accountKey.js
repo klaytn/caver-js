@@ -52,13 +52,13 @@ function testAccountKey(accountKey, expectedAccountKeyType, options = {}) {
             expect(accountKey instanceof AccountKeyLegacy).to.be.true
             break
         case 'AccountKeyPublic':
-            isAccountKeyPublic(accountKey, expectedAccountKey)
+            testAccountKeyPublic(accountKey, expectedAccountKey)
             break
         case 'AccountKeyFail':
             expect(accountKey instanceof AccountKeyFail).to.be.true
             break
         case 'AccountKeyWeightedMultiSig':
-            isAccountKeyWeightedMultiSig(accountKey, expectedAccountKey, exepectedOptions)
+            testAccountKeyWeightedMultiSig(accountKey, expectedAccountKey, exepectedOptions)
             break
         case 'AccountKeyRoleBased':
             expect(accountKey instanceof AccountKeyRoleBased).to.be.true
@@ -71,9 +71,9 @@ function testAccountKey(accountKey, expectedAccountKeyType, options = {}) {
                     expectedAccountKey[i] = _.isArray(expectedAccountKey[i]) ? expectedAccountKey[i][0] : expectedAccountKey[i]
                     expect(expectedAccountKey[i] instanceof AccountKeyFail)
                 } else if (acctKey instanceof AccountKeyPublic) {
-                    isAccountKeyPublic(acctKey, expectedAccountKey[i][0])
+                    testAccountKeyPublic(acctKey, expectedAccountKey[i][0])
                 } else if (acctKey instanceof AccountKeyWeightedMultiSig) {
-                    isAccountKeyWeightedMultiSig(acctKey, expectedAccountKey[i], exepectedOptions[i])
+                    testAccountKeyWeightedMultiSig(acctKey, expectedAccountKey[i], exepectedOptions[i])
                 } else if (acctKey === undefined) {
                     // AccountKeyNil case in AccountKeyRoleBased
                     expect(expectedAccountKey[i].length).to.equal(0)
@@ -88,12 +88,12 @@ function testAccountKey(accountKey, expectedAccountKeyType, options = {}) {
     }
 }
 
-function isAccountKeyPublic(key, singlePubKey) {
+function testAccountKeyPublic(key, singlePubKey) {
     expect(key instanceof AccountKeyPublic).to.be.true
     checkEqualWithPublicKey(key.publicKey, singlePubKey)
 }
 
-function isAccountKeyWeightedMultiSig(key, multiplePubKeys, options) {
+function testAccountKeyWeightedMultiSig(key, multiplePubKeys, options) {
     expect(key instanceof AccountKeyWeightedMultiSig).to.be.true
     if (options) {
         expect(key.threshold).to.equal(options.threshold)
@@ -118,7 +118,7 @@ describe('caver.account.accountKey.accountKeyLegacy', () => {
         it('should decode RLP-encoded string and return AccountLegacy instances', () => {
             const accountKey = caver.account.accountKey.accountKeyLegacy.decode(ACCOUNT_KEY_TAG.ACCOUNT_KEY_LEGACY_TAG)
 
-            isAccountKey(accountKey, 'AccountKeyLegacy')
+            testAccountKey(accountKey, 'AccountKeyLegacy')
         })
     })
 
@@ -148,7 +148,7 @@ describe('caver.account.accountKey.accountKeyPublic', () => {
                 '0x02a102c10b598a1a3ba252acc21349d61c2fbd9bc8c15c50a5599f420cccc3291f9bf9'
             )
 
-            isAccountKey(accountKey, 'AccountKeyPublic', { expectedAccountKey })
+            testAccountKey(accountKey, 'AccountKeyPublic', { expectedAccountKey })
         })
     })
 
@@ -167,7 +167,7 @@ describe('caver.account.accountKey.accountKeyPublic', () => {
             const [x, y] = caver.utils.xyPointFromPublicKey(pubKey)
             const accountKey = caver.account.accountKey.accountKeyPublic.fromXYPoint(x, y)
 
-            isAccountKey(accountKey, 'AccountKeyPublic', { expectedAccountKey: pubKey })
+            testAccountKey(accountKey, 'AccountKeyPublic', { expectedAccountKey: pubKey })
         })
     })
 
@@ -177,7 +177,7 @@ describe('caver.account.accountKey.accountKeyPublic', () => {
                 '0x022dfe0d7c496d954037ab15afd3352008f6c5bfe972850b7b321e96721f4bf11f7e6aa508dd50af53e190dcd4a2559aa1c3ef3f78b97b97e2928ac33e038464'
             const accountKey = caver.account.accountKey.accountKeyPublic.fromPublicKey(pubKey)
 
-            isAccountKey(accountKey, 'AccountKeyPublic', { expectedAccountKey: pubKey })
+            testAccountKey(accountKey, 'AccountKeyPublic', { expectedAccountKey: pubKey })
         })
     })
 
@@ -186,7 +186,7 @@ describe('caver.account.accountKey.accountKeyPublic', () => {
             const pubKey = '0x02022dfe0d7c496d954037ab15afd3352008f6c5bfe972850b7b321e96721f4bf1'
             const accountKey = caver.account.accountKey.accountKeyPublic.fromPublicKey(pubKey)
 
-            isAccountKey(accountKey, 'AccountKeyPublic', { expectedAccountKey: pubKey })
+            testAccountKey(accountKey, 'AccountKeyPublic', { expectedAccountKey: pubKey })
         })
     })
 
@@ -221,7 +221,7 @@ describe('caver.account.accountKey.accountKeyFail', () => {
         it('should decode RLP-encoded string and return AccountKeyFail instances', () => {
             const accountKey = caver.account.accountKey.accountKeyFail.decode(ACCOUNT_KEY_TAG.ACCOUNT_KEY_FAIL_TAG)
 
-            isAccountKey(accountKey, 'AccountKeyFail')
+            testAccountKey(accountKey, 'AccountKeyFail')
         })
     })
 
@@ -254,7 +254,7 @@ describe('caver.account.accountKey.accountKeyWeightedMultiSig', () => {
                 '0x04f84b02f848e301a102c10b598a1a3ba252acc21349d61c2fbd9bc8c15c50a5599f420cccc3291f9bf9e301a1021769a9196f523c419be50c26419ebbec34d3d6aa8b59da834212f13dbec9a9c1'
             )
 
-            isAccountKey(accountKey, 'AccountKeyWeightedMultiSig', { expectedAccountKey, exepectedOptions })
+            testAccountKey(accountKey, 'AccountKeyWeightedMultiSig', { expectedAccountKey, exepectedOptions })
         })
     })
 
@@ -276,7 +276,7 @@ describe('caver.account.accountKey.accountKeyWeightedMultiSig', () => {
             const options = { threshold: 2, weight: [1, 1] }
             const accountKey = caver.account.accountKey.accountKeyWeightedMultiSig.fromPublicKeysAndOptions(publicArray, options)
 
-            isAccountKey(accountKey, 'AccountKeyWeightedMultiSig', { expectedAccountKey: publicArray, exepectedOptions: options })
+            testAccountKey(accountKey, 'AccountKeyWeightedMultiSig', { expectedAccountKey: publicArray, exepectedOptions: options })
         })
     })
 
@@ -367,7 +367,7 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
                 '0x05f8c4a302a1036250dad4985bc22c8b9b84d1a05624c4daa0e83c8ae8fb35702d9024a8c14a71b84e04f84b02f848e301a102c10b598a1a3ba252acc21349d61c2fbd9bc8c15c50a5599f420cccc3291f9bf9e301a1021769a9196f523c419be50c26419ebbec34d3d6aa8b59da834212f13dbec9a9c1b84e04f84b01f848e301a103e7615d056e770b3262e5b39a4823c3124989924ed4dcfab13f10b252701540d4e301a1036f21d60c16200d99e6777422470b3122b65850d5135a5a4b41344a5607a1446d'
             )
 
-            isAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey, exepectedOptions })
+            testAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey, exepectedOptions })
         })
     })
 
@@ -388,7 +388,7 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
                 '0x05f876a302a1036250dad4985bc22c8b9b84d1a05624c4daa0e83c8ae8fb35702d9024a8c14a718180b84e04f84b01f848e301a103e7615d056e770b3262e5b39a4823c3124989924ed4dcfab13f10b252701540d4e301a1036f21d60c16200d99e6777422470b3122b65850d5135a5a4b41344a5607a1446d'
             )
 
-            isAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey, exepectedOptions })
+            testAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey, exepectedOptions })
         })
     })
 
@@ -423,7 +423,7 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
             const options = [{ threshold: 2, weight: [1, 1] }, { threshold: 2, weight: [1, 1, 2] }, { threshold: 3, weight: [1, 1, 2, 2] }]
             const accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)
 
-            isAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey: pubs, exepectedOptions: options })
+            testAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey: pubs, exepectedOptions: options })
         })
     })
 
@@ -449,7 +449,7 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
             const options = [{ threshold: 2, weight: [1, 1] }, { threshold: 2, weight: [1, 1, 2] }, { threshold: 3, weight: [1, 1, 2, 2] }]
             const accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)
 
-            isAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey: pubs, exepectedOptions: options })
+            testAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey: pubs, exepectedOptions: options })
         })
     })
 
@@ -470,7 +470,7 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
             const options = [{}, {}, { threshold: 3, weight: [1, 1, 2, 2] }]
             const accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)
 
-            isAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey: pubs, exepectedOptions: options })
+            testAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey: pubs, exepectedOptions: options })
         })
     })
 
@@ -511,7 +511,7 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
             const options = [{}, {}, { threshold: 3, weight: [1, 1, 2, 2] }]
             const accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)
 
-            isAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey: pubs, exepectedOptions: options })
+            testAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey: pubs, exepectedOptions: options })
         })
     })
 
@@ -530,7 +530,7 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
             const options = [{}, {}, { threshold: 3, weight: [1, 1, 2, 2] }]
             const accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)
 
-            isAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey: pubs, exepectedOptions: options })
+            testAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey: pubs, exepectedOptions: options })
         })
     })
 

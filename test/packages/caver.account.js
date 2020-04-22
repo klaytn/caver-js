@@ -44,7 +44,7 @@ beforeEach(() => {
     caver = new Caver(testRPCURL)
 })
 
-function isAccount(data, { expectedAddress, expectedAccountKeyType, expectedAccountKey, exepectedOptions }) {
+function testAccount(data, { expectedAddress, expectedAccountKeyType, expectedAccountKey, exepectedOptions }) {
     expect(data instanceof Account).to.be.true
     const objectKeys = ['_address', '_accountKey']
 
@@ -59,19 +59,19 @@ function isAccount(data, { expectedAddress, expectedAccountKeyType, expectedAcco
     if (expectedAccountKeyType !== undefined) {
         switch (expectedAccountKeyType) {
             case 'AccountKeyPublic':
-                isAccountKeyPublic(data.accountKey, expectedAccountKey)
+                testAccountKeyPublic(data.accountKey, expectedAccountKey)
                 break
             case 'AccountKeyWeightedMultiSig':
-                isAccountKeyWeightedMultiSig(data.accountKey, expectedAccountKey, exepectedOptions)
+                testAccountKeyWeightedMultiSig(data.accountKey, expectedAccountKey, exepectedOptions)
                 break
             case 'AccountKeyRoleBased':
                 expect(data.accountKey instanceof AccountKeyRoleBased).to.be.true
                 for (let i = 0; i < data.accountKey.accountKeys.length; i++) {
                     const acctKey = data.accountKey.accountKeys[i]
                     if (acctKey instanceof AccountKeyPublic) {
-                        isAccountKeyPublic(acctKey, expectedAccountKey[i][0])
+                        testAccountKeyPublic(acctKey, expectedAccountKey[i][0])
                     } else if (acctKey instanceof AccountKeyWeightedMultiSig) {
-                        isAccountKeyWeightedMultiSig(acctKey, expectedAccountKey[i], exepectedOptions[i])
+                        testAccountKeyWeightedMultiSig(acctKey, expectedAccountKey[i], exepectedOptions[i])
                     } else if (acctKey === undefined) {
                         // AccountKeyNil case in AccountKeyRoleBased
                         expect(expectedAccountKey[i].length).to.equal(0)
@@ -87,12 +87,12 @@ function isAccount(data, { expectedAddress, expectedAccountKeyType, expectedAcco
     }
 }
 
-function isAccountKeyPublic(key, singlePubKey) {
+function testAccountKeyPublic(key, singlePubKey) {
     expect(key instanceof AccountKeyPublic).to.be.true
     checkEqualWithPublicKey(key.publicKey, singlePubKey)
 }
 
-function isAccountKeyWeightedMultiSig(key, multiplePubKeys, options) {
+function testAccountKeyWeightedMultiSig(key, multiplePubKeys, options) {
     expect(key instanceof AccountKeyWeightedMultiSig).to.be.true
     if (options) {
         expect(key.threshold).to.equal(options.threshold)
@@ -122,7 +122,7 @@ describe('caver.account.create', () => {
 
             const account = caver.account.create(address, pub)
 
-            isAccount(account, { expectedAddress: address, expectedAccountKeyType: 'AccountKeyPublic', expectedAccountKey: pub })
+            testAccount(account, { expectedAddress: address, expectedAccountKeyType: 'AccountKeyPublic', expectedAccountKey: pub })
             expect(createWithAccoutnKeyPublicSpy).to.have.been.calledOnce
         })
     })
@@ -134,7 +134,7 @@ describe('caver.account.create', () => {
 
             const account = caver.account.create(address, pub)
 
-            isAccount(account, { expectedAddress: address, expectedAccountKeyType: 'AccountKeyPublic', expectedAccountKey: pub })
+            testAccount(account, { expectedAddress: address, expectedAccountKeyType: 'AccountKeyPublic', expectedAccountKey: pub })
         })
     })
 
@@ -166,7 +166,7 @@ describe('caver.account.create', () => {
 
             const account = caver.account.create(address, pubs, options)
 
-            isAccount(account, {
+            testAccount(account, {
                 expectedAddress: address,
                 expectedAccountKeyType: 'AccountKeyWeightedMultiSig',
                 expectedAccountKey: pubs,
@@ -189,7 +189,7 @@ describe('caver.account.create', () => {
 
             const account = caver.account.create(address, pubs, options)
 
-            isAccount(account, {
+            testAccount(account, {
                 expectedAddress: address,
                 expectedAccountKeyType: 'AccountKeyWeightedMultiSig',
                 expectedAccountKey: pubs,
@@ -223,7 +223,7 @@ describe('caver.account.create', () => {
 
             const account = caver.account.create(address, pubs, options)
 
-            isAccount(account, {
+            testAccount(account, {
                 expectedAddress: address,
                 expectedAccountKeyType: 'AccountKeyRoleBased',
                 expectedAccountKey: pubs,
@@ -257,7 +257,7 @@ describe('caver.account.create', () => {
 
             const account = caver.account.create(address, pubs, options)
 
-            isAccount(account, {
+            testAccount(account, {
                 expectedAddress: address,
                 expectedAccountKeyType: 'AccountKeyRoleBased',
                 expectedAccountKey: pubs,
@@ -288,7 +288,7 @@ describe('caver.account.createFromRLPEncoding', () => {
 
             const rlpEncodedAccountKey = '0x02a102c10b598a1a3ba252acc21349d61c2fbd9bc8c15c50a5599f420cccc3291f9bf9'
             const account = caver.account.createFromRLPEncoding(address, rlpEncodedAccountKey)
-            isAccount(account, {
+            testAccount(account, {
                 expectedAddress: address,
                 expectedAccountKeyType: 'AccountKeyPublic',
                 expectedAccountKey,
@@ -321,7 +321,7 @@ describe('caver.account.createFromRLPEncoding', () => {
             const account = caver.account.createFromRLPEncoding(address, rlpEncodedAccountKey)
             const exepectedOptions = { threshold: 2, weight: [1, 1] }
 
-            isAccount(account, {
+            testAccount(account, {
                 expectedAddress: address,
                 expectedAccountKeyType: 'AccountKeyWeightedMultiSig',
                 expectedAccountKey,
@@ -352,7 +352,7 @@ describe('caver.account.createFromRLPEncoding', () => {
             const account = caver.account.createFromRLPEncoding(address, rlpEncodedAccountKey)
             const exepectedOptions = [{}, { threshold: 2, weight: [1, 1] }, { threshold: 1, weight: [1, 1] }]
 
-            isAccount(account, {
+            testAccount(account, {
                 expectedAddress: address,
                 expectedAccountKeyType: 'AccountKeyRoleBased',
                 expectedAccountKey,
@@ -380,7 +380,7 @@ describe('caver.account.createFromRLPEncoding', () => {
             const account = caver.account.createFromRLPEncoding(address, rlpEncodedAccountKey)
             const exepectedOptions = [{}, {}, { threshold: 1, weight: [1, 1] }]
 
-            isAccount(account, {
+            testAccount(account, {
                 expectedAddress: address,
                 expectedAccountKeyType: 'AccountKeyRoleBased',
                 expectedAccountKey,
@@ -410,7 +410,7 @@ describe('caver.account.createWithAccountKeyPublic', () => {
 
             const account = caver.account.createWithAccountKeyPublic(address, pub)
 
-            isAccount(account, { expectedAddress: address, expectedAccountKeyType: 'AccountKeyPublic', expectedAccountKey: pub })
+            testAccount(account, { expectedAddress: address, expectedAccountKeyType: 'AccountKeyPublic', expectedAccountKey: pub })
         })
     })
 
@@ -421,7 +421,7 @@ describe('caver.account.createWithAccountKeyPublic', () => {
 
             const account = caver.account.createWithAccountKeyPublic(address, pub)
 
-            isAccount(account, { expectedAddress: address, expectedAccountKeyType: 'AccountKeyPublic', expectedAccountKey: pub })
+            testAccount(account, { expectedAddress: address, expectedAccountKeyType: 'AccountKeyPublic', expectedAccountKey: pub })
         })
     })
 })
@@ -451,7 +451,7 @@ describe('caver.account.createWithAccountKeyWeightedMultiSig', () => {
 
             const account = caver.account.createWithAccountKeyWeightedMultiSig(address, pubs, options)
 
-            isAccount(account, {
+            testAccount(account, {
                 expectedAddress: address,
                 expectedAccountKeyType: 'AccountKeyWeightedMultiSig',
                 expectedAccountKey: pubs,
@@ -499,7 +499,7 @@ describe('caver.account.createWithAccountKeyRoleBased', () => {
 
             const account = caver.account.createWithAccountKeyRoleBased(address, pubs, options)
 
-            isAccount(account, {
+            testAccount(account, {
                 expectedAddress: address,
                 expectedAccountKeyType: 'AccountKeyRoleBased',
                 expectedAccountKey: pubs,
