@@ -42,7 +42,7 @@ beforeEach(() => {
     caver = new Caver(testRPCURL)
 })
 
-function isKeyring(data, { expectedAddress, expectedKey } = {}) {
+function validateKeyring(data, { expectedAddress, expectedKey } = {}) {
     expect(data instanceof Keyring).to.be.true
     const objectKeys = ['_address', '_key']
 
@@ -66,7 +66,7 @@ function isKeyring(data, { expectedAddress, expectedKey } = {}) {
     }
 }
 
-function isKeystore(data, password, { address, expectedKey, keyringLength = 1 }, version = 4) {
+function validateKeystore(data, password, { address, expectedKey, keyringLength = 1 }, version = 4) {
     const objectKeys = ['version', 'id', 'address']
 
     if (version > 3) {
@@ -94,10 +94,10 @@ function isKeystore(data, password, { address, expectedKey, keyringLength = 1 },
     expect(prefixTrimmed).to.match(new RegExp(`^${address.slice(2)}$`, 'i'))
 
     const keyring = caver.wallet.keyring.decrypt(data, password)
-    isKeyring(keyring, { expectedAddress: address, expectedKey })
+    validateKeyring(keyring, { expectedAddress: address, expectedKey })
 }
 
-function isAccount(data, { keyring, expectedAccountKey, exepectedOptions }) {
+function validateAccount(data, { keyring, expectedAccountKey, exepectedOptions }) {
     expect(data instanceof Account).to.be.true
     const objectKeys = ['_address', '_accountKey']
 
@@ -112,19 +112,19 @@ function isAccount(data, { keyring, expectedAccountKey, exepectedOptions }) {
     if (expectedAccountKey !== undefined) {
         switch (expectedAccountKey) {
             case 'AccountKeyPublic':
-                isAccountKeyPublic(data.accountKey, keyring.key[0][0])
+                validateAccountKeyPublic(data.accountKey, keyring.key[0][0])
                 break
             case 'AccountKeyWeightedMultiSig':
-                isAccountKeyWeightedMultiSig(data.accountKey, keyring.key[0], exepectedOptions)
+                validateAccountKeyWeightedMultiSig(data.accountKey, keyring.key[0], exepectedOptions)
                 break
             case 'AccountKeyRoleBased':
                 expect(data.accountKey instanceof AccountKeyRoleBased).to.be.true
                 for (let i = 0; i < data.accountKey.accountKeys.length; i++) {
                     const acctKey = data.accountKey.accountKeys[i]
                     if (acctKey instanceof AccountKeyPublic) {
-                        isAccountKeyPublic(acctKey, keyring.key[i])
+                        validateAccountKeyPublic(acctKey, keyring.key[i])
                     } else {
-                        isAccountKeyWeightedMultiSig(acctKey, keyring.key[i], exepectedOptions[i])
+                        validateAccountKeyWeightedMultiSig(acctKey, keyring.key[i], exepectedOptions[i])
                     }
                 }
                 break
@@ -132,12 +132,12 @@ function isAccount(data, { keyring, expectedAccountKey, exepectedOptions }) {
     }
 }
 
-function isAccountKeyPublic(key, singleKey) {
+function validateAccountKeyPublic(key, singleKey) {
     expect(key instanceof AccountKeyPublic).to.be.true
     expect(key.publicKey).to.equal(singleKey.getPublicKey())
 }
 
-function isAccountKeyWeightedMultiSig(key, multipleKeys, options) {
+function validateAccountKeyWeightedMultiSig(key, multipleKeys, options) {
     expect(key instanceof AccountKeyWeightedMultiSig).to.be.true
     if (options) {
         expect(key.threshold).to.equal(options.threshold)
@@ -205,7 +205,7 @@ describe('caver.wallet.keyring.generate', () => {
     context('CAVERJS-UNIT-KEYRING-003: input: no parameter', () => {
         it('should return valid private Keyring instance', () => {
             const result = caver.wallet.keyring.generate()
-            isKeyring(result)
+            validateKeyring(result)
         })
     })
 
@@ -214,7 +214,7 @@ describe('caver.wallet.keyring.generate', () => {
             const entropy = caver.utils.randomHex(32)
 
             const result = caver.wallet.keyring.generate(entropy)
-            isKeyring(result)
+            validateKeyring(result)
         })
     })
 })
@@ -225,7 +225,7 @@ describe('caver.wallet.keyring.createFromPrivateKey', () => {
             const keyring = caver.wallet.keyring.generate()
 
             const result = caver.wallet.keyring.createFromPrivateKey(keyring.key[0][0].privateKey)
-            isKeyring(result, { expectedAddress: keyring.address })
+            validateKeyring(result, { expectedAddress: keyring.address })
         })
     })
 
@@ -234,7 +234,7 @@ describe('caver.wallet.keyring.createFromPrivateKey', () => {
             const keyring = caver.wallet.keyring.generate()
 
             const result = caver.wallet.keyring.createFromPrivateKey(utils.stripHexPrefix(keyring.key[0][0].privateKey))
-            isKeyring(result, { expectedAddress: keyring.address })
+            validateKeyring(result, { expectedAddress: keyring.address })
         })
     })
 
@@ -244,7 +244,7 @@ describe('caver.wallet.keyring.createFromPrivateKey', () => {
             const klaytnWalletKey = keyring.getKlaytnWalletKey()
 
             const result = caver.wallet.keyring.createFromPrivateKey(klaytnWalletKey)
-            isKeyring(result, { expectedKey: keyring.key, expectedAddress: keyring.address })
+            validateKeyring(result, { expectedKey: keyring.key, expectedAddress: keyring.address })
         })
     })
 
@@ -254,7 +254,7 @@ describe('caver.wallet.keyring.createFromPrivateKey', () => {
             const klaytnWalletKey = keyring.getKlaytnWalletKey()
 
             const result = caver.wallet.keyring.createFromPrivateKey(utils.stripHexPrefix(klaytnWalletKey))
-            isKeyring(result, { expectedKey: keyring.key, expectedAddress: keyring.address })
+            validateKeyring(result, { expectedKey: keyring.key, expectedAddress: keyring.address })
         })
     })
 
@@ -276,7 +276,7 @@ describe('caver.wallet.keyring.createFromKlaytnWalletKey', () => {
             const klaytnWalletKey = keyring.getKlaytnWalletKey()
 
             const result = caver.wallet.keyring.createFromKlaytnWalletKey(klaytnWalletKey)
-            isKeyring(result, { expectedKey: keyring.key, expectedAddress: keyring.address })
+            validateKeyring(result, { expectedKey: keyring.key, expectedAddress: keyring.address })
         })
     })
 
@@ -297,7 +297,7 @@ describe('caver.wallet.keyring.create', () => {
             const keyring = caver.wallet.keyring.generate()
             const created = caver.wallet.keyring.create(keyring.address, keyring.key[0][0].privateKey)
 
-            isKeyring(created, { expectedAddress: keyring.address, expectedKey: keyring.key })
+            validateKeyring(created, { expectedAddress: keyring.address, expectedKey: keyring.key })
         })
     })
 
@@ -310,7 +310,7 @@ describe('caver.wallet.keyring.create', () => {
                 caver.wallet.keyring.generatePrivateKey(),
             ]
             const created = caver.wallet.keyring.create(address, multiplePrivateKeys)
-            isKeyring(created, { expectedAddress: address, expectedKey: multiplePrivateKeys })
+            validateKeyring(created, { expectedAddress: address, expectedKey: multiplePrivateKeys })
         })
     })
 
@@ -327,7 +327,7 @@ describe('caver.wallet.keyring.create', () => {
                 [caver.wallet.keyring.generatePrivateKey(), caver.wallet.keyring.generatePrivateKey()],
             ]
             const created = caver.wallet.keyring.create(address, roleBasedPrivateKeys)
-            isKeyring(created, { expectedAddress: address, expectedKey: roleBasedPrivateKeys })
+            validateKeyring(created, { expectedAddress: address, expectedKey: roleBasedPrivateKeys })
         })
     })
 
@@ -336,7 +336,7 @@ describe('caver.wallet.keyring.create', () => {
             const address = caver.wallet.keyring.generate().address
             const roleBasedPrivateKeys = [[], [], [caver.wallet.keyring.generatePrivateKey(), caver.wallet.keyring.generatePrivateKey()]]
             const created = caver.wallet.keyring.create(address, roleBasedPrivateKeys)
-            isKeyring(created, { expectedAddress: address, expectedKey: roleBasedPrivateKeys })
+            validateKeyring(created, { expectedAddress: address, expectedKey: roleBasedPrivateKeys })
         })
     })
 
@@ -363,7 +363,7 @@ describe('caver.wallet.keyring.createWithSingleKey', () => {
 
             const result = caver.wallet.keyring.createWithSingleKey(coupled.address, prvString)
 
-            isKeyring(result, { expectedKey: prvString, expectedAddress: coupled.address })
+            validateKeyring(result, { expectedKey: prvString, expectedAddress: coupled.address })
         })
     })
 
@@ -374,7 +374,7 @@ describe('caver.wallet.keyring.createWithSingleKey', () => {
 
             const result = caver.wallet.keyring.createWithSingleKey(decoupled.address, prvString)
 
-            isKeyring(result, { expectedKey: prvString, expectedAddress: decoupled.address })
+            validateKeyring(result, { expectedKey: prvString, expectedAddress: decoupled.address })
         })
     })
 
@@ -411,7 +411,7 @@ describe('caver.wallet.keyring.createWithMultipleKey', () => {
             const arr = [caver.wallet.keyring.generatePrivateKey(), caver.wallet.keyring.generatePrivateKey()]
 
             const result = caver.wallet.keyring.createWithMultipleKey(keyring.address, arr)
-            isKeyring(result, { expectedKey: arr, expectedAddress: keyring.address })
+            validateKeyring(result, { expectedKey: arr, expectedAddress: keyring.address })
         })
     })
 
@@ -455,7 +455,7 @@ describe('caver.wallet.keyring.createWithRoleBasedKey', () => {
             ]
 
             const result = caver.wallet.keyring.createWithRoleBasedKey(keyring.address, arr)
-            isKeyring(result, { expectedKey: arr, expectedAddress: keyring.address })
+            validateKeyring(result, { expectedKey: arr, expectedAddress: keyring.address })
         })
     })
 
@@ -507,7 +507,7 @@ describe('caver.wallet.keyring.encrypt', () => {
             const keyring = caver.wallet.keyring.createFromPrivateKey(privateKey)
 
             const result = caver.wallet.keyring.encrypt(privateKey, password)
-            isKeystore(result, password, { address: keyring.address, expectedKey: privateKey })
+            validateKeystore(result, password, { address: keyring.address, expectedKey: privateKey })
         })
     })
 
@@ -518,7 +518,7 @@ describe('caver.wallet.keyring.encrypt', () => {
             const privateKey = keyring.key[0][0].privateKey
 
             const result = caver.wallet.keyring.encrypt(privateKey, password, { address: keyring.address })
-            isKeystore(result, password, { address: keyring.address, expectedKey: privateKey })
+            validateKeystore(result, password, { address: keyring.address, expectedKey: privateKey })
         })
     })
     context('CAVERJS-UNIT-KEYRING-030: input: klaytnWalletKey, password', () => {
@@ -528,7 +528,7 @@ describe('caver.wallet.keyring.encrypt', () => {
             const klaytnWalletKey = keyring.getKlaytnWalletKey()
 
             const result = caver.wallet.keyring.encrypt(klaytnWalletKey, password)
-            isKeystore(result, password, { address: keyring.address, expectedKey: keyring.key })
+            validateKeystore(result, password, { address: keyring.address, expectedKey: keyring.key })
         })
     })
 
@@ -543,7 +543,7 @@ describe('caver.wallet.keyring.encrypt', () => {
             const address = caver.wallet.keyring.generate().address
 
             const result = caver.wallet.keyring.encrypt(privateKeys, password, { address })
-            isKeystore(result, password, { address, keyringLength: 3, expectedKey: privateKeys })
+            validateKeystore(result, password, { address, keyringLength: 3, expectedKey: privateKeys })
         })
     })
 
@@ -578,7 +578,7 @@ describe('caver.wallet.keyring.encrypt', () => {
             const address = caver.wallet.keyring.generate().address
 
             const result = caver.wallet.keyring.encrypt(privateKeys, password, { address })
-            isKeystore(result, password, { address, keyringLength: [2, 1, 4], expectedKey: privateKeys })
+            validateKeystore(result, password, { address, keyringLength: [2, 1, 4], expectedKey: privateKeys })
         })
     })
 
@@ -593,7 +593,7 @@ describe('caver.wallet.keyring.encrypt', () => {
             const address = caver.wallet.keyring.generate().address
 
             const result = caver.wallet.keyring.encrypt(privateKeys, password, { address })
-            isKeystore(result, password, { address, keyringLength: [2, 0, 1], expectedKey: privateKeys })
+            validateKeystore(result, password, { address, keyringLength: [2, 0, 1], expectedKey: privateKeys })
         })
     })
 
@@ -733,7 +733,7 @@ describe('caver.wallet.keyring.encrypt', () => {
             compareEncrypted(result.keyring[1][1], expectedKeystore.keyring[1][1])
             compareEncrypted(result.keyring[2][0], expectedKeystore.keyring[2][0])
 
-            isKeystore(result, password, { address, keyringLength: [1, 2, 1], expectedKey: keys })
+            validateKeystore(result, password, { address, keyringLength: [1, 2, 1], expectedKey: keys })
         })
     })
 
@@ -757,7 +757,7 @@ describe('caver.wallet.keyring.encryptV3', () => {
             const keyring = caver.wallet.keyring.createFromPrivateKey(privateKey)
 
             const result = caver.wallet.keyring.encryptV3(privateKey, password)
-            isKeystore(result, password, { address: keyring.address, expectedKey: privateKey }, 3)
+            validateKeystore(result, password, { address: keyring.address, expectedKey: privateKey }, 3)
         })
     })
 
@@ -768,7 +768,7 @@ describe('caver.wallet.keyring.encryptV3', () => {
             const privateKey = keyring.key[0][0].privateKey
 
             const result = caver.wallet.keyring.encryptV3(privateKey, password, { address: keyring.address })
-            isKeystore(result, password, { address: keyring.address, expectedKey: privateKey }, 3)
+            validateKeystore(result, password, { address: keyring.address, expectedKey: privateKey }, 3)
         })
     })
     context('CAVERJS-UNIT-KEYRING-040: input: klaytnWalletKey, password', () => {
@@ -778,7 +778,7 @@ describe('caver.wallet.keyring.encryptV3', () => {
             const klaytnWalletKey = keyring.getKlaytnWalletKey()
 
             const result = caver.wallet.keyring.encryptV3(klaytnWalletKey, password)
-            isKeystore(result, password, { address: keyring.address, expectedKey: keyring.key }, 3)
+            validateKeystore(result, password, { address: keyring.address, expectedKey: keyring.key }, 3)
         })
     })
 
@@ -819,7 +819,7 @@ describe('caver.wallet.keyring.decrypt', () => {
             const encrypted = caver.wallet.keyring.encrypt(privateKey, password)
             const decrypted = caver.wallet.keyring.decrypt(encrypted, password)
 
-            isKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.key })
+            validateKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.key })
         })
     })
 
@@ -831,7 +831,7 @@ describe('caver.wallet.keyring.decrypt', () => {
             const encrypted = keyring.encrypt(password)
             const decrypted = caver.wallet.keyring.decrypt(encrypted, password)
 
-            isKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.key })
+            validateKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.key })
         })
     })
 
@@ -843,7 +843,7 @@ describe('caver.wallet.keyring.decrypt', () => {
             const encrypted = keyring.encrypt(password)
             const decrypted = caver.wallet.keyring.decrypt(encrypted, password)
 
-            isKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.key })
+            validateKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.key })
         })
     })
 
@@ -855,7 +855,7 @@ describe('caver.wallet.keyring.decrypt', () => {
             const encrypted = keyring.encrypt(password)
             const decrypted = caver.wallet.keyring.decrypt(encrypted, password)
 
-            isKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.key })
+            validateKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.key })
         })
     })
 
@@ -867,7 +867,7 @@ describe('caver.wallet.keyring.decrypt', () => {
             const encrypted = keyring.encrypt(password)
             const decrypted = caver.wallet.keyring.decrypt(encrypted, password)
 
-            isKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.key })
+            validateKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.key })
         })
     })
 
@@ -972,7 +972,7 @@ describe('caver.wallet.keyring.decrypt', () => {
 
             const decrypted = caver.wallet.keyring.decrypt(keystoreJsonV4, password)
 
-            isKeyring(decrypted, { expectedAddress: expectedAccount.address, expectedKey: expectedAccount.key })
+            validateKeyring(decrypted, { expectedAddress: expectedAccount.address, expectedKey: expectedAccount.key })
         })
     })
 
@@ -1005,7 +1005,7 @@ describe('caver.wallet.keyring.decrypt', () => {
 
             const result = caver.wallet.keyring.decrypt(keystoreJsonV3, password)
 
-            isKeyring(result, { keys: expectedAccount.keys, address: expectedAccount.address })
+            validateKeyring(result, { keys: expectedAccount.keys, address: expectedAccount.address })
         })
     })
 })
@@ -1111,7 +1111,7 @@ describe('keyring.copy', () => {
             const keyring = caver.wallet.keyring.generate()
             const copied = keyring.copy()
 
-            isKeyring(copied, { expectedAddress: keyring.address, expectedKey: keyring.key })
+            validateKeyring(copied, { expectedAddress: keyring.address, expectedKey: keyring.key })
         })
     })
 
@@ -1120,7 +1120,7 @@ describe('keyring.copy', () => {
             const keyring = generateDecoupledKeyring()
             const copied = keyring.copy()
 
-            isKeyring(copied, { expectedAddress: keyring.address, expectedKey: keyring.key })
+            validateKeyring(copied, { expectedAddress: keyring.address, expectedKey: keyring.key })
         })
     })
 
@@ -1129,7 +1129,7 @@ describe('keyring.copy', () => {
             const keyring = generateMultiSigKeyring(2)
             const copied = keyring.copy()
 
-            isKeyring(copied, { expectedAddress: keyring.address, expectedKey: keyring.key })
+            validateKeyring(copied, { expectedAddress: keyring.address, expectedKey: keyring.key })
         })
     })
 
@@ -1138,7 +1138,7 @@ describe('keyring.copy', () => {
             const keyring = generateRoleBasedKeyring([2, 3, 1])
             const copied = keyring.copy()
 
-            isKeyring(copied, { expectedAddress: keyring.address, expectedKey: keyring.key })
+            validateKeyring(copied, { expectedAddress: keyring.address, expectedKey: keyring.key })
         })
     })
 })
@@ -1838,7 +1838,7 @@ describe('keyring.toAccount', () => {
         it('return account instance which has AccountKeyPublic', () => {
             const account = coupled.toAccount()
 
-            isAccount(account, { keyring: coupled, expectedAccountKey: 'AccountKeyPublic' })
+            validateAccount(account, { keyring: coupled, expectedAccountKey: 'AccountKeyPublic' })
         })
     })
 
@@ -1856,7 +1856,7 @@ describe('keyring.toAccount', () => {
 
             const account = coupled.toAccount(options)
 
-            isAccount(account, { keyring: coupled, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions: options })
+            validateAccount(account, { keyring: coupled, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions: options })
         })
     })
 
@@ -1864,7 +1864,7 @@ describe('keyring.toAccount', () => {
         it('return account instance which has AccountKeyPublic', () => {
             const account = decoupled.toAccount()
 
-            isAccount(account, { keyring: decoupled, expectedAccountKey: 'AccountKeyPublic' })
+            validateAccount(account, { keyring: decoupled, expectedAccountKey: 'AccountKeyPublic' })
         })
     })
 
@@ -1882,7 +1882,7 @@ describe('keyring.toAccount', () => {
 
             const account = decoupled.toAccount(options)
 
-            isAccount(account, { keyring: decoupled, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions: options })
+            validateAccount(account, { keyring: decoupled, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions: options })
         })
     })
 
@@ -1890,7 +1890,7 @@ describe('keyring.toAccount', () => {
         it('return account instance which has AccountKeyWeightedMultiSig with default options', () => {
             const account = multiSig.toAccount()
             const exepectedOptions = { threshold: 1, weight: [1, 1, 1] }
-            isAccount(account, { keyring: multiSig, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions })
+            validateAccount(account, { keyring: multiSig, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions })
         })
     })
 
@@ -1898,7 +1898,7 @@ describe('keyring.toAccount', () => {
         it('return account instance which has AccountKeyWeightedMultiSig', () => {
             const options = { threshold: 5, weight: [2, 3, 4] }
             const account = multiSig.toAccount(options)
-            isAccount(account, { keyring: multiSig, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions: options })
+            validateAccount(account, { keyring: multiSig, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions: options })
         })
     })
 
@@ -1907,7 +1907,7 @@ describe('keyring.toAccount', () => {
             const options = []
             const exepectedOptions = { threshold: 1, weight: [1, 1, 1] }
             const account = multiSig.toAccount(options)
-            isAccount(account, { keyring: multiSig, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions })
+            validateAccount(account, { keyring: multiSig, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions })
         })
     })
 
@@ -1916,7 +1916,7 @@ describe('keyring.toAccount', () => {
             const options = [{}, {}, {}]
             const exepectedOptions = { threshold: 1, weight: [1, 1, 1] }
             const account = multiSig.toAccount(options)
-            isAccount(account, { keyring: multiSig, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions })
+            validateAccount(account, { keyring: multiSig, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions })
         })
     })
 
@@ -1924,7 +1924,7 @@ describe('keyring.toAccount', () => {
         it('return account instance which has AccountKeyWeightedMultiSig', () => {
             const options = [{ threshold: 5, weight: [2, 3, 4] }, {}, {}]
             const account = multiSig.toAccount(options)
-            isAccount(account, { keyring: multiSig, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions: options[0] })
+            validateAccount(account, { keyring: multiSig, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions: options[0] })
         })
     })
 
@@ -1936,7 +1936,7 @@ describe('keyring.toAccount', () => {
                 { threshold: 1, weight: [1, 1] },
                 { threshold: 1, weight: [1, 1, 1, 1] },
             ]
-            isAccount(account, { keyring: roleBased, expectedAccountKey: 'AccountKeyRoleBased', exepectedOptions })
+            validateAccount(account, { keyring: roleBased, expectedAccountKey: 'AccountKeyRoleBased', exepectedOptions })
         })
     })
 
@@ -1944,7 +1944,7 @@ describe('keyring.toAccount', () => {
         it('return account instance which has AccountKeyRoleBased', () => {
             const options = [{ threshold: 2, weight: [1, 1] }, { threshold: 2, weight: [1, 2] }, { threshold: 5, weight: [1, 2, 3, 4] }]
             const account = roleBased.toAccount(options)
-            isAccount(account, { keyring: roleBased, expectedAccountKey: 'AccountKeyRoleBased', exepectedOptions: options })
+            validateAccount(account, { keyring: roleBased, expectedAccountKey: 'AccountKeyRoleBased', exepectedOptions: options })
         })
     })
 
@@ -1956,7 +1956,7 @@ describe('keyring.toAccount', () => {
                 { threshold: 1, weight: [1, 1] },
                 { threshold: 1, weight: [1, 1, 1, 1] },
             ]
-            isAccount(account, { keyring: roleBased, expectedAccountKey: 'AccountKeyRoleBased', exepectedOptions })
+            validateAccount(account, { keyring: roleBased, expectedAccountKey: 'AccountKeyRoleBased', exepectedOptions })
         })
     })
 
@@ -1968,7 +1968,7 @@ describe('keyring.toAccount', () => {
                 { threshold: 1, weight: [1, 1] },
                 { threshold: 1, weight: [1, 1, 1, 1] },
             ]
-            isAccount(account, { keyring: roleBased, expectedAccountKey: 'AccountKeyRoleBased', exepectedOptions })
+            validateAccount(account, { keyring: roleBased, expectedAccountKey: 'AccountKeyRoleBased', exepectedOptions })
         })
     })
 
@@ -1999,7 +1999,7 @@ describe('keyring.encrypt', () => {
         it('should encrypted as v4Keystore', () => {
             const password = 'password'
             const result = coupled.encrypt(password)
-            isKeystore(result, password, { address: coupled.address })
+            validateKeystore(result, password, { address: coupled.address })
         })
     })
 
@@ -2007,7 +2007,7 @@ describe('keyring.encrypt', () => {
         it('should encrypted as v4Keystore', () => {
             const password = 'password'
             const result = decoupled.encrypt(password)
-            isKeystore(result, password, { address: decoupled.address })
+            validateKeystore(result, password, { address: decoupled.address })
         })
     })
 
@@ -2015,7 +2015,7 @@ describe('keyring.encrypt', () => {
         it('should encrypted as v4Keystore', () => {
             const password = 'password'
             const result = multiSig.encrypt(password)
-            isKeystore(result, password, { address: multiSig.address, keyringLength: 3 })
+            validateKeystore(result, password, { address: multiSig.address, keyringLength: 3 })
         })
     })
 
@@ -2023,7 +2023,7 @@ describe('keyring.encrypt', () => {
         it('should encrypted as v4Keystore', () => {
             const password = 'password'
             const result = roleBased.encrypt(password)
-            isKeystore(result, password, { address: roleBased.address, keyringLength: [2, 2, 4] })
+            validateKeystore(result, password, { address: roleBased.address, keyringLength: [2, 2, 4] })
         })
     })
 })
@@ -2045,7 +2045,7 @@ describe('keyring.encryptV3', () => {
         it('should encrypted as v3Keystore', () => {
             const password = 'password'
             const result = coupled.encryptV3(password)
-            isKeystore(result, password, { address: coupled.address }, 3)
+            validateKeystore(result, password, { address: coupled.address }, 3)
         })
     })
 
@@ -2053,7 +2053,7 @@ describe('keyring.encryptV3', () => {
         it('should encrypted as v4Keystore', () => {
             const password = 'password'
             const result = decoupled.encryptV3(password)
-            isKeystore(result, password, { address: decoupled.address }, 3)
+            validateKeystore(result, password, { address: decoupled.address }, 3)
         })
     })
 
