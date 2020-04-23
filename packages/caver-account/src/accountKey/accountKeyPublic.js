@@ -68,8 +68,7 @@ class AccountKeyPublic {
      * @param {string} publicKey - a public key
      */
     constructor(publicKey) {
-        if (!utils.isValidPublicKey(publicKey)) throw new Error(`Invalid public key: ${publicKey}`)
-        this._publicKey = utils.addHexPrefix(publicKey)
+        this.publicKey = publicKey
     }
 
     /**

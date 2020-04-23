@@ -152,14 +152,8 @@ class Account {
      * @param {AccountKeyLegacy|AccountKeyPublic|AccountKeyFail|AccountKeyWeightedMultiSig|AccountKeyRoleBased} accountKey - The accountKey of account.
      */
     constructor(address, accountKey) {
-        if (!utils.isAddress(address)) throw new Error(`Invalid address : ${address}`)
-        if (!isAccountKeyInstance(accountKey))
-            throw new Error(
-                `Invalid accountKey. accountKey should be an instance of AccountKeyLegacy, AccountKeyPublic, AccountKeyFail, AccountKeyWeightedMultiSig or AccountKeyRoleBased`
-            )
-
-        this._address = utils.addHexPrefix(address)
-        this._accountKey = accountKey
+        this.address = address
+        this.accountKey = accountKey
     }
 
     /**
