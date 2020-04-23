@@ -30,9 +30,8 @@ class WeightedPublicKey {
      * @param {string} publicKey - The public key string.
      */
     constructor(weight, publicKey) {
-        this._weight = utils.hexToNumber(weight)
-        if (!utils.isValidPublicKey(publicKey)) throw new Error(`Invalid public key: ${publicKey}`)
-        this._publicKey = utils.addHexPrefix(publicKey)
+        this.weight = weight
+        this.publicKey = publicKey
     }
 
     /**

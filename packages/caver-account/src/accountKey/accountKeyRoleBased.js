@@ -131,8 +131,7 @@ class AccountKeyRoleBased {
      * @param {Array.<AccountKeyLegacy|AccountKeyPublic|AccountKeyFail|AccountKeyWeightedMultiSig>} accountKeyArray - An array containing arrays of instances of AccountKeyPublic or AccountKeyWeightedMultiSig for each role.
      */
     constructor(accountKeyArray) {
-        if (!isValidRoleBasedKeyFormat(accountKeyArray)) throw new Error(`Invalid role-based account key format.`)
-        this._accountKeys = accountKeyArray
+        this.accountKeys = accountKeyArray
     }
 
     /**
@@ -142,7 +141,7 @@ class AccountKeyRoleBased {
         return this._accountKeys
     }
 
-    set accountkeys(keys) {
+    set accountKeys(keys) {
         if (!isValidRoleBasedKeyFormat(keys)) throw new Error(`Invalid role-based account key format.`)
         this._accountKeys = keys
     }

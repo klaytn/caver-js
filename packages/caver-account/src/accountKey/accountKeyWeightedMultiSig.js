@@ -84,12 +84,9 @@ class AccountKeyWeightedMultiSig {
      * @param {Array.<WeightedPublicKey>} weightedPublicKeys - An array of instances of WeightedPublicKeys
      */
     constructor(threshold, weightedPublicKeys) {
-        this._threshold = utils.hexToNumber(threshold)
+        this.threshold = threshold
 
-        for (const wp of weightedPublicKeys) {
-            if (!(wp instanceof WeightedPublicKey)) throw new Error(`Invalid type of weighted public keys.`)
-        }
-        this._weightedPublicKeys = weightedPublicKeys || []
+        this.weightedPublicKeys = weightedPublicKeys || []
     }
 
     /**
