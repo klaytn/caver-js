@@ -9,20 +9,9 @@
 		"params": 0
 	},
 	{
-		"name": "getCoinbase",
-		"call": "klay_coinbase",
-		"params": 0
-	},
-	{
 		"name": "isMining",
 		"call": "klay_mining",
 		"params": 0
-	},
-	{
-		"name": "getHashrate",
-		"call": "klay_hashrate",
-		"params": 0,
-		"outputFormatter": "hexToNumber"
 	},
 	{
 		"name": "isSyncing",
@@ -115,36 +104,6 @@
 		"params": 1,
 		"inputFormatter": ["inputCallFormatter"],
 		"outputFormatter": "hexToNumber"
-	},
-	{
-		"name": "getCompilers",
-		"call": "klay_getCompilers",
-		"params": 0
-	},
-	{
-		"name": "compile.solidity",
-		"call": "klay_compileSolidity",
-		"params": 1
-	},
-	{
-		"name": "compile.lll",
-		"call": "klay_compileLLL",
-		"params": 1
-	},
-	{
-		"name": "compile.serpent",
-		"call": "klay_compileSerpent",
-		"params": 1
-	},
-	{
-		"name": "submitWork",
-		"call": "klay_submitWork",
-		"params": 3
-	},
-	{
-		"name": "getWork",
-		"call": "klay_getWork",
-		"params": 0
 	},
 	{
 		"name": "getPastLogs",
