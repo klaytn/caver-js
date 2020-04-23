@@ -45,8 +45,6 @@ class PrivateKey {
      * @param {string} key - The private key string.
      */
     constructor(key) {
-        if (!utils.isValidPrivateKey(key)) throw new Error(`Invalid private key: ${key}`)
-
         this.privateKey = key
     }
 

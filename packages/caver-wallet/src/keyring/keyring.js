@@ -288,9 +288,8 @@ class Keyring {
      * @param {string|Array.<string>|Array.<Array<string>>|PrivateKey|Array.<PrivateKey>|Array.<Array<PrivateKey>>} key - The key(s) to use in keyring.
      */
     constructor(address, key) {
-        if (!utils.isAddress(address)) throw new Error(`Invalid address : ${address}`)
-        this._address = utils.addHexPrefix(address).toLowerCase()
-        this._key = formattingForKeyInKeyring(key)
+        this.address = address
+        this.key = key
     }
 
     /**
