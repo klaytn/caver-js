@@ -56,7 +56,7 @@ class AccountKeyPublic {
 
     /**
      * Creates AccountKeyPublic instance from public key string
-     * @param {string} pubKey - The public key string. This can be in format of compressed or decompressed.
+     * @param {string} pubKey - The public key string. This can be in format of compressed or uncompressed.
      * @return {AccountKeyPublic}
      */
     static fromPublicKey(pubKey) {

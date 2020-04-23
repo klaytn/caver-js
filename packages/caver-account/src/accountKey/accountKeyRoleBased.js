@@ -24,7 +24,7 @@ const AccountKeyPublic = require('./accountKeyPublic')
 const AccountKeyFail = require('./accountKeyFail')
 const utils = require('../../../caver-utils')
 const { ACCOUNT_KEY_TAG } = require('./accountKeyHelper')
-const { KEY_ROLE } = require('../../../caver-keyring/src/keyringHelper/keyringHelper')
+const { KEY_ROLE } = require('../../../caver-wallet/src/keyring/keyringHelper')
 
 function isValidRoleBasedKeyFormat(roleBasedAccountKeys) {
     if (!_.isArray(roleBasedAccountKeys)) return false
