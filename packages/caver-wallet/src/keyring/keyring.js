@@ -198,7 +198,7 @@ class Keyring {
      */
     static encryptV3(key, password, options = {}) {
         if (!_.isString(key) && !(key instanceof Keyring)) {
-            throw new Error(`Invalid parameter. key should be private key string, KlaytnWalletKey or instance of Keyring`)
+            throw new Error(`Invalid parameter. key should be a private key string, KlaytnWalletKey or instance of Keyring`)
         }
 
         const keyring =
@@ -230,7 +230,7 @@ class Keyring {
         }
 
         if (json.crypto) {
-            if (json.keyring) throw new Error("Invalid key store format: 'crypto' can not be with 'keyring'")
+            if (json.keyring) throw new Error("Invalid key store format: 'crypto' and 'keyring' cannot be defined together.")
 
             json.keyring = [json.crypto]
             delete json.crypto
