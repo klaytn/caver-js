@@ -421,22 +421,22 @@ class Keyring {
     }
 
     /**
-     * signs with hashed data and returns result object that includes `signsture`, `message` and `messageHash`
+     * signs with hashed data and returns result object that includes `signature`, `message` and `messageHash`
      *
      * @param {string} data The data string to sign.
      * @param {number} [role] A number indicating the role of the key. You can use `caver.wallet.keyring.role`. (default: `caver.wallet.keyring.role.ROLE_TRANSACTION_KEY`)
      * @param {number} [index] The index of the key to be used. (default: 0)
      * @return {object}
      */
-    signMessage(data, role, index) {
-        const messageHash = utils.hashMessage(data)
+    signMessage(message, role, index) {
+        const messageHash = utils.hashMessage(message)
         if (role === undefined && index === undefined) {
             role = KEY_ROLE.ROLE_TRANSACTION_KEY
-            if (this._key[role].length === 0) throw new Error(`Dafault key(${KEY_ROLE[0]}) does not have enough key to sign.`)
+            if (this._key[role].length === 0) throw new Error(`Default key(${KEY_ROLE[0]}) does not have enough keys to sign.`)
             index = 0
         } else if (role === undefined || index === undefined) {
             throw new Error(
-                `To sign message, both role and index must be defined. ` +
+                `To sign the given message, both role and index must be defined. ` +
                     `If both role and index are not defined, this function signs the message using the default key(${KEY_ROLE[0]}[0]).`
             )
         }
