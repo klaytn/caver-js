@@ -445,7 +445,7 @@ class Keyring {
         if (index >= keys.length) throw new Error(`Invalid index(${index}): index must be less than the length of keys(${keys.length}).`)
 
         const signed = keys[index].signMessage(messageHash)
-        signed.message = data
+        signed.message = message
         return signed
     }
 

@@ -1713,7 +1713,7 @@ describe('keyring.signMessage', () => {
     context('CAVERJS-UNIT-KEYRING-101: keyring type: roleBased / role: existed role', () => {
         it('should throw error when index or role is undefined', () => {
             const expectedError =
-                `To sign message, both role and index must be defined. ` +
+                `To sign the given message, both role and index must be defined. ` +
                 `If both role and index are not defined, this function signs the message using the default key(${
                     caver.wallet.keyring.role[0]
                 }[0]).`
@@ -1724,7 +1724,7 @@ describe('keyring.signMessage', () => {
     context('CAVERJS-UNIT-KEYRING-102: keyring type: roleBased / index: valid index', () => {
         it('should throw error when index or role is undefined', () => {
             const expectedError =
-                `To sign message, both role and index must be defined. ` +
+                `To sign the given message, both role and index must be defined. ` +
                 `If both role and index are not defined, this function signs the message using the default key(${
                     caver.wallet.keyring.role[0]
                 }[0]).`
@@ -1735,7 +1735,7 @@ describe('keyring.signMessage', () => {
     context('CAVERJS-UNIT-KEYRING-103: keyring type: roleBased', () => {
         it('should throw error when default key is empty', () => {
             const emptyDefaultKeyRoleBased = generateRoleBasedKeyring([0, 0, 3])
-            const expectedError = `Dafault key(${caver.wallet.keyring.role[0]}) does not have enough key to sign.`
+            const expectedError = `Default key(${caver.wallet.keyring.role[0]}) does not have enough keys to sign.`
             expect(() => emptyDefaultKeyRoleBased.signMessage(data)).to.throw(expectedError)
         })
     })
