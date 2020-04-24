@@ -234,7 +234,7 @@ class KeyringContainer {
 
         if (!transaction.from || transaction.from === '0x') transaction.from = address
 
-        await transaction.fillAndFormatTransaction()
+        await transaction.fillTransaction()
         const hash = hasher(transaction)
         const role = transaction.type.includes('ACCOUNT_UPDATE') ? KEY_ROLE.ROLE_ACCOUNT_UPDATE_KEY : KEY_ROLE.ROLE_TRANSACTION_KEY
 
@@ -258,7 +258,7 @@ class KeyringContainer {
     async signWithKeys(address, transaction, hasher = TransactionHasher.getHashForSigning) {
         if (!transaction.from || transaction.from === '0x') transaction.from = address
 
-        await transaction.fillAndFormatTransaction()
+        await transaction.fillTransaction()
         const hash = hasher(transaction)
         const role = transaction.type.includes('ACCOUNT_UPDATE') ? KEY_ROLE.ROLE_ACCOUNT_UPDATE_KEY : KEY_ROLE.ROLE_TRANSACTION_KEY
 
@@ -293,7 +293,7 @@ class KeyringContainer {
 
         if (!transaction.feePayer || transaction.feePayer === '0x') transaction.feePayer = address
 
-        await transaction.fillAndFormatTransaction()
+        await transaction.fillTransaction()
         const hash = hasher(transaction)
 
         const keyring = this.getKeyring(address)
@@ -316,7 +316,7 @@ class KeyringContainer {
     async signFeePayerWithKeys(address, transaction, hasher = TransactionHasher.getHashForFeePayerSigning) {
         if (!transaction.feePayer || transaction.feePayer === '0x') transaction.feePayer = address
 
-        await transaction.fillAndFormatTransaction()
+        await transaction.fillTransaction()
         const hash = hasher(transaction)
 
         const keyring = this.getKeyring(address)
