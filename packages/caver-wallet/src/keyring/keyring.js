@@ -114,7 +114,7 @@ class Keyring {
      */
     static createWithSingleKey(address, key) {
         if (!_.isString(key))
-            throw new Error(`Invalid format of parameter. Use 'fromMultipleKey' or 'fromRoleBasedKey' for two more more keys.`)
+            throw new Error(`Invalid format of parameter. Use 'fromMultipleKey' or 'fromRoleBasedKey' for two or more keys.`)
         if (utils.isKlaytnWalletKey(key))
             throw new Error(`Invalid format of parameter. Use 'fromKlaytnWalletKey' to create Keyring from KlaytnWalletKey.`)
 
