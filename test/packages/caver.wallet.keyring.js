@@ -394,7 +394,7 @@ describe('caver.wallet.keyring.createWithSingleKey', () => {
             const keyring = caver.wallet.keyring.generate()
             const arr = [caver.wallet.keyring.generatePrivateKey(), caver.wallet.keyring.generatePrivateKey()]
 
-            const errormsg = `Invalid format of parameter. Use 'fromMultipleKey' or 'fromRoleBasedKey' to use more than one.`
+            const errormsg = `Invalid format of parameter. Use 'fromMultipleKey' or 'fromRoleBasedKey' for two or more keys.`
 
             expect(() => caver.wallet.keyring.createWithSingleKey(keyring.address, arr)).to.throws(errormsg)
             expect(() => caver.wallet.keyring.createWithSingleKey(keyring.address, undefined)).to.throws(errormsg)
@@ -792,7 +792,7 @@ describe('caver.wallet.keyring.encryptV3', () => {
             ]
             const address = caver.wallet.keyring.generate().address
 
-            const errormsg = `Invalid parameter. key should be private key string, KlaytnWalletKey or instance of Keyring`
+            const errormsg = `Invalid parameter. key should be a private key string, KlaytnWalletKey or instance of Keyring`
             expect(() => caver.wallet.keyring.encryptV3(privateKeys, password, { address })).to.throws(errormsg)
         })
     })
