@@ -232,7 +232,7 @@ class KeyringContainer {
         if (!_.isNumber(index)) throw new Error(`Invalid index type: ${typeof index}`)
         if (hasher === undefined) hasher = TransactionHasher.getHashForSigning
 
-        if (!transaction.from) transaction.from = address
+        if (!transaction.from || transaction.from === '0x') transaction.from = address
 
         await transaction.fillAndFormatTransaction()
         const hash = hasher(transaction)
@@ -256,7 +256,7 @@ class KeyringContainer {
      * @return {string}
      */
     async signWithKeys(address, transaction, hasher = TransactionHasher.getHashForSigning) {
-        if (!transaction.from) transaction.from = address
+        if (!transaction.from || transaction.from === '0x') transaction.from = address
 
         await transaction.fillAndFormatTransaction()
         const hash = hasher(transaction)
