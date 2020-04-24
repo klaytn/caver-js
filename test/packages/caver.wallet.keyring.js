@@ -521,6 +521,7 @@ describe('caver.wallet.keyring.encrypt', () => {
             validateKeystore(result, password, { address: keyring.address, expectedKey: privateKey })
         })
     })
+
     context('CAVERJS-UNIT-KEYRING-030: input: klaytnWalletKey, password', () => {
         it('should encrypted as v4Keystore', () => {
             const password = 'password'
@@ -529,6 +530,30 @@ describe('caver.wallet.keyring.encrypt', () => {
 
             const result = caver.wallet.keyring.encrypt(klaytnWalletKey, password)
             validateKeystore(result, password, { address: keyring.address, expectedKey: keyring.key })
+        })
+    })
+
+    context('CAVERJS-UNIT-KEYRING-137: input: klaytnWalletKey, password, {valid address}', () => {
+        it('should encrypted as v4Keystore', () => {
+            const password = 'password'
+            const keyring = generateDecoupledKeyring()
+            const klaytnWalletKey = keyring.getKlaytnWalletKey()
+
+            const result = caver.wallet.keyring.encrypt(klaytnWalletKey, password, { address: klaytnWalletKey.address })
+            validateKeystore(result, password, { address: keyring.address, expectedKey: keyring.key })
+        })
+    })
+
+    context('CAVERJS-UNIT-KEYRING-138: input: klaytnWalletKey, password, {invalid address}', () => {
+        it('should encrypted as v4Keystore', () => {
+            const password = 'password'
+            const keyring = generateDecoupledKeyring()
+            const klaytnWalletKey = keyring.getKlaytnWalletKey()
+            const invalidAddress = caver.wallet.keyring.generate().address
+
+            const errormsg = `The address defined in options(${invalidAddress}) does not match the address of KlaytnWalletKey(${keyring.address}) entered as a parameter.`
+
+            expect(() => caver.wallet.keyring.encrypt(klaytnWalletKey, password, { address: invalidAddress })).to.throws(errormsg)
         })
     })
 
