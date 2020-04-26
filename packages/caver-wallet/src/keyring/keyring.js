@@ -711,9 +711,13 @@ function fillRoleKey(keys, role, keyToAdd) {
     if (keyToAdd === undefined) return
     keyToAdd = Array.isArray(keyToAdd) ? keyToAdd : [keyToAdd]
 
-    if (keyToAdd.length > MAXIMUM_KEY_NUM) {
+    if (keyToAdd.length > MAXIMUM_KEY_NUM)
         throw new Error(`The maximum number of private keys that can be used in keyring is ${MAXIMUM_KEY_NUM}.`)
-    }
+    if (role >= KEY_ROLE.ROLE_LAST)
+        throw new Error(
+            `Unsupported role number. The role number should be less than ${KEY_ROLE.ROLE_LAST}. Please use 'caver.wallet.keyring.role'`
+        )
+
     for (const keyString of keyToAdd) {
         const key = keyString instanceof PrivateKey ? keyString : new PrivateKey(keyString)
         keys[role].push(key)
