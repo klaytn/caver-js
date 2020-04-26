@@ -222,7 +222,7 @@ class Keyring {
     /**
      * decrypts a keystore v3 or v4 JSON and returns keyring instance.
      *
-     * @param {object} keystore The encrypted keyring to decrypt.
+     * @param {object} keystore The encrypted keystore to decrypt.
      * @param {string} password The password to use for decryption.
      * @return {Keyring}
      */
@@ -373,7 +373,7 @@ class Keyring {
      * signs with transactionHash with key and returns signature.
      *
      * @param {string} transactionHash The hash of transaction.
-     * @param {string|number} chainId The chainId or the network.
+     * @param {string|number} chainId The chainId specific to the network.
      * @param {number} role A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
      * @param {number} [index] The index of the key to be used. (default: 0)
      * @return {Array<string>}
@@ -397,7 +397,7 @@ class Keyring {
      * signs with transactionHash with multiple keys and returns signatures.
      *
      * @param {string} transactionHash The hash of transaction.
-     * @param {string|number} chainId The chainId or the network.
+     * @param {string|number} chainId the chain id specific to the network
      * @param {number} role A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
      * @return {Array.<Array<string>>}
      */
