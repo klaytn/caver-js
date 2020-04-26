@@ -74,18 +74,15 @@ class PrivateKey {
     }
 
     /**
-     * signs with hashed data and returns result object that includes `signsture` and `messageHash`
+     * signs with hashed data and returns `signsture`
      *
      * @param {string} messageHash The hash of data to sign.
-     * @return {object}
+     * @return {Array.<string>}
      */
     signMessage(messageHash) {
         const signature = AccountLib.sign(messageHash, this.privateKey)
         const [v, r, s] = AccountLib.decodeSignature(signature)
-        return {
-            messageHash,
-            signature: [v, r, s],
-        }
+        return [v, r, s]
     }
 
     /**

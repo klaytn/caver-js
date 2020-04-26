@@ -444,9 +444,12 @@ class Keyring {
         const keys = this.getKeyByRole(role)
         if (index >= keys.length) throw new Error(`Invalid index(${index}): index must be less than the length of keys(${keys.length}).`)
 
-        const signed = keys[index].signMessage(messageHash)
-        signed.message = message
-        return signed
+        const signature = keys[index].signMessage(messageHash)
+        return {
+            messageHash,
+            signature,
+            message,
+        }
     }
 
     /**
