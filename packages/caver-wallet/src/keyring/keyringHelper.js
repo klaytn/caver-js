@@ -26,6 +26,9 @@ const KEY_ROLE = {
     ROLE_LAST: 3,
 }
 
+const MAXIMUM_KEY_NUM = 10
+
 module.exports = {
     KEY_ROLE,
+    MAXIMUM_KEY_NUM,
 }

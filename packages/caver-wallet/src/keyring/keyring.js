@@ -24,7 +24,7 @@ const AccountLib = require('eth-lib/lib/account')
 
 const utils = require('../../../caver-utils')
 const PrivateKey = require('./privateKey')
-const { KEY_ROLE } = require('./keyringHelper')
+const { KEY_ROLE, MAXIMUM_KEY_NUM } = require('./keyringHelper')
 const Account = require('../../../caver-account')
 
 /**
@@ -711,6 +711,9 @@ function fillRoleKey(keys, role, keyToAdd) {
     if (keyToAdd === undefined) return
     keyToAdd = Array.isArray(keyToAdd) ? keyToAdd : [keyToAdd]
 
+    if (keyToAdd.length > MAXIMUM_KEY_NUM) {
+        throw new Error(`The maximum number of private keys that can be used in keyring is ${MAXIMUM_KEY_NUM}.`)
+    }
     for (const keyString of keyToAdd) {
         const key = keyString instanceof PrivateKey ? keyString : new PrivateKey(keyString)
         keys[role].push(key)
