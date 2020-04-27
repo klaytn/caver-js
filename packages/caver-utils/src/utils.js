@@ -469,6 +469,7 @@ const isHex = function(hex) {
 
 /**
  * Checks if the given string is a hexadecimal transaction hash with or without prefix 0x
+ * @deprecated since version v1.5.0
  * @method isTxHash
  * @param {String} txHash given hexadecimal transaction hash
  * @return {Boolean}
@@ -485,6 +486,7 @@ const isValidHash = hash => new RegExp(`^(0x|0X)?[0-9a-fA-F]{${HASH_LENGTH - 2}}
 
 /**
  * Checks if the given string is a hexadecimal transaction hash that starts with 0x
+ * @deprecated since version v1.5.0
  * @method isTxHashStrict
  * @param {String} txHash given hexadecimal transaction hash
  * @return {Boolean}
