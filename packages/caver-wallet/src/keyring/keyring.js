@@ -649,15 +649,17 @@ Keyring.role = KEY_ROLE
 module.exports = Keyring
 
 /**
- * Formatting key paramter for member variable in Keyring.
+ * Format the key parameters passed by the user to create a keyring instance into a two-dimensional array containing PrivateKey instances.
  *
- * @param {string|PrivateKey|Array.<string|PrivateKey>|Array.<Array.<string|PrivateKey>>} keyInput The input parameter for key variable in Keyring.
+ * The cases of the parameter that the user passes to the function is as follows, and this function formats it as a two-dimensional array.
  * PrivateKey instance: PrivateKey{}
  * single private key string: `0x{private key}`
  * multiple private key strings: [`0x{private key}`, `0x{private key}`]
  * multiple PrivateKey instances: [PrivateKey{}, PrivateKey{}]
  * role-based private key strings: [[`0x{private key}`], [`0x{private key}`, `0x{private key}`], [`0x{private key}`]]
  * role-based PrivateKey instances: [[PrivateKey{}], [PrivateKey{}, PrivateKey{}], [PrivateKey{}]]
+ *
+ * @param {string|PrivateKey|Array.<string|PrivateKey>|Array.<Array.<string|PrivateKey>>} keyInput The input parameter for key variable in Keyring.
  * @return {Array.<Array.<PrivateKey>>}
  */
 function formattingForKeyInKeyring(keyInput) {
