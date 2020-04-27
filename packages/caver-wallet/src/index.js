@@ -17,11 +17,11 @@
 */
 
 const _ = require('lodash')
+const AccountLib = require('eth-lib/lib/account')
 const Keyring = require('./keyring/keyring')
 const TransactionHasher = require('../../caver-transaction/src/transactionHasher/transactionHasher')
 const { KEY_ROLE } = require('./keyring/keyringHelper')
 const utils = require('../../caver-utils')
-const PrivateKey = require('./keyring/privateKey')
 
 /**
  * representing a Keyring container which manage keyrings.
@@ -99,7 +99,7 @@ class KeyringContainer {
      */
     // eslint-disable-next-line class-methods-use-this
     generatePrivateKey(entropy) {
-        return PrivateKey.generate(entropy)
+        return AccountLib.create(entropy || utils.randomHex(32)).privateKey
     }
 
     /**
