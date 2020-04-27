@@ -34,6 +34,8 @@ const utils = require('../../packages/caver-utils')
 const Keyring = require('../../packages/caver-wallet/src/keyring/keyring')
 const PrivateKey = require('../../packages/caver-wallet/src/keyring/privateKey')
 
+const { generateDecoupledKeyring, generateMultiSigKeyring, generateRoleBasedKeyring } = require('./utils')
+
 let caver
 
 beforeEach(() => {
@@ -62,39 +64,6 @@ function validateKeyringInWallet(data, { expectedAddress, expectedKey } = {}) {
             }
         }
     }
-}
-
-function generateDecoupledKeyring() {
-    const keyring = caver.wallet.keyring.generate()
-    keyring.key = caver.wallet.generatePrivateKey()
-    return keyring
-}
-
-function generateMultiSigKeyring(num = 3) {
-    const keyring = caver.wallet.keyring.generate()
-    const multipleKeys = []
-    for (let i = 0; i < num; i++) {
-        multipleKeys.push(caver.wallet.generatePrivateKey())
-    }
-    keyring.key = multipleKeys
-    return keyring
-}
-
-function generateRoleBasedKeyring(numArr) {
-    if (numArr === undefined) {
-        numArr = Array(caver.wallet.keyring.role.ROLE_LAST).fill(1)
-    }
-    const keyring = caver.wallet.keyring.generate()
-    const roleBased = []
-    for (let i = 0; i < numArr.length; i++) {
-        const keys = []
-        for (let j = 0; j < numArr[i]; j++) {
-            keys.push(caver.wallet.generatePrivateKey())
-        }
-        roleBased.push(keys)
-    }
-    keyring.key = roleBased
-    return keyring
 }
 
 describe('caver.wallet.generatePrivateKey', () => {
