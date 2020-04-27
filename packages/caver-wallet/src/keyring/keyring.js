@@ -33,18 +33,6 @@ const Account = require('../../../caver-account')
  */
 class Keyring {
     /**
-     * generates a private key string
-     *
-     * `caver.wallet.keyring.generatePrivateKey()`
-     *
-     * @param {string} entropy A random string to increase entropy.
-     * @return {string}
-     */
-    static generatePrivateKey(entropy) {
-        return PrivateKey.generate(entropy)
-    }
-
-    /**
      * generates a keyring instance
      *
      * `caver.wallet.keyring.generate()`
