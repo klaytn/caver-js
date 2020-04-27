@@ -398,6 +398,43 @@ describe('caver.utils.isTxHashStrict', () => {
     })
 })
 
+describe('caver.utils.isValidHashStrict', () => {
+    const hash = [
+        '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550',
+        '0xd09032de89e920fa6e9780fd4f5f29c2985f86f6510c0c3d086adc9e21e00763',
+    ]
+
+    context('CAVERJS-UNIT-ETC-205: input: valid strict hex', () => {
+        const tests = [
+            { hash: hash[0], expected: true }, // all lower
+            { hash: hash[0].toUpperCase(), expected: true }, // all upper
+            { hash: hash[0].slice(0, 10) + hash[0].slice(10).toUpperCase(), expected: true }, // mixed
+            { hash: hash[1], expected: true }, // all lower
+            { hash: hash[1].toUpperCase(), expected: true }, // all upper
+            { hash: hash[1].slice(0, 10) + hash[1].slice(10).toUpperCase(), expected: true }, // mixed
+        ]
+        it.each(tests, 'should return true', test => {
+            expect(caver.utils.isValidHashStrict(test.hash)).to.be.equal(test.expected)
+        })
+    })
+
+    context('CAVERJS-UNIT-ETC-206: invalid strict hex', () => {
+        const tests = [
+            { hash: `00${hash[0].slice(2)}`, expected: false }, // doesn't start with 0x
+            { hash: hash[0].slice(2), expected: false }, // doesn't start with 0x
+            { hash: `${hash[0].slice(0, 64)}ZZ`, expected: false }, // not hex
+            { hash: hash[0].slice(0, 10), expected: false }, // length is not enough
+            { hash: `00${hash[1].slice(2)}`, expected: false }, // doesn't start with 0x
+            { hash: hash[1].slice(2), expected: false }, // doesn't start with 0x
+            { hash: `${hash[1].slice(0, 64)}ZZ`, expected: false }, // not hex
+            { hash: hash[1].slice(0, 10), expected: false }, // length is not enough
+        ]
+        it.each(tests, 'should return false', test => {
+            expect(caver.utils.isValidHashStrict(test.hash)).to.be.equal(test.expected)
+        })
+    })
+})
+
 describe('caver.utils.isTxHash', () => {
     const transactionHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
     context('CAVERJS-UNIT-ETC-164: input: valid transaction hex', () => {
@@ -423,6 +460,50 @@ describe('caver.utils.isTxHash', () => {
         ]
         it.each(tests, 'should return false', test => {
             expect(caver.utils.isTxHash(test.tx)).to.be.equal(test.expected)
+        })
+    })
+})
+
+describe('caver.utils.isValidHash', () => {
+    const hash = [
+        '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550',
+        '0xd09032de89e920fa6e9780fd4f5f29c2985f86f6510c0c3d086adc9e21e00763',
+    ]
+
+    context('CAVERJS-UNIT-ETC-207: input: valid strict hex', () => {
+        const tests = [
+            { hash: hash[0], expected: true }, // all lower long
+            { hash: hash[0].slice(2), expected: true }, // all lower short
+            { hash: hash[0].toUpperCase(), expected: true }, // all upper long
+            { hash: hash[0].slice(2).toUpperCase(), expected: true }, // all upper short
+            { hash: hash[0].slice(0, 10) + hash[0].slice(10).toUpperCase(), expected: true }, // mixed long
+            { hash: hash[0].slice(2, 10) + hash[0].slice(10).toUpperCase(), expected: true }, // mixed short
+            { hash: hash[1], expected: true }, // all lower long
+            { hash: hash[1].slice(2), expected: true }, // all lower short
+            { hash: hash[1].toUpperCase(), expected: true }, // all upper long
+            { hash: hash[1].slice(2).toUpperCase(), expected: true }, // all upper short
+            { hash: hash[1].slice(0, 10) + hash[1].slice(10).toUpperCase(), expected: true }, // mixed long
+            { hash: hash[1].slice(2, 10) + hash[1].slice(10).toUpperCase(), expected: true }, // mixed short
+        ]
+        it.each(tests, 'should return true', test => {
+            expect(caver.utils.isValidHash(test.hash)).to.be.equal(test.expected)
+        })
+    })
+
+    context('CAVERJS-UNIT-ETC-208: invalid strict hex', () => {
+        const tests = [
+            { hash: hash[0].slice(4), expected: false }, // length is not enough (62)
+            { hash: `${hash[0].slice(0, 62)}ZZ`, expected: false }, // not hex
+            { hash: `${hash[0].slice(2)}00`, expected: false }, // length is too long (66 without 0x)
+            { hash: `${hash[0]}00`, expected: false }, // length is too long (68)
+            { hash: hash[1].slice(4), expected: false }, // length is not enough (62)
+            { hash: `${hash[1].slice(0, 62)}ZZ`, expected: false }, // not hex
+            { hash: `${hash[1].slice(2)}00`, expected: false }, // length is too long (66 without 0x)
+            { hash: `${hash[1]}00`, expected: false }, // length is too long (68)
+        ]
+
+        it.each(tests, 'should return false', test => {
+            expect(caver.utils.isValidHash(test.hash)).to.be.equal(test.expected)
         })
     })
 })

@@ -379,7 +379,7 @@ class Keyring {
      * @return {Array<string>}
      */
     signWithKey(transactionHash, chainId, role, index = 0) {
-        if (!utils.isTxHashStrict(transactionHash)) throw new Error(`Invalid transaction hash: ${transactionHash}`)
+        if (!utils.isValidHashStrict(transactionHash)) throw new Error(`Invalid transaction hash: ${transactionHash}`)
 
         if (chainId === undefined) {
             throw new Error(`chainId should be defined to sign.`)
@@ -402,7 +402,7 @@ class Keyring {
      * @return {Array.<Array<string>>}
      */
     signWithKeys(transactionHash, chainId, role) {
-        if (!utils.isTxHashStrict(transactionHash)) throw new Error(`Invalid transaction hash: ${transactionHash}`)
+        if (!utils.isValidHashStrict(transactionHash)) throw new Error(`Invalid transaction hash: ${transactionHash}`)
 
         if (chainId === undefined) {
             throw new Error(`chainId should be defined to sign.`)

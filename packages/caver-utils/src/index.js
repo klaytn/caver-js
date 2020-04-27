@@ -470,6 +470,9 @@ module.exports = {
     toTwosComplement: utils.toTwosComplement,
     isTxHash: utils.isTxHash,
     isTxHashStrict: utils.isTxHashStrict,
+    isValidHash: utils.isValidHash,
+    isValidHashStrict: utils.isValidHashStrict,
+
     // Moved promiEvent to utils,
     promiEvent: promiEvent,
     Iban: Iban,

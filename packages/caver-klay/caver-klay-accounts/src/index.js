@@ -186,7 +186,7 @@ function resolveArgsForSignTransactionWithHash(args) {
         throw new Error('Invalid parameter: The hash of transaction must be defined as a parameter.')
     }
 
-    if (!utils.isTxHashStrict(hash)) {
+    if (!utils.isValidHashStrict(hash)) {
         throw new Error('Invalid parameter: The hash of transaction must be 0x-hex prefixed string format.')
     }
 

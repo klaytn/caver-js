@@ -59,7 +59,7 @@ const txTypeToString = {
     '0x48': 'CHAIN_DATA_ANCHORING',
 }
 
-const TRANSACTION_HASH_LENGTH = 66
+const HASH_LENGTH = 66
 
 /**
  * Returns true if object is BN, otherwise false
@@ -470,18 +470,34 @@ const isHex = function(hex) {
 /**
  * Checks if the given string is a hexadecimal transaction hash with or without prefix 0x
  * @method isTxHash
- * @param {String} tx given hexadecimal transaction hash
+ * @param {String} txHash given hexadecimal transaction hash
  * @return {Boolean}
  */
-const isTxHash = tx => new RegExp(`^(0x|0X)?[0-9a-fA-F]{${TRANSACTION_HASH_LENGTH - 2}}$`).test(tx)
+const isTxHash = txHash => isValidHash(txHash)
+
+/**
+ * Checks if the given string is a hexadecimal hash with or without prefix 0x
+ * @method isValidHash
+ * @param {String} hash given hexadecimal hash
+ * @return {Boolean}
+ */
+const isValidHash = hash => new RegExp(`^(0x|0X)?[0-9a-fA-F]{${HASH_LENGTH - 2}}$`).test(hash)
 
 /**
  * Checks if the given string is a hexadecimal transaction hash that starts with 0x
  * @method isTxHashStrict
- * @param {String} tx given hexadecimal transaction hash
+ * @param {String} txHash given hexadecimal transaction hash
  * @return {Boolean}
  */
-const isTxHashStrict = tx => new RegExp(`^(0x|0X)[0-9a-fA-F]{${TRANSACTION_HASH_LENGTH - 2}}$`).test(tx)
+const isTxHashStrict = txHash => isValidHashStrict(txHash)
+
+/**
+ * Checks if the given string is a hexadecimal hash with prefix 0x
+ * @method isValidHashStrict
+ * @param {String} hash given hexadecimal hash
+ * @return {Boolean}
+ */
+const isValidHashStrict = hash => new RegExp(`^(0x|0X)[0-9a-fA-F]{${HASH_LENGTH - 2}}$`).test(hash)
 
 /**
  * Returns true if given string is a valid Klaytn block header bloom.
@@ -967,6 +983,8 @@ module.exports = {
     decompressPublicKey,
     isTxHash,
     isTxHashStrict,
+    isValidHash,
+    isValidHashStrict,
 
     isValidRole: isValidRole,
 
