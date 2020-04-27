@@ -222,6 +222,10 @@ class KeyringContainer {
      * @return {string}
      */
     async signWithKey(address, transaction, index, hasher) {
+        if (!transaction.from || transaction.from === '0x') transaction.from = address
+        if (transaction.from.toLowerCase() !== address.toLowerCase())
+            throw new Error(`The from address of the transaction is different with the address of the keyring to use.`)
+
         // Optional parameter processing
         // (address transaction) / (address transaction index) / (address transaction hasher) / (address transaction index hasher)
         if (_.isFunction(index) && hasher === undefined) {
@@ -231,8 +235,6 @@ class KeyringContainer {
         if (index === undefined) index = 0
         if (!_.isNumber(index)) throw new Error(`Invalid index type: ${typeof index}`)
         if (hasher === undefined) hasher = TransactionHasher.getHashForSigning
-
-        if (!transaction.from || transaction.from === '0x') transaction.from = address
 
         await transaction.fillTransaction()
         const hash = hasher(transaction)
@@ -257,6 +259,8 @@ class KeyringContainer {
      */
     async signWithKeys(address, transaction, hasher = TransactionHasher.getHashForSigning) {
         if (!transaction.from || transaction.from === '0x') transaction.from = address
+        if (transaction.from.toLowerCase() !== address.toLowerCase())
+            throw new Error(`The from address of the transaction is different with the address of the keyring to use.`)
 
         await transaction.fillTransaction()
         const hash = hasher(transaction)

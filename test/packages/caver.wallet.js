@@ -412,7 +412,7 @@ describe('wallet.signWithKey', () => {
 
             const vt = new mockValueTransfer(keyring)
 
-            const fillFormatSpy = sinon.spy(vt, 'fillAndFormatTransaction')
+            const fillFormatSpy = sinon.spy(vt, 'fillTransaction')
             const signSpy = sinon.spy(keyring, 'signWithKey')
             const appendSpy = sinon.spy(vt, 'appendSignatures')
 
@@ -431,7 +431,7 @@ describe('wallet.signWithKey', () => {
 
             const vt = new mockValueTransfer(keyring)
 
-            const fillFormatSpy = sinon.spy(vt, 'fillAndFormatTransaction')
+            const fillFormatSpy = sinon.spy(vt, 'fillTransaction')
             const signSpy = sinon.spy(keyring, 'signWithKey')
             const appendSpy = sinon.spy(vt, 'appendSignatures')
 
@@ -452,7 +452,7 @@ describe('wallet.signWithKey', () => {
 
             const txHash = '0xd4aab6590bdb708d1d3eafe95a967dafcd2d7cde197e512f3f0b8158e7b65fd1'
 
-            const fillFormatSpy = sinon.spy(vt, 'fillAndFormatTransaction')
+            const fillFormatSpy = sinon.spy(vt, 'fillTransaction')
             const signSpy = sinon.spy(keyring, 'signWithKey')
             const appendSpy = sinon.spy(vt, 'appendSignatures')
 
@@ -473,7 +473,7 @@ describe('wallet.signWithKey', () => {
 
             const txHash = '0xd4aab6590bdb708d1d3eafe95a967dafcd2d7cde197e512f3f0b8158e7b65fd1'
 
-            const fillFormatSpy = sinon.spy(vt, 'fillAndFormatTransaction')
+            const fillFormatSpy = sinon.spy(vt, 'fillTransaction')
             const signSpy = sinon.spy(keyring, 'signWithKey')
             const appendSpy = sinon.spy(vt, 'appendSignatures')
 
@@ -494,7 +494,7 @@ describe('wallet.signWithKey', () => {
 
             const txHash = '0xd4aab6590bdb708d1d3eafe95a967dafcd2d7cde197e512f3f0b8158e7b65fd1'
 
-            const fillFormatSpy = sinon.spy(updateTx, 'fillAndFormatTransaction')
+            const fillFormatSpy = sinon.spy(updateTx, 'fillTransaction')
             const signSpy = sinon.spy(keyring, 'signWithKey')
             const appendSpy = sinon.spy(updateTx, 'appendSignatures')
 
@@ -551,7 +551,7 @@ describe('wallet.signWithKeys', () => {
 
             const vt = new mockValueTransfer(keyring)
 
-            const fillFormatSpy = sinon.spy(vt, 'fillAndFormatTransaction')
+            const fillFormatSpy = sinon.spy(vt, 'fillTransaction')
             const signSpy = sinon.spy(keyring, 'signWithKeys')
             const appendSpy = sinon.spy(vt, 'appendSignatures')
 
@@ -572,7 +572,7 @@ describe('wallet.signWithKeys', () => {
 
             const txHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
 
-            const fillFormatSpy = sinon.spy(vt, 'fillAndFormatTransaction')
+            const fillFormatSpy = sinon.spy(vt, 'fillTransaction')
             const signSpy = sinon.spy(keyring, 'signWithKeys')
             const appendSpy = sinon.spy(vt, 'appendSignatures')
 
@@ -593,7 +593,7 @@ describe('wallet.signWithKeys', () => {
 
             const txHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
 
-            const fillFormatSpy = sinon.spy(updateTx, 'fillAndFormatTransaction')
+            const fillFormatSpy = sinon.spy(updateTx, 'fillTransaction')
             const signSpy = sinon.spy(keyring, 'signWithKeys')
             const appendSpy = sinon.spy(updateTx, 'appendSignatures')
 
@@ -672,7 +672,7 @@ describe('wallet.signFeePayerWithKey', () => {
 
             const vt = new mockFeeDelegatedValueTransfer(keyring)
 
-            const fillFormatSpy = sinon.spy(vt, 'fillAndFormatTransaction')
+            const fillFormatSpy = sinon.spy(vt, 'fillTransaction')
             const signSpy = sinon.spy(keyring, 'signWithKey')
             const appendSpy = sinon.spy(vt, 'appendFeePayerSignatures')
 
@@ -691,7 +691,7 @@ describe('wallet.signFeePayerWithKey', () => {
 
             const vt = new mockFeeDelegatedValueTransfer(keyring)
 
-            const fillFormatSpy = sinon.spy(vt, 'fillAndFormatTransaction')
+            const fillFormatSpy = sinon.spy(vt, 'fillTransaction')
             const signSpy = sinon.spy(keyring, 'signWithKey')
             const appendSpy = sinon.spy(vt, 'appendFeePayerSignatures')
 
@@ -712,7 +712,7 @@ describe('wallet.signFeePayerWithKey', () => {
 
             const txHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
 
-            const fillFormatSpy = sinon.spy(vt, 'fillAndFormatTransaction')
+            const fillFormatSpy = sinon.spy(vt, 'fillTransaction')
             const signSpy = sinon.spy(keyring, 'signWithKey')
             const appendSpy = sinon.spy(vt, 'appendFeePayerSignatures')
 
@@ -733,7 +733,7 @@ describe('wallet.signFeePayerWithKey', () => {
 
             const txHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
 
-            const fillFormatSpy = sinon.spy(vt, 'fillAndFormatTransaction')
+            const fillFormatSpy = sinon.spy(vt, 'fillTransaction')
             const signSpy = sinon.spy(keyring, 'signWithKey')
             const appendSpy = sinon.spy(vt, 'appendFeePayerSignatures')
 
@@ -790,7 +790,7 @@ describe('wallet.signFeePayerWithKeys', () => {
 
             const vt = new mockFeeDelegatedValueTransfer(keyring)
 
-            const fillFormatSpy = sinon.spy(vt, 'fillAndFormatTransaction')
+            const fillFormatSpy = sinon.spy(vt, 'fillTransaction')
             const signSpy = sinon.spy(keyring, 'signWithKeys')
             const appendSpy = sinon.spy(vt, 'appendFeePayerSignatures')
 
@@ -811,7 +811,7 @@ describe('wallet.signFeePayerWithKeys', () => {
 
             const txHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
 
-            const fillFormatSpy = sinon.spy(vt, 'fillAndFormatTransaction')
+            const fillFormatSpy = sinon.spy(vt, 'fillTransaction')
             const signSpy = sinon.spy(keyring, 'signWithKeys')
             const appendSpy = sinon.spy(vt, 'appendFeePayerSignatures')
 
@@ -862,7 +862,7 @@ class mockValueTransfer {
         this.signatures = []
 
         this.getRLPEncodingForSigning = () => '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
-        this.fillAndFormatTransaction = () => {}
+        this.fillTransaction = () => {}
         this.appendSignatures = () => {}
     }
 }
@@ -878,7 +878,7 @@ class mockAccountUpdate {
         this.gasPrice = '0x5d21dba00'
 
         this.getRLPEncodingForSigning = () => '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
-        this.fillAndFormatTransaction = () => {}
+        this.fillTransaction = () => {}
         this.appendSignatures = () => {}
     }
 }
@@ -888,6 +888,7 @@ class mockFeeDelegatedValueTransfer extends mockValueTransfer {
         super(keyring)
         this.type = 'FEE_DELEGATED_VALUE_TRANSFER'
 
+        this.getRLPEncodingForFeePayerSigning = () => '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
         this.appendFeePayerSignatures = () => {}
     }
 }
