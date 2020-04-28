@@ -111,7 +111,7 @@ class KeyringContainer {
     }
 
     /**
-     * querys the keyring address, and return.
+     * Get the keyring in container corresponding to the address
      *
      * @param {string} address The address of keyring to query.
      * @return {Keyring}
