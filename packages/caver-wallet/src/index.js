@@ -253,7 +253,7 @@ class KeyringContainer {
         const role = transaction.type.includes('ACCOUNT_UPDATE') ? KEY_ROLE.ROLE_ACCOUNT_UPDATE_KEY : KEY_ROLE.ROLE_TRANSACTION_KEY
 
         const keyring = this.getKeyring(address)
-        if (keyring === undefined) throw new Error(`Failed to find keyring from wallet with ${address}`)
+        if (keyring === undefined) throw new Error(`Failed to find the keyring from the wallet with the given address: ${address}`)
         const sigs = keyring.signWithKeys(hash, transaction.chainId, role)
 
         transaction.appendSignatures(sigs)
