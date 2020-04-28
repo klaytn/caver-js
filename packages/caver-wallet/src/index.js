@@ -80,7 +80,7 @@ class KeyringContainer {
     }
 
     /**
-     * creates keyring with parameters in the keyringContainer.
+     * creates keyring instance with parameters and adds to the keyringContainer.
      *
      * @param {string} address The address of the keyring.
      * @param {string|Array.<string>|Array.<Array.<string>>} key Private key string(s) to use in keyring. If different keys are used for each role, key must be defined as a two-dimensional array.
@@ -162,7 +162,7 @@ class KeyringContainer {
     /**
      * deletes keyring from keyringContainer.
      *
-     * @param {string} address An address of keyring or an index of keyring in keyringContainer.
+     * @param {string} address An address of keyring in keyringContainer.
      * @return {boolean}
      */
     remove(address) {
@@ -170,7 +170,7 @@ class KeyringContainer {
         if (utils.isAddress(address)) {
             keyringToRemove = this.getKeyring(address)
         } else {
-            throw new Error(`To remove keyring, parameter should be address string or index.`)
+            throw new Error(`To remove keyring, parameter should be address string.`)
         }
 
         if (keyringToRemove === undefined) return false
