@@ -36,15 +36,13 @@ class KeyringContainer {
         keyrings = keyrings || []
         this._length = 0
         this._addressToIndex = new Map()
-        this._setInitialState(keyrings)
 
-        this.keyring = Keyring
-    }
-
-    _setInitialState(keyrings) {
+        // add keyrings to keyringContainer
         for (const keyring of keyrings) {
             this.add(keyring)
         }
+
+        this.keyring = Keyring
     }
 
     _findSafeIndex(pointer) {
@@ -53,19 +51,6 @@ class KeyringContainer {
             return this._findSafeIndex(pointer + 1)
         }
         return pointer
-    }
-
-    _currentIndexes() {
-        const keys = Object.keys(this)
-        const indexes = keys
-            .map(function(key) {
-                return parseInt(key)
-            })
-            .filter(function(n) {
-                return n < 9e20
-            })
-
-        return indexes
     }
 
     /**
