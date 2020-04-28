@@ -134,7 +134,9 @@ class KeyringContainer {
      */
     getKeyring(address) {
         if (!utils.isAddress(address))
-            throw new Error(`Invalid address ${address}. To get keyring from wallet, you need to pass a valid address string as a parameter.`)
+            throw new Error(
+                `Invalid address ${address}. To get keyring from wallet, you need to pass a valid address string as a parameter.`
+            )
 
         const founded = this._addressKeyringMap.get(address.toLowerCase())
 
