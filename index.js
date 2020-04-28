@@ -34,6 +34,7 @@ global.rootRequire = name => require(`${__dirname}/packages/${name}/src/index.js
 const { packageInit, providers } = require('./packages/caver-core')
 const Klay = require('./packages/caver-klay')
 const Account = require('./packages/caver-account')
+const Wallet = require('./packages/caver-wallet')
 
 const Method = require('./packages/caver-core-method')
 const middleware = require('./packages/caver-middleware')
@@ -57,6 +58,7 @@ function Caver(provider, net) {
     this.Method = Method
 
     this.account = Account
+    this.wallet = new Wallet()
 
     // ex) call `onit.klay.property` || `onit.klay.method(...)`
     this.klay = new Klay(this)

@@ -16,19 +16,13 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const KEY_ROLE = {
-    ROLE_TRANSACTION_KEY: 0,
-    0: 'ROLE_TRANSACTION_KEY',
-    ROLE_ACCOUNT_UPDATE_KEY: 1,
-    1: 'ROLE_ACCOUNT_UPDATE_KEY',
-    ROLE_FEE_PAYER_KEY: 2,
-    2: 'ROLE_FEE_PAYER_KEY',
-    ROLE_LAST: 3,
+const Keyring = require('./keyring/keyring')
+
+// TODO: This will be implemented soon.
+class KeyringContainer {
+    constructor() {
+        this.keyring = Keyring
+    }
 }
 
-const MAXIMUM_KEY_NUM = 10
-
-module.exports = {
-    KEY_ROLE,
-    MAXIMUM_KEY_NUM,
-}
+module.exports = KeyringContainer
