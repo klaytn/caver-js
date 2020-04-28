@@ -33,7 +33,6 @@ class KeyringContainer {
      */
     constructor(keyrings) {
         keyrings = keyrings || []
-        this._length = 0
         this._addressKeyringMap = new Map()
 
         // add keyrings to keyringContainer
@@ -46,7 +45,7 @@ class KeyringContainer {
      * @type {number}
      */
     get length() {
-        return this._length
+        return this._addressKeyringMap.size
     }
 
     /**
@@ -89,7 +88,7 @@ class KeyringContainer {
             }
         }
 
-        if (!(keyring instanceof Keyring)) throw new Error(`Unsupported type : ${typeof key}`)
+        if (!(keyring instanceof Keyring)) throw new Error(`Unsupported type value: ${key} (type:${typeof key})`)
 
         return this.add(keyring)
     }
@@ -139,7 +138,6 @@ class KeyringContainer {
 
         const keyringToAdd = keyring.copy()
 
-        this._length++
         this._addressKeyringMap.set(keyringToAdd.address.toLowerCase(), keyringToAdd)
 
         return keyringToAdd
@@ -163,8 +161,6 @@ class KeyringContainer {
 
         keyringToRemove.key = null
         this._addressKeyringMap.delete(keyringToRemove.address.toLowerCase())
-
-        this._length--
 
         return true
     }
@@ -196,7 +192,9 @@ class KeyringContainer {
     async signWithKey(address, transaction, index, hasher) {
         if (!transaction.from || transaction.from === '0x') transaction.from = address
         if (transaction.from.toLowerCase() !== address.toLowerCase())
-            throw new Error(`transaction.from ${transaction.from.toLowerCase()} is different from the given address ${address.toLowerCase()}.`)
+            throw new Error(
+                `transaction.from ${transaction.from.toLowerCase()} is different from the given address ${address.toLowerCase()}.`
+            )
 
         // Optional parameter processing
         // (address transaction) / (address transaction index) / (address transaction hasher) / (address transaction index hasher)
@@ -210,7 +208,7 @@ class KeyringContainer {
 
         await transaction.fillTransaction()
         const hash = hasher(transaction)
-        const role = transaction.type.includes('ACCOUNT_UPDATE') ? KEY_ROLE.ROLE_ACCOUNT_UPDATE_KEY : KEY_ROLE.ROLE_TRANSACTION_KEY
+        const role = determineRoleToSign(transaction)
 
         const keyring = this.getKeyring(address)
         if (keyring === undefined) throw new Error(`Failed to find keyring from wallet with ${address}`)
@@ -232,11 +230,13 @@ class KeyringContainer {
     async signWithKeys(address, transaction, hasher = TransactionHasher.getHashForSigning) {
         if (!transaction.from || transaction.from === '0x') transaction.from = address
         if (transaction.from.toLowerCase() !== address.toLowerCase())
-            throw new Error(`transaction.from ${transaction.from.toLowerCase()} is different from the given address ${address.toLowerCase()}.`)
+            throw new Error(
+                `transaction.from ${transaction.from.toLowerCase()} is different from the given address ${address.toLowerCase()}.`
+            )
 
         await transaction.fillTransaction()
         const hash = hasher(transaction)
-        const role = transaction.type.includes('ACCOUNT_UPDATE') ? KEY_ROLE.ROLE_ACCOUNT_UPDATE_KEY : KEY_ROLE.ROLE_TRANSACTION_KEY
+        const role = determineRoleToSign(transaction)
 
         const keyring = this.getKeyring(address)
         if (keyring === undefined) throw new Error(`Failed to find the keyring from the wallet with the given address: ${address}`)
@@ -303,6 +303,10 @@ class KeyringContainer {
 
         return hash
     }
+}
+
+function determineRoleToSign(tx) {
+    return tx.type.includes('ACCOUNT_UPDATE') ? KEY_ROLE.ROLE_ACCOUNT_UPDATE_KEY : KEY_ROLE.ROLE_TRANSACTION_KEY
 }
 
 module.exports = KeyringContainer
