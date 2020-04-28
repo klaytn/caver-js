@@ -87,7 +87,7 @@ describe('caver.wallet.generatePrivateKey', () => {
 describe('wallet.generate', () => {
     context('CAVERJS-UNIT-KEYRINGCONTAINER-001: input: valid number of keyring to make', () => {
         it('should generate keyring instances and add to in-memory wallet', () => {
-            const addSpy = sinon.spy(caver.wallet, 'add')
+            const addSpy = sinon.spy(caver.wallet.keyringContainer, 'add')
 
             caver.wallet.generate(10)
 
@@ -98,7 +98,7 @@ describe('wallet.generate', () => {
 
     context('CAVERJS-UNIT-KEYRINGCONTAINER-002: input: valid number of keyring to make, entropy', () => {
         it('should generate keyring instances and add to in-memory wallet', () => {
-            const addSpy = sinon.spy(caver.wallet, 'add')
+            const addSpy = sinon.spy(caver.wallet.keyringContainer, 'add')
             const entropy = caver.utils.randomHex(32)
 
             caver.wallet.generate(10, entropy)
@@ -112,7 +112,7 @@ describe('wallet.generate', () => {
 describe('wallet.newKeyring', () => {
     context('CAVERJS-UNIT-KEYRINGCONTAINER-003: input: address, single private key string', () => {
         it('should create keyring instances with parameters and add to in-memory wallet', () => {
-            const addSpy = sinon.spy(caver.wallet, 'add')
+            const addSpy = sinon.spy(caver.wallet.keyringContainer, 'add')
             const keyring = caver.wallet.keyring.generate()
             const added = caver.wallet.newKeyring(keyring.address, keyring.key[0][0].privateKey)
 
@@ -124,7 +124,7 @@ describe('wallet.newKeyring', () => {
 
     context('CAVERJS-UNIT-KEYRINGCONTAINER-004: input: address, multiple private key strings', () => {
         it('should create keyring instances with parameters and add to in-memory wallet', () => {
-            const addSpy = sinon.spy(caver.wallet, 'add')
+            const addSpy = sinon.spy(caver.wallet.keyringContainer, 'add')
             const address = caver.wallet.keyring.generate().address
             const multiplePrivateKeys = [
                 caver.wallet.generatePrivateKey(),
@@ -141,7 +141,7 @@ describe('wallet.newKeyring', () => {
 
     context('CAVERJS-UNIT-KEYRINGCONTAINER-005: input: address, private keys by roles(without empty role)', () => {
         it('should create keyring instances with parameters and add to in-memory wallet', () => {
-            const addSpy = sinon.spy(caver.wallet, 'add')
+            const addSpy = sinon.spy(caver.wallet.keyringContainer, 'add')
             const address = caver.wallet.keyring.generate().address
             const roleBasedPrivateKeys = [
                 [caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey()],
@@ -158,7 +158,7 @@ describe('wallet.newKeyring', () => {
 
     context('CAVERJS-UNIT-KEYRINGCONTAINER-006: input: address, private keys by roles(with empty role)', () => {
         it('should create keyring instances with parameters and add to in-memory wallet', () => {
-            const addSpy = sinon.spy(caver.wallet, 'add')
+            const addSpy = sinon.spy(caver.wallet.keyringContainer, 'add')
             const address = caver.wallet.keyring.generate().address
             const roleBasedPrivateKeys = [[], [], [caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey()]]
             const added = caver.wallet.newKeyring(address, roleBasedPrivateKeys)
@@ -621,7 +621,7 @@ describe('wallet.signMessage', () => {
 
             const data = 'Some data'
 
-            const getKeyringSpy = sinon.spy(caver.wallet, 'getKeyring')
+            const getKeyringSpy = sinon.spy(caver.wallet.keyringContainer, 'getKeyring')
             const signMessageSpy = sinon.spy(keyring, 'signMessage')
 
             const signed = caver.wallet.signMessage(keyring.address, data)
