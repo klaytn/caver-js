@@ -270,7 +270,7 @@ describe('wallet.getKeyring', () => {
     context('CAVERJS-UNIT-KEYRINGCONTAINER-014: input: invalid address', () => {
         it('should throw error when parameter is invalid', () => {
             const invalidAddress = 'invalid address'
-            const expectedError = `Invalid address ${invalidAddress}. To get keyring from wallet, you need to pass valid address string as a parameter.`
+            const expectedError = `Invalid address ${invalidAddress}. To get keyring from wallet, you need to pass a valid address string as a parameter.`
             expect(() => caver.wallet.getKeyring(invalidAddress)).to.throw(expectedError)
         })
     })
@@ -608,7 +608,7 @@ describe('wallet.signWithKeys', () => {
 
             const vt = new mockValueTransfer(keyring)
 
-            const expectedError = `Failed to find keyring from wallet with ${keyring.address}`
+            const expectedError = `Failed to find the keyring from the wallet with the given address: ${keyring.address}`
             await expect(caver.wallet.signWithKeys(keyring.address, vt)).to.be.rejectedWith(expectedError)
         })
     })
