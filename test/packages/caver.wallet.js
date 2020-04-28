@@ -399,9 +399,8 @@ describe('wallet.signWithKey', () => {
             const signSpy = sinon.spy(keyring, 'signWithKey')
             const appendSpy = sinon.spy(vt, 'appendSignatures')
 
-            const hash = await caver.wallet.signWithKey(keyring.address, vt)
+            await caver.wallet.signWithKey(keyring.address, vt)
 
-            expect(utils.isTxHashStrict(hash)).to.be.true
             expect(fillFormatSpy).to.have.been.calledOnce
             expect(signSpy).to.have.been.calledOnce
             expect(appendSpy).to.have.been.calledOnce
@@ -418,9 +417,8 @@ describe('wallet.signWithKey', () => {
             const signSpy = sinon.spy(keyring, 'signWithKey')
             const appendSpy = sinon.spy(vt, 'appendSignatures')
 
-            const hash = await caver.wallet.signWithKey(keyring.address, vt, 2)
+            await caver.wallet.signWithKey(keyring.address, vt, 2)
 
-            expect(utils.isTxHashStrict(hash)).to.be.true
             expect(fillFormatSpy).to.have.been.calledOnce
             expect(signSpy).to.have.been.calledOnce
             expect(appendSpy).to.have.been.calledOnce
@@ -439,9 +437,8 @@ describe('wallet.signWithKey', () => {
             const signSpy = sinon.spy(keyring, 'signWithKey')
             const appendSpy = sinon.spy(vt, 'appendSignatures')
 
-            const hash = await caver.wallet.signWithKey(keyring.address, vt, () => txHash)
+            await caver.wallet.signWithKey(keyring.address, vt, () => txHash)
 
-            expect(utils.isTxHashStrict(hash)).to.be.true
             expect(fillFormatSpy).to.have.been.calledOnce
             expect(signSpy).to.have.been.calledWith(txHash, '0x7e3', 0, 0)
             expect(appendSpy).to.have.been.calledOnce
@@ -460,9 +457,8 @@ describe('wallet.signWithKey', () => {
             const signSpy = sinon.spy(keyring, 'signWithKey')
             const appendSpy = sinon.spy(vt, 'appendSignatures')
 
-            const hash = await caver.wallet.signWithKey(keyring.address, vt, 1, () => txHash)
+            await caver.wallet.signWithKey(keyring.address, vt, 1, () => txHash)
 
-            expect(utils.isTxHashStrict(hash)).to.be.true
             expect(fillFormatSpy).to.have.been.calledOnce
             expect(signSpy).to.have.been.calledWith(txHash, '0x7e3', 0, 1)
             expect(appendSpy).to.have.been.calledOnce
@@ -481,9 +477,8 @@ describe('wallet.signWithKey', () => {
             const signSpy = sinon.spy(keyring, 'signWithKey')
             const appendSpy = sinon.spy(updateTx, 'appendSignatures')
 
-            const hash = await caver.wallet.signWithKey(keyring.address, updateTx, 1, () => txHash)
+            await caver.wallet.signWithKey(keyring.address, updateTx, 1, () => txHash)
 
-            expect(utils.isTxHashStrict(hash)).to.be.true
             expect(fillFormatSpy).to.have.been.calledOnce
             expect(signSpy).to.have.been.calledWith(txHash, '0x7e3', 1, 1)
             expect(appendSpy).to.have.been.calledOnce
@@ -538,9 +533,8 @@ describe('wallet.signWithKeys', () => {
             const signSpy = sinon.spy(keyring, 'signWithKeys')
             const appendSpy = sinon.spy(vt, 'appendSignatures')
 
-            const hash = await caver.wallet.signWithKeys(keyring.address, vt)
+            await caver.wallet.signWithKeys(keyring.address, vt)
 
-            expect(utils.isTxHashStrict(hash)).to.be.true
             expect(fillFormatSpy).to.have.been.calledOnce
             expect(signSpy).to.have.been.calledOnce
             expect(appendSpy).to.have.been.calledOnce
@@ -559,9 +553,8 @@ describe('wallet.signWithKeys', () => {
             const signSpy = sinon.spy(keyring, 'signWithKeys')
             const appendSpy = sinon.spy(vt, 'appendSignatures')
 
-            const hash = await caver.wallet.signWithKeys(keyring.address, vt, () => txHash)
+            await caver.wallet.signWithKeys(keyring.address, vt, () => txHash)
 
-            expect(utils.isTxHashStrict(hash)).to.be.true
             expect(fillFormatSpy).to.have.been.calledOnce
             expect(signSpy).to.have.been.calledWith(txHash, '0x7e3', 0)
             expect(appendSpy).to.have.been.calledOnce
@@ -580,9 +573,8 @@ describe('wallet.signWithKeys', () => {
             const signSpy = sinon.spy(keyring, 'signWithKeys')
             const appendSpy = sinon.spy(updateTx, 'appendSignatures')
 
-            const hash = await caver.wallet.signWithKeys(keyring.address, updateTx, () => txHash)
+            await caver.wallet.signWithKeys(keyring.address, updateTx, () => txHash)
 
-            expect(utils.isTxHashStrict(hash)).to.be.true
             expect(fillFormatSpy).to.have.been.calledOnce
             expect(signSpy).to.have.been.calledWith(txHash, '0x7e3', 1)
             expect(appendSpy).to.have.been.calledOnce

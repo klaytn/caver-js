@@ -159,6 +159,7 @@ class KeyringContainer {
 
         if (keyringToRemove === undefined) return false
 
+        // deallocate keyring object created for keyringContainer
         keyringToRemove.key = null
         this._addressKeyringMap.delete(keyringToRemove.address.toLowerCase())
 
@@ -187,7 +188,7 @@ class KeyringContainer {
      * @param {Transaction} transaction A transaction object.
      * @param {number} [index] An index of key to use for signing.
      * @param {function} [hasher] A function to return hash of transaction.
-     * @return {string}
+     * @return {Transaction}
      */
     async signWithKey(address, transaction, index, hasher) {
         if (!transaction.from || transaction.from === '0x') transaction.from = address
@@ -216,7 +217,7 @@ class KeyringContainer {
 
         transaction.appendSignatures(sig)
 
-        return hash
+        return transaction
     }
 
     /**
@@ -225,7 +226,7 @@ class KeyringContainer {
      * @param {string} address An address of keyring in keyringContainer.
      * @param {Transaction} transaction A transaction object.
      * @param {function} [hasher] A function to return hash of transaction.
-     * @return {string}
+     * @return {Transaction}
      */
     async signWithKeys(address, transaction, hasher = TransactionHasher.getHashForSigning) {
         if (!transaction.from || transaction.from === '0x') transaction.from = address
@@ -244,7 +245,7 @@ class KeyringContainer {
 
         transaction.appendSignatures(sigs)
 
-        return hash
+        return transaction
     }
 
     /**
