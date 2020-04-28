@@ -135,7 +135,7 @@ class KeyringContainer {
      */
     add(keyring) {
         if (this._addressKeyringMap.get(keyring.address.toLowerCase()) !== undefined)
-            throw new Error(`Duplicate Account ${keyring.address}`)
+            throw new Error(`Duplicate Account ${keyring.address}. Please use updateKeyring() instead.`)
 
         const keyringToAdd = keyring.copy()
 
@@ -156,7 +156,7 @@ class KeyringContainer {
         if (utils.isAddress(address)) {
             keyringToRemove = this.getKeyring(address)
         } else {
-            throw new Error(`To remove keyring, parameter should be address string.`)
+            throw new Error(`To remove the keyring, the first parameter should be an address string.`)
         }
 
         if (keyringToRemove === undefined) return false
@@ -196,7 +196,7 @@ class KeyringContainer {
     async signWithKey(address, transaction, index, hasher) {
         if (!transaction.from || transaction.from === '0x') transaction.from = address
         if (transaction.from.toLowerCase() !== address.toLowerCase())
-            throw new Error(`The from address of the transaction is different with the address of the keyring to use.`)
+            throw new Error(`transaction.from ${transaction.from.toLowerCase()} is different from the given address ${address.toLowerCase()}.`)
 
         // Optional parameter processing
         // (address transaction) / (address transaction index) / (address transaction hasher) / (address transaction index hasher)
@@ -232,7 +232,7 @@ class KeyringContainer {
     async signWithKeys(address, transaction, hasher = TransactionHasher.getHashForSigning) {
         if (!transaction.from || transaction.from === '0x') transaction.from = address
         if (transaction.from.toLowerCase() !== address.toLowerCase())
-            throw new Error(`The from address of the transaction is different with the address of the keyring to use.`)
+            throw new Error(`transaction.from ${transaction.from.toLowerCase()} is different from the given address ${address.toLowerCase()}.`)
 
         await transaction.fillTransaction()
         const hash = hasher(transaction)
