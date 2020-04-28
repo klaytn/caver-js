@@ -44,7 +44,7 @@ beforeEach(() => {
 
 function validateKeyringInWallet(data, { expectedAddress, expectedKey } = {}) {
     expect(data instanceof Keyring).to.be.true
-    const objectKeys = ['_address', '_key', 'index']
+    const objectKeys = ['_address', '_key']
 
     expect(Object.getOwnPropertyNames(data)).to.deep.equal(objectKeys)
 

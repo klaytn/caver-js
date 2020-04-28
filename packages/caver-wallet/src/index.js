@@ -35,7 +35,7 @@ class KeyringContainer {
     constructor(keyrings) {
         keyrings = keyrings || []
         this._length = 0
-        this._addressToIndex = new Map()
+        this._addressKeyringMap = new Map()
 
         // add keyrings to keyringContainer
         for (const keyring of keyrings) {
@@ -43,14 +43,6 @@ class KeyringContainer {
         }
 
         this.keyring = Keyring
-    }
-
-    _findSafeIndex(pointer) {
-        pointer = pointer || 0
-        if (_.has(this, pointer)) {
-            return this._findSafeIndex(pointer + 1)
-        }
-        return pointer
     }
 
     /**
@@ -127,11 +119,11 @@ class KeyringContainer {
      * @return {Keyring}
      */
     updateKeyring(keyring) {
-        const idx = this._addressToIndex.get(keyring.address.toLowerCase())
-        if (idx === undefined) throw new Error(`Failed to find keyring to update`)
+        const founded = this._addressKeyringMap.get(keyring.address.toLowerCase())
+        if (founded === undefined) throw new Error(`Failed to find keyring to update`)
 
-        this[idx].key = keyring.copy().key
-        return this[idx]
+        founded.key = keyring.copy().key
+        return founded
     }
 
     /**
@@ -144,9 +136,9 @@ class KeyringContainer {
         if (!utils.isAddress(address))
             throw new Error(`Invalid address ${address}. To get keyring from wallet, you need to pass valid address string as a parameter.`)
 
-        const idx = this._addressToIndex.get(address.toLowerCase())
+        const founded = this._addressKeyringMap.get(address.toLowerCase())
 
-        return this[idx]
+        return founded
     }
 
     /**
@@ -156,40 +148,35 @@ class KeyringContainer {
      * @return {Keyring}
      */
     add(keyring) {
-        if (this._addressToIndex.get(keyring.address.toLowerCase()) !== undefined) throw new Error(`Duplicate Account ${keyring.address}`)
+        if (this._addressKeyringMap.get(keyring.address.toLowerCase()) !== undefined)
+            throw new Error(`Duplicate Account ${keyring.address}`)
 
         const keyringToAdd = keyring.copy()
 
-        keyringToAdd.index = this._findSafeIndex()
-        this[keyringToAdd.index] = keyringToAdd
-
         this._length++
-        this._addressToIndex.set(keyringToAdd.address.toLowerCase(), keyringToAdd.index)
+        this._addressKeyringMap.set(keyringToAdd.address.toLowerCase(), keyringToAdd)
 
-        return this[keyringToAdd.index]
+        return keyringToAdd
     }
 
     /**
      * deletes keyring from keyringContainer.
      *
-     * @param {string|number} addressOrIndex An address of keyring or an index of keyring in keyringContainer.
+     * @param {string} address An address of keyring or an index of keyring in keyringContainer.
      * @return {boolean}
      */
-    remove(addressOrIndex) {
+    remove(address) {
         let keyringToRemove
-        if (_.isNumber(addressOrIndex)) {
-            keyringToRemove = this[addressOrIndex]
-        } else if (utils.isAddress(addressOrIndex)) {
-            keyringToRemove = this.getKeyring(addressOrIndex)
+        if (utils.isAddress(address)) {
+            keyringToRemove = this.getKeyring(address)
         } else {
             throw new Error(`To remove keyring, parameter should be address string or index.`)
         }
 
         if (keyringToRemove === undefined) return false
 
-        this._addressToIndex.delete(keyringToRemove.address.toLowerCase())
-        this[keyringToRemove.index].key = null
-        delete this[keyringToRemove.index]
+        keyringToRemove.key = null
+        this._addressKeyringMap.delete(keyringToRemove.address.toLowerCase())
 
         this._length--
 
