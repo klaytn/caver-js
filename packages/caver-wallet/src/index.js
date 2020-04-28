@@ -24,13 +24,13 @@ const { KEY_ROLE } = require('./keyring/keyringHelper')
 const utils = require('../../caver-utils')
 
 /**
- * representing a Keyring container which manage keyrings.
+ * representing a Keyring container which manages keyrings.
  * @class
  */
 class KeyringContainer {
     /**
      * creates a keyringContainer.
-     * @param {Array.<Keyring>} keyrings - The keyrings to manage in keyringContainer.
+     * @param {Array.<Keyring>} keyrings - The keyrings to be managed in KeyringContainer.
      */
     constructor(keyrings) {
         keyrings = keyrings || []
@@ -80,7 +80,7 @@ class KeyringContainer {
     }
 
     /**
-     * creates keyring instance with parameters and adds to the keyringContainer.
+     * creates a keyring instance with given parameters and adds it to the keyringContainer.
      *
      * @param {string} address The address of the keyring.
      * @param {string|Array.<string>|Array.<Array.<string>>} key Private key string(s) to use in keyring. If different keys are used for each role, key must be defined as a two-dimensional array.
@@ -134,7 +134,7 @@ class KeyringContainer {
      */
     getKeyring(address) {
         if (!utils.isAddress(address))
-            throw new Error(`Invalid address ${address}. To get keyring from wallet, you need to pass valid address string as a parameter.`)
+            throw new Error(`Invalid address ${address}. To get keyring from wallet, you need to pass a valid address string as a parameter.`)
 
         const founded = this._addressKeyringMap.get(address.toLowerCase())
 
@@ -142,7 +142,7 @@ class KeyringContainer {
     }
 
     /**
-     * addes keyring to keyringContainer.
+     * adds a keyring to the keyringContainer.
      *
      * @param {Keyring} keyring A keyring instance to add to keyringContainer.
      * @return {Keyring}
@@ -160,9 +160,9 @@ class KeyringContainer {
     }
 
     /**
-     * deletes keyring from keyringContainer.
+     * deletes the keyring that associates with the given address from keyringContainer.
      *
-     * @param {string} address An address of keyring in keyringContainer.
+     * @param {string} address An address of the keyring to be deleted in keyringContainer.
      * @return {boolean}
      */
     remove(address) {
@@ -184,7 +184,7 @@ class KeyringContainer {
     }
 
     /**
-     * signs with data and returns result object that includes `signsture`, `message` and `messageHash`
+     * signs with data and returns the result object that includes `signature`, `message` and `messageHash`
      *
      * @param {string} address An address of keyring in keyringContainer.
      * @param {string} data The data string to sign.
