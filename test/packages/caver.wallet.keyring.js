@@ -1289,6 +1289,32 @@ describe('keyring.signWithKey', () => {
             )
         })
     })
+
+    context('CAVERJS-UNIT-KEYRING-139: keyring type: roleBased / role: existed role / index: invalid type', () => {
+        it('should throw error when index is out of range', () => {
+            let invalidIndex = []
+            let expectedError = `Invalid type of index(${invalidIndex}): index should be number type.`
+            expect(() => roleBased.signWithKey(hash, chainId, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY, invalidIndex)).to.throw(
+                expectedError
+            )
+
+            invalidIndex = {}
+            expectedError = `Invalid type of index(${invalidIndex}): index should be number type.`
+            expect(() => roleBased.signWithKey(hash, chainId, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY, invalidIndex)).to.throw(
+                expectedError
+            )
+        })
+    })
+
+    context('CAVERJS-UNIT-KEYRING-140: keyring type: roleBased / role: existed role / index: negative', () => {
+        it('should throw error when index is out of range', () => {
+            const invalidIndex = -1
+            const expectedError = `Invalid index(${invalidIndex}): index cannot be negative.`
+            expect(() => roleBased.signWithKey(hash, chainId, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY, invalidIndex)).to.throw(
+                expectedError
+            )
+        })
+    })
 })
 
 describe('keyring.signWithKeys', () => {
