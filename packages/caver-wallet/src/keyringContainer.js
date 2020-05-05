@@ -197,7 +197,7 @@ class KeyringContainer {
                 `transaction.from ${transaction.from.toLowerCase()} is different from the given address ${address.toLowerCase()}.`
             )
 
-        // Optional parameter cases
+        // User parameter input cases
         // (address transaction) / (address transaction index) / (address transaction index hasher)
         if (_.isFunction(index)) throw new Error(`In order to send a custom hasher as a parameter, the index must be defined first.`)
 
@@ -252,7 +252,7 @@ class KeyringContainer {
      * @return {string}
      */
     async signFeePayerWithKey(address, transaction, index = 0, hasher = TransactionHasher.getHashForFeePayerSigning) {
-        // Optional parameter processing
+        // User parameter input cases
         // (address transaction) / (address transaction index) / (address transaction index hasher)
         if (_.isFunction(index)) throw new Error(`In order to send a custom hasher as a parameter, the index must be defined first.`)
 
