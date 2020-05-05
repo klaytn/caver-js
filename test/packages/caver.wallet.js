@@ -683,16 +683,8 @@ describe('wallet.signFeePayerWithKey', () => {
 
             const txHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
 
-            const fillFormatSpy = sinon.spy(vt, 'fillTransaction')
-            const signSpy = sinon.spy(keyring, 'signWithKey')
-            const appendSpy = sinon.spy(vt, 'appendFeePayerSignatures')
-
-            const hash = await caver.wallet.signFeePayerWithKey(keyring.address, vt, () => txHash)
-
-            expect(utils.isTxHashStrict(hash)).to.be.true
-            expect(fillFormatSpy).to.have.been.calledOnce
-            expect(signSpy).to.have.been.calledWith(txHash, '0x7e3', 2, 0)
-            expect(appendSpy).to.have.been.calledOnce
+            const expectedError = `In order to send a custom hasher as a parameter, the index must be defined first.`
+            await expect(caver.wallet.signFeePayerWithKey(keyring.address, vt, () => txHash)).to.be.rejectedWith(expectedError)
         })
     })
 
@@ -729,18 +721,23 @@ describe('wallet.signFeePayerWithKey', () => {
         })
     })
 
-    context('CAVERJS-UNIT-KEYRINGCONTAINER-043: input: address, value transfer transaction, invalid hasher custom funtion', () => {
-        it('should throw error when transaction hash is invalid', async () => {
-            const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
+    context(
+        'CAVERJS-UNIT-KEYRINGCONTAINER-043: input: address, value transfer transaction, valid index, invalid hasher custom funtion',
+        () => {
+            it('should throw error when transaction hash is invalid', async () => {
+                const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
-            const vt = new mockFeeDelegatedValueTransfer(keyring)
+                const vt = new mockFeeDelegatedValueTransfer(keyring)
 
-            const invalidTxHash = 'invalidTxHash'
+                const invalidTxHash = 'invalidTxHash'
 
-            const expectedError = `Invalid transaction hash: ${invalidTxHash}`
-            await expect(caver.wallet.signFeePayerWithKey(keyring.address, vt, () => invalidTxHash)).to.be.rejectedWith(expectedError)
-        })
-    })
+                const expectedError = `Invalid transaction hash: ${invalidTxHash}`
+                await expect(caver.wallet.signFeePayerWithKey(keyring.address, vt, 0, () => invalidTxHash)).to.be.rejectedWith(
+                    expectedError
+                )
+            })
+        }
+    )
 
     context('CAVERJS-UNIT-KEYRINGCONTAINER-044: input: not exist keyring address, value transfer transaction', () => {
         it('should throw error when keyring is not existed in wallet', async () => {

@@ -248,19 +248,13 @@ class KeyringContainer {
      * @param {string} address An address of keyring in keyringContainer.
      * @param {Transaction} transaction A transaction object. This should be `FEE_DELEGATED` type.
      * @param {number} [index] An index of key to use for signing.
-     * @param {function} [hasher] A function to return hash of transaction.
+     * @param {function} [hasher] A function to return hash of transaction. In order to use a custom hasher, the index must be defined.
      * @return {string}
      */
-    async signFeePayerWithKey(address, transaction, index, hasher) {
+    async signFeePayerWithKey(address, transaction, index = 0, hasher = TransactionHasher.getHashForFeePayerSigning) {
         // Optional parameter processing
-        // (address transaction) / (address transaction index) / (address transaction hasher) / (address transaction index hasher)
-        if (_.isFunction(index) && hasher === undefined) {
-            hasher = index
-            index = 0
-        }
-        if (index === undefined) index = 0
-        if (!_.isNumber(index)) throw new Error(`Invalid index type: ${typeof index}`)
-        if (hasher === undefined) hasher = TransactionHasher.getHashForFeePayerSigning
+        // (address transaction) / (address transaction index) / (address transaction index hasher)
+        if (_.isFunction(index)) throw new Error(`In order to send a custom hasher as a parameter, the index must be defined first.`)
 
         if (!transaction.feePayer || transaction.feePayer === '0x') transaction.feePayer = address
 
