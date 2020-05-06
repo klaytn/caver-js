@@ -64,6 +64,7 @@ class KeyringContainer {
 
     /**
      * creates a keyring instance with given parameters and adds it to the keyringContainer.
+     * KeyringContainer manages Keyring instance using Map <string:Keyring> which has address as key value.
      *
      * @param {string} address The address of the keyring.
      * @param {string|Array.<string>|Array.<Array.<string>>} key Private key string(s) to use in keyring. If different keys are used for each role, key must be defined as a two-dimensional array.
