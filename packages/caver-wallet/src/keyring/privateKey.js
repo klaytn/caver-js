@@ -31,16 +31,6 @@ const utils = require('../../../caver-utils')
  */
 class PrivateKey {
     /**
-     * generates a private key string
-     *
-     * @param {string} entropy A random string to increase entropy.
-     * @return {string}
-     */
-    static generate(entropy) {
-        return AccountLib.create(entropy || utils.randomHex(32)).privateKey
-    }
-
-    /**
      * creates a privateKey.
      * @param {string} key - The private key string.
      */

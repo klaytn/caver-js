@@ -16,13 +16,56 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+const AccountLib = require('eth-lib/lib/account')
+const KeyringContainer = require('./keyringContainer')
 const Keyring = require('./keyring/keyring')
+const utils = require('../../caver-utils/src')
 
-// TODO: This will be implemented soon.
-class KeyringContainer {
-    constructor() {
+/**
+ * representing a Wallet class in caver-wallet package.
+ * This Wallet class is a wrapper for KeyringContainer.
+ * @class
+ */
+class Wallet {
+    constructor(keyrings) {
+        this.keyringContainer = new KeyringContainer(keyrings)
         this.keyring = Keyring
+
+        // Bind methods of KeyringContainer to Wallet
+        this.generate = this.keyringContainer.generate.bind(this.keyringContainer)
+        this.newKeyring = this.keyringContainer.newKeyring.bind(this.keyringContainer)
+        this.updateKeyring = this.keyringContainer.updateKeyring.bind(this.keyringContainer)
+        this.getKeyring = this.keyringContainer.getKeyring.bind(this.keyringContainer)
+
+        this.add = this.keyringContainer.add.bind(this.keyringContainer)
+        this.remove = this.keyringContainer.remove.bind(this.keyringContainer)
+
+        this.signMessage = this.keyringContainer.signMessage.bind(this.keyringContainer)
+        this.signWithKey = this.keyringContainer.signWithKey.bind(this.keyringContainer)
+        this.signWithKeys = this.keyringContainer.signWithKeys.bind(this.keyringContainer)
+        this.signFeePayerWithKey = this.keyringContainer.signFeePayerWithKey.bind(this.keyringContainer)
+        this.signFeePayerWithKeys = this.keyringContainer.signFeePayerWithKeys.bind(this.keyringContainer)
+    }
+
+    /**
+     * @type {number}
+     */
+    get length() {
+        return this.keyringContainer.length
+    }
+
+    /**
+     * generates a private key string
+     *
+     * `caver.wallet.generatePrivateKey()`
+     *
+     * @param {string} entropy A random string to increase entropy.
+     * @return {string}
+     */
+    // eslint-disable-next-line class-methods-use-this
+    generatePrivateKey(entropy) {
+        return AccountLib.create(entropy || utils.randomHex(32)).privateKey
     }
 }
 
-module.exports = KeyringContainer
+module.exports = Wallet

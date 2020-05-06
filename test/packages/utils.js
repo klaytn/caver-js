@@ -18,7 +18,9 @@
 
 const Keyring = require('../../packages/caver-wallet/src/keyring/keyring')
 const { KEY_ROLE } = require('../../packages/caver-wallet/src/keyring/keyringHelper')
-const PrivateKey = require('../../packages/caver-wallet/src/keyring/privateKey')
+const Wallet = require('../../packages/caver-wallet')
+
+const wallet = new Wallet()
 
 const unitMap = {
     peb: '1',
@@ -36,7 +38,7 @@ const unitMap = {
 
 const generateDecoupledKeyring = () => {
     const keyring = Keyring.generate()
-    keyring.key = PrivateKey.generate()
+    keyring.key = wallet.generatePrivateKey()
     return keyring
 }
 
@@ -44,7 +46,7 @@ const generateMultiSigKeyring = (num = 3) => {
     const keyring = Keyring.generate()
     const multipleKeys = []
     for (let i = 0; i < num; i++) {
-        multipleKeys.push(PrivateKey.generate())
+        multipleKeys.push(wallet.generatePrivateKey())
     }
     keyring.key = multipleKeys
     return keyring
@@ -59,7 +61,7 @@ const generateRoleBasedKeyring = numArr => {
     for (let i = 0; i < numArr.length; i++) {
         const keys = []
         for (let j = 0; j < numArr[i]; j++) {
-            keys.push(PrivateKey.generate())
+            keys.push(wallet.generatePrivateKey())
         }
         roleBased.push(keys)
     }

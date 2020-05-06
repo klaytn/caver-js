@@ -377,6 +377,8 @@ class Keyring {
         if (role === undefined) throw new Error(`role should be defined to sign.`)
 
         const keys = this.getKeyByRole(role)
+        if (!_.isNumber(index)) throw new Error(`Invalid type of index(${index}): index should be number type.`)
+        if (index < 0) throw new Error(`Invalid index(${index}): index cannot be negative.`)
         if (index >= keys.length) throw new Error(`Invalid index(${index}): index must be less than the length of keys(${keys.length}).`)
         return keys[index].sign(transactionHash, chainId)
     }
