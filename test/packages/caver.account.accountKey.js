@@ -210,8 +210,8 @@ describe('caver.account.accountKey.accountKeyPublic', () => {
 
             const xyPoints = accountKey.getXYPoint()
 
-            expect(xyPoints.x).to.equal(x)
-            expect(xyPoints.y).to.equal(y)
+            expect(xyPoints[0]).to.equal(x)
+            expect(xyPoints[1]).to.equal(y)
         })
     })
 })

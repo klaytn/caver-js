@@ -94,11 +94,10 @@ class AccountKeyPublic {
 
     /**
      * Returns the x and y coordinates of publicKey.
-     * @return {object}
+     * @return {Array.<string>}
      */
     getXYPoint() {
-        const [x, y] = utils.xyPointFromPublicKey(this.publicKey)
-        return { x, y }
+        return utils.xyPointFromPublicKey(this.publicKey)
     }
 }
 
