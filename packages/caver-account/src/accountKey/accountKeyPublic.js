@@ -97,8 +97,7 @@ class AccountKeyPublic {
      * @return {object}
      */
     getXYPoint() {
-        const [x, y] = utils.xyPointFromPublicKey(this.publicKey)
-        return { x, y }
+        return utils.xyPointFromPublicKey(this.publicKey)
     }
 }
 
