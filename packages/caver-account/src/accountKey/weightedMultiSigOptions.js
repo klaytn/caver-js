@@ -102,6 +102,12 @@ class WeightedMultiSigOptions {
     }
 }
 
+/**
+ * validates threshold and sum of weights.
+ * @param {number} threshold - The x point.
+ * @param {Array.<number>} weights - The y point.
+ * @return {Boolean}
+ */
 function validateWeightedSum(threshold, weights) {
     if (threshold === undefined || weights === undefined) return true
 
