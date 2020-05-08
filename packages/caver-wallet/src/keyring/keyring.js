@@ -519,7 +519,7 @@ class Keyring {
         }
 
         if (isRoleBased && options !== undefined && !_.isArray(options))
-            throw new Error(`options for account should define threshold and weight for each roles in an array format`)
+            throw new Error(`options for an account should define threshold and weight for each roles in an array format`)
 
         // _validateOptionsForUpdate returns WeightedMultiSigOptions with 1 threshold and 1 weight for each key when options is not defined.
         if (isRoleBased || isWeightedMultiSig) options = this._validateOptionsForUpdate(options)
