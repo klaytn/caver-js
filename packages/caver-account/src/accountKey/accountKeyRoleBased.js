@@ -98,7 +98,7 @@ class AccountKeyRoleBased {
         // keyArray = [[accountKeyLegacy], [accountKeyFail], [pub, pub, pub]]
         // options = [{threshold: 1, weights: [1,1]}, {}, {threshold: 1, weights: [1,1,1]}]
         for (let i = 0; i < roleBasedPubArray.length; i++) {
-            if (!(options[i] instanceof WeightedMultiSigOptions)) options[i] = WeightedMultiSigOptions.fromObejct(options[i])
+            if (!(options[i] instanceof WeightedMultiSigOptions)) options[i] = WeightedMultiSigOptions.fromObject(options[i])
 
             // To handle instance of AccountKeyLegacy or AccountKeyFail
             if (!_.isArray(roleBasedPubArray[i])) {

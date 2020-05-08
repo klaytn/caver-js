@@ -57,7 +57,7 @@ class AccountKeyWeightedMultiSig {
         if (options === undefined) {
             throw new Error(`Invalid options object. For AccountKeyWeightedMultiSig, the second parameter 'options' should be defined.`)
         }
-        if (!(options instanceof WeightedMultiSigOptions)) options = WeightedMultiSigOptions.fromObejct(options)
+        if (!(options instanceof WeightedMultiSigOptions)) options = WeightedMultiSigOptions.fromObject(options)
 
         if (publicKeyArray.length !== options.weights.length) {
             throw new Error(`The length of public keys is not equal to the length of weight array.`)

@@ -29,7 +29,7 @@ class WeightedMultiSigOptions {
      * @param {object} options - An object which defines 'threshold' and 'weights'.
      * @return {WeightedMultiSigOptions}
      */
-    static fromObejct(options) {
+    static fromObject(options) {
         // To support the previous options format(threshold and weight)
         if (options.weight && !options.weights) {
             options.weights = options.weight
