@@ -1969,7 +1969,7 @@ describe('keyring.toAccount', () => {
     context('CAVERJS-UNIT-KEYRING-128: keyring type: roleBased / options: defined(not array format)', () => {
         it('should throw error when options is insufficient', () => {
             const options = new caver.account.weightedMultiSigOptions(5, [2, 3, 4])
-            const expectedError = `options for account should define threshold and weight for each roles in an array format`
+            const expectedError = `options for an account should define threshold and weight for each roles in an array format`
 
             expect(() => roleBased.toAccount(options)).to.throw(expectedError)
         })
