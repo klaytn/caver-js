@@ -16,12 +16,12 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const _ = require('lodash')
 const RLP = require('eth-lib/lib/rlp')
 const Bytes = require('eth-lib/lib/bytes')
 const WeightedPublicKey = require('./weightedPublicKey')
 const utils = require('../../../caver-utils')
 const { ACCOUNT_KEY_TAG } = require('./accountKeyHelper')
+const WeightedMultiSigOptions = require('./weightedMultiSigOptions')
 
 /**
  * Representing an AccountKeyWeightedMultiSig.
@@ -50,29 +50,24 @@ class AccountKeyWeightedMultiSig {
     /**
      * Creates an instance of AccountKeyWeighedMultiSig.
      * @param {Array.<string>} publicKeyArray - An array of public key strings.
-     * @param {object} options - An options which defines threshold and weight.
+     * @param {WeightedMultiSigOptions|object} options - An options which defines threshold and weight.
      * @return {AccountKeyWeightedMultiSig}
      */
     static fromPublicKeysAndOptions(publicKeyArray, options) {
-        if (options === undefined || options.threshold === undefined || options.weight === undefined) {
+        if (options === undefined) {
             throw new Error(`Invalid options object. For AccountKeyWeightedMultiSig, the second parameter 'options' should be defined.`)
         }
-        if (!_.isArray(options.weight)) throw new Error(`weight should be an array that stores the weight of each public key.`)
-        if (publicKeyArray.length !== options.weight.length) {
+        if (!(options instanceof WeightedMultiSigOptions)) options = WeightedMultiSigOptions.fromObject(options)
+
+        if (publicKeyArray.length !== options.weights.length) {
             throw new Error(`The length of public keys is not equal to the length of weight array.`)
         }
 
         const weightedPublicKeys = []
-        let weightSum = 0
 
         for (let i = 0; i < publicKeyArray.length; i++) {
-            const weightedPublicKey = new WeightedPublicKey(options.weight[i], publicKeyArray[i])
+            const weightedPublicKey = new WeightedPublicKey(options.weights[i], publicKeyArray[i])
             weightedPublicKeys.push(weightedPublicKey)
-            weightSum += options.weight[i]
-        }
-
-        if (weightSum < options.threshold) {
-            throw new Error('Invalid options for AccountKeyWeightedMultiSig: The sum of weights is less than the threshold.')
         }
 
         return new AccountKeyWeightedMultiSig(options.threshold, weightedPublicKeys)

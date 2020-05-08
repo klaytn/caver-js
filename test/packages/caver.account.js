@@ -100,7 +100,7 @@ function testAccountKeyWeightedMultiSig(key, multiplePubKeys, options) {
     for (let i = 0; i < key.weightedPublicKeys.length; i++) {
         checkEqualWithPublicKey(key.weightedPublicKeys[i].publicKey, multiplePubKeys[i])
         if (options) {
-            expect(key.weightedPublicKeys[i].weight).to.equal(options.weight[i])
+            expect(key.weightedPublicKeys[i].weight).to.equal(options.weights[i])
         }
     }
 }
@@ -162,7 +162,7 @@ describe('caver.account.create', () => {
                 '0xd3bb14320d87eed081ae44740b5abbc52bac2c7ccf85b6281a0fc69f3ba4c171cc4bd2ba7f0c969cd72bfa49c854d8ac2cf3d0edea7f0ce0fd31cf080374935d',
                 '0xcfa4d1bee51e59e6842b136ff95b9d01385f94bed13c4be8996c6d20cb732c3ee47cd2b6bbb917658c5fd3d02b0ddf1242b1603d1acbde7812a7d9d684ed37a9',
             ]
-            const options = { threshold: 2, weight: [1, 1, 2, 2] }
+            const options = new caver.account.weightedMultiSigOptions(2, [1, 1, 2, 2])
 
             const account = caver.account.create(address, pubs, options)
 
@@ -185,7 +185,7 @@ describe('caver.account.create', () => {
                 '0x03d3bb14320d87eed081ae44740b5abbc52bac2c7ccf85b6281a0fc69f3ba4c171',
                 '0x03cfa4d1bee51e59e6842b136ff95b9d01385f94bed13c4be8996c6d20cb732c3e',
             ]
-            const options = { threshold: 2, weight: [1, 1, 2, 2] }
+            const options = new caver.account.weightedMultiSigOptions(2, [1, 1, 2, 2])
 
             const account = caver.account.create(address, pubs, options)
 
@@ -219,7 +219,11 @@ describe('caver.account.create', () => {
                     '0xcfa4d1bee51e59e6842b136ff95b9d01385f94bed13c4be8996c6d20cb732c3ee47cd2b6bbb917658c5fd3d02b0ddf1242b1603d1acbde7812a7d9d684ed37a9',
                 ],
             ]
-            const options = [{ threshold: 2, weight: [1, 1] }, { threshold: 2, weight: [1, 1, 2] }, { threshold: 3, weight: [1, 1, 2, 2] }]
+            const options = [
+                new caver.account.weightedMultiSigOptions(2, [1, 1]),
+                new caver.account.weightedMultiSigOptions(2, [1, 1, 2]),
+                new caver.account.weightedMultiSigOptions(3, [1, 1, 2, 2]),
+            ]
 
             const account = caver.account.create(address, pubs, options)
 
@@ -253,7 +257,11 @@ describe('caver.account.create', () => {
                     '0x03cfa4d1bee51e59e6842b136ff95b9d01385f94bed13c4be8996c6d20cb732c3e',
                 ],
             ]
-            const options = [{ threshold: 2, weight: [1, 1] }, { threshold: 2, weight: [1, 1, 2] }, { threshold: 3, weight: [1, 1, 2, 2] }]
+            const options = [
+                new caver.account.weightedMultiSigOptions(2, [1, 1]),
+                new caver.account.weightedMultiSigOptions(2, [1, 1, 2]),
+                new caver.account.weightedMultiSigOptions(3, [1, 1, 2, 2]),
+            ]
 
             const account = caver.account.create(address, pubs, options)
 
@@ -319,7 +327,7 @@ describe('caver.account.createFromRLPEncoding', () => {
             const rlpEncodedAccountKey =
                 '0x04f84b02f848e301a102c10b598a1a3ba252acc21349d61c2fbd9bc8c15c50a5599f420cccc3291f9bf9e301a1021769a9196f523c419be50c26419ebbec34d3d6aa8b59da834212f13dbec9a9c1'
             const account = caver.account.createFromRLPEncoding(address, rlpEncodedAccountKey)
-            const exepectedOptions = { threshold: 2, weight: [1, 1] }
+            const exepectedOptions = new caver.account.weightedMultiSigOptions(2, [1, 1])
 
             testAccount(account, {
                 expectedAddress: address,
@@ -350,7 +358,11 @@ describe('caver.account.createFromRLPEncoding', () => {
             const rlpEncodedAccountKey =
                 '0x05f8c4a302a1036250dad4985bc22c8b9b84d1a05624c4daa0e83c8ae8fb35702d9024a8c14a71b84e04f84b02f848e301a102c10b598a1a3ba252acc21349d61c2fbd9bc8c15c50a5599f420cccc3291f9bf9e301a1021769a9196f523c419be50c26419ebbec34d3d6aa8b59da834212f13dbec9a9c1b84e04f84b01f848e301a103e7615d056e770b3262e5b39a4823c3124989924ed4dcfab13f10b252701540d4e301a1036f21d60c16200d99e6777422470b3122b65850d5135a5a4b41344a5607a1446d'
             const account = caver.account.createFromRLPEncoding(address, rlpEncodedAccountKey)
-            const exepectedOptions = [{}, { threshold: 2, weight: [1, 1] }, { threshold: 1, weight: [1, 1] }]
+            const exepectedOptions = [
+                new caver.account.weightedMultiSigOptions(),
+                new caver.account.weightedMultiSigOptions(2, [1, 1]),
+                new caver.account.weightedMultiSigOptions(1, [1, 1]),
+            ]
 
             testAccount(account, {
                 expectedAddress: address,
@@ -378,7 +390,11 @@ describe('caver.account.createFromRLPEncoding', () => {
             const rlpEncodedAccountKey =
                 '0x05f876a302a1036250dad4985bc22c8b9b84d1a05624c4daa0e83c8ae8fb35702d9024a8c14a718180b84e04f84b01f848e301a103e7615d056e770b3262e5b39a4823c3124989924ed4dcfab13f10b252701540d4e301a1036f21d60c16200d99e6777422470b3122b65850d5135a5a4b41344a5607a1446d'
             const account = caver.account.createFromRLPEncoding(address, rlpEncodedAccountKey)
-            const exepectedOptions = [{}, {}, { threshold: 1, weight: [1, 1] }]
+            const exepectedOptions = [
+                new caver.account.weightedMultiSigOptions(),
+                new caver.account.weightedMultiSigOptions(),
+                new caver.account.weightedMultiSigOptions(1, [1, 1]),
+            ]
 
             testAccount(account, {
                 expectedAddress: address,
@@ -447,7 +463,7 @@ describe('caver.account.createWithAccountKeyWeightedMultiSig', () => {
                 '0xd3bb14320d87eed081ae44740b5abbc52bac2c7ccf85b6281a0fc69f3ba4c171cc4bd2ba7f0c969cd72bfa49c854d8ac2cf3d0edea7f0ce0fd31cf080374935d',
                 '0xcfa4d1bee51e59e6842b136ff95b9d01385f94bed13c4be8996c6d20cb732c3ee47cd2b6bbb917658c5fd3d02b0ddf1242b1603d1acbde7812a7d9d684ed37a9',
             ]
-            const options = { threshold: 2, weight: [1, 1, 2, 2] }
+            const options = new caver.account.weightedMultiSigOptions(2, [1, 1, 2, 2])
 
             const account = caver.account.createWithAccountKeyWeightedMultiSig(address, pubs, options)
 
@@ -495,7 +511,11 @@ describe('caver.account.createWithAccountKeyRoleBased', () => {
                     '0xcfa4d1bee51e59e6842b136ff95b9d01385f94bed13c4be8996c6d20cb732c3ee47cd2b6bbb917658c5fd3d02b0ddf1242b1603d1acbde7812a7d9d684ed37a9',
                 ],
             ]
-            const options = [{ threshold: 2, weight: [1, 1] }, { threshold: 2, weight: [1, 1, 2] }, { threshold: 3, weight: [1, 1, 2, 2] }]
+            const options = [
+                new caver.account.weightedMultiSigOptions(2, [1, 1]),
+                new caver.account.weightedMultiSigOptions(2, [1, 1, 2]),
+                new caver.account.weightedMultiSigOptions(3, [1, 1, 2, 2]),
+            ]
 
             const account = caver.account.createWithAccountKeyRoleBased(address, pubs, options)
 

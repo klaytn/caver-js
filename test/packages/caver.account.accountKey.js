@@ -101,7 +101,7 @@ function testAccountKeyWeightedMultiSig(key, multiplePubKeys, options) {
     for (let i = 0; i < key.weightedPublicKeys.length; i++) {
         checkEqualWithPublicKey(key.weightedPublicKeys[i].publicKey, multiplePubKeys[i])
         if (options) {
-            expect(key.weightedPublicKeys[i].weight).to.equal(options.weight[i])
+            expect(key.weightedPublicKeys[i].weight).to.equal(options.weights[i])
         }
     }
 }
@@ -249,7 +249,7 @@ describe('caver.account.accountKey.accountKeyWeightedMultiSig', () => {
                 '0xc10b598a1a3ba252acc21349d61c2fbd9bc8c15c50a5599f420cccc3291f9bf9803a1898f45b2770eda7abce70e8503b5e82b748ec0ce557ac9f4f4796965e4e',
                 '0x1769a9196f523c419be50c26419ebbec34d3d6aa8b59da834212f13dbec9a9c12a4d0eeb91d7bd5d592653d43dd0593cfe24cb20a5dbef05832932e7c7191bf6',
             ]
-            const exepectedOptions = { threshold: 2, weight: [1, 1] }
+            const exepectedOptions = new caver.account.weightedMultiSigOptions(2, [1, 1])
             const accountKey = caver.account.accountKey.accountKeyWeightedMultiSig.decode(
                 '0x04f84b02f848e301a102c10b598a1a3ba252acc21349d61c2fbd9bc8c15c50a5599f420cccc3291f9bf9e301a1021769a9196f523c419be50c26419ebbec34d3d6aa8b59da834212f13dbec9a9c1'
             )
@@ -273,6 +273,32 @@ describe('caver.account.accountKey.accountKeyWeightedMultiSig', () => {
                 '0xc10b598a1a3ba252acc21349d61c2fbd9bc8c15c50a5599f420cccc3291f9bf9803a1898f45b2770eda7abce70e8503b5e82b748ec0ce557ac9f4f4796965e4e',
                 '0x1769a9196f523c419be50c26419ebbec34d3d6aa8b59da834212f13dbec9a9c12a4d0eeb91d7bd5d592653d43dd0593cfe24cb20a5dbef05832932e7c7191bf6',
             ]
+            const options = new caver.account.weightedMultiSigOptions(2, [1, 1])
+            const accountKey = caver.account.accountKey.accountKeyWeightedMultiSig.fromPublicKeysAndOptions(publicArray, options)
+
+            testAccountKey(accountKey, 'AccountKeyWeightedMultiSig', { expectedAccountKey: publicArray, exepectedOptions: options })
+        })
+    })
+
+    context('CAVERJS-UNIT-ACCOUNT-058: caver.account.accountKey.accountKeyWeightedMultiSig.fromPublicKeysAndOptions', () => {
+        it('should create AccountKeyWeightedMultiSig instances and return when options is not weightedMultiSigOptions instance', () => {
+            const publicArray = [
+                '0xc10b598a1a3ba252acc21349d61c2fbd9bc8c15c50a5599f420cccc3291f9bf9803a1898f45b2770eda7abce70e8503b5e82b748ec0ce557ac9f4f4796965e4e',
+                '0x1769a9196f523c419be50c26419ebbec34d3d6aa8b59da834212f13dbec9a9c12a4d0eeb91d7bd5d592653d43dd0593cfe24cb20a5dbef05832932e7c7191bf6',
+            ]
+            const options = { threshold: 2, weights: [1, 1] }
+            const accountKey = caver.account.accountKey.accountKeyWeightedMultiSig.fromPublicKeysAndOptions(publicArray, options)
+
+            testAccountKey(accountKey, 'AccountKeyWeightedMultiSig', { expectedAccountKey: publicArray, exepectedOptions: options })
+        })
+    })
+
+    context('CAVERJS-UNIT-ACCOUNT-059: caver.account.accountKey.accountKeyWeightedMultiSig.fromPublicKeysAndOptions', () => {
+        it('should create AccountKeyWeightedMultiSig instances and return when options is in previous options format', () => {
+            const publicArray = [
+                '0xc10b598a1a3ba252acc21349d61c2fbd9bc8c15c50a5599f420cccc3291f9bf9803a1898f45b2770eda7abce70e8503b5e82b748ec0ce557ac9f4f4796965e4e',
+                '0x1769a9196f523c419be50c26419ebbec34d3d6aa8b59da834212f13dbec9a9c12a4d0eeb91d7bd5d592653d43dd0593cfe24cb20a5dbef05832932e7c7191bf6',
+            ]
             const options = { threshold: 2, weight: [1, 1] }
             const accountKey = caver.account.accountKey.accountKeyWeightedMultiSig.fromPublicKeysAndOptions(publicArray, options)
 
@@ -292,7 +318,8 @@ describe('caver.account.accountKey.accountKeyWeightedMultiSig', () => {
                 expectedError
             )
 
-            options = { weight: [1, 1] }
+            options = { weights: [1, 1] }
+            expectedError = `Invalid object for creating WeightedMultiSigOptions. 'threshold' and 'weights' should be defined.`
             expect(() => caver.account.accountKey.accountKeyWeightedMultiSig.fromPublicKeysAndOptions(publicArray, options)).to.throw(
                 expectedError
             )
@@ -302,13 +329,13 @@ describe('caver.account.accountKey.accountKeyWeightedMultiSig', () => {
                 expectedError
             )
 
-            options = { threshold: 1, weight: 1 }
+            options = { threshold: 1, weights: 1 }
             expectedError = `weight should be an array that stores the weight of each public key.`
             expect(() => caver.account.accountKey.accountKeyWeightedMultiSig.fromPublicKeysAndOptions(publicArray, options)).to.throw(
                 expectedError
             )
 
-            options = { threshold: 1, weight: [1, 1, 1] }
+            options = { threshold: 1, weights: [1, 1, 1] }
             expectedError = `The length of public keys is not equal to the length of weight array.`
             expect(() => caver.account.accountKey.accountKeyWeightedMultiSig.fromPublicKeysAndOptions(publicArray, options)).to.throw(
                 expectedError
@@ -322,7 +349,7 @@ describe('caver.account.accountKey.accountKeyWeightedMultiSig', () => {
                 '0xc10b598a1a3ba252acc21349d61c2fbd9bc8c15c50a5599f420cccc3291f9bf9803a1898f45b2770eda7abce70e8503b5e82b748ec0ce557ac9f4f4796965e4e',
                 '0x1769a9196f523c419be50c26419ebbec34d3d6aa8b59da834212f13dbec9a9c12a4d0eeb91d7bd5d592653d43dd0593cfe24cb20a5dbef05832932e7c7191bf6',
             ]
-            const options = { threshold: 5, weight: [1, 1] }
+            const options = { threshold: 5, weights: [1, 1] }
             const expectedError = `Invalid options for AccountKeyWeightedMultiSig: The sum of weights is less than the threshold.`
             expect(() => caver.account.accountKey.accountKeyWeightedMultiSig.fromPublicKeysAndOptions(publicArray, options)).to.throw(
                 expectedError
@@ -338,7 +365,7 @@ describe('caver.account.accountKey.accountKeyWeightedMultiSig', () => {
             ]
             const encoded =
                 '0x04f84b02f848e301a102c10b598a1a3ba252acc21349d61c2fbd9bc8c15c50a5599f420cccc3291f9bf9e301a1021769a9196f523c419be50c26419ebbec34d3d6aa8b59da834212f13dbec9a9c1'
-            const options = { threshold: 2, weight: [1, 1] }
+            const options = new caver.account.weightedMultiSigOptions(2, [1, 1])
             const accountKey = caver.account.accountKey.accountKeyWeightedMultiSig.fromPublicKeysAndOptions(publicArray, options)
 
             expect(accountKey.getRLPEncoding()).to.equal(encoded)
@@ -362,7 +389,11 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
                     '0x6f21d60c16200d99e6777422470b3122b65850d5135a5a4b41344a5607a1446d3a16e2e0f06d767ca158a1daf2463d78012287fd6503d1546229fdb1af532083',
                 ],
             ]
-            const exepectedOptions = [{}, { threshold: 2, weight: [1, 1] }, { threshold: 1, weight: [1, 1] }]
+            const exepectedOptions = [
+                new caver.account.weightedMultiSigOptions(),
+                new caver.account.weightedMultiSigOptions(2, [1, 1]),
+                new caver.account.weightedMultiSigOptions(1, [1, 1]),
+            ]
             const accountKey = caver.account.accountKey.accountKeyRoleBased.decode(
                 '0x05f8c4a302a1036250dad4985bc22c8b9b84d1a05624c4daa0e83c8ae8fb35702d9024a8c14a71b84e04f84b02f848e301a102c10b598a1a3ba252acc21349d61c2fbd9bc8c15c50a5599f420cccc3291f9bf9e301a1021769a9196f523c419be50c26419ebbec34d3d6aa8b59da834212f13dbec9a9c1b84e04f84b01f848e301a103e7615d056e770b3262e5b39a4823c3124989924ed4dcfab13f10b252701540d4e301a1036f21d60c16200d99e6777422470b3122b65850d5135a5a4b41344a5607a1446d'
             )
@@ -383,7 +414,11 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
                     '0x6f21d60c16200d99e6777422470b3122b65850d5135a5a4b41344a5607a1446d3a16e2e0f06d767ca158a1daf2463d78012287fd6503d1546229fdb1af532083',
                 ],
             ]
-            const exepectedOptions = [{}, {}, { threshold: 1, weight: [1, 1] }]
+            const exepectedOptions = [
+                new caver.account.weightedMultiSigOptions(),
+                new caver.account.weightedMultiSigOptions(),
+                new caver.account.weightedMultiSigOptions(1, [1, 1]),
+            ]
             const accountKey = caver.account.accountKey.accountKeyRoleBased.decode(
                 '0x05f876a302a1036250dad4985bc22c8b9b84d1a05624c4daa0e83c8ae8fb35702d9024a8c14a718180b84e04f84b01f848e301a103e7615d056e770b3262e5b39a4823c3124989924ed4dcfab13f10b252701540d4e301a1036f21d60c16200d99e6777422470b3122b65850d5135a5a4b41344a5607a1446d'
             )
@@ -420,7 +455,11 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
                     '0xcfa4d1bee51e59e6842b136ff95b9d01385f94bed13c4be8996c6d20cb732c3ee47cd2b6bbb917658c5fd3d02b0ddf1242b1603d1acbde7812a7d9d684ed37a9',
                 ],
             ]
-            const options = [{ threshold: 2, weight: [1, 1] }, { threshold: 2, weight: [1, 1, 2] }, { threshold: 3, weight: [1, 1, 2, 2] }]
+            const options = [
+                new caver.account.weightedMultiSigOptions(2, [1, 1]),
+                new caver.account.weightedMultiSigOptions(2, [1, 1, 2]),
+                new caver.account.weightedMultiSigOptions(3, [1, 1, 2, 2]),
+            ]
             const accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)
 
             testAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey: pubs, exepectedOptions: options })
@@ -429,6 +468,66 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
 
     context('CAVERJS-UNIT-ACCOUNT-051: caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions', () => {
         it('should create AccountKeyRoleBased instances and return with compressed public key strings', () => {
+            const pubs = [
+                [
+                    '0x02b86b2787e8c7accd7d2d82678c9bef047a0aafd72a6e690817506684e8513c9a',
+                    '0x02e4d4901155edabc2bd5b356c63e58af20fe0a74e5f210de6396b74094f40215d',
+                ],
+                [
+                    '0x031a909c4d7dbb5281b1d1b55e79a1b2568111bd2830246c3173ce824000eb8716',
+                    '0x021427ac6351bbfc15811e8e5389a674b01d7a2c253e69a6ed30a33583864368f6',
+                    '0x0290fe4bb78bc981a40874ebcff2f9de4eba1e59ecd7a271a37814413720a3a5ea',
+                ],
+                [
+                    '0x0291245244462b3eee6436d3dc0ba3f69ef413fe2296c729733eff891a55f70c02',
+                    '0x0277e05dd93cdd6362f8648447f33d5676cbc5f42f4c4946ae1ad62bd4c0c4f357',
+                    '0x03d3bb14320d87eed081ae44740b5abbc52bac2c7ccf85b6281a0fc69f3ba4c171',
+                    '0x03cfa4d1bee51e59e6842b136ff95b9d01385f94bed13c4be8996c6d20cb732c3e',
+                ],
+            ]
+            const options = [
+                new caver.account.weightedMultiSigOptions(2, [1, 1]),
+                new caver.account.weightedMultiSigOptions(2, [1, 1, 2]),
+                new caver.account.weightedMultiSigOptions(3, [1, 1, 2, 2]),
+            ]
+            const accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)
+
+            testAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey: pubs, exepectedOptions: options })
+        })
+    })
+
+    context('CAVERJS-UNIT-ACCOUNT-060: caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions', () => {
+        it('should create AccountKeyRoleBased instances and return when options is not instance of WeightedMultiSigOptions', () => {
+            const pubs = [
+                [
+                    '0x02b86b2787e8c7accd7d2d82678c9bef047a0aafd72a6e690817506684e8513c9a',
+                    '0x02e4d4901155edabc2bd5b356c63e58af20fe0a74e5f210de6396b74094f40215d',
+                ],
+                [
+                    '0x031a909c4d7dbb5281b1d1b55e79a1b2568111bd2830246c3173ce824000eb8716',
+                    '0x021427ac6351bbfc15811e8e5389a674b01d7a2c253e69a6ed30a33583864368f6',
+                    '0x0290fe4bb78bc981a40874ebcff2f9de4eba1e59ecd7a271a37814413720a3a5ea',
+                ],
+                [
+                    '0x0291245244462b3eee6436d3dc0ba3f69ef413fe2296c729733eff891a55f70c02',
+                    '0x0277e05dd93cdd6362f8648447f33d5676cbc5f42f4c4946ae1ad62bd4c0c4f357',
+                    '0x03d3bb14320d87eed081ae44740b5abbc52bac2c7ccf85b6281a0fc69f3ba4c171',
+                    '0x03cfa4d1bee51e59e6842b136ff95b9d01385f94bed13c4be8996c6d20cb732c3e',
+                ],
+            ]
+            const options = [
+                { threshold: 2, weights: [1, 1] },
+                { threshold: 2, weights: [1, 1, 2] },
+                { threshold: 3, weights: [1, 1, 2, 2] },
+            ]
+            const accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)
+
+            testAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey: pubs, exepectedOptions: options })
+        })
+    })
+
+    context('CAVERJS-UNIT-ACCOUNT-061 caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions', () => {
+        it('should create AccountKeyRoleBased instances and return when options is previous options format', () => {
             const pubs = [
                 [
                     '0x02b86b2787e8c7accd7d2d82678c9bef047a0aafd72a6e690817506684e8513c9a',
@@ -467,7 +566,7 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
                     '0xcfa4d1bee51e59e6842b136ff95b9d01385f94bed13c4be8996c6d20cb732c3ee47cd2b6bbb917658c5fd3d02b0ddf1242b1603d1acbde7812a7d9d684ed37a9',
                 ],
             ]
-            const options = [{}, {}, { threshold: 3, weight: [1, 1, 2, 2] }]
+            const options = [{}, new caver.account.weightedMultiSigOptions(), new caver.account.weightedMultiSigOptions(3, [1, 1, 2, 2])]
             const accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)
 
             testAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey: pubs, exepectedOptions: options })
@@ -488,7 +587,11 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
                     '0xcfa4d1bee51e59e6842b136ff95b9d01385f94bed13c4be8996c6d20cb732c3ee47cd2b6bbb917658c5fd3d02b0ddf1242b1603d1acbde7812a7d9d684ed37a9',
                 ],
             ]
-            const options = [{}, { threshold: 3, weight: [1, 1, 2, 2] }, { threshold: 3, weight: [1, 1, 2, 2] }]
+            const options = [
+                new caver.account.weightedMultiSigOptions(),
+                new caver.account.weightedMultiSigOptions(3, [1, 1, 2, 2]),
+                new caver.account.weightedMultiSigOptions(3, [1, 1, 2, 2]),
+            ]
             const expectedError = `Invalid options: AccountKeyNil cannot have options.`
             expect(() => caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)).to.throw(
                 expectedError
@@ -508,7 +611,11 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
                     '0xcfa4d1bee51e59e6842b136ff95b9d01385f94bed13c4be8996c6d20cb732c3ee47cd2b6bbb917658c5fd3d02b0ddf1242b1603d1acbde7812a7d9d684ed37a9',
                 ],
             ]
-            const options = [{}, {}, { threshold: 3, weight: [1, 1, 2, 2] }]
+            const options = [
+                new caver.account.weightedMultiSigOptions(),
+                new caver.account.weightedMultiSigOptions(),
+                new caver.account.weightedMultiSigOptions(3, [1, 1, 2, 2]),
+            ]
             const accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)
 
             testAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey: pubs, exepectedOptions: options })
@@ -527,7 +634,11 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
                     '0xcfa4d1bee51e59e6842b136ff95b9d01385f94bed13c4be8996c6d20cb732c3ee47cd2b6bbb917658c5fd3d02b0ddf1242b1603d1acbde7812a7d9d684ed37a9',
                 ],
             ]
-            const options = [{}, {}, { threshold: 3, weight: [1, 1, 2, 2] }]
+            const options = [
+                new caver.account.weightedMultiSigOptions(),
+                new caver.account.weightedMultiSigOptions(),
+                new caver.account.weightedMultiSigOptions(3, [1, 1, 2, 2]),
+            ]
             const accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)
 
             testAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey: pubs, exepectedOptions: options })
@@ -546,7 +657,11 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
                     '0xcfa4d1bee51e59e6842b136ff95b9d01385f94bed13c4be8996c6d20cb732c3ee47cd2b6bbb917658c5fd3d02b0ddf1242b1603d1acbde7812a7d9d684ed37a9',
                 ],
             ]
-            const options = [{ threshold: 3, weight: [1, 1, 2, 2] }, {}, { threshold: 3, weight: [1, 1, 2, 2] }]
+            const options = [
+                new caver.account.weightedMultiSigOptions(3, [1, 1, 2, 2]),
+                new caver.account.weightedMultiSigOptions(),
+                new caver.account.weightedMultiSigOptions(3, [1, 1, 2, 2]),
+            ]
             const expectedError = `Invalid options: AccountKeyLegacy or AccountKeyFail cannot have options.`
             expect(() => caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)).to.throw(
                 expectedError
@@ -585,7 +700,11 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
             ]
             const encoded =
                 '0x05f8c4a302a1036250dad4985bc22c8b9b84d1a05624c4daa0e83c8ae8fb35702d9024a8c14a71b84e04f84b02f848e301a102c10b598a1a3ba252acc21349d61c2fbd9bc8c15c50a5599f420cccc3291f9bf9e301a1021769a9196f523c419be50c26419ebbec34d3d6aa8b59da834212f13dbec9a9c1b84e04f84b01f848e301a103e7615d056e770b3262e5b39a4823c3124989924ed4dcfab13f10b252701540d4e301a1036f21d60c16200d99e6777422470b3122b65850d5135a5a4b41344a5607a1446d'
-            const options = [{}, { threshold: 2, weight: [1, 1] }, { threshold: 1, weight: [1, 1] }]
+            const options = [
+                new caver.account.weightedMultiSigOptions(),
+                new caver.account.weightedMultiSigOptions(2, [1, 1]),
+                new caver.account.weightedMultiSigOptions(1, [1, 1]),
+            ]
             const accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(publicArray, options)
 
             expect(accountKey.getRLPEncoding()).to.equal(encoded)

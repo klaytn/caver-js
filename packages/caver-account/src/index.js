@@ -24,6 +24,8 @@ const AccountKeyPublic = require('./accountKey/accountKeyPublic')
 const AccountKeyFail = require('./accountKey/accountKeyFail')
 const AccountKeyWeightedMultiSig = require('./accountKey/accountKeyWeightedMultiSig')
 const AccountKeyRoleBased = require('./accountKey/accountKeyRoleBased')
+const WeightedMultiSigOptions = require('./accountKey/weightedMultiSigOptions')
+const { isMultipleKeysFormat, isRoleBasedKeysFormat } = require('../../caver-wallet/src/keyring/keyringHelper')
 
 function isAccountKeyInstance(accountKey) {
     if (
@@ -51,7 +53,7 @@ class Account {
      *
      * @param {string} address The address of Account.
      * @param {string|Array} accountKey The accountKey value of Account. Depending on this, Account's accountKey will be AccountKeyLegacy / AccountKeyPublic / AccountKeyFail / AccountKeyWeightedMultiSig / AccountKeyRoleBased.
-     * @param {Object} [options] The options that includes 'threshold' and 'weight'. This is only necessary if AccountKeyWeightedMultiSig or AccountKeyRoleBased.
+     * @param {WeightedMultiSigOptions|Array.<WeightedMultiSigOptions>} [options] The options that includes 'threshold' and 'weight'. This is only necessary if AccountKeyWeightedMultiSig or AccountKeyRoleBased.
      * @return {Account}
      */
     static create(address, accountKey, options) {
@@ -62,9 +64,11 @@ class Account {
             return Account.createFromRLPEncoding(address, accountKey)
         }
 
-        if (_.isArray(accountKey)) {
+        if (isMultipleKeysFormat(accountKey)) {
             if (accountKey.length === 0) throw new Error(`Empty accountKey array.`)
-            if (_.isString(accountKey[0])) return Account.createWithAccountKeyWeightedMultiSig(address, accountKey, options)
+            return Account.createWithAccountKeyWeightedMultiSig(address, accountKey, options)
+        }
+        if (isRoleBasedKeysFormat(accountKey)) {
             return Account.createWithAccountKeyRoleBased(address, accountKey, options)
         }
 
@@ -194,6 +198,8 @@ class Account {
         return this._accountKey.getRLPEncoding()
     }
 }
+
+Account.weightedMultiSigOptions = WeightedMultiSigOptions
 
 Account.accountKey = {
     decode: AccountKeyDecoder.decode,
