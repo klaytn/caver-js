@@ -24,8 +24,9 @@ const AccountLib = require('eth-lib/lib/account')
 
 const utils = require('../../../caver-utils')
 const PrivateKey = require('./privateKey')
-const { KEY_ROLE, MAXIMUM_KEY_NUM } = require('./keyringHelper')
+const { KEY_ROLE, MAXIMUM_KEY_NUM, isMultipleKeysFormat, isRoleBasedKeysFormat } = require('./keyringHelper')
 const Account = require('../../../caver-account')
+const WeightedMultiSigOptions = require('../../../caver-account/src/accountKey/weightedMultiSigOptions')
 
 /**
  * representing a Keyring which includes `address` and `private keys` by roles.
@@ -487,7 +488,7 @@ class Keyring {
     /**
      * returns an instance of Account.
      *
-     * @param {object|Array.<object>} [options] The options that includes 'threshold' and 'weight'. This is only necessary when keyring use multiple private keys.
+     * @param {WeightedMultiSigOptions|Array.<WeightedMultiSigOptions>} [options] The options that includes 'threshold' and 'weight'. This is only necessary when keyring use multiple private keys.
      * @return {Account}
      */
     toAccount(options) {
@@ -510,7 +511,7 @@ class Keyring {
             if (this._key[KEY_ROLE.ROLE_TRANSACTION_KEY].length === 1 && options !== undefined) {
                 if (_.isArray(options) && options.length > 0) options = options[0]
                 // if private key length is 1, handled as an AccountKeyWeightedMultiSig only when valid options is defined.
-                if (options.threshold !== undefined && options.weight !== undefined) isWeightedMultiSig = true
+                if (options.threshold !== undefined && options.weights !== undefined) isWeightedMultiSig = true
             }
             if (this._key[KEY_ROLE.ROLE_TRANSACTION_KEY].length > 1) {
                 isWeightedMultiSig = true
@@ -518,21 +519,21 @@ class Keyring {
         }
 
         if (isRoleBased && options !== undefined && !_.isArray(options))
-            throw new Error(`options should define threshold and weight for each roles in an array format`)
+            throw new Error(`options for account should define threshold and weight for each roles in an array format`)
 
-        // _validateOptionsForUpdate returns options with 1 threshold and 1 weight for each key when options is not defined.
+        // _validateOptionsForUpdate returns WeightedMultiSigOptions with 1 threshold and 1 weight for each key when options is not defined.
         if (isRoleBased || isWeightedMultiSig) options = this._validateOptionsForUpdate(options)
 
         if (isRoleBased) {
             // AccountKeyRoleBased with AccountKeyPublic
             //   options = [ {}, {}, {} ]
             // AccountKeyRoleBased with AccountKeyWeightedMultiSig(roleTransactionKey/roleFeePayerKey)
-            //   options = [ {threshold: 1, weight: [1,2]}, {}, {threshold: 1, weight: [1,2]} ]
+            //   options = [ {threshold: 1, weights: [1,2]}, {}, {threshold: 1, weights: [1,2]} ]
             const publicKeysByRole = this.getPublicKey()
             return Account.createWithAccountKeyRoleBased(this.address, publicKeysByRole, options)
         }
         if (isWeightedMultiSig) {
-            // options = [ {threshold: 1, weight: [1,2] }, {}, {} ]
+            // options = [ {threshold: 1, weights: [1,2] }, {}, {} ]
             options = options[0]
 
             const publicKeys = this.getPublicKey()[0]
@@ -607,20 +608,24 @@ class Keyring {
     }
 
     _validateOptionsForUpdate(options = []) {
-        // { threshold: 1, weight: [1, 1] } => [{ threshold: 1, weight: [1, 1] }]
+        // { threshold: 1, weights: [1, 1] } => [{ threshold: 1, weights: [1, 1] }]
         if (!_.isArray(options)) options = [options]
 
         for (let i = 0; i < this._key.length; i++) {
             // Validation for options obejct will be operated in AccountKeyWeightedMultiSig class.
-            if (options[i] && Object.keys(options[i]).length > 0) continue
+            if (options[i] && Object.keys(options[i]).length > 0) {
+                if (!(options[i] instanceof WeightedMultiSigOptions))
+                    options[i] = new WeightedMultiSigOptions(options[i].threshold, options[i].weights)
+                if (!options[i].isEmpty()) continue
+            }
 
             let optionToAdd
             if (this._key[i].length > 1) {
                 // default option when option is not set
-                optionToAdd = { threshold: 1, weight: Array(this._key[i].length).fill(1) }
+                optionToAdd = new WeightedMultiSigOptions(1, Array(this._key[i].length).fill(1))
             } else {
                 // AccountKeyPublic does not need option
-                optionToAdd = {}
+                optionToAdd = new WeightedMultiSigOptions()
             }
 
             if (options[i]) {
@@ -678,22 +683,6 @@ function generateKeysFormat() {
     return Array(KEY_ROLE.ROLE_LAST)
         .fill(null)
         .map(() => [])
-}
-
-function isMultipleKeysFormat(keys) {
-    if (!_.isArray(keys)) return false
-    return keys.every(key => {
-        return _.isString(key)
-    })
-}
-
-function isRoleBasedKeysFormat(roledBasedKeyArray) {
-    if (!_.isArray(roledBasedKeyArray)) return false
-    if (roledBasedKeyArray.length > KEY_ROLE.ROLE_LAST) return false
-
-    return roledBasedKeyArray.every(arr => {
-        return _.isArray(arr)
-    })
 }
 
 function isEmptyKey(keys) {

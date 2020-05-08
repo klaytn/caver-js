@@ -147,7 +147,7 @@ function validateAccountKeyWeightedMultiSig(key, multipleKeys, options) {
     for (let i = 0; i < key.weightedPublicKeys.length; i++) {
         expect(key.weightedPublicKeys[i].publicKey).to.equal(multipleKeys[i].getPublicKey())
         if (options) {
-            expect(key.weightedPublicKeys[i].weight).to.equal(options.weight[i])
+            expect(key.weightedPublicKeys[i].weight).to.equal(options.weights[i])
         }
     }
 }
@@ -1838,7 +1838,7 @@ describe('keyring.toAccount', () => {
 
     context('CAVERJS-UNIT-KEYRING-115: keyring type: coupled / options: valid object defined', () => {
         it('return account instance which has AccountKeyWeightedMultiSig', () => {
-            const options = { threshold: 3, weight: [3] }
+            const options = new caver.account.weightedMultiSigOptions(3, [3])
 
             const account = coupled.toAccount(options)
 
@@ -1864,7 +1864,7 @@ describe('keyring.toAccount', () => {
 
     context('CAVERJS-UNIT-KEYRING-118: keyring type: decoupled / options: valid object defined', () => {
         it('return account instance which has AccountKeyWeightedMultiSig', () => {
-            const options = { threshold: 3, weight: [3] }
+            const options = new caver.account.weightedMultiSigOptions(3, [3])
 
             const account = decoupled.toAccount(options)
 
@@ -1875,14 +1875,14 @@ describe('keyring.toAccount', () => {
     context('CAVERJS-UNIT-KEYRING-119: keyring type: multiSig / options: undefined', () => {
         it('return account instance which has AccountKeyWeightedMultiSig with default options', () => {
             const account = multiSig.toAccount()
-            const exepectedOptions = { threshold: 1, weight: [1, 1, 1] }
+            const exepectedOptions = new caver.account.weightedMultiSigOptions(1, [1, 1, 1])
             validateAccount(account, { keyring: multiSig, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions })
         })
     })
 
     context('CAVERJS-UNIT-KEYRING-120: keyring type: multiSig / options: defined', () => {
         it('return account instance which has AccountKeyWeightedMultiSig', () => {
-            const options = { threshold: 5, weight: [2, 3, 4] }
+            const options = new caver.account.weightedMultiSigOptions(5, [2, 3, 4])
             const account = multiSig.toAccount(options)
             validateAccount(account, { keyring: multiSig, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions: options })
         })
@@ -1891,7 +1891,7 @@ describe('keyring.toAccount', () => {
     context('CAVERJS-UNIT-KEYRING-121: keyring type: multiSig / options: defined(empty array format)', () => {
         it('return account instance which has AccountKeyWeightedMultiSig', () => {
             const options = []
-            const exepectedOptions = { threshold: 1, weight: [1, 1, 1] }
+            const exepectedOptions = new caver.account.weightedMultiSigOptions(1, [1, 1, 1])
             const account = multiSig.toAccount(options)
             validateAccount(account, { keyring: multiSig, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions })
         })
@@ -1900,7 +1900,7 @@ describe('keyring.toAccount', () => {
     context('CAVERJS-UNIT-KEYRING-122: keyring type: multiSig / options: defined(array of empty object format)', () => {
         it('return account instance which has AccountKeyWeightedMultiSig', () => {
             const options = [{}, {}, {}]
-            const exepectedOptions = { threshold: 1, weight: [1, 1, 1] }
+            const exepectedOptions = new caver.account.weightedMultiSigOptions(1, [1, 1, 1])
             const account = multiSig.toAccount(options)
             validateAccount(account, { keyring: multiSig, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions })
         })
@@ -1908,7 +1908,11 @@ describe('keyring.toAccount', () => {
 
     context('CAVERJS-UNIT-KEYRING-123: keyring type: multiSig / options: defined(array format)', () => {
         it('return account instance which has AccountKeyWeightedMultiSig', () => {
-            const options = [{ threshold: 5, weight: [2, 3, 4] }, {}, {}]
+            const options = [
+                new caver.account.weightedMultiSigOptions(5, [2, 3, 4]),
+                new caver.account.weightedMultiSigOptions(),
+                new caver.account.weightedMultiSigOptions(),
+            ]
             const account = multiSig.toAccount(options)
             validateAccount(account, { keyring: multiSig, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions: options[0] })
         })
@@ -1918,9 +1922,9 @@ describe('keyring.toAccount', () => {
         it('return account instance which has AccountKeyRoleBased with default options', () => {
             const account = roleBased.toAccount()
             const exepectedOptions = [
-                { threshold: 1, weight: [1, 1] },
-                { threshold: 1, weight: [1, 1] },
-                { threshold: 1, weight: [1, 1, 1, 1] },
+                new caver.account.weightedMultiSigOptions(1, [1, 1]),
+                new caver.account.weightedMultiSigOptions(1, [1, 1]),
+                new caver.account.weightedMultiSigOptions(1, [1, 1, 1, 1]),
             ]
             validateAccount(account, { keyring: roleBased, expectedAccountKey: 'AccountKeyRoleBased', exepectedOptions })
         })
@@ -1928,7 +1932,11 @@ describe('keyring.toAccount', () => {
 
     context('CAVERJS-UNIT-KEYRING-125: keyring type: roleBased / options: defined', () => {
         it('return account instance which has AccountKeyRoleBased', () => {
-            const options = [{ threshold: 2, weight: [1, 1] }, { threshold: 2, weight: [1, 2] }, { threshold: 5, weight: [1, 2, 3, 4] }]
+            const options = [
+                new caver.account.weightedMultiSigOptions(2, [1, 1]),
+                new caver.account.weightedMultiSigOptions(2, [1, 2]),
+                new caver.account.weightedMultiSigOptions(5, [1, 2, 3, 4]),
+            ]
             const account = roleBased.toAccount(options)
             validateAccount(account, { keyring: roleBased, expectedAccountKey: 'AccountKeyRoleBased', exepectedOptions: options })
         })
@@ -1938,9 +1946,9 @@ describe('keyring.toAccount', () => {
         it('return account instance which has AccountKeyRoleBased with default options', () => {
             const account = roleBased.toAccount([])
             const exepectedOptions = [
-                { threshold: 1, weight: [1, 1] },
-                { threshold: 1, weight: [1, 1] },
-                { threshold: 1, weight: [1, 1, 1, 1] },
+                new caver.account.weightedMultiSigOptions(1, [1, 1]),
+                new caver.account.weightedMultiSigOptions(1, [1, 1]),
+                new caver.account.weightedMultiSigOptions(1, [1, 1, 1, 1]),
             ]
             validateAccount(account, { keyring: roleBased, expectedAccountKey: 'AccountKeyRoleBased', exepectedOptions })
         })
@@ -1950,9 +1958,9 @@ describe('keyring.toAccount', () => {
         it('return account instance which has AccountKeyRoleBased with default options', () => {
             const account = roleBased.toAccount([{}, {}, {}])
             const exepectedOptions = [
-                { threshold: 1, weight: [1, 1] },
-                { threshold: 1, weight: [1, 1] },
-                { threshold: 1, weight: [1, 1, 1, 1] },
+                new caver.account.weightedMultiSigOptions(1, [1, 1]),
+                new caver.account.weightedMultiSigOptions(1, [1, 1]),
+                new caver.account.weightedMultiSigOptions(1, [1, 1, 1, 1]),
             ]
             validateAccount(account, { keyring: roleBased, expectedAccountKey: 'AccountKeyRoleBased', exepectedOptions })
         })
@@ -1960,8 +1968,8 @@ describe('keyring.toAccount', () => {
 
     context('CAVERJS-UNIT-KEYRING-128: keyring type: roleBased / options: defined(not array format)', () => {
         it('should throw error when options is insufficient', () => {
-            const options = { threshold: 5, weight: [2, 3, 4] }
-            const expectedError = `options should define threshold and weight for each roles in an array format`
+            const options = new caver.account.weightedMultiSigOptions(5, [2, 3, 4])
+            const expectedError = `options for account should define threshold and weight for each roles in an array format`
 
             expect(() => roleBased.toAccount(options)).to.throw(expectedError)
         })

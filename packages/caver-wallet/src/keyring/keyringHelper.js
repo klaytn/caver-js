@@ -16,6 +16,8 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+const _ = require('lodash')
+
 const KEY_ROLE = {
     ROLE_TRANSACTION_KEY: 0,
     0: 'ROLE_TRANSACTION_KEY',
@@ -28,7 +30,25 @@ const KEY_ROLE = {
 
 const MAXIMUM_KEY_NUM = 10
 
+const isMultipleKeysFormat = keys => {
+    if (!_.isArray(keys)) return false
+    return keys.every(key => {
+        return _.isString(key)
+    })
+}
+
+const isRoleBasedKeysFormat = roledBasedKeyArray => {
+    if (!_.isArray(roledBasedKeyArray)) return false
+    if (roledBasedKeyArray.length > KEY_ROLE.ROLE_LAST) return false
+
+    return roledBasedKeyArray.every(arr => {
+        return _.isArray(arr)
+    })
+}
+
 module.exports = {
     KEY_ROLE,
     MAXIMUM_KEY_NUM,
+    isMultipleKeysFormat,
+    isRoleBasedKeysFormat,
 }

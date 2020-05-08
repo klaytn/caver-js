@@ -25,6 +25,7 @@ const AccountKeyFail = require('./accountKeyFail')
 const utils = require('../../../caver-utils')
 const { ACCOUNT_KEY_TAG } = require('./accountKeyHelper')
 const { KEY_ROLE } = require('../../../caver-wallet/src/keyring/keyringHelper')
+const WeightedMultiSigOptions = require('./weightedMultiSigOptions')
 
 function isValidRoleBasedKeyFormat(roleBasedAccountKeys) {
     if (!_.isArray(roleBasedAccountKeys)) return false
@@ -85,16 +86,20 @@ class AccountKeyRoleBased {
     /**
      * Creates an instance of AccountKeyRoleBased.
      * @param {Array.<AccountKeyLegacy|AccountKeyFail|Array.<string>>} roleBasedPubArray - An array of public key strings.
-     * @param {Array.<object>} options - An array of options which defines threshold and weight.
+     * @param {Array.<WeightedMultiSigOptions|object>} options - An array of options which defines threshold and weight.
      * @return {AccountKeyRoleBased}
      */
-    static fromRoleBasedPublicKeysAndOptions(roleBasedPubArray, options = [{}, {}, {}]) {
+    static fromRoleBasedPublicKeysAndOptions(roleBasedPubArray, options) {
+        if (!options) options = Array(KEY_ROLE.ROLE_LAST).fill(new WeightedMultiSigOptions())
+
         const accountKeys = []
         // Format will be like below
         // keyArray = [[pub, pub], [pub], [pub, pub, pub]]
         // keyArray = [[accountKeyLegacy], [accountKeyFail], [pub, pub, pub]]
-        // options = [{threshold: 1, weight: [1,1]}, {}, {threshold: 1, weight: [1,1,1]}]
+        // options = [{threshold: 1, weights: [1,1]}, {}, {threshold: 1, weights: [1,1,1]}]
         for (let i = 0; i < roleBasedPubArray.length; i++) {
+            if (!(options[i] instanceof WeightedMultiSigOptions)) options[i] = WeightedMultiSigOptions.fromObejct(options[i])
+
             // To handle instance of AccountKeyLegacy or AccountKeyFail
             if (!_.isArray(roleBasedPubArray[i])) {
                 throw new Error(`Invalid format of keys: Each role should define the key to use in an array form.`)
@@ -102,20 +107,19 @@ class AccountKeyRoleBased {
 
             // Empty key array means AccountKeyNil
             if (roleBasedPubArray[i].length === 0) {
-                if (Object.keys(options[i]).length !== 0) throw new Error(`Invalid options: AccountKeyNil cannot have options.`)
+                if (!options[i].isEmpty()) throw new Error(`Invalid options: AccountKeyNil cannot have options.`)
                 accountKeys.push(undefined)
                 continue
             }
 
             if (roleBasedPubArray[i].length === 1) {
                 if (roleBasedPubArray[i][0] instanceof AccountKeyLegacy || roleBasedPubArray[i][0] instanceof AccountKeyFail) {
-                    if (Object.keys(options[i]).length !== 0)
-                        throw new Error(`Invalid options: AccountKeyLegacy or AccountKeyFail cannot have options.`)
+                    if (!options[i].isEmpty()) throw new Error(`Invalid options: AccountKeyLegacy or AccountKeyFail cannot have options.`)
 
                     accountKeys.push(roleBasedPubArray[i][0])
                     continue
                 }
-                if (Object.keys(options[i]).length === 0) {
+                if (options[i].isEmpty()) {
                     accountKeys.push(AccountKeyPublic.fromPublicKey(roleBasedPubArray[i][0]))
                     continue
                 }
