@@ -158,7 +158,7 @@ class AbstractTransaction {
     async signWithKey(key, index = 0, hasher = TransactionHasher.getHashForSigning) {
         // User parameter input cases
         // (key) / (key index) / (key index hasher)
-        if (_.isFunction(index)) throw new Error(`In order to send a custom hasher as a parameter, the index must be defined first.`)
+        if (_.isFunction(index)) throw new Error(`In order to pass a custom hasher, use the third parameter.`)
 
         let keyring = key
         if (_.isString(key)) {
@@ -193,7 +193,7 @@ class AbstractTransaction {
      *
      * @async
      * @param {Keyring|string} key - The instance of Keyring, private key string or KlaytnWalletKey string.
-     * @param {function} [hasher] - The function to get hash of transaction.
+     * @param {function} [hasher] - The function to get the transaction hash.
      * @return {Transaction}
      */
     async signWithKeys(key, hasher = TransactionHasher.getHashForSigning) {
@@ -204,9 +204,9 @@ class AbstractTransaction {
                 `Unsupported key type. The key must be a single private key string, KlaytnWalletKey string, or Keyring instance.`
             )
 
-        // When user attempt to sign with a updated keyring into a TxTypeLegacyTransaction error should be thrown.
+        // When a user attempts to sign with an updated keyring into a TxTypeLegacyTransaction, an error should be thrown.
         if (this.type === TX_TYPE_STRING.TxTypeLegacyTransaction && keyring.isDecoupled())
-            throw new Error(`A legacy transaction must be signed with a legacy account key.`)
+            throw new Error(`A legacy transaction cannot be signed with a decoupled keyring.`)
 
         if (!this.from || this.from === '0x') this.from = keyring.address
         if (this.from.toLowerCase() !== keyring.address.toLowerCase())
