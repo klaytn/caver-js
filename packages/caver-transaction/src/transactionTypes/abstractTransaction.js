@@ -224,7 +224,7 @@ class AbstractTransaction {
     }
 
     /**
-     * Appends signatures to transaction.
+     * Appends signatures to the transaction.
      *
      * @param {Array.<string>|Array.<Array.<string>>} sig - An array of signatures to append to the transaction.
      *                                                      One signature can be defined in the form of a one-dimensional array or two-dimensional array,
@@ -236,8 +236,8 @@ class AbstractTransaction {
     }
 
     /**
-     * Combines signatures to transaction from RLP-encoded transaction strings.
-     * When combining the signatures of RLP-encoded transaction into a transaction instance,
+     * Combines signatures to the transaction from RLP-encoded transaction strings and returns a single transaction with all signatures combined.
+     * When combining the signatures into a transaction instance,
      * an error is thrown if the deocded transaction contains different value.
      *
      * @param {Array.<string>} rlpEncodedTxs - An array of RLP-encoded transaction strings.
