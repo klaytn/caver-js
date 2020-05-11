@@ -34,7 +34,7 @@ const utils = require('../../../caver-utils/src')
  */
 class AbstractFeeDelegatedTransaction extends AbstractTransaction {
     /**
-     * Abstract class that implements common logic for each transaction type.
+     * Abstract class that implements common logic for each fee-delegated transaction type.
      * In this constructor, feePayer and feePayerSignatures are set as transaction member variables.
      *
      * @constructor
