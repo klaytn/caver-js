@@ -41,7 +41,7 @@ class AbstractTransaction {
      * @param {object} createTxObj - The parameters to create a transaction instance.
      */
     constructor(typeString, createTxObj) {
-        this.type = typeString
+        this._type = typeString
 
         createTxObj.type = typeString
 
@@ -63,11 +63,6 @@ class AbstractTransaction {
      */
     get type() {
         return this._type
-    }
-
-    set type(t) {
-        if (TX_TYPE_STRING[t] === undefined) throw new Error(`Invalid transaction type ${t}. Please refer 'caver.transaction.type'.`)
-        this._type = t
     }
 
     /**
