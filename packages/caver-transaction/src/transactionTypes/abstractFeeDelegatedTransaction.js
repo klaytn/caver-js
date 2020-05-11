@@ -174,7 +174,7 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
             // Signatures can only be combined for the same transaction.
             // Therefore, compare whether the decoded transaction is the same as this.
             for (const k in decoded) {
-                if (k === '_signatures' || k === '_+feePayerSignatures') continue
+                if (k === '_signatures' || k === '_feePayerSignatures') continue
                 if (k === '_feePayer') {
                     if ((decoded[k] !== '0x' || this[k] === '0x') && fillVariables) this[k] = decoded[k]
                 }
