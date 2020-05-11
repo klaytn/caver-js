@@ -322,13 +322,22 @@ class AbstractTransaction {
 
     /**
      * Fills empty optional transaction properties(gasPrice, nonce, chainId).
-     *
      */
     async fillTransaction() {
-        this.gasPrice = this.gasPrice === undefined ? await AbstractTransaction._klaytnCall.getGasPrice() : this.gasPrice
-        this.nonce = this.nonce === undefined ? await AbstractTransaction._klaytnCall.getTransactionCount(this.from) : this.nonce
-        this.chainId = this.chainId === undefined ? await AbstractTransaction._klaytnCall.getChainId() : this.chainId
+        const [chainId, gasPrice, nonce] = await Promise.all([
+            isNot(this.chainId) ? AbstractTransaction._klaytnCall.getChainId() : this.chainId,
+            isNot(this.gasPrice) ? AbstractTransaction._klaytnCall.getGasPrice() : this.gasPrice,
+            isNot(this.nonce) ? AbstractTransaction._klaytnCall.getTransactionCount(this.from, 'pending') : this.nonce,
+        ])
+
+        this.chainId = chainId
+        this.gasPrice = gasPrice
+        this.nonce = nonce
     }
+}
+
+const isNot = function(value) {
+    return _.isUndefined(value) || _.isNull(value)
 }
 
 module.exports = AbstractTransaction
