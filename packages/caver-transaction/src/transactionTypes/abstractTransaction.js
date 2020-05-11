@@ -44,7 +44,7 @@ class AbstractTransaction {
      *
      * @constructor
      * @param {string} typeString - The type string of transaction.
-     * @param {object} createTxObj - The parameters to create an instance of transaction.
+     * @param {object} createTxObj - The parameters to create a transaction instance.
      */
     constructor(typeString, createTxObj) {
         this.type = typeString
@@ -85,7 +85,7 @@ class AbstractTransaction {
     }
 
     set tag(t) {
-        if (TX_TYPE_TAG[t] === undefined) throw new Error(`Invalid transaction type ${t}. Please refer 'caver.transaction.tag'.`)
+        if (TX_TYPE_TAG[t] === undefined) throw new Error(`Invalid transaction tag ${t}. Please refer 'caver.transaction.tag'.`)
         this._tag = t
     }
 
@@ -148,7 +148,7 @@ class AbstractTransaction {
     }
 
     /**
-     * Signs to transaction with single private key.
+     * Signs to the transaction with a single private key in the `key`.
      * @async
      * @param {Keyring|string} key - The instance of Keyring, private key string or KlaytnWalletKey string.
      * @param {number} [index] - The index of private key to use.
