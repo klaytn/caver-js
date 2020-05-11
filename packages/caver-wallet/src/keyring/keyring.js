@@ -282,11 +282,11 @@ class Keyring {
     /**
      * creates a keyring.
      * @param {string} address - The address of keyring.
-     * @param {string|Array.<string>|Array.<Array<string>>|PrivateKey|Array.<PrivateKey>|Array.<Array<PrivateKey>>} key - The key(s) to use in keyring.
+     * @param {string|Array.<string>|Array.<Array<string>>|PrivateKey|Array.<PrivateKey>|Array.<Array<PrivateKey>>} keys - The key(s) to use in keyring.
      */
-    constructor(address, key) {
+    constructor(address, keys) {
         this.address = address
-        this.key = key
+        this.keys = keys
     }
 
     /**
@@ -326,12 +326,12 @@ class Keyring {
     /**
      * @type {Array.<Array.<PrivateKey>>}
      */
-    get key() {
-        return this._key
+    get keys() {
+        return this._keys
     }
 
-    set key(keyInput) {
-        this._key = formattingForKeyInKeyring(keyInput)
+    set keys(keyInput) {
+        this._keys = formattingForKeyInKeyring(keyInput)
     }
 
     /**
@@ -342,7 +342,7 @@ class Keyring {
     getPublicKey() {
         const publicKeys = generateKeysFormat()
         for (let i = 0; i < KEY_ROLE.ROLE_LAST; i++) {
-            for (const k of this._key[i]) {
+            for (const k of this._keys[i]) {
                 publicKeys[i].push(k.getPublicKey())
             }
         }
@@ -355,7 +355,7 @@ class Keyring {
      * @return {Keyring}
      */
     copy() {
-        return new Keyring(this._address, this._key)
+        return new Keyring(this._address, this._keys)
     }
 
     /**
@@ -423,7 +423,7 @@ class Keyring {
         const messageHash = utils.hashMessage(message)
         if (role === undefined && index === undefined) {
             role = KEY_ROLE.ROLE_TRANSACTION_KEY
-            if (this._key[role].length === 0) throw new Error(`Default key(${KEY_ROLE[0]}) does not have enough keys to sign.`)
+            if (this._keys[role].length === 0) throw new Error(`Default key(${KEY_ROLE[0]}) does not have enough keys to sign.`)
             index = 0
         } else if (role === undefined || index === undefined) {
             throw new Error(
@@ -451,15 +451,15 @@ class Keyring {
      */
     getKeyByRole(role) {
         if (role === undefined) throw new Error(`role should be defined.`)
-        let key = this._key[role]
+        let key = this._keys[role]
         if (key.length === 0 && role > KEY_ROLE.ROLE_TRANSACTION_KEY) {
-            if (this._key[KEY_ROLE.ROLE_TRANSACTION_KEY].length === 0) {
+            if (this._keys[KEY_ROLE.ROLE_TRANSACTION_KEY].length === 0) {
                 throw new Error(
                     `The key with ${KEY_ROLE[role]} role does not exist. The ${KEY_ROLE[0]} for the default role is also empty.`
                 )
             }
 
-            key = this._key[KEY_ROLE.ROLE_TRANSACTION_KEY]
+            key = this._keys[KEY_ROLE.ROLE_TRANSACTION_KEY]
         }
         return key
     }
@@ -471,16 +471,16 @@ class Keyring {
      */
     getKlaytnWalletKey() {
         const notAvailableError = `The keyring cannot be exported in KlaytnWalletKey format. Use caver.wallet.keyring.encrypt or keyring.encrypt.`
-        if (this._key[KEY_ROLE.ROLE_TRANSACTION_KEY].length > 1) throw new Error(notAvailableError)
+        if (this._keys[KEY_ROLE.ROLE_TRANSACTION_KEY].length > 1) throw new Error(notAvailableError)
 
         for (let i = KEY_ROLE.ROLE_ACCOUNT_UPDATE_KEY; i < KEY_ROLE.ROLE_LAST; i++) {
-            if (this._key[i].length > 0) {
+            if (this._keys[i].length > 0) {
                 throw new Error(notAvailableError)
             }
         }
 
         const address = utils.addHexPrefix(this._address)
-        const privateKey = utils.addHexPrefix(this._key[0][0].privateKey)
+        const privateKey = utils.addHexPrefix(this._keys[0][0].privateKey)
 
         return `${privateKey}0x00${address}`
     }
@@ -496,11 +496,11 @@ class Keyring {
         let isWeightedMultiSig = false
 
         // If key is empty in keyring, account cannot be created from keyring.
-        if (isEmptyKey(this._key)) throw new Error(`Failed to create Account instance: Empty key in keyring.`)
+        if (isEmptyKey(this._keys)) throw new Error(`Failed to create Account instance: Empty key in keyring.`)
 
         // Determine AccountKeyRoleBased or not.
         for (let i = KEY_ROLE.ROLE_LAST - 1; i > KEY_ROLE.ROLE_TRANSACTION_KEY; i--) {
-            if (this._key[i].length > 0) {
+            if (this._keys[i].length > 0) {
                 isRoleBased = true
                 break
             }
@@ -508,12 +508,12 @@ class Keyring {
 
         // Determine AccountKeyWeightedMultiSig or not.
         if (!isRoleBased) {
-            if (this._key[KEY_ROLE.ROLE_TRANSACTION_KEY].length === 1 && options !== undefined) {
+            if (this._keys[KEY_ROLE.ROLE_TRANSACTION_KEY].length === 1 && options !== undefined) {
                 if (_.isArray(options) && options.length > 0) options = options[0]
                 // if private key length is 1, handled as an AccountKeyWeightedMultiSig only when valid options is defined.
                 if (options.threshold !== undefined && options.weights !== undefined) isWeightedMultiSig = true
             }
-            if (this._key[KEY_ROLE.ROLE_TRANSACTION_KEY].length > 1) {
+            if (this._keys[KEY_ROLE.ROLE_TRANSACTION_KEY].length > 1) {
                 isWeightedMultiSig = true
             }
         }
@@ -573,7 +573,7 @@ class Keyring {
         let isRoleBased = false
 
         for (let i = KEY_ROLE.ROLE_TRANSACTION_KEY; i < KEY_ROLE.ROLE_LAST; i++) {
-            const roledKey = this._key[i]
+            const roledKey = this._keys[i]
             if (i > KEY_ROLE.ROLE_TRANSACTION_KEY && roledKey.length > 0) isRoleBased = true
             keyring.push(encryptKey(roledKey, password, options))
         }
@@ -592,17 +592,17 @@ class Keyring {
      */
     encryptV3(password, options) {
         const notAvailableError = `This keyring cannot be encrypted keystore v3. use 'keyring.encrypt(password)'.`
-        if (this._key[KEY_ROLE.ROLE_TRANSACTION_KEY].length > 1) throw new Error(notAvailableError)
+        if (this._keys[KEY_ROLE.ROLE_TRANSACTION_KEY].length > 1) throw new Error(notAvailableError)
 
         for (let i = KEY_ROLE.ROLE_ACCOUNT_UPDATE_KEY; i < KEY_ROLE.ROLE_LAST; i++) {
-            if (this._key[i].length > 0) {
+            if (this._keys[i].length > 0) {
                 throw new Error(notAvailableError)
             }
         }
 
         options = options || {}
 
-        const crypto = encryptKey(this._key[0][0], password, options)
+        const crypto = encryptKey(this._keys[0][0], password, options)
 
         return formatEncrypted(3, this._address, crypto, options)
     }
@@ -611,7 +611,7 @@ class Keyring {
         // { threshold: 1, weights: [1, 1] } => [{ threshold: 1, weights: [1, 1] }]
         if (!_.isArray(options)) options = [options]
 
-        for (let i = 0; i < this._key.length; i++) {
+        for (let i = 0; i < this._keys.length; i++) {
             // Validation for options obejct will be operated in AccountKeyWeightedMultiSig class.
             if (options[i] && Object.keys(options[i]).length > 0) {
                 if (!(options[i] instanceof WeightedMultiSigOptions))
@@ -620,9 +620,9 @@ class Keyring {
             }
 
             let optionToAdd
-            if (this._key[i].length > 1) {
+            if (this._keys[i].length > 1) {
                 // default option when option is not set
-                optionToAdd = new WeightedMultiSigOptions(1, Array(this._key[i].length).fill(1))
+                optionToAdd = new WeightedMultiSigOptions(1, Array(this._keys[i].length).fill(1))
             } else {
                 // AccountKeyPublic does not need option
                 optionToAdd = new WeightedMultiSigOptions()

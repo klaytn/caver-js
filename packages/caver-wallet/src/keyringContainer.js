@@ -104,7 +104,7 @@ class KeyringContainer {
         const founded = this._addressKeyringMap.get(keyring.address.toLowerCase())
         if (founded === undefined) throw new Error(`Failed to find keyring to update`)
 
-        founded.key = keyring.copy().key
+        founded.keys = keyring.copy().keys
         return founded
     }
 
@@ -159,7 +159,7 @@ class KeyringContainer {
         if (keyringToRemove === undefined) return false
 
         // deallocate keyring object created for keyringContainer
-        keyringToRemove.key = null
+        keyringToRemove.keys = null
         this._addressKeyringMap.delete(keyringToRemove.address.toLowerCase())
 
         return true
