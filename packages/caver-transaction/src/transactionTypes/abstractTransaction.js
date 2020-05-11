@@ -171,7 +171,7 @@ class AbstractTransaction {
 
         // When user attempt to sign with a updated keyring into a TxTypeLegacyTransaction error should be thrown.
         if (this.type === TX_TYPE_STRING.TxTypeLegacyTransaction && keyring.isDecoupled())
-            throw new Error(`A legacy transaction must be signed with a legacy account key.`)
+            throw new Error(`A legacy transaction cannot be signed with a decoupled keyring.`)
 
         if (!this.from || this.from === '0x') this.from = keyring.address
         if (this.from.toLowerCase() !== keyring.address.toLowerCase())
