@@ -265,7 +265,7 @@ class AbstractTransaction {
 
                 const differentTxError = `Transactions containing different information cannot be combined.`
 
-                // Compare with RLP-encoded accountKey string, because 'account' is object.
+                // Compare with the RLP-encoded accountKey string, because 'account' is an object.
                 if (k === '_account') {
                     if (this[k].getRLPEncodingAccountKey() !== decoded[k].getRLPEncodingAccountKey()) throw new Error(differentTxError)
                     continue
