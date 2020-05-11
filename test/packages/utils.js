@@ -38,7 +38,7 @@ const unitMap = {
 
 const generateDecoupledKeyring = () => {
     const keyring = Keyring.generate()
-    keyring.key = wallet.generatePrivateKey()
+    keyring.keys = wallet.generatePrivateKey()
     return keyring
 }
 
@@ -48,7 +48,7 @@ const generateMultiSigKeyring = (num = 3) => {
     for (let i = 0; i < num; i++) {
         multipleKeys.push(wallet.generatePrivateKey())
     }
-    keyring.key = multipleKeys
+    keyring.keys = multipleKeys
     return keyring
 }
 
@@ -65,7 +65,7 @@ const generateRoleBasedKeyring = numArr => {
         }
         roleBased.push(keys)
     }
-    keyring.key = roleBased
+    keyring.keys = roleBased
     return keyring
 }
 

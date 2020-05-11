@@ -46,7 +46,7 @@ beforeEach(() => {
 
 function validateKeyring(data, { expectedAddress, expectedKey } = {}) {
     expect(data instanceof Keyring).to.be.true
-    const objectKeys = ['_address', '_key']
+    const objectKeys = ['_address', '_keys']
 
     expect(Object.getOwnPropertyNames(data)).to.deep.equal(objectKeys)
 
@@ -59,10 +59,10 @@ function validateKeyring(data, { expectedAddress, expectedKey } = {}) {
     if (expectedKey !== undefined) {
         if (_.isArray(expectedKey) && _.isString(expectedKey[0])) expectedKey = [expectedKey, [], []]
         if (_.isString(expectedKey)) expectedKey = [[expectedKey], [], []]
-        for (let i = 0; i < data.key.length; i++) {
-            for (let j = 0; j < data.key[i].length; j++) {
+        for (let i = 0; i < data.keys.length; i++) {
+            for (let j = 0; j < data.keys[i].length; j++) {
                 const privateKeyString = expectedKey[i][j] instanceof PrivateKey ? expectedKey[i][j].privateKey : expectedKey[i][j]
-                expect(data.key[i][j].privateKey.toLowerCase()).to.equal(privateKeyString.toLowerCase())
+                expect(data.keys[i][j].privateKey.toLowerCase()).to.equal(privateKeyString.toLowerCase())
             }
         }
     }
@@ -114,19 +114,19 @@ function validateAccount(data, { keyring, expectedAccountKey, exepectedOptions }
     if (expectedAccountKey !== undefined) {
         switch (expectedAccountKey) {
             case 'AccountKeyPublic':
-                validateAccountKeyPublic(data.accountKey, keyring.key[0][0])
+                validateAccountKeyPublic(data.accountKey, keyring.keys[0][0])
                 break
             case 'AccountKeyWeightedMultiSig':
-                validateAccountKeyWeightedMultiSig(data.accountKey, keyring.key[0], exepectedOptions)
+                validateAccountKeyWeightedMultiSig(data.accountKey, keyring.keys[0], exepectedOptions)
                 break
             case 'AccountKeyRoleBased':
                 expect(data.accountKey instanceof AccountKeyRoleBased).to.be.true
                 for (let i = 0; i < data.accountKey.accountKeys.length; i++) {
                     const acctKey = data.accountKey.accountKeys[i]
                     if (acctKey instanceof AccountKeyPublic) {
-                        validateAccountKeyPublic(acctKey, keyring.key[i])
+                        validateAccountKeyPublic(acctKey, keyring.keys[i])
                     } else {
-                        validateAccountKeyWeightedMultiSig(acctKey, keyring.key[i], exepectedOptions[i])
+                        validateAccountKeyWeightedMultiSig(acctKey, keyring.keys[i], exepectedOptions[i])
                     }
                 }
                 break
@@ -175,7 +175,7 @@ describe('caver.wallet.keyring.createFromPrivateKey', () => {
         it('should create Keyring instance from private key string', () => {
             const keyring = caver.wallet.keyring.generate()
 
-            const result = caver.wallet.keyring.createFromPrivateKey(keyring.key[0][0].privateKey)
+            const result = caver.wallet.keyring.createFromPrivateKey(keyring.keys[0][0].privateKey)
             validateKeyring(result, { expectedAddress: keyring.address })
         })
     })
@@ -184,7 +184,7 @@ describe('caver.wallet.keyring.createFromPrivateKey', () => {
         it('should create Keyring instance from private key string', () => {
             const keyring = caver.wallet.keyring.generate()
 
-            const result = caver.wallet.keyring.createFromPrivateKey(utils.stripHexPrefix(keyring.key[0][0].privateKey))
+            const result = caver.wallet.keyring.createFromPrivateKey(utils.stripHexPrefix(keyring.keys[0][0].privateKey))
             validateKeyring(result, { expectedAddress: keyring.address })
         })
     })
@@ -195,7 +195,7 @@ describe('caver.wallet.keyring.createFromPrivateKey', () => {
             const klaytnWalletKey = keyring.getKlaytnWalletKey()
 
             const result = caver.wallet.keyring.createFromPrivateKey(klaytnWalletKey)
-            validateKeyring(result, { expectedKey: keyring.key, expectedAddress: keyring.address })
+            validateKeyring(result, { expectedKey: keyring.keys, expectedAddress: keyring.address })
         })
     })
 
@@ -205,7 +205,7 @@ describe('caver.wallet.keyring.createFromPrivateKey', () => {
             const klaytnWalletKey = keyring.getKlaytnWalletKey()
 
             const result = caver.wallet.keyring.createFromPrivateKey(utils.stripHexPrefix(klaytnWalletKey))
-            validateKeyring(result, { expectedKey: keyring.key, expectedAddress: keyring.address })
+            validateKeyring(result, { expectedKey: keyring.keys, expectedAddress: keyring.address })
         })
     })
 
@@ -227,7 +227,7 @@ describe('caver.wallet.keyring.createFromKlaytnWalletKey', () => {
             const klaytnWalletKey = keyring.getKlaytnWalletKey()
 
             const result = caver.wallet.keyring.createFromKlaytnWalletKey(klaytnWalletKey)
-            validateKeyring(result, { expectedKey: keyring.key, expectedAddress: keyring.address })
+            validateKeyring(result, { expectedKey: keyring.keys, expectedAddress: keyring.address })
         })
     })
 
@@ -246,9 +246,9 @@ describe('caver.wallet.keyring.create', () => {
     context('CAVERJS-UNIT-KEYRING-012: input: address, single private key string', () => {
         it('should create keyring instances with parameters', () => {
             const keyring = caver.wallet.keyring.generate()
-            const created = caver.wallet.keyring.create(keyring.address, keyring.key[0][0].privateKey)
+            const created = caver.wallet.keyring.create(keyring.address, keyring.keys[0][0].privateKey)
 
-            validateKeyring(created, { expectedAddress: keyring.address, expectedKey: keyring.key })
+            validateKeyring(created, { expectedAddress: keyring.address, expectedKey: keyring.keys })
         })
     })
 
@@ -306,7 +306,7 @@ describe('caver.wallet.keyring.createWithSingleKey', () => {
     context('CAVERJS-UNIT-KEYRING-017: input: coupled address, private key', () => {
         it('should create Keyring instance', () => {
             const coupled = caver.wallet.keyring.generate()
-            const prvString = coupled.key[0][0].privateKey
+            const prvString = coupled.keys[0][0].privateKey
 
             const result = caver.wallet.keyring.createWithSingleKey(coupled.address, prvString)
 
@@ -317,7 +317,7 @@ describe('caver.wallet.keyring.createWithSingleKey', () => {
     context('CAVERJS-UNIT-KEYRING-018: input: decoupled address, private key', () => {
         it('should create Keyring instance', () => {
             const decoupled = generateDecoupledKeyring()
-            const prvString = decoupled.key[0][0].privateKey
+            const prvString = decoupled.keys[0][0].privateKey
 
             const result = caver.wallet.keyring.createWithSingleKey(decoupled.address, prvString)
 
@@ -462,7 +462,7 @@ describe('caver.wallet.keyring.encrypt', () => {
         it('should encrypted as v4Keystore', () => {
             const password = 'password'
             const keyring = generateDecoupledKeyring()
-            const privateKey = keyring.key[0][0].privateKey
+            const privateKey = keyring.keys[0][0].privateKey
 
             const result = caver.wallet.keyring.encrypt(privateKey, password, { address: keyring.address })
             validateKeystore(result, password, { address: keyring.address, expectedKey: privateKey })
@@ -476,7 +476,7 @@ describe('caver.wallet.keyring.encrypt', () => {
             const klaytnWalletKey = keyring.getKlaytnWalletKey()
 
             const result = caver.wallet.keyring.encrypt(klaytnWalletKey, password)
-            validateKeystore(result, password, { address: keyring.address, expectedKey: keyring.key })
+            validateKeystore(result, password, { address: keyring.address, expectedKey: keyring.keys })
         })
     })
 
@@ -487,7 +487,7 @@ describe('caver.wallet.keyring.encrypt', () => {
             const klaytnWalletKey = keyring.getKlaytnWalletKey()
 
             const result = caver.wallet.keyring.encrypt(klaytnWalletKey, password, { address: klaytnWalletKey.address })
-            validateKeystore(result, password, { address: keyring.address, expectedKey: keyring.key })
+            validateKeystore(result, password, { address: keyring.address, expectedKey: keyring.keys })
         })
     })
 
@@ -604,7 +604,7 @@ describe('caver.wallet.keyring.encrypt', () => {
 
             const options = Object.assign({ address }, encryptOption)
 
-            const result = caver.wallet.keyring.encrypt(keyring.key, password, options)
+            const result = caver.wallet.keyring.encrypt(keyring.keys, password, options)
 
             const expectedKeystore = {
                 version: 4,
@@ -729,7 +729,7 @@ describe('caver.wallet.keyring.encryptV3', () => {
         it('should encrypted as v4Keystore', () => {
             const password = 'password'
             const keyring = generateDecoupledKeyring()
-            const privateKey = keyring.key[0][0].privateKey
+            const privateKey = keyring.keys[0][0].privateKey
 
             const result = caver.wallet.keyring.encryptV3(privateKey, password, { address: keyring.address })
             validateKeystore(result, password, { address: keyring.address, expectedKey: privateKey }, 3)
@@ -742,7 +742,7 @@ describe('caver.wallet.keyring.encryptV3', () => {
             const klaytnWalletKey = keyring.getKlaytnWalletKey()
 
             const result = caver.wallet.keyring.encryptV3(klaytnWalletKey, password)
-            validateKeystore(result, password, { address: keyring.address, expectedKey: keyring.key }, 3)
+            validateKeystore(result, password, { address: keyring.address, expectedKey: keyring.keys }, 3)
         })
     })
 
@@ -779,7 +779,7 @@ describe('caver.wallet.keyring.decrypt', () => {
             const encrypted = caver.wallet.keyring.encrypt(privateKey, password)
             const decrypted = caver.wallet.keyring.decrypt(encrypted, password)
 
-            validateKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.key })
+            validateKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.keys })
         })
     })
 
@@ -791,7 +791,7 @@ describe('caver.wallet.keyring.decrypt', () => {
             const encrypted = keyring.encrypt(password)
             const decrypted = caver.wallet.keyring.decrypt(encrypted, password)
 
-            validateKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.key })
+            validateKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.keys })
         })
     })
 
@@ -803,7 +803,7 @@ describe('caver.wallet.keyring.decrypt', () => {
             const encrypted = keyring.encrypt(password)
             const decrypted = caver.wallet.keyring.decrypt(encrypted, password)
 
-            validateKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.key })
+            validateKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.keys })
         })
     })
 
@@ -815,7 +815,7 @@ describe('caver.wallet.keyring.decrypt', () => {
             const encrypted = keyring.encrypt(password)
             const decrypted = caver.wallet.keyring.decrypt(encrypted, password)
 
-            validateKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.key })
+            validateKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.keys })
         })
     })
 
@@ -827,7 +827,7 @@ describe('caver.wallet.keyring.decrypt', () => {
             const encrypted = keyring.encrypt(password)
             const decrypted = caver.wallet.keyring.decrypt(encrypted, password)
 
-            validateKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.key })
+            validateKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.keys })
         })
     })
 
@@ -932,7 +932,7 @@ describe('caver.wallet.keyring.decrypt', () => {
 
             const decrypted = caver.wallet.keyring.decrypt(keystoreJsonV4, password)
 
-            validateKeyring(decrypted, { expectedAddress: expectedAccount.address, expectedKey: expectedAccount.key })
+            validateKeyring(decrypted, { expectedAddress: expectedAccount.address, expectedKey: expectedAccount.keys })
         })
     })
 
@@ -1015,7 +1015,7 @@ describe('keyring.getPublicKey', () => {
             const keyring = caver.wallet.keyring.generate()
             const pubKey = keyring.getPublicKey()
 
-            expect(pubKey[0][0]).to.equal(keyring.key[0][0].getPublicKey())
+            expect(pubKey[0][0]).to.equal(keyring.keys[0][0].getPublicKey())
             expect(pubKey[0].length).to.equal(1)
             expect(pubKey[1].length).to.equal(0)
             expect(pubKey[2].length).to.equal(0)
@@ -1027,7 +1027,7 @@ describe('keyring.getPublicKey', () => {
             const keyring = generateDecoupledKeyring()
             const pubKey = keyring.getPublicKey()
 
-            expect(pubKey[0][0]).to.equal(keyring.key[0][0].getPublicKey())
+            expect(pubKey[0][0]).to.equal(keyring.keys[0][0].getPublicKey())
             expect(pubKey[0].length).to.equal(1)
             expect(pubKey[1].length).to.equal(0)
             expect(pubKey[2].length).to.equal(0)
@@ -1039,8 +1039,8 @@ describe('keyring.getPublicKey', () => {
             const keyring = generateMultiSigKeyring(2)
             const pubKey = keyring.getPublicKey()
 
-            expect(pubKey[0][0]).to.equal(keyring.key[0][0].getPublicKey())
-            expect(pubKey[0][1]).to.equal(keyring.key[0][1].getPublicKey())
+            expect(pubKey[0][0]).to.equal(keyring.keys[0][0].getPublicKey())
+            expect(pubKey[0][1]).to.equal(keyring.keys[0][1].getPublicKey())
             expect(pubKey[0].length).to.equal(2)
             expect(pubKey[1].length).to.equal(0)
             expect(pubKey[2].length).to.equal(0)
@@ -1052,12 +1052,12 @@ describe('keyring.getPublicKey', () => {
             const keyring = generateRoleBasedKeyring([2, 3, 1])
             const pubKey = keyring.getPublicKey()
 
-            expect(pubKey[0][0]).to.equal(keyring.key[0][0].getPublicKey())
-            expect(pubKey[0][1]).to.equal(keyring.key[0][1].getPublicKey())
-            expect(pubKey[1][0]).to.equal(keyring.key[1][0].getPublicKey())
-            expect(pubKey[1][1]).to.equal(keyring.key[1][1].getPublicKey())
-            expect(pubKey[1][2]).to.equal(keyring.key[1][2].getPublicKey())
-            expect(pubKey[2][0]).to.equal(keyring.key[2][0].getPublicKey())
+            expect(pubKey[0][0]).to.equal(keyring.keys[0][0].getPublicKey())
+            expect(pubKey[0][1]).to.equal(keyring.keys[0][1].getPublicKey())
+            expect(pubKey[1][0]).to.equal(keyring.keys[1][0].getPublicKey())
+            expect(pubKey[1][1]).to.equal(keyring.keys[1][1].getPublicKey())
+            expect(pubKey[1][2]).to.equal(keyring.keys[1][2].getPublicKey())
+            expect(pubKey[2][0]).to.equal(keyring.keys[2][0].getPublicKey())
             expect(pubKey[0].length).to.equal(2)
             expect(pubKey[1].length).to.equal(3)
             expect(pubKey[2].length).to.equal(1)
@@ -1071,7 +1071,7 @@ describe('keyring.copy', () => {
             const keyring = caver.wallet.keyring.generate()
             const copied = keyring.copy()
 
-            validateKeyring(copied, { expectedAddress: keyring.address, expectedKey: keyring.key })
+            validateKeyring(copied, { expectedAddress: keyring.address, expectedKey: keyring.keys })
         })
     })
 
@@ -1080,7 +1080,7 @@ describe('keyring.copy', () => {
             const keyring = generateDecoupledKeyring()
             const copied = keyring.copy()
 
-            validateKeyring(copied, { expectedAddress: keyring.address, expectedKey: keyring.key })
+            validateKeyring(copied, { expectedAddress: keyring.address, expectedKey: keyring.keys })
         })
     })
 
@@ -1089,7 +1089,7 @@ describe('keyring.copy', () => {
             const keyring = generateMultiSigKeyring(2)
             const copied = keyring.copy()
 
-            validateKeyring(copied, { expectedAddress: keyring.address, expectedKey: keyring.key })
+            validateKeyring(copied, { expectedAddress: keyring.address, expectedKey: keyring.keys })
         })
     })
 
@@ -1120,7 +1120,7 @@ describe('keyring.signWithKey', () => {
 
     context('CAVERJS-UNIT-KEYRING-061: keyring type: coupled / role: existed role / index: undefined', () => {
         it('return one signature array', () => {
-            const signSpy = sinon.spy(coupled.key[0][0], 'sign')
+            const signSpy = sinon.spy(coupled.keys[0][0], 'sign')
             const signed = coupled.signWithKey(hash, chainId, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1131,7 +1131,7 @@ describe('keyring.signWithKey', () => {
 
     context('CAVERJS-UNIT-KEYRING-062: keyring type: coupled / role: existed role / index: 0', () => {
         it('return one signature array', () => {
-            const signSpy = sinon.spy(coupled.key[0][0], 'sign')
+            const signSpy = sinon.spy(coupled.keys[0][0], 'sign')
             const signed = coupled.signWithKey(hash, chainId, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY, 0)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1142,7 +1142,7 @@ describe('keyring.signWithKey', () => {
 
     context('CAVERJS-UNIT-KEYRING-063: keyring type: coupled / role: not existed role / index: 0', () => {
         it('return sign with default role key and return one signature array', () => {
-            const signSpy = sinon.spy(coupled.key[0][0], 'sign')
+            const signSpy = sinon.spy(coupled.keys[0][0], 'sign')
             const signed = coupled.signWithKey(hash, chainId, caver.wallet.keyring.role.ROLE_ACCOUNT_UPDATE_KEY, 0)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1154,7 +1154,7 @@ describe('keyring.signWithKey', () => {
     context('CAVERJS-UNIT-KEYRING-064: keyring type: coupled / role: existed role / index: out of range', () => {
         it('should throw error when index is out of range', () => {
             const invalidIndex = 1
-            const expectedError = `Invalid index(${invalidIndex}): index must be less than the length of keys(${coupled.key[0].length}).`
+            const expectedError = `Invalid index(${invalidIndex}): index must be less than the length of keys(${coupled.keys[0].length}).`
             expect(() => coupled.signWithKey(hash, chainId, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY, invalidIndex)).to.throw(
                 expectedError
             )
@@ -1163,7 +1163,7 @@ describe('keyring.signWithKey', () => {
 
     context('CAVERJS-UNIT-KEYRING-065: keyring type: decoupled / role: existed role / index: undefined', () => {
         it('return return one signature array', () => {
-            const signSpy = sinon.spy(decoupled.key[0][0], 'sign')
+            const signSpy = sinon.spy(decoupled.keys[0][0], 'sign')
             const signed = decoupled.signWithKey(hash, chainId, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1174,7 +1174,7 @@ describe('keyring.signWithKey', () => {
 
     context('CAVERJS-UNIT-KEYRING-066: keyring type: decoupled / role: existed role / index: 0', () => {
         it('return return one signature array', () => {
-            const signSpy = sinon.spy(decoupled.key[0][0], 'sign')
+            const signSpy = sinon.spy(decoupled.keys[0][0], 'sign')
             const signed = decoupled.signWithKey(hash, chainId, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY, 0)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1185,7 +1185,7 @@ describe('keyring.signWithKey', () => {
 
     context('CAVERJS-UNIT-KEYRING-067: keyring type: decoupled / role: not existed role / index: 0', () => {
         it('return sign with default role key and return one signature array', () => {
-            const signSpy = sinon.spy(decoupled.key[0][0], 'sign')
+            const signSpy = sinon.spy(decoupled.keys[0][0], 'sign')
             const signed = decoupled.signWithKey(hash, chainId, caver.wallet.keyring.role.ROLE_ACCOUNT_UPDATE_KEY, 0)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1196,8 +1196,8 @@ describe('keyring.signWithKey', () => {
 
     context('CAVERJS-UNIT-KEYRING-068: keyring type: decoupled / role: existed role / index: out of range', () => {
         it('should throw error when index is out of range', () => {
-            const invalidIndex = decoupled.key[0].length
-            const expectedError = `Invalid index(${invalidIndex}): index must be less than the length of keys(${decoupled.key[0].length}).`
+            const invalidIndex = decoupled.keys[0].length
+            const expectedError = `Invalid index(${invalidIndex}): index must be less than the length of keys(${decoupled.keys[0].length}).`
             expect(() => decoupled.signWithKey(hash, chainId, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY, invalidIndex)).to.throw(
                 expectedError
             )
@@ -1206,7 +1206,7 @@ describe('keyring.signWithKey', () => {
 
     context('CAVERJS-UNIT-KEYRING-069: keyring type: multiSig / role: existed role / index: undefined', () => {
         it('return return one signature array', () => {
-            const signSpy = sinon.spy(multiSig.key[0][0], 'sign')
+            const signSpy = sinon.spy(multiSig.keys[0][0], 'sign')
             const signed = multiSig.signWithKey(hash, chainId, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1217,7 +1217,7 @@ describe('keyring.signWithKey', () => {
 
     context('CAVERJS-UNIT-KEYRING-070: keyring type: multiSig / role: existed role / index: 2', () => {
         it('return return one signature array', () => {
-            const signSpy = sinon.spy(multiSig.key[0][2], 'sign')
+            const signSpy = sinon.spy(multiSig.keys[0][2], 'sign')
             const signed = multiSig.signWithKey(hash, chainId, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY, 2)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1228,7 +1228,7 @@ describe('keyring.signWithKey', () => {
 
     context('CAVERJS-UNIT-KEYRING-071: keyring type: multiSig / role: not existed role / index: 0', () => {
         it('return sign with default role key and return one signature array', () => {
-            const signSpy = sinon.spy(multiSig.key[0][0], 'sign')
+            const signSpy = sinon.spy(multiSig.keys[0][0], 'sign')
             const signed = multiSig.signWithKey(hash, chainId, caver.wallet.keyring.role.ROLE_ACCOUNT_UPDATE_KEY, 0)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1239,8 +1239,8 @@ describe('keyring.signWithKey', () => {
 
     context('CAVERJS-UNIT-KEYRING-072: keyring type: multiSig / role: existed role / index: out of range', () => {
         it('should throw error when index is out of range', () => {
-            const invalidIndex = multiSig.key[0].length
-            const expectedError = `Invalid index(${invalidIndex}): index must be less than the length of keys(${multiSig.key[0].length}).`
+            const invalidIndex = multiSig.keys[0].length
+            const expectedError = `Invalid index(${invalidIndex}): index must be less than the length of keys(${multiSig.keys[0].length}).`
             expect(() => multiSig.signWithKey(hash, chainId, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY, invalidIndex)).to.throw(
                 expectedError
             )
@@ -1249,7 +1249,7 @@ describe('keyring.signWithKey', () => {
 
     context('CAVERJS-UNIT-KEYRING-073: keyring type: roleBased / role: existed role / index: undefined', () => {
         it('return return one signature array', () => {
-            const signSpy = sinon.spy(roleBased.key[0][0], 'sign')
+            const signSpy = sinon.spy(roleBased.keys[0][0], 'sign')
             const signed = roleBased.signWithKey(hash, chainId, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1260,7 +1260,7 @@ describe('keyring.signWithKey', () => {
 
     context('CAVERJS-UNIT-KEYRING-074: keyring type: roleBased / role: existed role / index: 2', () => {
         it('return return one signature array', () => {
-            const signSpy = sinon.spy(roleBased.key[2][2], 'sign')
+            const signSpy = sinon.spy(roleBased.keys[2][2], 'sign')
             const signed = roleBased.signWithKey(hash, chainId, caver.wallet.keyring.role.ROLE_FEE_PAYER_KEY, 2)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1271,7 +1271,7 @@ describe('keyring.signWithKey', () => {
 
     context('CAVERJS-UNIT-KEYRING-075: keyring type: roleBased / role: not existed role / index: 0', () => {
         it('return sign with default role key and return one signature array', () => {
-            const signSpy = sinon.spy(roleBased.key[0][0], 'sign')
+            const signSpy = sinon.spy(roleBased.keys[0][0], 'sign')
             const signed = roleBased.signWithKey(hash, chainId, caver.wallet.keyring.role.ROLE_ACCOUNT_UPDATE_KEY, 0)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1282,8 +1282,8 @@ describe('keyring.signWithKey', () => {
 
     context('CAVERJS-UNIT-KEYRING-076: keyring type: roleBased / role: existed role / index: out of range', () => {
         it('should throw error when index is out of range', () => {
-            const invalidIndex = roleBased.key[0].length
-            const expectedError = `Invalid index(${invalidIndex}): index must be less than the length of keys(${roleBased.key[0].length}).`
+            const invalidIndex = roleBased.keys[0].length
+            const expectedError = `Invalid index(${invalidIndex}): index must be less than the length of keys(${roleBased.keys[0].length}).`
             expect(() => roleBased.signWithKey(hash, chainId, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY, invalidIndex)).to.throw(
                 expectedError
             )
@@ -1334,7 +1334,7 @@ describe('keyring.signWithKeys', () => {
 
     context('CAVERJS-UNIT-KEYRING-077: keyring type: coupled / role: existed role', () => {
         it('return return one signature array', () => {
-            const signSpy = sinon.spy(coupled.key[0][0], 'sign')
+            const signSpy = sinon.spy(coupled.keys[0][0], 'sign')
             const signed = coupled.signWithKeys(hash, chainId, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1347,7 +1347,7 @@ describe('keyring.signWithKeys', () => {
 
     context('CAVERJS-UNIT-KEYRING-078: keyring type: coupled / role: not existed role', () => {
         it('return sign with default role key and return one signature array', () => {
-            const signSpy = sinon.spy(coupled.key[0][0], 'sign')
+            const signSpy = sinon.spy(coupled.keys[0][0], 'sign')
             const signed = coupled.signWithKeys(hash, chainId, caver.wallet.keyring.role.ROLE_ACCOUNT_UPDATE_KEY)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1360,7 +1360,7 @@ describe('keyring.signWithKeys', () => {
 
     context('CAVERJS-UNIT-KEYRING-079: keyring type: decoupled / role: existed role', () => {
         it('return return one signature array', () => {
-            const signSpy = sinon.spy(decoupled.key[0][0], 'sign')
+            const signSpy = sinon.spy(decoupled.keys[0][0], 'sign')
             const signed = decoupled.signWithKeys(hash, chainId, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1373,7 +1373,7 @@ describe('keyring.signWithKeys', () => {
 
     context('CAVERJS-UNIT-KEYRING-080: keyring type: decoupled / role: not existed role', () => {
         it('return sign with default role key and return one signature array', () => {
-            const signSpy = sinon.spy(decoupled.key[0][0], 'sign')
+            const signSpy = sinon.spy(decoupled.keys[0][0], 'sign')
             const signed = decoupled.signWithKeys(hash, chainId, caver.wallet.keyring.role.ROLE_ACCOUNT_UPDATE_KEY)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1386,9 +1386,9 @@ describe('keyring.signWithKeys', () => {
 
     context('CAVERJS-UNIT-KEYRING-081: keyring type: multiSig / role: existed role', () => {
         it('return return one signature array', () => {
-            const signSpy0 = sinon.spy(multiSig.key[0][0], 'sign')
-            const signSpy1 = sinon.spy(multiSig.key[0][1], 'sign')
-            const signSpy2 = sinon.spy(multiSig.key[0][2], 'sign')
+            const signSpy0 = sinon.spy(multiSig.keys[0][0], 'sign')
+            const signSpy1 = sinon.spy(multiSig.keys[0][1], 'sign')
+            const signSpy2 = sinon.spy(multiSig.keys[0][2], 'sign')
             const signed = multiSig.signWithKeys(hash, chainId, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY)
 
             expect(signSpy0).to.have.been.calledOnce
@@ -1407,9 +1407,9 @@ describe('keyring.signWithKeys', () => {
 
     context('CAVERJS-UNIT-KEYRING-082: keyring type: multiSig / role: not existed role', () => {
         it('return sign with default role key and return one signature array', () => {
-            const signSpy0 = sinon.spy(multiSig.key[0][0], 'sign')
-            const signSpy1 = sinon.spy(multiSig.key[0][1], 'sign')
-            const signSpy2 = sinon.spy(multiSig.key[0][2], 'sign')
+            const signSpy0 = sinon.spy(multiSig.keys[0][0], 'sign')
+            const signSpy1 = sinon.spy(multiSig.keys[0][1], 'sign')
+            const signSpy2 = sinon.spy(multiSig.keys[0][2], 'sign')
             const signed = multiSig.signWithKeys(hash, chainId, caver.wallet.keyring.role.ROLE_ACCOUNT_UPDATE_KEY)
 
             expect(signSpy0).to.have.been.calledOnce
@@ -1428,9 +1428,9 @@ describe('keyring.signWithKeys', () => {
 
     context('CAVERJS-UNIT-KEYRING-083: keyring type: roleBased / role: existed role', () => {
         it('return return one signature array', () => {
-            const signSpy0 = sinon.spy(roleBased.key[2][0], 'sign')
-            const signSpy1 = sinon.spy(roleBased.key[2][1], 'sign')
-            const signSpy2 = sinon.spy(roleBased.key[2][2], 'sign')
+            const signSpy0 = sinon.spy(roleBased.keys[2][0], 'sign')
+            const signSpy1 = sinon.spy(roleBased.keys[2][1], 'sign')
+            const signSpy2 = sinon.spy(roleBased.keys[2][2], 'sign')
             const signed = roleBased.signWithKeys(hash, chainId, caver.wallet.keyring.role.ROLE_FEE_PAYER_KEY)
 
             expect(signSpy0).to.have.been.calledOnce
@@ -1449,9 +1449,9 @@ describe('keyring.signWithKeys', () => {
 
     context('CAVERJS-UNIT-KEYRING-084: keyring type: roleBased / role: not existed role', () => {
         it('return sign with default role key and return one signature array', () => {
-            const signSpy0 = sinon.spy(roleBased.key[0][0], 'sign')
-            const signSpy1 = sinon.spy(roleBased.key[0][1], 'sign')
-            const signSpy2 = sinon.spy(roleBased.key[0][2], 'sign')
+            const signSpy0 = sinon.spy(roleBased.keys[0][0], 'sign')
+            const signSpy1 = sinon.spy(roleBased.keys[0][1], 'sign')
+            const signSpy2 = sinon.spy(roleBased.keys[0][2], 'sign')
             const signed = roleBased.signWithKeys(hash, chainId, caver.wallet.keyring.role.ROLE_ACCOUNT_UPDATE_KEY)
 
             expect(signSpy0).to.have.been.calledOnce
@@ -1485,7 +1485,7 @@ describe('keyring.signMessage', () => {
 
     context('CAVERJS-UNIT-KEYRING-085: keyring type: coupled / role: undefined / index: undefined', () => {
         it('return sign message with 0th key of default role key', () => {
-            const signSpy = sinon.spy(coupled.key[0][0], 'signMessage')
+            const signSpy = sinon.spy(coupled.keys[0][0], 'signMessage')
             const signed = coupled.signMessage(data)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1498,7 +1498,7 @@ describe('keyring.signMessage', () => {
 
     context('CAVERJS-UNIT-KEYRING-086: keyring type: coupled / role: existed role / index: 0', () => {
         it('return sign message with key', () => {
-            const signSpy = sinon.spy(coupled.key[0][0], 'signMessage')
+            const signSpy = sinon.spy(coupled.keys[0][0], 'signMessage')
             const signed = coupled.signMessage(data, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY, 0)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1511,7 +1511,7 @@ describe('keyring.signMessage', () => {
 
     context('CAVERJS-UNIT-KEYRING-087: keyring type: coupled / role: not existed role / index: 0', () => {
         it('return sign message with default role key', () => {
-            const signSpy = sinon.spy(coupled.key[0][0], 'signMessage')
+            const signSpy = sinon.spy(coupled.keys[0][0], 'signMessage')
             const signed = coupled.signMessage(data, caver.wallet.keyring.role.ROLE_FEE_PAYER_KEY, 0)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1524,15 +1524,15 @@ describe('keyring.signMessage', () => {
 
     context('CAVERJS-UNIT-KEYRING-088: keyring type: coupled / role: existed role / index: out of range', () => {
         it('should throw error when index is out of range', () => {
-            const invalidIndex = coupled.key[0].length
-            const expectedError = `Invalid index(${invalidIndex}): index must be less than the length of keys(${coupled.key[0].length}).`
+            const invalidIndex = coupled.keys[0].length
+            const expectedError = `Invalid index(${invalidIndex}): index must be less than the length of keys(${coupled.keys[0].length}).`
             expect(() => coupled.signMessage(data, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY, invalidIndex)).to.throw(expectedError)
         })
     })
 
     context('CAVERJS-UNIT-KEYRING-089: keyring type: decoupled / role: undefined / index: undefined', () => {
         it('return sign message with 0th key of default role key', () => {
-            const signSpy = sinon.spy(decoupled.key[0][0], 'signMessage')
+            const signSpy = sinon.spy(decoupled.keys[0][0], 'signMessage')
             const signed = decoupled.signMessage(data)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1545,7 +1545,7 @@ describe('keyring.signMessage', () => {
 
     context('CAVERJS-UNIT-KEYRING-090: keyring type: decoupled / role: existed role / index: 0', () => {
         it('return sign message with key', () => {
-            const signSpy = sinon.spy(decoupled.key[0][0], 'signMessage')
+            const signSpy = sinon.spy(decoupled.keys[0][0], 'signMessage')
             const signed = decoupled.signMessage(data, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY, 0)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1558,7 +1558,7 @@ describe('keyring.signMessage', () => {
 
     context('CAVERJS-UNIT-KEYRING-091: keyring type: decoupled / role: not existed role / index: 0', () => {
         it('return sign message with default role key', () => {
-            const signSpy = sinon.spy(decoupled.key[0][0], 'signMessage')
+            const signSpy = sinon.spy(decoupled.keys[0][0], 'signMessage')
             const signed = decoupled.signMessage(data, caver.wallet.keyring.role.ROLE_FEE_PAYER_KEY, 0)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1571,15 +1571,15 @@ describe('keyring.signMessage', () => {
 
     context('CAVERJS-UNIT-KEYRING-092: keyring type: decoupled / role: existed role / index: out of range', () => {
         it('should throw error when index is out of range', () => {
-            const invalidIndex = decoupled.key[0].length
-            const expectedError = `Invalid index(${invalidIndex}): index must be less than the length of keys(${decoupled.key[0].length}).`
+            const invalidIndex = decoupled.keys[0].length
+            const expectedError = `Invalid index(${invalidIndex}): index must be less than the length of keys(${decoupled.keys[0].length}).`
             expect(() => decoupled.signMessage(data, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY, invalidIndex)).to.throw(expectedError)
         })
     })
 
     context('CAVERJS-UNIT-KEYRING-093: keyring type: multiSig / role: undefined / index: undefined', () => {
         it('return sign message with 0th key of default role key', () => {
-            const signSpy = sinon.spy(multiSig.key[0][0], 'signMessage')
+            const signSpy = sinon.spy(multiSig.keys[0][0], 'signMessage')
             const signed = multiSig.signMessage(data)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1592,7 +1592,7 @@ describe('keyring.signMessage', () => {
 
     context('CAVERJS-UNIT-KEYRING-094: keyring type: multiSig / role: existed role / index: 1', () => {
         it('return sign message with key', () => {
-            const signSpy = sinon.spy(multiSig.key[0][1], 'signMessage')
+            const signSpy = sinon.spy(multiSig.keys[0][1], 'signMessage')
             const signed = multiSig.signMessage(data, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY, 1)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1605,7 +1605,7 @@ describe('keyring.signMessage', () => {
 
     context('CAVERJS-UNIT-KEYRING-095: keyring type: multiSig / role: not existed role / index: 2', () => {
         it('return sign message with default role key', () => {
-            const signSpy = sinon.spy(multiSig.key[0][2], 'signMessage')
+            const signSpy = sinon.spy(multiSig.keys[0][2], 'signMessage')
             const signed = multiSig.signMessage(data, caver.wallet.keyring.role.ROLE_FEE_PAYER_KEY, 2)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1618,15 +1618,15 @@ describe('keyring.signMessage', () => {
 
     context('CAVERJS-UNIT-KEYRING-096: keyring type: multiSig / role: existed role / index: out of range', () => {
         it('should throw error when index is out of range', () => {
-            const invalidIndex = multiSig.key[0].length
-            const expectedError = `Invalid index(${invalidIndex}): index must be less than the length of keys(${multiSig.key[0].length}).`
+            const invalidIndex = multiSig.keys[0].length
+            const expectedError = `Invalid index(${invalidIndex}): index must be less than the length of keys(${multiSig.keys[0].length}).`
             expect(() => multiSig.signMessage(data, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY, invalidIndex)).to.throw(expectedError)
         })
     })
 
     context('CAVERJS-UNIT-KEYRING-097: keyring type: roleBased / role: undefined / index: undefined', () => {
         it('return sign message with 0th key of default role key', () => {
-            const signSpy = sinon.spy(roleBased.key[0][0], 'signMessage')
+            const signSpy = sinon.spy(roleBased.keys[0][0], 'signMessage')
             const signed = roleBased.signMessage(data)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1639,7 +1639,7 @@ describe('keyring.signMessage', () => {
 
     context('CAVERJS-UNIT-KEYRING-098: keyring type: roleBased / role: existed role / index: 1', () => {
         it('return sign message with key', () => {
-            const signSpy = sinon.spy(roleBased.key[0][1], 'signMessage')
+            const signSpy = sinon.spy(roleBased.keys[0][1], 'signMessage')
             const signed = roleBased.signMessage(data, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY, 1)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1652,7 +1652,7 @@ describe('keyring.signMessage', () => {
 
     context('CAVERJS-UNIT-KEYRING-099: keyring type: roleBased / role: not existed role / index: 2', () => {
         it('return sign message with default role key', () => {
-            const signSpy = sinon.spy(roleBased.key[0][2], 'signMessage')
+            const signSpy = sinon.spy(roleBased.keys[0][2], 'signMessage')
             const signed = roleBased.signMessage(data, caver.wallet.keyring.role.ROLE_ACCOUNT_UPDATE_KEY, 2)
 
             expect(signSpy).to.have.been.calledOnce
@@ -1665,8 +1665,8 @@ describe('keyring.signMessage', () => {
 
     context('CAVERJS-UNIT-KEYRING-100: keyring type: roleBased / role: existed role / index: out of range', () => {
         it('should throw error when index is out of range', () => {
-            const invalidIndex = roleBased.key[0].length
-            const expectedError = `Invalid index(${invalidIndex}): index must be less than the length of keys(${roleBased.key[0].length}).`
+            const invalidIndex = roleBased.keys[0].length
+            const expectedError = `Invalid index(${invalidIndex}): index must be less than the length of keys(${roleBased.keys[0].length}).`
             expect(() => roleBased.signMessage(data, caver.wallet.keyring.role.ROLE_TRANSACTION_KEY, invalidIndex)).to.throw(expectedError)
         })
     })
@@ -1767,7 +1767,7 @@ describe('keyring.getKlaytnWalletKey', () => {
         it('return valid KlaytnWalletKey', () => {
             const klaytnWalletKey = coupled.getKlaytnWalletKey()
 
-            expect(klaytnWalletKey).to.equal(`${coupled.key[0][0].privateKey}0x00${coupled.address}`)
+            expect(klaytnWalletKey).to.equal(`${coupled.keys[0][0].privateKey}0x00${coupled.address}`)
         })
     })
 
@@ -1775,7 +1775,7 @@ describe('keyring.getKlaytnWalletKey', () => {
         it('return valid KlaytnWalletKey', () => {
             const klaytnWalletKey = decoupled.getKlaytnWalletKey()
 
-            expect(klaytnWalletKey).to.equal(`${decoupled.key[0][0].privateKey}0x00${decoupled.address}`)
+            expect(klaytnWalletKey).to.equal(`${decoupled.keys[0][0].privateKey}0x00${decoupled.address}`)
         })
     })
 
@@ -1812,7 +1812,7 @@ describe('keyring.toAccount', () => {
     context('CAVERJS-UNIT-KEYRING-112: keyring type: empty keyring', () => {
         it('should throw error when key in keyring is empty', () => {
             const empty = caver.wallet.keyring.generate()
-            empty.key = null
+            empty.keys = null
 
             const expectedError = `Failed to create Account instance: Empty key in keyring.`
 
