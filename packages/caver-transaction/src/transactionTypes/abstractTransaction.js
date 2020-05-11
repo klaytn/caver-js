@@ -238,13 +238,13 @@ class AbstractTransaction {
     /**
      * Combines signatures to the transaction from RLP-encoded transaction strings and returns a single transaction with all signatures combined.
      * When combining the signatures into a transaction instance,
-     * an error is thrown if the deocded transaction contains different value.
+     * an error is thrown if the decoded transaction contains different value except signatures.
      *
      * @param {Array.<string>} rlpEncodedTxs - An array of RLP-encoded transaction strings.
      * @return {string}
      */
     combineSignatures(rlpEncodedTxs) {
-        if (!_.isArray(rlpEncodedTxs)) throw new Error(`The parameter must be an array of RLP encoded transaction strings.`)
+        if (!_.isArray(rlpEncodedTxs)) throw new Error(`The parameter must be an array of RLP-encoded transaction strings.`)
 
         // If the signatures are empty, there may be an undefined member variable.
         // In this case, the empty information is filled with the decoded result.
@@ -253,7 +253,7 @@ class AbstractTransaction {
 
         for (const encoded of rlpEncodedTxs) {
             const type = typeDetectionFromRLPEncoding(encoded)
-            if (this.type !== type) throw new Error(`Transaction type mismatch: Different transactions cannot acquire signatures.`)
+            if (this.type !== type) throw new Error(`Transaction type mismatch: Signatures from different transactions cannot be combined.`)
 
             const decoded = this.constructor.decode(encoded)
 
