@@ -23,7 +23,7 @@ const Hash = require('eth-lib/lib/hash')
 const TransactionHasher = require('../transactionHasher/transactionHasher')
 const utils = require('../../../caver-utils')
 const Keyring = require('../../../caver-wallet/src/keyring/keyring')
-const { TX_TYPE_STRING, refineSignatures, typeDetectionFromRLPEncoding, isValidNumber } = require('../transactionHelper/transactionHelper')
+const { TX_TYPE_STRING, refineSignatures, typeDetectionFromRLPEncoding } = require('../transactionHelper/transactionHelper')
 const { KEY_ROLE } = require('../../../caver-wallet/src/keyring/keyringHelper')
 const { validateParams } = require('../../../caver-core-helpers/src/validateFunction')
 
@@ -73,8 +73,7 @@ class AbstractTransaction {
     }
 
     set nonce(n) {
-        if (!isValidNumber(n)) throw new Error(`Invalid nonce ${n}`)
-        this._nonce = utils.toHex(n)
+        this._nonce = utils.numberToHex(n)
     }
 
     /**
@@ -85,8 +84,7 @@ class AbstractTransaction {
     }
 
     set gas(g) {
-        if (!isValidNumber(g)) throw new Error(`Invalid gas ${g}`)
-        this._gas = utils.toHex(g)
+        this._gas = utils.numberToHex(g)
     }
 
     /**
@@ -97,8 +95,7 @@ class AbstractTransaction {
     }
 
     set gasPrice(g) {
-        if (!isValidNumber(g)) throw new Error(`Invalid gasPrice ${g}`)
-        this._gasPrice = utils.toHex(g)
+        this._gasPrice = utils.numberToHex(g)
     }
 
     /**
@@ -207,6 +204,7 @@ class AbstractTransaction {
      *                                                      and more than one signatures should be defined in the form of a two-dimensional array.
      */
     appendSignatures(sig) {
+        if (!_.isArray(sig)) throw new Error(`Signature to append should be an array.`)
         if (!_.isArray(sig[0])) sig = [sig]
         this.signatures = this.signatures.concat(sig)
     }

@@ -144,7 +144,8 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
      *                                                      and more than one feePayerSignatures should be defined in the form of a two-dimensional array.
      */
     appendFeePayerSignatures(sig) {
-        if (!Array.isArray(sig[0])) sig = [sig]
+        if (!_.isArray(sig)) throw new Error(`Signature to append should be an array.`)
+        if (!_.isArray(sig[0])) sig = [sig]
         this.feePayerSignatures = this.feePayerSignatures.concat(sig)
     }
 
