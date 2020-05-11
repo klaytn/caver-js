@@ -104,8 +104,8 @@ class WeightedMultiSigOptions {
 
 /**
  * validates threshold and sum of weights.
- * @param {number} threshold - The x point.
- * @param {Array.<number>} weights - The y point.
+ * @param {number} threshold - The threshold of the AccountKeyWeightedMultiSig.
+ * @param {Array.<number>} weights - An array of weights.
  * @return {Boolean}
  */
 function validateWeightedSum(threshold, weights) {
