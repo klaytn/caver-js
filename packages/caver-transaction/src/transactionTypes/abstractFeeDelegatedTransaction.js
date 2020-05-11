@@ -21,18 +21,18 @@ const RLP = require('eth-lib/lib/rlp')
 const Hash = require('eth-lib/lib/hash')
 const Bytes = require('eth-lib/lib/bytes')
 const TransactionHasher = require('../transactionHasher/transactionHasher')
-const AbstractTransactionType = require('./abstractTransactionType')
+const AbstractTransaction = require('./abstractTransaction')
 const { refineSignatures, typeDetectionFromRLPEncoding } = require('../transactionHelper/transactionHelper')
 const formatters = require('../../../caver-core-helpers/src/formatters')
 const Keyring = require('../../../caver-wallet/src/keyring/keyring')
 const { KEY_ROLE } = require('../../../caver-wallet/src/keyring/keyringHelper')
-const utils = require('../../../caver-utils')
+const utils = require('../../../caver-utils/src')
 
 /**
  * Abstract class that implements common logic for each fee delegated transaction type.
  * @class
  */
-class AbstractFeeDelegatedTransactionType extends AbstractTransactionType {
+class AbstractFeeDelegatedTransaction extends AbstractTransaction {
     /**
      * Abstract class that implements common logic for each transaction type.
      * In this constructor, feePayer and feePayerSignatures are set as transaction member variables.
@@ -219,4 +219,4 @@ class AbstractFeeDelegatedTransactionType extends AbstractTransactionType {
     }
 }
 
-module.exports = AbstractFeeDelegatedTransactionType
+module.exports = AbstractFeeDelegatedTransaction

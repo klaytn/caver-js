@@ -37,7 +37,7 @@ const { validateParams } = require('../../../caver-core-helpers/src/validateFunc
  * Abstract class that implements common logic for each transaction type.
  * @class
  */
-class AbstractTransactionType {
+class AbstractTransaction {
     /**
      * Abstract class that implements common logic for each transaction type.
      * In this constructor, type, tag, nonce, gasPrice, chainId, gas and signatures are set as transaction member variables.
@@ -327,10 +327,10 @@ class AbstractTransactionType {
      *
      */
     async fillTransaction() {
-        this.gasPrice = this.gasPrice === undefined ? await AbstractTransactionType._klaytnCall.getGasPrice() : this.gasPrice
-        this.nonce = this.nonce === undefined ? await AbstractTransactionType._klaytnCall.getTransactionCount(this.from) : this.nonce
-        this.chainId = this.chainId === undefined ? await AbstractTransactionType._klaytnCall.getChainId() : this.chainId
+        this.gasPrice = this.gasPrice === undefined ? await AbstractTransaction._klaytnCall.getGasPrice() : this.gasPrice
+        this.nonce = this.nonce === undefined ? await AbstractTransaction._klaytnCall.getTransactionCount(this.from) : this.nonce
+        this.chainId = this.chainId === undefined ? await AbstractTransaction._klaytnCall.getChainId() : this.chainId
     }
 }
 
-module.exports = AbstractTransactionType
+module.exports = AbstractTransaction
