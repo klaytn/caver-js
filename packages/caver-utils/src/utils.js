@@ -700,7 +700,10 @@ const rlpEncode = data => RLP.encode(data)
 
 const rlpDecode = encodedData => RLP.decode(encodedData)
 
-const xyPointFromPublicKey = publicKey => {
+const xyPointFromPublicKey = pub => {
+    let publicKey = pub
+    if (isCompressedPublicKey(publicKey)) publicKey = decompressPublicKey(pub)
+
     publicKey = publicKey.replace('0x', '')
     if (publicKey.length !== 128) throw Error('Invalid public key') // + 2 means '0x'
 
