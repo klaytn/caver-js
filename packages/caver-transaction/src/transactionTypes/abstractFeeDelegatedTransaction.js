@@ -137,7 +137,7 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
     }
 
     /**
-     * Appends feePayerSignatures to transaction.
+     * Appends feePayerSignatures to the transaction.
      *
      * @param {Array.<string>|Array.<Array.<string>>} sig - An array of feePayerSignatures to append to the transaction.
      *                                                      One feePayerSignature can be defined in the form of a one-dimensional array or two-dimensional array,
@@ -149,11 +149,11 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
     }
 
     /**
-     * Combines signatures and feePayerSignatures to transaction from RLP-encoded transaction strings.
-     * When combining the signatures and feePayerSignatures of RLP-encoded transaction into a transaction instance,
-     * an error is thrown if the deocded transaction contains different values.
+     * Combines signatures and feePayerSignatures to the transaction from RLP-encoded transaction strings and returns a single transaction with all signatures combined.
+     * When combining the signatures into a transaction instance,
+     * an error is thrown if the decoded transaction contains different value except signatures.
      *
-     * @param {Array.<string>} rlpEncodedTxs - An array of RLP-encoded fee delegated transaction strings.
+     * @param {Array.<string>} rlpEncodedTxs - An array of RLP-encoded transaction strings.
      * @return {string}
      */
     combineSignatures(rlpEncodedTxs) {
@@ -167,7 +167,7 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
 
         for (const encoded of rlpEncodedTxs) {
             const type = typeDetectionFromRLPEncoding(encoded)
-            if (this.type !== type) throw new Error(`Transaction type mismatch: Different transactions cannot acquire signatures.`)
+            if (this.type !== type) throw new Error(`Transaction type mismatch: Signatures from different transactions cannot be combined.`)
 
             const decoded = this.constructor.decode(encoded)
 
