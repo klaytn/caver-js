@@ -44,12 +44,11 @@ class AbstractTransaction {
      *
      * @constructor
      * @param {string} typeString - The type string of transaction.
-     * @param {string} typeTag - The type tag in format of hex string.
      * @param {object} createTxObj - The parameters to create an instance of transaction.
      */
-    constructor(typeString, typeTag, createTxObj) {
+    constructor(typeString, createTxObj) {
         this.type = typeString
-        this.tag = typeTag
+        this.tag = TX_TYPE_TAG[typeString]
 
         createTxObj.type = typeString
 

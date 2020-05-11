@@ -39,11 +39,10 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
      *
      * @constructor
      * @param {string} typeString - The type string of transaction.
-     * @param {string} typeTag - The type tag in format of hex string.
      * @param {object} createTxObj - The parameters to create an instance of transaction.
      */
-    constructor(typeString, typeTag, createTxObj) {
-        super(typeString, typeTag, createTxObj)
+    constructor(typeString, createTxObj) {
+        super(typeString, createTxObj)
         this.feePayer = createTxObj.feePayer
         this.feePayerSignatures = createTxObj.feePayerSignatures || []
     }
