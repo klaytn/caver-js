@@ -23,13 +23,7 @@ const Hash = require('eth-lib/lib/hash')
 const TransactionHasher = require('../transactionHasher/transactionHasher')
 const utils = require('../../../caver-utils')
 const Keyring = require('../../../caver-wallet/src/keyring/keyring')
-const {
-    TX_TYPE_STRING,
-    TX_TYPE_TAG,
-    refineSignatures,
-    typeDetectionFromRLPEncoding,
-    isValidNumber,
-} = require('../transactionHelper/transactionHelper')
+const { TX_TYPE_STRING, refineSignatures, typeDetectionFromRLPEncoding, isValidNumber } = require('../transactionHelper/transactionHelper')
 const { KEY_ROLE } = require('../../../caver-wallet/src/keyring/keyringHelper')
 const { validateParams } = require('../../../caver-core-helpers/src/validateFunction')
 
@@ -48,7 +42,6 @@ class AbstractTransaction {
      */
     constructor(typeString, createTxObj) {
         this.type = typeString
-        this.tag = TX_TYPE_TAG[typeString]
 
         createTxObj.type = typeString
 
@@ -75,18 +68,6 @@ class AbstractTransaction {
     set type(t) {
         if (TX_TYPE_STRING[t] === undefined) throw new Error(`Invalid transaction type ${t}. Please refer 'caver.transaction.type'.`)
         this._type = t
-    }
-
-    /**
-     * @type {string}
-     */
-    get tag() {
-        return this._tag
-    }
-
-    set tag(t) {
-        if (TX_TYPE_TAG[t] === undefined) throw new Error(`Invalid transaction tag ${t}. Please refer 'caver.transaction.tag'.`)
-        this._tag = t
     }
 
     /**
