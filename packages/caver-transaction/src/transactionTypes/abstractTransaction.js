@@ -304,8 +304,7 @@ class AbstractTransaction {
      * @return {string}
      */
     getSenderTxHash() {
-        const rlpEncoded = this.getRLPEncoding()
-        return Hash.keccak256(rlpEncoded)
+        return this.getTransactionHash()
     }
 
     /**
