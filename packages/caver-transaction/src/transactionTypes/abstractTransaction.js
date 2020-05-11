@@ -189,7 +189,7 @@ class AbstractTransaction {
     }
 
     /**
-     * Signs to transaction with multiple private keys.
+     * Signs to the transaction using all private keys in `key`.
      *
      * @async
      * @param {Keyring|string} key - The instance of Keyring, private key string or KlaytnWalletKey string.
