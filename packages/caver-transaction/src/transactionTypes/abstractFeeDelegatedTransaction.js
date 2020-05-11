@@ -73,17 +73,17 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
     }
 
     /**
-     * Signs to transaction with single private key as a fee payer.
+     * Signs to the transaction with a single private key in `key` as a fee payer.
      * @async
      * @param {Keyring|string} key - The instance of Keyring, private key string or KlaytnWalletKey string.
      * @param {number} [index] - The index of private key to use.
-     * @param {function} [hasher] - The function to get hash of transaction. In order to use a custom hasher, the index must be defined.
+     * @param {function} [hasher] - The function to get the transaction hash. In order to use a custom hasher, the index must be defined.
      * @return {Transaction}
      */
     async signFeePayerWithKey(key, index = 0, hasher = TransactionHasher.getHashForSigning) {
         // User parameter input cases
         // (key) / (key index) / (key index hasher)
-        if (_.isFunction(index)) throw new Error(`In order to send a custom hasher as a parameter, the index must be defined first.`)
+        if (_.isFunction(index)) throw new Error(`In order to pass a custom hasher, use the third parameter.`)
 
         if (!this.feePayer || this.feePayer === '0x') this.feePayer = keyring.address
         if (this.feePayer.toLowerCase() !== keyring.address.toLowerCase())
@@ -108,7 +108,7 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
     }
 
     /**
-     * Signs to transaction with multiple private keys as a fee payer.
+     * Signs to the transaction with all private keys in `keys` as a fee payer.
      *
      * @async
      * @param {Keyring|string} key - The instance of Keyring, private key string or KlaytnWalletKey string.
