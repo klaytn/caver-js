@@ -47,6 +47,8 @@ const TX_TYPE_STRING = {
     TxTypeFeeDelegatedCancelWithRatio: 'TxTypeFeeDelegatedCancelWithRatio',
 
     TxTypeChainDataAnchoring: 'TxTypeChainDataAnchoring',
+    TxTypeFeeDelegatedChainDataAnchoring: 'TxTypeFeeDelegatedChainDataAnchoring',
+    TxTypeFeeDelegatedChainDataAnchoringWithRatio: 'TxTypeFeeDelegatedChainDataAnchoringWithRatio',
 }
 
 const TX_TYPE_TAG = {
@@ -96,7 +98,10 @@ const TX_TYPE_TAG = {
     '0x3a': TX_TYPE_STRING.TxTypeFeeDelegatedCancelWithRatio,
 
     TxTypeChainDataAnchoring: '0x48',
-    '0x48': TX_TYPE_STRING.TxTypeChainDataAnchoring,
+    '0x49': TX_TYPE_STRING.TxTypeChainDataAnchoring,
+    TxTypeFeeDelegatedChainDataAnchoring: 'TxTypeFeeDelegatedChainDataAnchoring',
+    '0x4a': TX_TYPE_STRING.TxTypeChainDataAnchoring,
+    TxTypeFeeDelegatedChainDataAnchoringWithRatio: 'TxTypeFeeDelegatedChainDataAnchoringWithRatio',
 }
 
 const CODE_FORMAT = {
