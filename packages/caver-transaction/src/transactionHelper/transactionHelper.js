@@ -45,6 +45,8 @@ const TX_TYPE_STRING = {
     TxTypeCancel: 'TxTypeCancel',
     TxTypeFeeDelegatedCancel: 'TxTypeFeeDelegatedCancel',
     TxTypeFeeDelegatedCancelWithRatio: 'TxTypeFeeDelegatedCancelWithRatio',
+
+    TxTypeChainDataAnchoring: 'TxTypeChainDataAnchoring',
 }
 
 const TX_TYPE_TAG = {
@@ -92,6 +94,9 @@ const TX_TYPE_TAG = {
     '0x39': TX_TYPE_STRING.TxTypeFeeDelegatedCancel,
     TxTypeFeeDelegatedCancelWithRatio: '0x3a',
     '0x3a': TX_TYPE_STRING.TxTypeFeeDelegatedCancelWithRatio,
+
+    TxTypeChainDataAnchoring: '0x48',
+    '0x48': TX_TYPE_STRING.TxTypeChainDataAnchoring,
 }
 
 const CODE_FORMAT = {
