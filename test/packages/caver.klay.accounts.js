@@ -3203,7 +3203,7 @@ describe('caver.klay.accounts.encryptV3', () => {
             'Invalid parameter: encryptV3 only supports a single private key (also supports KlantnWalletKey format), or an instance of Account or AccountKeyPublic as a parameter. If you want to encrypt multiple keys, use caver.klay.accounts.encrypt which encrypts to keystore v4.'
         it.each(invalidParameters, 'should throw error', param => {
             expect(() => caver.klay.accounts.encryptV3(param, password)).to.throw(errorMessage)
-        }).timeout(50000)
+        })
     })
 })
 
