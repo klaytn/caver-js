@@ -210,12 +210,12 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
     }
 
     /**
-     * Returns an RLP-encoded transaction string for signing as a fee payer
+     * Returns an RLP-encoded transaction string for making signature as a fee payer
      *
      * @return {string}
      */
-    getRLPEncodingForFeePayerSigning() {
-        return RLP.encode([this.getCommonRLPForSigning(), this.feePayer, Bytes.fromNat(this.chainId || '0x1'), '0x', '0x'])
+    getRLPEncodingForFeePayerSignature() {
+        return RLP.encode([this.getCommonRLPEncodingForSignature(), this.feePayer, Bytes.fromNat(this.chainId || '0x1'), '0x', '0x'])
     }
 }
 
