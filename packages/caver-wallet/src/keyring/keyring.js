@@ -607,6 +607,21 @@ class Keyring {
         return formatEncrypted(3, this._address, crypto, options)
     }
 
+    /**
+     * returns true if keyring has decoupled key.
+     *
+     * @return {boolean}
+     */
+    isDecoupled() {
+        const isMultiple = this.keys.some(roledKey => {
+            return roledKey.length > 1
+        })
+        if (isMultiple) return true
+
+        const derived = this.keys[0][0].getDerivedAddress()
+        return this.address.toLowerCase() !== derived.toLowerCase()
+    }
+
     _validateOptionsForUpdate(options = []) {
         // { threshold: 1, weights: [1, 1] } => [{ threshold: 1, weights: [1, 1] }]
         if (!_.isArray(options)) options = [options]
