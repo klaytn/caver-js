@@ -125,6 +125,8 @@ const refineSignatures = (sigArray, isLegacy = false) => {
 
     if (result.length === 0) result = [['0x01', '0x', '0x']]
 
+    if (isLegacy && result.length > 1) throw new Error(`${TX_TYPE_STRING.TxTypeLegacyTransaction} cannot have multiple sigantures.`)
+
     return !isLegacy ? result : result[0]
 }
 
