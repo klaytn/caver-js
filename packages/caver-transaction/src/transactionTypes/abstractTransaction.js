@@ -282,16 +282,35 @@ class AbstractTransaction {
     }
 
     /**
-     * Returns an RLP-encoded transaction string for signing
+     * Returns an RLP-encoded transaction string
      *
      * @return {string}
      */
-    getRLPEncodingForSigning() {
-        if (this.gasPrice === undefined) throw new Error(`gasPrice is undefined. Use 'transaction.fillTransaction' to fill values.`)
-        if (this.nonce === undefined) throw new Error(`nonce is undefined. Use 'transaction.fillTransaction' to fill values.`)
-        if (this.chainId === undefined) throw new Error(`chainId is undefined. Use 'transaction.fillTransaction' to fill values.`)
+    getRLPEncoding() {
+        if (this.gasPrice === undefined)
+            throw new Error(`gasPrice is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`)
+        if (this.nonce === undefined)
+            throw new Error(`nonce is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`)
+        if (this.chainId === undefined)
+            throw new Error(`chainId is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`)
 
-        return RLP.encode([this.getCommonRLPForSigning(), Bytes.fromNat(this.chainId || '0x1'), '0x', '0x'])
+        return this.getRLPEncodingForTransactionHash()
+    }
+
+    /**
+     * Returns an RLP-encoded transaction string for making signature
+     *
+     * @return {string}
+     */
+    getRLPEncodingForSignature() {
+        if (this.gasPrice === undefined)
+            throw new Error(`gasPrice is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`)
+        if (this.nonce === undefined)
+            throw new Error(`nonce is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`)
+        if (this.chainId === undefined)
+            throw new Error(`chainId is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`)
+
+        return RLP.encode([this.getCommonRLPEncodingForSignature(), Bytes.fromNat(this.chainId || '0x1'), '0x', '0x'])
     }
 
     /**

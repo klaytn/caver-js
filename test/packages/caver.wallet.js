@@ -433,7 +433,7 @@ describe('wallet.signWithKey', () => {
 
             const txHash = '0xd4aab6590bdb708d1d3eafe95a967dafcd2d7cde197e512f3f0b8158e7b65fd1'
 
-            const expectedError = `In order to send a custom hasher as a parameter, the index must be defined first.`
+            const expectedError = `In order to pass a custom hasher, use the third parameter.`
             await expect(caver.wallet.signWithKey(keyring.address, vt, () => txHash)).to.be.rejectedWith(expectedError)
         })
     })
@@ -683,7 +683,7 @@ describe('wallet.signFeePayerWithKey', () => {
 
             const txHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
 
-            const expectedError = `In order to send a custom hasher as a parameter, the index must be defined first.`
+            const expectedError = `In order to pass a custom hasher, use the third parameter.`
             await expect(caver.wallet.signFeePayerWithKey(keyring.address, vt, () => txHash)).to.be.rejectedWith(expectedError)
         })
     })
@@ -829,7 +829,7 @@ class mockValueTransfer {
         this.gasPrice = '0x5d21dba00'
         this.signatures = []
 
-        this.getRLPEncodingForSigning = () => '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
+        this.getRLPEncodingForSignature = () => '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
         this.fillTransaction = () => {}
         this.appendSignatures = () => {}
     }
@@ -845,7 +845,7 @@ class mockAccountUpdate {
         this.nonce = '0x0'
         this.gasPrice = '0x5d21dba00'
 
-        this.getRLPEncodingForSigning = () => '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
+        this.getRLPEncodingForSignature = () => '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
         this.fillTransaction = () => {}
         this.appendSignatures = () => {}
     }
@@ -856,7 +856,7 @@ class mockFeeDelegatedValueTransfer extends mockValueTransfer {
         super(keyring)
         this.type = 'FEE_DELEGATED_VALUE_TRANSFER'
 
-        this.getRLPEncodingForFeePayerSigning = () => '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
+        this.getRLPEncodingForFeePayerSignature = () => '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
         this.appendFeePayerSignatures = () => {}
     }
 }

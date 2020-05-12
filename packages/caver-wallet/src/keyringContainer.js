@@ -198,7 +198,7 @@ class KeyringContainer {
 
         // User parameter input cases
         // (address transaction) / (address transaction index) / (address transaction index hasher)
-        if (_.isFunction(index)) throw new Error(`In order to send a custom hasher as a parameter, the index must be defined first.`)
+        if (_.isFunction(index)) throw new Error(`In order to pass a custom hasher, use the third parameter.`)
 
         await transaction.fillTransaction()
         const hash = hasher(transaction)
@@ -253,7 +253,7 @@ class KeyringContainer {
     async signFeePayerWithKey(address, transaction, index = 0, hasher = TransactionHasher.getHashForFeePayerSigning) {
         // User parameter input cases
         // (address transaction) / (address transaction index) / (address transaction index hasher)
-        if (_.isFunction(index)) throw new Error(`In order to send a custom hasher as a parameter, the index must be defined first.`)
+        if (_.isFunction(index)) throw new Error(`In order to pass a custom hasher, use the third parameter.`)
 
         if (!transaction.feePayer || transaction.feePayer === '0x') transaction.feePayer = address
 

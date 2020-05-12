@@ -20,12 +20,12 @@ const Hash = require('eth-lib/lib/hash')
 
 class TransactionHasher {
     static getHashForSigning(transaction) {
-        const rlpEncoded = transaction.getRLPEncodingForSigning()
+        const rlpEncoded = transaction.getRLPEncodingForSignature()
         return Hash.keccak256(rlpEncoded)
     }
 
     static getHashForFeePayerSigning(transaction) {
-        const rlpEncoded = transaction.getRLPEncodingForFeePayerSigning()
+        const rlpEncoded = transaction.getRLPEncodingForFeePayerSignature()
         return Hash.keccak256(rlpEncoded)
     }
 }
