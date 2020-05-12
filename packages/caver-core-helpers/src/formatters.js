@@ -74,7 +74,9 @@ const _txInputFormatter = function(options) {
     }
 
     if (options.to) {
-        options.humanReadable = options.humanReadable !== undefined ? options.humanReadable : false
+        if (options.type && options.type.includes('DEPLOY'))
+            options.humanReadable = options.humanReadable !== undefined ? options.humanReadable : false
+
         if (options.humanReadable) throw new Error('HumanReadableAddress is not supported yet.')
         if (!utils.isContractDeployment(options) || options.to !== '0x') {
             options.to = inputAddressFormatter(options.to)
