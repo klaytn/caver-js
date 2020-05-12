@@ -2067,3 +2067,33 @@ describe('keyring.encryptV3', () => {
         })
     })
 })
+
+describe('keyring.isDecoupled', () => {
+    context('keyring type: coupled', () => {
+        it('CAVERJS-UNIT-KEYRING-141: should return boolean whether decoupled or not', () => {
+            const keyring = caver.wallet.keyring.generate()
+            expect(keyring.isDecoupled()).to.be.false
+        })
+    })
+
+    context('keyring type: decoupled', () => {
+        it('CAVERJS-UNIT-KEYRING-142: should return boolean whether decoupled or not', () => {
+            const keyring = generateDecoupledKeyring()
+            expect(keyring.isDecoupled()).to.be.true
+        })
+    })
+
+    context('keyring type: decoupled', () => {
+        it('CAVERJS-UNIT-KEYRING-143: should return boolean whether decoupled or not', () => {
+            const keyring = generateMultiSigKeyring(3)
+            expect(keyring.isDecoupled()).to.be.true
+        })
+    })
+
+    context('keyring type: decoupled', () => {
+        it('CAVERJS-UNIT-KEYRING-144: should return boolean whether decoupled or not', () => {
+            const keyring = generateRoleBasedKeyring([2, 2, 4])
+            expect(keyring.isDecoupled()).to.be.true
+        })
+    })
+})
