@@ -74,7 +74,7 @@
     "scrypt-shim": "github:web3-js/scrypt-shim",
     "semver": "6.2.0",
     "utf8": "2.1.1",
-    "uuid": "2.0.1",
+    "uuid": "^3.0.0",
     "websocket": "^1.0.31",
     "xhr2-cookies": "^1.1.0"
   },
