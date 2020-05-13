@@ -152,7 +152,7 @@ class AbstractTransaction {
 
         await this.fillTransaction()
         const hash = hasher(this)
-        const role = this.type.includes('ACCOUNT_UPDATE') ? KEY_ROLE.ROLE_ACCOUNT_UPDATE_KEY : KEY_ROLE.ROLE_TRANSACTION_KEY
+        const role = this.type.includes('AccountUpdate') ? KEY_ROLE.RoleAccountUpdateKey : KEY_ROLE.RoleTransactionKey
 
         const sig = keyring.signWithKey(hash, this.chainId, role, index)
 
@@ -187,7 +187,7 @@ class AbstractTransaction {
 
         await this.fillTransaction()
         const hash = hasher(this)
-        const role = this.type.includes('ACCOUNT_UPDATE') ? KEY_ROLE.ROLE_ACCOUNT_UPDATE_KEY : KEY_ROLE.ROLE_TRANSACTION_KEY
+        const role = this.type.includes('AccountUpdate') ? KEY_ROLE.RoleAccountUpdateKey : KEY_ROLE.RoleTransactionKey
 
         const sigs = keyring.signWithKeys(hash, this.chainId, role)
 
@@ -282,33 +282,12 @@ class AbstractTransaction {
     }
 
     /**
-     * Returns an RLP-encoded transaction string
-     *
-     * @return {string}
-     */
-    getRLPEncoding() {
-        if (this.gasPrice === undefined)
-            throw new Error(`gasPrice is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`)
-        if (this.nonce === undefined)
-            throw new Error(`nonce is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`)
-        if (this.chainId === undefined)
-            throw new Error(`chainId is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`)
-
-        return this.getRLPEncodingForTransactionHash()
-    }
-
-    /**
      * Returns an RLP-encoded transaction string for making signature
      *
      * @return {string}
      */
     getRLPEncodingForSignature() {
-        if (this.gasPrice === undefined)
-            throw new Error(`gasPrice is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`)
-        if (this.nonce === undefined)
-            throw new Error(`nonce is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`)
-        if (this.chainId === undefined)
-            throw new Error(`chainId is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`)
+        this.validateOptionalValues()
 
         return RLP.encode([this.getCommonRLPEncodingForSignature(), Bytes.fromNat(this.chainId || '0x1'), '0x', '0x'])
     }
@@ -326,6 +305,19 @@ class AbstractTransaction {
         this.chainId = chainId
         this.gasPrice = gasPrice
         this.nonce = nonce
+    }
+
+    /**
+     * Checks that member variables that can be defined by the user are defined.
+     * If there is an undefined variable, an error occurs.
+     */
+    validateOptionalValues() {
+        if (this.gasPrice === undefined)
+            throw new Error(`gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`)
+        if (this.nonce === undefined)
+            throw new Error(`nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`)
+        if (this.chainId === undefined)
+            throw new Error(`chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`)
     }
 }
 

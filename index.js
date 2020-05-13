@@ -35,6 +35,7 @@ const { packageInit, providers } = require('./packages/caver-core')
 const Klay = require('./packages/caver-klay')
 const Account = require('./packages/caver-account')
 const Wallet = require('./packages/caver-wallet')
+const Transaction = require('./packages/caver-transaction')
 
 const Method = require('./packages/caver-core-method')
 const middleware = require('./packages/caver-middleware')
@@ -60,7 +61,9 @@ function Caver(provider, net) {
     this.account = Account
     this.wallet = new Wallet()
 
-    // ex) call `onit.klay.property` || `onit.klay.method(...)`
+    this.transaction = Transaction
+
+    // ex) call `caver.klay.property` || `caver.klay.method(...)`
     this.klay = new Klay(this)
     this.middleware = middleware
 
