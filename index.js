@@ -63,7 +63,7 @@ function Caver(provider, net) {
 
     this.transaction = Transaction
 
-    // ex) call `onit.klay.property` || `onit.klay.method(...)`
+    // ex) call `caver.klay.property` || `caver.klay.method(...)`
     this.klay = new Klay(this)
     this.middleware = middleware
 
