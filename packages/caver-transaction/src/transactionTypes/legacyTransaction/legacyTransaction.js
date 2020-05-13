@@ -24,7 +24,7 @@ const { TX_TYPE_STRING, validateOptionalValues } = require('../../transactionHel
 const utils = require('../../../../caver-utils/src')
 
 /**
- * Creates a legacy transaction.
+ * Represents a legacy transaction.
  * Please refer https://docs.klaytn.com/klaytn/design/transactions/basic#txtypelegacytransaction to see more detail.
  * @class
  */
@@ -43,7 +43,7 @@ class LegacyTransaction extends AbstractTransaction {
     }
 
     /**
-     * Represents a legacy transaction.
+     * Creates a legacy transaction.
      * @constructor
      * @param {object} createTxObj - The parameters to create a LegacyTransaction transaction.
      *                               The createTxObj can define `from`, `to`, `value`, `input`, `nonce`, `gas`, `gasPrice`, `feeRatio`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
