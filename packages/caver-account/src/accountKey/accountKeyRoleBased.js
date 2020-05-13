@@ -29,7 +29,7 @@ const WeightedMultiSigOptions = require('./weightedMultiSigOptions')
 
 function isValidRoleBasedKeyFormat(roleBasedAccountKeys) {
     if (!_.isArray(roleBasedAccountKeys)) return false
-    if (roleBasedAccountKeys.length > KEY_ROLE.ROLE_LAST) return false
+    if (roleBasedAccountKeys.length > KEY_ROLE.RoleLast) return false
 
     for (const accountKey of roleBasedAccountKeys) {
         if (
@@ -90,7 +90,7 @@ class AccountKeyRoleBased {
      * @return {AccountKeyRoleBased}
      */
     static fromRoleBasedPublicKeysAndOptions(roleBasedPubArray, options) {
-        if (!options) options = Array(KEY_ROLE.ROLE_LAST).fill(new WeightedMultiSigOptions())
+        if (!options) options = Array(KEY_ROLE.RoleLast).fill(new WeightedMultiSigOptions())
 
         const accountKeys = []
         // Format will be like below

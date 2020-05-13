@@ -262,7 +262,7 @@ class KeyringContainer {
 
         const keyring = this.getKeyring(address)
         if (keyring === undefined) throw new Error(`Failed to find keyring from wallet with ${address}`)
-        const sig = keyring.signWithKey(hash, transaction.chainId, KEY_ROLE.ROLE_FEE_PAYER_KEY, index)
+        const sig = keyring.signWithKey(hash, transaction.chainId, KEY_ROLE.RoleFeePayerKey, index)
 
         transaction.appendFeePayerSignatures(sig)
 
@@ -285,7 +285,7 @@ class KeyringContainer {
 
         const keyring = this.getKeyring(address)
         if (keyring === undefined) throw new Error(`Failed to find keyring from wallet with ${address}`)
-        const sigs = keyring.signWithKeys(hash, transaction.chainId, KEY_ROLE.ROLE_FEE_PAYER_KEY)
+        const sigs = keyring.signWithKeys(hash, transaction.chainId, KEY_ROLE.RoleFeePayerKey)
 
         transaction.appendFeePayerSignatures(sigs)
 
@@ -294,7 +294,7 @@ class KeyringContainer {
 }
 
 function determineRoleToSign(tx) {
-    return tx.type.includes('ACCOUNT_UPDATE') ? KEY_ROLE.ROLE_ACCOUNT_UPDATE_KEY : KEY_ROLE.ROLE_TRANSACTION_KEY
+    return tx.type.includes('ACCOUNT_UPDATE') ? KEY_ROLE.RoleAccountUpdateKey : KEY_ROLE.RoleTransactionKey
 }
 
 module.exports = KeyringContainer
