@@ -216,7 +216,7 @@ describe('TxTypeLegacyTransaction', () => {
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
             senderSignWithKeySpy = sandbox.spy(sender, 'signWithKey')
             appendSignaturesSpy = sandbox.spy(tx, 'appendSignatures')
-            hasherSpy = sandbox.stub(TransactionHasher, 'getHashForSigning')
+            hasherSpy = sandbox.stub(TransactionHasher, 'getHashForSignature')
             hasherSpy.returns(txHash)
         })
 
@@ -346,7 +346,7 @@ describe('TxTypeLegacyTransaction', () => {
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
             senderSignWithKeysSpy = sandbox.spy(sender, 'signWithKeys')
             appendSignaturesSpy = sandbox.spy(tx, 'appendSignatures')
-            hasherSpy = sandbox.stub(TransactionHasher, 'getHashForSigning')
+            hasherSpy = sandbox.stub(TransactionHasher, 'getHashForSignature')
             hasherSpy.returns(txHash)
         })
 

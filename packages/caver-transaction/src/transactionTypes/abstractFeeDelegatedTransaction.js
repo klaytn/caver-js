@@ -80,7 +80,7 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
      * @param {function} [hasher] - The function to get the transaction hash. In order to use a custom hasher, the index must be defined.
      * @return {Transaction}
      */
-    async signFeePayerWithKey(key, index = 0, hasher = TransactionHasher.getHashForSigning) {
+    async signFeePayerWithKey(key, index = 0, hasher = TransactionHasher.getHashForSignature) {
         // User parameter input cases
         // (key) / (key index) / (key index hasher)
         if (_.isFunction(index)) throw new Error(`In order to pass a custom hasher, use the third parameter.`)
@@ -115,7 +115,7 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
      * @param {function} [hasher] - The function to get hash of transaction.
      * @return {Transaction}
      */
-    async signFeePayerWithKeys(key, hasher = TransactionHasher.getHashForFeePayerSigning) {
+    async signFeePayerWithKeys(key, hasher = TransactionHasher.getHashForFeePayerSignature) {
         let keyring = key
         if (_.isString(key)) keyring = Keyring.createFromPrivateKey(key)
         if (!(keyring instanceof Keyring))
