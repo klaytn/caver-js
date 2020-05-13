@@ -24,7 +24,7 @@ const TransactionHasher = require('../transactionHasher/transactionHasher')
 const utils = require('../../../caver-utils')
 const Keyring = require('../../../caver-wallet/src/keyring/keyring')
 const { TX_TYPE_STRING, refineSignatures, typeDetectionFromRLPEncoding } = require('../transactionHelper/transactionHelper')
-const { KEY_ROLE } = require('../../../caver-wallet/src/keyring/keyringHelper')
+const { KEY_ROLE, validateOptionalValues } = require('../../../caver-wallet/src/keyring/keyringHelper')
 const { validateParams } = require('../../../caver-core-helpers/src/validateFunction')
 
 /**
@@ -282,33 +282,12 @@ class AbstractTransaction {
     }
 
     /**
-     * Returns an RLP-encoded transaction string
-     *
-     * @return {string}
-     */
-    getRLPEncoding() {
-        if (this.gasPrice === undefined)
-            throw new Error(`gasPrice is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`)
-        if (this.nonce === undefined)
-            throw new Error(`nonce is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`)
-        if (this.chainId === undefined)
-            throw new Error(`chainId is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`)
-
-        return this.getRLPEncodingForTransactionHash()
-    }
-
-    /**
      * Returns an RLP-encoded transaction string for making signature
      *
      * @return {string}
      */
     getRLPEncodingForSignature() {
-        if (this.gasPrice === undefined)
-            throw new Error(`gasPrice is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`)
-        if (this.nonce === undefined)
-            throw new Error(`nonce is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`)
-        if (this.chainId === undefined)
-            throw new Error(`chainId is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`)
+        validateOptionalValues(this)
 
         return RLP.encode([this.getCommonRLPEncodingForSignature(), Bytes.fromNat(this.chainId || '0x1'), '0x', '0x'])
     }

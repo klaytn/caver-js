@@ -20,7 +20,7 @@ const _ = require('lodash')
 const RLP = require('eth-lib/lib/rlp')
 const Bytes = require('eth-lib/lib/bytes')
 const AbstractTransaction = require('../abstractTransaction')
-const { TX_TYPE_STRING } = require('../../transactionHelper/transactionHelper')
+const { TX_TYPE_STRING, validateOptionalValues } = require('../../transactionHelper/transactionHelper')
 const utils = require('../../../../caver-utils/src')
 
 /**
@@ -144,7 +144,9 @@ class LegacyTransaction extends AbstractTransaction {
      * Returns RLP-encoded transaction string(rawTransaction).
      * @return {string}
      */
-    getRLPEncodingForTransactionHash() {
+    getRLPEncoding() {
+        validateOptionalValues(this)
+
         return RLP.encode([
             Bytes.fromNat(this.nonce),
             Bytes.fromNat(this.gasPrice),
@@ -164,12 +166,7 @@ class LegacyTransaction extends AbstractTransaction {
      * @return {string}
      */
     getRLPEncodingForSignature() {
-        if (this.gasPrice === undefined)
-            throw new Error(`gasPrice is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`)
-        if (this.nonce === undefined)
-            throw new Error(`nonce is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`)
-        if (this.chainId === undefined)
-            throw new Error(`chainId is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`)
+        validateOptionalValues(this)
 
         return RLP.encode([
             Bytes.fromNat(this.nonce),

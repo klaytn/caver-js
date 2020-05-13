@@ -162,12 +162,10 @@ describe('TxTypeLegacyTransaction', () => {
                 input: '0x31323334',
             }
             const tx = new caver.transaction.legacyTransaction(transactionObj)
-            const getRLPEncodingForTransactionHashSpy = sinon.spy(tx, 'getRLPEncodingForTransactionHash')
 
             expect(tx.getRLPEncoding()).to.equal(
                 '0xf8668204d219830f4240947b65b75d204abed71587c9e519a89277766ee1d00a843132333425a0b2a5a15550ec298dc7dddde3774429ed75f864c82caeb5ee24399649ad731be9a029da1014d16f2011b3307f7bbe1035b6e699a4204fc416c763def6cefd976567'
             )
-            expect(getRLPEncodingForTransactionHashSpy).to.have.been.calledOnce
         })
 
         it('CAVERJS-UNIT-TRANSACTION-044: getRLPEncoding should throw error when nonce is undefined', () => {
@@ -175,7 +173,7 @@ describe('TxTypeLegacyTransaction', () => {
             transactionObj.chainId = 2019
             const tx = new caver.transaction.legacyTransaction(transactionObj)
 
-            const expectedError = `nonce is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`
+            const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getRLPEncoding()).to.throw(expectedError)
         })
@@ -185,7 +183,7 @@ describe('TxTypeLegacyTransaction', () => {
             transactionObj.nonce = '0x3a'
             const tx = new caver.transaction.legacyTransaction(transactionObj)
 
-            const expectedError = `gasPrice is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`
+            const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getRLPEncoding()).to.throw(expectedError)
         })
@@ -195,7 +193,7 @@ describe('TxTypeLegacyTransaction', () => {
             transactionObj.nonce = '0x3a'
             const tx = new caver.transaction.legacyTransaction(transactionObj)
 
-            const expectedError = `chainId is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`
+            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getRLPEncoding()).to.throw(expectedError)
         })
@@ -643,13 +641,11 @@ describe('TxTypeLegacyTransaction', () => {
             }
             const tx = new caver.transaction.legacyTransaction(transactionObj)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
-            const getRLPEncodingForTxHashSpy = sandbox.spy(tx, 'getRLPEncodingForTransactionHash')
 
             const expected = '0xe434257753bf31a130c839fec0bd34fc6ea4aa256b825288ee82db31c2ed7524'
             const txHash = tx.getTransactionHash()
 
             expect(getRLPEncodingSpy).to.have.been.calledOnce
-            expect(getRLPEncodingForTxHashSpy).to.have.been.calledOnce
             expect(txHash).to.equal(expected)
             expect(caver.utils.isValidHashStrict(txHash)).to.be.true
         })
@@ -659,7 +655,7 @@ describe('TxTypeLegacyTransaction', () => {
             transactionObj.chainId = 2019
             const tx = new caver.transaction.legacyTransaction(transactionObj)
 
-            const expectedError = `nonce is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`
+            const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getTransactionHash()).to.throw(expectedError)
         })
@@ -669,7 +665,7 @@ describe('TxTypeLegacyTransaction', () => {
             transactionObj.nonce = '0x3a'
             const tx = new caver.transaction.legacyTransaction(transactionObj)
 
-            const expectedError = `gasPrice is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`
+            const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getTransactionHash()).to.throw(expectedError)
         })
@@ -679,7 +675,7 @@ describe('TxTypeLegacyTransaction', () => {
             transactionObj.nonce = '0x3a'
             const tx = new caver.transaction.legacyTransaction(transactionObj)
 
-            const expectedError = `chainId is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`
+            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getTransactionHash()).to.throw(expectedError)
         })
@@ -707,13 +703,11 @@ describe('TxTypeLegacyTransaction', () => {
             }
             const tx = new caver.transaction.legacyTransaction(transactionObj)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
-            const getRLPEncodingForTxHashSpy = sandbox.spy(tx, 'getRLPEncodingForTransactionHash')
 
             const expected = '0xe434257753bf31a130c839fec0bd34fc6ea4aa256b825288ee82db31c2ed7524'
             const senderTxHash = tx.getSenderTxHash()
 
             expect(getRLPEncodingSpy).to.have.been.calledOnce
-            expect(getRLPEncodingForTxHashSpy).to.have.been.calledOnce
             expect(senderTxHash).to.equal(expected)
             expect(caver.utils.isValidHashStrict(senderTxHash)).to.be.true
         })
@@ -723,7 +717,7 @@ describe('TxTypeLegacyTransaction', () => {
             transactionObj.chainId = 2019
             const tx = new caver.transaction.legacyTransaction(transactionObj)
 
-            const expectedError = `nonce is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`
+            const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getSenderTxHash()).to.throw(expectedError)
         })
@@ -733,7 +727,7 @@ describe('TxTypeLegacyTransaction', () => {
             transactionObj.nonce = '0x3a'
             const tx = new caver.transaction.legacyTransaction(transactionObj)
 
-            const expectedError = `gasPrice is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`
+            const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getSenderTxHash()).to.throw(expectedError)
         })
@@ -743,7 +737,7 @@ describe('TxTypeLegacyTransaction', () => {
             transactionObj.nonce = '0x3a'
             const tx = new caver.transaction.legacyTransaction(transactionObj)
 
-            const expectedError = `chainId is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`
+            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getSenderTxHash()).to.throw(expectedError)
         })
@@ -782,7 +776,7 @@ describe('TxTypeLegacyTransaction', () => {
             transactionObj.chainId = 2019
             const tx = new caver.transaction.legacyTransaction(transactionObj)
 
-            const expectedError = `nonce is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`
+            const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getRLPEncodingForSignature()).to.throw(expectedError)
         })
@@ -792,7 +786,7 @@ describe('TxTypeLegacyTransaction', () => {
             transactionObj.nonce = '0x3a'
             const tx = new caver.transaction.legacyTransaction(transactionObj)
 
-            const expectedError = `gasPrice is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`
+            const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getRLPEncodingForSignature()).to.throw(expectedError)
         })
@@ -802,7 +796,7 @@ describe('TxTypeLegacyTransaction', () => {
             transactionObj.nonce = '0x3a'
             const tx = new caver.transaction.legacyTransaction(transactionObj)
 
-            const expectedError = `chainId is undefined. Define variable in transaction or use 'transaction.fillTransaction' to fill values.`
+            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getRLPEncodingForSignature()).to.throw(expectedError)
         })
