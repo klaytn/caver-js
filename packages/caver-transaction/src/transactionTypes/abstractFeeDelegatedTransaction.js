@@ -100,7 +100,7 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
 
         await this.fillTransaction()
         const hash = hasher(this)
-        const sig = keyring.signWithKey(hash, this.chainId, KEY_ROLE.ROLE_FEE_PAYER_KEY, index)
+        const sig = keyring.signWithKey(hash, this.chainId, KEY_ROLE.RoleFeePayerKey, index)
 
         this.appendFeePayerSignatures(sig)
 
@@ -129,7 +129,7 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
 
         await this.fillTransaction()
         const hash = hasher(this)
-        const sigs = keyring.signWithKeys(hash, this.chainId, KEY_ROLE.ROLE_FEE_PAYER_KEY)
+        const sigs = keyring.signWithKeys(hash, this.chainId, KEY_ROLE.RoleFeePayerKey)
 
         this.appendFeePayerSignatures(sigs)
 

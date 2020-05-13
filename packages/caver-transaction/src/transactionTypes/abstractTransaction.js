@@ -152,7 +152,7 @@ class AbstractTransaction {
 
         await this.fillTransaction()
         const hash = hasher(this)
-        const role = this.type.includes('ACCOUNT_UPDATE') ? KEY_ROLE.ROLE_ACCOUNT_UPDATE_KEY : KEY_ROLE.ROLE_TRANSACTION_KEY
+        const role = this.type.includes('AccountUpdate') ? KEY_ROLE.RoleAccountUpdateKey : KEY_ROLE.RoleTransactionKey
 
         const sig = keyring.signWithKey(hash, this.chainId, role, index)
 
@@ -187,7 +187,7 @@ class AbstractTransaction {
 
         await this.fillTransaction()
         const hash = hasher(this)
-        const role = this.type.includes('ACCOUNT_UPDATE') ? KEY_ROLE.ROLE_ACCOUNT_UPDATE_KEY : KEY_ROLE.ROLE_TRANSACTION_KEY
+        const role = this.type.includes('AccountUpdate') ? KEY_ROLE.RoleAccountUpdateKey : KEY_ROLE.RoleTransactionKey
 
         const sigs = keyring.signWithKeys(hash, this.chainId, role)
 
