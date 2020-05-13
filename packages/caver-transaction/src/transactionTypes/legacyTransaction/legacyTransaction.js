@@ -24,7 +24,7 @@ const { TX_TYPE_STRING } = require('../../transactionHelper/transactionHelper')
 const utils = require('../../../../caver-utils/src')
 
 /**
- * Representing a legacy transaction.
+ * Creates a legacy transaction.
  * Please refer https://docs.klaytn.com/klaytn/design/transactions/basic#txtypelegacytransaction to see more detail.
  * @class
  */
