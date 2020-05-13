@@ -20,7 +20,7 @@ const _ = require('lodash')
 const RLP = require('eth-lib/lib/rlp')
 const Bytes = require('eth-lib/lib/bytes')
 const AbstractTransaction = require('../abstractTransaction')
-const { TX_TYPE_STRING, validateOptionalValues } = require('../../transactionHelper/transactionHelper')
+const { TX_TYPE_STRING } = require('../../transactionHelper/transactionHelper')
 const utils = require('../../../../caver-utils/src')
 
 /**
@@ -145,7 +145,7 @@ class LegacyTransaction extends AbstractTransaction {
      * @return {string}
      */
     getRLPEncoding() {
-        validateOptionalValues(this)
+        this.validateOptionalValues()
 
         return RLP.encode([
             Bytes.fromNat(this.nonce),
@@ -166,7 +166,7 @@ class LegacyTransaction extends AbstractTransaction {
      * @return {string}
      */
     getRLPEncodingForSignature() {
-        validateOptionalValues(this)
+        this.validateOptionalValues()
 
         return RLP.encode([
             Bytes.fromNat(this.nonce),

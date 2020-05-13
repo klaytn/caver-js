@@ -169,15 +169,6 @@ const getCodeFormatTag = cf => {
     throw new Error(`Unsupported code format : ${cf}`)
 }
 
-const validateOptionalValues = tx => {
-    if (tx.gasPrice === undefined)
-        throw new Error(`gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`)
-    if (tx.nonce === undefined)
-        throw new Error(`nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`)
-    if (tx.chainId === undefined)
-        throw new Error(`chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`)
-}
-
 module.exports = {
     TX_TYPE_STRING,
     TX_TYPE_TAG,
@@ -185,5 +176,4 @@ module.exports = {
     refineSignatures,
     typeDetectionFromRLPEncoding,
     getCodeFormatTag,
-    validateOptionalValues,
 }

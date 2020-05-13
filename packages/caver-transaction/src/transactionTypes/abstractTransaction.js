@@ -24,7 +24,7 @@ const TransactionHasher = require('../transactionHasher/transactionHasher')
 const utils = require('../../../caver-utils')
 const Keyring = require('../../../caver-wallet/src/keyring/keyring')
 const { TX_TYPE_STRING, refineSignatures, typeDetectionFromRLPEncoding } = require('../transactionHelper/transactionHelper')
-const { KEY_ROLE, validateOptionalValues } = require('../../../caver-wallet/src/keyring/keyringHelper')
+const { KEY_ROLE } = require('../../../caver-wallet/src/keyring/keyringHelper')
 const { validateParams } = require('../../../caver-core-helpers/src/validateFunction')
 
 /**
@@ -287,7 +287,7 @@ class AbstractTransaction {
      * @return {string}
      */
     getRLPEncodingForSignature() {
-        validateOptionalValues(this)
+        this.validateOptionalValues()
 
         return RLP.encode([this.getCommonRLPEncodingForSignature(), Bytes.fromNat(this.chainId || '0x1'), '0x', '0x'])
     }
@@ -305,6 +305,15 @@ class AbstractTransaction {
         this.chainId = chainId
         this.gasPrice = gasPrice
         this.nonce = nonce
+    }
+
+    validateOptionalValues() {
+        if (this.gasPrice === undefined)
+            throw new Error(`gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`)
+        if (this.nonce === undefined)
+            throw new Error(`nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`)
+        if (this.chainId === undefined)
+            throw new Error(`chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`)
     }
 }
 
