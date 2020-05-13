@@ -307,6 +307,10 @@ class AbstractTransaction {
         this.nonce = nonce
     }
 
+    /**
+     * Checks that member variables that can be defined by the user are defined.
+     * If there is an undefined variable, an error occurs.
+     */
     validateOptionalValues() {
         if (this.gasPrice === undefined)
             throw new Error(`gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`)
