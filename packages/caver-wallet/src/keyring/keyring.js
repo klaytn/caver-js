@@ -26,7 +26,10 @@ const utils = require('../../../caver-utils')
 const PrivateKey = require('./privateKey')
 const { KEY_ROLE, MAXIMUM_KEY_NUM, isMultipleKeysFormat, isRoleBasedKeysFormat } = require('./keyringHelper')
 const Account = require('../../../caver-account')
-const WeightedMultiSigOptions = require('../../../caver-account/src/accountKey/weightedMultiSigOptions')
+const {
+    fillWeightedMultiSigOptionsForMultiSig,
+    fillWeightedMultiSigOptionsForRoleBased,
+} = require('../../../caver-account/src/accountKey/accountKeyHelper')
 
 /**
  * representing a Keyring which includes `address` and `private keys` by roles.
@@ -521,8 +524,12 @@ class Keyring {
         if (isRoleBased && options !== undefined && !_.isArray(options))
             throw new Error(`options for an account should define threshold and weight for each roles in an array format`)
 
-        // _validateOptionsForUpdate returns WeightedMultiSigOptions with 1 threshold and 1 weight for each key when options is not defined.
-        if (isRoleBased || isWeightedMultiSig) options = this._validateOptionsForUpdate(options)
+        if (isRoleBased) {
+            const lengths = []
+            for (const k of this.keys) lengths.push(k.length)
+            options = fillWeightedMultiSigOptionsForRoleBased(lengths, options)
+        }
+        if (isWeightedMultiSig) options = fillWeightedMultiSigOptionsForMultiSig(this.keys[0].length, options)
 
         if (isRoleBased) {
             // AccountKeyRoleBased with AccountKeyPublic
@@ -533,9 +540,6 @@ class Keyring {
             return Account.createWithAccountKeyRoleBased(this.address, publicKeysByRole, options)
         }
         if (isWeightedMultiSig) {
-            // options = [ {threshold: 1, weights: [1,2] }, {}, {} ]
-            options = options[0]
-
             const publicKeys = this.getPublicKey()[0]
             return Account.createWithAccountKeyWeightedMultiSig(this.address, publicKeys, options)
         }
@@ -620,36 +624,6 @@ class Keyring {
 
         const derived = this.keys[0][0].getDerivedAddress()
         return this.address.toLowerCase() !== derived.toLowerCase()
-    }
-
-    _validateOptionsForUpdate(options = []) {
-        // { threshold: 1, weights: [1, 1] } => [{ threshold: 1, weights: [1, 1] }]
-        if (!_.isArray(options)) options = [options]
-
-        for (let i = 0; i < this._keys.length; i++) {
-            // Validation for options obejct will be operated in AccountKeyWeightedMultiSig class.
-            if (options[i] && Object.keys(options[i]).length > 0) {
-                if (!(options[i] instanceof WeightedMultiSigOptions))
-                    options[i] = new WeightedMultiSigOptions(options[i].threshold, options[i].weights)
-                if (!options[i].isEmpty()) continue
-            }
-
-            let optionToAdd
-            if (this._keys[i].length > 1) {
-                // default option when option is not set
-                optionToAdd = new WeightedMultiSigOptions(1, Array(this._keys[i].length).fill(1))
-            } else {
-                // AccountKeyPublic does not need option
-                optionToAdd = new WeightedMultiSigOptions()
-            }
-
-            if (options[i]) {
-                options[i] = optionToAdd
-            } else {
-                options.push(optionToAdd)
-            }
-        }
-        return options
     }
 }
 

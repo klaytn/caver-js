@@ -173,6 +173,32 @@ describe('caver.account.create', () => {
                 exepectedOptions: options,
             })
             expect(createWithAccountKeyWeightedMultiSigSpy).to.have.been.calledOnce
+            createWithAccountKeyWeightedMultiSigSpy.restore()
+        })
+    })
+
+    context('CAVERJS-UNIT-ACCOUNT-064: address: valid address / accountKey: uncompressed public key strings', () => {
+        it('should generate account instances with AccountKeyWeightedMultiSig with default options', () => {
+            const createWithAccountKeyWeightedMultiSigSpy = sinon.spy(caver.account, 'createWithAccountKeyWeightedMultiSig')
+            const address = '0xab9825316619a0720ad891135e92adb84fd74fc1'
+            const pubs = [
+                '0x91245244462b3eee6436d3dc0ba3f69ef413fe2296c729733eff891a55f70c02f2b0870653417943e795e7c8694c4f8be8af865b7a0224d1dec0bf8a1bf1b5a6',
+                '0x77e05dd93cdd6362f8648447f33d5676cbc5f42f4c4946ae1ad62bd4c0c4f3570b1a104b67d1cd169bbf61dd557f15ab5ee8b661326096954caddadf34ae6ac8',
+                '0xd3bb14320d87eed081ae44740b5abbc52bac2c7ccf85b6281a0fc69f3ba4c171cc4bd2ba7f0c969cd72bfa49c854d8ac2cf3d0edea7f0ce0fd31cf080374935d',
+                '0xcfa4d1bee51e59e6842b136ff95b9d01385f94bed13c4be8996c6d20cb732c3ee47cd2b6bbb917658c5fd3d02b0ddf1242b1603d1acbde7812a7d9d684ed37a9',
+            ]
+            const options = new caver.account.weightedMultiSigOptions(1, [1, 1, 1, 1])
+
+            const account = caver.account.create(address, pubs)
+
+            testAccount(account, {
+                expectedAddress: address,
+                expectedAccountKeyType: 'AccountKeyWeightedMultiSig',
+                expectedAccountKey: pubs,
+                exepectedOptions: options,
+            })
+            expect(createWithAccountKeyWeightedMultiSigSpy).to.have.been.calledOnce
+            createWithAccountKeyWeightedMultiSigSpy.restore()
         })
     })
 
@@ -234,6 +260,46 @@ describe('caver.account.create', () => {
                 exepectedOptions: options,
             })
             expect(createWithAccountKeyRoleBasedSpy).to.have.been.calledOnce
+            createWithAccountKeyRoleBasedSpy.restore()
+        })
+    })
+
+    context('CAVERJS-UNIT-ACCOUNT-065: address: valid address / accountKey: role based uncompressed public key strings', () => {
+        it('should generate account instances with AccountKeyRoleBased with default options', () => {
+            const createWithAccountKeyRoleBasedSpy = sinon.spy(caver.account, 'createWithAccountKeyRoleBased')
+            const address = '0xab9825316619a0720ad891135e92adb84fd74fc1'
+            const pubs = [
+                [
+                    '0xb86b2787e8c7accd7d2d82678c9bef047a0aafd72a6e690817506684e8513c9af36becba90c8de06fd06da16492263267a63720985f94fc5a027d0a26d25e6ae',
+                ],
+                [
+                    '0x1a909c4d7dbb5281b1d1b55e79a1b2568111bd2830246c3173ce824000eb8716afe39b6106fb9db360fb5779e2d346c8328698174831941586b11bdc3e755905',
+                    '0x1427ac6351bbfc15811e8e5389a674b01d7a2c253e69a6ed30a33583864368f65f63b92fd60be61c5d176ae1771e7738e6a043af814b9af5d81137df29ee95f2',
+                    '0x90fe4bb78bc981a40874ebcff2f9de4eba1e59ecd7a271a37814413720a3a5ea5fa9bd7d8bc5c66a9a08d77563458b004bbd1d594a3a12ef108cdc7c04c525a6',
+                ],
+                [
+                    '0x91245244462b3eee6436d3dc0ba3f69ef413fe2296c729733eff891a55f70c02f2b0870653417943e795e7c8694c4f8be8af865b7a0224d1dec0bf8a1bf1b5a6',
+                    '0x77e05dd93cdd6362f8648447f33d5676cbc5f42f4c4946ae1ad62bd4c0c4f3570b1a104b67d1cd169bbf61dd557f15ab5ee8b661326096954caddadf34ae6ac8',
+                    '0xd3bb14320d87eed081ae44740b5abbc52bac2c7ccf85b6281a0fc69f3ba4c171cc4bd2ba7f0c969cd72bfa49c854d8ac2cf3d0edea7f0ce0fd31cf080374935d',
+                    '0xcfa4d1bee51e59e6842b136ff95b9d01385f94bed13c4be8996c6d20cb732c3ee47cd2b6bbb917658c5fd3d02b0ddf1242b1603d1acbde7812a7d9d684ed37a9',
+                ],
+            ]
+            const options = [
+                new caver.account.weightedMultiSigOptions(),
+                new caver.account.weightedMultiSigOptions(1, [1, 1, 1]),
+                new caver.account.weightedMultiSigOptions(1, [1, 1, 1, 1]),
+            ]
+
+            const account = caver.account.create(address, pubs)
+
+            testAccount(account, {
+                expectedAddress: address,
+                expectedAccountKeyType: 'AccountKeyRoleBased',
+                expectedAccountKey: pubs,
+                exepectedOptions: options,
+            })
+            expect(createWithAccountKeyRoleBasedSpy).to.have.been.calledOnce
+            createWithAccountKeyRoleBasedSpy.restore()
         })
     })
 
@@ -484,8 +550,16 @@ describe('caver.account.createWithAccountKeyWeightedMultiSig', () => {
                 '0x77e05dd93cdd6362f8648447f33d5676cbc5f42f4c4946ae1ad62bd4c0c4f3570b1a104b67d1cd169bbf61dd557f15ab5ee8b661326096954caddadf34ae6ac8',
             ]
 
-            const expectedError = `The variable 'options' is undefined. To create an Account instance with AccountKeyWeightedMultiSig, 'options' should be defined.`
-            expect(() => caver.account.createWithAccountKeyWeightedMultiSig(address, pubs)).to.throw(expectedError)
+            const options = new caver.account.weightedMultiSigOptions(1, [1, 1])
+
+            const account = caver.account.createWithAccountKeyWeightedMultiSig(address, pubs)
+
+            testAccount(account, {
+                expectedAddress: address,
+                expectedAccountKeyType: 'AccountKeyWeightedMultiSig',
+                expectedAccountKey: pubs,
+                exepectedOptions: options,
+            })
         })
     })
 })
@@ -537,14 +611,27 @@ describe('caver.account.createWithAccountKeyRoleBased', () => {
                 ],
                 [
                     '0x1a909c4d7dbb5281b1d1b55e79a1b2568111bd2830246c3173ce824000eb8716afe39b6106fb9db360fb5779e2d346c8328698174831941586b11bdc3e755905',
+                    '0x1a909c4d7dbb5281b1d1b55e79a1b2568111bd2830246c3173ce824000eb8716afe39b6106fb9db360fb5779e2d346c8328698174831941586b11bdc3e755905',
                 ],
                 [
                     '0x91245244462b3eee6436d3dc0ba3f69ef413fe2296c729733eff891a55f70c02f2b0870653417943e795e7c8694c4f8be8af865b7a0224d1dec0bf8a1bf1b5a6',
                 ],
             ]
 
-            const expectedError = `The variable 'options' is undefined. To create an Account instance with AccountKeyRoleBased, 'options' should be defined.`
-            expect(() => caver.account.createWithAccountKeyRoleBased(address, pubs)).to.throw(expectedError)
+            const options = [
+                new caver.account.weightedMultiSigOptions(),
+                new caver.account.weightedMultiSigOptions(1, [1, 1]),
+                new caver.account.weightedMultiSigOptions(),
+            ]
+
+            const account = caver.account.createWithAccountKeyRoleBased(address, pubs)
+
+            testAccount(account, {
+                expectedAddress: address,
+                expectedAccountKeyType: 'AccountKeyRoleBased',
+                expectedAccountKey: pubs,
+                exepectedOptions: options,
+            })
         })
     })
 })

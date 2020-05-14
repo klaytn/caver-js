@@ -20,8 +20,7 @@ const RLP = require('eth-lib/lib/rlp')
 const Bytes = require('eth-lib/lib/bytes')
 const WeightedPublicKey = require('./weightedPublicKey')
 const utils = require('../../../caver-utils')
-const { ACCOUNT_KEY_TAG } = require('./accountKeyHelper')
-const WeightedMultiSigOptions = require('./weightedMultiSigOptions')
+const { ACCOUNT_KEY_TAG, fillWeightedMultiSigOptionsForMultiSig } = require('./accountKeyHelper')
 
 /**
  * Representing an AccountKeyWeightedMultiSig.
@@ -54,11 +53,7 @@ class AccountKeyWeightedMultiSig {
      * @return {AccountKeyWeightedMultiSig}
      */
     static fromPublicKeysAndOptions(publicKeyArray, options) {
-        if (options === undefined) {
-            throw new Error(`Invalid options object. For AccountKeyWeightedMultiSig, the second parameter 'options' should be defined.`)
-        }
-        if (!(options instanceof WeightedMultiSigOptions)) options = WeightedMultiSigOptions.fromObject(options)
-
+        options = fillWeightedMultiSigOptionsForMultiSig(publicKeyArray.length, options)
         if (publicKeyArray.length !== options.weights.length) {
             throw new Error(`The length of public keys is not equal to the length of weight array.`)
         }

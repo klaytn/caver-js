@@ -1891,18 +1891,17 @@ describe('keyring.toAccount', () => {
     context('CAVERJS-UNIT-KEYRING-121: keyring type: multiSig / options: defined(empty array format)', () => {
         it('return account instance which has AccountKeyWeightedMultiSig', () => {
             const options = []
-            const exepectedOptions = new caver.account.weightedMultiSigOptions(1, [1, 1, 1])
-            const account = multiSig.toAccount(options)
-            validateAccount(account, { keyring: multiSig, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions })
+
+            const expectedError = `For AccountKeyWeightedMultiSig, options cannot be defined as an array of WeightedMultiSigOptions.`
+            expect(() => multiSig.toAccount(options)).to.throw(expectedError)
         })
     })
 
     context('CAVERJS-UNIT-KEYRING-122: keyring type: multiSig / options: defined(array of empty object format)', () => {
         it('return account instance which has AccountKeyWeightedMultiSig', () => {
             const options = [{}, {}, {}]
-            const exepectedOptions = new caver.account.weightedMultiSigOptions(1, [1, 1, 1])
-            const account = multiSig.toAccount(options)
-            validateAccount(account, { keyring: multiSig, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions })
+            const expectedError = `For AccountKeyWeightedMultiSig, options cannot be defined as an array of WeightedMultiSigOptions.`
+            expect(() => multiSig.toAccount(options)).to.throw(expectedError)
         })
     })
 
@@ -1913,8 +1912,8 @@ describe('keyring.toAccount', () => {
                 new caver.account.weightedMultiSigOptions(),
                 new caver.account.weightedMultiSigOptions(),
             ]
-            const account = multiSig.toAccount(options)
-            validateAccount(account, { keyring: multiSig, expectedAccountKey: 'AccountKeyWeightedMultiSig', exepectedOptions: options[0] })
+            const expectedError = `For AccountKeyWeightedMultiSig, options cannot be defined as an array of WeightedMultiSigOptions.`
+            expect(() => multiSig.toAccount(options)).to.throw(expectedError)
         })
     })
 
