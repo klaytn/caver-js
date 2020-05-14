@@ -123,14 +123,10 @@ class Account {
      *
      * @param {string} address The address of Account.
      * @param {Array} publicKeyArray The array that includes multiple public key strings.
-     * @param {Object} options The object that includes threshold and weight array.
+     * @param {Object} [options] The object that includes threshold and weight array.
      * @return {Account}
      */
     static createWithAccountKeyWeightedMultiSig(address, publicKeyArray, options) {
-        if (options === undefined)
-            throw new Error(
-                `The variable 'options' is undefined. To create an Account instance with AccountKeyWeightedMultiSig, 'options' should be defined.`
-            )
         return new Account(address, AccountKeyWeightedMultiSig.fromPublicKeysAndOptions(publicKeyArray, options))
     }
 
@@ -139,14 +135,10 @@ class Account {
      *
      * @param {string} address The address of Account.
      * @param {Array} roledBasedPublicKeyArray A two-dimensional array containing arrays of public key strings for each role.
-     * @param {Array} options An array that contains objects with threshold and weight array defined for each role.
+     * @param {Array} [options] An array that contains objects with threshold and weight array defined for each role.
      * @return {Account}
      */
     static createWithAccountKeyRoleBased(address, roledBasedPublicKeyArray, options) {
-        if (options === undefined)
-            throw new Error(
-                `The variable 'options' is undefined. To create an Account instance with AccountKeyRoleBased, 'options' should be defined.`
-            )
         return new Account(address, AccountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(roledBasedPublicKeyArray, options))
     }
 

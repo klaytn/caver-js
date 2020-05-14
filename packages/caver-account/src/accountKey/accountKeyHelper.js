@@ -16,6 +16,9 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+const _ = require('lodash')
+const WeightedMultiSigOptions = require('./weightedMultiSigOptions')
+
 const ACCOUNT_KEY_TAG = {
     ACCOUNT_KEY_NIL_TAG: '0x80',
     ACCOUNT_KEY_LEGACY_TAG: '0x01c0',
@@ -25,6 +28,65 @@ const ACCOUNT_KEY_TAG = {
     ACCOUNT_KEY_ROLE_BASED_TAG: '0x05',
 }
 
+/**
+ * Creates and returns the valid instance of WeightedMultiSigOptions for AccountKeyWeightedMultiSig.
+ * If the user does not define the values of options(threshold, weights),
+ * default options(threshold is 1 and the weight of each key is 1) are returned.
+ *
+ * @param {number} lengthOfKeys The lenght of keys.
+ * @param {WeightedMultiSigOptions|object} [options] An instance of WeightedMultiSigOptions or an object that defines 'threshold' and 'weight'.
+ * @return {WeightedMultiSigOptions}
+ */
+const formatOptionsForMultiSig = (lengthOfKeys, options) => {
+    if (_.isArray(options))
+        throw new Error(`For AccountKeyWeightedMultiSig, options cannot be defined as an array of WeightedMultiSigOptions.`)
+
+    if (!options) options = new WeightedMultiSigOptions(1, Array(lengthOfKeys).fill(1))
+    if (!(options instanceof WeightedMultiSigOptions)) options = WeightedMultiSigOptions.fromObject(options)
+
+    return options.isEmpty() ? new WeightedMultiSigOptions(1, Array(lengthOfKeys).fill(1)) : options
+}
+
+/**
+ * Creates and returns the valid instance of WeightedMultiSigOptions for AccountKeyRoleBased.
+ * If the user does not define the values of options(threshold, weights),
+ * default options(threshold is 1 and the weight of each key is 1) will be used for each role key.
+ *
+ * @param {Array.<number>} lengthOfKeys The lenght of keys.
+ * @param {Array.<WeightedMultiSigOptions>|Array.<object>} [options] An array of WeightedMultiSigOptions or object that defines 'threshold' and 'weight'.
+ * @return {Array.<WeightedMultiSigOptions>}
+ */
+const formatOptionsForRoleBased = (lengthOfKeys, options = []) => {
+    if (!_.isArray(options)) throw new Error(`For AccountKeyRoleBased, options should be an array of WeightedMultiSigOptions.`)
+
+    for (let i = 0; i < lengthOfKeys.length; i++) {
+        if (options[i] && !(options[i] instanceof WeightedMultiSigOptions)) {
+            options[i] = WeightedMultiSigOptions.fromObject(options)
+        }
+        // If the WeightedMultiSigOptions instance is not empty,
+        // it means that the user has defined the option parameters needed when updating to AccountKeyWeightedMultiSig.
+        if (options[i] && !options[i].isEmpty()) continue
+
+        let optionToAdd
+        if (lengthOfKeys[i] > 1) {
+            // default option when option is not set
+            optionToAdd = new WeightedMultiSigOptions(1, Array(lengthOfKeys[i]).fill(1))
+        } else {
+            // AccountKeyPublic does not need option
+            optionToAdd = new WeightedMultiSigOptions()
+        }
+
+        if (options[i]) {
+            options[i] = optionToAdd
+        } else {
+            options.push(optionToAdd)
+        }
+    }
+    return options
+}
+
 module.exports = {
     ACCOUNT_KEY_TAG,
+    formatOptionsForMultiSig,
+    formatOptionsForRoleBased,
 }
