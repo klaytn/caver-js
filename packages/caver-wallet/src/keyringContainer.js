@@ -189,7 +189,7 @@ class KeyringContainer {
      * @param {function} [hasher] A function to return hash of transaction. In order to use a custom hasher, the index must be defined.
      * @return {Transaction}
      */
-    async signWithKey(address, transaction, index = 0, hasher = TransactionHasher.getHashForSigning) {
+    async signWithKey(address, transaction, index = 0, hasher = TransactionHasher.getHashForSignature) {
         if (!transaction.from || transaction.from === '0x') transaction.from = address
         if (transaction.from.toLowerCase() !== address.toLowerCase())
             throw new Error(
@@ -221,7 +221,7 @@ class KeyringContainer {
      * @param {function} [hasher] A function to return hash of transaction.
      * @return {Transaction}
      */
-    async signWithKeys(address, transaction, hasher = TransactionHasher.getHashForSigning) {
+    async signWithKeys(address, transaction, hasher = TransactionHasher.getHashForSignature) {
         if (!transaction.from || transaction.from === '0x') transaction.from = address
         if (transaction.from.toLowerCase() !== address.toLowerCase())
             throw new Error(
@@ -250,7 +250,7 @@ class KeyringContainer {
      * @param {function} [hasher] A function to return hash of transaction. In order to use a custom hasher, the index must be defined.
      * @return {string}
      */
-    async signFeePayerWithKey(address, transaction, index = 0, hasher = TransactionHasher.getHashForFeePayerSigning) {
+    async signFeePayerWithKey(address, transaction, index = 0, hasher = TransactionHasher.getHashForFeePayerSignature) {
         // User parameter input cases
         // (address transaction) / (address transaction index) / (address transaction index hasher)
         if (_.isFunction(index)) throw new Error(`In order to pass a custom hasher, use the third parameter.`)
@@ -277,7 +277,7 @@ class KeyringContainer {
      * @param {function} [hasher] A function to return hash of transaction.
      * @return {string}
      */
-    async signFeePayerWithKeys(address, transaction, hasher = TransactionHasher.getHashForFeePayerSigning) {
+    async signFeePayerWithKeys(address, transaction, hasher = TransactionHasher.getHashForFeePayerSignature) {
         if (!transaction.feePayer || transaction.feePayer === '0x') transaction.feePayer = address
 
         await transaction.fillTransaction()
