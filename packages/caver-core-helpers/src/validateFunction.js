@@ -692,8 +692,13 @@ function checkChainDataAnchoringEssential(transaction) {
         return new Error(`"data" and "input" cannot be used as properties of transactions at the same time.`)
     }
     if (transaction.input === undefined && transaction.data === undefined) {
-        if (transaction.type.includes('TxType')) return new Error('"input" is missing')
-        return new Error('"data" is missing')
+        if (transaction.anchoredData !== undefined) {
+            transaction.data = transaction.anchoredData
+            delete transaction.anchoredData
+        } else {
+            if (transaction.type.includes('TxType')) return new Error('"input" is missing')
+            return new Error('"data" is missing')
+        }
     }
 
     if (transaction.value !== undefined) {
