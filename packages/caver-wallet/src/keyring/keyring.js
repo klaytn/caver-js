@@ -26,7 +26,10 @@ const utils = require('../../../caver-utils')
 const PrivateKey = require('./privateKey')
 const { KEY_ROLE, MAXIMUM_KEY_NUM, isMultipleKeysFormat, isRoleBasedKeysFormat } = require('./keyringHelper')
 const Account = require('../../../caver-account')
-const { formatOptionsForMultiSig, formatOptionsForRoleBased } = require('../../../caver-account/src/accountKey/accountKeyHelper')
+const {
+    fillWeightedMultiSigOptionsForMultiSig,
+    fillWeightedMultiSigOptionsForRoleBased,
+} = require('../../../caver-account/src/accountKey/accountKeyHelper')
 
 /**
  * representing a Keyring which includes `address` and `private keys` by roles.
@@ -524,9 +527,9 @@ class Keyring {
         if (isRoleBased) {
             const lengths = []
             for (const k of this.keys) lengths.push(k.length)
-            options = formatOptionsForRoleBased(lengths, options)
+            options = fillWeightedMultiSigOptionsForRoleBased(lengths, options)
         }
-        if (isWeightedMultiSig) options = formatOptionsForMultiSig(this.keys[0].length, options)
+        if (isWeightedMultiSig) options = fillWeightedMultiSigOptionsForMultiSig(this.keys[0].length, options)
 
         if (isRoleBased) {
             // AccountKeyRoleBased with AccountKeyPublic

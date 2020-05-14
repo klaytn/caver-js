@@ -37,7 +37,7 @@ const ACCOUNT_KEY_TAG = {
  * @param {WeightedMultiSigOptions|object} [options] An instance of WeightedMultiSigOptions or an object that defines 'threshold' and 'weight'.
  * @return {WeightedMultiSigOptions}
  */
-const formatOptionsForMultiSig = (lengthOfKeys, options) => {
+const fillWeightedMultiSigOptionsForMultiSig = (lengthOfKeys, options) => {
     if (_.isArray(options))
         throw new Error(`For AccountKeyWeightedMultiSig, options cannot be defined as an array of WeightedMultiSigOptions.`)
 
@@ -56,7 +56,7 @@ const formatOptionsForMultiSig = (lengthOfKeys, options) => {
  * @param {Array.<WeightedMultiSigOptions>|Array.<object>} [options] An array of WeightedMultiSigOptions or object that defines 'threshold' and 'weight'.
  * @return {Array.<WeightedMultiSigOptions>}
  */
-const formatOptionsForRoleBased = (lengthOfKeys, options = []) => {
+const fillWeightedMultiSigOptionsForRoleBased = (lengthOfKeys, options = []) => {
     if (!_.isArray(options)) throw new Error(`For AccountKeyRoleBased, options should be an array of WeightedMultiSigOptions.`)
 
     for (let i = 0; i < lengthOfKeys.length; i++) {
@@ -87,6 +87,6 @@ const formatOptionsForRoleBased = (lengthOfKeys, options = []) => {
 
 module.exports = {
     ACCOUNT_KEY_TAG,
-    formatOptionsForMultiSig,
-    formatOptionsForRoleBased,
+    fillWeightedMultiSigOptionsForMultiSig,
+    fillWeightedMultiSigOptionsForRoleBased,
 }
