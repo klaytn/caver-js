@@ -60,8 +60,9 @@ class ValueTransfer extends AbstractTransaction {
     /**
      * Creates a value transfer transaction.
      * @constructor
-     * @param {object} createTxObj - The parameters to create a ValueTransfer transaction.
-     *                               The createTxObj can define `from`, `to`, `value`, `nonce`, `gas`, `gasPrice`, `signatures` and `chainId`.
+     * @param {object|string} createTxObj - The parameters to create a ValueTransfer transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
+     *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
+     *                                      The object can define `from`, `to`, `value`, `nonce`, `gas`, `gasPrice`, `signatures` and `chainId`.
      */
     constructor(createTxObj) {
         if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
