@@ -23,7 +23,6 @@ const Bytes = require('eth-lib/lib/bytes')
 const TransactionHasher = require('../transactionHasher/transactionHasher')
 const AbstractTransaction = require('./abstractTransaction')
 const { refineSignatures, typeDetectionFromRLPEncoding } = require('../transactionHelper/transactionHelper')
-const formatters = require('../../../caver-core-helpers/src/formatters')
 const Keyring = require('../../../caver-wallet/src/keyring/keyring')
 const { KEY_ROLE } = require('../../../caver-wallet/src/keyring/keyringHelper')
 const utils = require('../../../caver-utils/src')
@@ -159,7 +158,6 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
      */
     combineSignatures(rlpEncodedTxs) {
         if (!_.isArray(rlpEncodedTxs)) throw new Error(`The parameter must be an array of RLP encoded transaction strings.`)
-        formatters.inputTransactionFormatter(this)
 
         // If the signatures are empty, there may be an undefined member variable.
         // In this case, the empty information is filled with the decoded result.
