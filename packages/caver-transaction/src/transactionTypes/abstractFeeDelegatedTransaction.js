@@ -80,14 +80,10 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
      * @param {function} [hasher] - The function to get the transaction hash. In order to use a custom hasher, the index must be defined.
      * @return {Transaction}
      */
-    async signFeePayerWithKey(key, index = 0, hasher = TransactionHasher.getHashForSignature) {
+    async signFeePayerWithKey(key, index = 0, hasher = TransactionHasher.getHashForFeePayerSignature) {
         // User parameter input cases
         // (key) / (key index) / (key index hasher)
         if (_.isFunction(index)) throw new Error(`In order to pass a custom hasher, use the third parameter.`)
-
-        if (!this.feePayer || this.feePayer === '0x') this.feePayer = keyring.address
-        if (this.feePayer.toLowerCase() !== keyring.address.toLowerCase())
-            throw new Error(`The feePayer address of the transaction is different with the address of the keyring to use.`)
 
         let keyring = key
         if (_.isString(key)) {
@@ -97,6 +93,10 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
             throw new Error(
                 `Unsupported key type. The key parameter of the signFeePayerWithKey must be a single private key string, KlaytnWalletKey string, or Keyring instance.`
             )
+
+        if (!this.feePayer || this.feePayer === '0x') this.feePayer = keyring.address
+        if (this.feePayer.toLowerCase() !== keyring.address.toLowerCase())
+            throw new Error(`The feePayer address of the transaction is different with the address of the keyring to use.`)
 
         await this.fillTransaction()
         const hash = hasher(this)
@@ -178,6 +178,7 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
                 if (k === '_signatures' || k === '_feePayerSignatures') continue
                 if (k === '_feePayer') {
                     if ((decoded[k] !== '0x' || this[k] === '0x') && fillVariables) this[k] = decoded[k]
+                    if (decoded[k] === '0x') continue
                 }
 
                 if (this[k] === undefined && fillVariables) this[k] = decoded[k]
