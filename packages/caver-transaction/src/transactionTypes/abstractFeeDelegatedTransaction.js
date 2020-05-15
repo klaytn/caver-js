@@ -56,7 +56,7 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
 
     set feePayer(f) {
         if (f === undefined) f = '0x'
-        if (f !== '0x' && !utils.isAddress(f)) throw new Error(`Invalid address ${f}`)
+        if (f !== '0x' && !utils.isAddress(f)) throw new Error(`Invalid address of fee payer: ${f}`)
 
         this._feePayer = f.toLowerCase()
     }

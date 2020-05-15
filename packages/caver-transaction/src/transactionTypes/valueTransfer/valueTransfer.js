@@ -80,7 +80,7 @@ class ValueTransfer extends AbstractTransaction {
     }
 
     set from(address) {
-        if (!utils.isAddress(address)) throw new Error(`Invalid address ${address}`)
+        if (!utils.isAddress(address)) throw new Error(`Invalid address of from: ${address}`)
         this._from = address.toLowerCase()
     }
 
@@ -92,7 +92,7 @@ class ValueTransfer extends AbstractTransaction {
     }
 
     set to(address) {
-        if (!utils.isAddress(address)) throw new Error(`Invalid address ${address}`)
+        if (!utils.isAddress(address)) throw new Error(`Invalid address of to: ${address}`)
         this._to = address.toLowerCase()
     }
 
