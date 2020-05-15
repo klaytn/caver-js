@@ -181,9 +181,15 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
 
                 if (this[k] === undefined && fillVariables) this[k] = decoded[k]
 
-                if (this[k] !== decoded[k]) {
-                    throw new Error(`Transactions containing different information cannot be combined.`)
+                const differentTxError = `Transactions containing different information cannot be combined.`
+
+                // Compare with the RLP-encoded accountKey string, because 'account' is an object.
+                if (k === '_account') {
+                    if (this[k].getRLPEncodingAccountKey() !== decoded[k].getRLPEncodingAccountKey()) throw new Error(differentTxError)
+                    continue
                 }
+
+                if (this[k] !== decoded[k]) throw new Error(differentTxError)
             }
 
             this.appendSignatures(decoded.signatures)
