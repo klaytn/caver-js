@@ -16,7 +16,6 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const _ = require('lodash')
 const chai = require('chai')
 const sinon = require('sinon')
 const sinonChai = require('sinon-chai')
@@ -36,7 +35,7 @@ const Caver = require('../../../index.js')
 const Keyring = require('../../../packages/caver-wallet/src/keyring/keyring')
 const TransactionHasher = require('../../../packages/caver-transaction/src/transactionHasher/transactionHasher')
 
-const { generateRoleBasedKeyring } = require('../utils')
+const { generateRoleBasedKeyring, checkSignature } = require('../utils')
 
 const AbstractTransaction = require('../../../packages/caver-transaction/src/transactionTypes/abstractTransaction')
 
@@ -48,31 +47,6 @@ let roleBasedKeyring
 const txWithExpectedValues = {}
 
 const sandbox = sinon.createSandbox()
-
-function checkSignature(tx, expected = {}) {
-    let { expectedSignatures, expectedLength } = expected
-
-    if (expectedLength === undefined) {
-        if (expectedSignatures !== undefined) {
-            expectedLength = expectedSignatures.length
-        } else {
-            expectedLength = 1
-        }
-    }
-
-    expect(tx.signatures.length).to.equal(expectedLength)
-
-    for (let i = 0; i < expectedLength; i++) {
-        expect(_.isArray(tx.signatures[i])).to.be.true
-        expect(tx.signatures[i].length).to.equal(3)
-
-        if (expectedSignatures) {
-            for (let j = 0; j < 3; j++) {
-                expect(tx.signatures[i][j]).to.equal(expectedSignatures[i][j])
-            }
-        }
-    }
-}
 
 before(() => {
     caver = new Caver(testRPCURL)

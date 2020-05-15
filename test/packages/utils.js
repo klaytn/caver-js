@@ -16,6 +16,8 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+const _ = require('lodash')
+const { expect } = require('../extendedChai')
 const AccountForUpdate = require('../../packages/caver-klay/caver-klay-accounts/src/account/accountForUpdate')
 const Account = require('../../packages/caver-account')
 
@@ -147,10 +149,62 @@ const propertiesForUnnecessary = {
     },
 }
 
+const checkSignature = (tx, expected = {}) => {
+    let { expectedSignatures, expectedLength } = expected
+
+    if (expectedLength === undefined) {
+        if (expectedSignatures !== undefined) {
+            expectedLength = expectedSignatures.length
+        } else {
+            expectedLength = 1
+        }
+    }
+
+    expect(tx.signatures.length).to.equal(expectedLength)
+
+    for (let i = 0; i < expectedLength; i++) {
+        expect(_.isArray(tx.signatures[i])).to.be.true
+        expect(tx.signatures[i].length).to.equal(3)
+
+        if (expectedSignatures) {
+            for (let j = 0; j < 3; j++) {
+                expect(tx.signatures[i][j]).to.equal(expectedSignatures[i][j])
+            }
+        }
+    }
+}
+
+const checkFeePayerSignature = (tx, expected = {}) => {
+    let { expectedSignatures, expectedLength } = expected
+
+    if (expectedLength === undefined) {
+        if (expectedSignatures !== undefined) {
+            expectedLength = expectedSignatures.length
+        } else {
+            expectedLength = 1
+        }
+    }
+
+    expect(tx.feePayerSignatures.length).to.equal(expectedLength)
+
+    for (let i = 0; i < expectedLength; i++) {
+        expect(_.isArray(tx.feePayerSignatures[i])).to.be.true
+        expect(tx.feePayerSignatures[i].length).to.equal(3)
+
+        if (expectedSignatures) {
+            for (let j = 0; j < 3; j++) {
+                expect(tx.feePayerSignatures[i][j]).to.equal(expectedSignatures[i][j])
+            }
+        }
+    }
+}
+
 module.exports = {
     unitMap,
     generateDecoupledKeyring,
     generateMultiSigKeyring,
     generateRoleBasedKeyring,
     propertiesForUnnecessary,
+    checkSignature,
+    checkFeePayerSignature,
 }
