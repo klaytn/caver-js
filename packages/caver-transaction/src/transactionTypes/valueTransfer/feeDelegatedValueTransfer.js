@@ -47,12 +47,12 @@ function _decode(rlpEncoded) {
 
 /**
  * Represents a fee delegated value transfer transaction.
- * Please refer https://docs.klaytn.com/klaytn/design/transactions/fee-delegation#txtypefeedelegatedvaluetransfer to see more detail.
+ * Please refer to https://docs.klaytn.com/klaytn/design/transactions/fee-delegation#txtypefeedelegatedvaluetransfer to see more detail.
  * @class
  */
 class FeeDelegatedValueTransfer extends AbstractFeeDelegatedTransaction {
     /**
-     * decodes an RLP-encoded transation string and returns a FeeDelegatedValueTransfer transaction instance.
+     * decodes an RLP-encoded string and returns a FeeDelegatedValueTransfer transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded fee delegated value transfer transaction.
      * @return {FeeDelegatedValueTransfer}
@@ -112,7 +112,7 @@ class FeeDelegatedValueTransfer extends AbstractFeeDelegatedTransaction {
     }
 
     /**
-     * Returns RLP-encoded transaction string(rawTransaction).
+     * Returns the RLP-encoded string of this transaction (i.e., rawTransaction).
      * @return {string}
      */
     getRLPEncoding() {
@@ -135,7 +135,7 @@ class FeeDelegatedValueTransfer extends AbstractFeeDelegatedTransaction {
     }
 
     /**
-     * Returns common RLP-encoded transaction string for making signature.
+     * Returns the RLP-encoded transaction string to make the signature of this transaction.
      * @return {string}
      */
     getCommonRLPEncodingForSignature() {
