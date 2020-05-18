@@ -48,7 +48,7 @@ function _decode(rlpEncoded) {
  */
 class AccountUpdate extends AbstractTransaction {
     /**
-     * decodes an RLP-encoded transation string and returns an AccountUpdate transaction instance.
+     * decodes the RLP-encoded string and returns an AccountUpdate transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded account update transaction.
      * @return {AccountUpdate}
@@ -101,7 +101,7 @@ class AccountUpdate extends AbstractTransaction {
     }
 
     /**
-     * Returns RLP-encoded transaction string(rawTransaction).
+     * Returns the RLP-encoded string of this transaction (i.e., rawTransaction).
      * @return {string}
      */
     getRLPEncoding() {
@@ -121,7 +121,7 @@ class AccountUpdate extends AbstractTransaction {
     }
 
     /**
-     * Returns a RLP-encoded string to make the signature.
+     * Returns the RLP-encoded string to make the signature of this transaction.
      * @return {string}
      */
     getCommonRLPEncodingForSignature() {
