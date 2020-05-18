@@ -42,13 +42,13 @@ function _decode(rlpEncoded) {
 }
 
 /**
- * Represents a account update transaction.
- * Please refer https://docs.klaytn.com/klaytn/design/transactions/basic#txtypeaccountupdate to see more detail.
+ * Represents an account update transaction.
+ * Please refer to https://docs.klaytn.com/klaytn/design/transactions/basic#txtypeaccountupdate to see more detail.
  * @class
  */
 class AccountUpdate extends AbstractTransaction {
     /**
-     * decodes an RLP-encoded transation string and returns a AccountUpdate transaction instance.
+     * decodes an RLP-encoded transation string and returns an AccountUpdate transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded account update transaction.
      * @return {AccountUpdate}
@@ -60,9 +60,9 @@ class AccountUpdate extends AbstractTransaction {
     }
 
     /**
-     * Creates a account update transaction.
+     * Creates an account update transaction.
      * @constructor
-     * @param {object|string} createTxObj - The parameters to create a AccountUpdate transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
+     * @param {object|string} createTxObj - The parameters to create an AccountUpdate transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                                      The object can define `from`, `account`, `nonce`, `gas`, `gasPrice`, `signatures` and `chainId`.
      */
@@ -121,7 +121,7 @@ class AccountUpdate extends AbstractTransaction {
     }
 
     /**
-     * Returns common RLP-encoded transaction string for making signature.
+     * Returns a RLP-encoded string to make the signature.
      * @return {string}
      */
     getCommonRLPEncodingForSignature() {
