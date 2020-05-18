@@ -44,12 +44,12 @@ function _decode(rlpEncoded) {
 
 /**
  * Represents a value transfer memo transaction.
- * Please refer https://docs.klaytn.com/klaytn/design/transactions/basic#txtypevaluetransfermemo to see more detail.
+ * Please refer to https://docs.klaytn.com/klaytn/design/transactions/basic#txtypevaluetransfermemo to see more detail.
  * @class
  */
 class ValueTransferMemo extends AbstractTransaction {
     /**
-     * decodes an RLP-encoded transation string and returns a ValueTransferMemo transaction instance.
+     * decodes an RLP-encoded string and returns a ValueTransferMemo transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded value transfer memo transaction.
      * @return {ValueTransferMemo}
@@ -137,7 +137,7 @@ class ValueTransferMemo extends AbstractTransaction {
     }
 
     /**
-     * Returns RLP-encoded transaction string(rawTransaction).
+     * Returns RLP-encoded string(rawTransaction).
      * @return {string}
      */
     getRLPEncoding() {
@@ -159,7 +159,7 @@ class ValueTransferMemo extends AbstractTransaction {
     }
 
     /**
-     * Returns common RLP-encoded transaction string for making signature.
+     * Returns common RLP-encoded string to make the signature of this transaction.
      * @return {string}
      */
     getCommonRLPEncodingForSignature() {
