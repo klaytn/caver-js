@@ -168,7 +168,7 @@ class SmartContractDeploy extends AbstractTransaction {
     }
 
     /**
-     * Returns RLP-encoded transaction string(rawTransaction).
+     * Returns the RLP-encoded string of this transaction (i.e., rawTransaction).
      * @return {string}
      */
     getRLPEncoding() {
@@ -192,7 +192,7 @@ class SmartContractDeploy extends AbstractTransaction {
     }
 
     /**
-     * Returns common RLP-encoded transaction string for making signature.
+     * Returns the RLP-encoded string to make the signature of this transaction.
      * @return {string}
      */
     getCommonRLPEncodingForSignature() {
