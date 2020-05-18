@@ -41,12 +41,12 @@ function _decode(rlpEncoded) {
 
 /**
  * Represents a cancel transaction.
- * Please refer https://docs.klaytn.com/klaytn/design/transactions/basic#txtypecancel to see more detail.
+ * Please refer to https://docs.klaytn.com/klaytn/design/transactions/basic#txtypecancel to see more detail.
  * @class
  */
 class Cancel extends AbstractTransaction {
     /**
-     * decodes an RLP-encoded transation string and returns a Cancel transaction instance.
+     * decodes an RLP-encoded string and returns a Cancel transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded cancel transaction.
      * @return {Cancel}
@@ -82,7 +82,7 @@ class Cancel extends AbstractTransaction {
     }
 
     /**
-     * Returns RLP-encoded transaction string(rawTransaction).
+     * Returns the RLP-encoded string of this transaction (i.e., rawTransaction).
      * @return {string}
      */
     getRLPEncoding() {
@@ -101,7 +101,7 @@ class Cancel extends AbstractTransaction {
     }
 
     /**
-     * Returns common RLP-encoded transaction string for making signature.
+     * Returns the RLP-encoded string to make the signature of this transaction.
      * @return {string}
      */
     getCommonRLPEncodingForSignature() {
