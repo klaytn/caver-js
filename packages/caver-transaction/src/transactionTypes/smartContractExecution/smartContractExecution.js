@@ -51,7 +51,7 @@ function _decode(rlpEncoded) {
  */
 class SmartContractExecution extends AbstractTransaction {
     /**
-     * decodes an RLP-encoded transation string and returns a SmartContractExecution transaction instance.
+     * decodes the RLP-encoded transation string and returns a SmartContractExecution transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded smart contract execution transaction.
      * @return {SmartContractExecution}
