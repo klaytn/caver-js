@@ -52,7 +52,7 @@ function _decode(rlpEncoded) {
  */
 class FeeDelegatedValueTransfer extends AbstractFeeDelegatedTransaction {
     /**
-     * decodes an RLP-encoded string and returns a FeeDelegatedValueTransfer transaction instance.
+     * decodes the RLP-encoded string and returns a FeeDelegatedValueTransfer transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded fee delegated value transfer transaction.
      * @return {FeeDelegatedValueTransfer}
