@@ -20,6 +20,7 @@ const _ = require('lodash')
 const { expect } = require('../extendedChai')
 const AccountForUpdate = require('../../packages/caver-klay/caver-klay-accounts/src/account/accountForUpdate')
 const Account = require('../../packages/caver-account')
+const utils = require('../../packages/caver-utils')
 
 const Keyring = require('../../packages/caver-wallet/src/keyring/keyring')
 const { KEY_ROLE } = require('../../packages/caver-wallet/src/keyring/keyringHelper')
@@ -199,6 +200,64 @@ const checkFeePayerSignature = (tx, expected = {}) => {
     }
 }
 
+const checkReceipt = (r, tx) => {
+    expect(r.status).to.be.true
+
+    Object.keys(tx).map(key => {
+        if (key !== '_tag' && key !== '_chainId') {
+            const keyName = key.replace('_', '')
+            if (keyName === 'signatures' || keyName === 'feePayerSignatures') {
+                const twoDimensional = _.isArray(tx[keyName][0]) ? tx[keyName] : [tx[keyName]]
+                for (let i = 0; i < r[keyName].length; i++) {
+                    const resolved = utils.resolveSignature(r[keyName][i])
+                    for (let j = 0; j < 3; j++) {
+                        expect(resolved[j]).to.equal(utils.removeLeftPad(twoDimensional[i][j]))
+                    }
+                }
+            } else if (tx[keyName] !== '0x') {
+                expect(r[keyName]).to.equal(tx[keyName])
+            }
+        }
+    })
+}
+
+const makeAccount = (address, type, options) => {
+    const defaultOption = { threshold: 1, weights: [1, 1, 1] }
+    switch (type) {
+        case accountKeyTestCases.LEGACY:
+            return Account.createWithAccountKeyLegacy(address)
+        case accountKeyTestCases.PUBLIC:
+            const keyring = generateDecoupledKeyring()
+            keyring.address = address
+            return keyring.toAccount()
+        case accountKeyTestCases.FAIL:
+            return Account.createWithAccountKeyFail(address)
+        case accountKeyTestCases.MULTISIG:
+            options = options || defaultOption
+            const multiSig = generateMultiSigKeyring(options.weights.length)
+            multiSig.address = address
+            return multiSig.toAccount(options)
+        case accountKeyTestCases.ROLEBAED:
+            options = options || [defaultOption, defaultOption, defaultOption]
+
+            const roleBasedWithMultiSig = generateRoleBasedKeyring([
+                options[0].weights ? options[0].weights.length : 1,
+                options[1].weights ? options[1].weights.length : 1,
+                options[2].weights ? options[2].weights.length : 1,
+            ])
+            roleBasedWithMultiSig.address = address
+            return roleBasedWithMultiSig.toAccount(options)
+    }
+}
+
+const accountKeyTestCases = {
+    LEGACY: 0,
+    PUBLIC: 1,
+    FAIL: 2,
+    MULTISIG: 3,
+    ROLEBAED: 4,
+}
+
 module.exports = {
     unitMap,
     generateDecoupledKeyring,
@@ -207,4 +266,7 @@ module.exports = {
     propertiesForUnnecessary,
     checkSignature,
     checkFeePayerSignature,
+    checkReceipt,
+    makeAccount,
+    accountKeyTestCases,
 }
