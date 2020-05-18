@@ -19,6 +19,14 @@
 const { TX_TYPE_STRING, typeDetectionFromRLPEncoding } = require('../transactionHelper/transactionHelper')
 const LegacyTransaction = require('../transactionTypes/legacyTransaction/legacyTransaction')
 const ValueTransfer = require('../transactionTypes/valueTransfer/valueTransfer')
+const FeeDelegatedValueTransfer = require('../transactionTypes/valueTransfer/feeDelegatedValueTransfer')
+const ValueTransferMemo = require('../transactionTypes/valueTransferMemo/valueTransferMemo')
+const FeeDelegatedValueTransferMemo = require('../transactionTypes/valueTransferMemo/feeDelegatedValueTransferMemo')
+const AccountUpdate = require('../transactionTypes/accountUpdate/accountUpdate')
+const SmartContractDeploy = require('../transactionTypes/smartContractDeploy/smartContractDeploy')
+const SmartContractExecution = require('../transactionTypes/smartContractExecution/smartContractExecution')
+const Cancel = require('../transactionTypes/cancel/cancel')
+const ChainDataAnchoring = require('../transactionTypes/chainDataAnchoring/chainDataAnchoring')
 
 /**
  * Representing a transaction decoder.
@@ -38,6 +46,22 @@ class TransactionDecoder {
                 return LegacyTransaction.decode(rlpEncoded)
             case TX_TYPE_STRING.TxTypeValueTransfer:
                 return ValueTransfer.decode(rlpEncoded)
+            case TX_TYPE_STRING.TxTypeFeeDelegatedValueTransfer:
+                return FeeDelegatedValueTransfer.decode(rlpEncoded)
+            case TX_TYPE_STRING.TxTypeValueTransferMemo:
+                return ValueTransferMemo.decode(rlpEncoded)
+            case TX_TYPE_STRING.TxTypeFeeDelegatedValueTransferMemo:
+                return FeeDelegatedValueTransferMemo.decode(rlpEncoded)
+            case TX_TYPE_STRING.TxTypeAccountUpdate:
+                return AccountUpdate.decode(rlpEncoded)
+            case TX_TYPE_STRING.TxTypeSmartContractDeploy:
+                return SmartContractDeploy.decode(rlpEncoded)
+            case TX_TYPE_STRING.TxTypeSmartContractExecution:
+                return SmartContractExecution.decode(rlpEncoded)
+            case TX_TYPE_STRING.TxTypeCancel:
+                return Cancel.decode(rlpEncoded)
+            case TX_TYPE_STRING.TxTypeChainDataAnchoring:
+                return ChainDataAnchoring.decode(rlpEncoded)
         }
     }
 }
