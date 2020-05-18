@@ -46,7 +46,7 @@ function _decode(rlpEncoded) {
  */
 class Cancel extends AbstractTransaction {
     /**
-     * decodes an RLP-encoded string and returns a Cancel transaction instance.
+     * decodes the RLP-encoded string and returns a Cancel transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded cancel transaction.
      * @return {Cancel}
