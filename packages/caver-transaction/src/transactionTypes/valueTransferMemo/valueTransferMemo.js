@@ -137,7 +137,7 @@ class ValueTransferMemo extends AbstractTransaction {
     }
 
     /**
-     * Returns RLP-encoded string(rawTransaction).
+     * Returns the RLP-encoded string of this transaction (i.e., rawTransaction).
      * @return {string}
      */
     getRLPEncoding() {
@@ -159,7 +159,7 @@ class ValueTransferMemo extends AbstractTransaction {
     }
 
     /**
-     * Returns common RLP-encoded string to make the signature of this transaction.
+     * Returns the RLP-encoded string to make the signature of this transaction.
      * @return {string}
      */
     getCommonRLPEncodingForSignature() {
