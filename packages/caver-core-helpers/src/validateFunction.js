@@ -362,8 +362,14 @@ function checkValueTransferMemoEssential(transaction) {
     if (transaction.value === undefined) {
         return new Error('"value" is missing')
     }
-    if (transaction.type.includes('TxType') && transaction.input === undefined) return new Error('"input" is missing')
-    if (!transaction.type.includes('TxType') && transaction.data === undefined) return new Error('"data" is missing')
+
+    if (transaction.input !== undefined && transaction.data !== undefined) {
+        return new Error(`"data" and "input" cannot be used as properties of transactions at the same time.`)
+    }
+    if (transaction.input === undefined && transaction.data === undefined) {
+        if (transaction.type.includes('TxType')) return new Error('"input" is missing')
+        return new Error('"data" is missing')
+    }
 
     if (transaction.codeFormat !== undefined) {
         return new Error(`"codeFormat" cannot be used with ${transaction.type} transaction`)
@@ -545,8 +551,13 @@ function checkDeployEssential(transaction) {
         return new Error('"value" is missing')
     }
 
-    if (transaction.type.includes('TxType') && transaction.input === undefined) return new Error('"input" is missing')
-    if (!transaction.type.includes('TxType') && transaction.data === undefined) return new Error('"data" is missing')
+    if (transaction.input !== undefined && transaction.data !== undefined) {
+        return new Error(`"data" and "input" cannot be used as properties of transactions at the same time.`)
+    }
+    if (transaction.input === undefined && transaction.data === undefined) {
+        if (transaction.type.includes('TxType')) return new Error('"input" is missing')
+        return new Error('"data" is missing')
+    }
 
     if (transaction.to !== undefined && transaction.to !== '0x') {
         return new Error(`"to" cannot be used with ${transaction.type} transaction`)
@@ -591,8 +602,13 @@ function checkExecutionEssential(transaction) {
         return new Error(`Invalid address of to: ${transaction.to}`)
     }
 
-    if (transaction.type.includes('TxType') && transaction.input === undefined) return new Error('"input" is missing')
-    if (!transaction.type.includes('TxType') && transaction.data === undefined) return new Error('"data" is missing')
+    if (transaction.input !== undefined && transaction.data !== undefined) {
+        return new Error(`"data" and "input" cannot be used as properties of transactions at the same time.`)
+    }
+    if (transaction.input === undefined && transaction.data === undefined) {
+        if (transaction.type.includes('TxType')) return new Error('"input" is missing')
+        return new Error('"data" is missing')
+    }
 
     if (transaction.codeFormat !== undefined) {
         return new Error(`"codeFormat" cannot be used with ${transaction.type} transaction`)
@@ -672,24 +688,24 @@ function validateFeeDelegatedCancelWithRatio(transaction) {
 }
 
 function checkChainDataAnchoringEssential(transaction) {
-    if (transaction.to === undefined) {
-        return new Error('"to" is missing')
+    if (transaction.input !== undefined && transaction.data !== undefined) {
+        return new Error(`"data" and "input" cannot be used as properties of transactions at the same time.`)
     }
-    if (!utils.isAddress(transaction.to)) {
-        return new Error(`Invalid address of to: ${transaction.to}`)
-    }
-    if (transaction.value === undefined) {
-        return new Error('"value" is missing')
-    }
-    if (transaction.anchoredData === undefined) {
-        return new Error('"anchoredData" is missing')
+    if (transaction.input === undefined && transaction.data === undefined) {
+        if (transaction.anchoredData !== undefined) {
+            transaction.data = transaction.anchoredData
+            delete transaction.anchoredData
+        } else {
+            if (transaction.type.includes('TxType')) return new Error('"input" is missing')
+            return new Error('"data" is missing')
+        }
     }
 
-    if (transaction.data !== undefined) {
-        return new Error(`"data" cannot be used with ${transaction.type} transaction`)
+    if (transaction.value !== undefined) {
+        return new Error(`"value" cannot be used with ${transaction.type} transaction`)
     }
-    if (transaction.input !== undefined) {
-        return new Error(`"input" cannot be used with ${transaction.type} transaction`)
+    if (transaction.to !== undefined) {
+        return new Error(`"to" cannot be used with ${transaction.type} transaction`)
     }
     if (transaction.codeFormat !== undefined) {
         return new Error(`"codeFormat" cannot be used with ${transaction.type} transaction`)
