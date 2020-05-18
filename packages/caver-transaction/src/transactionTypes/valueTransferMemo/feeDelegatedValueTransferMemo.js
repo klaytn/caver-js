@@ -53,7 +53,7 @@ function _decode(rlpEncoded) {
  */
 class FeeDelegatedValueTransferMemo extends AbstractFeeDelegatedTransaction {
     /**
-     * decodes an RLP-encoded string and returns a FeeDelegatedValueTransferMemo transaction instance.
+     * decodes the RLP-encoded string and returns a FeeDelegatedValueTransferMemo transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded fee delegated value transfer memo transaction.
      * @return {FeeDelegatedValueTransferMemo}
@@ -141,7 +141,7 @@ class FeeDelegatedValueTransferMemo extends AbstractFeeDelegatedTransaction {
     }
 
     /**
-     * Returns the RLP-encoded transaction string of this transaction (i.e., rawTransaction).
+     * Returns the RLP-encoded string of this transaction (i.e., rawTransaction).
      * @return {string}
      */
     getRLPEncoding() {
@@ -165,7 +165,7 @@ class FeeDelegatedValueTransferMemo extends AbstractFeeDelegatedTransaction {
     }
 
     /**
-     * Returns the RLP-encoded transaction string to make the signature of this transaction.
+     * Returns the RLP-encoded string to make the signature of this transaction.
      * @return {string}
      */
     getCommonRLPEncodingForSignature() {
