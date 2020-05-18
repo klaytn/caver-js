@@ -18,6 +18,7 @@
 
 const { TX_TYPE_STRING, typeDetectionFromRLPEncoding } = require('../transactionHelper/transactionHelper')
 const LegacyTransaction = require('../transactionTypes/legacyTransaction/legacyTransaction')
+const ValueTransfer = require('../transactionTypes/valueTransfer/valueTransfer')
 
 /**
  * Representing a transaction decoder.
@@ -35,6 +36,8 @@ class TransactionDecoder {
         switch (type) {
             case TX_TYPE_STRING.TxTypeLegacyTransaction:
                 return LegacyTransaction.decode(rlpEncoded)
+            case TX_TYPE_STRING.TxTypeValueTransfer:
+                return ValueTransfer.decode(rlpEncoded)
         }
     }
 }

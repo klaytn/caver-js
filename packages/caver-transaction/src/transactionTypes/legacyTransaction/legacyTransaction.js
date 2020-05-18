@@ -45,8 +45,9 @@ class LegacyTransaction extends AbstractTransaction {
     /**
      * Creates a legacy transaction.
      * @constructor
-     * @param {object} createTxObj - The parameters to create a LegacyTransaction transaction.
-     *                               The createTxObj can define `from`, `to`, `value`, `input`, `nonce`, `gas`, `gasPrice`, `feeRatio`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @param {object|string} createTxObj - The parameters to create a LegacyTransaction transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
+     *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
+     *                               The object can define `from`, `to`, `value`, `input`, `nonce`, `gas`, `gasPrice`, `feeRatio`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
      */
     constructor(createTxObj) {
         if (_.isString(createTxObj)) createTxObj = LegacyTransaction.decode(createTxObj)

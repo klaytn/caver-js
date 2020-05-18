@@ -17,6 +17,7 @@
 */
 
 const LegacyTransaction = require('./transactionTypes/legacyTransaction/legacyTransaction')
+const ValueTransfer = require('./transactionTypes/valueTransfer/valueTransfer')
 const TransactionDecoder = require('./transactionDecoder/transactionDecoder')
 const { TX_TYPE_STRING, TX_TYPE_TAG } = require('./transactionHelper/transactionHelper')
 
@@ -24,6 +25,8 @@ module.exports = {
     decode: TransactionDecoder.decode,
 
     legacyTransaction: LegacyTransaction,
+
+    valueTransfer: ValueTransfer,
 
     type: TX_TYPE_STRING,
     tag: TX_TYPE_TAG,
