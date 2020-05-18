@@ -18,6 +18,14 @@
 
 const LegacyTransaction = require('./transactionTypes/legacyTransaction/legacyTransaction')
 const ValueTransfer = require('./transactionTypes/valueTransfer/valueTransfer')
+const FeeDelegatedValueTransfer = require('./transactionTypes/valueTransfer/feeDelegatedValueTransfer')
+const ValueTransferMemo = require('./transactionTypes/valueTransferMemo/valueTransferMemo')
+const FeeDelegatedValueTransferMemo = require('./transactionTypes/valueTransferMemo/feeDelegatedValueTransferMemo')
+const AccountUpdate = require('./transactionTypes/accountUpdate/accountUpdate')
+const SmartContractDeploy = require('./transactionTypes/smartContractDeploy/smartContractDeploy')
+const SmartContractExecution = require('./transactionTypes/smartContractExecution/smartContractExecution')
+const Cancel = require('./transactionTypes/cancel/cancel')
+const ChainDataAnchoring = require('./transactionTypes/chainDataAnchoring/chainDataAnchoring')
 const TransactionDecoder = require('./transactionDecoder/transactionDecoder')
 const { TX_TYPE_STRING, TX_TYPE_TAG } = require('./transactionHelper/transactionHelper')
 
@@ -27,6 +35,20 @@ module.exports = {
     legacyTransaction: LegacyTransaction,
 
     valueTransfer: ValueTransfer,
+    feeDelegatedValueTransfer: FeeDelegatedValueTransfer,
+
+    valueTransferMemo: ValueTransferMemo,
+    feeDelegatedValueTransferMemo: FeeDelegatedValueTransferMemo,
+
+    accountUpdate: AccountUpdate,
+
+    smartContractDeploy: SmartContractDeploy,
+
+    smartContractExecution: SmartContractExecution,
+
+    cancel: Cancel,
+
+    chainDataAnchoring: ChainDataAnchoring,
 
     type: TX_TYPE_STRING,
     tag: TX_TYPE_TAG,

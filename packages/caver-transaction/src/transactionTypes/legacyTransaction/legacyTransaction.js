@@ -25,7 +25,7 @@ const utils = require('../../../../caver-utils/src')
 
 /**
  * Represents a legacy transaction.
- * Please refer https://docs.klaytn.com/klaytn/design/transactions/basic#txtypelegacytransaction to see more detail.
+ * Please refer to https://docs.klaytn.com/klaytn/design/transactions/basic#txtypelegacytransaction to see more detail.
  * @class
  */
 class LegacyTransaction extends AbstractTransaction {
@@ -142,7 +142,7 @@ class LegacyTransaction extends AbstractTransaction {
     }
 
     /**
-     * Returns RLP-encoded transaction string(rawTransaction).
+     * Returns the RLP-encoded string of this transaction (i.e., rawTransaction).
      * @return {string}
      */
     getRLPEncoding() {
@@ -162,7 +162,7 @@ class LegacyTransaction extends AbstractTransaction {
     }
 
     /**
-     * Returns RLP-encoded transaction string for making signature
+     * Returns RLP-encoded string for making signature
      * @override
      * @return {string}
      */
