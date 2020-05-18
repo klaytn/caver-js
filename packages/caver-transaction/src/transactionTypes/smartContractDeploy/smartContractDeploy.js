@@ -47,12 +47,12 @@ function _decode(rlpEncoded) {
 
 /**
  * Represents a smart contract deploy transaction.
- * Please refer https://docs.klaytn.com/klaytn/design/transactions/basic#txtypesmartcontractdeploy to see more detail.
+ * Please refer to https://docs.klaytn.com/klaytn/design/transactions/basic#txtypesmartcontractdeploy to see more detail.
  * @class
  */
 class SmartContractDeploy extends AbstractTransaction {
     /**
-     * decodes an RLP-encoded transation string and returns a SmartContractDeploy transaction instance.
+     * decodes the RLP-encoded string and returns a SmartContractDeploy transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded smart contract deploy transaction.
      * @return {SmartContractDeploy}
