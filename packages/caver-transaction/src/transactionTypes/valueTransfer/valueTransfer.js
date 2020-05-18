@@ -48,7 +48,7 @@ function _decode(rlpEncoded) {
  */
 class ValueTransfer extends AbstractTransaction {
     /**
-     * decodes an RLP-encoded string and returns a ValueTransfer transaction instance.
+     * decodes the RLP-encoded string and returns a ValueTransfer transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded value transfer transaction.
      * @return {ValueTransfer}
