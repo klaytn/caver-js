@@ -47,7 +47,7 @@ function _decode(rlpEncoded) {
  */
 class ChainDataAnchoring extends AbstractTransaction {
     /**
-     * decodes an RLP-encoded string and returns a ChainDataAnchoring transaction instance.
+     * decodes the RLP-encoded string and returns a ChainDataAnchoring transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded chain data anchoring transaction.
      * @return {ChainDataAnchoring}
