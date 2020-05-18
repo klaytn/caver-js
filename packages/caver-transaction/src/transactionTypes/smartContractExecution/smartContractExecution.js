@@ -46,7 +46,7 @@ function _decode(rlpEncoded) {
 
 /**
  * Represents a smart contract execution transaction.
- * Please refer https://docs.klaytn.com/klaytn/design/transactions/basic#txtypesmartcontractexecution to see more detail.
+ * Please refer to https://docs.klaytn.com/klaytn/design/transactions/basic#txtypesmartcontractexecution to see more detail.
  * @class
  */
 class SmartContractExecution extends AbstractTransaction {
@@ -139,7 +139,7 @@ class SmartContractExecution extends AbstractTransaction {
     }
 
     /**
-     * Returns RLP-encoded transaction string(rawTransaction).
+     * Returns the RLP-encoded string of this transaction (i.e., rawTransaction).
      * @return {string}
      */
     getRLPEncoding() {
@@ -161,7 +161,7 @@ class SmartContractExecution extends AbstractTransaction {
     }
 
     /**
-     * Returns common RLP-encoded transaction string for making signature.
+     * Returns the RLP-encoded string to make the signature of this transaction.
      * @return {string}
      */
     getCommonRLPEncodingForSignature() {
