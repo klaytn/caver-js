@@ -112,7 +112,7 @@ class ChainDataAnchoring extends AbstractTransaction {
                 Bytes.fromNat(this.nonce),
                 Bytes.fromNat(this.gasPrice),
                 Bytes.fromNat(this.gas),
-                this.from,
+                this.from.toLowerCase(),
                 this.input,
                 this.signatures,
             ]).slice(2)
@@ -131,7 +131,7 @@ class ChainDataAnchoring extends AbstractTransaction {
             Bytes.fromNat(this.nonce),
             Bytes.fromNat(this.gasPrice),
             Bytes.fromNat(this.gas),
-            this.from,
+            this.from.toLowerCase(),
             this.input,
         ])
     }

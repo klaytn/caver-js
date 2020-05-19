@@ -72,7 +72,7 @@ class SmartContractExecution extends AbstractTransaction {
         super(TX_TYPE_STRING.TxTypeSmartContractExecution, createTxObj)
         this.from = createTxObj.from
         this.to = createTxObj.to
-        this.value = createTxObj.value
+        this.value = createTxObj.value || '0x0'
 
         if (createTxObj.input && createTxObj.data)
             throw new Error(`'input' and 'data' properties cannot be defined at the same time, please use either 'input' or 'data'.`)
@@ -124,7 +124,7 @@ class SmartContractExecution extends AbstractTransaction {
 
     set input(input) {
         if (!input || !utils.isHex(input)) throw new Error(`Invalid input data ${input}`)
-        this._input = utils.toHex(input)
+        this._input = utils.addHexPrefix(input)
     }
 
     /**
@@ -151,9 +151,9 @@ class SmartContractExecution extends AbstractTransaction {
                 Bytes.fromNat(this.nonce),
                 Bytes.fromNat(this.gasPrice),
                 Bytes.fromNat(this.gas),
-                this.to,
+                this.to.toLowerCase(),
                 Bytes.fromNat(this.value),
-                this.from,
+                this.from.toLowerCase(),
                 this.input,
                 this.signatures,
             ]).slice(2)
@@ -172,9 +172,9 @@ class SmartContractExecution extends AbstractTransaction {
             Bytes.fromNat(this.nonce),
             Bytes.fromNat(this.gasPrice),
             Bytes.fromNat(this.gas),
-            this.to,
+            this.to.toLowerCase(),
             Bytes.fromNat(this.value),
-            this.from,
+            this.from.toLowerCase(),
             this.input,
         ])
     }

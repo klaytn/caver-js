@@ -122,7 +122,7 @@ class ValueTransferMemo extends AbstractTransaction {
 
     set input(input) {
         if (!input || !utils.isHex(input)) throw new Error(`Invalid input data ${input}`)
-        this._input = utils.toHex(input)
+        this._input = utils.addHexPrefix(input)
     }
 
     /**
@@ -149,9 +149,9 @@ class ValueTransferMemo extends AbstractTransaction {
                 Bytes.fromNat(this.nonce),
                 Bytes.fromNat(this.gasPrice),
                 Bytes.fromNat(this.gas),
-                this.to,
+                this.to.toLowerCase(),
                 Bytes.fromNat(this.value),
-                this.from,
+                this.from.toLowerCase(),
                 this.input,
                 this.signatures,
             ]).slice(2)
@@ -170,9 +170,9 @@ class ValueTransferMemo extends AbstractTransaction {
             Bytes.fromNat(this.nonce),
             Bytes.fromNat(this.gasPrice),
             Bytes.fromNat(this.gas),
-            this.to,
+            this.to.toLowerCase(),
             Bytes.fromNat(this.value),
-            this.from,
+            this.from.toLowerCase(),
             this.input,
         ])
     }

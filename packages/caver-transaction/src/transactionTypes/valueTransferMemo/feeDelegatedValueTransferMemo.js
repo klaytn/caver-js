@@ -126,7 +126,7 @@ class FeeDelegatedValueTransferMemo extends AbstractFeeDelegatedTransaction {
 
     set input(input) {
         if (!input || !utils.isHex(input)) throw new Error(`Invalid input data ${input}`)
-        this._input = utils.toHex(input)
+        this._input = utils.addHexPrefix(input)
     }
 
     /**
@@ -153,12 +153,12 @@ class FeeDelegatedValueTransferMemo extends AbstractFeeDelegatedTransaction {
                 Bytes.fromNat(this.nonce),
                 Bytes.fromNat(this.gasPrice),
                 Bytes.fromNat(this.gas),
-                this.to,
+                this.to.toLowerCase(),
                 Bytes.fromNat(this.value),
-                this.from,
+                this.from.toLowerCase(),
                 this.input,
                 this.signatures,
-                this.feePayer,
+                this.feePayer.toLowerCase(),
                 this.feePayerSignatures,
             ]).slice(2)
         )
@@ -176,9 +176,9 @@ class FeeDelegatedValueTransferMemo extends AbstractFeeDelegatedTransaction {
             Bytes.fromNat(this.nonce),
             Bytes.fromNat(this.gasPrice),
             Bytes.fromNat(this.gas),
-            this.to,
+            this.to.toLowerCase(),
             Bytes.fromNat(this.value),
-            this.from,
+            this.from.toLowerCase(),
             this.input,
         ])
     }
