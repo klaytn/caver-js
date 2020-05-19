@@ -16,6 +16,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+const _ = require('lodash')
 const AbstractFeeDelegatedTransaction = require('./abstractFeeDelegatedTransaction')
 const utils = require('../../../caver-utils/src')
 
@@ -45,6 +46,11 @@ class AbstractFeeDelegatedWithRatioTransaction extends AbstractFeeDelegatedTrans
     }
 
     set feeRatio(fr) {
+        if (!_.isNumber(fr) && !utils.isHex(fr))
+            throw new Error(`Invalid type fo feeRatio: feeRatio should be number type or hex number string.`)
+        if (utils.hexToNumber(fr) <= 0 || utils.hexToNumber(fr) >= 100)
+            throw new Error(`Invalid feeRatio: feeRatio is out of range. [1, 99]`)
+
         this._feeRatio = utils.numberToHex(fr)
     }
 }
