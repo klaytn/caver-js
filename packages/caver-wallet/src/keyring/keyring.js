@@ -268,7 +268,7 @@ class Keyring {
      * @param {string|object} message A signed message string, a hash or an object that includes signed message string to recover.
      * @param {Array.<string>} signature v, r, s values.
      * @param {boolean} preFixed If the last parameter is true, the given message will NOT automatically be prefixed with "\x19Klaytn Signed Message:\n" + message.length + message, and assumed to be already prefixed.
-     * @return {Keyring}
+     * @return {string}
      */
     static recover(message, signature, preFixed = false) {
         if (_.isObject(message)) {

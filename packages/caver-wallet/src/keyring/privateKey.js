@@ -64,7 +64,7 @@ class PrivateKey {
     }
 
     /**
-     * signs with hashed data and returns `signsture`
+     * signs with hashed data and returns `signature`
      *
      * @param {string} messageHash The hash of data to sign.
      * @return {Array.<string>}
