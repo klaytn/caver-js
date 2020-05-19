@@ -314,7 +314,7 @@ describe('TxTypeAccountUpdate', () => {
             expect(() => new caver.transaction.accountUpdate(testUpdateObj)).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-540: If accountUpdate not define gas, return error', () => {
+        it('CAVERJS-UNIT-TRANSACTION-389: If accountUpdate not define gas, return error', () => {
             const testUpdateObj = Object.assign({}, txObjWithPublic)
             delete testUpdateObj.account
 
