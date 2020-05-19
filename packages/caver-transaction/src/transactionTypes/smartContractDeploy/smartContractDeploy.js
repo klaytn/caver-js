@@ -130,7 +130,7 @@ class SmartContractDeploy extends AbstractTransaction {
 
     set input(input) {
         if (!input || !utils.isHex(input)) throw new Error(`Invalid input data ${input}`)
-        this._input = utils.toHex(input)
+        this._input = utils.addHexPrefix(input)
     }
 
     /**
@@ -153,7 +153,7 @@ class SmartContractDeploy extends AbstractTransaction {
 
     set humanReadable(hr) {
         if (!_.isBoolean(hr)) throw new Error(`Invalid humanReadable ${hr}`)
-        this._humanReadable = utils.toHex(hr)
+        this._humanReadable = hr
     }
 
     /**
@@ -180,9 +180,9 @@ class SmartContractDeploy extends AbstractTransaction {
                 Bytes.fromNat(this.nonce),
                 Bytes.fromNat(this.gasPrice),
                 Bytes.fromNat(this.gas),
-                this.to,
+                this.to.toLowerCase(),
                 Bytes.fromNat(this.value),
-                this.from,
+                this.from.toLowerCase(),
                 this.input,
                 Bytes.fromNat(this.humanReadable === true ? '0x1' : '0x0'),
                 Bytes.fromNat(this.codeFormat),
@@ -203,9 +203,9 @@ class SmartContractDeploy extends AbstractTransaction {
             Bytes.fromNat(this.nonce),
             Bytes.fromNat(this.gasPrice),
             Bytes.fromNat(this.gas),
-            this.to,
+            this.to.toLowerCase(),
             Bytes.fromNat(this.value),
-            this.from,
+            this.from.toLowerCase(),
             this.input,
             Bytes.fromNat(this.humanReadable === true ? '0x1' : '0x0'),
             Bytes.fromNat(this.codeFormat),

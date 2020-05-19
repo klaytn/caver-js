@@ -124,11 +124,11 @@ class FeeDelegatedValueTransfer extends AbstractFeeDelegatedTransaction {
                 Bytes.fromNat(this.nonce),
                 Bytes.fromNat(this.gasPrice),
                 Bytes.fromNat(this.gas),
-                this.to,
+                this.to.toLowerCase(),
                 Bytes.fromNat(this.value),
-                this.from,
+                this.from.toLowerCase(),
                 this.signatures,
-                this.feePayer,
+                this.feePayer.toLowerCase(),
                 this.feePayerSignatures,
             ]).slice(2)
         )
@@ -146,9 +146,9 @@ class FeeDelegatedValueTransfer extends AbstractFeeDelegatedTransaction {
             Bytes.fromNat(this.nonce),
             Bytes.fromNat(this.gasPrice),
             Bytes.fromNat(this.gas),
-            this.to,
+            this.to.toLowerCase(),
             Bytes.fromNat(this.value),
-            this.from,
+            this.from.toLowerCase(),
         ])
     }
 }
