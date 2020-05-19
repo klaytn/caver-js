@@ -129,7 +129,7 @@ const refineSignatures = (sigArray, isLegacy = false) => {
             const sigString = sig.join('')
             if (!set.has(sigString)) {
                 set.add(sigString, true)
-                result.push(sig)
+                result.push(sig.map(vrs => utils.makeEven(vrs)))
             }
         }
     }
