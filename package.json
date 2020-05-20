@@ -4,7 +4,7 @@
   "description": "caver-js is a JavaScript API library that allows developers to interact with a Klaytn node",
   "main": "index.js",
   "scripts": {
-    "test": "npm run build && npm run transactionTest && npm run feeDelegatedTransactionTest && mocha test/packages/caver.utils.js && mocha test/packages/caver.klay.net.js && npm run accountTest && npm run serTest && npm run walletTest",
+    "test": "npm run build && npm run transactionTest && mocha test/packages/caver.utils.js && mocha test/packages/caver.klay.net.js && npm run accountTest && npm run serTest && npm run walletTest",
     "build-all": "gulp all",
     "build": "gulp default",
     "lint": "./node_modules/.bin/eslint './**/*.js'",
@@ -12,8 +12,7 @@
     "serTest": "mocha test/transactionType/serializationTest.js && mocha test/compressionPublicKey.js && mocha test/encodeContractDeploy.js && mocha test/parseAccountKey.js && mocha test/decodeTransaction.js",
     "accountTest": "mocha test/packages/caver.account.js && mocha test/packages/caver.account.accountKey.js",
     "walletTest": "mocha test/packages/caver.wallet.js && mocha test/packages/caver.wallet.keyring.js && mocha test/accountLib.js && mocha test/accounts.privateKeyToPublicKey.js && mocha test/accounts.recover.js && mocha test/packages/caver.klay.accounts.js && mocha test/isValidPrivateKey.js && mocha test/privateKeyToAccount.js",
-    "transactionTest": "mocha test/packages/caver.transaction/legacyTransaction.js && mocha test/packages/caver.transaction/valueTransfer.js && mocha test/packages/caver.transaction/valueTransferMemo.js && mocha test/packages/caver.transaction/accountUpdate.js && mocha test/packages/caver.transaction/smartContractDeploy.js && mocha test/packages/caver.transaction/smartContractExecution.js && mocha test/packages/caver.transaction/cancel.js && mocha test/packages/caver.transaction/chainDataAnchoring.js",
-    "feeDelegatedTransactionTest": "mocha test/packages/caver.transaction/feeDelegatedValueTransfer.js && mocha test/packages/caver.transaction/feeDelegatedValueTransferMemo.js",
+    "transactionTest": "mocha test/packages/caver.transaction/*.js",
     "txTest": "mocha test/methodErrorHandling.js && mocha test/sendSignedTransaction.js && mocha test/estimateComputationCost.js && mocha test/getTransactionReceipt.js && mocha test/setNonceWithPendingTag.js && mocha test/getTransaction.js && mocha test/setContractOptions.js && mocha test/encodeContractDeploy.js && mocha test/accounts.signTransaction.js && mocha test/sendTransactionCallback.js && mocha test/signWithMultiSig.js && mocha test/transactionType/legacyTransaction.js && mocha test/transactionType/valueTransfer* && mocha test/transactionType/accountUpdate.js && mocha test/transactionType/contract* && mocha test/transactionType/cancelTransaction.js && mocha test/transactionType/feeDelegated*",
     "etcTest": "mocha test/packages/caver.utils.js && mocha test/confirmationListener.js && mocha test/hashMessage.js && mocha test/iban.* && mocha test/randomHex.js && mocha test/sha3.js && mocha test/toChecksumAddress.js && mocha test/unitMap.js && mocha test/default* && mocha test/getNodeInfo.js && mocha test/eventEmitter.js && mocha test/packages/caver.klay.net.js && mocha test/getNetworkType.js && mocha test/invalidResponse.js && mocha test/isContractDeployment.js && mocha test/personal.js && mocha test/multiProviderTest.js && mocha test/subscription.js && mocha test/supportsSubscriptions.js && mocha test/contract.once.js && mocha test/setProvider.js",
     "accountKeyTest": "mocha test/scenarioTest/accountKeyPublic.js && mocha test/scenarioTest/accountKeyMultiSig.js && mocha test/scenarioTest/accountKeyRoleBased.js",
