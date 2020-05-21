@@ -110,6 +110,16 @@ const CODE_FORMAT = {
 }
 
 /**
+ * Returns transaction type number.
+ *
+ * @param {string} type - A transaction type string.
+ * @return {number}
+ */
+const getTypeInt = type => {
+    return utils.hexToNumber(TX_TYPE_TAG[type])
+}
+
+/**
  * Refines the array containing signatures.
  * - Removes duplicate signatures.
  * - Removes the default empty signature(['0x01', '0x', '0x']) included with other signatures.
@@ -177,4 +187,5 @@ module.exports = {
     refineSignatures,
     typeDetectionFromRLPEncoding,
     getCodeFormatTag,
+    getTypeInt,
 }

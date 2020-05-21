@@ -790,6 +790,7 @@ const transformSignaturesToObject = signatures => {
         const sigObj = {}
         if (_.isArray(sig)) {
             if (sig.length !== 3) throw new Error(`Failed to transform signatures to object: invalid length of signature (${sig.length})`)
+            if (isEmptySig(sig)) continue
             const [V, R, S] = sig
             sigObj.V = V
             sigObj.R = R
@@ -819,6 +820,9 @@ const transformSignaturesToObject = signatures => {
             throw new Error(`Failed to transform signatures to object: invalid signature ${sig}`)
         }
 
+        Object.keys(sigObj).map(k => {
+            sigObj[k] = trimLeadingZero(sigObj[k])
+        })
         ret.push(sigObj)
     }
 

@@ -36,6 +36,7 @@ const Klay = require('./packages/caver-klay')
 const Account = require('./packages/caver-account')
 const Wallet = require('./packages/caver-wallet')
 const Transaction = require('./packages/caver-transaction')
+const RPC = require('./packages/caver-rpc')
 
 const Method = require('./packages/caver-core-method')
 const middleware = require('./packages/caver-middleware')
@@ -65,6 +66,7 @@ function Caver(provider, net) {
 
     // ex) call `caver.klay.property` || `caver.klay.method(...)`
     this.klay = new Klay(this)
+    this.rpc = new RPC(this)
     this.middleware = middleware
 
     // overwrite package setProvider
@@ -72,6 +74,7 @@ function Caver(provider, net) {
     this.setProvider = (p, n) => {
         setProvider.apply(this, [p, n])
         _this.klay.setRequestManager(_this._requestManager)
+        _this.rpc.setRequestManager(_this._requestManager)
         return true
     }
 }

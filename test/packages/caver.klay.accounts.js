@@ -5202,11 +5202,12 @@ describe('caver.klay.accounts.signTransactionWithHash', () => {
             expect(sig[0].R).not.to.be.undefined
             expect(sig[0].S).not.to.be.undefined
 
-            const sigFromSignTransaction = await caver.klay.accounts.signTransaction(legacyTx, account.keys)
+            let sigFromSignTransaction = await caver.klay.accounts.signTransaction(legacyTx, account.keys)
+            sigFromSignTransaction = caver.utils.transformSignaturesToObject(sigFromSignTransaction.signatures)
 
-            expect(sig[0].V).to.equals(sigFromSignTransaction.signatures[0])
-            expect(sig[0].R).to.equals(sigFromSignTransaction.signatures[1])
-            expect(sig[0].S).to.equals(sigFromSignTransaction.signatures[2])
+            expect(sig[0].V).to.equals(sigFromSignTransaction.V)
+            expect(sig[0].R).to.equals(sigFromSignTransaction.R)
+            expect(sig[0].S).to.equals(sigFromSignTransaction.S)
         })
     })
 
@@ -5233,14 +5234,15 @@ describe('caver.klay.accounts.signTransactionWithHash', () => {
             expect(sig[1].R).not.to.be.undefined
             expect(sig[1].S).not.to.be.undefined
 
-            const sigFromSignTransaction = await caver.klay.accounts.signTransaction(vtTx, privateKeys)
+            let sigFromSignTransaction = await caver.klay.accounts.signTransaction(vtTx, privateKeys)
+            sigFromSignTransaction = caver.utils.transformSignaturesToObject(sigFromSignTransaction.signatures)
 
-            expect(sig[0].V).to.equals(sigFromSignTransaction.signatures[0][0])
-            expect(sig[0].R).to.equals(sigFromSignTransaction.signatures[0][1])
-            expect(sig[0].S).to.equals(sigFromSignTransaction.signatures[0][2])
-            expect(sig[1].V).to.equals(sigFromSignTransaction.signatures[1][0])
-            expect(sig[1].R).to.equals(sigFromSignTransaction.signatures[1][1])
-            expect(sig[1].S).to.equals(sigFromSignTransaction.signatures[1][2])
+            expect(sig[0].V).to.equals(sigFromSignTransaction[0].V)
+            expect(sig[0].R).to.equals(sigFromSignTransaction[0].R)
+            expect(sig[0].S).to.equals(sigFromSignTransaction[0].S)
+            expect(sig[1].V).to.equals(sigFromSignTransaction[1].V)
+            expect(sig[1].R).to.equals(sigFromSignTransaction[1].R)
+            expect(sig[1].S).to.equals(sigFromSignTransaction[1].S)
         })
     })
 
@@ -5254,11 +5256,12 @@ describe('caver.klay.accounts.signTransactionWithHash', () => {
             expect(sig[0].R).not.to.be.undefined
             expect(sig[0].S).not.to.be.undefined
 
-            const sigFromSignTransaction = await caver.klay.accounts.signTransaction(legacyTx, account.keys)
+            let sigFromSignTransaction = await caver.klay.accounts.signTransaction(legacyTx, account.keys)
+            sigFromSignTransaction = caver.utils.transformSignaturesToObject(sigFromSignTransaction.signatures)
 
-            expect(sig[0].V).to.equals(sigFromSignTransaction.signatures[0])
-            expect(sig[0].R).to.equals(sigFromSignTransaction.signatures[1])
-            expect(sig[0].S).to.equals(sigFromSignTransaction.signatures[2])
+            expect(sig[0].V).to.equals(sigFromSignTransaction.V)
+            expect(sig[0].R).to.equals(sigFromSignTransaction.R)
+            expect(sig[0].S).to.equals(sigFromSignTransaction.S)
         })
     })
 
@@ -5277,14 +5280,15 @@ describe('caver.klay.accounts.signTransactionWithHash', () => {
             expect(sig[1].R).not.to.be.undefined
             expect(sig[1].S).not.to.be.undefined
 
-            const sigFromSignTransaction = await caver.klay.accounts.signTransaction(vtTx, privateKeys)
+            let sigFromSignTransaction = await caver.klay.accounts.signTransaction(vtTx, privateKeys)
+            sigFromSignTransaction = caver.utils.transformSignaturesToObject(sigFromSignTransaction.signatures)
 
-            expect(sig[0].V).to.equals(sigFromSignTransaction.signatures[0][0])
-            expect(sig[0].R).to.equals(sigFromSignTransaction.signatures[0][1])
-            expect(sig[0].S).to.equals(sigFromSignTransaction.signatures[0][2])
-            expect(sig[1].V).to.equals(sigFromSignTransaction.signatures[1][0])
-            expect(sig[1].R).to.equals(sigFromSignTransaction.signatures[1][1])
-            expect(sig[1].S).to.equals(sigFromSignTransaction.signatures[1][2])
+            expect(sig[0].V).to.equals(sigFromSignTransaction[0].V)
+            expect(sig[0].R).to.equals(sigFromSignTransaction[0].R)
+            expect(sig[0].S).to.equals(sigFromSignTransaction[0].S)
+            expect(sig[1].V).to.equals(sigFromSignTransaction[1].V)
+            expect(sig[1].R).to.equals(sigFromSignTransaction[1].R)
+            expect(sig[1].S).to.equals(sigFromSignTransaction[1].S)
         })
     })
 
@@ -5311,11 +5315,12 @@ describe('caver.klay.accounts.signTransactionWithHash', () => {
 
             const tx = Object.assign({}, legacyTx)
             delete tx.chainId
-            const sigFromSignTransaction = await caver.klay.accounts.signTransaction(tx, account.keys)
+            let sigFromSignTransaction = await caver.klay.accounts.signTransaction(tx, account.keys)
+            sigFromSignTransaction = caver.utils.transformSignaturesToObject(sigFromSignTransaction.signatures)
 
-            expect(sig[0].V).to.equals(sigFromSignTransaction.signatures[0])
-            expect(sig[0].R).to.equals(sigFromSignTransaction.signatures[1])
-            expect(sig[0].S).to.equals(sigFromSignTransaction.signatures[2])
+            expect(sig[0].V).to.equals(sigFromSignTransaction.V)
+            expect(sig[0].R).to.equals(sigFromSignTransaction.R)
+            expect(sig[0].S).to.equals(sigFromSignTransaction.S)
         })
     })
 
@@ -5336,14 +5341,15 @@ describe('caver.klay.accounts.signTransactionWithHash', () => {
 
             const tx = Object.assign({}, vtTx)
             delete tx.chainId
-            const sigFromSignTransaction = await caver.klay.accounts.signTransaction(tx, privateKeys)
+            let sigFromSignTransaction = await caver.klay.accounts.signTransaction(tx, privateKeys)
+            sigFromSignTransaction = caver.utils.transformSignaturesToObject(sigFromSignTransaction.signatures)
 
-            expect(sig[0].V).to.equals(sigFromSignTransaction.signatures[0][0])
-            expect(sig[0].R).to.equals(sigFromSignTransaction.signatures[0][1])
-            expect(sig[0].S).to.equals(sigFromSignTransaction.signatures[0][2])
-            expect(sig[1].V).to.equals(sigFromSignTransaction.signatures[1][0])
-            expect(sig[1].R).to.equals(sigFromSignTransaction.signatures[1][1])
-            expect(sig[1].S).to.equals(sigFromSignTransaction.signatures[1][2])
+            expect(sig[0].V).to.equals(sigFromSignTransaction[0].V)
+            expect(sig[0].R).to.equals(sigFromSignTransaction[0].R)
+            expect(sig[0].S).to.equals(sigFromSignTransaction[0].S)
+            expect(sig[1].V).to.equals(sigFromSignTransaction[1].V)
+            expect(sig[1].R).to.equals(sigFromSignTransaction[1].R)
+            expect(sig[1].S).to.equals(sigFromSignTransaction[1].S)
         })
     })
 
