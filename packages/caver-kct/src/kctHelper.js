@@ -83,9 +83,9 @@ function validateDeployParameterForKIP17(obj) {
 }
 
 // KIP-7 token contract source code
-// caver-js/packages/caver-klay/caver-klay-kct/contract/token/KIP7/KIP7Token.sol
+// caver-js/packages/caver-klay/caver-kct/src/contract/token/KIP7/KIP7Token.sol
 // The ABI and bytecode below are built via the following command.
-// solc --abi --bin --allow-paths . ./packages/caver-klay/caver-klay-kct/contract/token/KIP7/KIP7Token.sol
+// solc --abi --bin --allow-paths . ./packages/caver-klay/caver-kct/src/contract/token/KIP7/KIP7Token.sol
 const kip7JsonInterface = [
     {
         constant: true,

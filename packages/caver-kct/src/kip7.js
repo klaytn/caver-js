@@ -19,7 +19,7 @@
 const _ = require('lodash')
 const BigNumber = require('bignumber.js')
 
-const Contract = require('../caver-klay-contract')
+const Contract = require('../../caver-contract')
 const {
     validateDeployParameterForKIP7,
     determineSendParams,

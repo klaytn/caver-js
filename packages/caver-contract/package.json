@@ -1,5 +1,5 @@
 {
-  "name": "caver-klay-contract",
+  "name": "caver-contract",
   "version": "1.0.0",
   "description": "This is a sub package of [caver-js][repo]",
   "main": "src/index.js",
