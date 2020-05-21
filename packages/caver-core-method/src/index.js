@@ -262,38 +262,51 @@ const buildSendTxCallbackFunc = (defer, method, payload, isSendTx) => (err, resu
     }
 }
 
-const buildSendSignedTxFunc = (method, payload, sendTxCallback) => sign => {
+const buildSendSignedTxFunc = (method, payload, sendTxCallback) => signed => {
+    const rawTransaction = signed.rawTransaction ? signed.rawTransaction : signed
     const signedPayload = _.extend({}, payload, {
         method: 'klay_sendRawTransaction',
-        params: [sign.rawTransaction],
+        params: [rawTransaction],
     })
 
     method.requestManager.send(signedPayload, sendTxCallback)
 }
 
 const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, method) => {
+    const methodName = payload.method
     // Logic for handling multiple cases of parameters in sendSignedTransaction.
     // 1. Object containing rawTransaction
     //    : call 'klay_sendRawTransaction' with RLP encoded transaction(rawTransaction) in object
     // 2. A transaction object containing signatures or feePayerSignatures
     //    : call 'getRawTransactionWithSignatures', then call 'klay_sendRawTransaction' with result of getRawTransactionWithSignatures
-    if (method && method.accounts && payload.method === 'klay_sendRawTransaction') {
-        const transaction = payload.params[0]
-        if (typeof transaction !== 'string' && _.isObject(transaction)) {
-            if (transaction.rawTransaction) {
-                return sendSignedTx(transaction)
+    if (method && methodName === 'klay_sendRawTransaction') {
+        // The existence of accounts in the method means the implementation before the common architecture.
+        if (method.accounts) {
+            const transaction = payload.params[0]
+            if (typeof transaction !== 'string' && _.isObject(transaction)) {
+                if (transaction.rawTransaction) {
+                    return sendSignedTx(transaction)
+                }
+                return method.accounts
+                    .getRawTransactionWithSignatures(transaction)
+                    .then(sendSignedTx)
+                    .catch(e => {
+                        sendTxCallback(e)
+                    })
             }
-            return method.accounts
-                .getRawTransactionWithSignatures(transaction)
-                .then(sendSignedTx)
-                .catch(e => {
-                    sendTxCallback(e)
-                })
+        } else {
+            const transaction = payload.params[0]
+            if (!_.isString(transaction) && _.isObject(transaction) && _.isFunction(transaction.getRLPEncoding)) {
+                return sendSignedTx(transaction.getRLPEncoding())
+            }
         }
     }
 
+    // In the previous implementation of common architecture,
+    // if there was an account in the in-memory wallet before requesting to send or sign a transaction to the node,
+    // it was handled by using it.
     if (method && method.accounts && method.accounts.wallet && method.accounts.wallet.length) {
-        switch (payload.method) {
+        switch (methodName) {
             case 'klay_sendTransaction': {
                 const tx = payload.params[0]
 
@@ -376,6 +389,28 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
                 break
             }
         }
+    }
+
+    // When sending a request to send or sign a transaction using a key stored in a Klaytn node,
+    // the variable names inside the transaction must be properly formatted.
+    // { _from: '0x..', _signatures: ['0x..', '0x..', '0x..'] } -> { from: '0x..', signatures: { V: '0x..', R: '0x..', S: '0x..'} }
+    if (
+        methodName === 'klay_sendTransaction' ||
+        methodName === 'klay_sendTransactionAsFeePayer' ||
+        methodName === 'klay_signTransaction' ||
+        methodName === 'klay_signTransactionAsFeePayer'
+    ) {
+        const tx = {}
+        Object.keys(payload.params[0]).map(k => {
+            let key = k
+            if (key.startsWith('_')) key = key.slice(1)
+            if (key === 'signatures' || key === 'feePayerSignatures') {
+                tx[key] = utils.transformSignaturesToObject(payload.params[0][k])
+            } else {
+                tx[key] = payload.params[0][k]
+            }
+        })
+        payload.params[0] = tx
     }
 
     return method.requestManager.send(payload, sendTxCallback)

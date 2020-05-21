@@ -199,7 +199,7 @@ const Klay = function Klay(...args) {
         // subscriptions
         new Subscriptions({
             name: 'subscribe',
-            type: 'eth',
+            type: 'klay',
             subscriptions: {
                 newBlockHeaders: {
                     // TODO rename on RPC side?
