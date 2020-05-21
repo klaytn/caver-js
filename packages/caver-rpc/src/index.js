@@ -16,8 +16,8 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const KlayRPC = require('./klayRPC')
-const NetRPC = require('./netRPC')
+const Klay = require('./klay')
+const Net = require('./net')
 const core = require('../../caver-core')
 
 class RPC {
@@ -45,8 +45,8 @@ class RPC {
             _this.setRequestManager(_this._requestManager)
         }
 
-        this.klay = new KlayRPC(this)
-        this.net = new NetRPC(this)
+        this.klay = new Klay(this)
+        this.net = new Net(this)
     }
 }
 
