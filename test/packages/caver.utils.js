@@ -1339,7 +1339,7 @@ describe('caver.utils.transformSignaturesToObject', () => {
                 '0x277b9c6e97dfa6fdbcc15c201b5f7e05a2ef03f6247d9b9c541f98b8c4f1041a',
             ],
             [
-                '0x0fea',
+                '0xfea',
                 '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f8',
                 '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
             ],
@@ -1358,7 +1358,7 @@ describe('caver.utils.transformSignaturesToObject', () => {
         const signatureString =
             '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f815111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7fea'
         const expectedSignatures = {
-            V: '0x0fea',
+            V: '0xfea',
             R: '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f8',
             S: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
         }
@@ -1375,12 +1375,12 @@ describe('caver.utils.transformSignaturesToObject', () => {
         ]
         const expectedSignatures = [
             {
-                V: '0x0fea',
+                V: '0xfea',
                 R: '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f8',
                 S: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
             },
             {
-                V: '0x07f6',
+                V: '0x7f6',
                 R: '0x53fe704c30cbddd8481035b01d0696120e960418e1d4f0f7e88d3de9354c6986',
                 S: '0x299fdedce9ea38d62a69a63462af32122f3db70623a40fe9bfe815ae6ebfeb7d',
             },
@@ -1395,7 +1395,7 @@ describe('caver.utils.transformSignaturesToObject', () => {
 
     it('CAVERJS-UNIT-ETC-187: should convert object(lowercase key) format of signatures to object with single signature', () => {
         const signature = {
-            v: '0x0fea',
+            v: '0xfea',
             r: '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f8',
             s: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
         }
@@ -1409,7 +1409,7 @@ describe('caver.utils.transformSignaturesToObject', () => {
 
     it('CAVERJS-UNIT-ETC-188: should convert object(uppercase key) format of signatures to object with single signature', () => {
         const signature = {
-            V: '0x0fea',
+            V: '0xfea',
             R: '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f8',
             S: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
         }
@@ -1424,12 +1424,12 @@ describe('caver.utils.transformSignaturesToObject', () => {
     it('CAVERJS-UNIT-ETC-189: should convert object format of signatures to object with multiple signatures', () => {
         const signatures = [
             {
-                v: '0x0fea',
+                v: '0xfea',
                 r: '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f8',
                 s: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
             },
             {
-                V: '0x07f6',
+                V: '0x7f6',
                 R: '0x53fe704c30cbddd8481035b01d0696120e960418e1d4f0f7e88d3de9354c6986',
                 S: '0x299fdedce9ea38d62a69a63462af32122f3db70623a40fe9bfe815ae6ebfeb7d',
             },
@@ -1464,7 +1464,7 @@ describe('caver.utils.transformSignaturesToObject', () => {
 
     it('CAVERJS-UNIT-ETC-191: should throw error when input does not have enough signature information', () => {
         let signature = {
-            V: '0x0fea',
+            V: '0xfea',
             S: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
         }
         expect(() => caver.utils.transformSignaturesToObject(signature)).to.throws(
@@ -1472,7 +1472,7 @@ describe('caver.utils.transformSignaturesToObject', () => {
         )
 
         signature = {
-            V: '0x0fea',
+            V: '0xfea',
             invalidKey: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
         }
         expect(() => caver.utils.transformSignaturesToObject(signature)).to.throws(
