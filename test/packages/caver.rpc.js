@@ -406,4 +406,47 @@ describe('caver.rpc.klay', () => {
             )
         }).timeout(100000)
     })
+
+    context('CAVERJS-UNIT-RPC-005: caver.rpc.klay.sendTransactionAsFeePayer', () => {
+        it('should send transaction to Klaytn node as a fee payer', async () => {
+            const passphrase = 'passphrase'
+            let keyringToImport = caver.wallet.keyring.generate()
+            keyringToImport = caver.wallet.add(keyringToImport)
+
+            // Send KLAY to test keyring
+            const valueTransfer = new caver.transaction.valueTransfer({
+                from: sender.address,
+                to: keyringToImport.address,
+                value: caver.utils.toPeb(1, 'KLAY'),
+                gas: 30000,
+            })
+            await valueTransfer.signWithKeys(sender)
+            await caver.rpc.klay.sendRawTransaction(valueTransfer)
+
+            // Import key in Klaytn node
+            const address = await caver.klay.personal.importRawKey(keyringToImport.keys[0][0].privateKey, passphrase)
+            expect(address.toLowerCase()).to.equals(keyringToImport.address.toLowerCase())
+
+            const isUnlock = await caver.klay.personal.unlockAccount(keyringToImport.address, passphrase, 100)
+            expect(typeof isUnlock).to.equals('boolean')
+            expect(isUnlock).to.be.true
+
+            const feeDelegated = new caver.transaction.feeDelegatedValueTransfer({
+                from: sender.address,
+                to: keyringToImport.address,
+                value: 1,
+                gas: 50000,
+                feePayer: keyringToImport.address,
+                nonce: await caver.rpc.klay.getTransactionCount(sender.address),
+            })
+
+            await feeDelegated.signWithKeys(sender)
+
+            const result = await caver.rpc.klay.signTransactionAsFeePayer(feeDelegated)
+            const signed = await feeDelegated.signFeePayerWithKeys(keyringToImport)
+            expect(result.tx.feePayerSignatures[0].toString()).to.equal(
+                caver.utils.transformSignaturesToObject(signed.feePayerSignatures).toString()
+            )
+        }).timeout(100000)
+    })
 })
