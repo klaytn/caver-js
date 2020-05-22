@@ -486,7 +486,7 @@ describe('caver.wallet.keyring.encrypt', () => {
             const keyring = generateDecoupledKeyring()
             const klaytnWalletKey = keyring.getKlaytnWalletKey()
 
-            const result = caver.wallet.keyring.encrypt(klaytnWalletKey, password, { address: klaytnWalletKey.address })
+            const result = caver.wallet.keyring.encrypt(klaytnWalletKey, password, { address: keyring.address })
             validateKeystore(result, password, { address: keyring.address, expectedKey: keyring.keys })
         })
     })
