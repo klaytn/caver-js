@@ -170,14 +170,15 @@ class Keyring {
         } else if (_.isString(key)) {
             if (options.address) {
                 if (utils.isKlaytnWalletKey(key)) {
-                    const fromKlaytnWalletKey = Keyring.createFromKlaytnWalletKey(key)
-                    if (fromKlaytnWalletKey.address.toLowerCase() !== options.address.toLowerCase()) {
+                    keyring = Keyring.createFromKlaytnWalletKey(key)
+                    if (keyring.address.toLowerCase() !== options.address.toLowerCase()) {
                         throw new Error(
-                            `The address defined in options(${options.address}) does not match the address of KlaytnWalletKey(${fromKlaytnWalletKey.address}) entered as a parameter.`
+                            `The address defined in options(${options.address}) does not match the address of KlaytnWalletKey(${keyring.address}) entered as a parameter.`
                         )
                     }
+                } else {
+                    keyring = Keyring.createWithSingleKey(options.address, key)
                 }
-                keyring = Keyring.createWithSingleKey(options.address, key)
             } else {
                 keyring = Keyring.createFromPrivateKey(key)
             }
