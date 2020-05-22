@@ -715,7 +715,7 @@ describe('caver.wallet.keyring.encrypt', () => {
 
 describe('caver.wallet.keyring.encryptV3', () => {
     context('CAVERJS-UNIT-KEYRING-038: input: private key string, password', () => {
-        it('should encrypted as v4Keystore', () => {
+        it('should encrypted as v3Keystore', () => {
             const password = 'password'
             const privateKey = caver.wallet.generatePrivateKey()
             const keyring = caver.wallet.keyring.createFromPrivateKey(privateKey)
@@ -726,7 +726,7 @@ describe('caver.wallet.keyring.encryptV3', () => {
     })
 
     context('CAVERJS-UNIT-KEYRING-039: input: private key string, password, {address}', () => {
-        it('should encrypted as v4Keystore', () => {
+        it('should encrypted as v3Keystore', () => {
             const password = 'password'
             const keyring = generateDecoupledKeyring()
             const privateKey = keyring.keys[0][0].privateKey
@@ -735,14 +735,38 @@ describe('caver.wallet.keyring.encryptV3', () => {
             validateKeystore(result, password, { address: keyring.address, expectedKey: privateKey }, 3)
         })
     })
+
     context('CAVERJS-UNIT-KEYRING-040: input: klaytnWalletKey, password', () => {
-        it('should encrypted as v4Keystore', () => {
+        it('should encrypted as v3Keystore', () => {
             const password = 'password'
             const keyring = generateDecoupledKeyring()
             const klaytnWalletKey = keyring.getKlaytnWalletKey()
 
             const result = caver.wallet.keyring.encryptV3(klaytnWalletKey, password)
             validateKeystore(result, password, { address: keyring.address, expectedKey: keyring.keys }, 3)
+        })
+    })
+
+    context('CAVERJS-UNIT-KEYRING-145: input: klaytnWalletKey, password, {address}', () => {
+        it('should encrypted as v3Keystore', () => {
+            const password = 'password'
+            const keyring = generateDecoupledKeyring()
+            const klaytnWalletKey = keyring.getKlaytnWalletKey()
+
+            const result = caver.wallet.keyring.encryptV3(klaytnWalletKey, password, { address: keyring.address })
+            validateKeystore(result, password, { address: keyring.address, expectedKey: keyring.keys }, 3)
+        })
+    })
+
+    context('CAVERJS-UNIT-KEYRING-146: input: klaytnWalletKey, password, {invalid address}', () => {
+        it('should throw error', () => {
+            const password = 'password'
+            const keyring = generateDecoupledKeyring()
+            const klaytnWalletKey = keyring.getKlaytnWalletKey()
+            const invalidAddress = '0x6726d0c6fc895e8db37039d94b440563118f3137'
+
+            const errormsg = `The address defined in options(${invalidAddress}) does not match the address of KlaytnWalletKey(${keyring.address}) entered as a parameter.`
+            expect(() => caver.wallet.keyring.encryptV3(klaytnWalletKey, password, { address: invalidAddress })).to.throws(errormsg)
         })
     })
 
