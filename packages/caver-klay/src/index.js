@@ -34,9 +34,9 @@ const utils = require('../../caver-utils')
 const Net = require('../../caver-net')
 
 const Personal = require('../caver-klay-personal')
-const BaseContract = require('../caver-klay-contract')
-const KIP7 = require('../caver-klay-kct/kip7')
-const KIP17 = require('../caver-klay-kct/kip17')
+const BaseContract = require('../../caver-contract')
+const KIP7 = require('../../caver-kct/src/kip7')
+const KIP17 = require('../../caver-kct/src/kip17')
 const Accounts = require('../caver-klay-accounts')
 const abi = require('../../caver-abi')
 const getNetworkType = require('./getNetworkType.js')
@@ -161,7 +161,7 @@ const Klay = function Klay(...args) {
         BaseContract.setProvider.apply(this, arguments)
     }
 
-    // make our proxy Contract inherit from caver-klay-contract so that it has all
+    // make our proxy Contract inherit from caver-contract so that it has all
     // the right functionality and so that instanceof and friends work properly
     Contract.prototype = Object.create(BaseContract.prototype)
     Contract.prototype.constructor = Contract
@@ -215,7 +215,7 @@ const Klay = function Klay(...args) {
                     params: 1,
                     inputFormatter: [formatters.inputLogFormatter],
                     outputFormatter: formatters.outputLogFormatter,
-                    // DUBLICATE, also in caver-klay-contract
+                    // DUBLICATE, also in caver-contract
                     subscriptionHandler: function(output) {
                         this.emit('data', output)
 
