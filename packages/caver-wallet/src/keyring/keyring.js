@@ -202,12 +202,23 @@ class Keyring {
             throw new Error(`Invalid parameter. key should be a private key string, KlaytnWalletKey or instance of Keyring`)
         }
 
-        const keyring =
-            key instanceof Keyring
-                ? key
-                : options.address
-                ? Keyring.createWithSingleKey(options.address, key)
-                : Keyring.createFromPrivateKey(key)
+        let keyring
+        if (key instanceof Keyring) {
+            keyring = key
+        } else if (options.address) {
+            if (utils.isKlaytnWalletKey(key)) {
+                keyring = Keyring.createFromKlaytnWalletKey(key)
+                if (keyring.address.toLowerCase() !== options.address.toLowerCase()) {
+                    throw new Error(
+                        `The address defined in options(${options.address}) does not match the address of KlaytnWalletKey(${keyring.address}) entered as a parameter.`
+                    )
+                }
+            } else {
+                keyring = Keyring.createWithSingleKey(options.address, key)
+            }
+        } else {
+            keyring = Keyring.createFromPrivateKey(key)
+        }
 
         return keyring.encryptV3(password, options)
     }
