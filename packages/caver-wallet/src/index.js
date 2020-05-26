@@ -19,7 +19,6 @@
 const _ = require('lodash')
 const Keyring = require('./keyring/keyring')
 const TransactionHasher = require('../../caver-transaction/src/transactionHasher/transactionHasher')
-const { KEY_ROLE } = require('./keyring/keyringHelper')
 const utils = require('../../caver-utils/src')
 
 /**
@@ -193,27 +192,11 @@ class KeyringContainer {
      * @return {Transaction}
      */
     async signWithKey(address, transaction, index = 0, hasher = TransactionHasher.getHashForSignature) {
-        if (!transaction.from || transaction.from === '0x') transaction.from = address
-        if (transaction.from.toLowerCase() !== address.toLowerCase())
-            throw new Error(
-                `transaction.from ${transaction.from.toLowerCase()} is different from the given address ${address.toLowerCase()}.`
-            )
-
-        // User parameter input cases
-        // (address transaction) / (address transaction index) / (address transaction index hasher)
-        if (_.isFunction(index)) throw new Error(`In order to pass a custom hasher, use the third parameter.`)
-
-        await transaction.fillTransaction()
-        const hash = hasher(transaction)
-        const role = determineRoleToSign(transaction)
-
         const keyring = this.getKeyring(address)
         if (keyring === undefined) throw new Error(`Failed to find keyring from wallet with ${address}`)
-        const sig = keyring.signWithKey(hash, transaction.chainId, role, index)
+        const signed = await transaction.signWithKey(keyring, index, hasher)
 
-        transaction.appendSignatures(sig)
-
-        return transaction
+        return signed
     }
 
     /**
@@ -225,23 +208,11 @@ class KeyringContainer {
      * @return {Transaction}
      */
     async signWithKeys(address, transaction, hasher = TransactionHasher.getHashForSignature) {
-        if (!transaction.from || transaction.from === '0x') transaction.from = address
-        if (transaction.from.toLowerCase() !== address.toLowerCase())
-            throw new Error(
-                `transaction.from ${transaction.from.toLowerCase()} is different from the given address ${address.toLowerCase()}.`
-            )
-
-        await transaction.fillTransaction()
-        const hash = hasher(transaction)
-        const role = determineRoleToSign(transaction)
-
         const keyring = this.getKeyring(address)
         if (keyring === undefined) throw new Error(`Failed to find the keyring from the wallet with the given address: ${address}`)
-        const sigs = keyring.signWithKeys(hash, transaction.chainId, role)
+        const signed = await transaction.signWithKeys(keyring, hasher)
 
-        transaction.appendSignatures(sigs)
-
-        return transaction
+        return signed
     }
 
     /**
@@ -251,25 +222,14 @@ class KeyringContainer {
      * @param {Transaction} transaction A transaction object. This should be `FEE_DELEGATED` type.
      * @param {number} [index] An index of key to use for signing.
      * @param {function} [hasher] A function to return hash of transaction. In order to use a custom hasher, the index must be defined.
-     * @return {string}
+     * @return {Transaction}
      */
     async signFeePayerWithKey(address, transaction, index = 0, hasher = TransactionHasher.getHashForFeePayerSignature) {
-        // User parameter input cases
-        // (address transaction) / (address transaction index) / (address transaction index hasher)
-        if (_.isFunction(index)) throw new Error(`In order to pass a custom hasher, use the third parameter.`)
-
-        if (!transaction.feePayer || transaction.feePayer === '0x') transaction.feePayer = address
-
-        await transaction.fillTransaction()
-        const hash = hasher(transaction)
-
         const keyring = this.getKeyring(address)
         if (keyring === undefined) throw new Error(`Failed to find keyring from wallet with ${address}`)
-        const sig = keyring.signWithKey(hash, transaction.chainId, KEY_ROLE.RoleFeePayerKey, index)
+        const signed = await transaction.signFeePayerWithKey(keyring, index, hasher)
 
-        transaction.appendFeePayerSignatures(sig)
-
-        return hash
+        return signed
     }
 
     /**
@@ -278,26 +238,15 @@ class KeyringContainer {
      * @param {string} address An address of keyring in keyringContainer.
      * @param {Transaction} transaction A transaction object. This should be `FEE_DELEGATED` type.
      * @param {function} [hasher] A function to return hash of transaction.
-     * @return {string}
+     * @return {Transaction}
      */
     async signFeePayerWithKeys(address, transaction, hasher = TransactionHasher.getHashForFeePayerSignature) {
-        if (!transaction.feePayer || transaction.feePayer === '0x') transaction.feePayer = address
-
-        await transaction.fillTransaction()
-        const hash = hasher(transaction)
-
         const keyring = this.getKeyring(address)
         if (keyring === undefined) throw new Error(`Failed to find keyring from wallet with ${address}`)
-        const sigs = keyring.signWithKeys(hash, transaction.chainId, KEY_ROLE.RoleFeePayerKey)
+        const signed = await transaction.signFeePayerWithKeys(keyring, hasher)
 
-        transaction.appendFeePayerSignatures(sigs)
-
-        return hash
+        return signed
     }
-}
-
-function determineRoleToSign(tx) {
-    return tx.type.includes('ACCOUNT_UPDATE') ? KEY_ROLE.RoleAccountUpdateKey : KEY_ROLE.RoleTransactionKey
 }
 
 module.exports = KeyringContainer

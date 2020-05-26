@@ -30,9 +30,12 @@ const expect = chai.expect
 const testRPCURL = require('../testrpc')
 
 const Caver = require('../../index.js')
-const utils = require('../../packages/caver-utils')
 const Keyring = require('../../packages/caver-wallet/src/keyring/keyring')
 const PrivateKey = require('../../packages/caver-wallet/src/keyring/privateKey')
+
+const ValueTransfer = require('../../packages/caver-transaction/src/transactionTypes/valueTransfer/valueTransfer')
+const FeeDelegatedValueTransfer = require('../../packages/caver-transaction/src/transactionTypes/valueTransfer/feeDelegatedValueTransfer')
+const AccountUpdate = require('../../packages/caver-transaction/src/transactionTypes/accountUpdate/accountUpdate')
 
 const { generateDecoupledKeyring, generateMultiSigKeyring, generateRoleBasedKeyring } = require('./utils')
 
@@ -377,7 +380,7 @@ describe('wallet.signWithKey', () => {
         it('should sign to transaction and return hash', async () => {
             const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
-            const vt = new mockValueTransfer(keyring)
+            const vt = generateValueTransfer(keyring)
 
             const fillFormatSpy = sinon.spy(vt, 'fillTransaction')
             const signSpy = sinon.spy(keyring, 'signWithKey')
@@ -395,7 +398,7 @@ describe('wallet.signWithKey', () => {
         it('should sign to transaction and return hash', async () => {
             const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
-            const vt = new mockValueTransfer(keyring)
+            const vt = generateValueTransfer(keyring)
 
             const fillFormatSpy = sinon.spy(vt, 'fillTransaction')
             const signSpy = sinon.spy(keyring, 'signWithKey')
@@ -413,7 +416,7 @@ describe('wallet.signWithKey', () => {
         it('should sign to transaction and return hash', async () => {
             const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
-            const vt = new mockValueTransfer(keyring)
+            const vt = generateValueTransfer(keyring)
 
             const txHash = '0xd4aab6590bdb708d1d3eafe95a967dafcd2d7cde197e512f3f0b8158e7b65fd1'
 
@@ -426,7 +429,7 @@ describe('wallet.signWithKey', () => {
         it('should sign to transaction and return hash', async () => {
             const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
-            const vt = new mockValueTransfer(keyring)
+            const vt = generateValueTransfer(keyring)
 
             const txHash = '0xd4aab6590bdb708d1d3eafe95a967dafcd2d7cde197e512f3f0b8158e7b65fd1'
 
@@ -446,7 +449,7 @@ describe('wallet.signWithKey', () => {
         it('should sign to transaction and return hash', async () => {
             const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
-            const updateTx = new mockAccountUpdate(keyring)
+            const updateTx = generateAccountUpdate(keyring)
 
             const txHash = '0xd4aab6590bdb708d1d3eafe95a967dafcd2d7cde197e512f3f0b8158e7b65fd1'
 
@@ -466,7 +469,7 @@ describe('wallet.signWithKey', () => {
         it('should throw error when index is invalid', async () => {
             const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
-            const vt = new mockValueTransfer(keyring)
+            const vt = generateValueTransfer(keyring)
 
             const invalidIndex = 3
             const expectedError = `Invalid index(${invalidIndex}): index must be less than the length of keys(${invalidIndex}).`
@@ -480,7 +483,7 @@ describe('wallet.signWithKey', () => {
             it('should throw error when transaction hash is invalid', async () => {
                 const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
-                const vt = new mockValueTransfer(keyring)
+                const vt = generateValueTransfer(keyring)
 
                 const invalidTxHash = 'invalidTxHash'
 
@@ -494,7 +497,7 @@ describe('wallet.signWithKey', () => {
         it('should throw error when keyring is not existed in wallet', async () => {
             const keyring = generateRoleBasedKeyring([3, 2, 4])
 
-            const vt = new mockValueTransfer(keyring)
+            const vt = generateValueTransfer(keyring)
 
             const expectedError = `Failed to find keyring from wallet with ${keyring.address}`
             await expect(caver.wallet.signWithKey(keyring.address, vt)).to.be.rejectedWith(expectedError)
@@ -507,7 +510,7 @@ describe('wallet.signWithKeys', () => {
         it('should sign to transaction and return hash', async () => {
             const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
-            const vt = new mockValueTransfer(keyring)
+            const vt = generateValueTransfer(keyring)
 
             const fillFormatSpy = sinon.spy(vt, 'fillTransaction')
             const signSpy = sinon.spy(keyring, 'signWithKeys')
@@ -525,7 +528,7 @@ describe('wallet.signWithKeys', () => {
         it('should sign to transaction and return hash', async () => {
             const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
-            const vt = new mockValueTransfer(keyring)
+            const vt = generateValueTransfer(keyring)
 
             const txHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
 
@@ -545,7 +548,7 @@ describe('wallet.signWithKeys', () => {
         it('should sign to transaction and return hash', async () => {
             const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
-            const updateTx = new mockAccountUpdate(keyring)
+            const updateTx = generateAccountUpdate(keyring)
 
             const txHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
 
@@ -565,7 +568,7 @@ describe('wallet.signWithKeys', () => {
         it('should throw error when transaction hash is invalid', async () => {
             const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
-            const vt = new mockValueTransfer(keyring)
+            const vt = generateValueTransfer(keyring)
 
             const invalidTxHash = 'invalidTxHash'
 
@@ -578,7 +581,7 @@ describe('wallet.signWithKeys', () => {
         it('should throw error when keyring is not existed in wallet', async () => {
             const keyring = generateRoleBasedKeyring([3, 2, 4])
 
-            const vt = new mockValueTransfer(keyring)
+            const vt = generateValueTransfer(keyring)
 
             const expectedError = `Failed to find the keyring from the wallet with the given address: ${keyring.address}`
             await expect(caver.wallet.signWithKeys(keyring.address, vt)).to.be.rejectedWith(expectedError)
@@ -625,15 +628,14 @@ describe('wallet.signFeePayerWithKey', () => {
         it('should sign to transaction with roleFeePayerKey and return hash', async () => {
             const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
-            const vt = new mockFeeDelegatedValueTransfer(keyring)
+            const vt = generateFeeDelegatedValueTransfer(keyring)
 
             const fillFormatSpy = sinon.spy(vt, 'fillTransaction')
             const signSpy = sinon.spy(keyring, 'signWithKey')
             const appendSpy = sinon.spy(vt, 'appendFeePayerSignatures')
 
-            const hash = await caver.wallet.signFeePayerWithKey(keyring.address, vt)
+            await caver.wallet.signFeePayerWithKey(keyring.address, vt)
 
-            expect(utils.isTxHashStrict(hash)).to.be.true
             expect(fillFormatSpy).to.have.been.calledOnce
             expect(signSpy).to.have.been.calledOnce
             expect(appendSpy).to.have.been.calledOnce
@@ -644,15 +646,14 @@ describe('wallet.signFeePayerWithKey', () => {
         it('should sign to transaction with roleFeePayerKey and return hash', async () => {
             const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
-            const vt = new mockFeeDelegatedValueTransfer(keyring)
+            const vt = generateFeeDelegatedValueTransfer(keyring)
 
             const fillFormatSpy = sinon.spy(vt, 'fillTransaction')
             const signSpy = sinon.spy(keyring, 'signWithKey')
             const appendSpy = sinon.spy(vt, 'appendFeePayerSignatures')
 
-            const hash = await caver.wallet.signFeePayerWithKey(keyring.address, vt, 2)
+            await caver.wallet.signFeePayerWithKey(keyring.address, vt, 2)
 
-            expect(utils.isTxHashStrict(hash)).to.be.true
             expect(fillFormatSpy).to.have.been.calledOnce
             expect(signSpy).to.have.been.calledOnce
             expect(appendSpy).to.have.been.calledOnce
@@ -663,7 +664,7 @@ describe('wallet.signFeePayerWithKey', () => {
         it('should sign to transaction with roleFeePayerKey and return hash', async () => {
             const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
-            const vt = new mockFeeDelegatedValueTransfer(keyring)
+            const vt = generateFeeDelegatedValueTransfer(keyring)
 
             const txHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
 
@@ -676,7 +677,7 @@ describe('wallet.signFeePayerWithKey', () => {
         it('should sign to transaction with roleFeePayerKey and return hash', async () => {
             const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
-            const vt = new mockFeeDelegatedValueTransfer(keyring)
+            const vt = generateFeeDelegatedValueTransfer(keyring)
 
             const txHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
 
@@ -684,9 +685,8 @@ describe('wallet.signFeePayerWithKey', () => {
             const signSpy = sinon.spy(keyring, 'signWithKey')
             const appendSpy = sinon.spy(vt, 'appendFeePayerSignatures')
 
-            const hash = await caver.wallet.signFeePayerWithKey(keyring.address, vt, 1, () => txHash)
+            await caver.wallet.signFeePayerWithKey(keyring.address, vt, 1, () => txHash)
 
-            expect(utils.isTxHashStrict(hash)).to.be.true
             expect(fillFormatSpy).to.have.been.calledOnce
             expect(signSpy).to.have.been.calledWith(txHash, '0x7e3', 2, 1)
             expect(appendSpy).to.have.been.calledOnce
@@ -697,7 +697,7 @@ describe('wallet.signFeePayerWithKey', () => {
         it('should throw error when index is invalid', async () => {
             const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
-            const vt = new mockFeeDelegatedValueTransfer(keyring)
+            const vt = generateFeeDelegatedValueTransfer(keyring)
 
             const invalidIndex = 4
             const expectedError = `Invalid index(${invalidIndex}): index must be less than the length of keys(${invalidIndex}).`
@@ -711,7 +711,7 @@ describe('wallet.signFeePayerWithKey', () => {
             it('should throw error when transaction hash is invalid', async () => {
                 const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
-                const vt = new mockFeeDelegatedValueTransfer(keyring)
+                const vt = generateFeeDelegatedValueTransfer(keyring)
 
                 const invalidTxHash = 'invalidTxHash'
 
@@ -727,7 +727,7 @@ describe('wallet.signFeePayerWithKey', () => {
         it('should throw error when keyring is not existed in wallet', async () => {
             const keyring = generateRoleBasedKeyring([3, 2, 4])
 
-            const vt = new mockFeeDelegatedValueTransfer(keyring)
+            const vt = generateFeeDelegatedValueTransfer(keyring)
 
             const expectedError = `Failed to find keyring from wallet with ${keyring.address}`
             await expect(caver.wallet.signFeePayerWithKey(keyring.address, vt)).to.be.rejectedWith(expectedError)
@@ -740,15 +740,14 @@ describe('wallet.signFeePayerWithKeys', () => {
         it('should sign to transaction with keys in roleFeePayerKey and return hash', async () => {
             const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
-            const vt = new mockFeeDelegatedValueTransfer(keyring)
+            const vt = generateFeeDelegatedValueTransfer(keyring)
 
             const fillFormatSpy = sinon.spy(vt, 'fillTransaction')
             const signSpy = sinon.spy(keyring, 'signWithKeys')
             const appendSpy = sinon.spy(vt, 'appendFeePayerSignatures')
 
-            const hash = await caver.wallet.signFeePayerWithKeys(keyring.address, vt)
+            await caver.wallet.signFeePayerWithKeys(keyring.address, vt)
 
-            expect(utils.isTxHashStrict(hash)).to.be.true
             expect(fillFormatSpy).to.have.been.calledOnce
             expect(signSpy).to.have.been.calledOnce
             expect(appendSpy).to.have.been.calledOnce
@@ -759,7 +758,7 @@ describe('wallet.signFeePayerWithKeys', () => {
         it('should sign to transaction with keys in roleFeePayerKey and return hash', async () => {
             const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
-            const vt = new mockFeeDelegatedValueTransfer(keyring)
+            const vt = generateFeeDelegatedValueTransfer(keyring)
 
             const txHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
 
@@ -767,9 +766,8 @@ describe('wallet.signFeePayerWithKeys', () => {
             const signSpy = sinon.spy(keyring, 'signWithKeys')
             const appendSpy = sinon.spy(vt, 'appendFeePayerSignatures')
 
-            const hash = await caver.wallet.signFeePayerWithKeys(keyring.address, vt, () => txHash)
+            await caver.wallet.signFeePayerWithKeys(keyring.address, vt, () => txHash)
 
-            expect(utils.isTxHashStrict(hash)).to.be.true
             expect(fillFormatSpy).to.have.been.calledOnce
             expect(signSpy).to.have.been.calledWith(txHash, '0x7e3', 2)
             expect(appendSpy).to.have.been.calledOnce
@@ -780,7 +778,7 @@ describe('wallet.signFeePayerWithKeys', () => {
         it('should throw error when transaction hash is invalid', async () => {
             const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
-            const vt = new mockFeeDelegatedValueTransfer(keyring)
+            const vt = generateFeeDelegatedValueTransfer(keyring)
 
             const invalidTxHash = 'invalidTxHash'
 
@@ -793,7 +791,7 @@ describe('wallet.signFeePayerWithKeys', () => {
         it('should throw error when keyring is not existed in wallet', async () => {
             const keyring = generateRoleBasedKeyring([3, 2, 4])
 
-            const vt = new mockFeeDelegatedValueTransfer(keyring)
+            const vt = generateFeeDelegatedValueTransfer(keyring)
 
             const expectedError = `Failed to find keyring from wallet with ${keyring.address}`
             await expect(caver.wallet.signFeePayerWithKeys(keyring.address, vt)).to.be.rejectedWith(expectedError)
@@ -801,46 +799,37 @@ describe('wallet.signFeePayerWithKeys', () => {
     })
 })
 
-class mockValueTransfer {
-    constructor(keyring) {
-        this.type = 'VALUE_TRANSFER'
-        this.from = keyring.address
-        this.to = keyring.address
-        this.value = '0x1'
-        this.gas = '0x15f90'
-        this.chainId = '0x7e3'
-        this.nonce = '0x0'
-        this.gasPrice = '0x5d21dba00'
-        this.signatures = []
-
-        this.getRLPEncodingForSignature = () => '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
-        this.fillTransaction = () => {}
-        this.appendSignatures = () => {}
-    }
+function generateValueTransfer(keyring) {
+    return new ValueTransfer({
+        from: keyring.address,
+        to: keyring.address,
+        value: '0x1',
+        gas: '0x15f90',
+        chainId: '0x7e3',
+        nonce: '0x0',
+        gasPrice: '0x5d21dba00',
+    })
 }
 
-class mockAccountUpdate {
-    constructor(keyring) {
-        this.type = 'ACCOUNT_UPDATE'
-        this.from = keyring.address
-        this.account = keyring.toAccount()
-        this.gas = '0x15f90'
-        this.chainId = '0x7e3'
-        this.nonce = '0x0'
-        this.gasPrice = '0x5d21dba00'
-
-        this.getRLPEncodingForSignature = () => '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
-        this.fillTransaction = () => {}
-        this.appendSignatures = () => {}
-    }
+function generateFeeDelegatedValueTransfer(keyring) {
+    return new FeeDelegatedValueTransfer({
+        from: keyring.address,
+        to: keyring.address,
+        value: '0x1',
+        gas: '0x15f90',
+        chainId: '0x7e3',
+        nonce: '0x0',
+        gasPrice: '0x5d21dba00',
+    })
 }
 
-class mockFeeDelegatedValueTransfer extends mockValueTransfer {
-    constructor(keyring) {
-        super(keyring)
-        this.type = 'FEE_DELEGATED_VALUE_TRANSFER'
-
-        this.getRLPEncodingForFeePayerSignature = () => '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
-        this.appendFeePayerSignatures = () => {}
-    }
+function generateAccountUpdate(keyring) {
+    return new AccountUpdate({
+        from: keyring.address,
+        account: keyring.toAccount(),
+        gas: '0x15f90',
+        chainId: '0x7e3',
+        nonce: '0x0',
+        gasPrice: '0x5d21dba00',
+    })
 }
