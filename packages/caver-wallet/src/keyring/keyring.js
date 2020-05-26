@@ -17,7 +17,7 @@
 */
 
 const _ = require('lodash')
-const scrypt = require('scrypt-shim')
+const scrypt = require('@web3-js/scrypt-shim')
 const uuid = require('uuid')
 const cryp = typeof global === 'undefined' ? require('crypto-browserify') : require('crypto')
 const AccountLib = require('eth-lib/lib/account')
