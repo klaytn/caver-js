@@ -68,7 +68,7 @@ class Keyring {
      *
      * @param {number} num A length of keys.
      * @param {string} entropy A random string to increase entropy.
-     * @return {Keyring}
+     * @return {Array.<String>}
      */
     static generateMultipleKeys(num, entropy) {
         if (num === undefined || !_.isNumber(num) || _.isString(num)) {
@@ -89,7 +89,7 @@ class Keyring {
      *
      * @param {Array.<number>} numArr An array containing the number of keys for each role.
      * @param {string} entropy A random string to increase entropy.
-     * @return {Keyring}
+     * @return {Array.<Array.<String>>}
      */
     static generateRoleBasedKeys(numArr, entropy) {
         if (numArr === undefined || !_.isArray(numArr) || _.isString(numArr)) {
