@@ -53,11 +53,14 @@ class KeyringContainer {
      *
      * @param {number} numberOfKeyrings The number of accounts to create.
      * @param {string} [entropy] A random string to increase entropy. If undefined, a random string will be generated using randomHex.
+     * @return {Array.<string>}
      */
     generate(numberOfKeyrings, entropy) {
+        const addresses = []
         for (let i = 0; i < numberOfKeyrings; ++i) {
-            this.add(Keyring.generate(entropy))
+            addresses.push(this.add(Keyring.generate(entropy)).address)
         }
+        return addresses
     }
 
     /**

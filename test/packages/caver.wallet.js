@@ -89,8 +89,13 @@ describe('wallet.generate', () => {
         it('should generate keyring instances and add to in-memory wallet', () => {
             const addSpy = sinon.spy(caver.wallet.keyringContainer, 'add')
 
-            caver.wallet.generate(10)
+            const addresses = caver.wallet.generate(10)
 
+            for (const address of addresses) {
+                expect(caver.utils.isAddress(address)).to.be.true
+            }
+
+            expect(addresses.length).to.equal(10)
             expect(caver.wallet.length).to.equal(10)
             expect(addSpy).to.have.been.callCount(10)
         })
@@ -101,8 +106,13 @@ describe('wallet.generate', () => {
             const addSpy = sinon.spy(caver.wallet.keyringContainer, 'add')
             const entropy = caver.utils.randomHex(32)
 
-            caver.wallet.generate(10, entropy)
+            const addresses = caver.wallet.generate(10, entropy)
 
+            for (const address of addresses) {
+                expect(caver.utils.isAddress(address)).to.be.true
+            }
+
+            expect(addresses.length).to.equal(10)
             expect(caver.wallet.length).to.equal(10)
             expect(addSpy).to.have.been.callCount(10)
         })
