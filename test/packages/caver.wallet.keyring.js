@@ -170,6 +170,145 @@ describe('caver.wallet.keyring.generate', () => {
     })
 })
 
+describe('caver.wallet.generateSingleKey', () => {
+    context('CAVERJS-UNIT-KEYRING-147: input: no parameter', () => {
+        it('should return valid private key string', () => {
+            const result = caver.wallet.keyring.generateSingleKey()
+            expect(utils.isValidPrivateKey(result)).to.be.true
+        })
+    })
+
+    context('CAVERJS-UNIT-KEYRING-148: input: entropy', () => {
+        it('should return valid private key string', () => {
+            const entropy = caver.utils.randomHex(32)
+
+            const result = caver.wallet.keyring.generateSingleKey(entropy)
+            expect(utils.isValidPrivateKey(result)).to.be.true
+        })
+    })
+})
+
+describe('caver.wallet.generateMultipleKeys', () => {
+    context('CAVERJS-UNIT-KEYRING-149: input: number of keys', () => {
+        it('should return valid an array of private key strings', () => {
+            const result = caver.wallet.keyring.generateMultipleKeys(3)
+            expect(result.length).to.be.equal(3)
+            for (const p of result) {
+                expect(utils.isValidPrivateKey(p)).to.be.true
+            }
+        })
+    })
+
+    context('CAVERJS-UNIT-KEYRING-150: input: number of keys, entropy', () => {
+        it('should return valid an array of private key strings', () => {
+            const entropy = caver.utils.randomHex(32)
+
+            const result = caver.wallet.keyring.generateMultipleKeys(3, entropy)
+            expect(result.length).to.be.equal(3)
+            for (const p of result) {
+                expect(utils.isValidPrivateKey(p)).to.be.true
+            }
+        })
+    })
+
+    context('CAVERJS-UNIT-KEYRING-151: input: no parameter', () => {
+        it('should return error', () => {
+            const expectedError = `To generate random multiple private keys, the number of keys should be defined.`
+            expect(() => caver.wallet.keyring.generateMultipleKeys()).to.throw(expectedError)
+        })
+    })
+
+    context('CAVERJS-UNIT-KEYRING-152: input: entropy', () => {
+        it('should return error', () => {
+            const entropy = caver.utils.randomHex(32)
+            const expectedError = `To generate random multiple private keys, the number of keys should be defined.`
+            expect(() => caver.wallet.keyring.generateMultipleKeys(entropy)).to.throw(expectedError)
+        })
+    })
+})
+
+describe('caver.wallet.generateRoleBasedKeys', () => {
+    context('CAVERJS-UNIT-KEYRING-153: input: an array of the number of keys(less than role)', () => {
+        it('should return valid a role-based private key strings', () => {
+            const result = caver.wallet.keyring.generateRoleBasedKeys([3])
+
+            expect(result.length).to.be.equal(3)
+            expect(result[0].length).to.be.equal(3)
+            expect(result[1].length).to.be.equal(0)
+            expect(result[2].length).to.be.equal(0)
+
+            for (const p of result[0]) {
+                expect(utils.isValidPrivateKey(p)).to.be.true
+            }
+        })
+    })
+
+    context('CAVERJS-UNIT-KEYRING-154: input: an array of the number of keys', () => {
+        it('should return valid a role-based private key strings', () => {
+            const result = caver.wallet.keyring.generateRoleBasedKeys([3, 1, 2])
+
+            expect(result.length).to.be.equal(3)
+            expect(result[0].length).to.be.equal(3)
+            expect(result[1].length).to.be.equal(1)
+            expect(result[2].length).to.be.equal(2)
+
+            for (let i = 0; i < result.length; i++) {
+                for (const p of result[i]) {
+                    expect(utils.isValidPrivateKey(p)).to.be.true
+                }
+            }
+        })
+    })
+
+    context('CAVERJS-UNIT-KEYRING-155: input: number of keys, entropy', () => {
+        it('should return valid a role-based private key strings', () => {
+            const entropy = caver.utils.randomHex(32)
+
+            const result = caver.wallet.keyring.generateRoleBasedKeys([2, 2, 2], entropy)
+
+            expect(result.length).to.be.equal(3)
+            expect(result[0].length).to.be.equal(2)
+            expect(result[1].length).to.be.equal(2)
+            expect(result[2].length).to.be.equal(2)
+
+            for (let i = 0; i < result.length; i++) {
+                for (const p of result[i]) {
+                    expect(utils.isValidPrivateKey(p)).to.be.true
+                }
+            }
+        })
+    })
+
+    context('CAVERJS-UNIT-KEYRING-156: input: no parameter', () => {
+        it('should return error', () => {
+            const expectedError = `To generate random role-based private keys, an array containing the number of keys for each role should be defined.`
+            expect(() => caver.wallet.keyring.generateRoleBasedKeys()).to.throw(expectedError)
+        })
+    })
+
+    context('CAVERJS-UNIT-KEYRING-157: input: entropy', () => {
+        it('should return error', () => {
+            const entropy = caver.utils.randomHex(32)
+            const expectedError = `To generate random role-based private keys, an array containing the number of keys for each role should be defined.`
+            expect(() => caver.wallet.keyring.generateRoleBasedKeys(entropy)).to.throw(expectedError)
+        })
+    })
+
+    context('CAVERJS-UNIT-KEYRING-158: input: not array', () => {
+        it('should return error', () => {
+            const expectedError = `To generate random role-based private keys, an array containing the number of keys for each role should be defined.`
+            expect(() => caver.wallet.keyring.generateRoleBasedKeys(3)).to.throw(expectedError)
+        })
+    })
+
+    context('CAVERJS-UNIT-KEYRING-159: input: too long array', () => {
+        it('should return error', () => {
+            const expectedError = `Unsupported role. The length of array should be less than ${caver.wallet.keyring.role.RoleLast}.`
+            expect(() => caver.wallet.keyring.generateRoleBasedKeys([1, 1, 1, 1, 1])).to.throw(expectedError)
+        })
+    })
+})
+
 describe('caver.wallet.keyring.createFromPrivateKey', () => {
     context('CAVERJS-UNIT-KEYRING-005: input: single private key', () => {
         it('should create Keyring instance from private key string', () => {
@@ -255,11 +394,7 @@ describe('caver.wallet.keyring.create', () => {
     context('CAVERJS-UNIT-KEYRING-013: input: address, multiple private key strings', () => {
         it('should create keyring instances with parameters and add to in-memory wallet', () => {
             const address = caver.wallet.keyring.generate().address
-            const multiplePrivateKeys = [
-                caver.wallet.generatePrivateKey(),
-                caver.wallet.generatePrivateKey(),
-                caver.wallet.generatePrivateKey(),
-            ]
+            const multiplePrivateKeys = caver.wallet.keyring.generateMultipleKeys(3)
             const created = caver.wallet.keyring.create(address, multiplePrivateKeys)
             validateKeyring(created, { expectedAddress: address, expectedKey: multiplePrivateKeys })
         })
@@ -268,11 +403,7 @@ describe('caver.wallet.keyring.create', () => {
     context('CAVERJS-UNIT-KEYRING-014: input: address, private keys by roles(without empty role)', () => {
         it('should create keyring instances with parameters and add to in-memory wallet', () => {
             const address = caver.wallet.keyring.generate().address
-            const roleBasedPrivateKeys = [
-                [caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey()],
-                [caver.wallet.generatePrivateKey()],
-                [caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey()],
-            ]
+            const roleBasedPrivateKeys = caver.wallet.keyring.generateRoleBasedKeys([3, 1, 2])
             const created = caver.wallet.keyring.create(address, roleBasedPrivateKeys)
             validateKeyring(created, { expectedAddress: address, expectedKey: roleBasedPrivateKeys })
         })
@@ -281,7 +412,7 @@ describe('caver.wallet.keyring.create', () => {
     context('CAVERJS-UNIT-KEYRING-015: input: address, private keys by roles(with empty role)', () => {
         it('should create keyring instances with parameters and add to in-memory wallet', () => {
             const address = caver.wallet.keyring.generate().address
-            const roleBasedPrivateKeys = [[], [], [caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey()]]
+            const roleBasedPrivateKeys = caver.wallet.keyring.generateRoleBasedKeys([0, 0, 2])
             const created = caver.wallet.keyring.create(address, roleBasedPrivateKeys)
             validateKeyring(created, { expectedAddress: address, expectedKey: roleBasedPrivateKeys })
         })
@@ -291,9 +422,9 @@ describe('caver.wallet.keyring.create', () => {
         it('should throw error if key is invalid format', () => {
             const address = caver.wallet.keyring.generate().address
             const invalidKey = [
-                caver.wallet.generatePrivateKey(),
+                caver.wallet.keyring.generateSingleKey(),
                 [],
-                [caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey()],
+                [caver.wallet.keyring.generateSingleKey(), caver.wallet.keyring.generateSingleKey()],
             ]
             const expectedError = `Unsupported key type: ${typeof invalidKey}`
 
@@ -339,7 +470,7 @@ describe('caver.wallet.keyring.createWithSingleKey', () => {
     context('CAVERJS-UNIT-KEYRING-020: input: valid address, multiple private key array', () => {
         it('should throw error', () => {
             const keyring = caver.wallet.keyring.generate()
-            const arr = [caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey()]
+            const arr = caver.wallet.keyring.generateMultipleKeys(2)
 
             const errormsg = `Invalid format of parameter. Use 'fromMultipleKey' or 'fromRoleBasedKey' for two or more keys.`
 
@@ -355,7 +486,7 @@ describe('caver.wallet.keyring.createWithMultipleKey', () => {
     context('CAVERJS-UNIT-KEYRING-021: input: valid address, valid private key array', () => {
         it('should create Keyring instance', () => {
             const keyring = caver.wallet.keyring.generate()
-            const arr = [caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey()]
+            const arr = caver.wallet.keyring.generateMultipleKeys(2)
 
             const result = caver.wallet.keyring.createWithMultipleKey(keyring.address, arr)
             validateKeyring(result, { expectedKey: arr, expectedAddress: keyring.address })
@@ -376,13 +507,13 @@ describe('caver.wallet.keyring.createWithMultipleKey', () => {
     context('CAVERJS-UNIT-KEYRING-023: input: valid address, invalid format of private key array', () => {
         it('should throw error', () => {
             const keyring = caver.wallet.keyring.generate()
-            let arr = [[caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey()]]
+            let arr = caver.wallet.keyring.generateRoleBasedKeys([2])
 
             const errormsg = `Invalid format of parameter. 'keyArray' should be an array of private key strings.`
 
             expect(() => caver.wallet.keyring.createWithMultipleKey(keyring.address, arr)).to.throws(errormsg)
 
-            arr = [caver.wallet.generatePrivateKey(), [caver.wallet.generatePrivateKey()]]
+            arr = [caver.wallet.keyring.generateSingleKey(), [caver.wallet.keyring.generateSingleKey()]]
             expect(() => caver.wallet.keyring.createWithMultipleKey(keyring.address, arr)).to.throws(errormsg)
 
             expect(() => caver.wallet.keyring.createWithMultipleKey(keyring.address, undefined)).to.throws(errormsg)
@@ -395,11 +526,7 @@ describe('caver.wallet.keyring.createWithRoleBasedKey', () => {
     context('CAVERJS-UNIT-KEYRING-024: input: valid address, valid role based private key array', () => {
         it('should create Keyring instance', () => {
             const keyring = caver.wallet.keyring.generate()
-            const arr = [
-                [caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey()],
-                [caver.wallet.generatePrivateKey()],
-                [caver.wallet.generatePrivateKey()],
-            ]
+            const arr = caver.wallet.keyring.generateRoleBasedKeys([2, 1, 1])
 
             const result = caver.wallet.keyring.createWithRoleBasedKey(keyring.address, arr)
             validateKeyring(result, { expectedKey: arr, expectedAddress: keyring.address })
@@ -410,9 +537,9 @@ describe('caver.wallet.keyring.createWithRoleBasedKey', () => {
         it('should throw error if the role-based key does not define the key to be used for the role in the form of an array.', () => {
             const keyring = caver.wallet.keyring.generate()
             const arr = [
-                [caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey()],
-                caver.wallet.generatePrivateKey(),
-                caver.wallet.generatePrivateKey(),
+                [caver.wallet.keyring.generateSingleKey(), caver.wallet.keyring.generateSingleKey()],
+                caver.wallet.keyring.generateSingleKey(),
+                caver.wallet.keyring.generateSingleKey(),
             ]
 
             const expectedError = `Invalid format of parameter. 'roledBasedKeyArray' should be in the form of an array defined as an array for the keys to be used for each role.`
@@ -434,12 +561,12 @@ describe('caver.wallet.keyring.createWithRoleBasedKey', () => {
     context('CAVERJS-UNIT-KEYRING-027: input: valid address, invalid format of role based private key array (1 dimensional array)', () => {
         it('should throw error', () => {
             const keyring = caver.wallet.keyring.generate()
-            const arr = [caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey()]
+            const arr = caver.wallet.keyring.generateMultipleKeys(2)
 
             const errormsg = `Invalid format of parameter. 'roledBasedKeyArray' should be in the form of an array defined as an array for the keys to be used for each role.`
 
             expect(() => caver.wallet.keyring.createWithRoleBasedKey(keyring.address, arr)).to.throws(errormsg)
-            expect(() => caver.wallet.keyring.createWithRoleBasedKey(keyring.address, caver.wallet.generatePrivateKey())).to.throws(
+            expect(() => caver.wallet.keyring.createWithRoleBasedKey(keyring.address, caver.wallet.keyring.generateSingleKey())).to.throws(
                 errormsg
             )
         })
@@ -450,7 +577,7 @@ describe('caver.wallet.keyring.encrypt', () => {
     context('CAVERJS-UNIT-KEYRING-028: input: private key string, password', () => {
         it('should encrypted as v4Keystore', () => {
             const password = 'password'
-            const privateKey = caver.wallet.generatePrivateKey()
+            const privateKey = caver.wallet.keyring.generateSingleKey()
             const keyring = caver.wallet.keyring.createFromPrivateKey(privateKey)
 
             const result = caver.wallet.keyring.encrypt(privateKey, password)
@@ -507,7 +634,7 @@ describe('caver.wallet.keyring.encrypt', () => {
     context('CAVERJS-UNIT-KEYRING-031: input: multiple private key, password, {address}', () => {
         it('should encrypted as v4Keystore', () => {
             const password = 'password'
-            const privateKeys = [caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey()]
+            const privateKeys = caver.wallet.keyring.generateMultipleKeys(3)
             const address = caver.wallet.keyring.generate().address
 
             const result = caver.wallet.keyring.encrypt(privateKeys, password, { address })
@@ -518,7 +645,7 @@ describe('caver.wallet.keyring.encrypt', () => {
     context('CAVERJS-UNIT-KEYRING-032: input: multiple private key, password', () => {
         it('should throw error', () => {
             const password = 'password'
-            const privateKeys = [caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey()]
+            const privateKeys = caver.wallet.keyring.generateMultipleKeys(3)
 
             const errormsg = `The address must be defined inside the options object to encrypt multiple keys.`
 
@@ -529,16 +656,7 @@ describe('caver.wallet.keyring.encrypt', () => {
     context('CAVERJS-UNIT-KEYRING-033: input: role based private key, password, {address}', () => {
         it('should encrypted as v4Keystore', () => {
             const password = 'password'
-            const privateKeys = [
-                [caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey()],
-                [caver.wallet.generatePrivateKey()],
-                [
-                    caver.wallet.generatePrivateKey(),
-                    caver.wallet.generatePrivateKey(),
-                    caver.wallet.generatePrivateKey(),
-                    caver.wallet.generatePrivateKey(),
-                ],
-            ]
+            const privateKeys = caver.wallet.keyring.generateRoleBasedKeys([2, 1, 4])
             const address = caver.wallet.keyring.generate().address
 
             const result = caver.wallet.keyring.encrypt(privateKeys, password, { address })
@@ -549,11 +667,7 @@ describe('caver.wallet.keyring.encrypt', () => {
     context('CAVERJS-UNIT-KEYRING-034: input: role based private key(with empty role), password, {address}', () => {
         it('should encrypted as v4Keystore', () => {
             const password = 'password'
-            const privateKeys = [
-                [caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey()],
-                [],
-                [caver.wallet.generatePrivateKey()],
-            ]
+            const privateKeys = caver.wallet.keyring.generateRoleBasedKeys([2, 0, 1])
             const address = caver.wallet.keyring.generate().address
 
             const result = caver.wallet.keyring.encrypt(privateKeys, password, { address })
@@ -564,11 +678,7 @@ describe('caver.wallet.keyring.encrypt', () => {
     context('CAVERJS-UNIT-KEYRING-035: input: role based private key, password', () => {
         it('should throw error', () => {
             const password = 'password'
-            const privateKeys = [
-                [caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey()],
-                [caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey()],
-                [caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey()],
-            ]
+            const privateKeys = caver.wallet.keyring.generateRoleBasedKeys([2, 2, 2])
 
             const errormsg = `The address must be defined inside the options object to encrypt multiple keys.`
 
@@ -717,7 +827,7 @@ describe('caver.wallet.keyring.encryptV3', () => {
     context('CAVERJS-UNIT-KEYRING-038: input: private key string, password', () => {
         it('should encrypted as v3Keystore', () => {
             const password = 'password'
-            const privateKey = caver.wallet.generatePrivateKey()
+            const privateKey = caver.wallet.keyring.generateSingleKey()
             const keyring = caver.wallet.keyring.createFromPrivateKey(privateKey)
 
             const result = caver.wallet.keyring.encryptV3(privateKey, password)
@@ -773,7 +883,7 @@ describe('caver.wallet.keyring.encryptV3', () => {
     context('CAVERJS-UNIT-KEYRING-041: input: multiple private key, password, {address}', () => {
         it('should throw error', () => {
             const password = 'password'
-            const privateKeys = [caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey(), caver.wallet.generatePrivateKey()]
+            const privateKeys = caver.wallet.keyring.generateMultipleKeys(3)
             const address = caver.wallet.keyring.generate().address
 
             const errormsg = `Invalid parameter. key should be a private key string, KlaytnWalletKey or instance of Keyring`
@@ -797,7 +907,7 @@ describe('caver.wallet.keyring.decrypt', () => {
     context('CAVERJS-UNIT-KEYRING-043: coupled keyring', () => {
         it('should return valid keyring', () => {
             const password = 'password'
-            const privateKey = caver.wallet.generatePrivateKey()
+            const privateKey = caver.wallet.keyring.generateSingleKey()
             const keyring = caver.wallet.keyring.createFromPrivateKey(privateKey)
 
             const encrypted = caver.wallet.keyring.encrypt(privateKey, password)

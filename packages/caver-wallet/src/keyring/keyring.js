@@ -17,7 +17,7 @@
 */
 
 const _ = require('lodash')
-const scrypt = require('scrypt-shim')
+const scrypt = require('@web3-js/scrypt-shim')
 const uuid = require('uuid')
 const cryp = typeof global === 'undefined' ? require('crypto-browserify') : require('crypto')
 const AccountLib = require('eth-lib/lib/account')
@@ -47,6 +47,67 @@ class Keyring {
     static generate(entropy) {
         const random = AccountLib.create(entropy || utils.randomHex(32))
         return Keyring.createWithSingleKey(random.address, random.privateKey)
+    }
+
+    /**
+     * generates a decoupled keyring instance
+     *
+     * `caver.wallet.keyring.generateSingleKey()`
+     *
+     * @param {string} entropy A random string to increase entropy.
+     * @return {String}
+     */
+    static generateSingleKey(entropy) {
+        return AccountLib.create(entropy || utils.randomHex(32)).privateKey
+    }
+
+    /**
+     * generates an keyring instance with multiple keys
+     *
+     * `caver.wallet.keyring.generateMultipleKeys()`
+     *
+     * @param {number} num A length of keys.
+     * @param {string} entropy A random string to increase entropy.
+     * @return {Array.<String>}
+     */
+    static generateMultipleKeys(num, entropy) {
+        if (num === undefined || !_.isNumber(num) || _.isString(num)) {
+            throw new Error(`To generate random multiple private keys, the number of keys should be defined.`)
+        }
+
+        const randomKeys = []
+        for (let i = 0; i < num; i++) {
+            randomKeys.push(AccountLib.create(entropy || utils.randomHex(32)).privateKey)
+        }
+        return randomKeys
+    }
+
+    /**
+     * generates an keyring instance with role-based keys
+     *
+     * `caver.wallet.keyring.generateRoleBasedKeys()`
+     *
+     * @param {Array.<number>} numArr An array containing the number of keys for each role.
+     * @param {string} entropy A random string to increase entropy.
+     * @return {Array.<Array.<String>>}
+     */
+    static generateRoleBasedKeys(numArr, entropy) {
+        if (numArr === undefined || !_.isArray(numArr) || _.isString(numArr)) {
+            throw new Error(
+                `To generate random role-based private keys, an array containing the number of keys for each role should be defined.`
+            )
+        }
+        if (numArr.length > KEY_ROLE.RoleLast) {
+            throw new Error(`Unsupported role. The length of array should be less than ${KEY_ROLE.RoleLast}.`)
+        }
+
+        const randomKeys = [[], [], []]
+        for (let i = 0; i < numArr.length; i++) {
+            for (let j = 0; j < numArr[i]; j++) {
+                randomKeys[i].push(AccountLib.create(entropy || utils.randomHex(32)).privateKey)
+            }
+        }
+        return randomKeys
     }
 
     /**

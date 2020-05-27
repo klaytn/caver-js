@@ -34,7 +34,8 @@ global.rootRequire = name => require(`${__dirname}/packages/${name}/src/index.js
 const { packageInit, providers } = require('./packages/caver-core')
 const Klay = require('./packages/caver-klay')
 const Account = require('./packages/caver-account')
-const Wallet = require('./packages/caver-wallet')
+const KeyringContainer = require('./packages/caver-wallet')
+const Keyring = require('./packages/caver-wallet/src/keyring/keyring')
 const Transaction = require('./packages/caver-transaction')
 const RPC = require('./packages/caver-rpc')
 
@@ -60,7 +61,8 @@ function Caver(provider, net) {
     this.Method = Method
 
     this.account = Account
-    this.wallet = new Wallet()
+    this.wallet = new KeyringContainer()
+    this.wallet.keyring = Keyring
 
     this.transaction = Transaction
 
