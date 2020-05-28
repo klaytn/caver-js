@@ -66,7 +66,7 @@ const Contract = function Contract(jsonInterface, address, options) {
     const args = Array.prototype.slice.call(arguments)
 
     if (!(this instanceof Contract)) {
-        throw new Error('Please use the "new" keyword to instantiate a caver.klay.contract() object!')
+        throw new Error('Please use the "new" keyword to instantiate a caver.contract() or caver.klay.Contract() object!')
     }
 
     // sets _requestmanager
