@@ -135,7 +135,7 @@ class SmartContractExecution extends AbstractTransaction {
     }
 
     set data(data) {
-        this.input = data
+        this._input = data
     }
 
     /**

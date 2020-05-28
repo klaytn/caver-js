@@ -158,7 +158,7 @@ class FeeDelegatedSmartContractDeployWithRatio extends AbstractFeeDelegatedWithR
     }
 
     set data(data) {
-        this.input = data
+        this._input = data
     }
 
     /**
