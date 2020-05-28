@@ -52,9 +52,17 @@ function validateParams(tx) {
 
     if (tx.type !== TX_TYPE_STRING.TxTypeLegacyTransaction && !tx.from) {
         error = new Error('"from" is missing')
-    } else if (tx.from && !utils.isAddress(tx.from)) {
-        error = new Error(`Invalid address of from: ${tx.from}`)
-    } else if (tx.gas === undefined && tx.gasLimit === undefined) {
+    } else if (tx.from) {
+        if (tx.from === '0x') {
+            if (tx.type !== TX_TYPE_STRING.TxTypeLegacyTransaction) {
+                error = new Error(`Invalid address of from: ${tx.from}`)
+            }
+        } else if (!utils.isAddress(tx.from)) {
+            error = new Error(`Invalid address of from: ${tx.from}`)
+        }
+    }
+
+    if (tx.gas === undefined && tx.gasLimit === undefined) {
         error = new Error('"gas" is missing')
     } else if (tx.nonce < 0 || tx.gas < 0 || tx.gasPrice < 0 || tx.chainId < 0) {
         error = new Error('gas, gasPrice, nonce or chainId is lower than 0')

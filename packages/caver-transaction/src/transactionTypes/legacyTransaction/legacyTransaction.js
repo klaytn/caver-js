@@ -51,8 +51,9 @@ class LegacyTransaction extends AbstractTransaction {
      */
     constructor(createTxObj) {
         if (_.isString(createTxObj)) createTxObj = LegacyTransaction.decode(createTxObj)
+        createTxObj.from = createTxObj.from || '0x'
+
         super(TX_TYPE_STRING.TxTypeLegacyTransaction, createTxObj)
-        this.from = createTxObj.from || '0x'
         this.to = createTxObj.to || '0x'
 
         if (createTxObj.input && createTxObj.data)
@@ -60,18 +61,6 @@ class LegacyTransaction extends AbstractTransaction {
         this.input = createTxObj.input || createTxObj.data || '0x'
 
         this.value = createTxObj.value || '0x0'
-    }
-
-    /**
-     * @type {string}
-     */
-    get from() {
-        return this._from
-    }
-
-    set from(address) {
-        if (address !== '0x' && !utils.isAddress(address)) throw new Error(`Invalid address ${address}`)
-        this._from = address.toLowerCase()
     }
 
     /**
