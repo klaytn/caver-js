@@ -117,7 +117,7 @@ class LegacyTransaction extends AbstractTransaction {
     }
 
     set data(data) {
-        this.input = data
+        this._input = data
     }
 
     /**

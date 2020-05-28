@@ -138,7 +138,7 @@ class FeeDelegatedValueTransferMemoWithRatio extends AbstractFeeDelegatedWithRat
     }
 
     set data(data) {
-        this.input = data
+        this._input = data
     }
 
     /**

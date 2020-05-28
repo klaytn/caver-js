@@ -139,7 +139,7 @@ class FeeDelegatedSmartContractExecutionWithRatio extends AbstractFeeDelegatedWi
     }
 
     set data(data) {
-        this.input = data
+        this._input = data
     }
 
     /**
