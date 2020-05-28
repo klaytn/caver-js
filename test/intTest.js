@@ -23,6 +23,7 @@
 //
 // To execute a specific test,
 // $ mocha --grep INT-LEGACY/012 test/intTest.js
+const _ = require('lodash')
 const RLP = require('eth-lib/lib/rlp')
 const Bytes = require('eth-lib/lib/bytes')
 
@@ -93,15 +94,15 @@ function replaceWithEnv(data) {
         const getRandomAccount = id => {
             if (testEnv.random === undefined) testEnv.random = {}
             if (testEnv.random[id] === undefined) {
-                const acc = caver.klay.accounts.create()
-                caver.klay.accounts.wallet.add(acc.privateKey)
-                testEnv.random[id] = acc
+                const keyring = caver.wallet.keyring.generate()
+                caver.wallet.add(keyring)
+                testEnv.random[id] = keyring
             }
             return testEnv.random[id]
         }
 
         if (elem.endsWith('.privateKey')) {
-            return getRandomAccount(elem.replace('.privateKey', '')).privateKey
+            return getRandomAccount(elem.replace('.privateKey', '')).keys[0][0].privateKey
         }
         if (elem.startsWith('random')) {
             return getRandomAccount(elem).address
@@ -217,19 +218,20 @@ function processAccountKey(tx) {
 async function processCall(t) {
     const contractAddr = deployedContractAddr[t.call.to].address
     const abi = deployedContractAddr[t.call.to].abi
-    const contract = new caver.klay.Contract(abi, contractAddr)
+    const contract = new caver.contract(abi, contractAddr)
 
     const from = replaceWithEnv(t.call.from)
     const params = replaceWithEnv(t.call.params)
 
-    const value = await contract.methods[t.call.method](...params).call({ from })
+    let value = await contract.methods[t.call.method](...params).call({ from })
+    if (_.isString(value)) value = value.toLowerCase()
     expect(value).to.equal(replaceWithEnv(t.expected.returns))
 }
 
 async function processSend(t) {
     const contractAddr = deployedContractAddr[t.send.to].address
     const abi = deployedContractAddr[t.send.to].abi
-    const contract = new caver.klay.Contract(abi, contractAddr)
+    const contract = new caver.contract(abi, contractAddr)
 
     const from = replaceWithEnv(t.send.from)
     let params = replaceWithEnv(t.send.params)
@@ -263,7 +265,7 @@ async function processSend(t) {
             expect(receipt.events[idx].raw.topics).to.deep.equal(t.expected.rawEvents[idx].topics)
             if (t.expected.rawEvents[idx].data.encodeParameters) {
                 params = replaceWithEnv(t.expected.rawEvents[idx].data.encodeParameters)
-                const data = caver.klay.abi.encodeParameters(...params)
+                const data = caver.abi.encodeParameters(...params)
                 expect(receipt.events[idx].raw.data).to.equal(data)
             }
         })
@@ -370,7 +372,7 @@ async function processTransaction(t) {
     let actual
     let receipt
 
-    await caver.klay.sendSignedTransaction(rawTransaction).then(
+    await caver.rpc.klay.sendRawTransaction(rawTransaction).then(
         r => {
             receipt = r
             // console.log(r)
@@ -423,13 +425,13 @@ async function processTransaction(t) {
 async function processApi(t) {
     if (t.api.pre !== undefined) {
         const rawTransaction = await getSignedRawTransaction(t.api.pre)
-        testEnv.receipt = await caver.klay.sendSignedTransaction(rawTransaction)
+        testEnv.receipt = await caver.rpc.klay.sendSignedTransaction(rawTransaction)
     }
     if (t.api.preSigned !== undefined) {
         testEnv.rawTransaction = await getSignedRawTransaction(t.api.preSigned)
     }
     await new Promise((resolve, reject) => {
-        caver.klay._requestManager.send(
+        caver.rpc.klay._requestManager.send(
             {
                 method: t.api.method,
                 params: replaceWithEnv(t.api.params),
@@ -472,10 +474,16 @@ async function processApi(t) {
 
 before(() => {
     caver = new Caver(testEnv.URL)
-    caver.klay.accounts.wallet.add(testEnv.sender.privateKey)
+    // caver.klay.accounts.wallet.add(testEnv.sender.privateKey)
+
+    const keyring = caver.wallet.keyring.createFromPrivateKey(testEnv.sender.privateKey)
+    caver.wallet.add(keyring)
+
     if (testEnv.accounts) {
         Object.keys(testEnv.accounts).forEach(acc => {
-            caver.klay.accounts.wallet.add(testEnv.accounts[acc].privateKey)
+            // caver.klay.accounts.wallet.add(testEnv.accounts[acc].privateKey)
+            const testKeyring = caver.wallet.keyring.createFromPrivateKey(testEnv.accounts[acc].privateKey)
+            caver.wallet.add(testKeyring)
         })
     }
 })
@@ -536,7 +544,7 @@ describe('Integration tests', () => {
                             const gas = 100000000
 
                             const params = replaceWithEnv(tc.deploy[k].constructorParams)
-                            const contractInstance = new caver.klay.Contract(abi)
+                            const contractInstance = new caver.contract(abi)
                             const newContractInstance = await contractInstance
                                 .deploy({
                                     data: `0x${bin}`,

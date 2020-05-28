@@ -36,6 +36,8 @@ const TIMEOUTBLOCK = 50
 const AVERAGE_BLOCK_TIME = 1 // 1s
 const POLLINGTIMEOUT = AVERAGE_BLOCK_TIME * TIMEOUTBLOCK // ~average block time (seconds) * TIMEOUTBLOCK
 
+const TransactionDecoder = require('../../caver-transaction/src/transactionDecoder/transactionDecoder')
+
 function Method(options) {
     // call, name should be existed to create a method.
     if (!options.call || !options.name) throw errors.needNameCallPropertyToCreateMethod
@@ -467,7 +469,10 @@ function buildCall() {
 }
 
 function _confirmTransaction(defer, result, payload) {
-    const payloadTxObject = (payload.params && _.isObject(payload.params[0]) && payload.params[0]) || {}
+    let payloadTxObject = (payload.params && _.isObject(payload.params[0]) && payload.params[0]) || {}
+
+    // If payload.params[0] is RLP-encoded string, decode RLP-encoded string to Transaction instance.
+    if (_.isString(payload.params[0])) payloadTxObject = TransactionDecoder.decode(payload.params[0])
 
     // mutableConfirmationPack will be used in
     // 1) checkConfirmation,

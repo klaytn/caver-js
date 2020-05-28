@@ -36,6 +36,9 @@ const core = require('../../caver-core')
 const Method = require('../../caver-core-method')
 const utils = require('../../caver-utils')
 const Subscription = require('../../caver-core-subscriptions').subscription
+const SmartContractDeploy = require('../../caver-transaction/src/transactionTypes/smartContractDeploy/smartContractDeploy')
+const SmartContractExecution = require('../../caver-transaction/src/transactionTypes/smartContractExecution/smartContractExecution')
+const KeyringContainer = require('../../caver-wallet')
 const { formatters } = require('../../caver-core-helpers')
 const { errors } = require('../../caver-core-helpers')
 const abi = require('../../caver-abi')
@@ -63,7 +66,7 @@ const Contract = function Contract(jsonInterface, address, options) {
     const args = Array.prototype.slice.call(arguments)
 
     if (!(this instanceof Contract)) {
-        throw new Error('Please use the "new" keyword to instantiate a cav.klay.contract() object!')
+        throw new Error('Please use the "new" keyword to instantiate a caver.contract() or caver.klay.Contract() object!')
     }
 
     // sets _requestmanager
@@ -273,6 +276,17 @@ Contract.setProvider = function(provider, accounts) {
     core.packageInit(this, [provider])
 
     this._klayAccounts = accounts
+}
+
+/**
+ * Set _keyrings in contract instance.
+ * When _keyrings is exsit, contract will use _keyrings instead of _klayAccounts
+ *
+ * @param {KeyringContainer} keyrings
+ */
+Contract.prototype.setKeyrings = function(keyrings) {
+    if (!(keyrings instanceof KeyringContainer)) throw new Error(`keyrings should be an instance of 'KeyringContainer'`)
+    this._keyrings = keyrings
 }
 
 Contract.prototype.addAccounts = function(accounts) {
@@ -592,6 +606,7 @@ Contract.prototype.deploy = function(options, callback) {
             parent: this,
             deployData: options.data,
             _klayAccounts: this.constructor._klayAccounts,
+            _keyrings: this._keyrings,
         },
         options.arguments
     )
@@ -846,6 +861,7 @@ Contract.prototype._createTxObject = function _createTxObject() {
     txObject._method = this.method
     txObject._parent = this.parent
     txObject._klayAccounts = this.parent.constructor._klayAccounts || this._klayAccounts
+    txObject._keyrings = this.parent._keyrings || this._keyrings
 
     if (this.deployData) {
         txObject._deployData = this.deployData
@@ -922,6 +938,7 @@ Contract.prototype._executeMethod = function _executeMethod() {
     const args = this._parent._processExecuteArguments.call(this, Array.prototype.slice.call(arguments), defer)
     var defer = utils.promiEvent(args.type !== 'send') /* eslint-disable-line no-var */
     const klayAccounts = _this.constructor._klayAccounts || _this._klayAccounts
+    const keyrings = _this._parent._keyrings || _this._keyrings
 
     // Not allow to specify options.gas to 0.
     if (args.options && args.options.gas === 0) {
@@ -1047,6 +1064,46 @@ Contract.prototype._executeMethod = function _executeMethod() {
                 },
             }
 
+            const sendTransaction = new Method({
+                name: 'sendTransaction',
+                call: 'klay_sendTransaction',
+                params: 1,
+                inputFormatter: [formatters.inputTransactionFormatter],
+                requestManager: _this._parent._requestManager,
+                accounts: klayAccounts, // is klay.accounts (necessary for wallet signing)
+                defaultAccount: _this._parent.defaultAccount,
+                defaultBlock: _this._parent.defaultBlock,
+                extraFormatters,
+            }).createFunction()
+
+            if (keyrings) {
+                const isExisted = keyrings.getKeyring(args.options.from)
+                if (!isExisted) {
+                    return sendTransaction(args.options, args.callback)
+                }
+
+                const sendRawTransaction = new Method({
+                    name: 'sendRawTransaction',
+                    call: 'klay_sendRawTransaction',
+                    params: 1,
+                    requestManager: _this._parent._requestManager,
+                    defaultAccount: _this._parent.defaultAccount,
+                    defaultBlock: _this._parent.defaultBlock,
+                    extraFormatters,
+                }).createFunction()
+
+                let transaction
+                if (this._deployData !== undefined) {
+                    transaction = new SmartContractDeploy(args.options)
+                } else {
+                    transaction = new SmartContractExecution(args.options)
+                }
+
+                return keyrings.signWithKeys(transaction.from, transaction).then(signedTx => {
+                    return sendRawTransaction(signedTx.getRLPEncoding())
+                })
+            }
+
             if (args.options.type === undefined) {
                 if (this._deployData !== undefined) {
                     args.options.type = 'SMART_CONTRACT_DEPLOY'
@@ -1058,18 +1115,6 @@ Contract.prototype._executeMethod = function _executeMethod() {
             if (args.options.type !== 'SMART_CONTRACT_EXECUTION' && args.options.type !== 'SMART_CONTRACT_DEPLOY') {
                 throw new Error('Unsupported transaction type. Please use SMART_CONTRACT_EXECUTION or SMART_CONTRACT_DEPLOY.')
             }
-
-            const sendTransaction = new Method({
-                name: 'sendTransaction',
-                call: 'klay_sendTransaction',
-                params: 1,
-                inputFormatter: [formatters.inputTransactionFormatter],
-                requestManager: _this._parent._requestManager,
-                accounts: _this.constructor._klayAccounts || _this._klayAccounts, // is klay.accounts (necessary for wallet signing)
-                defaultAccount: _this._parent.defaultAccount,
-                defaultBlock: _this._parent.defaultBlock,
-                extraFormatters,
-            }).createFunction()
 
             const fromInWallet = sendTransaction.method.accounts.wallet[args.options.from.toLowerCase()]
             if (!fromInWallet || !fromInWallet.privateKey) {
