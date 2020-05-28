@@ -901,8 +901,8 @@ const decompressPublicKey = compressedPublicKey => {
 
 const isContractDeployment = txObject => {
     if (txObject.type) {
-        if (txObject.type.includes('SMART_CONTRACT_DEPLOY')) return true
-        if (txObject.type !== 'LEGACY') return false
+        if (txObject.type.includes('SMART_CONTRACT_DEPLOY') || txObject.type.includes('SmartContractDeploy')) return true
+        if (txObject.type !== 'LEGACY' && txObject.type !== 'TxTypeLegacyTransaction') return false
     }
 
     if (txObject.data && txObject.data !== '0x' && (!txObject.to || txObject.to === '0x')) return true
