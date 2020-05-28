@@ -46,7 +46,7 @@ describe('Error handling in Method package', () => {
             gas: 140000,
             value: 0,
         }
-        const expectedError = `The contract code couldn't be stored, please check your gas limit.`
+        const expectedError = `contract creation code storage out of gas`
         await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
     }).timeout(200000)
 
