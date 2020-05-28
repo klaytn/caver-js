@@ -23,6 +23,7 @@
 //
 // To execute a specific test,
 // $ mocha --grep INT-LEGACY/012 test/intTest.js
+const _ = require('lodash')
 const RLP = require('eth-lib/lib/rlp')
 const Bytes = require('eth-lib/lib/bytes')
 
@@ -222,7 +223,8 @@ async function processCall(t) {
     const from = replaceWithEnv(t.call.from)
     const params = replaceWithEnv(t.call.params)
 
-    const value = await contract.methods[t.call.method](...params).call({ from })
+    let value = await contract.methods[t.call.method](...params).call({ from })
+    if (_.isString(value)) value = value.toLowerCase()
     expect(value).to.equal(replaceWithEnv(t.expected.returns))
 }
 
