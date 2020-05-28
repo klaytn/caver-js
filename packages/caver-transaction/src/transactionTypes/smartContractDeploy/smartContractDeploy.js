@@ -73,7 +73,6 @@ class SmartContractDeploy extends AbstractTransaction {
     constructor(createTxObj) {
         if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
         super(TX_TYPE_STRING.TxTypeSmartContractDeploy, createTxObj)
-        this.from = createTxObj.from
         this.to = createTxObj.to || '0x'
         this.value = createTxObj.value
 
@@ -84,18 +83,6 @@ class SmartContractDeploy extends AbstractTransaction {
 
         this.humanReadable = createTxObj.humanReadable !== undefined ? createTxObj.humanReadable : false
         this.codeFormat = createTxObj.codeFormat !== undefined ? createTxObj.codeFormat : CODE_FORMAT.EVM
-    }
-
-    /**
-     * @type {string}
-     */
-    get from() {
-        return this._from
-    }
-
-    set from(address) {
-        if (!utils.isAddress(address)) throw new Error(`Invalid address of from: ${address}`)
-        this._from = address.toLowerCase()
     }
 
     /**

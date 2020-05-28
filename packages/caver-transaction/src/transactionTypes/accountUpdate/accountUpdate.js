@@ -69,20 +69,7 @@ class AccountUpdate extends AbstractTransaction {
     constructor(createTxObj) {
         if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
         super(TX_TYPE_STRING.TxTypeAccountUpdate, createTxObj)
-        this.from = createTxObj.from
         this.account = createTxObj.account
-    }
-
-    /**
-     * @type {string}
-     */
-    get from() {
-        return this._from
-    }
-
-    set from(address) {
-        if (!utils.isAddress(address)) throw new Error(`Invalid address of from: ${address}`)
-        this._from = address
     }
 
     /**

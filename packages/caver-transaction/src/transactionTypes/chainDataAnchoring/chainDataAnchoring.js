@@ -67,24 +67,10 @@ class ChainDataAnchoring extends AbstractTransaction {
         if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
         super(TX_TYPE_STRING.TxTypeChainDataAnchoring, createTxObj)
 
-        this.from = createTxObj.from
-
         if (createTxObj.input && createTxObj.data)
             throw new Error(`'input' and 'data' properties cannot be defined at the same time, please use either 'input' or 'data'.`)
 
         this.input = createTxObj.input || createTxObj.data
-    }
-
-    /**
-     * @type {string}
-     */
-    get from() {
-        return this._from
-    }
-
-    set from(address) {
-        if (!utils.isAddress(address)) throw new Error(`Invalid address of from: ${address}`)
-        this._from = address.toLowerCase()
     }
 
     /**

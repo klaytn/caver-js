@@ -65,20 +65,6 @@ class Cancel extends AbstractTransaction {
     constructor(createTxObj) {
         if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
         super(TX_TYPE_STRING.TxTypeCancel, createTxObj)
-
-        this.from = createTxObj.from
-    }
-
-    /**
-     * @type {string}
-     */
-    get from() {
-        return this._from
-    }
-
-    set from(address) {
-        if (!utils.isAddress(address)) throw new Error(`Invalid address of from: ${address}`)
-        this._from = address
     }
 
     /**
