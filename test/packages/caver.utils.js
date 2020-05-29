@@ -1615,6 +1615,89 @@ describe('caver.utils.parsePrivateKey', () => {
     })
 })
 
+describe('caver.utils.parseKlaytnWalletKey', () => {
+    it('CAVERJS-UNIT-ETC-220: should parse KlaytnWalletKey and return an array', () => {
+        const key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+
+        const parsed = caver.utils.parseKlaytnWalletKey(key)
+
+        expect(parsed[0]).to.be.equal('0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d8')
+        expect(parsed[1]).to.be.equal('0x00')
+        expect(parsed[2]).to.be.equal('0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b')
+    })
+
+    it('CAVERJS-UNIT-ETC-221: should throw error when key is not in format of KlaytnWalletKey', () => {
+        // private key is not in hex
+        let key = '0xzza915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        let expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+
+        // type is not in hex
+        key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80xzz0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+
+        // address is not in hex
+        key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebfzz'
+        expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+
+        // without '0x' separator
+        key = '45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d800a94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+
+        // too many '0x'
+        key = '0x0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+
+        // without '0x' for type
+        key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d8000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+
+        // without '0x' for address
+        key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x00a94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+    })
+
+    it('CAVERJS-UNIT-ETC-222: should throw error when private key is invalid', () => {
+        // invalid length
+        let key = '0xa915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        let expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+
+        // invalid range
+        key = '0x00000000000000000000000000000000000000000000000000000000000000000x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+    })
+
+    it('CAVERJS-UNIT-ETC-223: should throw error when human readable is invalid', () => {
+        // invalid value
+        let key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x030xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        let expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+
+        // invalid length
+        key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x0000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+    })
+
+    it('CAVERJS-UNIT-ETC-224: should throw error when addresss is invalid', () => {
+        let key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf'
+        let expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+
+        key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0baf'
+        expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+    })
+})
+
 describe('caver.utils.resolveSignature', () => {
     it('CAVERJS-UNIT-ETC-211: should return an array of signature from object(lowercase)', () => {
         const signature = {
