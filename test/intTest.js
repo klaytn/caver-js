@@ -73,7 +73,7 @@ function isDict(v) {
 
 function replaceWithEnv(data) {
     function replaceElemWithEnv(elem) {
-        if (deployedContractAddr[elem] !== undefined) return deployedContractAddr[elem].address
+        if (deployedContractAddr[elem] !== undefined) return deployedContractAddr[elem].address.toLowerCase()
 
         if (elem === undefined) return elem
         if (elem === 'env.sender') return testEnv.sender.address
@@ -105,7 +105,7 @@ function replaceWithEnv(data) {
             return getRandomAccount(elem.replace('.privateKey', '')).keys[0][0].privateKey
         }
         if (elem.startsWith('random')) {
-            return getRandomAccount(elem).address
+            return getRandomAccount(elem).address.toLowerCase()
         }
 
         if (elem.startsWith('contract')) {
@@ -114,7 +114,7 @@ function replaceWithEnv(data) {
 
         if (elem.startsWith('env.accounts')) {
             const k = elem.replace('env.accounts.', '')
-            return testEnv.accounts[k].address
+            return testEnv.accounts[k].address.toLowerCase()
         }
 
         return elem
@@ -425,7 +425,7 @@ async function processTransaction(t) {
 async function processApi(t) {
     if (t.api.pre !== undefined) {
         const rawTransaction = await getSignedRawTransaction(t.api.pre)
-        testEnv.receipt = await caver.rpc.klay.sendSignedTransaction(rawTransaction)
+        testEnv.receipt = await caver.rpc.klay.sendRawTransaction(rawTransaction)
     }
     if (t.api.preSigned !== undefined) {
         testEnv.rawTransaction = await getSignedRawTransaction(t.api.preSigned)
@@ -576,7 +576,7 @@ describe('Integration tests', () => {
                             } catch (err) {
                                 if (String(err).includes('AssertionError: expected')) throw err
 
-                                if (t.expected.status !== false) {
+                                if (t.expected === undefined || t.expected.status === undefined || t.expected.status !== false) {
                                     console.log(err)
                                 }
                                 expect(t.expected.status).to.be.false
