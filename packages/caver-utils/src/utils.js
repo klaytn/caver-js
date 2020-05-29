@@ -633,7 +633,16 @@ function parsePrivateKey(privateKey) {
     }
 }
 
+function parseKlaytnWalletKey(key) {
+    if (!isKlaytnWalletKey(key)) throw new Error(`Invalid KlaytnWalletKey format: ${key}`)
+    const klaytnWalletKey = key.startsWith('0x') ? key.slice(2) : key
+    const splitted = klaytnWalletKey.split('0x')
+    return [`0x${splitted[0]}`, `0x${splitted[1]}`, `0x${splitted[2]}`]
+}
+
 const isKlaytnWalletKey = privateKey => {
+    if (!_.isString(privateKey)) return false
+
     const has0xPrefix = privateKey.slice(0, 2) === '0x'
     privateKey = has0xPrefix ? privateKey.slice(2) : privateKey
 
@@ -982,6 +991,7 @@ module.exports = {
     isValidPrivateKey: isValidPrivateKey,
     isValidNSHSN: isValidNSHSN,
     parsePrivateKey: parsePrivateKey,
+    parseKlaytnWalletKey: parseKlaytnWalletKey,
     isKlaytnWalletKey: isKlaytnWalletKey,
     isContractDeployment: isContractDeployment,
 

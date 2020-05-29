@@ -489,6 +489,7 @@ module.exports = {
     isValidPrivateKey: utils.isValidPrivateKey,
     isValidNSHSN: utils.isValidNSHSN,
     parsePrivateKey: utils.parsePrivateKey,
+    parseKlaytnWalletKey: utils.parseKlaytnWalletKey,
     isKlaytnWalletKey: utils.isKlaytnWalletKey,
     isContractDeployment: utils.isContractDeployment,
     // RLP
