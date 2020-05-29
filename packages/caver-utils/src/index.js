@@ -292,6 +292,30 @@ const toPeb = function(number, unit) {
     return utils.isBN(number) ? ethjsUnit.toWei(number, unit) : ethjsUnit.toWei(number, unit).toString(10)
 }
 
+/**
+ * Converts peb amount to specific unit amount
+ *
+ * @method convertFromPeb
+ * @param {number|string|BN|BigNumber} amount the peb amount
+ * @param {string} unit the unit to convert to
+ * @return {BN}
+ */
+const convertFromPeb = function(number, unit) {
+    return utils.toBN(fromPeb(number, unit))
+}
+
+/**
+ * Converts amount to peb amount
+ *
+ * @method convertToPeb
+ * @param {number|string|BN|BigNumber} amount the amount to convert
+ * @param {string} unit the unit to convert from
+ * @return {BN}
+ */
+const convertToPeb = function(number, unit) {
+    return utils.toBN(toPeb(number, unit))
+}
+
 function tryNumberToString(number) {
     try {
         return utils.toBN(number).toString(10)
@@ -428,6 +452,8 @@ module.exports = {
     unitKlayMap: unitKlayMap,
     toPeb: toPeb,
     fromPeb: fromPeb,
+    convertFromPeb: convertFromPeb,
+    convertToPeb: convertToPeb,
 
     BN: utils.BN,
     isBN: utils.isBN,
