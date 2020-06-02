@@ -311,6 +311,18 @@ class AbstractTransaction {
     }
 
     /**
+     * Returns the RLP-encoded string to make the signature of this transaction.
+     * This method has to be overrided in classes which extends AbstractTransaction.
+     * getCommonRLPEncodingForSignature is used in getRLPEncodingForSignature.
+     *
+     * @return {string}
+     */
+    // eslint-disable-next-line class-methods-use-this
+    getCommonRLPEncodingForSignature() {
+        throw new Error('getCommonRLPEncodingForSignature has to be implemented')
+    }
+
+    /**
      * Fills empty optional transaction properties(gasPrice, nonce, chainId).
      */
     async fillTransaction() {

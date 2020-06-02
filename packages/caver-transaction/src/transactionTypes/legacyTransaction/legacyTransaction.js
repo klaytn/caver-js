@@ -170,6 +170,16 @@ class LegacyTransaction extends AbstractTransaction {
             '0x',
         ])
     }
+
+    /**
+     * LegacyTransaction does not have a common RLP encoding because no other type exists.
+     * So getCommonRLPEncodingForSignature calls getRLPEncodingForSignature to return RLP-encoded string.
+     *
+     * @return {string}
+     */
+    getCommonRLPEncodingForSignature() {
+        return this.getRLPEncodingForSignature()
+    }
 }
 
 module.exports = LegacyTransaction
