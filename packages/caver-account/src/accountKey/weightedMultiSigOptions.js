@@ -47,7 +47,7 @@ class WeightedMultiSigOptions {
 
     /**
      * Creates an instance of WeightedMultiSigOptions.
-     * @param {string} threshold - a threshold
+     * @param {number} threshold - a threshold
      * @param {Array.<number>} weights - an array of weight of key
      */
     constructor(threshold, weights) {
