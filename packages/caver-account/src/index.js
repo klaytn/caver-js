@@ -25,6 +25,7 @@ const AccountKeyFail = require('./accountKey/accountKeyFail')
 const AccountKeyWeightedMultiSig = require('./accountKey/accountKeyWeightedMultiSig')
 const AccountKeyRoleBased = require('./accountKey/accountKeyRoleBased')
 const WeightedMultiSigOptions = require('./accountKey/weightedMultiSigOptions')
+const WeightedPublicKey = require('./accountKey/weightedPublicKey')
 const { isMultipleKeysFormat, isRoleBasedKeysFormat } = require('../../caver-wallet/src/keyring/keyringHelper')
 
 function isAccountKeyInstance(accountKey) {
@@ -52,7 +53,7 @@ class Account {
      * `caver.account.create('0x${address in hex}', [['0x{public key}'], ['0x{public key}', '0x{public key}'], ['0x{public key}']], [{}, { threshold: 1, weight: [1,1] }, {}])`
      *
      * @param {string} address The address of Account.
-     * @param {string|Array} accountKey The accountKey value of Account. Depending on this, Account's accountKey will be AccountKeyLegacy / AccountKeyPublic / AccountKeyFail / AccountKeyWeightedMultiSig / AccountKeyRoleBased.
+     * @param {string|Array.<string>|Array.<Array.<string>>} accountKey The accountKey value of Account. Depending on this, Account's accountKey will be AccountKeyLegacy / AccountKeyPublic / AccountKeyFail / AccountKeyWeightedMultiSig / AccountKeyRoleBased.
      * @param {WeightedMultiSigOptions|Array.<WeightedMultiSigOptions>} [options] The options that includes 'threshold' and 'weight'. This is only necessary if AccountKeyWeightedMultiSig or AccountKeyRoleBased.
      * @return {Account}
      */
@@ -200,6 +201,7 @@ Account.accountKey = {
     accountKeyFail: AccountKeyFail,
     accountKeyWeightedMultiSig: AccountKeyWeightedMultiSig,
     accountKeyRoleBased: AccountKeyRoleBased,
+    weightedPublicKey: WeightedPublicKey,
 }
 
 module.exports = Account
