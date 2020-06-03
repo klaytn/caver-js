@@ -700,7 +700,7 @@ class Keyring {
     }
 }
 
-Keyring.PrivateKey = PrivateKey
+Keyring.privateKey = PrivateKey
 Keyring.role = KEY_ROLE
 
 module.exports = Keyring
