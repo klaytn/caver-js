@@ -41,7 +41,7 @@ class Keyring {
      *
      * `caver.wallet.keyring.generate()`
      *
-     * @param {string} entropy A random string to increase entropy.
+     * @param {string} [entropy] A random string to increase entropy.
      * @return {Keyring}
      */
     static generate(entropy) {
@@ -50,11 +50,11 @@ class Keyring {
     }
 
     /**
-     * generates a decoupled keyring instance
+     * generates a single private key string
      *
      * `caver.wallet.keyring.generateSingleKey()`
      *
-     * @param {string} entropy A random string to increase entropy.
+     * @param {string} [entropy] A random string to increase entropy.
      * @return {String}
      */
     static generateSingleKey(entropy) {
@@ -62,12 +62,12 @@ class Keyring {
     }
 
     /**
-     * generates an keyring instance with multiple keys
+     * generates an array of private key strings
      *
      * `caver.wallet.keyring.generateMultipleKeys()`
      *
      * @param {number} num A length of keys.
-     * @param {string} entropy A random string to increase entropy.
+     * @param {string} [entropy] A random string to increase entropy.
      * @return {Array.<String>}
      */
     static generateMultipleKeys(num, entropy) {
@@ -83,12 +83,12 @@ class Keyring {
     }
 
     /**
-     * generates an keyring instance with role-based keys
+     * generates an array in which keys to be used for each role are defined as an array.
      *
      * `caver.wallet.keyring.generateRoleBasedKeys()`
      *
      * @param {Array.<number>} numArr An array containing the number of keys for each role.
-     * @param {string} entropy A random string to increase entropy.
+     * @param {string} [entropy] A random string to increase entropy.
      * @return {Array.<Array.<String>>}
      */
     static generateRoleBasedKeys(numArr, entropy) {
@@ -130,7 +130,7 @@ class Keyring {
     }
 
     /**
-     * creates a keyring instance from private key string. KlaytnWalletKey format also can be handled.
+     * creates a keyring instance from a private key string. KlaytnWalletKey format also can be handled.
      *
      * @param {string} privateKey The key parameter can be either normal private key or KlaytnWalletKey format.
      * @return {Keyring}
@@ -144,7 +144,7 @@ class Keyring {
     }
 
     /**
-     * creates a keyring instance from KlaytnWalletKey string.
+     * creates a keyring instance from a KlaytnWalletKey string.
      *
      * @param {string} klaytnWalletKey A key string in KlaytnWalletKey format.
      * @return {Keyring}
@@ -159,7 +159,7 @@ class Keyring {
     }
 
     /**
-     * creates a keyring instance from address and private key string.
+     * creates a keyring instance from an address and a private key string.
      *
      * @param {string} address An address of keyring.
      * @param {string} key A private key string.
@@ -175,7 +175,7 @@ class Keyring {
     }
 
     /**
-     * creates a keyring instance from address and multiple private key strings.
+     * creates a keyring instance from an address and multiple private key strings.
      *
      * @param {string} address An address of keyring.
      * @param {Array.<string>} keyArray An array of private key strings.
@@ -189,7 +189,7 @@ class Keyring {
     }
 
     /**
-     * creates a keyring instance from address and multiple private key strings.
+     * creates a keyring instance from an address and an array in which keys to be used for each role are defined as an array.
      *
      * @param {string} address An address of keyring.
      * @param {Array.<Array.<string>>} roledBasedKeyArray A two-dimensional array containing arrays of private key strings for each role.
