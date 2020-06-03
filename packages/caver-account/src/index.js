@@ -25,6 +25,7 @@ const AccountKeyFail = require('./accountKey/accountKeyFail')
 const AccountKeyWeightedMultiSig = require('./accountKey/accountKeyWeightedMultiSig')
 const AccountKeyRoleBased = require('./accountKey/accountKeyRoleBased')
 const WeightedMultiSigOptions = require('./accountKey/weightedMultiSigOptions')
+const WeightedPublicKey = require('./accountKey/weightedPublicKey')
 const { isMultipleKeysFormat, isRoleBasedKeysFormat } = require('../../caver-wallet/src/keyring/keyringHelper')
 
 function isAccountKeyInstance(accountKey) {
@@ -200,6 +201,7 @@ Account.accountKey = {
     accountKeyFail: AccountKeyFail,
     accountKeyWeightedMultiSig: AccountKeyWeightedMultiSig,
     accountKeyRoleBased: AccountKeyRoleBased,
+    weightedPublicKey: WeightedPublicKey,
 }
 
 module.exports = Account
