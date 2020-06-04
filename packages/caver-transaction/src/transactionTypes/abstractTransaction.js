@@ -309,7 +309,7 @@ class AbstractTransaction {
         if (this.chainId === undefined)
             throw new Error(`chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`)
 
-        return RLP.encode([this.getCommonRLPEncodingForSignature(), Bytes.fromNat(this.chainId || '0x1'), '0x', '0x'])
+        return RLP.encode([this.getCommonRLPEncodingForSignature(), Bytes.fromNat(this.chainId), '0x', '0x'])
     }
 
     /**

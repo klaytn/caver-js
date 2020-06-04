@@ -220,7 +220,7 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
      * @return {string}
      */
     getRLPEncodingForFeePayerSignature() {
-        return RLP.encode([this.getCommonRLPEncodingForSignature(), this.feePayer, Bytes.fromNat(this.chainId || '0x1'), '0x', '0x'])
+        return RLP.encode([this.getCommonRLPEncodingForSignature(), this.feePayer, Bytes.fromNat(this.chainId), '0x', '0x'])
     }
 }
 
