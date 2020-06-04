@@ -243,15 +243,6 @@ describe('TxTypeFeeDelegatedCancelWithRatio', () => {
 
             expect(() => tx.getRLPEncoding()).to.throw(expectedError)
         })
-
-        it('CAVERJS-UNIT-TRANSACTIONFDR-386: getRLPEncoding should throw error when chainId is undefined', () => {
-            const tx = new caver.transaction.feeDelegatedCancelWithRatio(txWithExpectedValues.tx)
-            delete tx._chainId
-
-            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getRLPEncoding()).to.throw(expectedError)
-        })
     })
 
     context('feeDelegatedCancelWithRatio.signWithKey', () => {
@@ -1113,15 +1104,6 @@ describe('TxTypeFeeDelegatedCancelWithRatio', () => {
 
             expect(() => tx.getTransactionHash()).to.throw(expectedError)
         })
-
-        it('CAVERJS-UNIT-TRANSACTIONFDR-435: getTransactionHash should throw error when chainId is undefined', () => {
-            const tx = new caver.transaction.feeDelegatedCancelWithRatio(txWithExpectedValues.tx)
-            delete tx._chainId
-
-            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getTransactionHash()).to.throw(expectedError)
-        })
     })
 
     context('feeDelegatedCancelWithRatio.getSenderTxHash', () => {
@@ -1154,15 +1136,6 @@ describe('TxTypeFeeDelegatedCancelWithRatio', () => {
             delete tx._gasPrice
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getSenderTxHash()).to.throw(expectedError)
-        })
-
-        it('CAVERJS-UNIT-TRANSACTIONFDR-439: getSenderTxHash should throw error when chainId is undefined', () => {
-            const tx = new caver.transaction.feeDelegatedCancelWithRatio(txWithExpectedValues.tx)
-            delete tx._chainId
-
-            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getSenderTxHash()).to.throw(expectedError)
         })

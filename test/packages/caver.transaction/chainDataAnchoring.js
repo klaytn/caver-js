@@ -193,15 +193,6 @@ describe('TxTypeChainDataAnchoring', () => {
 
             expect(() => tx.getRLPEncoding()).to.throw(expectedError)
         })
-
-        it('CAVERJS-UNIT-TRANSACTION-351: getRLPEncoding should throw error when chainId is undefined', () => {
-            const tx = new caver.transaction.chainDataAnchoring(txWithExpectedValues.tx)
-            delete tx._chainId
-
-            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getRLPEncoding()).to.throw(expectedError)
-        })
     })
 
     context('chainDataAnchoring.signWithKey', () => {
@@ -630,15 +621,6 @@ describe('TxTypeChainDataAnchoring', () => {
 
             expect(() => tx.getTransactionHash()).to.throw(expectedError)
         })
-
-        it('CAVERJS-UNIT-TRANSACTION-377: getTransactionHash should throw error when chainId is undefined', () => {
-            const tx = new caver.transaction.chainDataAnchoring(txWithExpectedValues.tx)
-            delete tx._chainId
-
-            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getTransactionHash()).to.throw(expectedError)
-        })
     })
 
     context('chainDataAnchoring.getSenderTxHash', () => {
@@ -672,15 +654,6 @@ describe('TxTypeChainDataAnchoring', () => {
             delete tx._gasPrice
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getSenderTxHash()).to.throw(expectedError)
-        })
-
-        it('CAVERJS-UNIT-TRANSACTION-381: getSenderTxHash should throw error when chainId is undefined', () => {
-            const tx = new caver.transaction.chainDataAnchoring(txWithExpectedValues.tx)
-            delete tx._chainId
-
-            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getSenderTxHash()).to.throw(expectedError)
         })

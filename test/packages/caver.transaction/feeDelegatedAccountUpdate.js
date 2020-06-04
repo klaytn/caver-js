@@ -480,17 +480,6 @@ describe('TxTypeFeeDelegatedAccountUpdate', () => {
                 expect(() => tx.getRLPEncoding()).to.throw(expectedError)
             }
         })
-
-        it('CAVERJS-UNIT-TRANSACTIONFD-160: getRLPEncoding should throw error when chainId is undefined', () => {
-            for (let i = 0; i < expectedValues.length; i++) {
-                const tx = new caver.transaction.feeDelegatedAccountUpdate(expectedValues[i].tx)
-                delete tx._chainId
-
-                const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
-
-                expect(() => tx.getRLPEncoding()).to.throw(expectedError)
-            }
-        })
     })
 
     context('feeDelegatedAccountUpdate.signWithKey', () => {
@@ -1478,17 +1467,6 @@ describe('TxTypeFeeDelegatedAccountUpdate', () => {
                 expect(() => tx.getTransactionHash()).to.throw(expectedError)
             }
         })
-
-        it('CAVERJS-UNIT-TRANSACTIONFD-209: getTransactionHash should throw error when chainId is undefined', () => {
-            for (let i = 0; i < expectedValues.length; i++) {
-                const tx = new caver.transaction.feeDelegatedAccountUpdate(expectedValues[i].tx)
-                delete tx._chainId
-
-                const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
-
-                expect(() => tx.getTransactionHash()).to.throw(expectedError)
-            }
-        })
     })
 
     context('feeDelegatedAccountUpdate.getSenderTxHash', () => {
@@ -1528,17 +1506,6 @@ describe('TxTypeFeeDelegatedAccountUpdate', () => {
                 delete tx._gasPrice
 
                 const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
-
-                expect(() => tx.getSenderTxHash()).to.throw(expectedError)
-            }
-        })
-
-        it('CAVERJS-UNIT-TRANSACTIONFD-213: getSenderTxHash should throw error when chainId is undefined', () => {
-            for (let i = 0; i < expectedValues.length; i++) {
-                const tx = new caver.transaction.feeDelegatedAccountUpdate(expectedValues[i].tx)
-                delete tx._chainId
-
-                const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
 
                 expect(() => tx.getSenderTxHash()).to.throw(expectedError)
             }
