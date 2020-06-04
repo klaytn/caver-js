@@ -58,6 +58,8 @@ function Method(options) {
 
     this.defaultBlock = options.defaultBlock || 'latest'
     this.defaultAccount = options.defaultAccount || null
+
+    this.outputFormatterDisable = options.outputFormatterDisable
 }
 
 Method.prototype.setRequestManager = setRequestManager
@@ -502,7 +504,9 @@ const addCustomSendMethod = mutableConfirmationPack => {
             name: 'getTransactionReceipt',
             call: 'klay_getTransactionReceipt',
             params: 1,
-            outputFormatter: formatters.outputTransactionReceiptFormatter,
+            outputFormatter: !mutableConfirmationPack.method.outputFormatterDisable
+                ? formatters.outputTransactionReceiptFormatter
+                : undefined,
         }),
         new Method({
             name: 'getCode',

@@ -29,7 +29,7 @@ const _ = require('lodash')
 const core = require('../../caver-core')
 const { formatters } = require('../../caver-core-helpers')
 const Subscriptions = require('../../caver-core-subscriptions').subscriptions
-const Method = require('../../caver-core-method')
+const MethodBase = require('../../caver-core-method')
 
 const utils = require('../../caver-utils')
 
@@ -57,6 +57,13 @@ class KlayRPC {
         }
 
         this.clearSubscriptions = _this._requestManager.clearSubscriptions
+
+        class Method extends MethodBase {
+            constructor(options) {
+                options.outputFormatterDisable = true
+                super(options)
+            }
+        }
 
         const _klaytnCall = [
             new Method({
