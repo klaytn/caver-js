@@ -278,16 +278,6 @@ describe('TxTypeFeeDelegatedSmartContractDeployWithRatio', () => {
 
             expect(() => tx.getRLPEncoding()).to.throw(expectedError)
         })
-
-        it('CAVERJS-UNIT-TRANSACTIONFDR-239: getRLPEncoding should throw error when chainId is undefined', () => {
-            transactionObj.gasPrice = '0x5d21dba00'
-            transactionObj.nonce = '0x3a'
-            const tx = new caver.transaction.feeDelegatedSmartContractDeployWithRatio(transactionObj)
-
-            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getRLPEncoding()).to.throw(expectedError)
-        })
     })
 
     context('feeDelegatedSmartContractDeployWithRatio.signWithKey', () => {
@@ -1156,16 +1146,6 @@ describe('TxTypeFeeDelegatedSmartContractDeployWithRatio', () => {
 
             expect(() => tx.getTransactionHash()).to.throw(expectedError)
         })
-
-        it('CAVERJS-UNIT-TRANSACTIONFDR-288: getTransactionHash should throw error when chainId is undefined', () => {
-            transactionObj.gasPrice = '0x5d21dba00'
-            transactionObj.nonce = '0x3a'
-            const tx = new caver.transaction.feeDelegatedSmartContractDeployWithRatio(transactionObj)
-
-            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getTransactionHash()).to.throw(expectedError)
-        })
     })
 
     context('feeDelegatedSmartContractDeployWithRatio.getSenderTxHash', () => {
@@ -1200,16 +1180,6 @@ describe('TxTypeFeeDelegatedSmartContractDeployWithRatio', () => {
             const tx = new caver.transaction.feeDelegatedSmartContractDeployWithRatio(transactionObj)
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getSenderTxHash()).to.throw(expectedError)
-        })
-
-        it('CAVERJS-UNIT-TRANSACTIONFDR-292: getSenderTxHash should throw error when chainId is undefined', () => {
-            transactionObj.gasPrice = '0x5d21dba00'
-            transactionObj.nonce = '0x3a'
-            const tx = new caver.transaction.feeDelegatedSmartContractDeployWithRatio(transactionObj)
-
-            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getSenderTxHash()).to.throw(expectedError)
         })

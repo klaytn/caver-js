@@ -187,16 +187,6 @@ describe('TxTypeLegacyTransaction', () => {
 
             expect(() => tx.getRLPEncoding()).to.throw(expectedError)
         })
-
-        it('CAVERJS-UNIT-TRANSACTION-046: getRLPEncoding should throw error when chainId is undefined', () => {
-            transactionObj.gasPrice = '0x5d21dba00'
-            transactionObj.nonce = '0x3a'
-            const tx = new caver.transaction.legacyTransaction(transactionObj)
-
-            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getRLPEncoding()).to.throw(expectedError)
-        })
     })
 
     context('legacyTransaction.signWithKey', () => {
@@ -669,16 +659,6 @@ describe('TxTypeLegacyTransaction', () => {
 
             expect(() => tx.getTransactionHash()).to.throw(expectedError)
         })
-
-        it('CAVERJS-UNIT-TRANSACTION-049: getTransactionHash should throw error when chainId is undefined', () => {
-            transactionObj.gasPrice = '0x5d21dba00'
-            transactionObj.nonce = '0x3a'
-            const tx = new caver.transaction.legacyTransaction(transactionObj)
-
-            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getTransactionHash()).to.throw(expectedError)
-        })
     })
 
     context('legacyTransaction.getSenderTxHash', () => {
@@ -728,16 +708,6 @@ describe('TxTypeLegacyTransaction', () => {
             const tx = new caver.transaction.legacyTransaction(transactionObj)
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getSenderTxHash()).to.throw(expectedError)
-        })
-
-        it('CAVERJS-UNIT-TRANSACTION-052: getSenderTxHash should throw error when chainId is undefined', () => {
-            transactionObj.gasPrice = '0x5d21dba00'
-            transactionObj.nonce = '0x3a'
-            const tx = new caver.transaction.legacyTransaction(transactionObj)
-
-            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getSenderTxHash()).to.throw(expectedError)
         })

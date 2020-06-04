@@ -157,6 +157,8 @@ class LegacyTransaction extends AbstractTransaction {
      */
     getRLPEncodingForSignature() {
         this.validateOptionalValues()
+        if (this.chainId === undefined)
+            throw new Error(`chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`)
 
         return RLP.encode([
             Bytes.fromNat(this.nonce),

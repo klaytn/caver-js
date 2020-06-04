@@ -241,7 +241,7 @@ class AbstractTransaction {
         // If the signatures are empty, there may be an undefined member variable.
         // In this case, the empty information is filled with the decoded result.
         let fillVariables = false
-        if (this.signatures.length === 0) fillVariables = true
+        if (this.signatures.length === 0 || utils.isEmptySig(this.signatures)) fillVariables = true
 
         for (const encoded of rlpEncodedTxs) {
             const type = typeDetectionFromRLPEncoding(encoded)
@@ -306,6 +306,8 @@ class AbstractTransaction {
      */
     getRLPEncodingForSignature() {
         this.validateOptionalValues()
+        if (this.chainId === undefined)
+            throw new Error(`chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`)
 
         return RLP.encode([this.getCommonRLPEncodingForSignature(), Bytes.fromNat(this.chainId || '0x1'), '0x', '0x'])
     }
@@ -346,8 +348,6 @@ class AbstractTransaction {
             throw new Error(`gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`)
         if (this.nonce === undefined)
             throw new Error(`nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`)
-        if (this.chainId === undefined)
-            throw new Error(`chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`)
     }
 }
 

@@ -210,15 +210,6 @@ describe('TxTypeSmartContractExecution', () => {
 
             expect(() => tx.getRLPEncoding()).to.throw(expectedError)
         })
-
-        it('CAVERJS-UNIT-TRANSACTION-258: getRLPEncoding should throw error when chainId is undefined', () => {
-            const tx = new caver.transaction.smartContractExecution(txWithExpectedValues.tx)
-            delete tx._chainId
-
-            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getRLPEncoding()).to.throw(expectedError)
-        })
     })
 
     context('smartContractExecution.signWithKey', () => {
@@ -649,15 +640,6 @@ describe('TxTypeSmartContractExecution', () => {
 
             expect(() => tx.getTransactionHash()).to.throw(expectedError)
         })
-
-        it('CAVERJS-UNIT-TRANSACTION-284: getTransactionHash should throw error when chainId is undefined', () => {
-            const tx = new caver.transaction.smartContractExecution(txWithExpectedValues.tx)
-            delete tx._chainId
-
-            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getTransactionHash()).to.throw(expectedError)
-        })
     })
 
     context('smartContractExecution.getSenderTxHash', () => {
@@ -691,15 +673,6 @@ describe('TxTypeSmartContractExecution', () => {
             delete tx._gasPrice
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getSenderTxHash()).to.throw(expectedError)
-        })
-
-        it('CAVERJS-UNIT-TRANSACTION-288: getSenderTxHash should throw error when chainId is undefined', () => {
-            const tx = new caver.transaction.smartContractExecution(txWithExpectedValues.tx)
-            delete tx._chainId
-
-            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getSenderTxHash()).to.throw(expectedError)
         })

@@ -210,15 +210,6 @@ describe('TxTypeFeeDelegatedCancel', () => {
 
             expect(() => tx.getRLPEncoding()).to.throw(expectedError)
         })
-
-        it('CAVERJS-UNIT-TRANSACTIONFD-380: getRLPEncoding should throw error when chainId is undefined', () => {
-            const tx = new caver.transaction.feeDelegatedCancel(txWithExpectedValues.tx)
-            delete tx._chainId
-
-            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getRLPEncoding()).to.throw(expectedError)
-        })
     })
 
     context('feeDelegatedCancel.signWithKey', () => {
@@ -1079,15 +1070,6 @@ describe('TxTypeFeeDelegatedCancel', () => {
 
             expect(() => tx.getTransactionHash()).to.throw(expectedError)
         })
-
-        it('CAVERJS-UNIT-TRANSACTIONFD-429: getTransactionHash should throw error when chainId is undefined', () => {
-            const tx = new caver.transaction.feeDelegatedCancel(txWithExpectedValues.tx)
-            delete tx._chainId
-
-            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getTransactionHash()).to.throw(expectedError)
-        })
     })
 
     context('feeDelegatedCancel.getSenderTxHash', () => {
@@ -1120,15 +1102,6 @@ describe('TxTypeFeeDelegatedCancel', () => {
             delete tx._gasPrice
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getSenderTxHash()).to.throw(expectedError)
-        })
-
-        it('CAVERJS-UNIT-TRANSACTIONFD-433: getSenderTxHash should throw error when chainId is undefined', () => {
-            const tx = new caver.transaction.feeDelegatedCancel(txWithExpectedValues.tx)
-            delete tx._chainId
-
-            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getSenderTxHash()).to.throw(expectedError)
         })

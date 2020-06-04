@@ -121,42 +121,42 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
     })
 
     context('create feeDelegatedChainDataAnchoringWithRatio instance', () => {
-        it('CAVERJS-UNIT-TRANSACTIONFD-448: If feeDelegatedChainDataAnchoringWithRatio not define from, return error', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-448: If feeDelegatedChainDataAnchoringWithRatio not define from, return error', () => {
             delete transactionObj.from
 
             const expectedError = '"from" is missing'
             expect(() => new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(transactionObj)).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-449: If feeDelegatedChainDataAnchoringWithRatio not define gas, return error', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-449: If feeDelegatedChainDataAnchoringWithRatio not define gas, return error', () => {
             delete transactionObj.gas
 
             const expectedError = '"gas" is missing'
             expect(() => new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(transactionObj)).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-450: If feeDelegatedChainDataAnchoringWithRatio not define input, return error', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-450: If feeDelegatedChainDataAnchoringWithRatio not define input, return error', () => {
             delete transactionObj.input
 
             const expectedError = '"input" is missing'
             expect(() => new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(transactionObj)).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-451: If feeDelegatedChainDataAnchoringWithRatio not define feeRatio, return error', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-451: If feeDelegatedChainDataAnchoringWithRatio not define feeRatio, return error', () => {
             delete transactionObj.feeRatio
 
             const expectedError = '"feeRatio" is missing'
             expect(() => new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(transactionObj)).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-452: If feeDelegatedChainDataAnchoringWithRatio define from property with invalid address, return error', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-452: If feeDelegatedChainDataAnchoringWithRatio define from property with invalid address, return error', () => {
             transactionObj.from = 'invalid'
 
             const expectedError = `Invalid address of from: ${transactionObj.from}`
             expect(() => new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(transactionObj)).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-453: If feeDelegatedChainDataAnchoringWithRatio define feePayer property with invalid address, return error', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-453: If feeDelegatedChainDataAnchoringWithRatio define feePayer property with invalid address, return error', () => {
             transactionObj.feePayer = 'invalid'
 
             const expectedError = `Invalid address of fee payer: ${transactionObj.feePayer}`
@@ -188,7 +188,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(() => new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(transactionObj)).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-454: If feeDelegatedChainDataAnchoringWithRatio define feePayerSignatures property without feePayer, return error', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-454: If feeDelegatedChainDataAnchoringWithRatio define feePayerSignatures property without feePayer, return error', () => {
             transactionObj.feePayerSignatures = [
                 [
                     '0x26',
@@ -201,7 +201,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(() => new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(transactionObj)).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-455: If feeDelegatedChainDataAnchoringWithRatio define unnecessary property, return error', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-455: If feeDelegatedChainDataAnchoringWithRatio define unnecessary property, return error', () => {
             const unnecessaries = [
                 propertiesForUnnecessary.to,
                 propertiesForUnnecessary.value,
@@ -231,13 +231,13 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
     })
 
     context('feeDelegatedChainDataAnchoringWithRatio.getRLPEncoding', () => {
-        it('CAVERJS-UNIT-TRANSACTIONFD-456: Returns RLP-encoded string', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-456: Returns RLP-encoded string', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(txWithExpectedValues.tx)
 
             expect(tx.getRLPEncoding()).to.equal(txWithExpectedValues.rlpEncoding)
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-457: getRLPEncoding should throw error when nonce is undefined', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-457: getRLPEncoding should throw error when nonce is undefined', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(txWithExpectedValues.tx)
             delete tx._nonce
 
@@ -246,20 +246,11 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(() => tx.getRLPEncoding()).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-458: getRLPEncoding should throw error when gasPrice is undefined', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-458: getRLPEncoding should throw error when gasPrice is undefined', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(txWithExpectedValues.tx)
             delete tx._gasPrice
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getRLPEncoding()).to.throw(expectedError)
-        })
-
-        it('CAVERJS-UNIT-TRANSACTIONFD-459: getRLPEncoding should throw error when chainId is undefined', () => {
-            const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(txWithExpectedValues.tx)
-            delete tx._chainId
-
-            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getRLPEncoding()).to.throw(expectedError)
         })
@@ -296,7 +287,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             if (!customHasher) expect(hasherSpy).to.have.been.calledWith(tx)
         }
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-460: input: keyring. should sign transaction.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-460: input: keyring. should sign transaction.', async () => {
             await tx.signWithKey(sender)
 
             checkFunctionCall()
@@ -305,7 +296,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(senderSignWithKeySpy).to.have.been.calledWith(txHash, '0x7e3', 0, 0)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-461: input: private key string. should sign transaction.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-461: input: private key string. should sign transaction.', async () => {
             const signWithKeyProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKey')
             await tx.signWithKey(sender.keys[0][0].privateKey)
 
@@ -315,7 +306,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(signWithKeyProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 0, 0)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-462: input: KlaytnWalletKey. should sign transaction.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-462: input: KlaytnWalletKey. should sign transaction.', async () => {
             const signWithKeyProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKey')
             await tx.signWithKey(sender.getKlaytnWalletKey())
 
@@ -325,7 +316,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(signWithKeyProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 0, 0)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-463: input: keyring, index. should sign transaction with specific index.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-463: input: keyring, index. should sign transaction with specific index.', async () => {
             const roleBasedSignWithKeySpy = sandbox.spy(roleBasedKeyring, 'signWithKey')
 
             tx.from = roleBasedKeyring.address
@@ -338,7 +329,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(roleBasedSignWithKeySpy).to.have.been.calledWith(txHash, '0x7e3', 0, 1)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-464: input: keyring, custom hasher. should throw error.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-464: input: keyring, custom hasher. should throw error.', async () => {
             const hashForCustomHasher = '0x9e4b4835f6ea5ce55bd1037fe92040dd070af6154aefc30d32c65364a1123cae'
             const customHasher = () => hashForCustomHasher
 
@@ -346,7 +337,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             await expect(tx.signWithKey(sender, customHasher)).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-465: input: keyring, index, custom hasher. should use custom hasher when sign transaction.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-465: input: keyring, index, custom hasher. should use custom hasher when sign transaction.', async () => {
             const hashForCustomHasher = '0x9e4b4835f6ea5ce55bd1037fe92040dd070af6154aefc30d32c65364a1123cae'
             const customHasher = () => hashForCustomHasher
 
@@ -362,7 +353,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(roleBasedSignWithKeySpy).to.have.been.calledWith(hashForCustomHasher, '0x7e3', 0, 1)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-466: input: keyring. should throw error when from is different.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-466: input: keyring. should throw error when from is different.', async () => {
             transactionObj.from = roleBasedKeyring.address
             tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(transactionObj)
 
@@ -370,7 +361,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             await expect(tx.signWithKey(sender)).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-467: input: rolebased keyring, index out of range. should throw error.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-467: input: rolebased keyring, index out of range. should throw error.', async () => {
             transactionObj.from = roleBasedKeyring.address
             tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(transactionObj)
 
@@ -411,7 +402,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             if (!customHasher) expect(hasherSpy).to.have.been.calledWith(tx)
         }
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-468: input: keyring. If feePayer is not defined, should be set with keyring address.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-468: input: keyring. If feePayer is not defined, should be set with keyring address.', async () => {
             tx.feePayer = '0x'
             await tx.signFeePayerWithKey(sender)
 
@@ -422,7 +413,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(senderSignWithKeySpy).to.have.been.calledWith(txHash, '0x7e3', 2, 0)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-469: input: keyring. should sign transaction.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-469: input: keyring. should sign transaction.', async () => {
             await tx.signFeePayerWithKey(sender)
 
             checkFunctionCall()
@@ -431,7 +422,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(senderSignWithKeySpy).to.have.been.calledWith(txHash, '0x7e3', 2, 0)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-470: input: private key string. should sign transaction.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-470: input: private key string. should sign transaction.', async () => {
             const signWithKeyProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKey')
             await tx.signFeePayerWithKey(sender.keys[0][0].privateKey)
 
@@ -441,7 +432,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(signWithKeyProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 2, 0)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-471: input: KlaytnWalletKey. should sign transaction.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-471: input: KlaytnWalletKey. should sign transaction.', async () => {
             const signWithKeyProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKey')
             await tx.signFeePayerWithKey(sender.getKlaytnWalletKey())
 
@@ -451,7 +442,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(signWithKeyProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 2, 0)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-472: input: keyring, index. should sign transaction with specific index.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-472: input: keyring, index. should sign transaction with specific index.', async () => {
             const roleBasedSignWithKeySpy = sandbox.spy(roleBasedKeyring, 'signWithKey')
 
             tx.feePayer = roleBasedKeyring.address
@@ -464,7 +455,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(roleBasedSignWithKeySpy).to.have.been.calledWith(txHash, '0x7e3', 2, 1)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-473: input: keyring, custom hasher. should throw error.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-473: input: keyring, custom hasher. should throw error.', async () => {
             const hashForCustomHasher = '0x9e4b4835f6ea5ce55bd1037fe92040dd070af6154aefc30d32c65364a1123cae'
             const customHasher = () => hashForCustomHasher
 
@@ -472,7 +463,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             await expect(tx.signFeePayerWithKey(sender, customHasher)).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-474: input: keyring, index, custom hasher. should use custom hasher when sign transaction.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-474: input: keyring, index, custom hasher. should use custom hasher when sign transaction.', async () => {
             const hashForCustomHasher = '0x9e4b4835f6ea5ce55bd1037fe92040dd070af6154aefc30d32c65364a1123cae'
             const customHasher = () => hashForCustomHasher
 
@@ -488,14 +479,14 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(roleBasedSignWithKeySpy).to.have.been.calledWith(hashForCustomHasher, '0x7e3', 2, 1)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-475: input: keyring. should throw error when feePayer is different.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-475: input: keyring. should throw error when feePayer is different.', async () => {
             tx.feePayer = roleBasedKeyring.address
 
             const expectedError = `The feePayer address of the transaction is different with the address of the keyring to use.`
             await expect(tx.signFeePayerWithKey(sender)).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-476: input: rolebased keyring, index out of range. should throw error.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-476: input: rolebased keyring, index out of range. should throw error.', async () => {
             transactionObj.from = roleBasedKeyring.address
             tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(transactionObj)
 
@@ -535,7 +526,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             if (!customHasher) expect(hasherSpy).to.have.been.calledWith(tx)
         }
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-477: input: keyring. should sign transaction.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-477: input: keyring. should sign transaction.', async () => {
             await tx.signWithKeys(sender)
 
             checkFunctionCall()
@@ -544,7 +535,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(senderSignWithKeysSpy).to.have.been.calledWith(txHash, '0x7e3', 0)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-478: input: private key string. should sign transaction.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-478: input: private key string. should sign transaction.', async () => {
             const signWithKeysProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKeys')
             await tx.signWithKeys(sender.keys[0][0].privateKey)
 
@@ -554,7 +545,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(signWithKeysProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 0)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-479: input: KlaytnWalletKey. should sign transaction.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-479: input: KlaytnWalletKey. should sign transaction.', async () => {
             const signWithKeysProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKeys')
             await tx.signWithKeys(sender.getKlaytnWalletKey())
 
@@ -564,7 +555,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(signWithKeysProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 0)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-480: input: keyring, custom hasher. should use custom hasher when sign transaction.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-480: input: keyring, custom hasher. should use custom hasher when sign transaction.', async () => {
             const hashForCustomHasher = '0x9e4b4835f6ea5ce55bd1037fe92040dd070af6154aefc30d32c65364a1123cae'
             const customHasher = () => hashForCustomHasher
 
@@ -576,7 +567,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(senderSignWithKeysSpy).to.have.been.calledWith(hashForCustomHasher, '0x7e3', 0)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-481: input: keyring. should throw error when from is different.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-481: input: keyring. should throw error when from is different.', async () => {
             transactionObj.from = roleBasedKeyring.address
             tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(transactionObj)
 
@@ -584,7 +575,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             await expect(tx.signWithKeys(sender)).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-482: input: roleBased keyring. should sign with multiple keys and append signatures', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-482: input: roleBased keyring. should sign with multiple keys and append signatures', async () => {
             const roleBasedSignWithKeysSpy = sandbox.spy(roleBasedKeyring, 'signWithKeys')
 
             tx.from = roleBasedKeyring.address
@@ -629,7 +620,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             if (!customHasher) expect(hasherSpy).to.have.been.calledWith(tx)
         }
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-483: input: keyring. If feePayer is not defined, should be set with keyring address.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-483: input: keyring. If feePayer is not defined, should be set with keyring address.', async () => {
             tx.feePayer = '0x'
             await tx.signFeePayerWithKeys(sender)
 
@@ -639,7 +630,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(senderSignWithKeysSpy).to.have.been.calledWith(txHash, '0x7e3', 2)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-484: input: keyring. should sign transaction.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-484: input: keyring. should sign transaction.', async () => {
             await tx.signFeePayerWithKeys(sender)
 
             checkFunctionCall()
@@ -648,7 +639,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(senderSignWithKeysSpy).to.have.been.calledWith(txHash, '0x7e3', 2)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-485: input: private key string. should sign transaction.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-485: input: private key string. should sign transaction.', async () => {
             const signWithKeysProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKeys')
             await tx.signFeePayerWithKeys(sender.keys[0][0].privateKey)
 
@@ -658,7 +649,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(signWithKeysProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 2)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-486: input: KlaytnWalletKey. should sign transaction.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-486: input: KlaytnWalletKey. should sign transaction.', async () => {
             const signWithKeysProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKeys')
             await tx.signFeePayerWithKeys(sender.getKlaytnWalletKey())
 
@@ -668,7 +659,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(signWithKeysProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 2)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-487: input: keyring, custom hasher. should use custom hasher when sign transaction.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-487: input: keyring, custom hasher. should use custom hasher when sign transaction.', async () => {
             const hashForCustomHasher = '0x9e4b4835f6ea5ce55bd1037fe92040dd070af6154aefc30d32c65364a1123cae'
             const customHasher = () => hashForCustomHasher
 
@@ -680,14 +671,14 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(senderSignWithKeysSpy).to.have.been.calledWith(hashForCustomHasher, '0x7e3', 2)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-488: input: keyring. should throw error when feePayer is different.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-488: input: keyring. should throw error when feePayer is different.', async () => {
             tx.feePayer = roleBasedKeyring.address
 
             const expectedError = `The feePayer address of the transaction is different with the address of the keyring to use.`
             await expect(tx.signFeePayerWithKeys(sender)).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-489: input: roleBased keyring. should sign with multiple keys and append signatures', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-489: input: roleBased keyring. should sign with multiple keys and append signatures', async () => {
             const roleBasedSignWithKeysSpy = sandbox.spy(roleBasedKeyring, 'signWithKeys')
 
             tx.feePayer = roleBasedKeyring.address
@@ -706,7 +697,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             sandbox.restore()
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-490: If signatures is empty, appendSignatures append signatures in transaction', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-490: If signatures is empty, appendSignatures append signatures in transaction', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(transactionObj)
 
             const sig = [
@@ -718,7 +709,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             checkSignature(tx)
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-491: If signatures is empty, appendSignatures append signatures with two-dimensional signature array', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-491: If signatures is empty, appendSignatures append signatures with two-dimensional signature array', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(transactionObj)
 
             const sig = [
@@ -732,7 +723,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             checkSignature(tx)
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-492: If signatures is not empty, appendSignatures should append signatures', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-492: If signatures is not empty, appendSignatures should append signatures', () => {
             transactionObj.signatures = [
                 '0x0fea',
                 '0xade9480f584fe481bf070ab758ecc010afa15debc33e1bd75af637d834073a6e',
@@ -750,7 +741,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             checkSignature(tx, { expectedLength: 2 })
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-493: appendSignatures should append multiple signatures', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-493: appendSignatures should append multiple signatures', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(transactionObj)
 
             const sig = [
@@ -779,7 +770,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             sandbox.restore()
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-494: If feePayerSignatures is empty, appendFeePayerSignatures append feePayerSignatures in transaction', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-494: If feePayerSignatures is empty, appendFeePayerSignatures append feePayerSignatures in transaction', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(transactionObj)
 
             const sig = [
@@ -791,7 +782,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             checkFeePayerSignature(tx)
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-495: If feePayerSignatures is empty, appendFeePayerSignatures append feePayerSignatures with two-dimensional signature array', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-495: If feePayerSignatures is empty, appendFeePayerSignatures append feePayerSignatures with two-dimensional signature array', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(transactionObj)
 
             const sig = [
@@ -805,7 +796,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             checkFeePayerSignature(tx)
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-496: If feePayerSignatures is not empty, appendFeePayerSignatures should append feePayerSignatures', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-496: If feePayerSignatures is not empty, appendFeePayerSignatures should append feePayerSignatures', () => {
             transactionObj.feePayerSignatures = [
                 '0x0fea',
                 '0xade9480f584fe481bf070ab758ecc010afa15debc33e1bd75af637d834073a6e',
@@ -823,7 +814,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             checkFeePayerSignature(tx, { expectedLength: 2 })
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-497: appendFeePayerSignatures should append multiple feePayerSignatures', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-497: appendFeePayerSignatures should append multiple feePayerSignatures', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(transactionObj)
 
             const sig = [
@@ -860,7 +851,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             sandbox.restore()
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-498: combineSignatures combines single signature and sets signatures in transaction', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-498: combineSignatures combines single signature and sets signatures in transaction', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(transactionObj)
             const appendSignaturesSpy = sandbox.spy(tx, 'appendSignatures')
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
@@ -883,7 +874,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             checkSignature(tx, { expectedSignatures })
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-499: combineSignatures combines multiple signatures and sets signatures in transaction', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-499: combineSignatures combines multiple signatures and sets signatures in transaction', () => {
             transactionObj.signatures = [
                 [
                     '0x0fea',
@@ -930,7 +921,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             checkSignature(tx, { expectedSignatures })
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-500: combineSignatures combines single feePayerSignature and sets feePayerSignatures in transaction', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-500: combineSignatures combines single feePayerSignature and sets feePayerSignatures in transaction', () => {
             transactionObj.feePayer = '0x75d141c9dbefde51f488c8d79da55f48282a1e52'
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(transactionObj)
             const appendSignaturesSpy = sandbox.spy(tx, 'appendFeePayerSignatures')
@@ -954,7 +945,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             checkFeePayerSignature(tx, { expectedSignatures })
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-501: combineSignatures combines multiple feePayerSignatures and sets feePayerSignatures in transaction', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-501: combineSignatures combines multiple feePayerSignatures and sets feePayerSignatures in transaction', () => {
             transactionObj.feePayer = '0x75d141c9dbefde51f488c8d79da55f48282a1e52'
             transactionObj.feePayerSignatures = [
                 [
@@ -1002,7 +993,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             checkFeePayerSignature(tx, { expectedSignatures })
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-502: combineSignatures combines multiple signatures and feePayerSignatures', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-502: combineSignatures combines multiple signatures and feePayerSignatures', () => {
             let tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(transactionObj)
 
             // RLP encoding with only signatures
@@ -1065,7 +1056,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             checkFeePayerSignature(tx, { expectedFeePayerSignatures })
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-503: If decode transaction has different values, combineSignatures should throw error', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-503: If decode transaction has different values, combineSignatures should throw error', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(transactionObj)
             tx.nonce = 1234
 
@@ -1082,7 +1073,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             sandbox.restore()
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-504: getRawTransaction should call getRLPEncoding function', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-504: getRawTransaction should call getRLPEncoding function', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(txWithExpectedValues.tx)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
@@ -1098,7 +1089,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             sandbox.restore()
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-505: getTransactionHash should call getRLPEncoding function and return hash of RLPEncoding', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-505: getTransactionHash should call getRLPEncoding function and return hash of RLPEncoding', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(txWithExpectedValues.tx)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
             const txHash = tx.getTransactionHash()
@@ -1108,7 +1099,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(caver.utils.isValidHashStrict(txHash)).to.be.true
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-506: getTransactionHash should throw error when nonce is undefined', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-506: getTransactionHash should throw error when nonce is undefined', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(txWithExpectedValues.tx)
             delete tx._nonce
 
@@ -1117,20 +1108,11 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(() => tx.getTransactionHash()).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-507: getTransactionHash should throw error when gasPrice is undefined', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-507: getTransactionHash should throw error when gasPrice is undefined', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(txWithExpectedValues.tx)
             delete tx._gasPrice
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getTransactionHash()).to.throw(expectedError)
-        })
-
-        it('CAVERJS-UNIT-TRANSACTIONFD-508: getTransactionHash should throw error when chainId is undefined', () => {
-            const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(txWithExpectedValues.tx)
-            delete tx._chainId
-
-            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getTransactionHash()).to.throw(expectedError)
         })
@@ -1141,7 +1123,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             sandbox.restore()
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-509: getSenderTxHash should call getRLPEncoding function and return hash of RLPEncoding', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-509: getSenderTxHash should call getRLPEncoding function and return hash of RLPEncoding', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(txWithExpectedValues.tx)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
@@ -1152,7 +1134,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(caver.utils.isValidHashStrict(senderTxHash)).to.be.true
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-510: getSenderTxHash should throw error when nonce is undefined', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-510: getSenderTxHash should throw error when nonce is undefined', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(txWithExpectedValues.tx)
             delete tx._nonce
 
@@ -1161,20 +1143,11 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(() => tx.getSenderTxHash()).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-511: getSenderTxHash should throw error when gasPrice is undefined', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-511: getSenderTxHash should throw error when gasPrice is undefined', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(txWithExpectedValues.tx)
             delete tx._gasPrice
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getSenderTxHash()).to.throw(expectedError)
-        })
-
-        it('CAVERJS-UNIT-TRANSACTIONFD-512: getSenderTxHash should throw error when chainId is undefined', () => {
-            const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(txWithExpectedValues.tx)
-            delete tx._chainId
-
-            const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getSenderTxHash()).to.throw(expectedError)
         })
@@ -1185,7 +1158,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             sandbox.restore()
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-513: getRLPEncodingForSignature should return RLP-encoded transaction string for signing', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-513: getRLPEncodingForSignature should return RLP-encoded transaction string for signing', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(txWithExpectedValues.tx)
 
             const commonRLPForSigningSpy = sandbox.spy(tx, 'getCommonRLPEncodingForSignature')
@@ -1196,7 +1169,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(commonRLPForSigningSpy).to.have.been.calledOnce
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-514: getRLPEncodingForSignature should throw error when nonce is undefined', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-514: getRLPEncodingForSignature should throw error when nonce is undefined', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(txWithExpectedValues.tx)
             delete tx._nonce
 
@@ -1205,7 +1178,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(() => tx.getRLPEncodingForSignature()).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-515: getRLPEncodingForSignature should throw error when gasPrice is undefined', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-515: getRLPEncodingForSignature should throw error when gasPrice is undefined', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(txWithExpectedValues.tx)
             delete tx._gasPrice
 
@@ -1214,7 +1187,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(() => tx.getRLPEncodingForSignature()).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-516: getRLPEncodingForSignature should throw error when chainId is undefined', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-516: getRLPEncodingForSignature should throw error when chainId is undefined', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(txWithExpectedValues.tx)
             delete tx._chainId
 
@@ -1225,7 +1198,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
     })
 
     context('feeDelegatedChainDataAnchoringWithRatio.getCommonRLPEncodingForSignature', () => {
-        it('CAVERJS-UNIT-TRANSACTIONFD-517: getRLPEncodingForSignature should return RLP-encoded transaction string for signing', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-517: getRLPEncodingForSignature should return RLP-encoded transaction string for signing', () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(txWithExpectedValues.tx)
 
             const commonRLPForSign = tx.getCommonRLPEncodingForSignature()
@@ -1236,7 +1209,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
     })
 
     context('feeDelegatedChainDataAnchoringWithRatio.fillTransaction', () => {
-        it('CAVERJS-UNIT-TRANSACTIONFD-518: fillTransaction should call klay_getGasPrice to fill gasPrice when gasPrice is undefined', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-518: fillTransaction should call klay_getGasPrice to fill gasPrice when gasPrice is undefined', async () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(txWithExpectedValues.tx)
             delete tx._gasPrice
 
@@ -1246,7 +1219,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(getChainIdSpy).not.to.have.been.calledOnce
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-519: fillTransaction should call klay_getTransactionCount to fill nonce when nonce is undefined', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-519: fillTransaction should call klay_getTransactionCount to fill nonce when nonce is undefined', async () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(txWithExpectedValues.tx)
             delete tx._nonce
 
@@ -1256,7 +1229,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
             expect(getChainIdSpy).not.to.have.been.calledOnce
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-520: fillTransaction should call klay_getChainid to fill chainId when chainId is undefined', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-520: fillTransaction should call klay_getChainid to fill chainId when chainId is undefined', async () => {
             const tx = new caver.transaction.feeDelegatedChainDataAnchoringWithRatio(txWithExpectedValues.tx)
             delete tx._chainId
 

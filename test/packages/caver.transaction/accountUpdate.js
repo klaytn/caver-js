@@ -395,17 +395,6 @@ describe('TxTypeAccountUpdate', () => {
                 expect(() => tx.getRLPEncoding()).to.throw(expectedError)
             }
         })
-
-        it('CAVERJS-UNIT-TRANSACTION-159: getRLPEncoding should throw error when chainId is undefined', () => {
-            for (let i = 0; i < expectedValues.length; i++) {
-                const tx = new caver.transaction.accountUpdate(expectedValues[i].tx)
-                delete tx._chainId
-
-                const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
-
-                expect(() => tx.getRLPEncoding()).to.throw(expectedError)
-            }
-        })
     })
 
     context('accountUpdate.signWithKey', () => {
@@ -898,17 +887,6 @@ describe('TxTypeAccountUpdate', () => {
                 expect(() => tx.getTransactionHash()).to.throw(expectedError)
             }
         })
-
-        it('CAVERJS-UNIT-TRANSACTION-185: getTransactionHash should throw error when chainId is undefined', () => {
-            for (let i = 0; i < expectedValues.length; i++) {
-                const tx = new caver.transaction.accountUpdate(expectedValues[i].tx)
-                delete tx._chainId
-
-                const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
-
-                expect(() => tx.getTransactionHash()).to.throw(expectedError)
-            }
-        })
     })
 
     context('accountUpdate.getSenderTxHash', () => {
@@ -948,17 +926,6 @@ describe('TxTypeAccountUpdate', () => {
                 delete tx._gasPrice
 
                 const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
-
-                expect(() => tx.getSenderTxHash()).to.throw(expectedError)
-            }
-        })
-
-        it('CAVERJS-UNIT-TRANSACTION-189: getSenderTxHash should throw error when chainId is undefined', () => {
-            for (let i = 0; i < expectedValues.length; i++) {
-                const tx = new caver.transaction.accountUpdate(expectedValues[i].tx)
-                delete tx._chainId
-
-                const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
 
                 expect(() => tx.getSenderTxHash()).to.throw(expectedError)
             }
