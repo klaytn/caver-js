@@ -679,7 +679,7 @@ class Keyring {
 
         options = options || {}
 
-        const crypto = encryptKey(this._keys[0][0], password, options)
+        const crypto = encryptKey(this._keys[0][0], password, options)[0]
 
         return formatEncrypted(3, this._address, crypto, options)
     }
