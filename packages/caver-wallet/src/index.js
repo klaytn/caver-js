@@ -50,7 +50,7 @@ class KeyringContainer {
     /**
      * generates keyrings in the keyringContainer with randomly generated key pairs.
      *
-     * @param {number} numberOfKeyrings The number of accounts to create.
+     * @param {number} numberOfKeyrings The number of keyrings to create.
      * @param {string} [entropy] A random string to increase entropy. If undefined, a random string will be generated using randomHex.
      * @return {Array.<string>}
      */
