@@ -53,7 +53,7 @@ const generateMultiSigKeyring = (num = 3) => {
 
 const generateRoleBasedKeyring = numArr => {
     if (numArr === undefined) {
-        numArr = Array(KEY_ROLE.RoleLast).fill(1)
+        numArr = Array(KEY_ROLE.roleLast).fill(1)
     }
     const keyring = Keyring.generate()
     keyring.keys = Keyring.generateRoleBasedKeys(numArr)

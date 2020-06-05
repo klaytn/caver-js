@@ -19,13 +19,13 @@
 const _ = require('lodash')
 
 const KEY_ROLE = {
-    RoleTransactionKey: 0,
-    0: 'RoleTransactionKey',
-    RoleAccountUpdateKey: 1,
-    1: 'RoleAccountUpdateKey',
-    RoleFeePayerKey: 2,
-    2: 'RoleFeePayerKey',
-    RoleLast: 3,
+    roleTransactionKey: 0,
+    0: 'roleTransactionKey',
+    roleAccountUpdateKey: 1,
+    1: 'roleAccountUpdateKey',
+    roleFeePayerKey: 2,
+    2: 'roleFeePayerKey',
+    roleLast: 3,
 }
 
 const MAXIMUM_KEY_NUM = 10
@@ -39,7 +39,7 @@ const isMultipleKeysFormat = keys => {
 
 const isRoleBasedKeysFormat = roledBasedKeyArray => {
     if (!_.isArray(roledBasedKeyArray)) return false
-    if (roledBasedKeyArray.length > KEY_ROLE.RoleLast) return false
+    if (roledBasedKeyArray.length > KEY_ROLE.roleLast) return false
 
     return roledBasedKeyArray.every(arr => {
         return _.isArray(arr)
