@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable class-methods-use-this */
 /*
     Copyright 2020 The caver-js Authors
     This file is part of the caver-js library.
