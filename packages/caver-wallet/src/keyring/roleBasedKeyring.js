@@ -24,7 +24,7 @@ const PrivateKey = require('./privateKey')
 const { KEY_ROLE, MAXIMUM_KEY_NUM, isMultipleKeysFormat, isRoleBasedKeysFormat } = require('./keyringHelper')
 const Account = require('../../../caver-account')
 const { fillWeightedMultiSigOptionsForRoleBased } = require('../../../caver-account/src/accountKey/accountKeyHelper')
-const { validateForSigning, validateIndexWithKeys, encryptKey, formatEncrypted } = require('./keyringHelper')
+const { validateForSigning, validateIndexWithKeys, encryptKey, formatEncrypted, checkDependentOptionalParams } = require('./keyringHelper')
 
 /**
  * representing a Keyring which includes `address` and `private keys` by roles.
@@ -107,17 +107,18 @@ class RoleBasedKeyring extends AbstractKeyring {
      *
      * @param {string} transactionHash The hash of transaction.
      * @param {string|number} chainId The chainId specific to the network.
-     * @param {number} role A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
-     * @param {number} [index] The index of the key to be used. (default: 0)
+     * @param {number} [role] (default: `caver.wallet.keyring.role.roleTransactionKey`) A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
+     * @param {number} [index] (default: 0) The index of the key to be used. In order to define index, role should be defined.
      * @return {Array<string>}
      */
     signWithKey(transactionHash, chainId, role, index = 0) {
-        validateForSigning(transactionHash, chainId)
-        if (role === undefined) throw new Error(`role should be defined to sign.`)
+        const optionalParams = checkDependentOptionalParams(role, index)
 
-        const keys = this.getKeyByRole(role)
-        validateIndexWithKeys(index, keys.length)
-        return keys[index].sign(transactionHash, chainId)
+        validateForSigning(transactionHash, chainId)
+
+        const keys = this.getKeyByRole(optionalParams.role)
+        validateIndexWithKeys(optionalParams.index, keys.length)
+        return keys[optionalParams.index].sign(transactionHash, chainId)
     }
 
     /**
@@ -125,17 +126,17 @@ class RoleBasedKeyring extends AbstractKeyring {
      *
      * @param {string} transactionHash The hash of transaction.
      * @param {string|number} chainId the chain id specific to the network
-     * @param {number} role A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
+     * @param {number} [role] (default: `caver.wallet.keyring.role.roleTransactionKey`) A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
      * @return {Array.<Array<string>>}
      */
     signWithKeys(transactionHash, chainId, role) {
         validateForSigning(transactionHash, chainId)
-        if (role === undefined) throw new Error(`role should be defined to sign.`)
+        if (role === undefined) role = KEY_ROLE.roleTransactionKey
 
         const signatures = []
 
-        for (const key of this.getKeyByRole(role)) {
-            signatures.push(key.sign(transactionHash, chainId))
+        for (let i = 0; i < this.getKeyByRole(role).length; i++) {
+            signatures.push(this.signWithKey(transactionHash, chainId, role, i))
         }
 
         return signatures
@@ -150,22 +151,13 @@ class RoleBasedKeyring extends AbstractKeyring {
      * @return {object}
      */
     signMessage(message, role, index) {
+        const optionalParams = checkDependentOptionalParams(role, index)
         const messageHash = utils.hashMessage(message)
-        if (role === undefined && index === undefined) {
-            role = KEY_ROLE.roleTransactionKey
-            if (this._keys[role].length === 0) throw new Error(`Default key(${KEY_ROLE[0]}) does not have enough keys to sign.`)
-            index = 0
-        } else if (role === undefined || index === undefined) {
-            throw new Error(
-                `To sign the given message, both role and index must be defined. ` +
-                    `If both role and index are not defined, this function signs the message using the default key(${KEY_ROLE[0]}[0]).`
-            )
-        }
 
-        const keys = this.getKeyByRole(role)
-        validateIndexWithKeys(index, keys.length)
+        const keys = this.getKeyByRole(optionalParams.role)
+        validateIndexWithKeys(optionalParams.index, keys.length)
 
-        const signature = keys[index].signMessage(messageHash)
+        const signature = keys[optionalParams.index].signMessage(messageHash)
         return {
             messageHash,
             signature,

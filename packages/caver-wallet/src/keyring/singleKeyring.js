@@ -21,10 +21,10 @@ const utils = require('../../../caver-utils')
 const PrivateKey = require('./privateKey')
 const { KEY_ROLE } = require('./keyringHelper')
 const Account = require('../../../caver-account')
-const { validateForSigning, validateIndexWithKeys, encryptKey, formatEncrypted } = require('./keyringHelper')
+const { validateForSigning, validateIndexWithKeys, encryptKey, formatEncrypted, checkDependentOptionalParams } = require('./keyringHelper')
 
 /**
- * representing a Keyring which includes `address` and `private key`.
+ * representing a Keyring which includes `address` and a `private key`.
  * @class
  */
 class SingleKeyring extends AbstractKeyring {
@@ -72,20 +72,21 @@ class SingleKeyring extends AbstractKeyring {
     }
 
     /**
-     * signs with transactionHash with key and returns signature.
+     * signs with transactionHash with a key and returns signature.
      *
      * @param {string} transactionHash The hash of transaction.
      * @param {string|number} chainId The chainId specific to the network.
-     * @param {number} role A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
-     * @param {number} [index] The index of the key to be used. (default: 0)
+     * @param {number} [role] (default: `caver.wallet.keyring.role.roleTransactionKey`) A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
+     * @param {number} [index] (default: 0) The index of the key to be used. In order to define index, role should be defined.
      * @return {Array<string>}
      */
-    signWithKey(transactionHash, chainId, role, index = 0) {
-        validateForSigning(transactionHash, chainId)
-        if (role === undefined) throw new Error(`role should be defined to sign.`)
+    signWithKey(transactionHash, chainId, role, index) {
+        const optionalParams = checkDependentOptionalParams(role, index)
 
-        const key = this.getKeyByRole(role)
-        validateIndexWithKeys(index, 1)
+        validateForSigning(transactionHash, chainId)
+
+        const key = this.getKeyByRole(optionalParams.role)
+        validateIndexWithKeys(optionalParams.index, 1)
         return key.sign(transactionHash, chainId)
     }
 
@@ -94,11 +95,11 @@ class SingleKeyring extends AbstractKeyring {
      *
      * @param {string} transactionHash The hash of transaction.
      * @param {string|number} chainId the chain id specific to the network
-     * @param {number} role A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
+     * @param {number} [role] A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
      * @return {Array.<Array<string>>}
      */
-    signWithKeys(transactionHash, chainId, role) {
-        return [this.signWithKey(transactionHash, chainId, role)]
+    signWithKeys(transactionHash, chainId, role = 0) {
+        return [this.signWithKey(transactionHash, chainId, role, 0)]
     }
 
     /**
@@ -110,19 +111,11 @@ class SingleKeyring extends AbstractKeyring {
      * @return {object}
      */
     signMessage(message, role, index) {
+        const optionalParams = checkDependentOptionalParams(role, index)
         const messageHash = utils.hashMessage(message)
-        if (role === undefined && index === undefined) {
-            role = KEY_ROLE.roleTransactionKey
-            index = 0
-        } else if (role === undefined || index === undefined) {
-            throw new Error(
-                `To sign the given message, both role and index must be defined. ` +
-                    `If both role and index are not defined, this function signs the message using the default key(${KEY_ROLE[0]}[0]).`
-            )
-        }
 
-        const key = this.getKeyByRole(role)
-        validateIndexWithKeys(index, 1)
+        const key = this.getKeyByRole(optionalParams.role)
+        validateIndexWithKeys(optionalParams.index, 1)
 
         const signature = key.signMessage(messageHash)
         return {
@@ -158,8 +151,7 @@ class SingleKeyring extends AbstractKeyring {
      *
      * @return {Account}
      */
-    toAccount(options) {
-        if (options) throw new Error(`options cannot be defined with single key.`)
+    toAccount() {
         if (!this.key) throw new Error(`Failed to create Account instance: Empty key in keyring.`)
         const publicKey = this.getPublicKey()
         return Account.createWithAccountKeyPublic(this.address, publicKey)
