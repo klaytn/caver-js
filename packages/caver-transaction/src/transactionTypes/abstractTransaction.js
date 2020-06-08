@@ -23,6 +23,7 @@ const Hash = require('eth-lib/lib/hash')
 const TransactionHasher = require('../transactionHasher/transactionHasher')
 const utils = require('../../../caver-utils')
 const Keyring = require('../../../caver-wallet/src/keyring/keyring')
+const AbstractKeyring = require('../../../caver-wallet/src/keyring/abstractKeyring')
 const { TX_TYPE_STRING, refineSignatures, typeDetectionFromRLPEncoding } = require('../transactionHelper/transactionHelper')
 const { KEY_ROLE } = require('../../../caver-wallet/src/keyring/keyringHelper')
 const { validateParams } = require('../../../caver-core-helpers/src/validateFunction')
@@ -155,7 +156,7 @@ class AbstractTransaction {
         if (_.isString(key)) {
             keyring = Keyring.createFromPrivateKey(key)
         }
-        if (!(keyring instanceof Keyring))
+        if (!(keyring instanceof AbstractKeyring))
             throw new Error(
                 `Unsupported key type. The key must be a single private key string, KlaytnWalletKey string, or Keyring instance.`
             )
@@ -190,7 +191,7 @@ class AbstractTransaction {
     async signWithKeys(key, hasher = TransactionHasher.getHashForSignature) {
         let keyring = key
         if (_.isString(key)) keyring = Keyring.createFromPrivateKey(key)
-        if (!(keyring instanceof Keyring))
+        if (!(keyring instanceof AbstractKeyring))
             throw new Error(
                 `Unsupported key type. The key must be a single private key string, KlaytnWalletKey string, or Keyring instance.`
             )

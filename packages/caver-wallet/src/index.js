@@ -18,6 +18,7 @@
 
 const _ = require('lodash')
 const Keyring = require('./keyring/keyring')
+const AbstractKeyring = require('./keyring/abstractKeyring')
 const TransactionHasher = require('../../caver-transaction/src/transactionHasher/transactionHasher')
 const utils = require('../../caver-utils/src')
 
@@ -89,7 +90,7 @@ class KeyringContainer {
             }
         }
 
-        if (!(keyring instanceof Keyring)) throw new Error(`Unsupported type value: ${key} (type:${typeof key})`)
+        if (!(keyring instanceof AbstractKeyring)) throw new Error(`Unsupported type value: ${key} (type:${typeof key})`)
 
         return this.add(keyring)
     }
@@ -106,8 +107,10 @@ class KeyringContainer {
         const founded = this._addressKeyringMap.get(keyring.address.toLowerCase())
         if (founded === undefined) throw new Error(`Failed to find keyring to update`)
 
-        founded.keys = keyring.copy().keys
-        return founded
+        this.remove(founded.address)
+        this.add(keyring)
+
+        return keyring
     }
 
     /**

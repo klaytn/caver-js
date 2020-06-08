@@ -17,19 +17,16 @@
 */
 
 const _ = require('lodash')
-const scrypt = require('@web3-js/scrypt-shim')
-const uuid = require('uuid')
-const cryp = typeof global === 'undefined' ? require('crypto-browserify') : require('crypto')
 const AccountLib = require('eth-lib/lib/account')
 
-const utils = require('../../../caver-utils')
+const utils = require('../../../caver-utils/src')
 const PrivateKey = require('./privateKey')
-const { KEY_ROLE, MAXIMUM_KEY_NUM, isMultipleKeysFormat, isRoleBasedKeysFormat } = require('./keyringHelper')
-const Account = require('../../../caver-account')
-const {
-    fillWeightedMultiSigOptionsForMultiSig,
-    fillWeightedMultiSigOptionsForRoleBased,
-} = require('../../../caver-account/src/accountKey/accountKeyHelper')
+const { KEY_ROLE, isMultipleKeysFormat, isRoleBasedKeysFormat } = require('./keyringHelper')
+const { decryptKey } = require('./keyringHelper')
+const SingleKeyring = require('./singleKeyring')
+const MultipleKeyring = require('./multipleKeyring')
+const RoleBasedKeyring = require('./roleBasedKeyring')
+const AbstractKeyring = require('./abstractKeyring')
 
 /**
  * representing a Keyring which includes `address` and `private keys` by roles.
@@ -171,7 +168,7 @@ class Keyring {
         if (utils.isKlaytnWalletKey(key))
             throw new Error(`Invalid format of parameter. Use 'fromKlaytnWalletKey' to create Keyring from KlaytnWalletKey.`)
 
-        return new Keyring(address, key)
+        return new SingleKeyring(address, key)
     }
 
     /**
@@ -185,7 +182,7 @@ class Keyring {
         if (!isMultipleKeysFormat(keyArray))
             throw new Error(`Invalid format of parameter. 'keyArray' should be an array of private key strings.`)
 
-        return new Keyring(address, keyArray)
+        return new MultipleKeyring(address, keyArray)
     }
 
     /**
@@ -201,7 +198,7 @@ class Keyring {
                 `Invalid format of parameter. 'roledBasedKeyArray' should be in the form of an array defined as an array for the keys to be used for each role.`
             )
 
-        return new Keyring(address, roledBasedKeyArray)
+        return new RoleBasedKeyring(address, roledBasedKeyArray)
     }
 
     /**
@@ -226,7 +223,7 @@ class Keyring {
             } else {
                 throw new Error(`Invalid key format.`)
             }
-        } else if (key instanceof Keyring) {
+        } else if (key instanceof AbstractKeyring) {
             keyring = key
         } else if (_.isString(key)) {
             if (options.address) {
@@ -309,10 +306,9 @@ class Keyring {
             delete json.crypto
         }
 
-        const keys = []
-
         // AccountKeyRoleBased format
         if (_.isArray(json.keyring[0])) {
+            const keys = []
             const transactionKey = decryptKey(json.keyring[KEY_ROLE.roleTransactionKey], password)
             transactionKey ? keys.push(transactionKey) : keys.push([])
 
@@ -321,18 +317,15 @@ class Keyring {
 
             const feePayerKey = decryptKey(json.keyring[KEY_ROLE.roleFeePayerKey], password)
             feePayerKey ? keys.push(feePayerKey) : keys.push([])
-        } else {
-            let decrypted = decryptKey(json.keyring, password)
-            decrypted = _.isArray(decrypted) ? decrypted : [decrypted]
-            keys.push(decrypted)
 
-            // Make format like "[[keys], [], []]"
-            for (let i = 0; i < KEY_ROLE.roleLast - decrypted.length; i++) {
-                keys.push([])
-            }
+            return Keyring.createWithRoleBasedKey(json.address, keys)
         }
 
-        return Keyring.createWithRoleBasedKey(json.address, keys)
+        let decrypted = decryptKey(json.keyring, password)
+        decrypted = _.isArray(decrypted) ? decrypted : [decrypted]
+        if (decrypted.length === 1) return Keyring.createWithSingleKey(json.address, decrypted[0])
+
+        return Keyring.createWithMultipleKey(json.address, decrypted)
     }
 
     /**
@@ -354,559 +347,9 @@ class Keyring {
 
         return AccountLib.recover(message, AccountLib.encodeSignature(signature)).toLowerCase()
     }
-
-    /**
-     * creates a keyring.
-     * @param {string} address - The address of keyring.
-     * @param {string|Array.<string>|Array.<Array<string>>|PrivateKey|Array.<PrivateKey>|Array.<Array<PrivateKey>>} keys - The key(s) to use in keyring.
-     */
-    constructor(address, keys) {
-        this.address = address
-        this.keys = keys
-    }
-
-    /**
-     * @type {string}
-     */
-    get address() {
-        return this._address
-    }
-
-    set address(addressInput) {
-        if (!utils.isAddress(addressInput)) throw new Error(`Invalid address : ${addressInput}`)
-
-        this._address = utils.addHexPrefix(addressInput).toLowerCase()
-    }
-
-    /**
-     * @type {Array.<PrivateKey>}
-     */
-    get roleTransactionKey() {
-        return this.getKeyByRole(KEY_ROLE.roleTransactionKey)
-    }
-
-    /**
-     * @type {Array.<PrivateKey>}
-     */
-    get roleAccountUpdateKey() {
-        return this.getKeyByRole(KEY_ROLE.roleAccountUpdateKey)
-    }
-
-    /**
-     * @type {Array.<PrivateKey>}
-     */
-    get roleFeePayerKey() {
-        return this.getKeyByRole(KEY_ROLE.roleFeePayerKey)
-    }
-
-    /**
-     * @type {Array.<Array.<PrivateKey>>}
-     */
-    get keys() {
-        return this._keys
-    }
-
-    set keys(keyInput) {
-        this._keys = formattingForKeyInKeyring(keyInput)
-    }
-
-    /**
-     * returns public key strings in format of role-based.
-     *
-     * @return {Array.<Array<string>>}
-     */
-    getPublicKey() {
-        const publicKeys = generateKeysFormat()
-        for (let i = 0; i < KEY_ROLE.roleLast; i++) {
-            for (const k of this._keys[i]) {
-                publicKeys[i].push(k.getPublicKey())
-            }
-        }
-        return publicKeys
-    }
-
-    /**
-     * returns a copied keyring instance
-     *
-     * @return {Keyring}
-     */
-    copy() {
-        return new Keyring(this._address, this._keys)
-    }
-
-    /**
-     * signs with transactionHash with key and returns signature.
-     *
-     * @param {string} transactionHash The hash of transaction.
-     * @param {string|number} chainId The chainId specific to the network.
-     * @param {number} role A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
-     * @param {number} [index] The index of the key to be used. (default: 0)
-     * @return {Array<string>}
-     */
-    signWithKey(transactionHash, chainId, role, index = 0) {
-        if (!utils.isValidHashStrict(transactionHash)) throw new Error(`Invalid transaction hash: ${transactionHash}`)
-
-        if (chainId === undefined) {
-            throw new Error(`chainId should be defined to sign.`)
-        } else {
-            chainId = utils.toHex(chainId)
-        }
-        if (role === undefined) throw new Error(`role should be defined to sign.`)
-
-        const keys = this.getKeyByRole(role)
-        if (!_.isNumber(index)) throw new Error(`Invalid type of index(${index}): index should be number type.`)
-        if (index < 0) throw new Error(`Invalid index(${index}): index cannot be negative.`)
-        if (index >= keys.length) throw new Error(`Invalid index(${index}): index must be less than the length of keys(${keys.length}).`)
-        return keys[index].sign(transactionHash, chainId)
-    }
-
-    /**
-     * signs with transactionHash with multiple keys and returns signatures.
-     *
-     * @param {string} transactionHash The hash of transaction.
-     * @param {string|number} chainId the chain id specific to the network
-     * @param {number} role A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
-     * @return {Array.<Array<string>>}
-     */
-    signWithKeys(transactionHash, chainId, role) {
-        if (!utils.isValidHashStrict(transactionHash)) throw new Error(`Invalid transaction hash: ${transactionHash}`)
-
-        if (chainId === undefined) {
-            throw new Error(`chainId should be defined to sign.`)
-        } else {
-            chainId = utils.toHex(chainId)
-        }
-        if (role === undefined) throw new Error(`role should be defined to sign.`)
-
-        const signatures = []
-
-        for (const key of this.getKeyByRole(role)) {
-            signatures.push(key.sign(transactionHash, chainId))
-        }
-
-        return signatures
-    }
-
-    /**
-     * signs with hashed data and returns result object that includes `signature`, `message` and `messageHash`
-     *
-     * @param {string} data The data string to sign.
-     * @param {number} [role] A number indicating the role of the key. You can use `caver.wallet.keyring.role`. (default: `caver.wallet.keyring.role.roleTransactionKey`)
-     * @param {number} [index] The index of the key to be used. (default: 0)
-     * @return {object}
-     */
-    signMessage(message, role, index) {
-        const messageHash = utils.hashMessage(message)
-        if (role === undefined && index === undefined) {
-            role = KEY_ROLE.roleTransactionKey
-            if (this._keys[role].length === 0) throw new Error(`Default key(${KEY_ROLE[0]}) does not have enough keys to sign.`)
-            index = 0
-        } else if (role === undefined || index === undefined) {
-            throw new Error(
-                `To sign the given message, both role and index must be defined. ` +
-                    `If both role and index are not defined, this function signs the message using the default key(${KEY_ROLE[0]}[0]).`
-            )
-        }
-
-        const keys = this.getKeyByRole(role)
-        if (index >= keys.length) throw new Error(`Invalid index(${index}): index must be less than the length of keys(${keys.length}).`)
-
-        const signature = keys[index].signMessage(messageHash)
-        return {
-            messageHash,
-            signature,
-            message,
-        }
-    }
-
-    /**
-     * returns keys by role.If the key of the role passed as parameter is empty, the default key is returned.
-     *
-     * @param {number} role A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
-     * @return {Array.<PrivateKey>}
-     */
-    getKeyByRole(role) {
-        if (role === undefined) throw new Error(`role should be defined.`)
-        let key = this._keys[role]
-        if (key.length === 0 && role > KEY_ROLE.roleTransactionKey) {
-            if (this._keys[KEY_ROLE.roleTransactionKey].length === 0) {
-                throw new Error(
-                    `The key with ${KEY_ROLE[role]} role does not exist. The ${KEY_ROLE[0]} for the default role is also empty.`
-                )
-            }
-
-            key = this._keys[KEY_ROLE.roleTransactionKey]
-        }
-        return key
-    }
-
-    /**
-     * returns KlaytnWalletKey format. If keyring uses more than one private key, this function will throw error.
-     *
-     * @return {string}
-     */
-    getKlaytnWalletKey() {
-        const notAvailableError = `The keyring cannot be exported in KlaytnWalletKey format. Use caver.wallet.keyring.encrypt or keyring.encrypt.`
-        if (this._keys[KEY_ROLE.roleTransactionKey].length > 1) throw new Error(notAvailableError)
-
-        for (let i = KEY_ROLE.roleAccountUpdateKey; i < KEY_ROLE.roleLast; i++) {
-            if (this._keys[i].length > 0) {
-                throw new Error(notAvailableError)
-            }
-        }
-
-        const address = utils.addHexPrefix(this._address)
-        const privateKey = utils.addHexPrefix(this._keys[0][0].privateKey)
-
-        return `${privateKey}0x00${address}`
-    }
-
-    /**
-     * returns an instance of Account.
-     *
-     * @param {WeightedMultiSigOptions|Array.<WeightedMultiSigOptions>} [options] The options that includes 'threshold' and 'weight'. This is only necessary when keyring use multiple private keys.
-     * @return {Account}
-     */
-    toAccount(options) {
-        let isRoleBased = false
-        let isWeightedMultiSig = false
-
-        // If key is empty in keyring, account cannot be created from keyring.
-        if (isEmptyKey(this._keys)) throw new Error(`Failed to create Account instance: Empty key in keyring.`)
-
-        // Determine AccountKeyRoleBased or not.
-        for (let i = KEY_ROLE.roleLast - 1; i > KEY_ROLE.roleTransactionKey; i--) {
-            if (this._keys[i].length > 0) {
-                isRoleBased = true
-                break
-            }
-        }
-
-        // Determine AccountKeyWeightedMultiSig or not.
-        if (!isRoleBased) {
-            if (this._keys[KEY_ROLE.roleTransactionKey].length === 1 && options !== undefined) {
-                if (_.isArray(options) && options.length > 0) options = options[0]
-                // if private key length is 1, handled as an AccountKeyWeightedMultiSig only when valid options is defined.
-                if (options.threshold !== undefined && options.weights !== undefined) isWeightedMultiSig = true
-            }
-            if (this._keys[KEY_ROLE.roleTransactionKey].length > 1) {
-                isWeightedMultiSig = true
-            }
-        }
-
-        if (isRoleBased && options !== undefined && !_.isArray(options))
-            throw new Error(`options for an account should define threshold and weight for each roles in an array format`)
-
-        if (isRoleBased) {
-            const lengths = []
-            for (const k of this.keys) lengths.push(k.length)
-            options = fillWeightedMultiSigOptionsForRoleBased(lengths, options)
-        }
-        if (isWeightedMultiSig) options = fillWeightedMultiSigOptionsForMultiSig(this.keys[0].length, options)
-
-        if (isRoleBased) {
-            // AccountKeyRoleBased with AccountKeyPublic
-            //   options = [ {}, {}, {} ]
-            // AccountKeyRoleBased with AccountKeyWeightedMultiSig(roleTransactionKey/roleFeePayerKey)
-            //   options = [ {threshold: 1, weights: [1,2]}, {}, {threshold: 1, weights: [1,2]} ]
-            const publicKeysByRole = this.getPublicKey()
-            return Account.createWithAccountKeyRoleBased(this.address, publicKeysByRole, options)
-        }
-        if (isWeightedMultiSig) {
-            const publicKeys = this.getPublicKey()[0]
-            return Account.createWithAccountKeyWeightedMultiSig(this.address, publicKeys, options)
-        }
-
-        if (options !== undefined) throw new Error(`options cannot be defined with single key.`)
-        const publicKeyString = this.getPublicKey()[0][0]
-        return Account.createWithAccountKeyPublic(this.address, publicKeyString)
-    }
-
-    /**
-     * encrypts a keyring and returns a keystore v4 object.
-     *
-     * @param {string} password The password to be used for encryption. The encrypted key store can be decrypted with this password.
-     * @param {object} options The options to use when encrypt a keyring. Also address can be defined specifically in options object.
-     * @return {object}
-     */
-    /**
-     * options can include below
-     * {
-     *   salt: ...,
-     *   iv: ...,
-     *   kdf: ...,
-     *   dklen: ...,
-     *   c: ...,
-     *   n: ...,
-     *   r: ...,
-     *   p: ...,
-     *   cipher: ...,
-     *   uuid: ...,
-     *   cipher: ...,
-     * }
-     */
-    encrypt(password, options = {}) {
-        let keyring = []
-        let isRoleBased = false
-
-        for (let i = KEY_ROLE.roleTransactionKey; i < KEY_ROLE.roleLast; i++) {
-            const roledKey = this._keys[i]
-            if (i > KEY_ROLE.roleTransactionKey && roledKey.length > 0) isRoleBased = true
-            keyring.push(encryptKey(roledKey, password, options))
-        }
-
-        if (!isRoleBased) keyring = keyring[0]
-
-        return formatEncrypted(4, this._address, keyring, options)
-    }
-
-    /**
-     * encrypts a keyring and returns a keystore v3 object.
-     *
-     * @param {string} password The password to be used for keyring encryption. The encrypted key store can be decrypted with this password.
-     * @param {object} options The options to use when encrypt a keyring. See `keyring.encrypt` for more detail about options.
-     * @return {object}
-     */
-    encryptV3(password, options) {
-        const notAvailableError = `This keyring cannot be encrypted keystore v3. use 'keyring.encrypt(password)'.`
-        if (this._keys[KEY_ROLE.roleTransactionKey].length > 1) throw new Error(notAvailableError)
-
-        for (let i = KEY_ROLE.roleAccountUpdateKey; i < KEY_ROLE.roleLast; i++) {
-            if (this._keys[i].length > 0) {
-                throw new Error(notAvailableError)
-            }
-        }
-
-        options = options || {}
-
-        const crypto = encryptKey(this._keys[0][0], password, options)[0]
-
-        return formatEncrypted(3, this._address, crypto, options)
-    }
-
-    /**
-     * returns true if keyring has decoupled key.
-     *
-     * @return {boolean}
-     */
-    isDecoupled() {
-        const isMultiple = this.keys.some(roledKey => {
-            return roledKey.length > 1
-        })
-        if (isMultiple) return true
-
-        const derived = this.keys[0][0].getDerivedAddress()
-        return this.address.toLowerCase() !== derived.toLowerCase()
-    }
 }
 
 Keyring.privateKey = PrivateKey
 Keyring.role = KEY_ROLE
 
 module.exports = Keyring
-
-/**
- * Format the key parameters passed by the user to create a keyring instance into a two-dimensional array containing PrivateKey instances.
- *
- * The cases of the parameter that the user passes to the function is as follows, and this function formats it as a two-dimensional array.
- * PrivateKey instance: PrivateKey{}
- * single private key string: `0x{private key}`
- * multiple private key strings: [`0x{private key}`, `0x{private key}`]
- * multiple PrivateKey instances: [PrivateKey{}, PrivateKey{}]
- * role-based private key strings: [[`0x{private key}`], [`0x{private key}`, `0x{private key}`], [`0x{private key}`]]
- * role-based PrivateKey instances: [[PrivateKey{}], [PrivateKey{}, PrivateKey{}], [PrivateKey{}]]
- *
- * @param {string|PrivateKey|Array.<string|PrivateKey>|Array.<Array.<string|PrivateKey>>} keyInput The input parameter for key variable in Keyring.
- * @return {Array.<Array.<PrivateKey>>}
- */
-function formattingForKeyInKeyring(keyInput) {
-    if (keyInput === null) {
-        return keyInput
-    }
-
-    if (keyInput instanceof PrivateKey || _.isString(keyInput)) {
-        keyInput = [[keyInput], [], []]
-    } else if (isMultipleKeysFormat(keyInput)) {
-        // [`0x{private key}`, `0x{private key}`, `0x{private key}`]
-        keyInput = [keyInput, [], []]
-    } else if (!isRoleBasedKeysFormat(keyInput)) {
-        throw new Error(`Invalid format for key variable in keyring`)
-    }
-
-    const keys = generateKeysFormat()
-    for (let i = 0; i < KEY_ROLE.roleLast; i++) {
-        fillRoleKey(keys, i, keyInput[i])
-    }
-
-    return keys
-}
-
-function generateKeysFormat() {
-    return Array(KEY_ROLE.roleLast)
-        .fill(null)
-        .map(() => [])
-}
-
-function isEmptyKey(keys) {
-    if (!keys) return true
-
-    for (const key of keys) {
-        if (key.length > 0) return false
-    }
-    return true
-}
-
-function fillRoleKey(keys, role, keyToAdd) {
-    if (keyToAdd === undefined) return
-    keyToAdd = Array.isArray(keyToAdd) ? keyToAdd : [keyToAdd]
-
-    if (keyToAdd.length > MAXIMUM_KEY_NUM)
-        throw new Error(`The maximum number of private keys that can be used in keyring is ${MAXIMUM_KEY_NUM}.`)
-    if (role >= KEY_ROLE.roleLast)
-        throw new Error(
-            `Unsupported role number. The role number should be less than ${KEY_ROLE.roleLast}. Please use 'caver.wallet.keyring.role'`
-        )
-
-    for (const keyString of keyToAdd) {
-        const key = keyString instanceof PrivateKey ? keyString : new PrivateKey(keyString)
-        keys[role].push(key)
-    }
-}
-
-function decryptKey(encryptedArray, password) {
-    if (!encryptedArray || encryptedArray.length === 0) return undefined
-
-    const decryptedArray = []
-    for (const encrypted of encryptedArray) {
-        let derivedKey
-        let kdfparams
-        /**
-         * Supported kdf modules are the following:
-         * 1) pbkdf2
-         * 2) scrypt
-         */
-        if (encrypted.kdf === 'scrypt') {
-            kdfparams = encrypted.kdfparams
-
-            // FIXME: support progress reporting callback
-            derivedKey = scrypt(
-                Buffer.from(password),
-                Buffer.from(kdfparams.salt, 'hex'),
-                kdfparams.n,
-                kdfparams.r,
-                kdfparams.p,
-                kdfparams.dklen
-            )
-        } else if (encrypted.kdf === 'pbkdf2') {
-            kdfparams = encrypted.kdfparams
-
-            if (kdfparams.prf !== 'hmac-sha256') {
-                throw new Error('Unsupported parameters to PBKDF2')
-            }
-
-            derivedKey = cryp.pbkdf2Sync(Buffer.from(password), Buffer.from(kdfparams.salt, 'hex'), kdfparams.c, kdfparams.dklen, 'sha256')
-        } else {
-            throw new Error('Unsupported key derivation scheme')
-        }
-
-        const ciphertext = Buffer.from(encrypted.ciphertext, 'hex')
-
-        const mac = utils.sha3(Buffer.concat([derivedKey.slice(16, 32), ciphertext])).replace('0x', '')
-        if (mac !== encrypted.mac) {
-            throw new Error('Key derivation failed - possibly wrong password')
-        }
-
-        const decipher = cryp.createDecipheriv(encrypted.cipher, derivedKey.slice(0, 16), Buffer.from(encrypted.cipherparams.iv, 'hex'))
-        decryptedArray.push(`0x${Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('hex')}`)
-    }
-    return decryptedArray
-}
-
-function encryptKey(privateKey, password, options) {
-    const encryptedArray = []
-
-    if (!privateKey) return encryptedArray
-
-    const privateKeyArray = _.isArray(privateKey) ? privateKey : [privateKey]
-
-    for (let i = 0; i < privateKeyArray.length; i++) {
-        const salt = options.salt || cryp.randomBytes(32)
-        const iv = options.iv || cryp.randomBytes(16)
-
-        let derivedKey
-        const kdf = options.kdf || 'scrypt'
-        const kdfparams = {
-            dklen: options.dklen || 32,
-            salt: salt.toString('hex'),
-        }
-
-        /**
-         * Supported kdf modules are the following:
-         * 1) pbkdf2
-         * 2) scrypt - default
-         */
-        if (kdf === 'pbkdf2') {
-            kdfparams.c = options.c || 262144
-            kdfparams.prf = 'hmac-sha256'
-            derivedKey = cryp.pbkdf2Sync(Buffer.from(password), Buffer.from(kdfparams.salt, 'hex'), kdfparams.c, kdfparams.dklen, 'sha256')
-        } else if (kdf === 'scrypt') {
-            // FIXME: support progress reporting callback
-            kdfparams.n = options.n || 4096 // 2048 4096 8192 16384
-            kdfparams.r = options.r || 8
-            kdfparams.p = options.p || 1
-            derivedKey = scrypt(
-                Buffer.from(password),
-                Buffer.from(kdfparams.salt, 'hex'),
-                kdfparams.n,
-                kdfparams.r,
-                kdfparams.p,
-                kdfparams.dklen
-            )
-        } else {
-            throw new Error('Unsupported kdf')
-        }
-
-        const cipher = cryp.createCipheriv(options.cipher || 'aes-128-ctr', derivedKey.slice(0, 16), iv)
-        if (!cipher) {
-            throw new Error('Unsupported cipher')
-        }
-
-        const ciphertext = Buffer.concat([
-            cipher.update(Buffer.from(privateKeyArray[i].privateKey.replace('0x', ''), 'hex')),
-            cipher.final(),
-        ])
-
-        const mac = utils.sha3(Buffer.concat([derivedKey.slice(16, 32), Buffer.from(ciphertext, 'hex')])).replace('0x', '')
-
-        encryptedArray.push({
-            ciphertext: ciphertext.toString('hex'),
-            cipherparams: {
-                iv: iv.toString('hex'),
-            },
-            cipher: options.cipher || 'aes-128-ctr',
-            kdf,
-            kdfparams,
-            mac: mac.toString('hex'),
-        })
-    }
-
-    return encryptedArray
-}
-
-function formatEncrypted(version, address, keyringOrCrypto, options) {
-    const keystore = {
-        version,
-        id: uuid.v4({ random: options.uuid || cryp.randomBytes(16) }),
-        address: address.toLowerCase(),
-    }
-
-    if (version === 3) {
-        keystore.crypto = keyringOrCrypto
-    } else if (version === 4) {
-        keystore.keyring = keyringOrCrypto
-    } else {
-        throw new Error(`Unsupported version of keystore`)
-    }
-
-    return keystore
-}

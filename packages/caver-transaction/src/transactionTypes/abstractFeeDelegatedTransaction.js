@@ -24,6 +24,7 @@ const TransactionHasher = require('../transactionHasher/transactionHasher')
 const AbstractTransaction = require('./abstractTransaction')
 const { refineSignatures, typeDetectionFromRLPEncoding } = require('../transactionHelper/transactionHelper')
 const Keyring = require('../../../caver-wallet/src/keyring/keyring')
+const AbstractKeyring = require('../../../caver-wallet/src/keyring/abstractKeyring')
 const { KEY_ROLE } = require('../../../caver-wallet/src/keyring/keyringHelper')
 const utils = require('../../../caver-utils/src')
 
@@ -88,7 +89,7 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
         if (_.isString(key)) {
             keyring = Keyring.createFromPrivateKey(key)
         }
-        if (!(keyring instanceof Keyring))
+        if (!(keyring instanceof AbstractKeyring))
             throw new Error(
                 `Unsupported key type. The key parameter of the signFeePayerWithKey must be a single private key string, KlaytnWalletKey string, or Keyring instance.`
             )
@@ -117,7 +118,7 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
     async signFeePayerWithKeys(key, hasher = TransactionHasher.getHashForFeePayerSignature) {
         let keyring = key
         if (_.isString(key)) keyring = Keyring.createFromPrivateKey(key)
-        if (!(keyring instanceof Keyring))
+        if (!(keyring instanceof AbstractKeyring))
             throw new Error(
                 `Unsupported key type. The key parameter of the signFeePayerWithKeys must be a single private key string, KlaytnWalletKey string, or Keyring instance.`
             )

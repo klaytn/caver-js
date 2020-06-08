@@ -41,13 +41,12 @@ const unitMap = {
 
 const generateDecoupledKeyring = () => {
     const keyring = Keyring.generate()
-    keyring.keys = Keyring.generateSingleKey()
+    keyring.key = Keyring.generateSingleKey()
     return keyring
 }
 
 const generateMultiSigKeyring = (num = 3) => {
-    const keyring = Keyring.generate()
-    keyring.keys = Keyring.generateMultipleKeys(num)
+    const keyring = Keyring.createWithMultipleKey(Keyring.generate().address, Keyring.generateMultipleKeys(num))
     return keyring
 }
 
@@ -55,8 +54,7 @@ const generateRoleBasedKeyring = numArr => {
     if (numArr === undefined) {
         numArr = Array(KEY_ROLE.roleLast).fill(1)
     }
-    const keyring = Keyring.generate()
-    keyring.keys = Keyring.generateRoleBasedKeys(numArr)
+    const keyring = Keyring.createWithRoleBasedKey(Keyring.generate().address, Keyring.generateRoleBasedKeys(numArr))
     return keyring
 }
 

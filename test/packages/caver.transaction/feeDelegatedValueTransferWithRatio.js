@@ -33,6 +33,7 @@ const { propertiesForUnnecessary } = require('../utils')
 const testRPCURL = require('../../testrpc')
 const Caver = require('../../../index.js')
 const Keyring = require('../../../packages/caver-wallet/src/keyring/keyring')
+const SingleKeyring = require('../../../packages/caver-wallet/src/keyring/singleKeyring')
 const TransactionHasher = require('../../../packages/caver-transaction/src/transactionHasher/transactionHasher')
 
 const { generateRoleBasedKeyring, checkSignature, checkFeePayerSignature } = require('../utils')
@@ -314,8 +315,8 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-016: input: private key string. should sign transaction.', async () => {
-            const signWithKeyProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKey')
-            await tx.signWithKey(sender.keys[0][0].privateKey)
+            const signWithKeyProtoSpy = sandbox.spy(SingleKeyring.prototype, 'signWithKey')
+            await tx.signWithKey(sender.key.privateKey)
 
             checkFunctionCall()
             checkSignature(tx)
@@ -324,7 +325,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-017: input: KlaytnWalletKey. should sign transaction.', async () => {
-            const signWithKeyProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKey')
+            const signWithKeyProtoSpy = sandbox.spy(SingleKeyring.prototype, 'signWithKey')
             await tx.signWithKey(sender.getKlaytnWalletKey())
 
             checkFunctionCall()
@@ -440,8 +441,8 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-025: input: private key string. should sign transaction.', async () => {
-            const signWithKeyProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKey')
-            await tx.signFeePayerWithKey(sender.keys[0][0].privateKey)
+            const signWithKeyProtoSpy = sandbox.spy(SingleKeyring.prototype, 'signWithKey')
+            await tx.signFeePayerWithKey(sender.key.privateKey)
 
             checkFunctionCall()
             checkFeePayerSignature(tx)
@@ -450,7 +451,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-026: input: KlaytnWalletKey. should sign transaction.', async () => {
-            const signWithKeyProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKey')
+            const signWithKeyProtoSpy = sandbox.spy(SingleKeyring.prototype, 'signWithKey')
             await tx.signFeePayerWithKey(sender.getKlaytnWalletKey())
 
             checkFunctionCall()
@@ -553,8 +554,8 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-033: input: private key string. should sign transaction.', async () => {
-            const signWithKeysProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKeys')
-            await tx.signWithKeys(sender.keys[0][0].privateKey)
+            const signWithKeysProtoSpy = sandbox.spy(SingleKeyring.prototype, 'signWithKeys')
+            await tx.signWithKeys(sender.key.privateKey)
 
             checkFunctionCall()
             checkSignature(tx)
@@ -563,7 +564,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-034: input: KlaytnWalletKey. should sign transaction.', async () => {
-            const signWithKeysProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKeys')
+            const signWithKeysProtoSpy = sandbox.spy(SingleKeyring.prototype, 'signWithKeys')
             await tx.signWithKeys(sender.getKlaytnWalletKey())
 
             checkFunctionCall()
@@ -657,8 +658,8 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-040: input: private key string. should sign transaction.', async () => {
-            const signWithKeysProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKeys')
-            await tx.signFeePayerWithKeys(sender.keys[0][0].privateKey)
+            const signWithKeysProtoSpy = sandbox.spy(SingleKeyring.prototype, 'signWithKeys')
+            await tx.signFeePayerWithKeys(sender.key.privateKey)
 
             checkFunctionCall()
             checkFeePayerSignature(tx)
@@ -667,7 +668,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-041: input: KlaytnWalletKey. should sign transaction.', async () => {
-            const signWithKeysProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKeys')
+            const signWithKeysProtoSpy = sandbox.spy(SingleKeyring.prototype, 'signWithKeys')
             await tx.signFeePayerWithKeys(sender.getKlaytnWalletKey())
 
             checkFunctionCall()
