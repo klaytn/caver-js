@@ -17,7 +17,7 @@
 */
 
 const _ = require('lodash')
-const Keyring = require('./keyring/keyring')
+const Keyring = require('./keyring/keyringFactory')
 const AbstractKeyring = require('./keyring/abstractKeyring')
 const utils = require('../../caver-utils/src')
 

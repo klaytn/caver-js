@@ -22,7 +22,7 @@ const AccountForUpdate = require('../../packages/caver-klay/caver-klay-accounts/
 const Account = require('../../packages/caver-account')
 const utils = require('../../packages/caver-utils')
 
-const Keyring = require('../../packages/caver-wallet/src/keyring/keyring')
+const Keyring = require('../../packages/caver-wallet/src/keyring/keyringFactory')
 const { KEY_ROLE } = require('../../packages/caver-wallet/src/keyring/keyringHelper')
 
 const unitMap = {
