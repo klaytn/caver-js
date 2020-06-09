@@ -400,7 +400,7 @@ describe('caver.rpc.klay', () => {
             await feeDelegated.signWithKeys(sender)
 
             const result = await caver.rpc.klay.signTransactionAsFeePayer(feeDelegated)
-            const signed = await feeDelegated.signFeePayerWithKeys(keyringToImport)
+            const signed = await feeDelegated.signAsFeePayer(keyringToImport)
             expect(result.tx.feePayerSignatures[0].toString()).to.equal(
                 caver.utils.transformSignaturesToObject(signed.feePayerSignatures).toString()
             )
@@ -443,7 +443,7 @@ describe('caver.rpc.klay', () => {
             await feeDelegated.signWithKeys(sender)
 
             const result = await caver.rpc.klay.signTransactionAsFeePayer(feeDelegated)
-            const signed = await feeDelegated.signFeePayerWithKeys(keyringToImport)
+            const signed = await feeDelegated.signAsFeePayer(keyringToImport)
             expect(result.tx.feePayerSignatures[0].toString()).to.equal(
                 caver.utils.transformSignaturesToObject(signed.feePayerSignatures).toString()
             )

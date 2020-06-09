@@ -24,7 +24,7 @@ const PrivateKey = require('./privateKey')
 const { KEY_ROLE } = require('./keyringHelper')
 const Account = require('../../../caver-account')
 const { fillWeightedMultiSigOptionsForMultiSig } = require('../../../caver-account/src/accountKey/accountKeyHelper')
-const { validateForSigning, validateIndexWithKeys, encryptKey, formatEncrypted, checkDependentOptionalParams } = require('./keyringHelper')
+const { validateForSigning, validateIndexWithKeys, encryptKey, formatEncrypted } = require('./keyringHelper')
 
 /**
  * representing a Keyring which includes `address` and `private keys`.
@@ -79,39 +79,28 @@ class MultipleKeyring extends AbstractKeyring {
     }
 
     /**
-     * signs with transactionHash with key and returns signature.
+     * signs with transactionHash with key and returns signature(s).
      *
      * @param {string} transactionHash The hash of transaction.
      * @param {string|number} chainId The chainId specific to the network.
-     * @param {number} [role] (default: `caver.wallet.keyring.role.roleTransactionKey`) A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
-     * @param {number} [index] (default: 0) The index of the key to be used. In order to define index, role should be defined.
-     * @return {Array<string>}
+     * @param {number} role A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
+     * @param {number} [index] The index of the key to be used. If index is undefined, all private keys in keyring will be used.
+     * @return {Array.<string>|Array.<Array.<string>>}
      */
-    signWithKey(transactionHash, chainId, role, index) {
-        const optionalParams = checkDependentOptionalParams(role, index)
-
+    sign(transactionHash, chainId, role, index) {
         validateForSigning(transactionHash, chainId)
 
-        const keys = this.getKeyByRole(optionalParams.role)
-        validateIndexWithKeys(optionalParams.index, keys.length)
-        return keys[index].sign(transactionHash, chainId)
-    }
+        const keys = this.getKeyByRole(role)
 
-    /**
-     * signs with transactionHash with multiple keys and returns signatures.
-     *
-     * @param {string} transactionHash The hash of transaction.
-     * @param {string|number} chainId the chain id specific to the network
-     * @param {number} [role] (default: `caver.wallet.keyring.role.roleTransactionKey`) A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
-     * @return {Array.<Array<string>>}
-     */
-    signWithKeys(transactionHash, chainId, role) {
-        const signatures = []
-
-        for (let i = 0; i < this.keys.length; i++) {
-            signatures.push(this.signWithKey(transactionHash, chainId, role, i))
+        if (index !== undefined) {
+            validateIndexWithKeys(index, keys.length)
+            return keys[index].sign(transactionHash, chainId)
         }
 
+        const signatures = []
+        for (const k of keys) {
+            signatures.push(k.sign(transactionHash, chainId))
+        }
         return signatures
     }
 

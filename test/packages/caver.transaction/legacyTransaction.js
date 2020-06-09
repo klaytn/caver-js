@@ -190,7 +190,7 @@ describe('TxTypeLegacyTransaction', () => {
         })
     })
 
-    context('legacyTransaction.signWithKey', () => {
+    context('legacyTransaction.sign', () => {
         const txHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
 
         let fillTransactionSpy
@@ -205,7 +205,7 @@ describe('TxTypeLegacyTransaction', () => {
 
             fillTransactionSpy = sandbox.spy(tx, 'fillTransaction')
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
-            senderSignWithKeySpy = sandbox.spy(sender, 'signWithKey')
+            senderSignWithKeySpy = sandbox.spy(sender, 'sign')
             appendSignaturesSpy = sandbox.spy(tx, 'appendSignatures')
             hasherSpy = sandbox.stub(TransactionHasher, 'getHashForSignature')
             hasherSpy.returns(txHash)
@@ -226,43 +226,43 @@ describe('TxTypeLegacyTransaction', () => {
         }
 
         it('CAVERJS-UNIT-TRANSACTION-007: input: keyring. should sign transaction.', async () => {
-            await tx.signWithKey(sender)
+            await tx.sign(sender)
 
             checkFunctionCall()
             checkSignature()
             expect(createFromPrivateKeySpy).not.to.have.been.calledOnce
-            expect(senderSignWithKeySpy).to.have.been.calledWith(txHash, '0x7e3', 0, 0)
+            expect(senderSignWithKeySpy).to.have.been.calledWith(txHash, '0x7e3', 0, undefined)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-008: input: private key string. should sign transaction.', async () => {
-            const signWithKeyProtoSpy = sandbox.spy(SingleKeyring.prototype, 'signWithKey')
-            await tx.signWithKey(sender.key.privateKey)
+            const signWithKeyProtoSpy = sandbox.spy(SingleKeyring.prototype, 'sign')
+            await tx.sign(sender.key.privateKey)
 
             checkFunctionCall()
             checkSignature()
             expect(createFromPrivateKeySpy).to.have.been.calledOnce
-            expect(signWithKeyProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 0, 0)
+            expect(signWithKeyProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 0, undefined)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-009: input: KlaytnWalletKey. should sign transaction.', async () => {
-            const signWithKeyProtoSpy = sandbox.spy(SingleKeyring.prototype, 'signWithKey')
-            await tx.signWithKey(sender.getKlaytnWalletKey())
+            const signWithKeyProtoSpy = sandbox.spy(SingleKeyring.prototype, 'sign')
+            await tx.sign(sender.getKlaytnWalletKey())
 
             checkFunctionCall()
             checkSignature()
             expect(createFromPrivateKeySpy).to.have.been.calledOnce
-            expect(signWithKeyProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 0, 0)
+            expect(signWithKeyProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 0, undefined)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-010: input: decoupled KlaytnWalletKey. should throw error.', async () => {
             tx = new caver.transaction.legacyTransaction(transactionObj)
 
             const expectedError = `A legacy transaction cannot be signed with a decoupled keyring.`
-            await expect(tx.signWithKey(generateDecoupledKeyring().getKlaytnWalletKey())).to.be.rejectedWith(expectedError)
+            await expect(tx.sign(generateDecoupledKeyring().getKlaytnWalletKey())).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-011: input: keyring, index. should sign transaction with specific index.', async () => {
-            await tx.signWithKey(sender, 0)
+            await tx.sign(sender, 0)
 
             checkFunctionCall()
             checkSignature()
@@ -270,19 +270,23 @@ describe('TxTypeLegacyTransaction', () => {
             expect(senderSignWithKeySpy).to.have.been.calledWith(txHash, '0x7e3', 0, 0)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-012: input: keyring, custom hasher. should throw error.', async () => {
+        it('CAVERJS-UNIT-TRANSACTION-012: input: keyring, custom hasher. should use custom hasher.', async () => {
             const hashForCustomHasher = '0x9e4b4835f6ea5ce55bd1037fe92040dd070af6154aefc30d32c65364a1123cae'
             const customHasher = () => hashForCustomHasher
 
-            const expectedError = `In order to pass a custom hasher, use the third parameter.`
-            await expect(tx.signWithKey(sender, customHasher)).to.be.rejectedWith(expectedError)
+            await tx.sign(sender, customHasher)
+
+            checkFunctionCall(true)
+            checkSignature(tx)
+            expect(createFromPrivateKeySpy).not.to.have.been.calledOnce
+            expect(senderSignWithKeySpy).to.have.been.calledWith(hashForCustomHasher, '0x7e3', 0, undefined)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-013: input: keyring, index, custom hasher. should use custom hasher when sign transaction.', async () => {
             const hashForCustomHasher = '0x9e4b4835f6ea5ce55bd1037fe92040dd070af6154aefc30d32c65364a1123cae'
             const customHasher = () => hashForCustomHasher
 
-            await tx.signWithKey(sender, 0, customHasher)
+            await tx.sign(sender, 0, customHasher)
 
             checkFunctionCall(true)
             checkSignature()
@@ -294,21 +298,21 @@ describe('TxTypeLegacyTransaction', () => {
             tx = new caver.transaction.legacyTransaction(transactionObj)
 
             const expectedError = `A legacy transaction cannot be signed with a decoupled keyring.`
-            await expect(tx.signWithKey(generateDecoupledKeyring())).to.be.rejectedWith(expectedError)
+            await expect(tx.sign(generateDecoupledKeyring())).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-015: input: multisig keyring. should throw error.', async () => {
             tx = new caver.transaction.legacyTransaction(transactionObj)
 
             const expectedError = `A legacy transaction cannot be signed with a decoupled keyring.`
-            await expect(tx.signWithKey(generateMultiSigKeyring())).to.be.rejectedWith(expectedError)
+            await expect(tx.sign(generateMultiSigKeyring())).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-016: input: roleBased keyring. should throw error.', async () => {
             tx = new caver.transaction.legacyTransaction(transactionObj)
 
             const expectedError = `A legacy transaction cannot be signed with a decoupled keyring.`
-            await expect(tx.signWithKey(roleBasedKeyring)).to.be.rejectedWith(expectedError)
+            await expect(tx.sign(roleBasedKeyring)).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-017: input: keyring. should throw error when from is different.', async () => {
@@ -316,11 +320,11 @@ describe('TxTypeLegacyTransaction', () => {
             tx = new caver.transaction.legacyTransaction(transactionObj)
 
             const expectedError = `The from address of the transaction is different with the address of the keyring to use.`
-            await expect(tx.signWithKey(sender)).to.be.rejectedWith(expectedError)
+            await expect(tx.sign(sender)).to.be.rejectedWith(expectedError)
         }).timeout(200000)
     })
 
-    context('legacyTransaction.signWithKeys', () => {
+    context('legacyTransaction.sign with multiple keys', () => {
         const txHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
 
         let fillTransactionSpy
@@ -335,7 +339,7 @@ describe('TxTypeLegacyTransaction', () => {
 
             fillTransactionSpy = sandbox.spy(tx, 'fillTransaction')
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
-            senderSignWithKeysSpy = sandbox.spy(sender, 'signWithKeys')
+            senderSignWithKeysSpy = sandbox.spy(sender, 'sign')
             appendSignaturesSpy = sandbox.spy(tx, 'appendSignatures')
             hasherSpy = sandbox.stub(TransactionHasher, 'getHashForSignature')
             hasherSpy.returns(txHash)
@@ -357,7 +361,7 @@ describe('TxTypeLegacyTransaction', () => {
         }
 
         it('CAVERJS-UNIT-TRANSACTION-018: input: keyring. should sign transaction.', async () => {
-            await tx.signWithKeys(sender)
+            await tx.sign(sender)
 
             checkFunctionCall()
             checkSignature()
@@ -366,8 +370,8 @@ describe('TxTypeLegacyTransaction', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-019: input: private key string. should sign transaction.', async () => {
-            const signWithKeysProtoSpy = sandbox.spy(SingleKeyring.prototype, 'signWithKeys')
-            await tx.signWithKeys(sender.key.privateKey)
+            const signWithKeysProtoSpy = sandbox.spy(SingleKeyring.prototype, 'sign')
+            await tx.sign(sender.key.privateKey)
 
             checkFunctionCall()
             checkSignature()
@@ -376,8 +380,8 @@ describe('TxTypeLegacyTransaction', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-020: input: KlaytnWalletKey. should sign transaction.', async () => {
-            const signWithKeysProtoSpy = sandbox.spy(SingleKeyring.prototype, 'signWithKeys')
-            await tx.signWithKeys(sender.getKlaytnWalletKey())
+            const signWithKeysProtoSpy = sandbox.spy(SingleKeyring.prototype, 'sign')
+            await tx.sign(sender.getKlaytnWalletKey())
 
             checkFunctionCall()
             checkSignature()
@@ -389,14 +393,14 @@ describe('TxTypeLegacyTransaction', () => {
             tx = new caver.transaction.legacyTransaction(transactionObj)
 
             const expectedError = `A legacy transaction cannot be signed with a decoupled keyring.`
-            await expect(tx.signWithKeys(generateDecoupledKeyring().getKlaytnWalletKey())).to.be.rejectedWith(expectedError)
+            await expect(tx.sign(generateDecoupledKeyring().getKlaytnWalletKey())).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-022: input: keyring, custom hasher. should use custom hasher when sign transaction.', async () => {
             const hashForCustomHasher = '0x9e4b4835f6ea5ce55bd1037fe92040dd070af6154aefc30d32c65364a1123cae'
             const customHasher = () => hashForCustomHasher
 
-            await tx.signWithKeys(sender, customHasher)
+            await tx.sign(sender, customHasher)
 
             checkFunctionCall(true)
             checkSignature()
@@ -409,28 +413,28 @@ describe('TxTypeLegacyTransaction', () => {
             tx = new caver.transaction.legacyTransaction(transactionObj)
 
             const expectedError = `The from address of the transaction is different with the address of the keyring to use.`
-            await expect(tx.signWithKeys(sender)).to.be.rejectedWith(expectedError)
+            await expect(tx.sign(sender)).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-024: input: decoupled keyring. should throw error.', async () => {
             tx = new caver.transaction.legacyTransaction(transactionObj)
 
             const expectedError = `A legacy transaction cannot be signed with a decoupled keyring.`
-            await expect(tx.signWithKeys(generateDecoupledKeyring())).to.be.rejectedWith(expectedError)
+            await expect(tx.sign(generateDecoupledKeyring())).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-025: input: multisig keyring. should throw error.', async () => {
             tx = new caver.transaction.legacyTransaction(transactionObj)
 
             const expectedError = `A legacy transaction cannot be signed with a decoupled keyring.`
-            await expect(tx.signWithKeys(generateMultiSigKeyring())).to.be.rejectedWith(expectedError)
+            await expect(tx.sign(generateMultiSigKeyring())).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-026: input: roleBased keyring. should throw error.', async () => {
             tx = new caver.transaction.legacyTransaction(transactionObj)
 
             const expectedError = `A legacy transaction cannot be signed with a decoupled keyring.`
-            await expect(tx.signWithKeys(roleBasedKeyring)).to.be.rejectedWith(expectedError)
+            await expect(tx.sign(roleBasedKeyring)).to.be.rejectedWith(expectedError)
         }).timeout(200000)
     })
 

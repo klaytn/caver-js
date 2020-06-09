@@ -202,20 +202,6 @@ const formatEncrypted = (version, address, keyringOrCrypto, options) => {
     return keystore
 }
 
-const checkDependentOptionalParams = (role, index) => {
-    if (role === undefined && index === undefined) {
-        role = KEY_ROLE.roleTransactionKey
-        index = 0
-    } else if (role === undefined || index === undefined) {
-        throw new Error(
-            `To sign the given message, both role and index must be defined. ` +
-                `If both role and index are not defined, this function signs the message using the default key(${KEY_ROLE[0]}[0]).`
-        )
-    }
-
-    return { role, index }
-}
-
 module.exports = {
     KEY_ROLE,
     MAXIMUM_KEY_NUM,
@@ -226,5 +212,4 @@ module.exports = {
     decryptKey,
     encryptKey,
     formatEncrypted,
-    checkDependentOptionalParams,
 }

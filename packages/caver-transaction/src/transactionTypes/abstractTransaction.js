@@ -140,17 +140,20 @@ class AbstractTransaction {
     }
 
     /**
-     * Signs to the transaction with a single private key in the `key`.
+     * Signs to the transaction with private key(s) in the `key`.
      * @async
      * @param {Keyring|string} key - The instance of Keyring, private key string or KlaytnWalletKey string.
-     * @param {number} [index] - The index of private key to use.
+     * @param {number} [index] - The index of private key to use. If index is undefined, all private keys in keyring will be used.
      * @param {function} [hasher] - The function to get hash of transaction. In order to use a custom hasher, the index must be defined.
      * @return {Transaction}
      */
-    async signWithKey(key, index = 0, hasher = TransactionHasher.getHashForSignature) {
+    async sign(key, index, hasher = TransactionHasher.getHashForSignature) {
         // User parameter input cases
-        // (key) / (key index) / (key index hasher)
-        if (_.isFunction(index)) throw new Error(`In order to pass a custom hasher, use the third parameter.`)
+        // (key) / (key index) / (key hasher) / (key index hasher)
+        if (_.isFunction(index)) {
+            hasher = index
+            index = undefined
+        }
 
         let keyring = key
         if (_.isString(key)) {
@@ -173,44 +176,9 @@ class AbstractTransaction {
         const hash = hasher(this)
         const role = this.type.includes('AccountUpdate') ? KEY_ROLE.roleAccountUpdateKey : KEY_ROLE.roleTransactionKey
 
-        const sig = keyring.signWithKey(hash, this.chainId, role, index)
+        const sig = keyring.sign(hash, this.chainId, role, index)
 
         this.appendSignatures(sig)
-
-        return this
-    }
-
-    /**
-     * Signs to the transaction using all private keys in `key`.
-     *
-     * @async
-     * @param {Keyring|string} key - The instance of Keyring, private key string or KlaytnWalletKey string.
-     * @param {function} [hasher] - The function to get the transaction hash.
-     * @return {Transaction}
-     */
-    async signWithKeys(key, hasher = TransactionHasher.getHashForSignature) {
-        let keyring = key
-        if (_.isString(key)) keyring = Keyring.createFromPrivateKey(key)
-        if (!(keyring instanceof AbstractKeyring))
-            throw new Error(
-                `Unsupported key type. The key must be a single private key string, KlaytnWalletKey string, or Keyring instance.`
-            )
-
-        // When a user attempts to sign with an updated keyring into a TxTypeLegacyTransaction, an error should be thrown.
-        if (this.type === TX_TYPE_STRING.TxTypeLegacyTransaction && keyring.isDecoupled())
-            throw new Error(`A legacy transaction cannot be signed with a decoupled keyring.`)
-
-        if (!this.from || this.from === '0x') this.from = keyring.address
-        if (this.from.toLowerCase() !== keyring.address.toLowerCase())
-            throw new Error(`The from address of the transaction is different with the address of the keyring to use.`)
-
-        await this.fillTransaction()
-        const hash = hasher(this)
-        const role = this.type.includes('AccountUpdate') ? KEY_ROLE.roleAccountUpdateKey : KEY_ROLE.roleTransactionKey
-
-        const sigs = keyring.signWithKeys(hash, this.chainId, role)
-
-        this.appendSignatures(sigs)
 
         return this
     }
