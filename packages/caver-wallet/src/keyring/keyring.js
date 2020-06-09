@@ -26,24 +26,23 @@ const { decryptKey } = require('./keyringHelper')
 const SingleKeyring = require('./singleKeyring')
 const MultipleKeyring = require('./multipleKeyring')
 const RoleBasedKeyring = require('./roleBasedKeyring')
-const AbstractKeyring = require('./abstractKeyring')
 
 /**
- * representing a Keyring which includes `address` and `private keys` by roles.
+ * representing a KeyringFactory which supports create functions for Keyring(SingleKeyring/MultipleKeyring/RoleBasedKeyring)
  * @class
  */
-class Keyring {
+class KeyringFactory {
     /**
      * generates a keyring instance
      *
      * `caver.wallet.keyring.generate()`
      *
      * @param {string} [entropy] A random string to increase entropy.
-     * @return {Keyring}
+     * @return {SingleKeyring}
      */
     static generate(entropy) {
         const random = AccountLib.create(entropy || utils.randomHex(32))
-        return Keyring.createWithSingleKey(random.address, random.privateKey)
+        return KeyringFactory.createWithSingleKey(random.address, random.privateKey)
     }
 
     /**
@@ -116,12 +115,12 @@ class Keyring {
      *
      * @param {string} address An address of keyring.
      * @param {string|Array.<string>|Array.<Array.<string>>} key Private key(s) to use in keyring.
-     * @return {Keyring}
+     * @return {AbstractKeyring}
      */
     static create(address, key) {
-        if (_.isString(key)) return Keyring.createWithSingleKey(address, key)
-        if (isMultipleKeysFormat(key)) return Keyring.createWithMultipleKey(address, key)
-        if (isRoleBasedKeysFormat(key)) return Keyring.createWithRoleBasedKey(address, key)
+        if (_.isString(key)) return KeyringFactory.createWithSingleKey(address, key)
+        if (isMultipleKeysFormat(key)) return KeyringFactory.createWithMultipleKey(address, key)
+        if (isRoleBasedKeysFormat(key)) return KeyringFactory.createWithRoleBasedKey(address, key)
 
         throw new Error(`Unsupported key type: ${typeof key}`)
     }
@@ -130,21 +129,21 @@ class Keyring {
      * creates a keyring instance from a private key string. KlaytnWalletKey format also can be handled.
      *
      * @param {string} privateKey The key parameter can be either normal private key or KlaytnWalletKey format.
-     * @return {Keyring}
+     * @return {SingleKeyring}
      */
     static createFromPrivateKey(privateKey) {
         if (!_.isString(privateKey)) throw new Error(`Invalid format of parameter. 'privateKey' should be in format of string`)
-        if (utils.isKlaytnWalletKey(privateKey)) return Keyring.createFromKlaytnWalletKey(privateKey)
+        if (utils.isKlaytnWalletKey(privateKey)) return KeyringFactory.createFromKlaytnWalletKey(privateKey)
 
         const acct = AccountLib.fromPrivate(utils.addHexPrefix(privateKey))
-        return Keyring.createWithSingleKey(acct.address, acct.privateKey)
+        return KeyringFactory.createWithSingleKey(acct.address, acct.privateKey)
     }
 
     /**
      * creates a keyring instance from a KlaytnWalletKey string.
      *
      * @param {string} klaytnWalletKey A key string in KlaytnWalletKey format.
-     * @return {Keyring}
+     * @return {SingleKeyring}
      */
     static createFromKlaytnWalletKey(klaytnWalletKey) {
         if (!_.isString(klaytnWalletKey)) throw new Error(`Invalid format of parameter. 'klaytnWalletKey' should be in format of string`)
@@ -152,7 +151,7 @@ class Keyring {
             throw new Error(`Invalid KlaytnWalletKey: ${klaytnWalletKey}`)
         }
         const parsed = utils.parsePrivateKey(klaytnWalletKey)
-        return Keyring.createWithSingleKey(parsed.address, parsed.privateKey)
+        return KeyringFactory.createWithSingleKey(parsed.address, parsed.privateKey)
     }
 
     /**
@@ -160,7 +159,7 @@ class Keyring {
      *
      * @param {string} address An address of keyring.
      * @param {string} key A private key string.
-     * @return {Keyring}
+     * @return {SingleKeyring}
      */
     static createWithSingleKey(address, key) {
         if (!_.isString(key))
@@ -176,7 +175,7 @@ class Keyring {
      *
      * @param {string} address An address of keyring.
      * @param {Array.<string>} keyArray An array of private key strings.
-     * @return {Keyring}
+     * @return {MultipleKeyring}
      */
     static createWithMultipleKey(address, keyArray) {
         if (!isMultipleKeysFormat(keyArray))
@@ -190,7 +189,7 @@ class Keyring {
      *
      * @param {string} address An address of keyring.
      * @param {Array.<Array.<string>>} roledBasedKeyArray A two-dimensional array containing arrays of private key strings for each role.
-     * @return {Keyring}
+     * @return {RoleBasedKeyring}
      */
     static createWithRoleBasedKey(address, roledBasedKeyArray) {
         if (!isRoleBasedKeysFormat(roledBasedKeyArray))
@@ -202,91 +201,11 @@ class Keyring {
     }
 
     /**
-     * encrypts a keyring and returns a keystore v4 object.
-     *
-     * @param {string|Array.<string>|Array.<string>|Keyring} key The key parameter can be an instance of Keyring, a normal private key(KlaytnWalletKey format also supported),
-     *                                                           an array of private key strings, or a two-dimensional array containing arrays of private key strings for each role,
-     * @param {string} password The password to be used for encryption. The encrypted key store can be decrypted with this password.
-     * @param {object} options The options to use when encrypt a keyring. See `keyring.encrypt` for more detail about options.
-     * @return {object}
-     */
-    static encrypt(key, password, options = {}) {
-        let keyring
-        if (_.isArray(key)) {
-            if (options.address === undefined)
-                throw new Error(`The address must be defined inside the options object to encrypt multiple keys.`)
-
-            if (isRoleBasedKeysFormat(key)) {
-                keyring = Keyring.createWithRoleBasedKey(options.address, key)
-            } else if (isMultipleKeysFormat(key)) {
-                keyring = Keyring.createWithMultipleKey(options.address, key)
-            } else {
-                throw new Error(`Invalid key format.`)
-            }
-        } else if (key instanceof AbstractKeyring) {
-            keyring = key
-        } else if (_.isString(key)) {
-            if (options.address) {
-                if (utils.isKlaytnWalletKey(key)) {
-                    keyring = Keyring.createFromKlaytnWalletKey(key)
-                    if (keyring.address.toLowerCase() !== options.address.toLowerCase()) {
-                        throw new Error(
-                            `The address defined in options(${options.address}) does not match the address of KlaytnWalletKey(${keyring.address}) entered as a parameter.`
-                        )
-                    }
-                } else {
-                    keyring = Keyring.createWithSingleKey(options.address, key)
-                }
-            } else {
-                keyring = Keyring.createFromPrivateKey(key)
-            }
-        } else {
-            throw new Error(`Invalid key format.`)
-        }
-
-        return keyring.encrypt(password, options)
-    }
-
-    /**
-     * encrypts a keyring and returns a keystore v3 object.
-     *
-     * @param {string|Keyring} key The key parameter can be a normal private key(KlaytnWalletKey format also supported) or an instance of Keyring.
-     * @param {string} password The password to be used for keyring encryption. The encrypted key store can be decrypted with this password.
-     * @param {object} options The options to use when encrypt a keyring. See `keyring.encrypt` for more detail about options.
-     * @return {object}
-     */
-    static encryptV3(key, password, options = {}) {
-        if (!_.isString(key) && !(key instanceof Keyring)) {
-            throw new Error(`Invalid parameter. key should be a private key string, KlaytnWalletKey or instance of Keyring`)
-        }
-
-        let keyring
-        if (key instanceof Keyring) {
-            keyring = key
-        } else if (options.address) {
-            if (utils.isKlaytnWalletKey(key)) {
-                keyring = Keyring.createFromKlaytnWalletKey(key)
-                if (keyring.address.toLowerCase() !== options.address.toLowerCase()) {
-                    throw new Error(
-                        `The address defined in options(${options.address}) does not match the address of KlaytnWalletKey(${keyring.address}) entered as a parameter.`
-                    )
-                }
-            } else {
-                keyring = Keyring.createWithSingleKey(options.address, key)
-            }
-        } else {
-            keyring = Keyring.createFromPrivateKey(key)
-        }
-
-        return keyring.encryptV3(password, options)
-    }
-
-    /**
      * decrypts a keystore v3 or v4 JSON and returns keyring instance.
      *
      * @param {object} keystore The encrypted keystore to decrypt.
      * @param {string} password The password to use for decryption.
-     * @return {Keyring}
+     * @return {AbstractKeyring}
      */
     static decrypt(keystore, password) {
         const json = _.isObject(keystore) ? keystore : JSON.parse(keystore)
@@ -318,38 +237,101 @@ class Keyring {
             const feePayerKey = decryptKey(json.keyring[KEY_ROLE.roleFeePayerKey], password)
             feePayerKey ? keys.push(feePayerKey) : keys.push([])
 
-            return Keyring.createWithRoleBasedKey(json.address, keys)
+            return KeyringFactory.createWithRoleBasedKey(json.address, keys)
         }
 
         let decrypted = decryptKey(json.keyring, password)
         decrypted = _.isArray(decrypted) ? decrypted : [decrypted]
-        if (decrypted.length === 1) return Keyring.createWithSingleKey(json.address, decrypted[0])
+        if (decrypted.length === 1) return KeyringFactory.createWithSingleKey(json.address, decrypted[0])
 
-        return Keyring.createWithMultipleKey(json.address, decrypted)
+        return KeyringFactory.createWithMultipleKey(json.address, decrypted)
     }
 
-    /**
-     * recovers the address that was used to sign the given data.
-     *
-     * @param {string|object} message A signed message string, a hash or an object that includes signed message string to recover.
-     * @param {Array.<string>} signature v, r, s values.
-     * @param {boolean} preFixed If the last parameter is true, the given message will NOT automatically be prefixed with "\x19Klaytn Signed Message:\n" + message.length + message, and assumed to be already prefixed.
-     * @return {string}
-     */
-    static recover(message, signature, preFixed = false) {
-        if (_.isObject(message)) {
-            return this.recover(message.messageHash, message.signature, true)
-        }
+    // /**
+    //  * encrypts a keyring and returns a keystore v4 object.
+    //  *
+    //  * @param {string|Array.<string>|Array.<string>|Keyring} key The key parameter can be an instance of Keyring, a normal private key(KlaytnWalletKey format also supported),
+    //  *                                                           an array of private key strings, or a two-dimensional array containing arrays of private key strings for each role,
+    //  * @param {string} password The password to be used for encryption. The encrypted key store can be decrypted with this password.
+    //  * @param {object} options The options to use when encrypt a keyring. See `keyring.encrypt` for more detail about options.
+    //  * @return {object}
+    //  */
+    // static encrypt(key, password, options = {}) {
+    //     let keyring
+    //     if (_.isArray(key)) {
+    //         if (options.address === undefined)
+    //             throw new Error(`The address must be defined inside the options object to encrypt multiple keys.`)
 
-        if (!preFixed) {
-            message = utils.hashMessage(message)
-        }
+    //         if (isRoleBasedKeysFormat(key)) {
+    //             keyring = KeyringFactory.createWithRoleBasedKey(options.address, key)
+    //         } else if (isMultipleKeysFormat(key)) {
+    //             keyring = KeyringFactory.createWithMultipleKey(options.address, key)
+    //         } else {
+    //             throw new Error(`Invalid key format.`)
+    //         }
+    //     } else if (key instanceof AbstractKeyring) {
+    //         keyring = key
+    //     } else if (_.isString(key)) {
+    //         if (options.address) {
+    //             if (utils.isKlaytnWalletKey(key)) {
+    //                 keyring = KeyringFactory.createFromKlaytnWalletKey(key)
+    //                 if (keyring.address.toLowerCase() !== options.address.toLowerCase()) {
+    //                     throw new Error(
+    //                         `The address defined in options(${options.address}) does not match the address of KlaytnWalletKey(${keyring.address}) entered as a parameter.`
+    //                     )
+    //                 }
+    //             } else {
+    //                 keyring = KeyringFactory.createWithSingleKey(options.address, key)
+    //             }
+    //         } else {
+    //             keyring = KeyringFactory.createFromPrivateKey(key)
+    //         }
+    //     } else {
+    //         throw new Error(`Invalid key format.`)
+    //     }
 
-        return AccountLib.recover(message, AccountLib.encodeSignature(signature)).toLowerCase()
-    }
+    //     return keyring.encrypt(password, options)
+    // }
+
+    // /**
+    //  * encrypts a keyring and returns a keystore v3 object.
+    //  *
+    //  * @param {string|Keyring} key The key parameter can be a normal private key(KlaytnWalletKey format also supported) or an instance of Keyring.
+    //  * @param {string} password The password to be used for keyring encryption. The encrypted key store can be decrypted with this password.
+    //  * @param {object} options The options to use when encrypt a keyring. See `keyring.encrypt` for more detail about options.
+    //  * @return {object}
+    //  */
+    // static encryptV3(key, password, options = {}) {
+    //     if (!_.isString(key) && !(key instanceof Keyring)) {
+    //         throw new Error(`Invalid parameter. key should be a private key string, KlaytnWalletKey or instance of Keyring`)
+    //     }
+
+    //     let keyring
+    //     if (key instanceof Keyring) {
+    //         keyring = key
+    //     } else if (options.address) {
+    //         if (utils.isKlaytnWalletKey(key)) {
+    //             keyring = KeyringFactory.createFromKlaytnWalletKey(key)
+    //             if (keyring.address.toLowerCase() !== options.address.toLowerCase()) {
+    //                 throw new Error(
+    //                     `The address defined in options(${options.address}) does not match the address of KlaytnWalletKey(${keyring.address}) entered as a parameter.`
+    //                 )
+    //             }
+    //         } else {
+    //             keyring = KeyringFactory.createWithSingleKey(options.address, key)
+    //         }
+    //     } else {
+    //         keyring = KeyringFactory.createFromPrivateKey(key)
+    //     }
+
+    //     return keyring.encryptV3(password, options)
+    // }
 }
 
-Keyring.privateKey = PrivateKey
-Keyring.role = KEY_ROLE
+KeyringFactory.privateKey = PrivateKey
+KeyringFactory.singleKeyring = SingleKeyring
+KeyringFactory.multipleKeyring = MultipleKeyring
+KeyringFactory.roleBasedKeyring = RoleBasedKeyring
+KeyringFactory.role = KEY_ROLE
 
-module.exports = Keyring
+module.exports = KeyringFactory

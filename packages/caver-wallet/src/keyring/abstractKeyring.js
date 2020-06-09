@@ -52,7 +52,7 @@ class AbstractKeyring {
      * @return {string}
      */
     getKlaytnWalletKey() {
-        throw new Error(`The keyring cannot be exported in KlaytnWalletKey format. Use caver.wallet.keyring.encrypt or keyring.encrypt.`)
+        throw new Error(`The keyring cannot be exported in KlaytnWalletKey format. Use keyring.encrypt.`)
     }
 
     /**

@@ -539,4 +539,5 @@ module.exports = {
     isEmptySig: utils.isEmptySig,
 
     hashMessage: utils.hashMessage,
+    recover: utils.recover,
 }

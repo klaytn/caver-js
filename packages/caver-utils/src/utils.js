@@ -959,6 +959,18 @@ const hashMessage = data => {
     return Hash.keccak256(klayMessage)
 }
 
+const recover = (message, signature, preFixed = false) => {
+    if (_.isObject(message)) {
+        return recover(message.messageHash, message.signature, true)
+    }
+
+    if (!preFixed) {
+        message = hashMessage(message)
+    }
+
+    return Account.recover(message, Account.encodeSignature(signature)).toLowerCase()
+}
+
 module.exports = {
     BN: BN,
     isBN: isBN,
@@ -1018,4 +1030,5 @@ module.exports = {
     isEmptySig: isEmptySig,
 
     hashMessage: hashMessage,
+    recover: recover,
 }
