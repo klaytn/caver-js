@@ -175,7 +175,7 @@ class KeyringContainer {
      *
      * @param {string} address An address of keyring in keyringContainer.
      * @param {string} data The data string to sign.
-     * @param {number} [role] A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
+     * @param {number} role A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
      * @param {number} [index] An index of key to use for signing.
      * @return {object}
      */

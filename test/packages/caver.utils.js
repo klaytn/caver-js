@@ -1976,30 +1976,21 @@ describe('caver.utils.convertToPeb', () => {
 })
 
 describe('caver.utils.recover', () => {
-    it('CAVERJS-UNIT-ETC-247: return recovered address when input is signMessage result object', () => {
-        const keyring = caver.wallet.keyring.generate()
-        const message = 'Some data'
-        const signed = keyring.signMessage(message)
-
-        const result = caver.utils.recover(signed)
-        expect(result).to.equal(keyring.address)
-    })
-
     it('CAVERJS-UNIT-ETC-248: return recovered address when input is message, signature', () => {
         const keyring = caver.wallet.keyring.generate()
         const message = 'Some data'
-        const signed = keyring.signMessage(message)
+        const signed = keyring.signMessage(message, caver.wallet.keyring.role.roleTransactionKey)
 
-        const result = caver.utils.recover(signed)
+        const result = caver.utils.recover(signed.message, signed.signatures[0])
         expect(result).to.equal(keyring.address)
     })
 
     it('CAVERJS-UNIT-ETC-249: return recovered address when input is messageHash, signature, prefixed', () => {
         const keyring = caver.wallet.keyring.generate()
         const message = 'Some data'
-        const signed = keyring.signMessage(message)
+        const signed = keyring.signMessage(message, caver.wallet.keyring.role.roleTransactionKey)
 
-        const result = caver.utils.recover(signed)
+        const result = caver.utils.recover(signed.messageHash, signed.signatures[0], true)
         expect(result).to.equal(keyring.address)
     })
 })

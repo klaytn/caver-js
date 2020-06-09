@@ -116,24 +116,31 @@ class MultipleKeyring extends AbstractKeyring {
     }
 
     /**
-     * signs with hashed message and returns result object that includes `signature`, `message` and `messageHash`
+     * signs with hashed message and returns result object that includes `signatures`, `message` and `messageHash`
      *
      * @param {string} message The message string to sign.
-     * @param {number} [role] A number indicating the role of the key. You can use `caver.wallet.keyring.role`. (default: `caver.wallet.keyring.role.roleTransactionKey`)
-     * @param {number} [index] The index of the key to be used. (default: 0)
+     * @param {number} role A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
+     * @param {number} [index] The index of the key to be used.
      * @return {object}
      */
     signMessage(message, role, index) {
-        const optionalParams = checkDependentOptionalParams(role, index)
+        if (role === undefined) throw new Error(`role should be defined for signMessage. Please use 'caver.wallet.keyring.role'.`)
         const messageHash = utils.hashMessage(message)
 
-        const keys = this.getKeyByRole(optionalParams.role)
-        validateIndexWithKeys(optionalParams.index, keys.length)
+        const keys = this.getKeyByRole(role)
 
-        const signature = keys[optionalParams.index].signMessage(messageHash)
+        const signatures = []
+        if (index !== undefined) {
+            validateIndexWithKeys(index, keys.length)
+            signatures.push(keys[index].signMessage(messageHash))
+        } else {
+            for (const k of keys) {
+                signatures.push(k.signMessage(messageHash))
+            }
+        }
         return {
             messageHash,
-            signature,
+            signatures,
             message,
         }
     }

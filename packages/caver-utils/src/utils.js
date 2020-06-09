@@ -960,10 +960,6 @@ const hashMessage = data => {
 }
 
 const recover = (message, signature, preFixed = false) => {
-    if (_.isObject(message)) {
-        return recover(message.messageHash, message.signature, true)
-    }
-
     if (!preFixed) {
         message = hashMessage(message)
     }

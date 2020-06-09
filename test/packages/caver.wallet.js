@@ -601,7 +601,7 @@ describe('wallet.signWithKeys', () => {
 })
 
 describe('wallet.signMessage', () => {
-    context('CAVERJS-UNIT-KEYRINGCONTAINER-036: input: address, data', () => {
+    context('CAVERJS-UNIT-KEYRINGCONTAINER-036: input: address, data, role', () => {
         it('should sign to message and return signed result', () => {
             const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
 
@@ -610,14 +610,35 @@ describe('wallet.signMessage', () => {
             const getKeyringSpy = sinon.spy(caver.wallet, 'getKeyring')
             const signMessageSpy = sinon.spy(keyring, 'signMessage')
 
-            const signed = caver.wallet.signMessage(keyring.address, data)
+            const signed = caver.wallet.signMessage(keyring.address, data, caver.wallet.keyring.role.roleTransactionKey)
 
             expect(signed.messageHash).to.equal(caver.utils.hashMessage(data))
-            expect(_.isArray(signed.signature)).to.be.true
-            expect(signed.signature.length).to.equal(3)
+            expect(_.isArray(signed.signatures)).to.be.true
+            expect(signed.signatures.length).to.equal(keyring.roleTransactionKey.length)
+            expect(signed.signatures[0].length).to.equal(3)
             expect(signed.message).to.equal(data)
             expect(getKeyringSpy).to.have.been.calledOnce
-            expect(signMessageSpy).to.have.been.calledWith(data, undefined, undefined)
+            expect(signMessageSpy).to.have.been.calledWith(data, 0, undefined)
+        })
+    })
+    context('CAVERJS-UNIT-KEYRINGCONTAINER-051: input: address, data, role, index', () => {
+        it('should sign to message and return signed result', () => {
+            const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))
+
+            const data = 'Some data'
+
+            const getKeyringSpy = sinon.spy(caver.wallet, 'getKeyring')
+            const signMessageSpy = sinon.spy(keyring, 'signMessage')
+
+            const signed = caver.wallet.signMessage(keyring.address, data, caver.wallet.keyring.role.roleTransactionKey, 0)
+
+            expect(signed.messageHash).to.equal(caver.utils.hashMessage(data))
+            expect(_.isArray(signed.signatures)).to.be.true
+            expect(signed.signatures.length).to.equal(1)
+            expect(signed.signatures[0].length).to.equal(3)
+            expect(signed.message).to.equal(data)
+            expect(getKeyringSpy).to.have.been.calledOnce
+            expect(signMessageSpy).to.have.been.calledWith(data, 0, 0)
         })
     })
 
