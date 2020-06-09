@@ -104,6 +104,8 @@ class FeeDelegatedValueTransfer extends AbstractFeeDelegatedTransaction {
      */
     getRLPEncoding() {
         this.validateOptionalValues()
+        const signatures = this.signatures.map(sig => sig.encode())
+        const feePayerSignatures = this.feePayerSignatures.map(sig => sig.encode())
 
         return (
             TX_TYPE_TAG.TxTypeFeeDelegatedValueTransfer +
@@ -114,9 +116,9 @@ class FeeDelegatedValueTransfer extends AbstractFeeDelegatedTransaction {
                 this.to.toLowerCase(),
                 Bytes.fromNat(this.value),
                 this.from.toLowerCase(),
-                this.signatures,
+                signatures,
                 this.feePayer.toLowerCase(),
-                this.feePayerSignatures,
+                feePayerSignatures,
             ]).slice(2)
         )
     }

@@ -75,6 +75,8 @@ class FeeDelegatedCancel extends AbstractFeeDelegatedTransaction {
      */
     getRLPEncoding() {
         this.validateOptionalValues()
+        const signatures = this.signatures.map(sig => sig.encode())
+        const feePayerSignatures = this.feePayerSignatures.map(sig => sig.encode())
 
         return (
             TX_TYPE_TAG.TxTypeFeeDelegatedCancel +
@@ -83,9 +85,9 @@ class FeeDelegatedCancel extends AbstractFeeDelegatedTransaction {
                 Bytes.fromNat(this.gasPrice),
                 Bytes.fromNat(this.gas),
                 this.from.toLowerCase(),
-                this.signatures,
+                signatures,
                 this.feePayer.toLowerCase(),
-                this.feePayerSignatures,
+                feePayerSignatures,
             ]).slice(2)
         )
     }

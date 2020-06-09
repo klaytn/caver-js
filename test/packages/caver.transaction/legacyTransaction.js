@@ -16,7 +16,6 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const _ = require('lodash')
 const chai = require('chai')
 const sinon = require('sinon')
 const sinonChai = require('sinon-chai')
@@ -34,6 +33,8 @@ const Caver = require('../../../index.js')
 const Keyring = require('../../../packages/caver-wallet/src/keyring/keyringFactory')
 const SingleKeyring = require('../../../packages/caver-wallet/src/keyring/singleKeyring')
 const TransactionHasher = require('../../../packages/caver-transaction/src/transactionHasher/transactionHasher')
+
+const SignatureData = require('../../../packages/caver-wallet/src/keyring/signatureData')
 
 const { generateDecoupledKeyring, generateMultiSigKeyring, generateRoleBasedKeyring } = require('../utils')
 
@@ -221,8 +222,7 @@ describe('TxTypeLegacyTransaction', () => {
             if (!customHasher) expect(hasherSpy).to.have.been.calledWith(tx)
         }
         function checkSignature() {
-            expect(tx.signatures.length).to.equal(3)
-            expect(_.isArray(tx.signatures[0])).to.be.false
+            expect(tx.signatures instanceof SignatureData).to.be.true
         }
 
         it('CAVERJS-UNIT-TRANSACTION-007: input: keyring. should sign transaction.', async () => {
@@ -356,8 +356,7 @@ describe('TxTypeLegacyTransaction', () => {
         }
 
         function checkSignature() {
-            expect(tx.signatures.length).to.equal(3)
-            expect(_.isArray(tx.signatures[0])).to.be.false
+            expect(tx.signatures instanceof SignatureData).to.be.true
         }
 
         it('CAVERJS-UNIT-TRANSACTION-018: input: keyring. should sign transaction.', async () => {
@@ -453,11 +452,10 @@ describe('TxTypeLegacyTransaction', () => {
             ]
             tx.appendSignatures(sig)
 
-            expect(tx.signatures.length).to.equal(3)
-            expect(_.isArray(tx.signatures[0])).to.be.false
-            expect(tx.signatures[0]).to.equal(sig[0])
-            expect(tx.signatures[1]).to.equal(sig[1])
-            expect(tx.signatures[2]).to.equal(sig[2])
+            expect(tx.signatures instanceof SignatureData).to.be.true
+            expect(tx.signatures.v).to.equal(sig[0])
+            expect(tx.signatures.r).to.equal(sig[1])
+            expect(tx.signatures.s).to.equal(sig[2])
         })
 
         it('CAVERJS-UNIT-TRANSACTION-028: If signatures is empty, appendSignatures append signatures with two-dimensional signature array', () => {
@@ -472,11 +470,10 @@ describe('TxTypeLegacyTransaction', () => {
             ]
             tx.appendSignatures(sig)
 
-            expect(tx.signatures.length).to.equal(3)
-            expect(_.isArray(tx.signatures[0])).to.be.false
-            expect(tx.signatures[0]).to.equal(sig[0][0])
-            expect(tx.signatures[1]).to.equal(sig[0][1])
-            expect(tx.signatures[2]).to.equal(sig[0][2])
+            expect(tx.signatures instanceof SignatureData).to.be.true
+            expect(tx.signatures.v).to.equal(sig[0][0])
+            expect(tx.signatures.r).to.equal(sig[0][1])
+            expect(tx.signatures.s).to.equal(sig[0][2])
         })
 
         it('CAVERJS-UNIT-TRANSACTION-029: If signatures is not empty, appendSignatures should throw error', () => {
@@ -545,8 +542,7 @@ describe('TxTypeLegacyTransaction', () => {
             expect(appendSignaturesSpy).to.have.been.calledOnce
             expect(getRLPEncodingSpy).to.have.been.calledOnce
             expect(combined).to.equal(rlpEncoded)
-            expect(tx.signatures.length).to.equal(3)
-            expect(_.isArray(tx.signatures[0])).to.be.false
+            expect(tx.signatures instanceof SignatureData).to.be.true
         })
 
         it('CAVERJS-UNIT-TRANSACTION-032: If signatures is not empty, combineSignatures should throw error', () => {

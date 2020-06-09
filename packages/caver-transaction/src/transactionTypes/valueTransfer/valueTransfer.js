@@ -101,6 +101,7 @@ class ValueTransfer extends AbstractTransaction {
      */
     getRLPEncoding() {
         this.validateOptionalValues()
+        const signatures = this.signatures.map(sig => sig.encode())
 
         return (
             TX_TYPE_TAG.TxTypeValueTransfer +
@@ -111,7 +112,7 @@ class ValueTransfer extends AbstractTransaction {
                 this.to.toLowerCase(),
                 Bytes.fromNat(this.value),
                 this.from.toLowerCase(),
-                this.signatures,
+                signatures,
             ]).slice(2)
         )
     }

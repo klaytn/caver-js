@@ -191,8 +191,12 @@ class AbstractTransaction {
      *                                                      and more than one signatures should be defined in the form of a two-dimensional array.
      */
     appendSignatures(sig) {
-        if (!_.isArray(sig)) throw new Error(`Signature to append should be an array.`)
-        if (!_.isArray(sig[0])) sig = [sig]
+        if (!_.isArray(sig)) {
+            if (_.isString(sig)) throw new Error(`Signature to append should be an array.`)
+            sig = [sig]
+        } else if (!_.isArray(sig[0]) && _.isString(sig[0])) {
+            sig = [sig]
+        }
         this.signatures = this.signatures.concat(sig)
     }
 

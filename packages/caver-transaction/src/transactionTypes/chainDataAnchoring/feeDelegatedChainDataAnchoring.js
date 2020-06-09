@@ -95,6 +95,8 @@ class FeeDelegatedChainDataAnchoring extends AbstractFeeDelegatedTransaction {
      */
     getRLPEncoding() {
         this.validateOptionalValues()
+        const signatures = this.signatures.map(sig => sig.encode())
+        const feePayerSignatures = this.feePayerSignatures.map(sig => sig.encode())
 
         return (
             TX_TYPE_TAG.TxTypeFeeDelegatedChainDataAnchoring +
@@ -104,9 +106,9 @@ class FeeDelegatedChainDataAnchoring extends AbstractFeeDelegatedTransaction {
                 Bytes.fromNat(this.gas),
                 this.from.toLowerCase(),
                 this.input,
-                this.signatures,
+                signatures,
                 this.feePayer.toLowerCase(),
-                this.feePayerSignatures,
+                feePayerSignatures,
             ]).slice(2)
         )
     }

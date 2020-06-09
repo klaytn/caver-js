@@ -24,6 +24,7 @@ const elliptic = require('elliptic')
 const secp256k1 = new elliptic.ec('secp256k1')
 
 const utils = require('../../../caver-utils')
+const SignatureData = require('./signatureData')
 
 /**
  * Representing a PrivateKey class that includes private key string.
@@ -55,25 +56,25 @@ class PrivateKey {
      *
      * @param {string} transactionHash The hash of transaction.
      * @param {string|number} chainId The chainId or the network.
-     * @return {Array<string>}
+     * @return {SignatureData}
      */
     sign(transactionHash, chainId) {
         chainId = utils.toHex(chainId)
         const signature = AccountLib.makeSigner(Nat.toNumber(chainId) * 2 + 35)(transactionHash, this.privateKey)
         const [v, r, s] = AccountLib.decodeSignature(signature).map(sig => utils.makeEven(utils.trimLeadingZero(sig)))
-        return [v, r, s]
+        return new SignatureData([v, r, s])
     }
 
     /**
      * signs with hashed data and returns `signature`
      *
      * @param {string} messageHash The hash of data to sign.
-     * @return {Array.<string>}
+     * @return {SignatureData}
      */
     signMessage(messageHash) {
         const signature = AccountLib.sign(messageHash, this.privateKey)
         const [v, r, s] = AccountLib.decodeSignature(signature)
-        return [v, r, s]
+        return new SignatureData([v, r, s])
     }
 
     /**

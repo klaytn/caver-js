@@ -930,7 +930,7 @@ const isValidRole = role => {
 }
 
 const isEmptySig = sig => {
-    if (!Array.isArray(sig)) return false
+    if (!Array.isArray(sig)) sig = resolveSignature(sig)
 
     function isEmpty(s) {
         if (s.length !== 3) throw new Error(`Invalid signatures length: ${s.length}`)
@@ -939,13 +939,11 @@ const isEmptySig = sig => {
         return false
     }
 
-    if (Array.isArray(sig[0])) {
-        // [[v,r,s]]
-        if (sig.length !== 1) return false
-        return isEmpty(sig[0])
-    }
+    if (_.isString(sig[0])) return isEmpty(sig)
 
-    return isEmpty(sig)
+    if (sig.length !== 1) return false
+
+    return isEmptySig(sig[0])
 }
 
 const hashMessage = data => {
@@ -964,7 +962,7 @@ const recover = (message, signature, preFixed = false) => {
         message = hashMessage(message)
     }
 
-    return Account.recover(message, Account.encodeSignature(signature)).toLowerCase()
+    return Account.recover(message, Account.encodeSignature(signature.encode())).toLowerCase()
 }
 
 module.exports = {

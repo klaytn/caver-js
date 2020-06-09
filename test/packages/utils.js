@@ -25,6 +25,8 @@ const utils = require('../../packages/caver-utils')
 const Keyring = require('../../packages/caver-wallet/src/keyring/keyringFactory')
 const { KEY_ROLE } = require('../../packages/caver-wallet/src/keyring/keyringHelper')
 
+const SignatureData = require('../../packages/caver-wallet/src/keyring/signatureData')
+
 const unitMap = {
     peb: '1',
     kpeb: '1000',
@@ -147,13 +149,12 @@ const checkSignature = (tx, expected = {}) => {
     expect(tx.signatures.length).to.equal(expectedLength)
 
     for (let i = 0; i < expectedLength; i++) {
-        expect(_.isArray(tx.signatures[i])).to.be.true
-        expect(tx.signatures[i].length).to.equal(3)
+        expect(tx.signatures[i] instanceof SignatureData).to.be.true
 
         if (expectedSignatures) {
-            for (let j = 0; j < 3; j++) {
-                expect(tx.signatures[i][j]).to.equal(expectedSignatures[i][j])
-            }
+            expect(tx.signatures[i].v).to.equal(expectedSignatures[i][0])
+            expect(tx.signatures[i].r).to.equal(expectedSignatures[i][1])
+            expect(tx.signatures[i].s).to.equal(expectedSignatures[i][2])
         }
     }
 }
@@ -172,13 +173,12 @@ const checkFeePayerSignature = (tx, expected = {}) => {
     expect(tx.feePayerSignatures.length).to.equal(expectedLength)
 
     for (let i = 0; i < expectedLength; i++) {
-        expect(_.isArray(tx.feePayerSignatures[i])).to.be.true
-        expect(tx.feePayerSignatures[i].length).to.equal(3)
+        expect(tx.feePayerSignatures[i] instanceof SignatureData).to.be.true
 
         if (expectedSignatures) {
-            for (let j = 0; j < 3; j++) {
-                expect(tx.feePayerSignatures[i][j]).to.equal(expectedSignatures[i][j])
-            }
+            expect(tx.feePayerSignatures[i].v).to.equal(expectedSignatures[i][0])
+            expect(tx.feePayerSignatures[i].r).to.equal(expectedSignatures[i][1])
+            expect(tx.feePayerSignatures[i].s).to.equal(expectedSignatures[i][2])
         }
     }
 }

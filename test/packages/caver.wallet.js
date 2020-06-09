@@ -39,6 +39,8 @@ const ValueTransfer = require('../../packages/caver-transaction/src/transactionT
 const FeeDelegatedValueTransfer = require('../../packages/caver-transaction/src/transactionTypes/valueTransfer/feeDelegatedValueTransfer')
 const AccountUpdate = require('../../packages/caver-transaction/src/transactionTypes/accountUpdate/accountUpdate')
 
+const SignatureData = require('../../packages/caver-wallet/src/keyring/signatureData')
+
 const { generateDecoupledKeyring, generateMultiSigKeyring, generateRoleBasedKeyring } = require('./utils')
 
 let caver
@@ -622,7 +624,7 @@ describe('wallet.signMessage', () => {
             expect(signed.messageHash).to.equal(caver.utils.hashMessage(data))
             expect(_.isArray(signed.signatures)).to.be.true
             expect(signed.signatures.length).to.equal(keyring.roleTransactionKey.length)
-            expect(signed.signatures[0].length).to.equal(3)
+            expect(signed.signatures[0] instanceof SignatureData).to.be.true
             expect(signed.message).to.equal(data)
             expect(getKeyringSpy).to.have.been.calledOnce
             expect(signMessageSpy).to.have.been.calledWith(data, 0, undefined)
@@ -642,7 +644,7 @@ describe('wallet.signMessage', () => {
             expect(signed.messageHash).to.equal(caver.utils.hashMessage(data))
             expect(_.isArray(signed.signatures)).to.be.true
             expect(signed.signatures.length).to.equal(1)
-            expect(signed.signatures[0].length).to.equal(3)
+            expect(signed.signatures[0] instanceof SignatureData).to.be.true
             expect(signed.message).to.equal(data)
             expect(getKeyringSpy).to.have.been.calledOnce
             expect(signMessageSpy).to.have.been.calledWith(data, 0, 0)
