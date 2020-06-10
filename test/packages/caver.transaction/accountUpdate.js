@@ -405,7 +405,7 @@ describe('TxTypeAccountUpdate', () => {
         const appendSignaturesSpys = []
 
         let createFromPrivateKeySpy
-        let senderSignWithKeySpy
+        let senderSignSpy
         let hasherSpy
 
         beforeEach(() => {
@@ -415,7 +415,7 @@ describe('TxTypeAccountUpdate', () => {
             }
 
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
-            senderSignWithKeySpy = sandbox.spy(sender, 'sign')
+            senderSignSpy = sandbox.spy(sender, 'sign')
             hasherSpy = sandbox.stub(TransactionHasher, 'getHashForSignature')
             hasherSpy.returns(txHash)
         })
@@ -437,13 +437,13 @@ describe('TxTypeAccountUpdate', () => {
 
                 checkFunctionCall(i)
                 checkSignature(tx)
-                expect(senderSignWithKeySpy).to.have.been.calledWith(txHash, '0x7e3', 1, undefined)
+                expect(senderSignSpy).to.have.been.calledWith(txHash, '0x7e3', 1, undefined)
             }
             expect(createFromPrivateKeySpy).not.to.have.been.called
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-161: input: private key string. should sign transaction.', async () => {
-            const signWithKeyProtoSpy = sandbox.spy(SingleKeyring.prototype, 'sign')
+            const signProtoSpy = sandbox.spy(SingleKeyring.prototype, 'sign')
 
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
@@ -451,13 +451,13 @@ describe('TxTypeAccountUpdate', () => {
 
                 checkFunctionCall(i)
                 checkSignature(tx)
-                expect(signWithKeyProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 1, undefined)
+                expect(signProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 1, undefined)
             }
             expect(createFromPrivateKeySpy).to.have.been.callCount(Object.keys(txsByAccountKeys).length)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-162: input: KlaytnWalletKey. should sign transaction.', async () => {
-            const signWithKeyProtoSpy = sandbox.spy(SingleKeyring.prototype, 'sign')
+            const signProtoSpy = sandbox.spy(SingleKeyring.prototype, 'sign')
 
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
@@ -465,13 +465,13 @@ describe('TxTypeAccountUpdate', () => {
 
                 checkFunctionCall(i)
                 checkSignature(tx)
-                expect(signWithKeyProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 1, undefined)
+                expect(signProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 1, undefined)
             }
             expect(createFromPrivateKeySpy).to.have.been.callCount(Object.keys(txsByAccountKeys).length)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-163: input: keyring, index. should sign transaction with specific index.', async () => {
-            const roleBasedSignWithKeySpy = sandbox.spy(roleBasedKeyring, 'sign')
+            const roleBasedSignSpy = sandbox.spy(roleBasedKeyring, 'sign')
 
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
@@ -481,7 +481,7 @@ describe('TxTypeAccountUpdate', () => {
 
                 checkFunctionCall(i)
                 checkSignature(tx)
-                expect(roleBasedSignWithKeySpy).to.have.been.calledWith(txHash, '0x7e3', 1, 1)
+                expect(roleBasedSignSpy).to.have.been.calledWith(txHash, '0x7e3', 1, 1)
             }
             expect(createFromPrivateKeySpy).not.to.have.been.called
         }).timeout(200000)
@@ -497,7 +497,7 @@ describe('TxTypeAccountUpdate', () => {
 
                 checkFunctionCall(i, true)
                 checkSignature(tx)
-                expect(senderSignWithKeySpy).to.have.been.calledWith(hashForCustomHasher, '0x7e3', 1, undefined)
+                expect(senderSignSpy).to.have.been.calledWith(hashForCustomHasher, '0x7e3', 1, undefined)
             }
             expect(createFromPrivateKeySpy).not.to.have.been.calledOnce
         }).timeout(200000)
@@ -506,7 +506,7 @@ describe('TxTypeAccountUpdate', () => {
             const hashForCustomHasher = '0x9e4b4835f6ea5ce55bd1037fe92040dd070af6154aefc30d32c65364a1123cae'
             const customHasher = () => hashForCustomHasher
 
-            const roleBasedSignWithKeySpy = sandbox.spy(roleBasedKeyring, 'sign')
+            const roleBasedSignSpy = sandbox.spy(roleBasedKeyring, 'sign')
 
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
@@ -517,7 +517,7 @@ describe('TxTypeAccountUpdate', () => {
                 checkFunctionCall(i, true)
                 checkSignature(tx)
                 expect(createFromPrivateKeySpy).not.to.have.been.calledOnce
-                expect(roleBasedSignWithKeySpy).to.have.been.calledWith(hashForCustomHasher, '0x7e3', 1, 1)
+                expect(roleBasedSignSpy).to.have.been.calledWith(hashForCustomHasher, '0x7e3', 1, 1)
             }
             expect(createFromPrivateKeySpy).not.to.have.been.called
         }).timeout(200000)
@@ -588,27 +588,27 @@ describe('TxTypeAccountUpdate', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-169: input: private key string. should sign transaction.', async () => {
-            const signWithKeysProtoSpy = sandbox.spy(SingleKeyring.prototype, 'sign')
+            const signProtoSpy = sandbox.spy(SingleKeyring.prototype, 'sign')
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
                 await tx.sign(sender.key.privateKey)
 
                 checkFunctionCall(i)
                 checkSignature(tx)
-                expect(signWithKeysProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 1)
+                expect(signProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 1)
             }
             expect(createFromPrivateKeySpy).to.have.been.callCount(Object.keys(txsByAccountKeys).length)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-170: input: KlaytnWalletKey. should sign transaction.', async () => {
-            const signWithKeysProtoSpy = sandbox.spy(SingleKeyring.prototype, 'sign')
+            const signProtoSpy = sandbox.spy(SingleKeyring.prototype, 'sign')
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
                 await tx.sign(sender.getKlaytnWalletKey())
 
                 checkFunctionCall(i)
                 checkSignature(tx)
-                expect(signWithKeysProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 1)
+                expect(signProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 1)
             }
             expect(createFromPrivateKeySpy).to.have.been.callCount(Object.keys(txsByAccountKeys).length)
         }).timeout(200000)

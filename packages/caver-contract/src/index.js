@@ -1099,7 +1099,7 @@ Contract.prototype._executeMethod = function _executeMethod() {
                     transaction = new SmartContractExecution(args.options)
                 }
 
-                return keyrings.signWithKeys(transaction.from, transaction).then(signedTx => {
+                return keyrings.sign(transaction.from, transaction).then(signedTx => {
                     return sendRawTransaction(signedTx.getRLPEncoding())
                 })
             }

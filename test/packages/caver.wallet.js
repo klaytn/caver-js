@@ -523,7 +523,7 @@ describe('wallet.sign', () => {
     })
 })
 
-describe('wallet.signWithKeys', () => {
+describe('wallet.sign', () => {
     context('CAVERJS-UNIT-KEYRINGCONTAINER-031: input: address, value transfer transaction', () => {
         it('should sign to transaction and return hash', async () => {
             const keyring = caver.wallet.add(generateRoleBasedKeyring([3, 2, 4]))

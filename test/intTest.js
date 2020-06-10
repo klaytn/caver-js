@@ -102,7 +102,7 @@ function replaceWithEnv(data) {
         }
 
         if (elem.endsWith('.privateKey')) {
-            return getRandomAccount(elem.replace('.privateKey', '')).keys[0][0].privateKey
+            return getRandomAccount(elem.replace('.privateKey', '')).key.privateKey
         }
         if (elem.startsWith('random')) {
             return getRandomAccount(elem).address.toLowerCase()
@@ -380,7 +380,7 @@ async function processTransaction(t) {
                 if (t.expected.receipt.checkContractAddress) {
                     const addrHash = caver.utils.keccak256(RLP.encode([t.tx.from.toLowerCase(), Bytes.fromNat(t.tx.nonce)]))
                     const address = caver.utils.toChecksumAddress(`0x${addrHash.slice(-40)}`)
-                    expect(r.contractAddress).to.equal(address)
+                    expect(r.contractAddress.toLowerCase()).to.equal(address.toLowerCase())
                 }
 
                 if (t.expected.receipt.codeFormat) expect(r.codeFormat).to.equal(t.expected.receipt.codeFormat)
