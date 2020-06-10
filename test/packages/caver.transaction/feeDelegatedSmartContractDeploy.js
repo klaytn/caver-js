@@ -105,7 +105,6 @@ describe('TxTypeFeeDelegatedSmartContractDeploy', () => {
     beforeEach(() => {
         transactionObj = {
             from: sender.address,
-            value: 0,
             input,
             gas: '0x15f90',
         }
@@ -127,13 +126,6 @@ describe('TxTypeFeeDelegatedSmartContractDeploy', () => {
             delete transactionObj.from
 
             const expectedError = '"from" is missing'
-            expect(() => new caver.transaction.feeDelegatedSmartContractDeploy(transactionObj)).to.throw(expectedError)
-        })
-
-        it('CAVERJS-UNIT-TRANSACTIONFD-223: If feeDelegatedSmartContractDeploy not define value, return error', () => {
-            delete transactionObj.value
-
-            const expectedError = '"value" is missing'
             expect(() => new caver.transaction.feeDelegatedSmartContractDeploy(transactionObj)).to.throw(expectedError)
         })
 

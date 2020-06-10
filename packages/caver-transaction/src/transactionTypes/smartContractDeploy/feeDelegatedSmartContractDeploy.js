@@ -78,7 +78,7 @@ class FeeDelegatedSmartContractDeploy extends AbstractFeeDelegatedTransaction {
         if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
         super(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy, createTxObj)
         this.to = createTxObj.to || '0x'
-        this.value = createTxObj.value
+        this.value = createTxObj.value || '0x0'
 
         if (createTxObj.input && createTxObj.data)
             throw new Error(`'input' and 'data' properties cannot be defined at the same time, please use either 'input' or 'data'.`)

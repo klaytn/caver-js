@@ -106,7 +106,6 @@ describe('TxTypeFeeDelegatedSmartContractDeployWithRatio', () => {
     beforeEach(() => {
         transactionObj = {
             from: sender.address,
-            value: 0,
             input,
             feeRatio: 30,
             gas: '0x15f90',
@@ -129,13 +128,6 @@ describe('TxTypeFeeDelegatedSmartContractDeployWithRatio', () => {
             delete transactionObj.from
 
             const expectedError = '"from" is missing'
-            expect(() => new caver.transaction.feeDelegatedSmartContractDeployWithRatio(transactionObj)).to.throw(expectedError)
-        })
-
-        it('CAVERJS-UNIT-TRANSACTIONFDR-226: If feeDelegatedSmartContractDeployWithRatio not define value, return error', () => {
-            delete transactionObj.value
-
-            const expectedError = '"value" is missing'
             expect(() => new caver.transaction.feeDelegatedSmartContractDeployWithRatio(transactionObj)).to.throw(expectedError)
         })
 

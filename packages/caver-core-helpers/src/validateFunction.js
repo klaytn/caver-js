@@ -555,7 +555,7 @@ function validateFeeDelegatedAccountUpdateWithRatio(transaction) {
 }
 
 function checkDeployEssential(transaction) {
-    if (transaction.value === undefined) {
+    if (transaction.value === undefined && !transaction.type.includes('TxType')) {
         return new Error('"value" is missing')
     }
 
