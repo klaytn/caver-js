@@ -256,7 +256,7 @@ async function processSend(t) {
     // console.log(receipt)
     if (t.expected.receipt) {
         expect(receipt).to.not.undefined
-        if (t.expected.receipt.status) expect(receipt.status).to.equal(t.expected.receipt.status)
+        if (t.expected.receipt.status) expect(receipt.status).to.equal(t.expected.receipt.status ? '0x1' : '0x0')
         if (t.expected.receipt.txError) expect(receipt.txError).to.equal(t.expected.receipt.txError)
     }
 
@@ -412,7 +412,7 @@ async function processTransaction(t) {
             testEnv.contracts[t.deployedAddress] = receipt.contractAddress
         }
         if (t.expected.receipt && t.expected.receipt.status) {
-            expect(receipt.status).to.equal(t.expected.receipt.status)
+            expect(receipt.status).to.equal(t.expected.receipt.status ? '0x1' : '0x0')
         }
         if (t.expected.receipt && t.expected.receipt.txError) {
             expect(receipt.txError).to.equal(t.expected.receipt.txError)
