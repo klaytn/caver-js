@@ -32,9 +32,9 @@ const { validateForSigning, validateIndexWithKeys, encryptKey, formatEncrypted }
  */
 class RoleBasedKeyring extends AbstractKeyring {
     /**
-     * creates a keyring.
+     * creates a RoleBasedKeyring.
      * @param {string} address - The address of keyring.
-     * @param {Array.<Array<string>>|Array.<Array<PrivateKey>>} keys - The keys to use in roleBasedKeyring.
+     * @param {Array.<Array<string>>|Array.<Array<PrivateKey>>} keys - The keys to use in RoleBasedKeyring.
      */
     constructor(address, keys) {
         super(address)
