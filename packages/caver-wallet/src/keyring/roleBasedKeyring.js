@@ -166,7 +166,7 @@ class RoleBasedKeyring extends AbstractKeyring {
      */
     getKeyByRole(role) {
         if (role === undefined) throw new Error(`role should be defined.`)
-        if (role >= KEY_ROLE.roleLast) throw new Error(`Invalid role number: ${role}`)
+        if (role >= KEY_ROLE.roleLast || role < 0) throw new Error(`Invalid role number: ${role}`)
         let key = this._keys[role]
         if (key.length === 0 && role > KEY_ROLE.roleTransactionKey) {
             if (this._keys[KEY_ROLE.roleTransactionKey].length === 0) {

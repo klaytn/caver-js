@@ -142,7 +142,7 @@ class MultipleKeyring extends AbstractKeyring {
      */
     getKeyByRole(role) {
         if (role === undefined) throw new Error(`role should be defined.`)
-        if (role >= KEY_ROLE.roleLast) throw new Error(`Invalid role number: ${role}`)
+        if (role >= KEY_ROLE.roleLast || role < 0) throw new Error(`Invalid role number: ${role}`)
         return this.keys
     }
 
