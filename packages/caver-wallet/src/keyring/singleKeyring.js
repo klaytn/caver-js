@@ -120,7 +120,7 @@ class SingleKeyring extends AbstractKeyring {
     }
 
     /**
-     * returns keys by role.If the key of the role passed as parameter is empty, the default key is returned.
+     * returns keys by role. If the key of the role passed as parameter is empty, the default key is returned.
      *
      * @param {number} role A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
      * @return {Array.<PrivateKey>}
