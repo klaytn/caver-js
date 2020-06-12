@@ -32,7 +32,7 @@ const { validateForSigning, validateIndexWithKeys, encryptKey, formatEncrypted }
  */
 class MultipleKeyring extends AbstractKeyring {
     /**
-     * creates a keyring.
+     * creates a MultipleKeyring.
      * @param {string} address - The address of keyring.
      * @param {Array.<string>|Array.<PrivateKey>} keys - The keys to use in MultipleKeyring.
      */
