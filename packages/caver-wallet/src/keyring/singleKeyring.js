@@ -29,7 +29,7 @@ const { validateForSigning, validateIndexWithKeys, encryptKey, formatEncrypted }
  */
 class SingleKeyring extends AbstractKeyring {
     /**
-     * creates a keyring.
+     * creates a SingleKeyring.
      * @param {string} address - The address of keyring.
      * @param {string|PrivateKey} key - The key to use in SingleKeyring.
      */
