@@ -58,6 +58,7 @@ class PrivateKey {
      * @return {Array<string>}
      */
     sign(transactionHash, chainId) {
+        chainId = utils.toHex(chainId)
         const signature = AccountLib.makeSigner(Nat.toNumber(chainId) * 2 + 35)(transactionHash, this.privateKey)
         const [v, r, s] = AccountLib.decodeSignature(signature).map(sig => utils.makeEven(utils.trimLeadingZero(sig)))
         return [v, r, s]

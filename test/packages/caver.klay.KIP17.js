@@ -50,8 +50,8 @@ const prepareTestSetting = async () => {
     ownerMap[testAccount.address] = []
     ownerMap[receiver.address] = []
 
-    caver2.klay.accounts.wallet.add(testAccount.keys[0][0].privateKey)
-    caver2.klay.accounts.wallet.add(receiver.keys[0][0].privateKey)
+    caver2.klay.accounts.wallet.add(testAccount.key.privateKey)
+    caver2.klay.accounts.wallet.add(receiver.key.privateKey)
 
     const txObject = new caver.transaction.valueTransfer({
         from: sender.address,
@@ -60,7 +60,7 @@ const prepareTestSetting = async () => {
         gas: 900000,
     })
 
-    await txObject.signWithKeys(sender)
+    await txObject.sign(sender)
 
     return caver.rpc.klay.sendRawTransaction(txObject)
 }

@@ -23,7 +23,8 @@ const Bytes = require('eth-lib/lib/bytes')
 const TransactionHasher = require('../transactionHasher/transactionHasher')
 const AbstractTransaction = require('./abstractTransaction')
 const { refineSignatures, typeDetectionFromRLPEncoding } = require('../transactionHelper/transactionHelper')
-const Keyring = require('../../../caver-wallet/src/keyring/keyring')
+const Keyring = require('../../../caver-wallet/src/keyring/keyringFactory')
+const AbstractKeyring = require('../../../caver-wallet/src/keyring/abstractKeyring')
 const { KEY_ROLE } = require('../../../caver-wallet/src/keyring/keyringHelper')
 const utils = require('../../../caver-utils/src')
 
@@ -72,25 +73,28 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
     }
 
     /**
-     * Signs to the transaction with a single private key in `key` as a fee payer.
+     * Signs to the transaction with private key(s) in `key` as a fee payer.
      * @async
      * @param {Keyring|string} key - The instance of Keyring, private key string or KlaytnWalletKey string.
-     * @param {number} [index] - The index of private key to use.
-     * @param {function} [hasher] - The function to get the transaction hash. In order to use a custom hasher, the index must be defined.
+     * @param {number} [index] - The index of private key to use. If index is undefined, all private keys in keyring will be used.
+     * @param {function} [hasher] - The function to get the transaction hash.
      * @return {Transaction}
      */
-    async signFeePayerWithKey(key, index = 0, hasher = TransactionHasher.getHashForFeePayerSignature) {
+    async signAsFeePayer(key, index, hasher = TransactionHasher.getHashForFeePayerSignature) {
         // User parameter input cases
-        // (key) / (key index) / (key index hasher)
-        if (_.isFunction(index)) throw new Error(`In order to pass a custom hasher, use the third parameter.`)
+        // (key) / (key index) / (key hasher) / (key index hasher)
+        if (_.isFunction(index)) {
+            hasher = index
+            index = undefined
+        }
 
         let keyring = key
         if (_.isString(key)) {
             keyring = Keyring.createFromPrivateKey(key)
         }
-        if (!(keyring instanceof Keyring))
+        if (!(keyring instanceof AbstractKeyring))
             throw new Error(
-                `Unsupported key type. The key parameter of the signFeePayerWithKey must be a single private key string, KlaytnWalletKey string, or Keyring instance.`
+                `Unsupported key type. The key parameter of the signAsFeePayer must be a single private key string, KlaytnWalletKey string, or Keyring instance.`
             )
 
         if (!this.feePayer || this.feePayer === '0x') this.feePayer = keyring.address
@@ -99,38 +103,9 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
 
         await this.fillTransaction()
         const hash = hasher(this)
-        const sig = keyring.signWithKey(hash, this.chainId, KEY_ROLE.roleFeePayerKey, index)
+        const sig = keyring.sign(hash, this.chainId, KEY_ROLE.roleFeePayerKey, index)
 
         this.appendFeePayerSignatures(sig)
-
-        return this
-    }
-
-    /**
-     * Signs to the transaction with all private keys in `keys` as a fee payer.
-     *
-     * @async
-     * @param {Keyring|string} key - The instance of Keyring, private key string or KlaytnWalletKey string.
-     * @param {function} [hasher] - The function to get hash of transaction.
-     * @return {Transaction}
-     */
-    async signFeePayerWithKeys(key, hasher = TransactionHasher.getHashForFeePayerSignature) {
-        let keyring = key
-        if (_.isString(key)) keyring = Keyring.createFromPrivateKey(key)
-        if (!(keyring instanceof Keyring))
-            throw new Error(
-                `Unsupported key type. The key parameter of the signFeePayerWithKeys must be a single private key string, KlaytnWalletKey string, or Keyring instance.`
-            )
-
-        if (!this.feePayer || this.feePayer === '0x') this.feePayer = keyring.address
-        if (this.feePayer.toLowerCase() !== keyring.address.toLowerCase())
-            throw new Error(`The feePayer address of the transaction is different with the address of the keyring to use.`)
-
-        await this.fillTransaction()
-        const hash = hasher(this)
-        const sigs = keyring.signWithKeys(hash, this.chainId, KEY_ROLE.roleFeePayerKey)
-
-        this.appendFeePayerSignatures(sigs)
 
         return this
     }

@@ -354,7 +354,7 @@ describe('caver.rpc.klay', () => {
             const passphrase = 'passphrase'
             let keyringToImport = caver.wallet.keyring.generate()
             keyringToImport = caver.wallet.add(keyringToImport)
-            const address = await caver.klay.personal.importRawKey(keyringToImport.keys[0][0].privateKey, passphrase)
+            const address = await caver.klay.personal.importRawKey(keyringToImport.key.privateKey, passphrase)
             expect(address.toLowerCase()).to.equals(keyringToImport.address.toLowerCase())
 
             const isUnlock = await caver.klay.personal.unlockAccount(keyringToImport.address, passphrase, 100)
@@ -371,7 +371,7 @@ describe('caver.rpc.klay', () => {
             })
 
             const result = await caver.rpc.klay.signTransaction(feeDelegated)
-            const signed = await feeDelegated.signWithKeys(keyringToImport)
+            const signed = await feeDelegated.sign(keyringToImport)
             expect(result.tx.signatures[0].toString()).to.equal(caver.utils.transformSignaturesToObject(signed.signatures).toString())
         }).timeout(100000)
     })
@@ -381,7 +381,7 @@ describe('caver.rpc.klay', () => {
             const passphrase = 'passphrase'
             let keyringToImport = caver.wallet.keyring.generate()
             keyringToImport = caver.wallet.add(keyringToImport)
-            const address = await caver.klay.personal.importRawKey(keyringToImport.keys[0][0].privateKey, passphrase)
+            const address = await caver.klay.personal.importRawKey(keyringToImport.key.privateKey, passphrase)
             expect(address.toLowerCase()).to.equals(keyringToImport.address.toLowerCase())
 
             const isUnlock = await caver.klay.personal.unlockAccount(keyringToImport.address, passphrase, 100)
@@ -397,10 +397,10 @@ describe('caver.rpc.klay', () => {
                 nonce: await caver.rpc.klay.getTransactionCount(sender.address),
             })
 
-            await feeDelegated.signWithKeys(sender)
+            await feeDelegated.sign(sender)
 
             const result = await caver.rpc.klay.signTransactionAsFeePayer(feeDelegated)
-            const signed = await feeDelegated.signFeePayerWithKeys(keyringToImport)
+            const signed = await feeDelegated.signAsFeePayer(keyringToImport)
             expect(result.tx.feePayerSignatures[0].toString()).to.equal(
                 caver.utils.transformSignaturesToObject(signed.feePayerSignatures).toString()
             )
@@ -420,11 +420,11 @@ describe('caver.rpc.klay', () => {
                 value: caver.utils.toPeb(1, 'KLAY'),
                 gas: 30000,
             })
-            await valueTransfer.signWithKeys(sender)
+            await valueTransfer.sign(sender)
             await caver.rpc.klay.sendRawTransaction(valueTransfer)
 
             // Import key in Klaytn node
-            const address = await caver.klay.personal.importRawKey(keyringToImport.keys[0][0].privateKey, passphrase)
+            const address = await caver.klay.personal.importRawKey(keyringToImport.key.privateKey, passphrase)
             expect(address.toLowerCase()).to.equals(keyringToImport.address.toLowerCase())
 
             const isUnlock = await caver.klay.personal.unlockAccount(keyringToImport.address, passphrase, 100)
@@ -440,10 +440,10 @@ describe('caver.rpc.klay', () => {
                 nonce: await caver.rpc.klay.getTransactionCount(sender.address),
             })
 
-            await feeDelegated.signWithKeys(sender)
+            await feeDelegated.sign(sender)
 
             const result = await caver.rpc.klay.signTransactionAsFeePayer(feeDelegated)
-            const signed = await feeDelegated.signFeePayerWithKeys(keyringToImport)
+            const signed = await feeDelegated.signAsFeePayer(keyringToImport)
             expect(result.tx.feePayerSignatures[0].toString()).to.equal(
                 caver.utils.transformSignaturesToObject(signed.feePayerSignatures).toString()
             )

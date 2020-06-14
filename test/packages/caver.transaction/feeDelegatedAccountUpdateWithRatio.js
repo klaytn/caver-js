@@ -32,7 +32,8 @@ const { propertiesForUnnecessary } = require('../utils')
 
 const testRPCURL = require('../../testrpc')
 const Caver = require('../../../index.js')
-const Keyring = require('../../../packages/caver-wallet/src/keyring/keyring')
+const Keyring = require('../../../packages/caver-wallet/src/keyring/keyringFactory')
+const SingleKeyring = require('../../../packages/caver-wallet/src/keyring/singleKeyring')
 const TransactionHasher = require('../../../packages/caver-transaction/src/transactionHasher/transactionHasher')
 
 const { generateRoleBasedKeyring, makeAccount, accountKeyTestCases, checkSignature, checkFeePayerSignature } = require('../utils')
@@ -522,14 +523,14 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
         })
     })
 
-    context('feeDelegatedAccountUpdateWithRatio.signWithKey', () => {
+    context('feeDelegatedAccountUpdateWithRatio.sign', () => {
         const txHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
 
         const fillTransactionSpys = []
         const appendSignaturesSpys = []
 
         let createFromPrivateKeySpy
-        let senderSignWithKeySpy
+        let senderSignSpy
         let hasherSpy
 
         beforeEach(() => {
@@ -539,7 +540,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
             }
 
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
-            senderSignWithKeySpy = sandbox.spy(sender, 'signWithKey')
+            senderSignSpy = sandbox.spy(sender, 'sign')
             hasherSpy = sandbox.stub(TransactionHasher, 'getHashForSignature')
             hasherSpy.returns(txHash)
         })
@@ -557,86 +558,95 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-164: input: keyring. should sign transaction.', async () => {
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
-                await tx.signWithKey(sender)
+                await tx.sign(sender)
 
                 checkFunctionCall(i)
                 checkSignature(tx)
-                expect(senderSignWithKeySpy).to.have.been.calledWith(txHash, '0x7e3', 1, 0)
+                expect(senderSignSpy).to.have.been.calledWith(txHash, '0x7e3', 1, undefined)
             }
             expect(createFromPrivateKeySpy).not.to.have.been.called
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-165: input: private key string. should sign transaction.', async () => {
-            const signWithKeyProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKey')
+            const signProtoSpy = sandbox.spy(SingleKeyring.prototype, 'sign')
 
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
-                await tx.signWithKey(sender.keys[0][0].privateKey)
+                await tx.sign(sender.key.privateKey)
 
                 checkFunctionCall(i)
                 checkSignature(tx)
-                expect(signWithKeyProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 1, 0)
+                expect(signProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 1, undefined)
             }
             expect(createFromPrivateKeySpy).to.have.been.callCount(Object.keys(txsByAccountKeys).length)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-166: input: KlaytnWalletKey. should sign transaction.', async () => {
-            const signWithKeyProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKey')
+            const signProtoSpy = sandbox.spy(SingleKeyring.prototype, 'sign')
 
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
-                await tx.signWithKey(sender.getKlaytnWalletKey())
+                await tx.sign(sender.getKlaytnWalletKey())
 
                 checkFunctionCall(i)
                 checkSignature(tx)
-                expect(signWithKeyProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 1, 0)
+                expect(signProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 1, undefined)
             }
             expect(createFromPrivateKeySpy).to.have.been.callCount(Object.keys(txsByAccountKeys).length)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-167: input: keyring, index. should sign transaction with specific index.', async () => {
-            const roleBasedSignWithKeySpy = sandbox.spy(roleBasedKeyring, 'signWithKey')
+            const roleBasedSignSpy = sandbox.spy(roleBasedKeyring, 'sign')
 
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
                 tx.from = roleBasedKeyring.address
 
-                await tx.signWithKey(roleBasedKeyring, 1)
+                await tx.sign(roleBasedKeyring, 1)
 
                 checkFunctionCall(i)
                 checkSignature(tx)
-                expect(roleBasedSignWithKeySpy).to.have.been.calledWith(txHash, '0x7e3', 1, 1)
+                expect(roleBasedSignSpy).to.have.been.calledWith(txHash, '0x7e3', 1, 1)
             }
             expect(createFromPrivateKeySpy).not.to.have.been.called
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFDR-168: input: keyring, custom hasher. should throw error.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-168: input: keyring, custom hasher. should use custom hasher.', async () => {
             const hashForCustomHasher = '0x9e4b4835f6ea5ce55bd1037fe92040dd070af6154aefc30d32c65364a1123cae'
             const customHasher = () => hashForCustomHasher
 
+            const roleBasedSignSpy = sandbox.spy(roleBasedKeyring, 'sign')
+
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
-                const expectedError = `In order to pass a custom hasher, use the third parameter.`
-                await expect(tx.signWithKey(sender, customHasher)).to.be.rejectedWith(expectedError)
+                tx.from = roleBasedKeyring.address
+
+                await tx.sign(roleBasedKeyring, customHasher)
+
+                checkFunctionCall(i, true)
+                checkSignature(tx, { expectedLength: roleBasedKeyring.roleAccountUpdateKey.length })
+                expect(createFromPrivateKeySpy).not.to.have.been.calledOnce
+                expect(roleBasedSignSpy).to.have.been.calledWith(hashForCustomHasher, '0x7e3', 1, undefined)
             }
+            expect(createFromPrivateKeySpy).not.to.have.been.called
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-169: input: keyring, index, custom hasher. should use custom hasher when sign transaction.', async () => {
             const hashForCustomHasher = '0x9e4b4835f6ea5ce55bd1037fe92040dd070af6154aefc30d32c65364a1123cae'
             const customHasher = () => hashForCustomHasher
 
-            const roleBasedSignWithKeySpy = sandbox.spy(roleBasedKeyring, 'signWithKey')
+            const roleBasedSignSpy = sandbox.spy(roleBasedKeyring, 'sign')
 
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
                 tx.from = roleBasedKeyring.address
 
-                await tx.signWithKey(roleBasedKeyring, 1, customHasher)
+                await tx.sign(roleBasedKeyring, 1, customHasher)
 
                 checkFunctionCall(i, true)
                 checkSignature(tx)
                 expect(createFromPrivateKeySpy).not.to.have.been.calledOnce
-                expect(roleBasedSignWithKeySpy).to.have.been.calledWith(hashForCustomHasher, '0x7e3', 1, 1)
+                expect(roleBasedSignSpy).to.have.been.calledWith(hashForCustomHasher, '0x7e3', 1, 1)
             }
             expect(createFromPrivateKeySpy).not.to.have.been.called
         }).timeout(200000)
@@ -647,7 +657,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
                 tx.from = roleBasedKeyring.address
 
                 const expectedError = `The from address of the transaction is different with the address of the keyring to use.`
-                await expect(tx.signWithKey(sender)).to.be.rejectedWith(expectedError)
+                await expect(tx.sign(sender)).to.be.rejectedWith(expectedError)
             }
         }).timeout(200000)
 
@@ -657,19 +667,19 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
                 tx.from = roleBasedKeyring.address
 
                 const expectedError = `Invalid index(10): index must be less than the length of keys(${roleBasedKeyring.keys[0].length}).`
-                await expect(tx.signWithKey(roleBasedKeyring, 10)).to.be.rejectedWith(expectedError)
+                await expect(tx.sign(roleBasedKeyring, 10)).to.be.rejectedWith(expectedError)
             }
         })
     })
 
-    context('feeDelegatedAccountUpdateWithRatio.signFeePayerWithKey', () => {
+    context('feeDelegatedAccountUpdateWithRatio.signAsFeePayer', () => {
         const txHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
 
         const fillTransactionSpys = []
         const appendSignaturesSpys = []
 
         let createFromPrivateKeySpy
-        let feePayerSignWithKeySpy
+        let feePayerSignSpy
         let hasherSpy
 
         beforeEach(() => {
@@ -679,7 +689,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
             }
 
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
-            feePayerSignWithKeySpy = sandbox.spy(feePayer, 'signWithKey')
+            feePayerSignSpy = sandbox.spy(feePayer, 'sign')
             hasherSpy = sandbox.stub(TransactionHasher, 'getHashForFeePayerSignature')
             hasherSpy.returns(txHash)
         })
@@ -698,12 +708,12 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
                 tx.feePayer = '0x'
-                await tx.signFeePayerWithKey(feePayer)
+                await tx.signAsFeePayer(feePayer)
 
                 expect(tx.feePayer.toLowerCase()).to.equal(feePayer.address.toLowerCase())
                 checkFunctionCall(i)
                 checkFeePayerSignature(tx)
-                expect(feePayerSignWithKeySpy).to.have.been.calledWith(txHash, '0x7e3', 2, 0)
+                expect(feePayerSignSpy).to.have.been.calledWith(txHash, '0x7e3', 2, undefined)
             }
             expect(createFromPrivateKeySpy).not.to.have.been.called
         }).timeout(200000)
@@ -711,83 +721,92 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-173: input: keyring. should sign transaction.', async () => {
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
-                await tx.signFeePayerWithKey(feePayer)
+                await tx.signAsFeePayer(feePayer)
 
                 checkFunctionCall(i)
                 checkFeePayerSignature(tx)
-                expect(feePayerSignWithKeySpy).to.have.been.calledWith(txHash, '0x7e3', 2, 0)
+                expect(feePayerSignSpy).to.have.been.calledWith(txHash, '0x7e3', 2, undefined)
             }
             expect(createFromPrivateKeySpy).not.to.have.been.called
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-174: input: private key string. should sign transaction.', async () => {
-            const signWithKeyProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKey')
+            const signProtoSpy = sandbox.spy(SingleKeyring.prototype, 'sign')
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
-                await tx.signFeePayerWithKey(feePayer.keys[0][0].privateKey)
+                await tx.signAsFeePayer(feePayer.key.privateKey)
 
                 checkFunctionCall(i)
                 checkFeePayerSignature(tx)
-                expect(signWithKeyProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 2, 0)
+                expect(signProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 2, undefined)
             }
             expect(createFromPrivateKeySpy).to.have.been.callCount(Object.keys(txsByAccountKeys).length)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-175: input: KlaytnWalletKey. should sign transaction.', async () => {
-            const signWithKeyProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKey')
+            const signProtoSpy = sandbox.spy(SingleKeyring.prototype, 'sign')
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
-                await tx.signFeePayerWithKey(feePayer.getKlaytnWalletKey())
+                await tx.signAsFeePayer(feePayer.getKlaytnWalletKey())
 
                 checkFunctionCall(i)
                 checkFeePayerSignature(tx)
-                expect(signWithKeyProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 2, 0)
+                expect(signProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 2, undefined)
             }
             expect(createFromPrivateKeySpy).to.have.been.callCount(Object.keys(txsByAccountKeys).length)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-176: input: keyring, index. should sign transaction with specific index.', async () => {
-            const roleBasedSignWithKeySpy = sandbox.spy(roleBasedKeyring, 'signWithKey')
+            const roleBasedSignSpy = sandbox.spy(roleBasedKeyring, 'sign')
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
                 tx.feePayer = roleBasedKeyring.address
 
-                await tx.signFeePayerWithKey(roleBasedKeyring, 1)
+                await tx.signAsFeePayer(roleBasedKeyring, 1)
 
                 checkFunctionCall(i)
                 checkFeePayerSignature(tx)
-                expect(roleBasedSignWithKeySpy).to.have.been.calledWith(txHash, '0x7e3', 2, 1)
+                expect(roleBasedSignSpy).to.have.been.calledWith(txHash, '0x7e3', 2, 1)
             }
             expect(createFromPrivateKeySpy).not.to.have.been.called
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTIONFDR-177: input: keyring, custom hasher. should throw error.', async () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-177: input: keyring, custom hasher. should use custom hasher.', async () => {
             const hashForCustomHasher = '0x9e4b4835f6ea5ce55bd1037fe92040dd070af6154aefc30d32c65364a1123cae'
             const customHasher = () => hashForCustomHasher
 
+            const roleBasedSignSpy = sandbox.spy(roleBasedKeyring, 'sign')
+
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
-                const expectedError = `In order to pass a custom hasher, use the third parameter.`
-                await expect(tx.signFeePayerWithKey(sender, customHasher)).to.be.rejectedWith(expectedError)
+                tx.feePayer = roleBasedKeyring.address
+
+                await tx.signAsFeePayer(roleBasedKeyring, customHasher)
+
+                checkFunctionCall(i, true)
+                checkFeePayerSignature(tx, { expectedLength: roleBasedKeyring.roleFeePayerKey.length })
+                expect(createFromPrivateKeySpy).not.to.have.been.calledOnce
+                expect(roleBasedSignSpy).to.have.been.calledWith(hashForCustomHasher, '0x7e3', 2, undefined)
             }
+            expect(createFromPrivateKeySpy).not.to.have.been.called
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-178: input: keyring, index, custom hasher. should use custom hasher when sign transaction.', async () => {
             const hashForCustomHasher = '0x9e4b4835f6ea5ce55bd1037fe92040dd070af6154aefc30d32c65364a1123cae'
             const customHasher = () => hashForCustomHasher
 
-            const roleBasedSignWithKeySpy = sandbox.spy(roleBasedKeyring, 'signWithKey')
+            const roleBasedSignSpy = sandbox.spy(roleBasedKeyring, 'sign')
 
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
                 tx.feePayer = roleBasedKeyring.address
 
-                await tx.signFeePayerWithKey(roleBasedKeyring, 1, customHasher)
+                await tx.signAsFeePayer(roleBasedKeyring, 1, customHasher)
 
                 checkFunctionCall(i, true)
                 checkFeePayerSignature(tx)
                 expect(createFromPrivateKeySpy).not.to.have.been.calledOnce
-                expect(roleBasedSignWithKeySpy).to.have.been.calledWith(hashForCustomHasher, '0x7e3', 2, 1)
+                expect(roleBasedSignSpy).to.have.been.calledWith(hashForCustomHasher, '0x7e3', 2, 1)
             }
             expect(createFromPrivateKeySpy).not.to.have.been.called
         }).timeout(200000)
@@ -798,7 +817,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
                 tx.feePayer = roleBasedKeyring.address
 
                 const expectedError = `The feePayer address of the transaction is different with the address of the keyring to use.`
-                await expect(tx.signFeePayerWithKey(sender)).to.be.rejectedWith(expectedError)
+                await expect(tx.signAsFeePayer(sender)).to.be.rejectedWith(expectedError)
             }
         }).timeout(200000)
 
@@ -808,12 +827,12 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
                 tx.feePayer = roleBasedKeyring.address
 
                 const expectedError = `Invalid index(10): index must be less than the length of keys(${roleBasedKeyring.keys[0].length}).`
-                await expect(tx.signFeePayerWithKey(roleBasedKeyring, 10)).to.be.rejectedWith(expectedError)
+                await expect(tx.signAsFeePayer(roleBasedKeyring, 10)).to.be.rejectedWith(expectedError)
             }
         }).timeout(200000)
     })
 
-    context('feeDelegatedAccountUpdateWithRatio.signWithKeys', () => {
+    context('feeDelegatedAccountUpdateWithRatio.sign with multiple keys', () => {
         const txHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
 
         const fillTransactionSpys = []
@@ -830,7 +849,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
             }
 
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
-            senderSignWithKeysSpy = sandbox.spy(sender, 'signWithKeys')
+            senderSignWithKeysSpy = sandbox.spy(sender, 'sign')
             hasherSpy = sandbox.stub(TransactionHasher, 'getHashForSignature')
             hasherSpy.returns(txHash)
         })
@@ -848,7 +867,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-181: input: keyring. should sign transaction.', async () => {
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
-                await tx.signWithKeys(sender)
+                await tx.sign(sender)
 
                 checkFunctionCall(i)
                 checkSignature(tx)
@@ -858,27 +877,27 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-182: input: private key string. should sign transaction.', async () => {
-            const signWithKeysProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKeys')
+            const signProtoSpy = sandbox.spy(SingleKeyring.prototype, 'sign')
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
-                await tx.signWithKeys(sender.keys[0][0].privateKey)
+                await tx.sign(sender.key.privateKey)
 
                 checkFunctionCall(i)
                 checkSignature(tx)
-                expect(signWithKeysProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 1)
+                expect(signProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 1)
             }
             expect(createFromPrivateKeySpy).to.have.been.callCount(Object.keys(txsByAccountKeys).length)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-183: input: KlaytnWalletKey. should sign transaction.', async () => {
-            const signWithKeysProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKeys')
+            const signProtoSpy = sandbox.spy(SingleKeyring.prototype, 'sign')
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
-                await tx.signWithKeys(sender.getKlaytnWalletKey())
+                await tx.sign(sender.getKlaytnWalletKey())
 
                 checkFunctionCall(i)
                 checkSignature(tx)
-                expect(signWithKeysProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 1)
+                expect(signProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 1)
             }
             expect(createFromPrivateKeySpy).to.have.been.callCount(Object.keys(txsByAccountKeys).length)
         }).timeout(200000)
@@ -889,7 +908,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
 
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
-                await tx.signWithKeys(sender, customHasher)
+                await tx.sign(sender, customHasher)
 
                 checkFunctionCall(i, true)
                 checkSignature(tx)
@@ -903,18 +922,18 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
                 const tx = txsByAccountKeys[i]
                 tx.from = roleBasedKeyring.address
                 const expectedError = `The from address of the transaction is different with the address of the keyring to use.`
-                await expect(tx.signWithKeys(sender)).to.be.rejectedWith(expectedError)
+                await expect(tx.sign(sender)).to.be.rejectedWith(expectedError)
             }
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-186: input: roleBased keyring. should sign with multiple keys and append signatures', async () => {
-            const roleBasedSignWithKeysSpy = sandbox.spy(roleBasedKeyring, 'signWithKeys')
+            const roleBasedSignWithKeysSpy = sandbox.spy(roleBasedKeyring, 'sign')
 
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
                 tx.from = roleBasedKeyring.address
 
-                await tx.signWithKeys(roleBasedKeyring)
+                await tx.sign(roleBasedKeyring)
 
                 checkFunctionCall(i, true)
                 checkSignature(tx, { expectedLength: roleBasedKeyring.keys[0].length })
@@ -925,7 +944,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
         }).timeout(200000)
     })
 
-    context('feeDelegatedAccountUpdateWithRatio.signFeePayerWithKeys', () => {
+    context('feeDelegatedAccountUpdateWithRatio.signAsFeePayer with multiple keys', () => {
         const txHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
 
         const fillTransactionSpys = []
@@ -942,7 +961,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
             }
 
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
-            feePayerSignWithKeysSpy = sandbox.spy(feePayer, 'signWithKeys')
+            feePayerSignWithKeysSpy = sandbox.spy(feePayer, 'sign')
             hasherSpy = sandbox.stub(TransactionHasher, 'getHashForFeePayerSignature')
             hasherSpy.returns(txHash)
         })
@@ -961,7 +980,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
                 tx.feePayer = '0x'
-                await tx.signFeePayerWithKeys(feePayer)
+                await tx.signAsFeePayer(feePayer)
 
                 expect(tx.feePayer.toLowerCase()).to.equal(feePayer.address.toLowerCase())
                 checkFunctionCall(i)
@@ -974,7 +993,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-188: input: keyring. should sign transaction.', async () => {
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
-                await tx.signFeePayerWithKeys(feePayer)
+                await tx.signAsFeePayer(feePayer)
 
                 checkFunctionCall(i)
                 checkFeePayerSignature(tx)
@@ -984,27 +1003,27 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-189: input: private key string. should sign transaction.', async () => {
-            const signWithKeysProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKeys')
+            const signProtoSpy = sandbox.spy(SingleKeyring.prototype, 'sign')
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
-                await tx.signFeePayerWithKeys(feePayer.keys[0][0].privateKey)
+                await tx.signAsFeePayer(feePayer.key.privateKey)
 
                 checkFunctionCall(i)
                 checkFeePayerSignature(tx)
-                expect(signWithKeysProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 2)
+                expect(signProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 2)
             }
             expect(createFromPrivateKeySpy).to.have.been.callCount(Object.keys(txsByAccountKeys).length)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-190: input: KlaytnWalletKey. should sign transaction.', async () => {
-            const signWithKeysProtoSpy = sandbox.spy(Keyring.prototype, 'signWithKeys')
+            const signProtoSpy = sandbox.spy(SingleKeyring.prototype, 'sign')
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
-                await tx.signFeePayerWithKeys(feePayer.getKlaytnWalletKey())
+                await tx.signAsFeePayer(feePayer.getKlaytnWalletKey())
 
                 checkFunctionCall(i)
                 checkFeePayerSignature(tx)
-                expect(signWithKeysProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 2)
+                expect(signProtoSpy).to.have.been.calledWith(txHash, '0x7e3', 2)
             }
             expect(createFromPrivateKeySpy).to.have.been.callCount(Object.keys(txsByAccountKeys).length)
         }).timeout(200000)
@@ -1013,16 +1032,16 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
             const hashForCustomHasher = '0x9e4b4835f6ea5ce55bd1037fe92040dd070af6154aefc30d32c65364a1123cae'
             const customHasher = () => hashForCustomHasher
 
-            const roleBasedSignWithKeysSpy = sandbox.spy(roleBasedKeyring, 'signWithKeys')
+            const roleBasedSignWithKeysSpy = sandbox.spy(roleBasedKeyring, 'sign')
 
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
                 tx.feePayer = roleBasedKeyring.address
 
-                await tx.signFeePayerWithKeys(roleBasedKeyring, customHasher)
+                await tx.signAsFeePayer(roleBasedKeyring, customHasher)
 
                 checkFunctionCall(i, true)
-                checkFeePayerSignature(tx, { expectedLength: roleBasedKeyring.roleFeePayerKey.length })
+                checkFeePayerSignature(tx, { expectedLength: roleBasedKeyring.keys[caver.wallet.keyring.role.roleFeePayerKey].length })
                 expect(createFromPrivateKeySpy).not.to.have.been.calledOnce
                 expect(roleBasedSignWithKeysSpy).to.have.been.calledWith(hashForCustomHasher, '0x7e3', 2)
             }
@@ -1035,17 +1054,17 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
                 tx.feePayer = roleBasedKeyring.address
 
                 const expectedError = `The feePayer address of the transaction is different with the address of the keyring to use.`
-                await expect(tx.signFeePayerWithKeys(sender)).to.be.rejectedWith(expectedError)
+                await expect(tx.signAsFeePayer(sender)).to.be.rejectedWith(expectedError)
             }
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-193: input: roleBased keyring. should sign with multiple keys and append signatures', async () => {
-            const roleBasedSignWithKeysSpy = sandbox.spy(roleBasedKeyring, 'signWithKeys')
+            const roleBasedSignWithKeysSpy = sandbox.spy(roleBasedKeyring, 'sign')
             for (let i = 0; i < txsByAccountKeys.length; i++) {
                 const tx = txsByAccountKeys[i]
                 tx.feePayer = roleBasedKeyring.address
 
-                await tx.signFeePayerWithKeys(roleBasedKeyring)
+                await tx.signAsFeePayer(roleBasedKeyring)
 
                 checkFunctionCall(i, true)
                 checkFeePayerSignature(tx, { expectedLength: roleBasedKeyring.keys[2].length })
