@@ -19,6 +19,8 @@
 const _ = require('lodash')
 const utils = require('../../../caver-utils')
 
+const emptySigArray = ['0x01', '0x', '0x']
+
 /**
  * Representing a SignatureData class that includes ECDSA signature data string.
  * @class
@@ -26,9 +28,10 @@ const utils = require('../../../caver-utils')
 class SignatureData {
     /**
      * creates a SignatureData.
-     * @param {Array.<string>|SignatureData} key - The ECDSA signatureData 
+     * @param {Array.<string>|SignatureData} key - The ECDSA signatureData
      */
     constructor(signature) {
+        if (!signature) signature = emptySigArray
         if (signature instanceof SignatureData) {
             this.v = signature.v
             this.r = signature.r
@@ -137,6 +140,6 @@ class SignatureData {
     }
 }
 
-SignatureData.emtpySig = new SignatureData(['0x01', '0x', '0x'])
+SignatureData.emtpySig = new SignatureData(emptySigArray)
 
 module.exports = SignatureData
