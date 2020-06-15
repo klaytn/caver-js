@@ -27,6 +27,7 @@ const Keyring = require('../../../caver-wallet/src/keyring/keyringFactory')
 const AbstractKeyring = require('../../../caver-wallet/src/keyring/abstractKeyring')
 const { KEY_ROLE } = require('../../../caver-wallet/src/keyring/keyringHelper')
 const utils = require('../../../caver-utils/src')
+const SignatureData = require('../../../caver-wallet/src/keyring/signatureData')
 
 /**
  * Abstract class that implements common logic for each fee delegated transaction type.
@@ -113,17 +114,19 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
     /**
      * Appends feePayerSignatures to the transaction.
      *
-     * @param {Array.<string>|Array.<Array.<string>>} sig - An array of feePayerSignatures to append to the transaction.
+     * @param {SignatureData|Array.<SignatureData>|Array.<string>|Array.<Array.<string>>} signatures - An array of feePayerSignatures to append to the transaction.
      *                                                      One feePayerSignature can be defined in the form of a one-dimensional array or two-dimensional array,
      *                                                      and more than one feePayerSignatures should be defined in the form of a two-dimensional array.
      */
-    appendFeePayerSignatures(sig) {
-        if (!_.isArray(sig)) {
-            if (_.isString(sig)) throw new Error(`Signature to append should be an array.`)
-            sig = [sig]
-        } else if (!_.isArray(sig[0]) && _.isString(sig[0])) {
-            sig = [sig]
-        }
+    appendFeePayerSignatures(signatures) {
+        let sig = signatures
+        if (_.isString(sig)) sig = utils.resolveSignature(sig)
+        if (sig instanceof SignatureData) sig = [sig]
+
+        if (!_.isArray(sig)) throw new Error(`Failed to append signatures: invalid signatures format ${sig}`)
+
+        if (_.isString(sig[0])) sig = [sig]
+
         this.feePayerSignatures = this.feePayerSignatures.concat(sig)
     }
 

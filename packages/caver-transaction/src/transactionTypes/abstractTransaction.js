@@ -27,6 +27,7 @@ const AbstractKeyring = require('../../../caver-wallet/src/keyring/abstractKeyri
 const { TX_TYPE_STRING, refineSignatures, typeDetectionFromRLPEncoding } = require('../transactionHelper/transactionHelper')
 const { KEY_ROLE } = require('../../../caver-wallet/src/keyring/keyringHelper')
 const { validateParams } = require('../../../caver-core-helpers/src/validateFunction')
+const SignatureData = require('../../../caver-wallet/src/keyring/signatureData')
 
 /**
  * Abstract class that implements common logic for each transaction type.
@@ -186,17 +187,19 @@ class AbstractTransaction {
     /**
      * Appends signatures to the transaction.
      *
-     * @param {Array.<string>|Array.<Array.<string>>} sig - An array of signatures to append to the transaction.
+     * @param {SignatureData|Array.<SignatureData>|Array.<string>|Array.<Array.<string>>} signatures - An array of signatures to append to the transaction.
      *                                                      One signature can be defined in the form of a one-dimensional array or two-dimensional array,
      *                                                      and more than one signatures should be defined in the form of a two-dimensional array.
      */
-    appendSignatures(sig) {
-        if (!_.isArray(sig)) {
-            if (_.isString(sig)) throw new Error(`Signature to append should be an array.`)
-            sig = [sig]
-        } else if (!_.isArray(sig[0]) && _.isString(sig[0])) {
-            sig = [sig]
-        }
+    appendSignatures(signatures) {
+        let sig = signatures
+        if (_.isString(sig)) sig = utils.resolveSignature(sig)
+        if (sig instanceof SignatureData) sig = [sig]
+
+        if (!_.isArray(sig)) throw new Error(`Failed to append signatures: invalid signatures format ${sig}`)
+
+        if (_.isString(sig[0])) sig = [sig]
+
         this.signatures = this.signatures.concat(sig)
     }
 
