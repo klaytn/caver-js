@@ -53,6 +53,9 @@ class SignatureData {
         this._v = utils.makeEven(v)
     }
 
+    /**
+     * @type {string}
+     */
     get V() {
         return this.v
     }
@@ -72,6 +75,9 @@ class SignatureData {
         this._r = utils.makeEven(r)
     }
 
+    /**
+     * @type {string}
+     */
     get R() {
         return this.r
     }
@@ -91,6 +97,9 @@ class SignatureData {
         this._s = utils.makeEven(s)
     }
 
+    /**
+     * @type {string}
+     */
     get S() {
         return this.s
     }
@@ -99,15 +108,30 @@ class SignatureData {
         this.s = s
     }
 
+    /**
+     * Return `true` if signature is same with emptySig.
+     *
+     * @return {boolean}
+     */
     isEmpty() {
         if (this.v === '0x01' && this.r === '0x' && this.s === '0x') return true
         return false
     }
 
+    /**
+     * Convert to array and return
+     *
+     * @return {Array.<string>}
+     */
     encode() {
         return [this.v, this.r, this.s]
     }
 
+    /**
+     * Convert to string
+     *
+     * @return {string}
+     */
     toString() {
         return this.v + this.r + this.s
     }
