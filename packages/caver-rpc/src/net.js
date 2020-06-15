@@ -26,7 +26,7 @@ const Net = function Net(...args) {
 
     const netMethods = [
         new Method({
-            name: 'networkId',
+            name: 'getNetworkId',
             call: 'net_networkID',
             params: 0,
         }),
@@ -36,12 +36,12 @@ const Net = function Net(...args) {
             params: 0,
         }),
         new Method({
-            name: 'peerCount',
+            name: 'getPeerCount',
             call: 'net_peerCount',
             params: 0,
         }),
         new Method({
-            name: 'peerCountByType',
+            name: 'getPeerCountByType',
             call: 'net_peerCountByType',
             params: 0,
         }),
