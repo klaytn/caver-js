@@ -25,8 +25,8 @@ const utils = require('../../../caver-utils')
  */
 class SignatureData {
     /**
-     * creates a privateKey.
-     * @param {string} key - The private key string.
+     * creates a SignatureData.
+     * @param {Array.<string>|SignatureData} key - The ECDSA signatureData 
      */
     constructor(signature) {
         if (signature instanceof SignatureData) {
