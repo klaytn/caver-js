@@ -26,6 +26,7 @@ const { decryptKey } = require('./keyringHelper')
 const SingleKeyring = require('./singleKeyring')
 const MultipleKeyring = require('./multipleKeyring')
 const RoleBasedKeyring = require('./roleBasedKeyring')
+const SignatureData = require('./signatureData')
 
 /**
  * representing a KeyringFactory which supports create functions for Keyring(SingleKeyring/MultipleKeyring/RoleBasedKeyring)
@@ -333,5 +334,6 @@ KeyringFactory.singleKeyring = SingleKeyring
 KeyringFactory.multipleKeyring = MultipleKeyring
 KeyringFactory.roleBasedKeyring = RoleBasedKeyring
 KeyringFactory.role = KEY_ROLE
+KeyringFactory.signatureData = SignatureData
 
 module.exports = KeyringFactory
