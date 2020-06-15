@@ -126,8 +126,9 @@ const getTypeInt = type => {
  * - Removes the default empty signature(['0x01', '0x', '0x']) included with other signatures.
  * - For an empty signature array, return an array containing the default empty signature(['0x01', '0x', '0x']).
  *
- * @param {Array.<string>} rlpEncodedTxs - An array of RLP-encoded transaction strings.
- * @return {string}
+ * @param {Array.<string>|Array.<Array.<string>>|SignatureData|Array.<SignatureData>} sigArray - A signature or an array of signatures.
+ * @param {boolean} [isLegacy] - Whether 'LegacyTransaction' or not.
+ * @return {SignatureData|Array.<SignatureData>}
  */
 const refineSignatures = (sigArray, isLegacy = false) => {
     const set = new Set()
