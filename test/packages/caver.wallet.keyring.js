@@ -36,6 +36,7 @@ const AccountKeyPublic = require('../../packages/caver-account/src/accountKey/ac
 const AccountKeyWeightedMultiSig = require('../../packages/caver-account/src/accountKey/accountKeyWeightedMultiSig')
 const AccountKeyRoleBased = require('../../packages/caver-account/src/accountKey/accountKeyRoleBased')
 const PrivateKey = require('../../packages/caver-wallet/src/keyring/privateKey')
+const SignatureData = require('../../packages/caver-wallet/src/keyring/signatureData')
 
 const { generateDecoupledKeyring, generateMultiSigKeyring, generateRoleBasedKeyring } = require('./utils')
 const utils = require('../../packages/caver-utils')
@@ -899,8 +900,7 @@ describe('keyring.sign', () => {
 
             expect(signSpy).to.have.been.calledOnce
             expect(_.isArray(signed)).to.be.true
-            expect(_.isArray(signed[0])).to.be.true
-            expect(signed[0].length).to.equal(3)
+            expect(signed[0] instanceof SignatureData).to.be.true
         })
     })
 
@@ -910,8 +910,7 @@ describe('keyring.sign', () => {
             const signed = coupled.sign(hash, chainId, caver.wallet.keyring.role.roleTransactionKey, 0)
 
             expect(signSpy).to.have.been.calledOnce
-            expect(_.isArray(signed)).to.be.true
-            expect(signed.length).to.equal(3)
+            expect(signed instanceof SignatureData).to.be.true
         })
     })
 
@@ -921,8 +920,7 @@ describe('keyring.sign', () => {
             const signed = coupled.sign(hash, chainId, caver.wallet.keyring.role.roleAccountUpdateKey, 0)
 
             expect(signSpy).to.have.been.calledOnce
-            expect(_.isArray(signed)).to.be.true
-            expect(signed.length).to.equal(3)
+            expect(signed instanceof SignatureData).to.be.true
         })
     })
 
@@ -941,8 +939,7 @@ describe('keyring.sign', () => {
 
             expect(signSpy).to.have.been.calledOnce
             expect(_.isArray(signed)).to.be.true
-            expect(_.isArray(signed[0])).to.be.true
-            expect(signed[0].length).to.equal(3)
+            expect(signed[0] instanceof SignatureData).to.be.true
         })
     })
 
@@ -952,8 +949,7 @@ describe('keyring.sign', () => {
             const signed = decoupled.sign(hash, chainId, caver.wallet.keyring.role.roleTransactionKey, 0)
 
             expect(signSpy).to.have.been.calledOnce
-            expect(_.isArray(signed)).to.be.true
-            expect(signed.length).to.equal(3)
+            expect(signed instanceof SignatureData).to.be.true
         })
     })
 
@@ -963,8 +959,7 @@ describe('keyring.sign', () => {
             const signed = decoupled.sign(hash, chainId, caver.wallet.keyring.role.roleAccountUpdateKey, 0)
 
             expect(signSpy).to.have.been.calledOnce
-            expect(_.isArray(signed)).to.be.true
-            expect(signed.length).to.equal(3)
+            expect(signed instanceof SignatureData).to.be.true
         })
     })
 
@@ -983,9 +978,8 @@ describe('keyring.sign', () => {
 
             expect(signSpy).to.have.been.calledOnce
             expect(_.isArray(signed)).to.be.true
-            expect(_.isArray(signed[0])).to.be.true
+            expect(signed[0] instanceof SignatureData).to.be.true
             expect(signed.length).to.equal(multiSig.keys.length)
-            expect(signed[0].length).to.equal(3)
         })
     })
 
@@ -995,8 +989,7 @@ describe('keyring.sign', () => {
             const signed = multiSig.sign(hash, chainId, caver.wallet.keyring.role.roleTransactionKey, 2)
 
             expect(signSpy).to.have.been.calledOnce
-            expect(_.isArray(signed)).to.be.true
-            expect(signed.length).to.equal(3)
+            expect(signed instanceof SignatureData).to.be.true
         })
     })
 
@@ -1006,8 +999,7 @@ describe('keyring.sign', () => {
             const signed = multiSig.sign(hash, chainId, caver.wallet.keyring.role.roleAccountUpdateKey, 0)
 
             expect(signSpy).to.have.been.calledOnce
-            expect(_.isArray(signed)).to.be.true
-            expect(signed.length).to.equal(3)
+            expect(signed instanceof SignatureData).to.be.true
         })
     })
 
@@ -1026,9 +1018,8 @@ describe('keyring.sign', () => {
 
             expect(signSpy).to.have.been.calledOnce
             expect(_.isArray(signed)).to.be.true
-            expect(_.isArray(signed[0])).to.be.true
+            expect(signed[0] instanceof SignatureData).to.be.true
             expect(signed.length).to.equal(roleBased.roleTransactionKey.length)
-            expect(signed[0].length).to.equal(3)
         })
     })
 
@@ -1038,8 +1029,7 @@ describe('keyring.sign', () => {
             const signed = roleBased.sign(hash, chainId, caver.wallet.keyring.role.roleFeePayerKey, 2)
 
             expect(signSpy).to.have.been.calledOnce
-            expect(_.isArray(signed)).to.be.true
-            expect(signed.length).to.equal(3)
+            expect(signed instanceof SignatureData).to.be.true
         })
     })
 
@@ -1049,8 +1039,7 @@ describe('keyring.sign', () => {
             const signed = roleBased.sign(hash, chainId, caver.wallet.keyring.role.roleAccountUpdateKey, 0)
 
             expect(signSpy).to.have.been.calledOnce
-            expect(_.isArray(signed)).to.be.true
-            expect(signed.length).to.equal(3)
+            expect(signed instanceof SignatureData).to.be.true
         })
     })
 
@@ -1114,7 +1103,7 @@ describe('keyring.signMessage', () => {
             expect(caver.utils.hashMessage(data)).to.equal(signed.messageHash)
             expect(_.isArray(signed.signatures)).to.be.true
             expect(signed.signatures.length).to.equal(1)
-            expect(signed.signatures[0].length).to.equal(3)
+            expect(signed.signatures[0] instanceof SignatureData).to.be.true
         })
     })
 
@@ -1128,7 +1117,7 @@ describe('keyring.signMessage', () => {
             expect(caver.utils.hashMessage(data)).to.equal(signed.messageHash)
             expect(_.isArray(signed.signatures)).to.be.true
             expect(signed.signatures.length).to.equal(1)
-            expect(signed.signatures[0].length).to.equal(3)
+            expect(signed.signatures[0] instanceof SignatureData).to.be.true
         })
     })
 
@@ -1142,7 +1131,7 @@ describe('keyring.signMessage', () => {
             expect(caver.utils.hashMessage(data)).to.equal(signed.messageHash)
             expect(_.isArray(signed.signatures)).to.be.true
             expect(signed.signatures.length).to.equal(1)
-            expect(signed.signatures[0].length).to.equal(3)
+            expect(signed.signatures[0] instanceof SignatureData).to.be.true
         })
     })
 
@@ -1171,7 +1160,7 @@ describe('keyring.signMessage', () => {
             expect(caver.utils.hashMessage(data)).to.equal(signed.messageHash)
             expect(_.isArray(signed.signatures)).to.be.true
             expect(signed.signatures.length).to.equal(1)
-            expect(signed.signatures[0].length).to.equal(3)
+            expect(signed.signatures[0] instanceof SignatureData).to.be.true
         })
     })
 
@@ -1185,7 +1174,7 @@ describe('keyring.signMessage', () => {
             expect(caver.utils.hashMessage(data)).to.equal(signed.messageHash)
             expect(_.isArray(signed.signatures)).to.be.true
             expect(signed.signatures.length).to.equal(1)
-            expect(signed.signatures[0].length).to.equal(3)
+            expect(signed.signatures[0] instanceof SignatureData).to.be.true
         })
     })
 
@@ -1199,7 +1188,7 @@ describe('keyring.signMessage', () => {
             expect(caver.utils.hashMessage(data)).to.equal(signed.messageHash)
             expect(_.isArray(signed.signatures)).to.be.true
             expect(signed.signatures.length).to.equal(1)
-            expect(signed.signatures[0].length).to.equal(3)
+            expect(signed.signatures[0] instanceof SignatureData).to.be.true
         })
     })
 
@@ -1228,7 +1217,7 @@ describe('keyring.signMessage', () => {
             expect(caver.utils.hashMessage(data)).to.equal(signed.messageHash)
             expect(_.isArray(signed.signatures)).to.be.true
             expect(signed.signatures.length).to.equal(1)
-            expect(signed.signatures[0].length).to.equal(3)
+            expect(signed.signatures[0] instanceof SignatureData).to.be.true
         })
     })
 
@@ -1242,7 +1231,7 @@ describe('keyring.signMessage', () => {
             expect(caver.utils.hashMessage(data)).to.equal(signed.messageHash)
             expect(_.isArray(signed.signatures)).to.be.true
             expect(signed.signatures.length).to.equal(multiSig.keys.length)
-            expect(signed.signatures[0].length).to.equal(3)
+            expect(signed.signatures[0] instanceof SignatureData).to.be.true
         })
     })
 
@@ -1256,7 +1245,7 @@ describe('keyring.signMessage', () => {
             expect(caver.utils.hashMessage(data)).to.equal(signed.messageHash)
             expect(_.isArray(signed.signatures)).to.be.true
             expect(signed.signatures.length).to.equal(1)
-            expect(signed.signatures[0].length).to.equal(3)
+            expect(signed.signatures[0] instanceof SignatureData).to.be.true
         })
     })
 
@@ -1285,7 +1274,7 @@ describe('keyring.signMessage', () => {
             expect(caver.utils.hashMessage(data)).to.equal(signed.messageHash)
             expect(_.isArray(signed.signatures)).to.be.true
             expect(signed.signatures.length).to.equal(1)
-            expect(signed.signatures[0].length).to.equal(3)
+            expect(signed.signatures[0] instanceof SignatureData).to.be.true
         })
     })
 
@@ -1299,7 +1288,7 @@ describe('keyring.signMessage', () => {
             expect(caver.utils.hashMessage(data)).to.equal(signed.messageHash)
             expect(_.isArray(signed.signatures)).to.be.true
             expect(signed.signatures.length).to.equal(roleBased.roleTransactionKey.length)
-            expect(signed.signatures[0].length).to.equal(3)
+            expect(signed.signatures[0] instanceof SignatureData).to.be.true
         })
     })
 
@@ -1313,7 +1302,7 @@ describe('keyring.signMessage', () => {
             expect(caver.utils.hashMessage(data)).to.equal(signed.messageHash)
             expect(_.isArray(signed.signatures)).to.be.true
             expect(signed.signatures.length).to.equal(1)
-            expect(signed.signatures[0].length).to.equal(3)
+            expect(signed.signatures[0] instanceof SignatureData).to.be.true
         })
     })
 

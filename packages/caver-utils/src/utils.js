@@ -929,23 +929,27 @@ const isValidRole = role => {
     return false
 }
 
+// ['0x01', '0x', '0x]
+// [['0x01', '0x', '0x]]
+// '0x....'
+// { v: '0x01', r: '0x', s:'0x' }
+// SignatureData { _v: '0x01', _r: '0x', _s:'0x' }
+// [SignatureData { _v: '0x01', _r: '0x', _s:'0x' }]
 const isEmptySig = sig => {
-    if (!Array.isArray(sig)) return false
+    let sigs = sig
 
-    function isEmpty(s) {
+    // Convert to array format
+    if (!_.isArray(sig)) sigs = resolveSignature(sigs)
+    // Format to two-dimentional array
+    if (_.isString(sigs[0])) sigs = [sigs]
+
+    for (let s of sigs) {
+        if (!_.isArray(s)) s = resolveSignature(s)
         if (s.length !== 3) throw new Error(`Invalid signatures length: ${s.length}`)
-
-        if (s[0] === '0x01' && s[1] === '0x' && s[2] === '0x') return true
-        return false
+        if (s[0] !== '0x01' || s[1] !== '0x' || s[2] !== '0x') return false
     }
 
-    if (Array.isArray(sig[0])) {
-        // [[v,r,s]]
-        if (sig.length !== 1) return false
-        return isEmpty(sig[0])
-    }
-
-    return isEmpty(sig)
+    return true
 }
 
 const hashMessage = data => {
@@ -964,7 +968,7 @@ const recover = (message, signature, preFixed = false) => {
         message = hashMessage(message)
     }
 
-    return Account.recover(message, Account.encodeSignature(signature)).toLowerCase()
+    return Account.recover(message, Account.encodeSignature(signature.encode())).toLowerCase()
 }
 
 module.exports = {

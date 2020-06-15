@@ -51,6 +51,7 @@ class LegacyTransaction extends AbstractTransaction {
      */
     constructor(createTxObj) {
         if (_.isString(createTxObj)) createTxObj = LegacyTransaction.decode(createTxObj)
+
         createTxObj.from = createTxObj.from || '0x'
 
         super(TX_TYPE_STRING.TxTypeLegacyTransaction, createTxObj)
@@ -144,9 +145,9 @@ class LegacyTransaction extends AbstractTransaction {
             this.to.toLowerCase(),
             Bytes.fromNat(this.value),
             this.input,
-            this.signatures[0],
-            this.signatures[1],
-            this.signatures[2],
+            this.signatures.v,
+            this.signatures.r,
+            this.signatures.s,
         ])
     }
 

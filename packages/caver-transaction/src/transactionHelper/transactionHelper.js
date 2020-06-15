@@ -18,6 +18,7 @@
 
 const _ = require('lodash')
 const utils = require('../../../caver-utils/src')
+const SignatureData = require('../../../caver-wallet/src/keyring/signatureData')
 
 const TX_TYPE_STRING = {
     TxTypeLegacyTransaction: 'TxTypeLegacyTransaction',
@@ -125,26 +126,31 @@ const getTypeInt = type => {
  * - Removes the default empty signature(['0x01', '0x', '0x']) included with other signatures.
  * - For an empty signature array, return an array containing the default empty signature(['0x01', '0x', '0x']).
  *
- * @param {Array.<string>} rlpEncodedTxs - An array of RLP-encoded transaction strings.
- * @return {string}
+ * @param {Array.<string>|Array.<Array.<string>>|SignatureData|Array.<SignatureData>} sigArray - A signature or an array of signatures.
+ * @param {boolean} [isLegacy] - Whether 'LegacyTransaction' or not.
+ * @return {SignatureData|Array.<SignatureData>}
  */
 const refineSignatures = (sigArray, isLegacy = false) => {
     const set = new Set()
     let result = []
 
-    const arrayOfSignatures = !_.isArray(sigArray[0]) ? [sigArray] : sigArray
-
+    let arrayOfSignatures = sigArray
+    if (!_.isArray(sigArray) && sigArray instanceof SignatureData) {
+        arrayOfSignatures = [sigArray]
+    } else if (_.isArray(sigArray) && _.isString(sigArray[0])) {
+        arrayOfSignatures = [sigArray]
+    }
     for (const sig of arrayOfSignatures) {
-        if (sig.length > 0 && !utils.isEmptySig(sig)) {
-            const sigString = sig.join('')
+        const signatureData = new SignatureData(sig)
+        if (!signatureData.isEmpty()) {
+            const sigString = sig.toString()
             if (!set.has(sigString)) {
                 set.add(sigString, true)
-                result.push(sig.map(vrs => utils.makeEven(vrs)))
+                result.push(signatureData)
             }
         }
     }
-
-    if (result.length === 0) result = [['0x01', '0x', '0x']]
+    if (result.length === 0) result = [SignatureData.emtpySig]
 
     if (isLegacy && result.length > 1) throw new Error(`${TX_TYPE_STRING.TxTypeLegacyTransaction} cannot have multiple sigantures.`)
 

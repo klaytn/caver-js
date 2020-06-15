@@ -73,6 +73,7 @@ class Cancel extends AbstractTransaction {
      */
     getRLPEncoding() {
         this.validateOptionalValues()
+        const signatures = this.signatures.map(sig => sig.encode())
 
         return (
             TX_TYPE_TAG.TxTypeCancel +
@@ -81,7 +82,7 @@ class Cancel extends AbstractTransaction {
                 Bytes.fromNat(this.gasPrice),
                 Bytes.fromNat(this.gas),
                 this.from.toLowerCase(),
-                this.signatures,
+                signatures,
             ]).slice(2)
         )
     }

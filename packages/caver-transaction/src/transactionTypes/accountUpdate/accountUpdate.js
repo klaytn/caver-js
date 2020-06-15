@@ -93,6 +93,7 @@ class AccountUpdate extends AbstractTransaction {
      */
     getRLPEncoding() {
         this.validateOptionalValues()
+        const signatures = this.signatures.map(sig => sig.encode())
 
         return (
             TX_TYPE_TAG.TxTypeAccountUpdate +
@@ -102,7 +103,7 @@ class AccountUpdate extends AbstractTransaction {
                 Bytes.fromNat(this.gas),
                 this.from.toLowerCase(),
                 this.account.getRLPEncodingAccountKey(),
-                this.signatures,
+                signatures,
             ]).slice(2)
         )
     }

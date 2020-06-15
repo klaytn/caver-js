@@ -78,6 +78,8 @@ class FeeDelegatedCancelWithRatio extends AbstractFeeDelegatedWithRatioTransacti
      */
     getRLPEncoding() {
         this.validateOptionalValues()
+        const signatures = this.signatures.map(sig => sig.encode())
+        const feePayerSignatures = this.feePayerSignatures.map(sig => sig.encode())
 
         return (
             TX_TYPE_TAG.TxTypeFeeDelegatedCancelWithRatio +
@@ -87,9 +89,9 @@ class FeeDelegatedCancelWithRatio extends AbstractFeeDelegatedWithRatioTransacti
                 Bytes.fromNat(this.gas),
                 this.from.toLowerCase(),
                 this.feeRatio,
-                this.signatures,
+                signatures,
                 this.feePayer.toLowerCase(),
-                this.feePayerSignatures,
+                feePayerSignatures,
             ]).slice(2)
         )
     }

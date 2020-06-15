@@ -91,6 +91,7 @@ class ChainDataAnchoring extends AbstractTransaction {
      */
     getRLPEncoding() {
         this.validateOptionalValues()
+        const signatures = this.signatures.map(sig => sig.encode())
 
         return (
             TX_TYPE_TAG.TxTypeChainDataAnchoring +
@@ -100,7 +101,7 @@ class ChainDataAnchoring extends AbstractTransaction {
                 Bytes.fromNat(this.gas),
                 this.from.toLowerCase(),
                 this.input,
-                this.signatures,
+                signatures,
             ]).slice(2)
         )
     }

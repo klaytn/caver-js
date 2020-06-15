@@ -177,6 +177,8 @@ class FeeDelegatedSmartContractDeployWithRatio extends AbstractFeeDelegatedWithR
      */
     getRLPEncoding() {
         this.validateOptionalValues()
+        const signatures = this.signatures.map(sig => sig.encode())
+        const feePayerSignatures = this.feePayerSignatures.map(sig => sig.encode())
 
         return (
             TX_TYPE_TAG.TxTypeFeeDelegatedSmartContractDeployWithRatio +
@@ -191,9 +193,9 @@ class FeeDelegatedSmartContractDeployWithRatio extends AbstractFeeDelegatedWithR
                 Bytes.fromNat(this.humanReadable === true ? '0x1' : '0x0'),
                 this.feeRatio,
                 Bytes.fromNat(this.codeFormat),
-                this.signatures,
+                signatures,
                 this.feePayer.toLowerCase(),
-                this.feePayerSignatures,
+                feePayerSignatures,
             ]).slice(2)
         )
     }

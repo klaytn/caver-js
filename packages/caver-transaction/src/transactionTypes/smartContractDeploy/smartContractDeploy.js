@@ -160,6 +160,7 @@ class SmartContractDeploy extends AbstractTransaction {
      */
     getRLPEncoding() {
         this.validateOptionalValues()
+        const signatures = this.signatures.map(sig => sig.encode())
 
         return (
             TX_TYPE_TAG.TxTypeSmartContractDeploy +
@@ -173,7 +174,7 @@ class SmartContractDeploy extends AbstractTransaction {
                 this.input,
                 Bytes.fromNat(this.humanReadable === true ? '0x1' : '0x0'),
                 Bytes.fromNat(this.codeFormat),
-                this.signatures,
+                signatures,
             ]).slice(2)
         )
     }

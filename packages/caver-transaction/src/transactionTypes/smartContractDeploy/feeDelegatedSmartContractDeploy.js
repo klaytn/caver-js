@@ -164,6 +164,8 @@ class FeeDelegatedSmartContractDeploy extends AbstractFeeDelegatedTransaction {
      */
     getRLPEncoding() {
         this.validateOptionalValues()
+        const signatures = this.signatures.map(sig => sig.encode())
+        const feePayerSignatures = this.feePayerSignatures.map(sig => sig.encode())
 
         return (
             TX_TYPE_TAG.TxTypeFeeDelegatedSmartContractDeploy +
@@ -177,9 +179,9 @@ class FeeDelegatedSmartContractDeploy extends AbstractFeeDelegatedTransaction {
                 this.input,
                 Bytes.fromNat(this.humanReadable === true ? '0x1' : '0x0'),
                 Bytes.fromNat(this.codeFormat),
-                this.signatures,
+                signatures,
                 this.feePayer.toLowerCase(),
-                this.feePayerSignatures,
+                feePayerSignatures,
             ]).slice(2)
         )
     }
