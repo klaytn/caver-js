@@ -71,7 +71,11 @@ class FeeDelegatedAccountUpdate extends AbstractFeeDelegatedTransaction {
      *                               The object can define `from`, `account`, `nonce`, `gas`, `gasPrice`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
      */
     constructor(createTxObj) {
-        if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
+        if (_.isString(createTxObj)) {
+            createTxObj = _decode(createTxObj)
+            createTxObj.account = Account.createFromRLPEncoding(createTxObj.from, createTxObj.rlpEncodedKey)
+        }
+
         super(TX_TYPE_STRING.TxTypeFeeDelegatedAccountUpdate, createTxObj)
         this.account = createTxObj.account
     }
