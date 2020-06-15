@@ -23,6 +23,19 @@ const AbstractTransaction = require('../abstractTransaction')
 const { TX_TYPE_STRING } = require('../../transactionHelper/transactionHelper')
 const utils = require('../../../../caver-utils/src')
 
+function _decode(rlpEncoded) {
+    rlpEncoded = utils.addHexPrefix(rlpEncoded)
+    const [nonce, gasPrice, gas, to, value, input, v, r, s] = RLP.decode(rlpEncoded)
+    return {
+        nonce: utils.trimLeadingZero(nonce),
+        gasPrice: utils.trimLeadingZero(gasPrice),
+        gas: utils.trimLeadingZero(gas),
+        to,
+        value: utils.trimLeadingZero(value),
+        input: utils.trimLeadingZero(input),
+        signatures: [v, r, s],
+    }
+}
 /**
  * Represents a legacy transaction.
  * Please refer to https://docs.klaytn.com/klaytn/design/transactions/basic#txtypelegacytransaction to see more detail.
@@ -30,16 +43,7 @@ const utils = require('../../../../caver-utils/src')
  */
 class LegacyTransaction extends AbstractTransaction {
     static decode(rlpEncoded) {
-        const [nonce, gasPrice, gas, to, value, input, v, r, s] = RLP.decode(rlpEncoded)
-        return new LegacyTransaction({
-            nonce: utils.trimLeadingZero(nonce),
-            gasPrice: utils.trimLeadingZero(gasPrice),
-            gas: utils.trimLeadingZero(gas),
-            to,
-            value: utils.trimLeadingZero(value),
-            input: utils.trimLeadingZero(input),
-            signatures: [v, r, s],
-        })
+        return new LegacyTransaction(_decode(rlpEncoded))
     }
 
     /**
@@ -50,7 +54,7 @@ class LegacyTransaction extends AbstractTransaction {
      *                                      The object can define `from`, `to`, `value`, `input`, `nonce`, `gas`, `gasPrice` and `chainId`.
      */
     constructor(createTxObj) {
-        if (_.isString(createTxObj)) createTxObj = LegacyTransaction.decode(createTxObj)
+        if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
 
         createTxObj.from = createTxObj.from || '0x'
 
