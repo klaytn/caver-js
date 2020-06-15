@@ -20,7 +20,7 @@ const _ = require('lodash')
 const utils = require('../../../caver-utils')
 
 /**
- * Representing a PrivateKey class that includes private key string.
+ * Representing a SignatureData class that includes ECDSA signature data string.
  * @class
  */
 class SignatureData {
