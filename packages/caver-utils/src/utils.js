@@ -811,11 +811,11 @@ const transformSignaturesToObject = signatures => {
             sigObj.S = decoded[2]
         } else if (_.isObject(sig)) {
             Object.keys(sig).map(key => {
-                if (key === 'v' || key === 'V') {
+                if (key === 'v' || key === 'V' || key === '_v') {
                     sigObj.V = sig[key]
-                } else if (key === 'r' || key === 'R') {
+                } else if (key === 'r' || key === 'R' || key === '_r') {
                     sigObj.R = sig[key]
-                } else if (key === 's' || key === 'S') {
+                } else if (key === 's' || key === 'S' || key === '_s') {
                     sigObj.S = sig[key]
                 } else {
                     throw new Error(`Failed to transform signatures to object: invalid key(${key}) is defined in signature object.`)

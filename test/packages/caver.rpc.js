@@ -372,7 +372,9 @@ describe('caver.rpc.klay', () => {
 
             const result = await caver.rpc.klay.signTransaction(feeDelegated)
             const signed = await feeDelegated.sign(keyringToImport)
-            expect(result.tx.signatures[0].toString()).to.equal(caver.utils.transformSignaturesToObject(signed.signatures).toString())
+            expect(caver.utils.makeEven(result.tx.signatures[0].V)).to.equal(signed.signatures[0].v)
+            expect(caver.utils.makeEven(result.tx.signatures[0].R)).to.equal(signed.signatures[0].r)
+            expect(caver.utils.makeEven(result.tx.signatures[0].S)).to.equal(signed.signatures[0].s)
         }).timeout(100000)
     })
 
