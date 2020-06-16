@@ -1007,7 +1007,7 @@ describe('TxTypeFeeDelegatedValueTransferMemoWithRatio', () => {
             const expectedRLPEncoded =
                 '0x12f9012e018505d21dba00830f4240947b65b75d204abed71587c9e519a89277766ee1d00a94ceca418cc3ed540c8d16675fe600d703154e379f8568656c6c6f1ec4c301808094188375ff24b14775e1c13d382c2d1ef3a27ca614f8d5f845820fe9a05610e0b35da77d24c009fd6040a43ee70248b60b91892611a0cf36ef185399a2a05fc451b5b9e90453e8fcdf797e1a0875746ddfe1fdcc6617a21eb8e35b328f76f845820feaa0defc41992109af25e9956cbe7d593cd3f65dd2bf1e8f71d7ac1799451a90c062a03487aacf56a6f5f4719e51778ac5fac00e6994b0327ffa5edf99d879116e6e5af845820fe9a09913be30cc8b8c68fd4745f6b04ede43e272496c9245bc0784339cdff8b3c008a02e3b652fa111946ea868e29714370822220dec6c4bfabfcaf1f023df800217d2'
 
-            const expectedSignatures = [
+            const expectedFeePayerSignatures = [
                 [
                     '0x0fe9',
                     '0x5610e0b35da77d24c009fd6040a43ee70248b60b91892611a0cf36ef185399a2',
@@ -1028,7 +1028,7 @@ describe('TxTypeFeeDelegatedValueTransferMemoWithRatio', () => {
             expect(appendSignaturesSpy).to.have.been.callCount(rlpEncodedStrings.length)
             expect(getRLPEncodingSpy).to.have.been.calledOnce
             expect(combined).to.equal(expectedRLPEncoded)
-            checkFeePayerSignature(tx, { expectedSignatures })
+            checkFeePayerSignature(tx, { expectedFeePayerSignatures })
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-133: combineSignatures combines multiple signatures and feePayerSignatures', () => {
@@ -1082,7 +1082,7 @@ describe('TxTypeFeeDelegatedValueTransferMemoWithRatio', () => {
             ]
 
             const appendFeePayerSignaturesSpy = sandbox.spy(tx, 'appendFeePayerSignatures')
-            combined = tx.combineSignatures(rlpEncodedStrings)
+            combined = tx.combineSignatures(rlpEncodedStringsWithFeePayerSignatures)
             expect(appendFeePayerSignaturesSpy).to.have.been.callCount(rlpEncodedStringsWithFeePayerSignatures.length)
 
             // combine multiple signatures and feePayerSignatures

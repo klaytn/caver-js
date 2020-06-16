@@ -217,7 +217,7 @@ class AbstractTransaction {
         // If the signatures are empty, there may be an undefined member variable.
         // In this case, the empty information is filled with the decoded result.
         let fillVariables = false
-        if (this.signatures.length === 0 || utils.isEmptySig(this.signatures)) fillVariables = true
+        if (utils.isEmptySig(this.signatures)) fillVariables = true
 
         for (const encoded of rlpEncodedTxs) {
             const type = typeDetectionFromRLPEncoding(encoded)

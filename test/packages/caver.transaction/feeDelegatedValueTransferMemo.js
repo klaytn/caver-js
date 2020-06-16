@@ -973,7 +973,7 @@ describe('TxTypeFeeDelegatedValueTransferMemo', () => {
             const expectedRLPEncoded =
                 '0x11f9012d018505d21dba00830f4240947b65b75d204abed71587c9e519a89277766ee1d00a941bc5339c6c55380d0da8aaa28e135164ecb862628568656c6c6fc4c3018080948d2f6e4986bc55e2d50611149e5725999a763d7cf8d5f845820feaa0779d20a7958d3131e5ef6a423abb2337e8f120bd0798c47227aee51c70d23c06a07d3c36d5a33cb18e8fec7d1e1f2cfd9a0ec932adee9ad9a090fcd28fafd44392f845820fe9a0de14998f4aba6474b55b84e9a236daf159252b460915cea204a4361cf99c9dc9a0743a40d63646defba13c70581d85000836155dddb30bc8024c62dad76981abecf845820fe9a034fa68120ce57d201f0c859308d32d74835e7969555960c4041a466c9e2f8788a05a996a8c67347f0eba83cd6b38fe030aff2e8356e4b5ec2af85549f040014e3d'
 
-            const expectedSignatures = [
+            const expectedFeePayerSignatures = [
                 [
                     '0x0fea',
                     '0x779d20a7958d3131e5ef6a423abb2337e8f120bd0798c47227aee51c70d23c06',
@@ -994,7 +994,7 @@ describe('TxTypeFeeDelegatedValueTransferMemo', () => {
             expect(appendSignaturesSpy).to.have.been.callCount(rlpEncodedStrings.length)
             expect(getRLPEncodingSpy).to.have.been.calledOnce
             expect(combined).to.equal(expectedRLPEncoded)
-            checkFeePayerSignature(tx, { expectedSignatures })
+            checkFeePayerSignature(tx, { expectedFeePayerSignatures })
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFD-131: combineSignatures combines multiple signatures and feePayerSignatures', () => {
@@ -1048,7 +1048,7 @@ describe('TxTypeFeeDelegatedValueTransferMemo', () => {
             ]
 
             const appendFeePayerSignaturesSpy = sandbox.spy(tx, 'appendFeePayerSignatures')
-            combined = tx.combineSignatures(rlpEncodedStrings)
+            combined = tx.combineSignatures(rlpEncodedStringsWithFeePayerSignatures)
             expect(appendFeePayerSignaturesSpy).to.have.been.callCount(rlpEncodedStringsWithFeePayerSignatures.length)
 
             // combine multiple signatures and feePayerSignatures

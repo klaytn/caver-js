@@ -965,7 +965,7 @@ describe('TxTypeFeeDelegatedSmartContractExecution', () => {
             const expectedRLPEncoded =
                 '0x31f9016d038505d21dba00830dbba094d3e7cbbba40c98e05d972438b11ff9374d71654a8094553b11f36cd1ebcbf74c920dc51cd8a1648cb98ab844a9059cbb000000000000000000000000fc9fb77a8407e4ac10e6d5f96574debc844d0d5b00000000000000000000000000000000000000000000000000000002540be400c4c301808094fc9fb77a8407e4ac10e6d5f96574debc844d0d5bf8d5f845820feaa08d9d977567a1903deb82d67525beaa23842ebfe8ae7dad04c0d161a9a2451573a07e280f122aaf89e6379e95d1499c2d536d7ac37b77fa8980b5f083d153f2fb5bf845820fe9a08ffc31dc605d1d93b62e5dc5d72d62efe6994235e370feffc2f4366cf5f68a69a03910e05d112c137482ddb5740062dfcc6ce1556f081f22efb9b5f343adf45638f845820feaa025f9886ca65ae770ac69e155978600c6dfe9f2f3f06c692bbae5175f5eb4d7e1a020d0b91badffe5074dd66bdd558ddd2be0ec629e83e6616cf381bb692d41bbe5'
 
-            const expectedSignatures = [
+            const expectedFeePayerSignatures = [
                 [
                     '0x0fea',
                     '0x8d9d977567a1903deb82d67525beaa23842ebfe8ae7dad04c0d161a9a2451573',
@@ -986,7 +986,7 @@ describe('TxTypeFeeDelegatedSmartContractExecution', () => {
             expect(appendSignaturesSpy).to.have.been.callCount(rlpEncodedStrings.length)
             expect(getRLPEncodingSpy).to.have.been.calledOnce
             expect(combined).to.equal(expectedRLPEncoded)
-            checkFeePayerSignature(tx, { expectedSignatures })
+            checkFeePayerSignature(tx, { expectedFeePayerSignatures })
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFD-352: combineSignatures combines multiple signatures and feePayerSignatures', () => {
@@ -1040,7 +1040,7 @@ describe('TxTypeFeeDelegatedSmartContractExecution', () => {
             ]
 
             const appendFeePayerSignaturesSpy = sandbox.spy(tx, 'appendFeePayerSignatures')
-            combined = tx.combineSignatures(rlpEncodedStrings)
+            combined = tx.combineSignatures(rlpEncodedStringsWithFeePayerSignatures)
             expect(appendFeePayerSignaturesSpy).to.have.been.callCount(rlpEncodedStringsWithFeePayerSignatures.length)
 
             // combine multiple signatures and feePayerSignatures
