@@ -93,7 +93,7 @@ class SmartContractDeploy extends AbstractTransaction {
     }
 
     set to(address) {
-        if (address !== '0x' && !utils.isAddress(address)) throw new Error(`Invalid address of to: ${address}`)
+        if (address !== '0x') throw new Error(`Invalid address of to: 'to' should be '0x' with smart contract deploy transaction.`)
         this._to = address.toLowerCase()
     }
 
