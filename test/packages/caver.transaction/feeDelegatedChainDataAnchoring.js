@@ -947,7 +947,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoring', () => {
             const expectedRLPEncoded =
                 '0x49f901c4018505d21dba0085174876e80094f1f766ded1aae1e06e2ed6c85127dd69891f7b28b8aff8ad80b8aaf8a8a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000001a00000000000000000000000000000000000000000000000000000000000000002a00000000000000000000000000000000000000000000000000000000000000003a00000000000000000000000000000000000000000000000000000000000000004058006c4c301808094ee43ecbed54e4862ed98c11d2e71b8bd04c1667ef8d5f845820fe9a0f8f21b4d667b139e80818c2b8bfd6117ace4bc11157be3c3ee74c0360565356fa0346828779330f21b7d06be682ec8289f3211c4018a20385cabd0d0ebc2569f16f845820feaa0baa6a845e8c68ae8bf9acc7e018bceaab506e0818e0dc8db2afe3490a1927317a046bacf69af211302103f8c3841bc3cc6a79e2298ee4bc5d5e73b25f42ca98156f845820fe9a05df342131bfdae8239829e16a4298d711c238d0d4ab679b864878be729362921a07e3a7f484d6eb139c6b652c96aaa8ac8df43a5dfb3adaff46bc552a2c6965cba'
 
-            const expectedSignatures = [
+            const expectedFeePayerSignatures = [
                 [
                     '0x0fe9',
                     '0xf8f21b4d667b139e80818c2b8bfd6117ace4bc11157be3c3ee74c0360565356f',
@@ -968,7 +968,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoring', () => {
             expect(appendSignaturesSpy).to.have.been.callCount(rlpEncodedStrings.length)
             expect(getRLPEncodingSpy).to.have.been.calledOnce
             expect(combined).to.equal(expectedRLPEncoded)
-            checkFeePayerSignature(tx, { expectedSignatures })
+            checkFeePayerSignature(tx, { expectedFeePayerSignatures })
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFD-495: combineSignatures combines multiple signatures and feePayerSignatures', () => {
@@ -1022,7 +1022,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoring', () => {
             ]
 
             const appendFeePayerSignaturesSpy = sandbox.spy(tx, 'appendFeePayerSignatures')
-            combined = tx.combineSignatures(rlpEncodedStrings)
+            combined = tx.combineSignatures(rlpEncodedStringsWithFeePayerSignatures)
             expect(appendFeePayerSignaturesSpy).to.have.been.callCount(rlpEncodedStringsWithFeePayerSignatures.length)
 
             // combine multiple signatures and feePayerSignatures

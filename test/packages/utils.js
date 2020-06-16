@@ -160,11 +160,11 @@ const checkSignature = (tx, expected = {}) => {
 }
 
 const checkFeePayerSignature = (tx, expected = {}) => {
-    let { expectedSignatures, expectedLength } = expected
+    let { expectedFeePayerSignatures, expectedLength } = expected
 
     if (expectedLength === undefined) {
-        if (expectedSignatures !== undefined) {
-            expectedLength = expectedSignatures.length
+        if (expectedFeePayerSignatures !== undefined) {
+            expectedLength = expectedFeePayerSignatures.length
         } else {
             expectedLength = 1
         }
@@ -175,10 +175,10 @@ const checkFeePayerSignature = (tx, expected = {}) => {
     for (let i = 0; i < expectedLength; i++) {
         expect(tx.feePayerSignatures[i] instanceof SignatureData).to.be.true
 
-        if (expectedSignatures) {
-            expect(tx.feePayerSignatures[i].v).to.equal(expectedSignatures[i][0])
-            expect(tx.feePayerSignatures[i].r).to.equal(expectedSignatures[i][1])
-            expect(tx.feePayerSignatures[i].s).to.equal(expectedSignatures[i][2])
+        if (expectedFeePayerSignatures) {
+            expect(tx.feePayerSignatures[i].v).to.equal(expectedFeePayerSignatures[i][0])
+            expect(tx.feePayerSignatures[i].r).to.equal(expectedFeePayerSignatures[i][1])
+            expect(tx.feePayerSignatures[i].s).to.equal(expectedFeePayerSignatures[i][2])
         }
     }
 }

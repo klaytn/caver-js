@@ -144,7 +144,7 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
         // If the signatures are empty, there may be an undefined member variable.
         // In this case, the empty information is filled with the decoded result.
         let fillVariables = false
-        if (this.signatures.length === 0 && this.feePayerSignatures.length === 0) fillVariables = true
+        if (utils.isEmptySig(this.signatures) || utils.isEmptySig(this.feePayerSignatures)) fillVariables = true
 
         for (const encoded of rlpEncodedTxs) {
             const type = typeDetectionFromRLPEncoding(encoded)

@@ -1367,7 +1367,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
             const expectedRLPEncoded =
                 '0x22f90115018505d21dba00830186a094610a4bf32905c1dc6e5e61c37165b9aa3a7189088201c01ec4c301808094a317526534d82b902e86c960e037ede7b83af824f8d5f845820fe9a071487ff3f9d01d0bbec812339ff775a7129a0311b2039e8cbf113be48f2fa3d9a04d4d0bcb2c9e4468de70645a5a818d9304ec2f8c75497fa092eb3cc8e7fe94d2f845820fe9a0d7e460da9cd48d780a71a8005b0bb5a6d6009786af55151f3388e42499b70e37a078643c2eca2711a2f776d9558fc2d8cf1a2f905647bbb0ffbab34b046ba9a141f845820fe9a03a8484bbfde6d139cc886e9a253648f50b5b435f1049725f1e52da8f2b3ca765a004149af877984cfd0f3756b7e46ea8dd6a5f47de504c852d607adbdb67fa17fa'
 
-            const expectedSignatures = [
+            const expectedFeePayerSignatures = [
                 [
                     '0x0fe9',
                     '0x71487ff3f9d01d0bbec812339ff775a7129a0311b2039e8cbf113be48f2fa3d9',
@@ -1388,7 +1388,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
             expect(appendSignaturesSpy).to.have.been.callCount(rlpEncodedStrings.length)
             expect(getRLPEncodingSpy).to.have.been.calledOnce
             expect(combined).to.equal(expectedRLPEncoded)
-            checkFeePayerSignature(tx, { expectedSignatures })
+            checkFeePayerSignature(tx, { expectedFeePayerSignatures })
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-206: combineSignatures combines multiple signatures and feePayerSignatures', () => {
@@ -1442,7 +1442,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
             ]
 
             const appendFeePayerSignaturesSpy = sandbox.spy(tx, 'appendFeePayerSignatures')
-            combined = tx.combineSignatures(rlpEncodedStrings)
+            combined = tx.combineSignatures(rlpEncodedStringsWithFeePayerSignatures)
             expect(appendFeePayerSignaturesSpy).to.have.been.callCount(rlpEncodedStringsWithFeePayerSignatures.length)
 
             // combine multiple signatures and feePayerSignatures
