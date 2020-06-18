@@ -398,7 +398,7 @@ class KlayRPC {
                 params: 0,
             }),
             new Method({
-                name: 'writeThroughCaching',
+                name: 'isWriteThroughCaching',
                 call: 'klay_writeThroughCaching',
                 params: 0,
             }),
