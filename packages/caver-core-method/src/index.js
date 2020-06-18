@@ -457,6 +457,7 @@ function buildCall() {
     const method = this
     const isSendTx =
         method.call === 'klay_sendTransaction' ||
+        method.call === 'klay_sendTransactionAsFeePayer' ||
         method.call === 'klay_sendRawTransaction' ||
         method.call === 'personal_sendTransaction' ||
         method.call === 'personal_sendValueTransfer' ||
