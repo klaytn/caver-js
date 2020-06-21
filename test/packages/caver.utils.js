@@ -19,6 +19,7 @@
 require('it-each')({ testPerIteration: true })
 const BN = require('bn.js')
 const BigNumber = require('bignumber.js')
+const _ = require('lodash')
 const testRPCURL = require('../testrpc')
 const { expect } = require('../extendedChai')
 
@@ -1774,213 +1775,213 @@ describe('caver.utils.resolveSignature', () => {
 describe('caver.utils.convertFromPeb', () => {
     it('CAVERJS-UNIT-ETC-225: should convert to peb from peb', () => {
         const amount = '1000000000000000000000000000'
-        const expected = new caver.utils.BN(amount)
+        const expected = amount
 
         const converted = caver.utils.convertFromPeb(amount, 'peb')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-226: should convert to kpeb from peb', () => {
         const amount = '1000000000000000000000000000'
-        const expected = new caver.utils.BN('1000000000000000000000000')
+        const expected = '1000000000000000000000000'
 
         const converted = caver.utils.convertFromPeb(amount, 'kpeb')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-227: should convert to Mpeb from peb', () => {
         const amount = '1000000000000000000000000000'
-        const expected = new caver.utils.BN('1000000000000000000000')
+        const expected = '1000000000000000000000'
 
         const converted = caver.utils.convertFromPeb(amount, 'Mpeb')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-228: should convert to Gpeb from peb', () => {
         const amount = '1000000000000000000000000000'
-        const expected = new caver.utils.BN('1000000000000000000')
+        const expected = '1000000000000000000'
 
         const converted = caver.utils.convertFromPeb(amount, 'Gpeb')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-229: should convert to Ston from peb', () => {
         const amount = '1000000000000000000000000000'
-        const expected = new caver.utils.BN('1000000000000000000')
+        const expected = '1000000000000000000'
 
         const converted = caver.utils.convertFromPeb(amount, 'Ston')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-230: should convert to uKLAY from peb', () => {
         const amount = '1000000000000000000000000000'
-        const expected = new caver.utils.BN('1000000000000000')
+        const expected = '1000000000000000'
 
         const converted = caver.utils.convertFromPeb(amount, 'uKLAY')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-231: should convert to mKLAY from peb', () => {
         const amount = '1000000000000000000000000000'
-        const expected = new caver.utils.BN('1000000000000')
+        const expected = '1000000000000'
 
         const converted = caver.utils.convertFromPeb(amount, 'mKLAY')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-232: should convert to KLAY from peb', () => {
         const amount = '1000000000000000000000000000'
-        const expected = new caver.utils.BN('1000000000')
+        const expected = '1000000000'
 
         const converted = caver.utils.convertFromPeb(amount, 'KLAY')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-233: should convert to kKLAY from peb', () => {
         const amount = '1000000000000000000000000000'
-        const expected = new caver.utils.BN('1000000')
+        const expected = '1000000'
 
         const converted = caver.utils.convertFromPeb(amount, 'kKLAY')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-234: should convert to MKLAY from peb', () => {
         const amount = '1000000000000000000000000000'
-        const expected = new caver.utils.BN('1000')
+        const expected = '1000'
 
         const converted = caver.utils.convertFromPeb(amount, 'MKLAY')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-235: should convert to GKLAY from peb', () => {
         const amount = '1000000000000000000000000000'
-        const expected = new caver.utils.BN('1')
+        const expected = '1'
 
         const converted = caver.utils.convertFromPeb(amount, 'GKLAY')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 })
 
 describe('caver.utils.convertToPeb', () => {
     it('CAVERJS-UNIT-ETC-236: should convert to peb from peb', () => {
-        const expected = new caver.utils.BN('1')
+        const expected = '1'
 
         const converted = caver.utils.convertToPeb(1, 'peb')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-237: should convert to peb from kpeb', () => {
-        const expected = new caver.utils.BN('1000')
+        const expected = '1000'
 
         const converted = caver.utils.convertToPeb(1, 'kpeb')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-238: should convert to peb from Mpeb', () => {
-        const expected = new caver.utils.BN('1000000')
+        const expected = '1000000'
 
         const converted = caver.utils.convertToPeb(1, 'Mpeb')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-239: should convert to peb from Gpeb', () => {
-        const expected = new caver.utils.BN('1000000000')
+        const expected = '1000000000'
 
         const converted = caver.utils.convertToPeb(1, 'Gpeb')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-240: should convert to peb from Ston', () => {
-        const expected = new caver.utils.BN('1000000000')
+        const expected = '1000000000'
 
         const converted = caver.utils.convertToPeb(1, 'Ston')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-241: should convert to peb from uKLAY', () => {
-        const expected = new caver.utils.BN('1000000000000')
+        const expected = '1000000000000'
 
         const converted = caver.utils.convertToPeb(1, 'uKLAY')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-242: should convert to peb from mKLAY', () => {
-        const expected = new caver.utils.BN('1000000000000000')
+        const expected = '1000000000000000'
 
         const converted = caver.utils.convertToPeb(1, 'mKLAY')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-243: should convert to peb from KLAY', () => {
-        const expected = new caver.utils.BN('1000000000000000000')
+        const expected = '1000000000000000000'
 
         const converted = caver.utils.convertToPeb(1, 'KLAY')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-244: should convert to peb from kKLAY', () => {
-        const expected = new caver.utils.BN('1000000000000000000000')
+        const expected = '1000000000000000000000'
 
         const converted = caver.utils.convertToPeb(1, 'kKLAY')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-245: should convert to peb from MKLAY', () => {
-        const expected = new caver.utils.BN('1000000000000000000000000')
+        const expected = '1000000000000000000000000'
 
         const converted = caver.utils.convertToPeb(1, 'MKLAY')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-246: should convert to peb from GKLAY', () => {
-        const expected = new caver.utils.BN('1000000000000000000000000000')
+        const expected = '1000000000000000000000000000'
 
         const converted = caver.utils.convertToPeb(1, 'GKLAY')
 
-        expect(caver.utils.isBN(converted)).to.be.true
-        expect(converted.eq(expected)).to.be.true
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
     })
 })
 

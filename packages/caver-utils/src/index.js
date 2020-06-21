@@ -275,7 +275,7 @@ const fromPeb = function(number, unit) {
         number = tryNumberToString(number)
     }
 
-    return utils.isBN(number) ? ethjsUnit.fromWei(number, unit) : ethjsUnit.fromWei(number, unit).toString(10)
+    return ethjsUnit.fromWei(number, unit)
 }
 
 const toPeb = function(number, unit) {
@@ -298,10 +298,10 @@ const toPeb = function(number, unit) {
  * @method convertFromPeb
  * @param {number|string|BN|BigNumber} amount the peb amount
  * @param {string} unit the unit to convert to
- * @return {BN}
+ * @return {string}
  */
 const convertFromPeb = function(number, unit) {
-    return utils.toBN(fromPeb(number, unit))
+    return fromPeb(number, unit)
 }
 
 /**
@@ -310,10 +310,10 @@ const convertFromPeb = function(number, unit) {
  * @method convertToPeb
  * @param {number|string|BN|BigNumber} amount the amount to convert
  * @param {string} unit the unit to convert from
- * @return {BN}
+ * @return {string|BN}
  */
 const convertToPeb = function(number, unit) {
-    return utils.toBN(toPeb(number, unit))
+    return toPeb(number, unit)
 }
 
 function tryNumberToString(number) {
