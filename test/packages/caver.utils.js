@@ -1251,6 +1251,15 @@ describe('caver.utils.isValidRole', () => {
 
         isValid = caver.utils.isValidRole('feePayerKey')
         expect(isValid).to.be.true
+
+        isValid = caver.utils.isValidRole('roleTransactionKey')
+        expect(isValid).to.be.true
+
+        isValid = caver.utils.isValidRole('roleAccountUpdateKey')
+        expect(isValid).to.be.true
+
+        isValid = caver.utils.isValidRole('roleFeePayerKey')
+        expect(isValid).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-177: caver.utils.isValidRole should false with invalid role', () => {

@@ -921,6 +921,9 @@ const isContractDeployment = txObject => {
 
 const isValidRole = role => {
     switch (role) {
+        case 'roleTransactionKey':
+        case 'roleAccountUpdateKey':
+        case 'roleFeePayerKey':
         case 'transactionKey':
         case 'updateKey':
         case 'feePayerKey':
