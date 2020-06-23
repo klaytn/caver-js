@@ -244,7 +244,7 @@ const unitKlayMap = {
 }
 
 const KlayUnit = {
-    peb: { unit: 'peb', pebFactor: 1 },
+    peb: { unit: 'peb', pebFactor: 0 },
     kpeb: { unit: 'kpeb', pebFactor: 3 },
     Mpeb: { unit: 'Mpeb', pebFactor: 6 },
     Gpeb: { unit: 'Gpeb', pebFactor: 9 },

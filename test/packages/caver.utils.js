@@ -925,6 +925,23 @@ describe('caver.utils.unitMap', () => {
     })
 })
 
+describe('caver.utils.klayUnit', () => {
+    it('CAVERJS-UNIT-ETC-250: should return valid klayUnit', () => {
+        const klayUnit = caver.utils.klayUnit
+        const unitMap = caver.utils.unitMap
+        Object.values(klayUnit).map(unitObj => {
+            const { unit, pebFactor } = unitObj
+            expect(unitMap[unit]).not.to.undefined
+            expect(unitMap[unit]).to.equal(
+                caver.utils
+                    .toBN(10)
+                    .pow(caver.utils.toBN(pebFactor))
+                    .toString(10)
+            )
+        })
+    })
+})
+
 describe('caver.utils.padLeft', () => {
     context('CAVERJS-UNIT-ETC-142: input: hex', () => {
         const tests = [
