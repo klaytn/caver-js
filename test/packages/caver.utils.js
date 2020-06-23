@@ -914,6 +914,7 @@ describe('caver.utils.unitMap', () => {
         expect(result.Mpeb).to.equals('1000000')
         expect(result.Gpeb).to.equals('1000000000')
         expect(result.Ston).to.equals('1000000000')
+        expect(result.ston).to.equals('1000000000')
         expect(result.uKLAY).to.equals('1000000000000')
         expect(result.mKLAY).to.equals('1000000000000000')
         expect(result.KLAY).to.equals('1000000000000000000')
