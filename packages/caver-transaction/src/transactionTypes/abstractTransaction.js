@@ -204,14 +204,14 @@ class AbstractTransaction {
     }
 
     /**
-     * Combines signatures to the transaction from RLP-encoded transaction strings and returns a single transaction with all signatures combined.
+     * Combines RLP-encoded transactions (rawTransaction) to the transaction from RLP-encoded transaction strings and returns a single transaction with all signatures combined.
      * When combining the signatures into a transaction instance,
      * an error is thrown if the decoded transaction contains different value except signatures.
      *
      * @param {Array.<string>} rlpEncodedTxs - An array of RLP-encoded transaction strings.
      * @return {string}
      */
-    combineSignatures(rlpEncodedTxs) {
+    combineSignedRawTransactions(rlpEncodedTxs) {
         if (!_.isArray(rlpEncodedTxs)) throw new Error(`The parameter must be an array of RLP-encoded transaction strings.`)
 
         // If the signatures are empty, there may be an undefined member variable.

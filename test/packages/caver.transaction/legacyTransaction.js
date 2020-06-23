@@ -517,12 +517,12 @@ describe('TxTypeLegacyTransaction', () => {
         })
     })
 
-    context('legacyTransaction.combineSignatures', () => {
+    context('legacyTransaction.combineSignedRawTransactions', () => {
         afterEach(() => {
             sandbox.restore()
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-031: If signatures is empty, combineSignatures set signatures in transaction', () => {
+        it('CAVERJS-UNIT-TRANSACTION-031: If signatures is empty, combineSignedRawTransactions set signatures in transaction', () => {
             transactionObj = {
                 to: '0x8723590d5D60e35f7cE0Db5C09D3938b26fF80Ae',
                 value: 1,
@@ -537,7 +537,7 @@ describe('TxTypeLegacyTransaction', () => {
 
             const rlpEncoded =
                 '0xf8673a8505d21dba0083015f90948723590d5d60e35f7ce0db5c09d3938b26ff80ae0180820feaa0ade9480f584fe481bf070ab758ecc010afa15debc33e1bd75af637d834073a6ea038160105d78cef4529d765941ad6637d8dcf6bd99310e165fee1c39fff2aa27e'
-            const combined = tx.combineSignatures([rlpEncoded])
+            const combined = tx.combineSignedRawTransactions([rlpEncoded])
 
             expect(appendSignaturesSpy).to.have.been.calledOnce
             expect(getRLPEncodingSpy).to.have.been.calledOnce
@@ -545,7 +545,7 @@ describe('TxTypeLegacyTransaction', () => {
             expect(tx.signatures instanceof SignatureData).to.be.true
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-032: If signatures is not empty, combineSignatures should throw error', () => {
+        it('CAVERJS-UNIT-TRANSACTION-032: If signatures is not empty, combineSignedRawTransactions should throw error', () => {
             transactionObj = {
                 to: '0x8723590d5D60e35f7cE0Db5C09D3938b26fF80Ae',
                 value: 1,
@@ -565,17 +565,17 @@ describe('TxTypeLegacyTransaction', () => {
                 '0xf8673a8505d21dba0083015f90948723590d5d60e35f7ce0db5c09d3938b26ff80ae0180820feaa0ade9480f584fe481bf070ab758ecc010afa15debc33e1bd75af637d834073a6ea038160105d78cef4529d765941ad6637d8dcf6bd99310e165fee1c39fff2aa27e'
             const expectedError = `signatures already defined. ${tx.type} cannot include more than one signature. Please use tx.signatures = sigArr to replace.`
 
-            expect(() => tx.combineSignatures([rlpEncoded])).to.throw(expectedError)
+            expect(() => tx.combineSignedRawTransactions([rlpEncoded])).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-033: If decode transaction has different values, combineSignatures should throw error', () => {
+        it('CAVERJS-UNIT-TRANSACTION-033: If decode transaction has different values, combineSignedRawTransactions should throw error', () => {
             const tx = new caver.transaction.legacyTransaction(transactionObj)
 
             const rlpEncoded =
                 '0xf8673a8505d21dba0083015f90948723590d5d60e35f7ce0db5c09d3938b26ff80ae0180820feaa0ade9480f584fe481bf070ab758ecc010afa15debc33e1bd75af637d834073a6ea038160105d78cef4529d765941ad6637d8dcf6bd99310e165fee1c39fff2aa27e'
             const expectedError = `Transactions containing different information cannot be combined.`
 
-            expect(() => tx.combineSignatures([rlpEncoded])).to.throw(expectedError)
+            expect(() => tx.combineSignedRawTransactions([rlpEncoded])).to.throw(expectedError)
         })
     })
 
