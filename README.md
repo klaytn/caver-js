@@ -151,7 +151,7 @@ Units of KLAY is shown as below, and `peb` is the smallest currency unit.
 | kpeb | 1,000 |
 | Mpeb | 1,000,000 |
 | Gpeb | 1,000,000,000 |
-| Ston | 1,000,000,000 |
+| ston | 1,000,000,000 |
 | uKLAY | 1,000,000,000,000 |
 | mKLAY | 1,000,000,000,000,000 |
 | KLAY | 1,000,000,000,000,000,000 |
