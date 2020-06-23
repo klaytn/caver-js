@@ -803,7 +803,7 @@ describe('TxTypeFeeDelegatedCancel', () => {
         })
     })
 
-    context('feeDelegatedCancel.combineSignatures', () => {
+    context('feeDelegatedCancel.combineSignedRawTransactions', () => {
         beforeEach(() => {
             transactionObj = {
                 from: '0xdcad313f2bf2240dbdb243eaf5eee2f512e0bfd1',
@@ -817,14 +817,14 @@ describe('TxTypeFeeDelegatedCancel', () => {
             sandbox.restore()
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-419: combineSignatures combines single signature and sets signatures in transaction', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFD-419: combineSignedRawTransactions combines single signature and sets signatures in transaction', () => {
             const tx = new caver.transaction.feeDelegatedCancel(transactionObj)
             const appendSignaturesSpy = sandbox.spy(tx, 'appendSignatures')
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
             const rlpEncoded =
                 '0x39f86f018505d21dba00830dbba094dcad313f2bf2240dbdb243eaf5eee2f512e0bfd1f847f845820fe9a04d9bf7a8bd15a41143eeecd3c39691cdc151b50d641534f0c73055849f7abca1a07123185b4cc046eb6a78e1ee370c059dfe437012098ebe18379685acd907606f80c4c3018080'
-            const combined = tx.combineSignatures([rlpEncoded])
+            const combined = tx.combineSignedRawTransactions([rlpEncoded])
 
             const expectedSignatures = [
                 [
@@ -840,7 +840,7 @@ describe('TxTypeFeeDelegatedCancel', () => {
             checkSignature(tx, { expectedSignatures })
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-420: combineSignatures combines multiple signatures and sets signatures in transaction', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFD-420: combineSignedRawTransactions combines multiple signatures and sets signatures in transaction', () => {
             transactionObj.signatures = [
                 [
                     '0x0fe9',
@@ -858,7 +858,7 @@ describe('TxTypeFeeDelegatedCancel', () => {
             const appendSignaturesSpy = sandbox.spy(tx, 'appendSignatures')
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
-            const combined = tx.combineSignatures(rlpEncodedStrings)
+            const combined = tx.combineSignedRawTransactions(rlpEncodedStrings)
 
             const expectedRLPEncoded =
                 '0x39f8fd018505d21dba00830dbba094dcad313f2bf2240dbdb243eaf5eee2f512e0bfd1f8d5f845820fe9a04d9bf7a8bd15a41143eeecd3c39691cdc151b50d641534f0c73055849f7abca1a07123185b4cc046eb6a78e1ee370c059dfe437012098ebe18379685acd907606ff845820fe9a0205d4f6f758629da5eb25d1d572e82430243e00096ed64097b6d0031847bf792a0280ce8a79438c699fce0417403e8892e46e10da764b16876091ef0965c1ce1dff845820feaa02f3c7b7aebd6c9af7a5b4259f0ea77d96362efbdca397b9f17e3c6924296c53fa00e4197ba6e38cecf99715f523c1805a58559072f944443bad1152dee73bfb16780c4c3018080'
@@ -887,7 +887,7 @@ describe('TxTypeFeeDelegatedCancel', () => {
             checkSignature(tx, { expectedSignatures })
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-421: combineSignatures combines single feePayerSignature and sets feePayerSignatures in transaction', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFD-421: combineSignedRawTransactions combines single feePayerSignature and sets feePayerSignatures in transaction', () => {
             transactionObj.feePayer = '0x6f89ec285c52a3e092cdb017e125a9b197e78dc7'
             const tx = new caver.transaction.feeDelegatedCancel(transactionObj)
             const appendSignaturesSpy = sandbox.spy(tx, 'appendFeePayerSignatures')
@@ -895,7 +895,7 @@ describe('TxTypeFeeDelegatedCancel', () => {
 
             const rlpEncoded =
                 '0x39f883018505d21dba00830dbba094dcad313f2bf2240dbdb243eaf5eee2f512e0bfd1c4c3018080946f89ec285c52a3e092cdb017e125a9b197e78dc7f847f845820fe9a0a4ca740e08115db092a79ce902bdac45347a3d34a74ea0fcc371ccf01269ca43a029e095bf3f9e0be7e2130fe6985419114958877412b46b5b4243cc39380c5028'
-            const combined = tx.combineSignatures([rlpEncoded])
+            const combined = tx.combineSignedRawTransactions([rlpEncoded])
 
             const expectedSignatures = [
                 [
@@ -911,7 +911,7 @@ describe('TxTypeFeeDelegatedCancel', () => {
             checkFeePayerSignature(tx, { expectedSignatures })
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-422: combineSignatures combines multiple feePayerSignatures and sets feePayerSignatures in transaction', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFD-422: combineSignedRawTransactions combines multiple feePayerSignatures and sets feePayerSignatures in transaction', () => {
             transactionObj.feePayer = '0x6f89ec285c52a3e092cdb017e125a9b197e78dc7'
             transactionObj.feePayerSignatures = [
                 [
@@ -930,7 +930,7 @@ describe('TxTypeFeeDelegatedCancel', () => {
             const appendSignaturesSpy = sandbox.spy(tx, 'appendFeePayerSignatures')
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
-            const combined = tx.combineSignatures(rlpEncodedStrings)
+            const combined = tx.combineSignedRawTransactions(rlpEncodedStrings)
 
             const expectedRLPEncoded =
                 '0x39f90111018505d21dba00830dbba094dcad313f2bf2240dbdb243eaf5eee2f512e0bfd1c4c3018080946f89ec285c52a3e092cdb017e125a9b197e78dc7f8d5f845820fe9a0a4ca740e08115db092a79ce902bdac45347a3d34a74ea0fcc371ccf01269ca43a029e095bf3f9e0be7e2130fe6985419114958877412b46b5b4243cc39380c5028f845820feaa09c86edd1b5d75ac1050a5a7494dece5f186b8e9654f75cf4942f7dca57fc2de0a032f306028776389107c40f1765679b2630f093b1c4f4fda9415f0c909c7addeff845820fe9a0392e7a5d2efbc7da9d114ce79797eebbe2007ece065109f7f93baed1e23bb22ca022e161a9f20c14b5830154e819cdaf59e8d82690b318afb19e2903b52020bb3e'
@@ -959,7 +959,7 @@ describe('TxTypeFeeDelegatedCancel', () => {
             checkFeePayerSignature(tx, { expectedFeePayerSignatures })
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-423: combineSignatures combines multiple signatures and feePayerSignatures', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFD-423: combineSignedRawTransactions combines multiple signatures and feePayerSignatures', () => {
             let tx = new caver.transaction.feeDelegatedCancel(transactionObj)
 
             // RLP encoding with only signatures
@@ -985,7 +985,7 @@ describe('TxTypeFeeDelegatedCancel', () => {
             ]
 
             const appendSignaturesSpy = sandbox.spy(tx, 'appendSignatures')
-            let combined = tx.combineSignatures(rlpEncodedStrings)
+            let combined = tx.combineSignedRawTransactions(rlpEncodedStrings)
             expect(appendSignaturesSpy).to.have.been.callCount(rlpEncodedStrings.length)
 
             const rlpEncodedStringsWithFeePayerSignatures = [
@@ -1010,19 +1010,19 @@ describe('TxTypeFeeDelegatedCancel', () => {
             ]
 
             const appendFeePayerSignaturesSpy = sandbox.spy(tx, 'appendFeePayerSignatures')
-            combined = tx.combineSignatures(rlpEncodedStringsWithFeePayerSignatures)
+            combined = tx.combineSignedRawTransactions(rlpEncodedStringsWithFeePayerSignatures)
             expect(appendFeePayerSignaturesSpy).to.have.been.callCount(rlpEncodedStringsWithFeePayerSignatures.length)
 
             // combine multiple signatures and feePayerSignatures
             tx = new caver.transaction.feeDelegatedCancel(transactionObj)
-            const combinedWithMultiple = tx.combineSignatures([combined])
+            const combinedWithMultiple = tx.combineSignedRawTransactions([combined])
 
             expect(combined).to.equal(combinedWithMultiple)
             checkSignature(tx, { expectedSignatures })
             checkFeePayerSignature(tx, { expectedFeePayerSignatures })
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-424: If decode transaction has different values, combineSignatures should throw error', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFD-424: If decode transaction has different values, combineSignedRawTransactions should throw error', () => {
             const tx = new caver.transaction.feeDelegatedCancel(transactionObj)
             tx.nonce = 1234
 
@@ -1030,7 +1030,7 @@ describe('TxTypeFeeDelegatedCancel', () => {
                 '0x39f86f018505d21dba00830dbba094dcad313f2bf2240dbdb243eaf5eee2f512e0bfd1f847f845820fe9a04d9bf7a8bd15a41143eeecd3c39691cdc151b50d641534f0c73055849f7abca1a07123185b4cc046eb6a78e1ee370c059dfe437012098ebe18379685acd907606f80c4c3018080'
             const expectedError = `Transactions containing different information cannot be combined.`
 
-            expect(() => tx.combineSignatures([rlpEncoded])).to.throw(expectedError)
+            expect(() => tx.combineSignedRawTransactions([rlpEncoded])).to.throw(expectedError)
         })
     })
 

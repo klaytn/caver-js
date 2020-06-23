@@ -830,7 +830,7 @@ describe('TxTypeFeeDelegatedSmartContractDeploy', () => {
         })
     })
 
-    context('feeDelegatedSmartContractDeploy.combineSignatures', () => {
+    context('feeDelegatedSmartContractDeploy.combineSignedRawTransactions', () => {
         beforeEach(() => {
             transactionObj = {
                 from: '0x54dc8905caf698250cebfcbde49f037b52d55f61',
@@ -849,14 +849,14 @@ describe('TxTypeFeeDelegatedSmartContractDeploy', () => {
             sandbox.restore()
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-274: combineSignatures combines single signature and sets signatures in transaction', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFD-274: combineSignedRawTransactions combines single signature and sets signatures in transaction', () => {
             const tx = new caver.transaction.feeDelegatedSmartContractDeploy(transactionObj)
             const appendSignaturesSpy = sandbox.spy(tx, 'appendSignatures')
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
             const rlpEncoded =
                 '0x29f90274018505d21dba00830dbba080809454dc8905caf698250cebfcbde49f037b52d55f61b901fe608060405234801561001057600080fd5b506101de806100206000396000f3006080604052600436106100615763ffffffff7c01000000000000000000000000000000000000000000000000000000006000350416631a39d8ef81146100805780636353586b146100a757806370a08231146100ca578063fd6b7ef8146100f8575b3360009081526001602052604081208054349081019091558154019055005b34801561008c57600080fd5b5061009561010d565b60408051918252519081900360200190f35b6100c873ffffffffffffffffffffffffffffffffffffffff60043516610113565b005b3480156100d657600080fd5b5061009573ffffffffffffffffffffffffffffffffffffffff60043516610147565b34801561010457600080fd5b506100c8610159565b60005481565b73ffffffffffffffffffffffffffffffffffffffff1660009081526001602052604081208054349081019091558154019055565b60016020526000908152604090205481565b336000908152600160205260408120805490829055908111156101af57604051339082156108fc029083906000818181858888f193505050501561019c576101af565b3360009081526001602052604090208190555b505600a165627a7a72305820627ca46bb09478a015762806cc00c431230501118c7c26c30ac58c4e09e51c4f00298080f847f845820fe9a0627b73b8636a2d98f5f51bc30381631055127c3aa13f6f5d470c94ace4d10780a010632196cf8e128de3f99f5e13d41c254dfe3edcc17eea84a49e287cf5b28bda80c4c3018080'
-            const combined = tx.combineSignatures([rlpEncoded])
+            const combined = tx.combineSignedRawTransactions([rlpEncoded])
 
             const expectedSignatures = [
                 [
@@ -872,7 +872,7 @@ describe('TxTypeFeeDelegatedSmartContractDeploy', () => {
             checkSignature(tx, { expectedSignatures })
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-275: combineSignatures combines multiple signatures and sets signatures in transaction', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFD-275: combineSignedRawTransactions combines multiple signatures and sets signatures in transaction', () => {
             transactionObj.signatures = [
                 [
                     '0x0fe9',
@@ -890,7 +890,7 @@ describe('TxTypeFeeDelegatedSmartContractDeploy', () => {
             const appendSignaturesSpy = sandbox.spy(tx, 'appendSignatures')
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
-            const combined = tx.combineSignatures(rlpEncodedStrings)
+            const combined = tx.combineSignedRawTransactions(rlpEncodedStrings)
 
             const expectedRLPEncoded =
                 '0x29f90302018505d21dba00830dbba080809454dc8905caf698250cebfcbde49f037b52d55f61b901fe608060405234801561001057600080fd5b506101de806100206000396000f3006080604052600436106100615763ffffffff7c01000000000000000000000000000000000000000000000000000000006000350416631a39d8ef81146100805780636353586b146100a757806370a08231146100ca578063fd6b7ef8146100f8575b3360009081526001602052604081208054349081019091558154019055005b34801561008c57600080fd5b5061009561010d565b60408051918252519081900360200190f35b6100c873ffffffffffffffffffffffffffffffffffffffff60043516610113565b005b3480156100d657600080fd5b5061009573ffffffffffffffffffffffffffffffffffffffff60043516610147565b34801561010457600080fd5b506100c8610159565b60005481565b73ffffffffffffffffffffffffffffffffffffffff1660009081526001602052604081208054349081019091558154019055565b60016020526000908152604090205481565b336000908152600160205260408120805490829055908111156101af57604051339082156108fc029083906000818181858888f193505050501561019c576101af565b3360009081526001602052604090208190555b505600a165627a7a72305820627ca46bb09478a015762806cc00c431230501118c7c26c30ac58c4e09e51c4f00298080f8d5f845820fe9a0627b73b8636a2d98f5f51bc30381631055127c3aa13f6f5d470c94ace4d10780a010632196cf8e128de3f99f5e13d41c254dfe3edcc17eea84a49e287cf5b28bdaf845820fe9a0c941f8f173e5a5c22216f3f0fdfa4da602356398e24ceee99beb2a2a9c2bfafca00f231de0075bd109708513416a3896fa076130cf6fd891cb1a7abd1835a352bef845820fe9a073bdd7375228ab9598ab5be10a4ffe1c44211de675295cf07bfce726eef2b764a018923a5455d601c52532280259d820ec2ae5cda3ec57095d8df2a872192a5ae980c4c3018080'
@@ -919,7 +919,7 @@ describe('TxTypeFeeDelegatedSmartContractDeploy', () => {
             checkSignature(tx, { expectedSignatures })
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-276: combineSignatures combines single feePayerSignature and sets feePayerSignatures in transaction', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFD-276: combineSignedRawTransactions combines single feePayerSignature and sets feePayerSignatures in transaction', () => {
             transactionObj.feePayer = '0xb1d7bfd3587cd8bfb1cc6ae980fef3735a3601ab'
             const tx = new caver.transaction.feeDelegatedSmartContractDeploy(transactionObj)
             const appendSignaturesSpy = sandbox.spy(tx, 'appendFeePayerSignatures')
@@ -927,7 +927,7 @@ describe('TxTypeFeeDelegatedSmartContractDeploy', () => {
 
             const rlpEncoded =
                 '0x29f90288018505d21dba00830dbba080809454dc8905caf698250cebfcbde49f037b52d55f61b901fe608060405234801561001057600080fd5b506101de806100206000396000f3006080604052600436106100615763ffffffff7c01000000000000000000000000000000000000000000000000000000006000350416631a39d8ef81146100805780636353586b146100a757806370a08231146100ca578063fd6b7ef8146100f8575b3360009081526001602052604081208054349081019091558154019055005b34801561008c57600080fd5b5061009561010d565b60408051918252519081900360200190f35b6100c873ffffffffffffffffffffffffffffffffffffffff60043516610113565b005b3480156100d657600080fd5b5061009573ffffffffffffffffffffffffffffffffffffffff60043516610147565b34801561010457600080fd5b506100c8610159565b60005481565b73ffffffffffffffffffffffffffffffffffffffff1660009081526001602052604081208054349081019091558154019055565b60016020526000908152604090205481565b336000908152600160205260408120805490829055908111156101af57604051339082156108fc029083906000818181858888f193505050501561019c576101af565b3360009081526001602052604090208190555b505600a165627a7a72305820627ca46bb09478a015762806cc00c431230501118c7c26c30ac58c4e09e51c4f00298080c4c301808094b1d7bfd3587cd8bfb1cc6ae980fef3735a3601abf847f845820fe9a0142775d7fd0e65c21ddf3a83f32a9b3043638b0fd0f75301b436616b00261121a07efb4167f4cfd4c6497bf812014f80a4e66612f860e1ff5a4f5fdc282b131a72'
-            const combined = tx.combineSignatures([rlpEncoded])
+            const combined = tx.combineSignedRawTransactions([rlpEncoded])
 
             const expectedSignatures = [
                 [
@@ -943,7 +943,7 @@ describe('TxTypeFeeDelegatedSmartContractDeploy', () => {
             checkFeePayerSignature(tx, { expectedSignatures })
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-277: combineSignatures combines multiple feePayerSignatures and sets feePayerSignatures in transaction', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFD-277: combineSignedRawTransactions combines multiple feePayerSignatures and sets feePayerSignatures in transaction', () => {
             transactionObj.feePayer = '0xb1d7bfd3587cd8bfb1cc6ae980fef3735a3601ab'
             transactionObj.feePayerSignatures = [
                 [
@@ -962,7 +962,7 @@ describe('TxTypeFeeDelegatedSmartContractDeploy', () => {
             const appendSignaturesSpy = sandbox.spy(tx, 'appendFeePayerSignatures')
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
-            const combined = tx.combineSignatures(rlpEncodedStrings)
+            const combined = tx.combineSignedRawTransactions(rlpEncodedStrings)
 
             const expectedRLPEncoded =
                 '0x29f90316018505d21dba00830dbba080809454dc8905caf698250cebfcbde49f037b52d55f61b901fe608060405234801561001057600080fd5b506101de806100206000396000f3006080604052600436106100615763ffffffff7c01000000000000000000000000000000000000000000000000000000006000350416631a39d8ef81146100805780636353586b146100a757806370a08231146100ca578063fd6b7ef8146100f8575b3360009081526001602052604081208054349081019091558154019055005b34801561008c57600080fd5b5061009561010d565b60408051918252519081900360200190f35b6100c873ffffffffffffffffffffffffffffffffffffffff60043516610113565b005b3480156100d657600080fd5b5061009573ffffffffffffffffffffffffffffffffffffffff60043516610147565b34801561010457600080fd5b506100c8610159565b60005481565b73ffffffffffffffffffffffffffffffffffffffff1660009081526001602052604081208054349081019091558154019055565b60016020526000908152604090205481565b336000908152600160205260408120805490829055908111156101af57604051339082156108fc029083906000818181858888f193505050501561019c576101af565b3360009081526001602052604090208190555b505600a165627a7a72305820627ca46bb09478a015762806cc00c431230501118c7c26c30ac58c4e09e51c4f00298080c4c301808094b1d7bfd3587cd8bfb1cc6ae980fef3735a3601abf8d5f845820fe9a0142775d7fd0e65c21ddf3a83f32a9b3043638b0fd0f75301b436616b00261121a07efb4167f4cfd4c6497bf812014f80a4e66612f860e1ff5a4f5fdc282b131a72f845820feaa06e6acf405e08848854e469e8e38edad783ebf0e24cdefbd5d4a2d8f75c37b662a06f39343ba613683a6b0c85ed2f421acdee010027d5803c0da9658b21602919c6f845820feaa0a85dfa3531c970ad63298dc803176e5c3edb98fdaa406fc32be853bedba01e51a03c6b2458349fc33f5acef72252e62e1c59e38dcb00a1c38426b00c2f0d8051be'
@@ -991,7 +991,7 @@ describe('TxTypeFeeDelegatedSmartContractDeploy', () => {
             checkFeePayerSignature(tx, { expectedFeePayerSignatures })
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-278: combineSignatures combines multiple signatures and feePayerSignatures', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFD-278: combineSignedRawTransactions combines multiple signatures and feePayerSignatures', () => {
             let tx = new caver.transaction.feeDelegatedSmartContractDeploy(transactionObj)
 
             // RLP encoding with only signatures
@@ -1017,7 +1017,7 @@ describe('TxTypeFeeDelegatedSmartContractDeploy', () => {
             ]
 
             const appendSignaturesSpy = sandbox.spy(tx, 'appendSignatures')
-            let combined = tx.combineSignatures(rlpEncodedStrings)
+            let combined = tx.combineSignedRawTransactions(rlpEncodedStrings)
             expect(appendSignaturesSpy).to.have.been.callCount(rlpEncodedStrings.length)
 
             const rlpEncodedStringsWithFeePayerSignatures = [
@@ -1042,19 +1042,19 @@ describe('TxTypeFeeDelegatedSmartContractDeploy', () => {
             ]
 
             const appendFeePayerSignaturesSpy = sandbox.spy(tx, 'appendFeePayerSignatures')
-            combined = tx.combineSignatures(rlpEncodedStringsWithFeePayerSignatures)
+            combined = tx.combineSignedRawTransactions(rlpEncodedStringsWithFeePayerSignatures)
             expect(appendFeePayerSignaturesSpy).to.have.been.callCount(rlpEncodedStringsWithFeePayerSignatures.length)
 
             // combine multiple signatures and feePayerSignatures
             tx = new caver.transaction.feeDelegatedSmartContractDeploy(transactionObj)
-            const combinedWithMultiple = tx.combineSignatures([combined])
+            const combinedWithMultiple = tx.combineSignedRawTransactions([combined])
 
             expect(combined).to.equal(combinedWithMultiple)
             checkSignature(tx, { expectedSignatures })
             checkFeePayerSignature(tx, { expectedFeePayerSignatures })
         })
 
-        it('CAVERJS-UNIT-TRANSACTIONFD-279: If decode transaction has different values, combineSignatures should throw error', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFD-279: If decode transaction has different values, combineSignedRawTransactions should throw error', () => {
             const tx = new caver.transaction.feeDelegatedSmartContractDeploy(transactionObj)
             tx.value = 10000
 
@@ -1062,7 +1062,7 @@ describe('TxTypeFeeDelegatedSmartContractDeploy', () => {
                 '0x29f90316018505d21dba00830dbba080809454dc8905caf698250cebfcbde49f037b52d55f61b901fe608060405234801561001057600080fd5b506101de806100206000396000f3006080604052600436106100615763ffffffff7c01000000000000000000000000000000000000000000000000000000006000350416631a39d8ef81146100805780636353586b146100a757806370a08231146100ca578063fd6b7ef8146100f8575b3360009081526001602052604081208054349081019091558154019055005b34801561008c57600080fd5b5061009561010d565b60408051918252519081900360200190f35b6100c873ffffffffffffffffffffffffffffffffffffffff60043516610113565b005b3480156100d657600080fd5b5061009573ffffffffffffffffffffffffffffffffffffffff60043516610147565b34801561010457600080fd5b506100c8610159565b60005481565b73ffffffffffffffffffffffffffffffffffffffff1660009081526001602052604081208054349081019091558154019055565b60016020526000908152604090205481565b336000908152600160205260408120805490829055908111156101af57604051339082156108fc029083906000818181858888f193505050501561019c576101af565b3360009081526001602052604090208190555b505600a165627a7a72305820627ca46bb09478a015762806cc00c431230501118c7c26c30ac58c4e09e51c4f00298080c4c301808094b1d7bfd3587cd8bfb1cc6ae980fef3735a3601abf8d5f845820fe9a0142775d7fd0e65c21ddf3a83f32a9b3043638b0fd0f75301b436616b00261121a07efb4167f4cfd4c6497bf812014f80a4e66612f860e1ff5a4f5fdc282b131a72f845820feaa06e6acf405e08848854e469e8e38edad783ebf0e24cdefbd5d4a2d8f75c37b662a06f39343ba613683a6b0c85ed2f421acdee010027d5803c0da9658b21602919c6f845820feaa0a85dfa3531c970ad63298dc803176e5c3edb98fdaa406fc32be853bedba01e51a03c6b2458349fc33f5acef72252e62e1c59e38dcb00a1c38426b00c2f0d8051be'
             const expectedError = `Transactions containing different information cannot be combined.`
 
-            expect(() => tx.combineSignatures([rlpEncoded])).to.throw(expectedError)
+            expect(() => tx.combineSignedRawTransactions([rlpEncoded])).to.throw(expectedError)
         })
     })
 

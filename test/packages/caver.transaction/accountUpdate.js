@@ -733,7 +733,7 @@ describe('TxTypeAccountUpdate', () => {
         })
     })
 
-    context('accountUpdate.combineSignatures', () => {
+    context('accountUpdate.combineSignedRawTransactions', () => {
         let combinedTarget
         beforeEach(() => {
             const testAddress = '0x40efcb7d744fdc881f698a8ec573999fe6383545'
@@ -750,14 +750,14 @@ describe('TxTypeAccountUpdate', () => {
             sandbox.restore()
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-178: combineSignatures combines single signature and sets signatures in transaction', () => {
+        it('CAVERJS-UNIT-TRANSACTION-178: combineSignedRawTransactions combines single signature and sets signatures in transaction', () => {
             const tx = new caver.transaction.accountUpdate(combinedTarget)
             const appendSignaturesSpy = sandbox.spy(tx, 'appendSignatures')
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
             const rlpEncoded =
                 '0x20f86c018505d21dba0083015f909440efcb7d744fdc881f698a8ec573999fe63835458201c0f847f845820fe9a0f2a83743da6931ce25a29d04f1c51cec8464f0d9d4dabb5acb059aa3fb8c345aa065879e06474669005e02e0b8ca06cba6f8943022305659f8936f1f6109147fdd'
-            const combined = tx.combineSignatures([rlpEncoded])
+            const combined = tx.combineSignedRawTransactions([rlpEncoded])
 
             const expectedSignatures = [
                 [
@@ -773,7 +773,7 @@ describe('TxTypeAccountUpdate', () => {
             checkSignature(tx, { expectedSignatures })
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-179: combineSignatures combines multiple signatures and sets signatures in transaction', () => {
+        it('CAVERJS-UNIT-TRANSACTION-179: combineSignedRawTransactions combines multiple signatures and sets signatures in transaction', () => {
             combinedTarget.signatures = [
                 [
                     '0x0fe9',
@@ -791,7 +791,7 @@ describe('TxTypeAccountUpdate', () => {
             const appendSignaturesSpy = sandbox.spy(tx, 'appendSignatures')
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
-            const combined = tx.combineSignatures(rlpEncodedStrings)
+            const combined = tx.combineSignedRawTransactions(rlpEncodedStrings)
 
             const expectedRLPEncoded =
                 '0x20f8fa018505d21dba0083015f909440efcb7d744fdc881f698a8ec573999fe63835458201c0f8d5f845820fe9a0f2a83743da6931ce25a29d04f1c51cec8464f0d9d4dabb5acb059aa3fb8c345aa065879e06474669005e02e0b8ca06cba6f8943022305659f8936f1f6109147fddf845820feaa0638f0d712b4b709cadab174dea6da50e5429ea59d78446e810af954af8d67981a0129ad4eb9222e161e9e52be9c2384e1b1ff7566c640bc5b30c054efd64b081e7f845820fe9a0935584330d98f4a8a1cf83bf81ea7a18e33a962ad17b6a9eb8e04e3f5f95179da026804e07b5c105427497e8336300c1435d30ffa8d379dc27e5c1facd966c58db'
@@ -820,7 +820,7 @@ describe('TxTypeAccountUpdate', () => {
             checkSignature(tx, { expectedSignatures })
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-180: If decode transaction has different values, combineSignatures should throw error', () => {
+        it('CAVERJS-UNIT-TRANSACTION-180: If decode transaction has different values, combineSignedRawTransactions should throw error', () => {
             const tx = new caver.transaction.accountUpdate(combinedTarget)
             tx.nonce = 1234
 
@@ -828,7 +828,7 @@ describe('TxTypeAccountUpdate', () => {
                 '0x20f86c018505d21dba0083015f909440efcb7d744fdc881f698a8ec573999fe63835458201c0f847f845820feaa0638f0d712b4b709cadab174dea6da50e5429ea59d78446e810af954af8d67981a0129ad4eb9222e161e9e52be9c2384e1b1ff7566c640bc5b30c054efd64b081e7'
             const expectedError = `Transactions containing different information cannot be combined.`
 
-            expect(() => tx.combineSignatures([rlpEncoded])).to.throw(expectedError)
+            expect(() => tx.combineSignedRawTransactions([rlpEncoded])).to.throw(expectedError)
         })
     })
 

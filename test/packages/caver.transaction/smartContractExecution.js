@@ -496,7 +496,7 @@ describe('TxTypeSmartContractExecution', () => {
         })
     })
 
-    context('smartContractExecution.combineSignatures', () => {
+    context('smartContractExecution.combineSignedRawTransactions', () => {
         beforeEach(() => {
             transactionObj = {
                 from: '0x2de587b91c76fb0b92fd607c4fbd5e9a17da799f',
@@ -513,14 +513,14 @@ describe('TxTypeSmartContractExecution', () => {
             sandbox.restore()
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-277: combineSignatures combines single signature and sets signatures in transaction', () => {
+        it('CAVERJS-UNIT-TRANSACTION-277: combineSignedRawTransactions combines single signature and sets signatures in transaction', () => {
             const tx = new caver.transaction.smartContractExecution(transactionObj)
             const appendSignaturesSpy = sandbox.spy(tx, 'appendSignatures')
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
             const rlpEncoded =
                 '0x30f8c5018505d21dba00830dbba094e3cd4e1cd287235cc0ea48c9fd02978533f5ec2b80942de587b91c76fb0b92fd607c4fbd5e9a17da799fb844a9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039f847f845820fe9a04a7d00c2680e5bca49a5880e23c5adb40b069af204a55e888f45746a20978e46a007b57a439201d182f4aec5db28d72192468f58f4fe7a1e717f96dd0d1def2d16'
-            const combined = tx.combineSignatures([rlpEncoded])
+            const combined = tx.combineSignedRawTransactions([rlpEncoded])
 
             const expectedSignatures = [
                 [
@@ -536,7 +536,7 @@ describe('TxTypeSmartContractExecution', () => {
             checkSignature(tx, { expectedSignatures })
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-278: combineSignatures combines multiple signatures and sets signatures in transaction', () => {
+        it('CAVERJS-UNIT-TRANSACTION-278: combineSignedRawTransactions combines multiple signatures and sets signatures in transaction', () => {
             transactionObj.signatures = [
                 [
                     '0x0fe9',
@@ -554,7 +554,7 @@ describe('TxTypeSmartContractExecution', () => {
             const appendSignaturesSpy = sandbox.spy(tx, 'appendSignatures')
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
-            const combined = tx.combineSignatures(rlpEncodedStrings)
+            const combined = tx.combineSignedRawTransactions(rlpEncodedStrings)
 
             const expectedRLPEncoded =
                 '0x30f90153018505d21dba00830dbba094e3cd4e1cd287235cc0ea48c9fd02978533f5ec2b80942de587b91c76fb0b92fd607c4fbd5e9a17da799fb844a9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039f8d5f845820fe9a04a7d00c2680e5bca49a5880e23c5adb40b069af204a55e888f45746a20978e46a007b57a439201d182f4aec5db28d72192468f58f4fe7a1e717f96dd0d1def2d16f845820fe9a08494bfd86b0480e33700635d37ab0eb0ce3e6d93b5c51e6eda9fadd179569804a047f601d9fcb8682090165d8d048d6a5e3c5a48377ec9b212be6d7ee72b768bfdf845820fe9a0f642b38cf64cf70c89a0ccd74de13266ea98854078119a4619cad3bb2e6d4530a02307abe779333fe9da8eeebf40fbfeff9f1314ae8467a0119541339dfb65f10a'
@@ -583,7 +583,7 @@ describe('TxTypeSmartContractExecution', () => {
             checkSignature(tx, { expectedSignatures })
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-279: If decode transaction has different values, combineSignatures should throw error', () => {
+        it('CAVERJS-UNIT-TRANSACTION-279: If decode transaction has different values, combineSignedRawTransactions should throw error', () => {
             const tx = new caver.transaction.smartContractExecution(transactionObj)
             tx.value = 10000
 
@@ -591,7 +591,7 @@ describe('TxTypeSmartContractExecution', () => {
                 '0x30f8c5018505d21dba00830dbba094e3cd4e1cd287235cc0ea48c9fd02978533f5ec2b80942de587b91c76fb0b92fd607c4fbd5e9a17da799fb844a9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039f847f845820fe9a08494bfd86b0480e33700635d37ab0eb0ce3e6d93b5c51e6eda9fadd179569804a047f601d9fcb8682090165d8d048d6a5e3c5a48377ec9b212be6d7ee72b768bfd'
             const expectedError = `Transactions containing different information cannot be combined.`
 
-            expect(() => tx.combineSignatures([rlpEncoded])).to.throw(expectedError)
+            expect(() => tx.combineSignedRawTransactions([rlpEncoded])).to.throw(expectedError)
         })
     })
 
