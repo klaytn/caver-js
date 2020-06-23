@@ -99,7 +99,7 @@ You can add the keyring object created in the above example to the wallet instan
 // Adding a keyring to caver.wallet with an address and private keys
 > caver.wallet.newKeyring('0x{address in hex}', ['0x{private key1}', '0x{private key2}', ...])
 
-// Adding a keyring to wallet with an address and private keys by roles
+// Adding a keyring to caver.wallet with an address and private keys by roles
 > caver.wallet.newKeyring('0x{address in hex}', [ ['0x{private key1}', ...], ['0x{private key2}', ...], ['0x{private key3}', ...] ])
 ```
 
