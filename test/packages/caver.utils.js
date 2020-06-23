@@ -919,6 +919,8 @@ describe('caver.utils.unitMap', () => {
         expect(result.KLAY).to.equals('1000000000000000000')
         expect(result.kKLAY).to.equals('1000000000000000000000')
         expect(result.MKLAY).to.equals('1000000000000000000000000')
+        expect(result.GKLAY).to.equals('1000000000000000000000000000')
+        expect(result.TKLAY).to.equals('1000000000000000000000000000000')
     })
 })
 
