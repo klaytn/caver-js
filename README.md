@@ -73,7 +73,7 @@ Klaytn/vX.X.X/linux-amd64/goX.X.X
 
 ## Using caver-js keyring/wallet
 
-You can easily use your Klaytn account when sign transaction or message by using the [Keyring] / [wallet] provided by caver-js. 
+You can easily use your Klaytn account when signing a transaction or message by using the [Keyring] / [wallet].
 
 Keyring type ([SingleKeyring], [MultipleKeyring] or [RoleBasedKeyring]) is different according to the type of private key that the user wants to use in caver-js. See [caver.wallet.keyring] for details.
 [caver.wallet] provides the **in-memory wallet** for easy keyring management in caver-js.
