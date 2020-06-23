@@ -96,13 +96,13 @@ You can add the keyring object created in the above example to the caver.wallet,
 // Add a keyring instance to caver.wallet
 > caver.wallet.add(keyring)
 
-// Adding a keyring to caver.wallet with an address and a private key
+// Add a keyring to caver.wallet with an address and a private key
 > caver.wallet.newKeyring('0x{address in hex}', '0x{private key}')
 
-// Adding a keyring to caver.wallet with an address and private keys
+// Add a keyring to caver.wallet with an address and private keys
 > caver.wallet.newKeyring('0x{address in hex}', ['0x{private key1}', '0x{private key2}', ...])
 
-// Adding a keyring to caver.wallet with an address and private keys by roles
+// Add a keyring to caver.wallet with an address and private keys by roles
 > caver.wallet.newKeyring('0x{address in hex}', [ ['0x{private key1}', ...], ['0x{private key2}', ...], ['0x{private key3}', ...] ])
 ```
 
