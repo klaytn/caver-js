@@ -76,9 +76,9 @@ Klaytn/vX.X.X/linux-amd64/goX.X.X
 You can easily use your Klaytn account when signing a transaction or message by using the [Keyring] / [wallet].
 
 The keyring is a new feature that contains an address and one or more private keys based on the key types ([SingleKeyring], [MultipleKeyring] or [RoleBasedKeyring]). Refer to [caver.wallet.keyring] for details.
-[caver.wallet] provides the **in-memory wallet** for easy keyring management in caver-js.
+[caver.wallet], the **in-memory wallet**, is provided to easily manage multiple keyrings.
 
-**Note** Functions associated with wallet and keyring provided by caver-js have no effect on the actual Klaytn blockchain platform (Klaytn).
+**Note** Functions associated with `wallet` and `keyring` have no effect on the Klaytn blockchain platform. It just manipulates keyrings in the in-memory wallet.
 
 Let's create a random keyring as shown in the example below:
 ```
