@@ -160,7 +160,7 @@ Units of KLAY is shown as below, and `peb` is the smallest currency unit.
 | GKLAY | 1,000,000,000,000,000,000,000,000,000 |
 | TKLAY | 1,000,000,000,000,000,000,000,000,000,000 |
 
-caver-js provides the caver.utils.toPeb function for unit conversion. Please refer to the usage below.
+caver-js provides the caver.utils.convertToPeb function for unit conversion. Please refer to the usage below.
 ```
 > caver.utils.convertToPeb(1, 'peb')
 '1'
