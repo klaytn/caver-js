@@ -233,12 +233,29 @@ const unitKlayMap = {
     Mpeb: '1000000',
     Gpeb: '1000000000',
     Ston: '1000000000',
+    ston: '1000000000',
     uKLAY: '1000000000000',
     mKLAY: '1000000000000000',
     KLAY: '1000000000000000000',
     kKLAY: '1000000000000000000000',
     MKLAY: '1000000000000000000000000',
     GKLAY: '1000000000000000000000000000',
+    TKLAY: '1000000000000000000000000000000',
+}
+
+const KlayUnit = {
+    peb: { unit: 'peb', pebFactor: 0 },
+    kpeb: { unit: 'kpeb', pebFactor: 3 },
+    Mpeb: { unit: 'Mpeb', pebFactor: 6 },
+    Gpeb: { unit: 'Gpeb', pebFactor: 9 },
+    ston: { unit: 'ston', pebFactor: 9 },
+    uKLAY: { unit: 'uKLAY', pebFactor: 12 },
+    mKLAY: { unit: 'mKLAY', pebFactor: 15 },
+    KLAY: { unit: 'KLAY', pebFactor: 18 },
+    kKLAY: { unit: 'kKLAY', pebFactor: 21 },
+    MKLAY: { unit: 'MKLAY', pebFactor: 24 },
+    GKLAY: { unit: 'GKLAY', pebFactor: 27 },
+    TKLAY: { unit: 'TKLAY', pebFactor: 30 },
 }
 
 const unitKlayToEthMap = {
@@ -247,12 +264,14 @@ const unitKlayToEthMap = {
     Mpeb: 'mwei',
     Gpeb: 'gwei',
     Ston: 'gwei',
+    ston: 'gwei',
     uKLAY: 'microether',
     mKLAY: 'milliether',
     KLAY: 'ether',
     kKLAY: 'kether',
     MKLAY: 'mether',
     GKLAY: 'gether',
+    TKLAY: 'tether',
 }
 const getKlayUnitValue = function(unit) {
     unit = unit || 'KLAY'
@@ -293,15 +312,17 @@ const toPeb = function(number, unit) {
 }
 
 /**
- * Converts peb amount to specific unit amount
+ * Converts peb amount to specific unit amount.
  *
  * @method convertFromPeb
  * @param {number|string|BN|BigNumber} amount the peb amount
- * @param {string} unit the unit to convert to
+ * @param {string|KlayUnit} unitString the unit to convert to
  * @return {string}
  */
-const convertFromPeb = function(number, unit) {
-    return fromPeb(number, unit)
+const convertFromPeb = function(number, unitString) {
+    if (_.isObject(unitString) && unitString.unit) unitString = unitString.unit
+    const converted = fromPeb(number, unitString)
+    return utils.isBN(converted) ? converted.toString(10) : converted
 }
 
 /**
@@ -309,11 +330,13 @@ const convertFromPeb = function(number, unit) {
  *
  * @method convertToPeb
  * @param {number|string|BN|BigNumber} amount the amount to convert
- * @param {string} unit the unit to convert from
+ * @param {string|KlayUnit} unitString the unit to convert from
  * @return {string|BN}
  */
-const convertToPeb = function(number, unit) {
-    return toPeb(number, unit)
+const convertToPeb = function(number, unitString) {
+    if (_.isObject(unitString) && unitString.unit) unitString = unitString.unit
+    const converted = toPeb(number, unitString)
+    return utils.isBN(converted) ? converted.toString(10) : converted
 }
 
 function tryNumberToString(number) {
@@ -445,6 +468,7 @@ module.exports = {
     fromAscii: asciiToHex,
 
     unitMap: unitKlayMap,
+    klayUnit: KlayUnit,
     toWei: toWei,
     fromWei: fromWei,
 

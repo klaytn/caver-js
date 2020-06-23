@@ -914,11 +914,31 @@ describe('caver.utils.unitMap', () => {
         expect(result.Mpeb).to.equals('1000000')
         expect(result.Gpeb).to.equals('1000000000')
         expect(result.Ston).to.equals('1000000000')
+        expect(result.ston).to.equals('1000000000')
         expect(result.uKLAY).to.equals('1000000000000')
         expect(result.mKLAY).to.equals('1000000000000000')
         expect(result.KLAY).to.equals('1000000000000000000')
         expect(result.kKLAY).to.equals('1000000000000000000000')
         expect(result.MKLAY).to.equals('1000000000000000000000000')
+        expect(result.GKLAY).to.equals('1000000000000000000000000000')
+        expect(result.TKLAY).to.equals('1000000000000000000000000000000')
+    })
+})
+
+describe('caver.utils.klayUnit', () => {
+    it('CAVERJS-UNIT-ETC-250: should return valid klayUnit', () => {
+        const klayUnit = caver.utils.klayUnit
+        const unitMap = caver.utils.unitMap
+        Object.values(klayUnit).map(unitObj => {
+            const { unit, pebFactor } = unitObj
+            expect(unitMap[unit]).not.to.undefined
+            expect(unitMap[unit]).to.equal(
+                caver.utils
+                    .toBN(10)
+                    .pow(caver.utils.toBN(pebFactor))
+                    .toString(10)
+            )
+        })
     })
 })
 
