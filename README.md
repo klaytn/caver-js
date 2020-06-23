@@ -10,12 +10,11 @@ Table of contents
    * [Installation](#installation)
    * [Getting Started](#getting-started)
       * [Check the Connection](#check-the-connection)
-      * [Using caver-js account/wallet](#using-caver-js-account/wallet)
+      * [Using caver-js keyring/wallet](#using-caver-js-keyring/wallet)
       * [Submitting a Transaction](#submitting-a-transaction)
       * [Units for KLAY](#units-for-klay)
    * [Documentation](#documentation)
    * [API Specification](#api-specification)
-   * [Web3.js Similarity](#web3.js-similarity)
    * [Error Code Improvement](#error-code-improvement)
    * [Sample Projects](#sample-projects)
    * [Github Repository](#github-repository)
@@ -34,8 +33,9 @@ Testing in caver-js is implemented using the mocha testing framework. If you wan
 **Note** caver-js can run on Node.js versions 8 and 10, and the recommended versions are:
 - lts/carbon ([8.16.0](https://nodejs.org/dist/latest-v8.x/))
 - lts/dubnium ([10.16.0](https://nodejs.org/dist/latest-v10.x/))
+* lts/erbium ([12.18.0](https://nodejs.org/dist/latest-v12.x/))
 
-If you are already using a different version of the node(for example, node v12), use the Node Version Manager([NVM](https://github.com/nvm-sh/nvm)) to install and use the version supported by caver-js.
+If you are already using a different version of the node(for example, node v14), use the Node Version Manager([NVM](https://github.com/nvm-sh/nvm)) to install and use the version supported by caver-js.
 
 
 Installation
@@ -67,111 +67,78 @@ $ node
 ## Check the Connection
 You can now use caver-js. You can send a basic request to the node as shown below and check the results.
 ```
-> caver.klay.getNodeInfo().then(console.log)
+> caver.rpc.klay.getClientVersion().then(console.log)
 Klaytn/vX.X.X/linux-amd64/goX.X.X
 ```
 
-## Using caver-js account/wallet
-You can easily manage your account by using the account / wallet packages provided by caver-js.
-[caver.klay.accounts](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.klay.accounts) package provides functions related to accounts, such as create, signTransaction, and privateKeyToAccount.
-[caver.klay.accounts.wallet](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.klay.accounts#wallet) provides the **in-memory wallet** for easy account management in caver-js.
+## Using caver-js keyring/wallet
 
-**Note** Functions associated with wallet and account provided by caver-js have no effect on the actual Klaytn network.
+You can easily use your Klaytn account when sign transaction or message by using the [Keyring] / [wallet] provided by caver-js. 
 
-Let's create a random account as shown in the example below:
+Keyring type ([SingleKeyring], [MultipleKeyring] or [RoleBasedKeyring]) is different according to the type of private key that the user wants to use in caver-js. See [caver.wallet.keyring] for details.
+[caver.wallet] provides the **in-memory wallet** for easy keyring management in caver-js.
+
+**Note** Functions associated with wallet and keyring provided by caver-js have no effect on the actual Klaytn blockchain platform (Klaytn).
+
+Let's create a random keyring as shown in the example below:
 ```
-> const account = caver.klay.accounts.create()
+> const keyring = caver.wallet.keyring.generate()
 
-> account
-{ address: '0xF5b66670135666F273F6b5a2eA706A5aCf38D8D5',
-  privateKey: '0x{private key}',
-  ... }
-```
-
-You can add to the wallet instance of caver-js using the account object created in the above example, or you can add an account using a specific private key. If the address is not specified separately, the address derived from the private key is set. If the private key is decoupled from the address, pass the address as a second parameter separately shown below.
-```
-// Adding an account object
-> caver.klay.accounts.wallet.add(account)
-
-// Adding a private key
-> caver.klay.accounts.wallet.add('0x{private key}')
-
-// Adding a private key with an address
-> caver.klay.accounts.wallet.add('0x{private key}', '0x6b6bb1221c5c27cbc87768aae849b97d01a073a9')
+> keyring
+SingleKeyring {
+  _address: '0x64d221893cc628605314026f4c4e0879af5b75b1',
+  _key: PrivateKey { _privateKey: '0x{private key}' }
+}
 ```
 
-caver-js supports two types of private key formats.
-One is a raw private key format of a 32-byte string type and the other is the [KlaytnWalletKey](https://docs.klaytn.com/klaytn/design/accounts#klaytn-wallet-key-format).
+You can add to the wallet instance of caver-js using the keyring object created in the above example, or you can add a keyring using an address and private key(s).
+```
+// Adding a keyring to wallet with an address and a private key
+> caver.wallet.newKeyring('0x{address in hex}', '0x{private key}')
 
-You can also add your account using the KlaytnWalletKey format as shown below:
-```
-// Adding a Klaytn wallet key
-> caver.klay.accounts.wallet.add('0x{private key}0x000x{address in hex}')
-```
+// Adding a keyring to wallet with an address and private keys
+> caver.wallet.newKeyring('0x{address in hex}', ['0x{private key1}', '0x{private key2}', ...])
 
-Once added to a wallet, it can be accessed via an index or an address.
-```
-> caver.klay.accounts.wallet[0]
-> caver.klay.accounts.wallet['0xF5b66670135666F273F6b5a2eA706A5aCf38D8D5']
-```
-
-The private key that matches a specific account stored in the wallet instance can be updated as follows:
-```
-> caver.klay.accounts.wallet.updatePrivateKey('0x{new private key}', '0x{address in hex}')
+// Adding a keyring to wallet with an address and private keys by roles
+> caver.wallet.newKeyring('0x{address in hex}', [ ['0x{private key1}', ...], ['0x{private key2}', ...], ['0x{private key3}', ...] ])
 ```
 
 ## Submitting a Transaction
-You can use caver-js to submit various types of transactions to a node. Please refer to the [caver.klay.sendTransaction](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.klay/transaction#sendtransaction) to see how to send a transaction of each type.
+You can use caver-js to submit various types of transactions to a node. Please refer to the [caver.transaction](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.transaction/class) to see how to create a transaction of each type.
 
-You can submit the transaction as shown below, and the result can be confirmed by the returned receipt:
+You can sign the transaction using a keyring and send a signed transaction through `caver.rpc.klay.sendRawTransaction` as shown below, and the result can be confirmed by the returned receipt:
 ```
-// using the promise
-> caver.klay.sendTransaction({
-    type: 'VALUE_TRANSFER',
-    from: '0x76d1cc1cdb081de8627cab2c074f02ebc7bce0d0',
-    to: '0x80c2c57dad6cb16488b4c70c17d77152c74f8ade',
-    gas: '300000',
-    value: caver.utils.toPeb('1', 'KLAY'),
-  }).then(console.log)
+// Add a keyring to caver.wallet
+> const keyring = caver.wallet.newKeyring('0x{address in hex}', '0x{private key}')
+> const vt = new caver.transaction.valueTransfer({
+		from: keyring.address,
+		to: '0x176ff0344de49c04be577a3512b6991507647f72',
+		value: caver.utils.convertToPeb(1, 'KLAY'),
+		gas: 25000,
+	})
+> caver.wallet.sign(keyring.address, vt).then(signed => {
+  caver.rpc.klay.sendRawTransaction(signed).then(console.log)
+})
 { 
   blockHash: '0x0a78b5c5b95456b2d6b6a9ba25fd2afd0000d16bcf03a8ae58a6557a59319a67',
   blockNumber: 8021,
   contractAddress: null,
-  from: '0x76d1cc1cdb081de8627cab2c074f02ebc7bce0d0',
+  from: '0x09a08f2289d3eb3499868908f1c84fd9523fe11b',
   ...
   type: 'TxTypeValueTransfer',
   typeInt: 8,
   value: '0xde0b6b3a7640000' 
 }
+```
 
-// using the event emitter
-> caver.klay.sendTransaction({
-    type: 'VALUE_TRANSFER',
-    from: '0x76d1cc1cdb081de8627cab2c074f02ebc7bce0d0',
-    to: '0x80c2c57dad6cb16488b4c70c17d77152c74f8ade',
-    gas: '300000',
-    value: caver.utils.toPeb('1', 'KLAY'),
-  }).on('transactionHash', function(hash){
+The above example is using `Promise` when send signed transaction to the Klaytn. You can use `event emitter` like below.
+
+```
+caver.rpc.klay.sendRawTransaction(signed).on('transactionHash', function(hash){
     ...
   }).on('receipt', function(receipt){
     ...
   })
-```
-The sendTransaction function will sign if the account corresponding to `from` is in the wallet and send it to the node; otherwise, send the transaction unsigned.
-
-If you want to get a raw signed transaction, do the following with an appropriate private key:
-```
-> caver.klay.accounts.signTransaction({
-    type: 'VALUE_TRANSFER',
-    from: '0x76d1cc1cdb081de8627cab2c074f02ebc7bce0d0',
-    to: '0x80c2c57dad6cb16488b4c70c17d77152c74f8ade',
-    gas: '300000',
-    value: caver.utils.toPeb('1', 'KLAY'),
-  }, '{private key}').then((signed)=>console.log(signed.rawTransaction))
-```
-The raw transaction can be transferred to the Klaytn node using caver.klay.sendSignedTransaction:
-```
-> caver.klay.sendSignedTransaction(rawTransaction).then(console.log)
 ```
 
 ## Units for KLAY
@@ -191,16 +158,17 @@ Units of KLAY is shown as below, and `peb` is the smallest currency unit.
 | kKLAY | 1,000,000,000,000,000,000,000 |
 | MKLAY | 1,000,000,000,000,000,000,000,000 |
 | GKLAY | 1,000,000,000,000,000,000,000,000,000 |
+| TKLAY | 1,000,000,000,000,000,000,000,000,000,000 |
 
 caver-js provides the caver.utils.toPeb function for unit conversion. Please refer to the usage below.
 ```
-> caver.utils.toPeb(1, 'peb')
+> caver.utils.convertToPeb(1, 'peb')
 '1'
 
-> caver.utils.toPeb(1, 'Gpeb')
+> caver.utils.convertToPeb(1, 'Gpeb')
 '1000000000'
 
-> caver.utils.toPeb(1, 'KLAY')
+> caver.utils.convertToPeb(1, 'KLAY')
 '1000000000000000000'
 ```
 
@@ -214,31 +182,17 @@ API Specification
 
 The API lists of caver-js are described in folloinwg links:
 
-* [caver.klay](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.klay)
-* [caver.klay.accounts](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.klay.accounts)
-* [caver.klay.contract](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.klay.contract)
-* [caver.klay.net](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.klay.net)
-* [caver.klay.abi](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.klay.abi)
+* [caver.account](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.account)
+* [caver.wallet.keyring](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet.keyring)
+* [caver.wallet](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet)
+* [caver.transaction](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.transaction)
+* [caver.rpc.klay](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.rpc/klay)
+* [caver.rpc.net](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.rpc/net)
+* [caver.contract](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.contract)
+* [caver.abi](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.abi)
+* [caver.kct.kip7](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.kct/kip7)
+* [caver.kct.kip17](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.kct/kip17)
 * [caver.utils](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.utils)
-
-
-Web3.js Similarity
-=================
-Since caver-js has been evolved from web3.js, usage pattern of caver-js is very similar to that of web3.js.
-This means a software developed using web3.js can be easily converted to caver-js.
-The following examples are code patterns used in web3.js and caver-js, respectively.
-```
-const Web3 = require('web3');
-const web3 = new Web3(new web3.providers.HttpProvider('http://localhost:8545'));
-
-web3.eth.getBalance('0x407d73d8a49eeb85d32cf465507dd71d507100c1').then(console.log)
-```
-```
-const Caver = require('caver-js');
-const caver = new Caver(new Caver.providers.HttpProvider('http://localhost:8545'));
-
-caver.klay.getBalance('0x407d73d8a49eeb85d32cf465507dd71d507100c1').then(console.log)
-```
 
 Error Code Improvement
 =================
@@ -308,3 +262,12 @@ Github Repository
 Related Projects
 =================
 [caver-java](https://github.com/klaytn/caver-java) for Java
+
+
+[Keyring]: https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet.keyring
+[caver.wallet.keyring]: https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet.keyring
+[wallet]: https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet
+[caver.wallet]: https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet
+[SingleKeyring]: https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet.keyring#singlekeyring
+[MultipleKeyring]: https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet.keyring#multiplekeyring
+[RoleBasedKeyring]: https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet.keyring#rolebasedkeyring
