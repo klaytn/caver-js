@@ -109,7 +109,7 @@ You can add the keyring object created in the above example to the caver.wallet,
 ## Submitting a Transaction
 You can use caver-js to submit various types of transactions to a node. Please refer to the [caver.transaction](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.transaction/#class) to see how to create a transaction of each type.
 
-You can sign the transaction using a keyring and send a signed transaction through `caver.rpc.klay.sendRawTransaction` as shown below, and the result can be confirmed by the returned receipt:
+You can sign the transaction using a keyring and send a signed transaction through `caver.rpc.klay.sendRawTransaction` as shown below, and the receipt is returned as a result.
 ```
 // Add a keyring to caver.wallet
 > const keyring = caver.wallet.newKeyring('0x{address in hex}', '0x{private key}')
@@ -134,7 +134,7 @@ You can sign the transaction using a keyring and send a signed transaction throu
 }
 ```
 
-The above example is using `Promise` when send signed transaction to the Klaytn. You can use `event emitter` like below.
+The above example uses `Promise` when sending a signed transaction to the Klaytn. You can also use `event emitter` like below.
 
 ```
 caver.rpc.klay.sendRawTransaction(signed).on('transactionHash', function(hash){
