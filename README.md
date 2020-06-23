@@ -91,8 +91,11 @@ SingleKeyring {
 }
 ```
 
-You can add the keyring object created in the above example to the wallet instance, or you can add a keyring using an address and private key(s).
+You can add the keyring object created in the above example to the caver.wallet, or you can add a keyring using an address and private key(s).
 ```
+// Adding a keyring instance to caver.wallet
+> caver.wallet.add(keyring)
+
 // Adding a keyring to caver.wallet with an address and a private key
 > caver.wallet.newKeyring('0x{address in hex}', '0x{private key}')
 
