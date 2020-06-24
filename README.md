@@ -286,10 +286,10 @@ Related Projects
 [caver-java](https://github.com/klaytn/caver-java) for Java
 
 
-[Keyring]: https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet.keyring
-[caver.wallet.keyring]: https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet.keyring
+[Keyring]: https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet/keyring
+[caver.wallet.keyring]: https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet/keyring
 [wallet]: https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet
 [caver.wallet]: https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet
-[SingleKeyring]: https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet.keyring#singlekeyring
-[MultipleKeyring]: https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet.keyring#multiplekeyring
-[RoleBasedKeyring]: https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet.keyring#rolebasedkeyring
+[SingleKeyring]: https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet/keyring#singlekeyring
+[MultipleKeyring]: https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet/keyring#multiplekeyring
+[RoleBasedKeyring]: https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet/keyring#rolebasedkeyring
