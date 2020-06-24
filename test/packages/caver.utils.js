@@ -19,6 +19,7 @@
 require('it-each')({ testPerIteration: true })
 const BN = require('bn.js')
 const BigNumber = require('bignumber.js')
+const _ = require('lodash')
 const testRPCURL = require('../testrpc')
 const { expect } = require('../extendedChai')
 
@@ -398,6 +399,43 @@ describe('caver.utils.isTxHashStrict', () => {
     })
 })
 
+describe('caver.utils.isValidHashStrict', () => {
+    const hash = [
+        '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550',
+        '0xd09032de89e920fa6e9780fd4f5f29c2985f86f6510c0c3d086adc9e21e00763',
+    ]
+
+    context('CAVERJS-UNIT-ETC-205: input: valid strict hex', () => {
+        const tests = [
+            { hash: hash[0], expected: true }, // all lower
+            { hash: hash[0].toUpperCase(), expected: true }, // all upper
+            { hash: hash[0].slice(0, 10) + hash[0].slice(10).toUpperCase(), expected: true }, // mixed
+            { hash: hash[1], expected: true }, // all lower
+            { hash: hash[1].toUpperCase(), expected: true }, // all upper
+            { hash: hash[1].slice(0, 10) + hash[1].slice(10).toUpperCase(), expected: true }, // mixed
+        ]
+        it.each(tests, 'should return true', test => {
+            expect(caver.utils.isValidHashStrict(test.hash)).to.be.equal(test.expected)
+        })
+    })
+
+    context('CAVERJS-UNIT-ETC-206: invalid strict hex', () => {
+        const tests = [
+            { hash: `00${hash[0].slice(2)}`, expected: false }, // doesn't start with 0x
+            { hash: hash[0].slice(2), expected: false }, // doesn't start with 0x
+            { hash: `${hash[0].slice(0, 64)}ZZ`, expected: false }, // not hex
+            { hash: hash[0].slice(0, 10), expected: false }, // length is not enough
+            { hash: `00${hash[1].slice(2)}`, expected: false }, // doesn't start with 0x
+            { hash: hash[1].slice(2), expected: false }, // doesn't start with 0x
+            { hash: `${hash[1].slice(0, 64)}ZZ`, expected: false }, // not hex
+            { hash: hash[1].slice(0, 10), expected: false }, // length is not enough
+        ]
+        it.each(tests, 'should return false', test => {
+            expect(caver.utils.isValidHashStrict(test.hash)).to.be.equal(test.expected)
+        })
+    })
+})
+
 describe('caver.utils.isTxHash', () => {
     const transactionHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
     context('CAVERJS-UNIT-ETC-164: input: valid transaction hex', () => {
@@ -423,6 +461,50 @@ describe('caver.utils.isTxHash', () => {
         ]
         it.each(tests, 'should return false', test => {
             expect(caver.utils.isTxHash(test.tx)).to.be.equal(test.expected)
+        })
+    })
+})
+
+describe('caver.utils.isValidHash', () => {
+    const hash = [
+        '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550',
+        '0xd09032de89e920fa6e9780fd4f5f29c2985f86f6510c0c3d086adc9e21e00763',
+    ]
+
+    context('CAVERJS-UNIT-ETC-207: input: valid strict hex', () => {
+        const tests = [
+            { hash: hash[0], expected: true }, // all lower long
+            { hash: hash[0].slice(2), expected: true }, // all lower short
+            { hash: hash[0].toUpperCase(), expected: true }, // all upper long
+            { hash: hash[0].slice(2).toUpperCase(), expected: true }, // all upper short
+            { hash: hash[0].slice(0, 10) + hash[0].slice(10).toUpperCase(), expected: true }, // mixed long
+            { hash: hash[0].slice(2, 10) + hash[0].slice(10).toUpperCase(), expected: true }, // mixed short
+            { hash: hash[1], expected: true }, // all lower long
+            { hash: hash[1].slice(2), expected: true }, // all lower short
+            { hash: hash[1].toUpperCase(), expected: true }, // all upper long
+            { hash: hash[1].slice(2).toUpperCase(), expected: true }, // all upper short
+            { hash: hash[1].slice(0, 10) + hash[1].slice(10).toUpperCase(), expected: true }, // mixed long
+            { hash: hash[1].slice(2, 10) + hash[1].slice(10).toUpperCase(), expected: true }, // mixed short
+        ]
+        it.each(tests, 'should return true', test => {
+            expect(caver.utils.isValidHash(test.hash)).to.be.equal(test.expected)
+        })
+    })
+
+    context('CAVERJS-UNIT-ETC-208: invalid strict hex', () => {
+        const tests = [
+            { hash: hash[0].slice(4), expected: false }, // length is not enough (62)
+            { hash: `${hash[0].slice(0, 62)}ZZ`, expected: false }, // not hex
+            { hash: `${hash[0].slice(2)}00`, expected: false }, // length is too long (66 without 0x)
+            { hash: `${hash[0]}00`, expected: false }, // length is too long (68)
+            { hash: hash[1].slice(4), expected: false }, // length is not enough (62)
+            { hash: `${hash[1].slice(0, 62)}ZZ`, expected: false }, // not hex
+            { hash: `${hash[1].slice(2)}00`, expected: false }, // length is too long (66 without 0x)
+            { hash: `${hash[1]}00`, expected: false }, // length is too long (68)
+        ]
+
+        it.each(tests, 'should return false', test => {
+            expect(caver.utils.isValidHash(test.hash)).to.be.equal(test.expected)
         })
     })
 })
@@ -832,11 +914,31 @@ describe('caver.utils.unitMap', () => {
         expect(result.Mpeb).to.equals('1000000')
         expect(result.Gpeb).to.equals('1000000000')
         expect(result.Ston).to.equals('1000000000')
+        expect(result.ston).to.equals('1000000000')
         expect(result.uKLAY).to.equals('1000000000000')
         expect(result.mKLAY).to.equals('1000000000000000')
         expect(result.KLAY).to.equals('1000000000000000000')
         expect(result.kKLAY).to.equals('1000000000000000000000')
         expect(result.MKLAY).to.equals('1000000000000000000000000')
+        expect(result.GKLAY).to.equals('1000000000000000000000000000')
+        expect(result.TKLAY).to.equals('1000000000000000000000000000000')
+    })
+})
+
+describe('caver.utils.klayUnit', () => {
+    it('CAVERJS-UNIT-ETC-250: should return valid klayUnit', () => {
+        const klayUnit = caver.utils.klayUnit
+        const unitMap = caver.utils.unitMap
+        Object.values(klayUnit).map(unitObj => {
+            const { unit, pebFactor } = unitObj
+            expect(unitMap[unit]).not.to.undefined
+            expect(unitMap[unit]).to.equal(
+                caver.utils
+                    .toBN(10)
+                    .pow(caver.utils.toBN(pebFactor))
+                    .toString(10)
+            )
+        })
     })
 })
 
@@ -1073,6 +1175,30 @@ describe('caver.utils.xyPointFromPublicKey', () => {
         expect(xyPoint4[0]).to.equals('0x5b3b58259770871a1cc18534f2d438935fa2dcdb04116cbfbde8adfe858c23e')
         expect(xyPoint4[1]).to.equals('0x50047c5aea3c2f55de7de04203f8fe8ccc3b491029338d038a7ef6d6903b302e')
     })
+
+    it('CAVERJS-UNIT-ETC-209: caver.utils.xyPointFromPublicKey should return x, y point with compressed public key', () => {
+        const publicKey1 = '0x03046241c7524030e5b44fff78021e35227d708c8630757b35090d56527b615f60'
+        const publicKey2 = '0x02ba7135b75cae89b958e7bb78009bda52f6a348150757cc078e3e5e5d25519c50'
+        const publicKey3 = '0x0212b97e6756861ac0257a240d985d761cee9ca7719a29c233c644cfcc42188500'
+        const publicKey4 = '0x0205b3b58259770871a1cc18534f2d438935fa2dcdb04116cbfbde8adfe858c23e'
+
+        const xyPoint1 = caver.utils.xyPointFromPublicKey(publicKey1)
+        const xyPoint2 = caver.utils.xyPointFromPublicKey(publicKey2)
+        const xyPoint3 = caver.utils.xyPointFromPublicKey(publicKey3)
+        const xyPoint4 = caver.utils.xyPointFromPublicKey(publicKey4)
+
+        expect(xyPoint1[0]).to.equals('0x46241c7524030e5b44fff78021e35227d708c8630757b35090d56527b615f60')
+        expect(xyPoint1[1]).to.equals('0x5b8d366782c86dee49356be574e1172f75ef5ce5d03b6e8c17dbf10f3fa2d9a3')
+
+        expect(xyPoint2[0]).to.equals('0xba7135b75cae89b958e7bb78009bda52f6a348150757cc078e3e5e5d25519c50')
+        expect(xyPoint2[1]).to.equals('0xed4ccec1f78ba4e1c21c7b1e57751cec4cf42e3997a476e3ecbf360ad095336')
+
+        expect(xyPoint3[0]).to.equals('0x12b97e6756861ac0257a240d985d761cee9ca7719a29c233c644cfcc42188500')
+        expect(xyPoint3[1]).to.equals('0xc8e4c69cdb71665377b9e8ffb702355ca53917e66c7444619049c3dd0252ab6')
+
+        expect(xyPoint4[0]).to.equals('0x5b3b58259770871a1cc18534f2d438935fa2dcdb04116cbfbde8adfe858c23e')
+        expect(xyPoint4[1]).to.equals('0x50047c5aea3c2f55de7de04203f8fe8ccc3b491029338d038a7ef6d6903b302e')
+    })
 })
 
 describe('caver.utils.isValidPublicKey', () => {
@@ -1126,6 +1252,14 @@ describe('caver.utils.isValidPublicKey', () => {
         const isValid = caver.utils.isValidPublicKey(compressed)
         expect(isValid).to.be.false
     })
+
+    it('CAVERJS-UNIT-ETC-204: caver.utils.isValidPublicKey should false when point is not on curve', () => {
+        const pub =
+            '0x4be11ff42d8fc1954fb9ed52296db1657564c5e38517764664fb7cf4306a1e163a2686aa755dd0291aa2f291c3560ef4bf4b46c671983ff3e23f11a1b744ff4a'
+
+        const isValid = caver.utils.isValidPublicKey(pub)
+        expect(isValid).to.be.false
+    })
 })
 
 describe('caver.utils.isValidRole', () => {
@@ -1137,6 +1271,15 @@ describe('caver.utils.isValidRole', () => {
         expect(isValid).to.be.true
 
         isValid = caver.utils.isValidRole('feePayerKey')
+        expect(isValid).to.be.true
+
+        isValid = caver.utils.isValidRole('roleTransactionKey')
+        expect(isValid).to.be.true
+
+        isValid = caver.utils.isValidRole('roleAccountUpdateKey')
+        expect(isValid).to.be.true
+
+        isValid = caver.utils.isValidRole('roleFeePayerKey')
         expect(isValid).to.be.true
     })
 
@@ -1159,13 +1302,13 @@ describe('caver.utils.isEmptySig', () => {
 
         isDefault = caver.utils.isEmptySig([['0x01', '0x', '0x']])
         expect(isDefault).to.be.true
+
+        isDefault = caver.utils.isEmptySig([['0x01', '0x', '0x'], ['0x01', '0x', '0x']])
+        expect(isDefault).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-179: caver.utils.isEmptySig should false if signatures is not same with default signatures', () => {
-        let isDefault = caver.utils.isEmptySig([['0x01', '0x', '0x'], ['0x01', '0x', '0x']])
-        expect(isDefault).to.be.false
-
-        isDefault = caver.utils.isEmptySig([
+        let isDefault = caver.utils.isEmptySig([
             '0x25',
             '0xb2a5a15550ec298dc7dddde3774429ed75f864c82caeb5ee24399649ad731be9',
             '0x29da1014d16f2011b3307f7bbe1035b6e699a4204fc416c763def6cefd976567',
@@ -1226,7 +1369,7 @@ describe('caver.utils.transformSignaturesToObject', () => {
                 '0x277b9c6e97dfa6fdbcc15c201b5f7e05a2ef03f6247d9b9c541f98b8c4f1041a',
             ],
             [
-                '0x0fea',
+                '0xfea',
                 '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f8',
                 '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
             ],
@@ -1245,7 +1388,7 @@ describe('caver.utils.transformSignaturesToObject', () => {
         const signatureString =
             '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f815111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7fea'
         const expectedSignatures = {
-            V: '0x0fea',
+            V: '0xfea',
             R: '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f8',
             S: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
         }
@@ -1262,12 +1405,12 @@ describe('caver.utils.transformSignaturesToObject', () => {
         ]
         const expectedSignatures = [
             {
-                V: '0x0fea',
+                V: '0xfea',
                 R: '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f8',
                 S: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
             },
             {
-                V: '0x07f6',
+                V: '0x7f6',
                 R: '0x53fe704c30cbddd8481035b01d0696120e960418e1d4f0f7e88d3de9354c6986',
                 S: '0x299fdedce9ea38d62a69a63462af32122f3db70623a40fe9bfe815ae6ebfeb7d',
             },
@@ -1282,7 +1425,7 @@ describe('caver.utils.transformSignaturesToObject', () => {
 
     it('CAVERJS-UNIT-ETC-187: should convert object(lowercase key) format of signatures to object with single signature', () => {
         const signature = {
-            v: '0x0fea',
+            v: '0xfea',
             r: '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f8',
             s: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
         }
@@ -1296,7 +1439,7 @@ describe('caver.utils.transformSignaturesToObject', () => {
 
     it('CAVERJS-UNIT-ETC-188: should convert object(uppercase key) format of signatures to object with single signature', () => {
         const signature = {
-            V: '0x0fea',
+            V: '0xfea',
             R: '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f8',
             S: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
         }
@@ -1311,12 +1454,12 @@ describe('caver.utils.transformSignaturesToObject', () => {
     it('CAVERJS-UNIT-ETC-189: should convert object format of signatures to object with multiple signatures', () => {
         const signatures = [
             {
-                v: '0x0fea',
+                v: '0xfea',
                 r: '0xf1998d3f1c22689998d565673182482c962d7b22cbcd7c5538af13fc25f452f8',
                 s: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
             },
             {
-                V: '0x07f6',
+                V: '0x7f6',
                 R: '0x53fe704c30cbddd8481035b01d0696120e960418e1d4f0f7e88d3de9354c6986',
                 S: '0x299fdedce9ea38d62a69a63462af32122f3db70623a40fe9bfe815ae6ebfeb7d',
             },
@@ -1351,7 +1494,7 @@ describe('caver.utils.transformSignaturesToObject', () => {
 
     it('CAVERJS-UNIT-ETC-191: should throw error when input does not have enough signature information', () => {
         let signature = {
-            V: '0x0fea',
+            V: '0xfea',
             S: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
         }
         expect(() => caver.utils.transformSignaturesToObject(signature)).to.throws(
@@ -1359,7 +1502,7 @@ describe('caver.utils.transformSignaturesToObject', () => {
         )
 
         signature = {
-            V: '0x0fea',
+            V: '0xfea',
             invalidKey: '0x15111ea59ea6c9aeaa63523b422da3d57fc5dc7620cf5ac08c7e76a5691b53c7',
         }
         expect(() => caver.utils.transformSignaturesToObject(signature)).to.throws(
@@ -1499,5 +1642,385 @@ describe('caver.utils.parsePrivateKey', () => {
         const expectedError = 'Invalid KlaytnWalletKey format.'
 
         expect(() => caver.utils.parsePrivateKey(key)).to.throws(expectedError)
+    })
+})
+
+describe('caver.utils.parseKlaytnWalletKey', () => {
+    it('CAVERJS-UNIT-ETC-220: should parse KlaytnWalletKey and return an array', () => {
+        const key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+
+        const parsed = caver.utils.parseKlaytnWalletKey(key)
+
+        expect(parsed[0]).to.be.equal('0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d8')
+        expect(parsed[1]).to.be.equal('0x00')
+        expect(parsed[2]).to.be.equal('0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b')
+    })
+
+    it('CAVERJS-UNIT-ETC-221: should throw error when key is not in format of KlaytnWalletKey', () => {
+        // private key is not in hex
+        let key = '0xzza915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        let expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+
+        // type is not in hex
+        key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80xzz0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+
+        // address is not in hex
+        key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebfzz'
+        expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+
+        // without '0x' separator
+        key = '45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d800a94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+
+        // too many '0x'
+        key = '0x0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+
+        // without '0x' for type
+        key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d8000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+
+        // without '0x' for address
+        key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x00a94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+    })
+
+    it('CAVERJS-UNIT-ETC-222: should throw error when private key is invalid', () => {
+        // invalid length
+        let key = '0xa915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        let expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+
+        // invalid range
+        key = '0x00000000000000000000000000000000000000000000000000000000000000000x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+    })
+
+    it('CAVERJS-UNIT-ETC-223: should throw error when human readable is invalid', () => {
+        // invalid value
+        let key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x030xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        let expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+
+        // invalid length
+        key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x0000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
+        expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+    })
+
+    it('CAVERJS-UNIT-ETC-224: should throw error when addresss is invalid', () => {
+        let key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf'
+        let expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+
+        key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0baf'
+        expectedError = `Invalid KlaytnWalletKey format: ${key}`
+        expect(() => caver.utils.parseKlaytnWalletKey(key)).to.throw(expectedError)
+    })
+})
+
+describe('caver.utils.resolveSignature', () => {
+    it('CAVERJS-UNIT-ETC-211: should return an array of signature from object(lowercase)', () => {
+        const signature = {
+            v: '0x0fe9',
+            r: '0x02aca4ec6773a26c71340c2500cb45886a61797bcd82790f7f01150ced48b0ac',
+            s: '0x20502f22a1b3c95a5f260a03dc3de0eaa1f4a618b1d2a7d4da643507302e523c',
+        }
+
+        const resolved = caver.utils.resolveSignature(signature)
+
+        expect(resolved.length).to.be.equals(3)
+        expect(resolved[0]).to.be.equals(signature.v)
+        expect(resolved[1]).to.be.equals(signature.r)
+        expect(resolved[2]).to.be.equals(signature.s)
+    })
+
+    it('CAVERJS-UNIT-ETC-212: should return an array of signature from object(uppercase)', () => {
+        const signature = {
+            V: '0x0fe9',
+            R: '0x02aca4ec6773a26c71340c2500cb45886a61797bcd82790f7f01150ced48b0ac',
+            S: '0x20502f22a1b3c95a5f260a03dc3de0eaa1f4a618b1d2a7d4da643507302e523c',
+        }
+
+        const resolved = caver.utils.resolveSignature(signature)
+
+        expect(resolved.length).to.be.equals(3)
+        expect(resolved[0]).to.be.equals(signature.V)
+        expect(resolved[1]).to.be.equals(signature.R)
+        expect(resolved[2]).to.be.equals(signature.S)
+    })
+
+    it('CAVERJS-UNIT-ETC-213: should return an array of signature', () => {
+        const signature = [
+            '0x0fe9',
+            '0x02aca4ec6773a26c71340c2500cb45886a61797bcd82790f7f01150ced48b0ac',
+            '0x20502f22a1b3c95a5f260a03dc3de0eaa1f4a618b1d2a7d4da643507302e523c',
+        ]
+
+        const resolved = caver.utils.resolveSignature(signature)
+
+        expect(resolved.length).to.be.equals(3)
+        expect(resolved[0]).to.be.equals(signature[0])
+        expect(resolved[1]).to.be.equals(signature[1])
+        expect(resolved[2]).to.be.equals(signature[2])
+    })
+
+    it('CAVERJS-UNIT-ETC-214: should return an array of signature from encoded signature', () => {
+        const signature =
+            '0x7e85aaff6a6ef0730308af49f6b512741e61f958a21df387a0d0e8973fb40ca0307a8b87f6ac249f7218b4ee1a1d2f7d764ec2d20d9824e7b7b842dd214f139c7f6'
+        const expected = [
+            '0x7f6',
+            '0x7e85aaff6a6ef0730308af49f6b512741e61f958a21df387a0d0e8973fb40ca0',
+            '0x307a8b87f6ac249f7218b4ee1a1d2f7d764ec2d20d9824e7b7b842dd214f139c',
+        ]
+
+        const resolved = caver.utils.resolveSignature(signature)
+
+        expect(resolved.length).to.be.equals(3)
+        expect(resolved[0]).to.be.equals(expected[0])
+        expect(resolved[1]).to.be.equals(expected[1])
+        expect(resolved[2]).to.be.equals(expected[2])
+    })
+})
+
+describe('caver.utils.convertFromPeb', () => {
+    it('CAVERJS-UNIT-ETC-225: should convert to peb from peb', () => {
+        const amount = '1000000000000000000000000000'
+        const expected = amount
+
+        const converted = caver.utils.convertFromPeb(amount, 'peb')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+
+    it('CAVERJS-UNIT-ETC-226: should convert to kpeb from peb', () => {
+        const amount = '1000000000000000000000000000'
+        const expected = '1000000000000000000000000'
+
+        const converted = caver.utils.convertFromPeb(amount, 'kpeb')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+
+    it('CAVERJS-UNIT-ETC-227: should convert to Mpeb from peb', () => {
+        const amount = '1000000000000000000000000000'
+        const expected = '1000000000000000000000'
+
+        const converted = caver.utils.convertFromPeb(amount, 'Mpeb')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+
+    it('CAVERJS-UNIT-ETC-228: should convert to Gpeb from peb', () => {
+        const amount = '1000000000000000000000000000'
+        const expected = '1000000000000000000'
+
+        const converted = caver.utils.convertFromPeb(amount, 'Gpeb')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+
+    it('CAVERJS-UNIT-ETC-229: should convert to Ston from peb', () => {
+        const amount = '1000000000000000000000000000'
+        const expected = '1000000000000000000'
+
+        const converted = caver.utils.convertFromPeb(amount, 'Ston')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+
+    it('CAVERJS-UNIT-ETC-230: should convert to uKLAY from peb', () => {
+        const amount = '1000000000000000000000000000'
+        const expected = '1000000000000000'
+
+        const converted = caver.utils.convertFromPeb(amount, 'uKLAY')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+
+    it('CAVERJS-UNIT-ETC-231: should convert to mKLAY from peb', () => {
+        const amount = '1000000000000000000000000000'
+        const expected = '1000000000000'
+
+        const converted = caver.utils.convertFromPeb(amount, 'mKLAY')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+
+    it('CAVERJS-UNIT-ETC-232: should convert to KLAY from peb', () => {
+        const amount = '1000000000000000000000000000'
+        const expected = '1000000000'
+
+        const converted = caver.utils.convertFromPeb(amount, 'KLAY')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+
+    it('CAVERJS-UNIT-ETC-233: should convert to kKLAY from peb', () => {
+        const amount = '1000000000000000000000000000'
+        const expected = '1000000'
+
+        const converted = caver.utils.convertFromPeb(amount, 'kKLAY')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+
+    it('CAVERJS-UNIT-ETC-234: should convert to MKLAY from peb', () => {
+        const amount = '1000000000000000000000000000'
+        const expected = '1000'
+
+        const converted = caver.utils.convertFromPeb(amount, 'MKLAY')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+
+    it('CAVERJS-UNIT-ETC-235: should convert to GKLAY from peb', () => {
+        const amount = '1000000000000000000000000000'
+        const expected = '1'
+
+        const converted = caver.utils.convertFromPeb(amount, 'GKLAY')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+})
+
+describe('caver.utils.convertToPeb', () => {
+    it('CAVERJS-UNIT-ETC-236: should convert to peb from peb', () => {
+        const expected = '1'
+
+        const converted = caver.utils.convertToPeb(1, 'peb')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+
+    it('CAVERJS-UNIT-ETC-237: should convert to peb from kpeb', () => {
+        const expected = '1000'
+
+        const converted = caver.utils.convertToPeb(1, 'kpeb')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+
+    it('CAVERJS-UNIT-ETC-238: should convert to peb from Mpeb', () => {
+        const expected = '1000000'
+
+        const converted = caver.utils.convertToPeb(1, 'Mpeb')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+
+    it('CAVERJS-UNIT-ETC-239: should convert to peb from Gpeb', () => {
+        const expected = '1000000000'
+
+        const converted = caver.utils.convertToPeb(1, 'Gpeb')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+
+    it('CAVERJS-UNIT-ETC-240: should convert to peb from Ston', () => {
+        const expected = '1000000000'
+
+        const converted = caver.utils.convertToPeb(1, 'Ston')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+
+    it('CAVERJS-UNIT-ETC-241: should convert to peb from uKLAY', () => {
+        const expected = '1000000000000'
+
+        const converted = caver.utils.convertToPeb(1, 'uKLAY')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+
+    it('CAVERJS-UNIT-ETC-242: should convert to peb from mKLAY', () => {
+        const expected = '1000000000000000'
+
+        const converted = caver.utils.convertToPeb(1, 'mKLAY')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+
+    it('CAVERJS-UNIT-ETC-243: should convert to peb from KLAY', () => {
+        const expected = '1000000000000000000'
+
+        const converted = caver.utils.convertToPeb(1, 'KLAY')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+
+    it('CAVERJS-UNIT-ETC-244: should convert to peb from kKLAY', () => {
+        const expected = '1000000000000000000000'
+
+        const converted = caver.utils.convertToPeb(1, 'kKLAY')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+
+    it('CAVERJS-UNIT-ETC-245: should convert to peb from MKLAY', () => {
+        const expected = '1000000000000000000000000'
+
+        const converted = caver.utils.convertToPeb(1, 'MKLAY')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+
+    it('CAVERJS-UNIT-ETC-246: should convert to peb from GKLAY', () => {
+        const expected = '1000000000000000000000000000'
+
+        const converted = caver.utils.convertToPeb(1, 'GKLAY')
+
+        expect(_.isString(converted)).to.be.true
+        expect(converted === expected).to.be.true
+    })
+})
+
+describe('caver.utils.recover', () => {
+    it('CAVERJS-UNIT-ETC-248: return recovered address when input is message, signature', () => {
+        const keyring = caver.wallet.keyring.generate()
+        const message = 'Some data'
+        const signed = keyring.signMessage(message, caver.wallet.keyring.role.roleTransactionKey)
+
+        const result = caver.utils.recover(signed.message, signed.signatures[0])
+        expect(result).to.equal(keyring.address)
+    })
+
+    it('CAVERJS-UNIT-ETC-249: return recovered address when input is messageHash, signature, prefixed', () => {
+        const keyring = caver.wallet.keyring.generate()
+        const message = 'Some data'
+        const signed = keyring.signMessage(message, caver.wallet.keyring.role.roleTransactionKey)
+
+        const result = caver.utils.recover(signed.messageHash, signed.signatures[0], true)
+        expect(result).to.equal(keyring.address)
     })
 })

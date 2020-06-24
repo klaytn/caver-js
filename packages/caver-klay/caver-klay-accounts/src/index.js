@@ -35,7 +35,7 @@ const Bytes = require('eth-lib/lib/bytes')
 const cryp = typeof global === 'undefined' ? require('crypto-browserify') : require('crypto')
 const uuid = require('uuid')
 const elliptic = require('elliptic')
-const scrypt = require('scrypt-shim')
+const scrypt = require('@web3-js/scrypt-shim')
 const utils = require('../../../caver-utils')
 const helpers = require('../../../caver-core-helpers')
 
@@ -186,7 +186,7 @@ function resolveArgsForSignTransactionWithHash(args) {
         throw new Error('Invalid parameter: The hash of transaction must be defined as a parameter.')
     }
 
-    if (!utils.isTxHashStrict(hash)) {
+    if (!utils.isValidHashStrict(hash)) {
         throw new Error('Invalid parameter: The hash of transaction must be 0x-hex prefixed string format.')
     }
 
@@ -240,13 +240,20 @@ function encryptKey(privateKey, password, options) {
         if (kdf === 'pbkdf2') {
             kdfparams.c = options.c || 262144
             kdfparams.prf = 'hmac-sha256'
-            derivedKey = cryp.pbkdf2Sync(Buffer.from(password), salt, kdfparams.c, kdfparams.dklen, 'sha256')
+            derivedKey = cryp.pbkdf2Sync(Buffer.from(password), Buffer.from(kdfparams.salt, 'hex'), kdfparams.c, kdfparams.dklen, 'sha256')
         } else if (kdf === 'scrypt') {
             // FIXME: support progress reporting callback
             kdfparams.n = options.n || 4096 // 2048 4096 8192 16384
             kdfparams.r = options.r || 8
             kdfparams.p = options.p || 1
-            derivedKey = scrypt(Buffer.from(password), salt, kdfparams.n, kdfparams.r, kdfparams.p, kdfparams.dklen)
+            derivedKey = scrypt(
+                Buffer.from(password),
+                Buffer.from(kdfparams.salt, 'hex'),
+                kdfparams.n,
+                kdfparams.r,
+                kdfparams.p,
+                kdfparams.dklen
+            )
         } else {
             throw new Error('Unsupported kdf')
         }

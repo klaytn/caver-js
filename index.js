@@ -33,6 +33,16 @@ global.rootRequire = name => require(`${__dirname}/packages/${name}/src/index.js
 
 const { packageInit, providers } = require('./packages/caver-core')
 const Klay = require('./packages/caver-klay')
+const Account = require('./packages/caver-account')
+const KeyringContainer = require('./packages/caver-wallet')
+const Keyring = require('./packages/caver-wallet/src/keyring/keyringFactory')
+const Transaction = require('./packages/caver-transaction')
+const RPC = require('./packages/caver-rpc')
+const abi = require('./packages/caver-abi')
+const BaseContract = require('./packages/caver-contract')
+const KCT = require('./packages/caver-kct')
+
+const core = require('./packages/caver-core')
 const Method = require('./packages/caver-core-method')
 const middleware = require('./packages/caver-middleware')
 const utils = require('./packages/caver-utils')
@@ -50,12 +60,21 @@ function Caver(provider, net) {
 
     this.version = version
     this.utils = utils
+    this.abi = abi
     this.formatters = formatters
     this.helpers = helpers
     this.Method = Method
 
-    // ex) call `onit.klay.property` || `onit.klay.method(...)`
+    this.account = Account
+    this.wallet = new KeyringContainer()
+    this.wallet.keyring = Keyring
+
+    this.transaction = Transaction
+
+    // ex) call `caver.klay.property` || `caver.klay.method(...)`
+    this.kct = new KCT(this)
     this.klay = new Klay(this)
+    this.rpc = new RPC(this)
     this.middleware = middleware
 
     // overwrite package setProvider
@@ -63,8 +82,38 @@ function Caver(provider, net) {
     this.setProvider = (p, n) => {
         setProvider.apply(this, [p, n])
         _this.klay.setRequestManager(_this._requestManager)
+        _this.rpc.setRequestManager(_this._requestManager)
+        _this.kct.setRequestManager(_this._requestManager)
+        _this.contract._requestManager = _this._requestManager
+        _this.contract.currentProvider = _this._provider
         return true
     }
+
+    const self = this
+    const Contract = function Contract() {
+        BaseContract.apply(this, arguments)
+
+        // when caver.setProvider is called, call 'packageInit' all contract instances instantiated via this Caver instances.
+        // This will update the currentProvider for the contract instances
+        const _this = this // eslint-disable-line no-shadow
+        const setProvider = self.setProvider // eslint-disable-line no-shadow
+        self.setProvider = function() {
+            setProvider.apply(self, arguments)
+            core.packageInit(_this, [self])
+        }
+        this.setKeyrings(self.wallet)
+    }
+
+    Contract.setProvider = function() {
+        BaseContract.setProvider.apply(this, arguments)
+    }
+
+    Contract.prototype = Object.create(BaseContract.prototype)
+    Contract.prototype.constructor = Contract
+
+    this.contract = Contract
+    this.contract._requestManager = this._requestManager
+    this.contract.currentProvider = this._requestManager.provider
 }
 
 Caver.utils = utils

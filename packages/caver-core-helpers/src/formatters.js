@@ -28,6 +28,12 @@
 const _ = require('lodash')
 const utils = require('../../caver-utils')
 const validateParams = require('../../caver-core-helpers/src/validateFunction').validateParams
+const { getTypeInt } = require('../../caver-transaction/src/transactionHelper/transactionHelper')
+const AccountKeyLegacy = require('../../caver-account/src/accountKey/accountKeyLegacy')
+const AccountKeyPublic = require('../../caver-account/src/accountKey/accountKeyPublic')
+const AccountKeyFail = require('../../caver-account/src/accountKey/accountKeyFail')
+const AccountKeyWeightedMultiSig = require('../../caver-account/src/accountKey/accountKeyWeightedMultiSig')
+const AccountKeyRoleBased = require('../../caver-account/src/accountKey/accountKeyRoleBased')
 
 /**
  * Should the format output to a big number
@@ -74,7 +80,9 @@ const _txInputFormatter = function(options) {
     }
 
     if (options.to) {
-        options.humanReadable = options.humanReadable !== undefined ? options.humanReadable : false
+        if (options.type && options.type.includes('DEPLOY'))
+            options.humanReadable = options.humanReadable !== undefined ? options.humanReadable : false
+
         if (options.humanReadable) throw new Error('HumanReadableAddress is not supported yet.')
         if (!utils.isContractDeployment(options) || options.to !== '0x') {
             options.to = inputAddressFormatter(options.to)
@@ -173,6 +181,9 @@ const inputTransactionFormatter = function(options) {
         throw err
     }
 
+    // Set typeInt value in object
+    options.typeInt = getTypeInt(options.type)
+
     return options
 }
 
@@ -213,6 +224,45 @@ const inputPersonalTransactionFormatter = function(options) {
  */
 const inputSignFormatter = function(data) {
     return utils.isHexStrict(data) ? data : utils.utf8ToHex(data)
+}
+
+/**
+ * Formats the accountKey to object which defines `keyType` and `key`
+ *
+ * @method inputAccountKeyFormatter
+ * @param {AccountKeyLegacy|AccountKeyPublic|AccountKeyFail|AccountKeyWeightedMultiSig|AccountKeyRoleBased|object} accountKey
+ * @returns {object}
+ */
+const inputAccountKeyFormatter = function(accountKey) {
+    if (accountKey instanceof AccountKeyLegacy) return { keyType: 1, key: {} }
+    if (accountKey instanceof AccountKeyPublic) return { keyType: 2, key: { x: accountKey.getXYPoint()[0], y: accountKey.getXYPoint()[1] } }
+    if (accountKey instanceof AccountKeyFail) return { keyType: 3, key: {} }
+    if (accountKey instanceof AccountKeyWeightedMultiSig) {
+        const weightedMultiSig = { threshold: accountKey.threshold, keys: [] }
+        for (const wp of accountKey.weightedPublicKeys) {
+            weightedMultiSig.keys.push({
+                weight: wp.weight,
+                key: {
+                    x: utils.xyPointFromPublicKey(wp.publicKey)[0],
+                    y: utils.xyPointFromPublicKey(wp.publicKey)[1],
+                },
+            })
+        }
+        return { keyType: 4, key: weightedMultiSig }
+    }
+    if (accountKey instanceof AccountKeyRoleBased) {
+        const key = []
+        for (const k of accountKey.accountKeys) {
+            key.push(inputAccountKeyFormatter(k))
+        }
+        return { keyType: 5, key }
+    }
+
+    if (accountKey.keyType === undefined || accountKey.key === undefined) {
+        throw new Error(`AccountKey obejct should define 'keyType' and 'key'`)
+    }
+
+    return accountKey
 }
 
 /**
@@ -514,6 +564,7 @@ module.exports = {
     inputLogFormatter: inputLogFormatter,
     inputSignFormatter: inputSignFormatter,
     inputRawKeyFormatter: inputRawKeyFormatter,
+    inputAccountKeyFormatter: inputAccountKeyFormatter,
     outputBigNumberFormatter: outputBigNumberFormatter,
     outputTransactionFormatter: outputTransactionFormatter,
     outputTransactionReceiptFormatter: outputTransactionReceiptFormatter,

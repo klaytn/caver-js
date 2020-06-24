@@ -48,6 +48,18 @@ const testCases = [
             '0xc5ae07417506b7351379f43b8745327d5e5bffecaa209109b03820072d02d6185cf4e5c13397d82e4b8ba9681fa093fc2a1d8788c19d89e4b024ca41b8a66067',
         compressed: '0x03c5ae07417506b7351379f43b8745327d5e5bffecaa209109b03820072d02d618',
     },
+    {
+        // Test with x point that starts with '0'
+        uncompressed:
+            '0x0b88d831c595f59b7fa50bebddd11d10c77017c3aeca47056e79b143383bd2a2db1dfff0728df2ee5c742729644831f2d39c6781ee32b98b13b708d0ca349c2a',
+        compressed: '0x020b88d831c595f59b7fa50bebddd11d10c77017c3aeca47056e79b143383bd2a2',
+    },
+    {
+        // Test with y point that starts with '0'
+        uncompressed:
+            '0x77e05dd93cdd6362f8648447f33d5676cbc5f42f4c4946ae1ad62bd4c0c4f3570b1a104b67d1cd169bbf61dd557f15ab5ee8b661326096954caddadf34ae6ac8',
+        compressed: '0x0277e05dd93cdd6362f8648447f33d5676cbc5f42f4c4946ae1ad62bd4c0c4f357',
+    },
 ]
 
 describe('caver.utils.compressPublicKey', () => {
@@ -57,6 +69,8 @@ describe('caver.utils.compressPublicKey', () => {
         expect(caver.utils.compressPublicKey(testCases[2].uncompressed)).to.equal(testCases[2].compressed)
         expect(caver.utils.compressPublicKey(testCases[3].uncompressed)).to.equal(testCases[3].compressed)
         expect(caver.utils.compressPublicKey(testCases[4].uncompressed)).to.equal(testCases[4].compressed)
+        expect(caver.utils.compressPublicKey(testCases[5].uncompressed)).to.equal(testCases[5].compressed)
+        expect(caver.utils.compressPublicKey(testCases[6].uncompressed)).to.equal(testCases[6].compressed)
     })
 
     it('CAVERJS-UNIT-SER-023 : Should return same one with the argument if the argument is compressed public key', () => {
@@ -65,6 +79,8 @@ describe('caver.utils.compressPublicKey', () => {
         expect(caver.utils.compressPublicKey(testCases[2].compressed)).to.equal(testCases[2].compressed)
         expect(caver.utils.compressPublicKey(testCases[3].compressed)).to.equal(testCases[3].compressed)
         expect(caver.utils.compressPublicKey(testCases[4].compressed)).to.equal(testCases[4].compressed)
+        expect(caver.utils.compressPublicKey(testCases[5].compressed)).to.equal(testCases[5].compressed)
+        expect(caver.utils.compressPublicKey(testCases[6].compressed)).to.equal(testCases[6].compressed)
     })
 })
 
@@ -75,6 +91,8 @@ describe('caver.utils.isCompressedPublicKey', () => {
         expect(caver.utils.isCompressedPublicKey(testCases[2].uncompressed)).to.be.false
         expect(caver.utils.isCompressedPublicKey(testCases[3].uncompressed)).to.be.false
         expect(caver.utils.isCompressedPublicKey(testCases[4].uncompressed)).to.be.false
+        expect(caver.utils.isCompressedPublicKey(testCases[5].uncompressed)).to.be.false
+        expect(caver.utils.isCompressedPublicKey(testCases[6].uncompressed)).to.be.false
     })
 
     it('CAVERJS-UNIT-SER-026: Should return true if the argument is compressed public key', () => {
@@ -83,6 +101,8 @@ describe('caver.utils.isCompressedPublicKey', () => {
         expect(caver.utils.isCompressedPublicKey(testCases[2].compressed)).to.be.true
         expect(caver.utils.isCompressedPublicKey(testCases[3].compressed)).to.be.true
         expect(caver.utils.isCompressedPublicKey(testCases[4].compressed)).to.be.true
+        expect(caver.utils.isCompressedPublicKey(testCases[5].compressed)).to.be.true
+        expect(caver.utils.isCompressedPublicKey(testCases[6].compressed)).to.be.true
     })
 })
 
@@ -93,6 +113,8 @@ describe('caver.utils.decompressPublicKey', () => {
         expect(caver.utils.decompressPublicKey(testCases[2].compressed)).to.equal(testCases[2].uncompressed)
         expect(caver.utils.decompressPublicKey(testCases[3].compressed)).to.equal(testCases[3].uncompressed)
         expect(caver.utils.decompressPublicKey(testCases[4].compressed)).to.equal(testCases[4].uncompressed)
+        expect(caver.utils.decompressPublicKey(testCases[5].compressed)).to.equal(testCases[5].uncompressed)
+        expect(caver.utils.decompressPublicKey(testCases[6].compressed)).to.equal(testCases[6].uncompressed)
     })
 
     it('CAVERJS-UNIT-SER-067: Should return same one with the argument if the argument is uncompressed public key', () => {
@@ -101,5 +123,7 @@ describe('caver.utils.decompressPublicKey', () => {
         expect(caver.utils.decompressPublicKey(testCases[2].uncompressed)).to.equal(testCases[2].uncompressed)
         expect(caver.utils.decompressPublicKey(testCases[3].uncompressed)).to.equal(testCases[3].uncompressed)
         expect(caver.utils.decompressPublicKey(testCases[4].uncompressed)).to.equal(testCases[4].uncompressed)
+        expect(caver.utils.decompressPublicKey(testCases[5].uncompressed)).to.equal(testCases[5].uncompressed)
+        expect(caver.utils.decompressPublicKey(testCases[6].uncompressed)).to.equal(testCases[6].uncompressed)
     })
 })

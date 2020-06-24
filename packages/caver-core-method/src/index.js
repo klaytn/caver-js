@@ -36,6 +36,8 @@ const TIMEOUTBLOCK = 50
 const AVERAGE_BLOCK_TIME = 1 // 1s
 const POLLINGTIMEOUT = AVERAGE_BLOCK_TIME * TIMEOUTBLOCK // ~average block time (seconds) * TIMEOUTBLOCK
 
+const TransactionDecoder = require('../../caver-transaction/src/transactionDecoder/transactionDecoder')
+
 function Method(options) {
     // call, name should be existed to create a method.
     if (!options.call || !options.name) throw errors.needNameCallPropertyToCreateMethod
@@ -56,6 +58,8 @@ function Method(options) {
 
     this.defaultBlock = options.defaultBlock || 'latest'
     this.defaultAccount = options.defaultAccount || null
+
+    this.outputFormatterDisable = options.outputFormatterDisable
 }
 
 Method.prototype.setRequestManager = setRequestManager
@@ -262,38 +266,51 @@ const buildSendTxCallbackFunc = (defer, method, payload, isSendTx) => (err, resu
     }
 }
 
-const buildSendSignedTxFunc = (method, payload, sendTxCallback) => sign => {
+const buildSendSignedTxFunc = (method, payload, sendTxCallback) => signed => {
+    const rawTransaction = signed.rawTransaction ? signed.rawTransaction : signed
     const signedPayload = _.extend({}, payload, {
         method: 'klay_sendRawTransaction',
-        params: [sign.rawTransaction],
+        params: [rawTransaction],
     })
 
     method.requestManager.send(signedPayload, sendTxCallback)
 }
 
 const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, method) => {
+    const methodName = payload.method
     // Logic for handling multiple cases of parameters in sendSignedTransaction.
     // 1. Object containing rawTransaction
     //    : call 'klay_sendRawTransaction' with RLP encoded transaction(rawTransaction) in object
     // 2. A transaction object containing signatures or feePayerSignatures
     //    : call 'getRawTransactionWithSignatures', then call 'klay_sendRawTransaction' with result of getRawTransactionWithSignatures
-    if (method && method.accounts && payload.method === 'klay_sendRawTransaction') {
-        const transaction = payload.params[0]
-        if (typeof transaction !== 'string' && _.isObject(transaction)) {
-            if (transaction.rawTransaction) {
-                return sendSignedTx(transaction)
+    if (method && methodName === 'klay_sendRawTransaction') {
+        // The existence of accounts in the method means the implementation before the common architecture.
+        if (method.accounts) {
+            const transaction = payload.params[0]
+            if (typeof transaction !== 'string' && _.isObject(transaction)) {
+                if (transaction.rawTransaction) {
+                    return sendSignedTx(transaction)
+                }
+                return method.accounts
+                    .getRawTransactionWithSignatures(transaction)
+                    .then(sendSignedTx)
+                    .catch(e => {
+                        sendTxCallback(e)
+                    })
             }
-            return method.accounts
-                .getRawTransactionWithSignatures(transaction)
-                .then(sendSignedTx)
-                .catch(e => {
-                    sendTxCallback(e)
-                })
+        } else {
+            const transaction = payload.params[0]
+            if (!_.isString(transaction) && _.isObject(transaction) && _.isFunction(transaction.getRLPEncoding)) {
+                return sendSignedTx(transaction.getRLPEncoding())
+            }
         }
     }
 
+    // In the previous implementation of common architecture,
+    // if there was an account in the in-memory wallet before requesting to send or sign a transaction to the node,
+    // it was handled by using it.
     if (method && method.accounts && method.accounts.wallet && method.accounts.wallet.length) {
-        switch (payload.method) {
+        switch (methodName) {
             case 'klay_sendTransaction': {
                 const tx = payload.params[0]
 
@@ -378,6 +395,28 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
         }
     }
 
+    // When sending a request to send or sign a transaction using a key stored in a Klaytn node,
+    // the variable names inside the transaction must be properly formatted.
+    // { _from: '0x..', _signatures: ['0x..', '0x..', '0x..'] } -> { from: '0x..', signatures: { V: '0x..', R: '0x..', S: '0x..'} }
+    if (
+        methodName === 'klay_sendTransaction' ||
+        methodName === 'klay_sendTransactionAsFeePayer' ||
+        methodName === 'klay_signTransaction' ||
+        methodName === 'klay_signTransactionAsFeePayer'
+    ) {
+        const tx = {}
+        Object.keys(payload.params[0]).map(k => {
+            let key = k
+            if (key.startsWith('_')) key = key.slice(1)
+            if (key === 'signatures' || key === 'feePayerSignatures') {
+                if (!utils.isEmptySig(payload.params[0][key])) tx[key] = utils.transformSignaturesToObject(payload.params[0][key])
+            } else {
+                tx[key] = payload.params[0][key]
+            }
+        })
+        payload.params[0] = tx
+    }
+
     return method.requestManager.send(payload, sendTxCallback)
 }
 
@@ -418,6 +457,7 @@ function buildCall() {
     const method = this
     const isSendTx =
         method.call === 'klay_sendTransaction' ||
+        method.call === 'klay_sendTransactionAsFeePayer' ||
         method.call === 'klay_sendRawTransaction' ||
         method.call === 'personal_sendTransaction' ||
         method.call === 'personal_sendValueTransfer' ||
@@ -432,7 +472,10 @@ function buildCall() {
 }
 
 function _confirmTransaction(defer, result, payload) {
-    const payloadTxObject = (payload.params && _.isObject(payload.params[0]) && payload.params[0]) || {}
+    let payloadTxObject = (payload.params && _.isObject(payload.params[0]) && payload.params[0]) || {}
+
+    // If payload.params[0] is RLP-encoded string, decode RLP-encoded string to Transaction instance.
+    if (_.isString(payload.params[0])) payloadTxObject = TransactionDecoder.decode(payload.params[0])
 
     // mutableConfirmationPack will be used in
     // 1) checkConfirmation,
@@ -462,7 +505,9 @@ const addCustomSendMethod = mutableConfirmationPack => {
             name: 'getTransactionReceipt',
             call: 'klay_getTransactionReceipt',
             params: 1,
-            outputFormatter: formatters.outputTransactionReceiptFormatter,
+            outputFormatter: !mutableConfirmationPack.method.outputFormatterDisable
+                ? formatters.outputTransactionReceiptFormatter
+                : undefined,
         }),
         new Method({
             name: 'getCode',
@@ -636,26 +681,26 @@ const checkForContractDeployment = (mutableConfirmationPack, receipt, sub) => {
         return
     }
 
+    if (!receipt.status && receipt.txError) {
+        const receiptJSON = JSON.stringify(receipt, null, 2)
+        utils._fireError(new Error(`${errors.txErrorTable[receipt.txError]}\n ${receiptJSON}`), defer.eventEmitter, defer.reject)
+    }
+
     _klaytnCall.getCode(receipt.contractAddress, (e, code) => {
         if (!code) return
 
-        if (code.length > 2) {
-            defer.eventEmitter.emit('receipt', receipt)
+        defer.eventEmitter.emit('receipt', receipt)
 
-            // if contract, return instance instead of receipt
-            defer.resolve(
-                (method.extraFormatters &&
-                    method.extraFormatters.contractDeployFormatter &&
-                    method.extraFormatters.contractDeployFormatter(receipt)) ||
-                    receipt
-            )
+        // if contract, return instance instead of receipt
+        defer.resolve(
+            (method.extraFormatters &&
+                method.extraFormatters.contractDeployFormatter &&
+                method.extraFormatters.contractDeployFormatter(receipt)) ||
+                receipt
+        )
 
-            // need to remove listeners, as they aren't removed automatically when succesfull
-            if (canUnsubscribe) defer.eventEmitter.removeAllListeners()
-        } else {
-            // code.length <= 2 means, contract code couldn't be stored.
-            utils._fireError(errors.contractCouldntBeStored, defer.eventEmitter, defer.reject)
-        }
+        // need to remove listeners, as they aren't removed automatically when succesfull
+        if (canUnsubscribe) defer.eventEmitter.removeAllListeners()
 
         if (canUnsubscribe) sub.unsubscribe()
         mutableConfirmationPack.promiseResolved = true

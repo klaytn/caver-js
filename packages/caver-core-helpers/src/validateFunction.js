@@ -25,6 +25,7 @@
  */
 
 const utils = require('../../caver-utils')
+const { TX_TYPE_STRING } = require('../../caver-transaction/src/transactionHelper/transactionHelper')
 
 function validateParams(tx) {
     let error
@@ -49,11 +50,19 @@ function validateParams(tx) {
         return error
     }
 
-    if (!tx.from) {
+    if (tx.type !== TX_TYPE_STRING.TxTypeLegacyTransaction && !tx.from) {
         error = new Error('"from" is missing')
-    } else if (!utils.isAddress(tx.from)) {
-        error = new Error(`Invalid address of from: ${tx.from}`)
-    } else if (tx.gas === undefined && tx.gasLimit === undefined) {
+    } else if (tx.from) {
+        if (tx.from === '0x') {
+            if (tx.type !== TX_TYPE_STRING.TxTypeLegacyTransaction) {
+                error = new Error(`Invalid address of from: ${tx.from}`)
+            }
+        } else if (!utils.isAddress(tx.from)) {
+            error = new Error(`Invalid address of from: ${tx.from}`)
+        }
+    }
+
+    if (tx.gas === undefined && tx.gasLimit === undefined) {
         error = new Error('"gas" is missing')
     } else if (tx.nonce < 0 || tx.gas < 0 || tx.gasPrice < 0 || tx.chainId < 0) {
         error = new Error('gas, gasPrice, nonce or chainId is lower than 0')
@@ -104,6 +113,28 @@ function validateTxType(txType) {
         case 'FEE_DELEGATED_CANCEL_WITH_RATIO':
         case 'CHAIN_DATA_ANCHORING':
         case 'LEGACY':
+        case TX_TYPE_STRING.TxTypeValueTransfer:
+        case TX_TYPE_STRING.TxTypeFeeDelegatedValueTransfer:
+        case TX_TYPE_STRING.TxTypeFeeDelegatedValueTransferWithRatio:
+        case TX_TYPE_STRING.TxTypeValueTransferMemo:
+        case TX_TYPE_STRING.TxTypeFeeDelegatedValueTransferMemo:
+        case TX_TYPE_STRING.TxTypeFeeDelegatedValueTransferMemoWithRatio:
+        case TX_TYPE_STRING.TxTypeAccountUpdate:
+        case TX_TYPE_STRING.TxTypeFeeDelegatedAccountUpdate:
+        case TX_TYPE_STRING.TxTypeFeeDelegatedAccountUpdateWithRatio:
+        case TX_TYPE_STRING.TxTypeSmartContractDeploy:
+        case TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy:
+        case TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio:
+        case TX_TYPE_STRING.TxTypeSmartContractExecution:
+        case TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution:
+        case TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio:
+        case TX_TYPE_STRING.TxTypeCancel:
+        case TX_TYPE_STRING.TxTypeFeeDelegatedCancel:
+        case TX_TYPE_STRING.TxTypeFeeDelegatedCancelWithRatio:
+        case TX_TYPE_STRING.TxTypeChainDataAnchoring:
+        case TX_TYPE_STRING.TxTypeFeeDelegatedChainDataAnchoring:
+        case TX_TYPE_STRING.TxTypeFeeDelegatedChainDataAnchoringWithRatio:
+        case TX_TYPE_STRING.TxTypeLegacyTransaction:
             return true
     }
     return false
@@ -137,49 +168,75 @@ function validateTxObjectWithType(tx) {
     }
     switch (tx.type) {
         case 'LEGACY':
+        case TX_TYPE_STRING.TxTypeLegacyTransaction:
             return validateLegacy(tx)
         case 'VALUE_TRANSFER':
+        case TX_TYPE_STRING.TxTypeValueTransfer:
             return validateValueTransfer(tx)
         case 'FEE_DELEGATED_VALUE_TRANSFER':
+        case TX_TYPE_STRING.TxTypeFeeDelegatedValueTransfer:
             return validateFeeDelegatedValueTransfer(tx)
         case 'FEE_DELEGATED_VALUE_TRANSFER_WITH_RATIO':
+        case TX_TYPE_STRING.TxTypeFeeDelegatedValueTransferWithRatio:
             return validateFeeDelegatedValueTransferWithRatio(tx)
         case 'VALUE_TRANSFER_MEMO':
+        case TX_TYPE_STRING.TxTypeValueTransferMemo:
             return validateValueTransferMemo(tx)
         case 'FEE_DELEGATED_VALUE_TRANSFER_MEMO':
+        case TX_TYPE_STRING.TxTypeFeeDelegatedValueTransferMemo:
             return validateFeeDelegatedValueTransferMemo(tx)
         case 'FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO':
+        case TX_TYPE_STRING.TxTypeFeeDelegatedValueTransferMemoWithRatio:
             return validateFeeDelegatedValueTransferMemoWithRatio(tx)
         case 'ACCOUNT_UPDATE':
+        case TX_TYPE_STRING.TxTypeAccountUpdate:
             return validateAccountUpdate(tx)
         case 'FEE_DELEGATED_ACCOUNT_UPDATE':
+        case TX_TYPE_STRING.TxTypeFeeDelegatedAccountUpdate:
             return validateFeeDelegatedAccountUpdate(tx)
         case 'FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO':
+        case TX_TYPE_STRING.TxTypeFeeDelegatedAccountUpdateWithRatio:
             return validateFeeDelegatedAccountUpdateWithRatio(tx)
         case 'SMART_CONTRACT_DEPLOY':
+        case TX_TYPE_STRING.TxTypeSmartContractDeploy:
             return validateSmartContractDeploy(tx)
         case 'FEE_DELEGATED_SMART_CONTRACT_DEPLOY':
+        case TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy:
             return validateFeeDelegatedSmartContractDeploy(tx)
         case 'FEE_DELEGATED_SMART_CONTRACT_DEPLOY_WITH_RATIO':
+        case TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio:
             return validateFeeDelegatedSmartContractDeployWithRatio(tx)
         case 'SMART_CONTRACT_EXECUTION':
+        case TX_TYPE_STRING.TxTypeSmartContractExecution:
             return validateSmartContractExecution(tx)
         case 'FEE_DELEGATED_SMART_CONTRACT_EXECUTION':
+        case TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution:
             return validateFeeDelegatedSmartContractExecution(tx)
         case 'FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO':
+        case TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio:
             return validateFeeDelegatedSmartContractExecutionWithRatio(tx)
         case 'CANCEL':
+        case TX_TYPE_STRING.TxTypeCancel:
             return validateCancel(tx)
         case 'FEE_DELEGATED_CANCEL':
+        case TX_TYPE_STRING.TxTypeFeeDelegatedCancel:
             return validateFeeDelegatedCancel(tx)
         case 'FEE_DELEGATED_CANCEL_WITH_RATIO':
+        case TX_TYPE_STRING.TxTypeFeeDelegatedCancelWithRatio:
             return validateFeeDelegatedCancelWithRatio(tx)
+        case 'CHAIN_DATA_ANCHORING':
+        case TX_TYPE_STRING.TxTypeChainDataAnchoring:
+            return validateChainDataAnchoring(tx)
+        case TX_TYPE_STRING.TxTypeFeeDelegatedChainDataAnchoring:
+            return validateFeeDelegatedChainDataAnchoring(tx)
+        case TX_TYPE_STRING.TxTypeFeeDelegatedChainDataAnchoringWithRatio:
+            return validateFeeDelegatedChainDataAnchoringWithRatio(tx)
     }
     return undefined
 }
 
 function validateLegacy(transaction) {
-    if (transaction.to === undefined && transaction.data === undefined) {
+    if (transaction.to === undefined && transaction.data === undefined && transaction.input === undefined) {
         return new Error('contract creation without any data provided')
     }
 
@@ -188,7 +245,11 @@ function validateLegacy(transaction) {
     }
 
     if (transaction.codeFormat !== undefined) {
-        return new Error('"codeFormat" cannot be used with LEGACY transaction')
+        return new Error(`"codeFormat" cannot be used with ${transaction.type} transaction`)
+    }
+
+    if (transaction.humanReadable !== undefined) {
+        return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
     }
 
     const error = validateNonFeeDelegated(transaction)
@@ -211,7 +272,7 @@ function validateNonFeeDelegated(transaction) {
 }
 
 function validateFeeDelegated(transaction) {
-    if (transaction.type.includes('WITH_RATIO')) {
+    if (transaction.type.includes('WITH_RATIO') || transaction.type.includes('WithRatio')) {
         if (transaction.feeRatio === undefined) {
             return new Error('"feeRatio" is missing')
         }
@@ -222,6 +283,9 @@ function validateFeeDelegated(transaction) {
 
 function validateNotAccountTransaction(transaction) {
     const type = transaction.type ? transaction.type : 'LEGACY'
+    if (transaction.account !== undefined) {
+        return new Error(`"account" cannot be used with ${type} transaction`)
+    }
     if (transaction.key !== undefined) {
         return new Error(`"key" cannot be used with ${type} transaction`)
     }
@@ -264,6 +328,12 @@ function checkValueTransferEssential(transaction) {
     if (transaction.data !== undefined) {
         return new Error(`"data" cannot be used with ${transaction.type} transaction`)
     }
+    if (transaction.input !== undefined) {
+        return new Error(`"input" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.humanReadable !== undefined) {
+        return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
+    }
 }
 
 function validateValueTransfer(transaction) {
@@ -300,11 +370,20 @@ function checkValueTransferMemoEssential(transaction) {
     if (transaction.value === undefined) {
         return new Error('"value" is missing')
     }
-    if (transaction.data === undefined) {
+
+    if (transaction.input !== undefined && transaction.data !== undefined) {
+        return new Error(`"data" and "input" cannot be used as properties of transactions at the same time.`)
+    }
+    if (transaction.input === undefined && transaction.data === undefined) {
+        if (transaction.type.includes('TxType')) return new Error('"input" is missing')
         return new Error('"data" is missing')
     }
+
     if (transaction.codeFormat !== undefined) {
         return new Error(`"codeFormat" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.humanReadable !== undefined) {
+        return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
     }
 }
 
@@ -336,10 +415,51 @@ function validateAccountTransaction(transaction) {
     if (transaction.data !== undefined) {
         return new Error(`"data" cannot be used with ${transaction.type} transaction`)
     }
+    if (transaction.input !== undefined) {
+        return new Error(`"input" cannot be used with ${transaction.type} transaction`)
+    }
     if (transaction.codeFormat !== undefined) {
         return new Error(`"codeFormat" cannot be used with ${transaction.type} transaction`)
     }
+    if (transaction.humanReadable !== undefined) {
+        return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
+    }
 
+    // TxTypeAccountUpdate, TxTypeFeeDelegatedAccountUpdate and TxTypeFeeDelegatedAccountUpdateWithRatio transaction use 'account' only
+    if (transaction.type.includes('TxType')) {
+        if (!transaction.account) return new Error(`Missing account information with ${transaction.type} transaction`)
+
+        if (transaction.key !== undefined) {
+            return new Error(`"key" cannot be used with ${transaction.type} transaction.`)
+        }
+        if (transaction.legacyKey !== undefined) {
+            return new Error(`"legacyKey" cannot be used with ${transaction.type} transaction.`)
+        }
+        if (transaction.publicKey) {
+            return new Error(`"publicKey" cannot be used with ${transaction.type} transaction.`)
+        }
+        if (transaction.multisig) {
+            return new Error(`"multisig" cannot be used with ${transaction.type} transaction.`)
+        }
+        if (transaction.roleTransactionKey) {
+            return new Error(`"roleTransactionKey" cannot be used with ${transaction.type} transaction.`)
+        }
+        if (transaction.roleAccountUpdateKey) {
+            return new Error(`"roleAccountUpdateKey" cannot be used with ${transaction.type} transaction.`)
+        }
+        if (transaction.roleFeePayerKey) {
+            return new Error(`"roleFeePayerKey" cannot be used with ${transaction.type} transaction.`)
+        }
+        if (transaction.failKey !== undefined) {
+            return new Error(`"failKey" cannot be used with ${transaction.type} transaction.`)
+        }
+
+        return
+    }
+
+    if (transaction.account) return new Error(`"account" cannot be used with ${transaction.type} transaction`)
+
+    const duplicatedKeyInfo = `The key parameter to be used for ${transaction.type} is duplicated.`
     if (
         !transaction.key &&
         transaction.legacyKey === undefined &&
@@ -352,8 +472,6 @@ function validateAccountTransaction(transaction) {
     ) {
         return new Error(`Missing key information with ${transaction.type} transaction`)
     }
-
-    const duplicatedKeyInfo = `The key parameter to be used for ${transaction.type} is duplicated.`
     if (transaction.key) {
         if (
             transaction.legacyKey !== undefined ||
@@ -437,17 +555,26 @@ function validateFeeDelegatedAccountUpdateWithRatio(transaction) {
 }
 
 function checkDeployEssential(transaction) {
-    if (transaction.value === undefined) {
+    if (transaction.value === undefined && !transaction.type.includes('TxType')) {
         return new Error('"value" is missing')
     }
-    if (transaction.data === undefined) {
+
+    if (transaction.input !== undefined && transaction.data !== undefined) {
+        return new Error(`"data" and "input" cannot be used as properties of transactions at the same time.`)
+    }
+    if (transaction.input === undefined && transaction.data === undefined) {
+        if (transaction.type.includes('TxType')) return new Error('"input" is missing')
         return new Error('"data" is missing')
     }
+
     if (transaction.to !== undefined && transaction.to !== '0x') {
         return new Error(`"to" cannot be used with ${transaction.type} transaction`)
     }
     if (transaction.codeFormat !== undefined && !validateCodeFormat(transaction.codeFormat)) {
         return new Error(`The codeFormat(${transaction.codeFormat}) is invalid.`)
+    }
+    if (transaction.humanReadable !== undefined && transaction.humanReadable === true) {
+        return new Error('HumanReadableAddress is not supported yet.')
     }
 }
 
@@ -482,11 +609,20 @@ function checkExecutionEssential(transaction) {
     if (!utils.isAddress(transaction.to)) {
         return new Error(`Invalid address of to: ${transaction.to}`)
     }
-    if (transaction.data === undefined) {
+
+    if (transaction.input !== undefined && transaction.data !== undefined) {
+        return new Error(`"data" and "input" cannot be used as properties of transactions at the same time.`)
+    }
+    if (transaction.input === undefined && transaction.data === undefined) {
+        if (transaction.type.includes('TxType')) return new Error('"input" is missing')
         return new Error('"data" is missing')
     }
+
     if (transaction.codeFormat !== undefined) {
         return new Error(`"codeFormat" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.humanReadable !== undefined) {
+        return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
     }
 }
 
@@ -524,8 +660,14 @@ function checkCacncelEssential(transaction) {
     if (transaction.data !== undefined) {
         return new Error(`"data" cannot be used with ${transaction.type} transaction`)
     }
+    if (transaction.input !== undefined) {
+        return new Error(`"input" cannot be used with ${transaction.type} transaction`)
+    }
     if (transaction.codeFormat !== undefined) {
         return new Error(`"codeFormat" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.humanReadable !== undefined) {
+        return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
     }
 }
 
@@ -551,6 +693,58 @@ function validateFeeDelegatedCancel(transaction) {
 
 function validateFeeDelegatedCancelWithRatio(transaction) {
     return validateFeeDelegatedCancel(transaction)
+}
+
+function checkChainDataAnchoringEssential(transaction) {
+    if (transaction.input !== undefined && transaction.data !== undefined) {
+        return new Error(`"data" and "input" cannot be used as properties of transactions at the same time.`)
+    }
+    if (transaction.input === undefined && transaction.data === undefined) {
+        if (transaction.anchoredData !== undefined) {
+            transaction.data = transaction.anchoredData
+            delete transaction.anchoredData
+        } else {
+            if (transaction.type.includes('TxType')) return new Error('"input" is missing')
+            return new Error('"data" is missing')
+        }
+    }
+
+    if (transaction.value !== undefined) {
+        return new Error(`"value" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.to !== undefined) {
+        return new Error(`"to" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.codeFormat !== undefined) {
+        return new Error(`"codeFormat" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.humanReadable !== undefined) {
+        return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
+    }
+}
+
+function validateChainDataAnchoring(transaction) {
+    let error = checkChainDataAnchoringEssential(transaction)
+    if (error) return error
+
+    error = validateNonFeeDelegated(transaction)
+    if (error) return error
+
+    return validateNotAccountTransaction(transaction)
+}
+
+function validateFeeDelegatedChainDataAnchoring(transaction) {
+    let error = checkChainDataAnchoringEssential(transaction)
+    if (error) return error
+
+    error = validateNotAccountTransaction(transaction)
+    if (error) return error
+
+    return validateFeeDelegated(transaction)
+}
+
+function validateFeeDelegatedChainDataAnchoringWithRatio(transaction) {
+    return validateFeeDelegatedChainDataAnchoring(transaction)
 }
 
 module.exports = {

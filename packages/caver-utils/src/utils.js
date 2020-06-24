@@ -59,7 +59,7 @@ const txTypeToString = {
     '0x48': 'CHAIN_DATA_ANCHORING',
 }
 
-const TRANSACTION_HASH_LENGTH = 66
+const HASH_LENGTH = 66
 
 /**
  * Returns true if object is BN, otherwise false
@@ -469,19 +469,37 @@ const isHex = function(hex) {
 
 /**
  * Checks if the given string is a hexadecimal transaction hash with or without prefix 0x
+ * @deprecated since version v1.5.0
  * @method isTxHash
- * @param {String} tx given hexadecimal transaction hash
+ * @param {String} txHash given hexadecimal transaction hash
  * @return {Boolean}
  */
-const isTxHash = tx => new RegExp(`^(0x|0X)?[0-9a-fA-F]{${TRANSACTION_HASH_LENGTH - 2}}$`).test(tx)
+const isTxHash = txHash => isValidHash(txHash)
+
+/**
+ * Checks if the given string is a hexadecimal hash with or without prefix 0x
+ * @method isValidHash
+ * @param {String} hash given hexadecimal hash
+ * @return {Boolean}
+ */
+const isValidHash = hash => new RegExp(`^(0x|0X)?[0-9a-fA-F]{${HASH_LENGTH - 2}}$`).test(hash)
 
 /**
  * Checks if the given string is a hexadecimal transaction hash that starts with 0x
+ * @deprecated since version v1.5.0
  * @method isTxHashStrict
- * @param {String} tx given hexadecimal transaction hash
+ * @param {String} txHash given hexadecimal transaction hash
  * @return {Boolean}
  */
-const isTxHashStrict = tx => new RegExp(`^(0x|0X)[0-9a-fA-F]{${TRANSACTION_HASH_LENGTH - 2}}$`).test(tx)
+const isTxHashStrict = txHash => isValidHashStrict(txHash)
+
+/**
+ * Checks if the given string is a hexadecimal hash with prefix 0x
+ * @method isValidHashStrict
+ * @param {String} hash given hexadecimal hash
+ * @return {Boolean}
+ */
+const isValidHashStrict = hash => new RegExp(`^(0x|0X)[0-9a-fA-F]{${HASH_LENGTH - 2}}$`).test(hash)
 
 /**
  * Returns true if given string is a valid Klaytn block header bloom.
@@ -615,7 +633,16 @@ function parsePrivateKey(privateKey) {
     }
 }
 
+function parseKlaytnWalletKey(key) {
+    if (!isKlaytnWalletKey(key)) throw new Error(`Invalid KlaytnWalletKey format: ${key}`)
+    const klaytnWalletKey = key.startsWith('0x') ? key.slice(2) : key
+    const splitted = klaytnWalletKey.split('0x')
+    return [`0x${splitted[0]}`, `0x${splitted[1]}`, `0x${splitted[2]}`]
+}
+
 const isKlaytnWalletKey = privateKey => {
+    if (!_.isString(privateKey)) return false
+
     const has0xPrefix = privateKey.slice(0, 2) === '0x'
     privateKey = has0xPrefix ? privateKey.slice(2) : privateKey
 
@@ -682,7 +709,10 @@ const rlpEncode = data => RLP.encode(data)
 
 const rlpDecode = encodedData => RLP.decode(encodedData)
 
-const xyPointFromPublicKey = publicKey => {
+const xyPointFromPublicKey = pub => {
+    let publicKey = pub
+    if (isCompressedPublicKey(publicKey)) publicKey = decompressPublicKey(pub)
+
     publicKey = publicKey.replace('0x', '')
     if (publicKey.length !== 128) throw Error('Invalid public key') // + 2 means '0x'
 
@@ -705,6 +735,12 @@ const makeEven = function(hex) {
     return hex
 }
 
+/**
+ * Returns an array of signatures.
+ *
+ * @param {string|object|Array.<string>} signature The address entered by the user for use in creating an account.
+ * @return {Array.<string>} the sha3 string
+ */
 const resolveSignature = signature => {
     if (_.isArray(signature)) {
         const [v, r, s] = signature
@@ -712,7 +748,9 @@ const resolveSignature = signature => {
     }
 
     if (_.isObject(signature)) {
-        const { v, r, s } = signature
+        const v = signature.V || signature.v
+        const r = signature.R || signature.r
+        const s = signature.S || signature.s
         if (!v || !r || !s) throw new Error('v, r, s fields should exist in signature')
 
         return [v, r, s]
@@ -761,6 +799,7 @@ const transformSignaturesToObject = signatures => {
         const sigObj = {}
         if (_.isArray(sig)) {
             if (sig.length !== 3) throw new Error(`Failed to transform signatures to object: invalid length of signature (${sig.length})`)
+            if (isEmptySig(sig)) continue
             const [V, R, S] = sig
             sigObj.V = V
             sigObj.R = R
@@ -772,11 +811,11 @@ const transformSignaturesToObject = signatures => {
             sigObj.S = decoded[2]
         } else if (_.isObject(sig)) {
             Object.keys(sig).map(key => {
-                if (key === 'v' || key === 'V') {
+                if (key === 'v' || key === 'V' || key === '_v') {
                     sigObj.V = sig[key]
-                } else if (key === 'r' || key === 'R') {
+                } else if (key === 'r' || key === 'R' || key === '_r') {
                     sigObj.R = sig[key]
-                } else if (key === 's' || key === 'S') {
+                } else if (key === 's' || key === 'S' || key === '_s') {
                     sigObj.S = sig[key]
                 } else {
                     throw new Error(`Failed to transform signatures to object: invalid key(${key}) is defined in signature object.`)
@@ -790,6 +829,9 @@ const transformSignaturesToObject = signatures => {
             throw new Error(`Failed to transform signatures to object: invalid signature ${sig}`)
         }
 
+        Object.keys(sigObj).map(k => {
+            sigObj[k] = trimLeadingZero(sigObj[k])
+        })
         ret.push(sigObj)
     }
 
@@ -807,18 +849,19 @@ const getTxTypeStringFromRawTransaction = rawTransaction => {
 }
 
 const isValidPublicKey = publicKey => {
-    publicKey = publicKey.replace('0x', '')
+    let pubString = publicKey.replace('0x', '')
 
-    if (publicKey.length !== 66 && publicKey.length !== 128) return false
+    if (pubString.length !== 66 && pubString.length !== 128) return false
 
-    if (publicKey.length === 66 && !isCompressedPublicKey(publicKey)) return false
+    if (pubString.length === 66 && !isCompressedPublicKey(pubString)) return false
 
-    if (publicKey.length === 128) {
-        const xyPoints = xyPointFromPublicKey(publicKey)
-        if (xyPoints === undefined || !xyPoints.length) return false
-    }
+    if (pubString.length === 66) pubString = decompressPublicKey(pubString)
 
-    return true
+    const xyPoints = xyPointFromPublicKey(pubString)
+    if (xyPoints === undefined || !xyPoints.length || xyPoints.length !== 2) return false
+
+    const point = secp256k1.curve.point(xyPoints[0].slice(2), xyPoints[1].slice(2), true)
+    return secp256k1.keyFromPublic(point).validate().result
 }
 
 const isCompressedPublicKey = publicKey => {
@@ -834,7 +877,7 @@ const compressPublicKey = uncompressedPublicKey => {
 
     const xyPoints = xyPointFromPublicKey(uncompressedPublicKey)
 
-    if (xyPoints === undefined || !xyPoints.length) {
+    if (xyPoints === undefined || !xyPoints.length || xyPoints.length !== 2) {
         throw new Error('invalid public key')
     }
 
@@ -860,17 +903,15 @@ const decompressPublicKey = compressedPublicKey => {
 
     const curve = secp256k1.curve
     const decoded = curve.decodePoint(compressedWithoutPrefix, 'hex')
+    const hexEncoded = decoded.encode('hex').slice(2)
 
-    const xPoint = decoded.x.toString(16)
-    const yPoint = decoded.y.toString(16)
-
-    return `0x${xPoint}${yPoint}`
+    return `0x${hexEncoded}`
 }
 
 const isContractDeployment = txObject => {
     if (txObject.type) {
-        if (txObject.type.includes('SMART_CONTRACT_DEPLOY')) return true
-        if (txObject.type !== 'LEGACY') return false
+        if (txObject.type.includes('SMART_CONTRACT_DEPLOY') || txObject.type.includes('SmartContractDeploy')) return true
+        if (txObject.type !== 'LEGACY' && txObject.type !== 'TxTypeLegacyTransaction') return false
     }
 
     if (txObject.data && txObject.data !== '0x' && (!txObject.to || txObject.to === '0x')) return true
@@ -880,6 +921,9 @@ const isContractDeployment = txObject => {
 
 const isValidRole = role => {
     switch (role) {
+        case 'roleTransactionKey':
+        case 'roleAccountUpdateKey':
+        case 'roleFeePayerKey':
         case 'transactionKey':
         case 'updateKey':
         case 'feePayerKey':
@@ -888,23 +932,46 @@ const isValidRole = role => {
     return false
 }
 
+// ['0x01', '0x', '0x]
+// [['0x01', '0x', '0x]]
+// '0x....'
+// { v: '0x01', r: '0x', s:'0x' }
+// SignatureData { _v: '0x01', _r: '0x', _s:'0x' }
+// [SignatureData { _v: '0x01', _r: '0x', _s:'0x' }]
 const isEmptySig = sig => {
-    if (!Array.isArray(sig)) return false
+    let sigs = sig
 
-    function isEmpty(s) {
+    // Convert to array format
+    if (!_.isArray(sig)) sigs = resolveSignature(sigs)
+    // Format to two-dimentional array
+    if (_.isString(sigs[0])) sigs = [sigs]
+
+    for (let s of sigs) {
+        if (!_.isArray(s)) s = resolveSignature(s)
         if (s.length !== 3) throw new Error(`Invalid signatures length: ${s.length}`)
-
-        if (s[0] === '0x01' && s[1] === '0x' && s[2] === '0x') return true
-        return false
+        if (s[0] !== '0x01' || s[1] !== '0x' || s[2] !== '0x') return false
     }
 
-    if (Array.isArray(sig[0])) {
-        // [[v,r,s]]
-        if (sig.length !== 1) return false
-        return isEmpty(sig[0])
+    return true
+}
+
+const hashMessage = data => {
+    const message = isHexStrict(data) ? hexToBytes(data) : data
+    const messageBuffer = Buffer.from(message)
+    const preamble = `\x19Klaytn Signed Message:\n${message.length}`
+    const preambleBuffer = Buffer.from(preamble)
+    // klayMessage is concatenated buffer (preambleBuffer + messageBuffer)
+    const klayMessage = Buffer.concat([preambleBuffer, messageBuffer])
+    // Finally, run keccak256 on klayMessage.
+    return Hash.keccak256(klayMessage)
+}
+
+const recover = (message, signature, preFixed = false) => {
+    if (!preFixed) {
+        message = hashMessage(message)
     }
 
-    return isEmpty(sig)
+    return Account.recover(message, Account.encodeSignature(signature.encode())).toLowerCase()
 }
 
 module.exports = {
@@ -939,6 +1006,7 @@ module.exports = {
     isValidPrivateKey: isValidPrivateKey,
     isValidNSHSN: isValidNSHSN,
     parsePrivateKey: parsePrivateKey,
+    parseKlaytnWalletKey: parseKlaytnWalletKey,
     isKlaytnWalletKey: isKlaytnWalletKey,
     isContractDeployment: isContractDeployment,
 
@@ -957,8 +1025,13 @@ module.exports = {
     decompressPublicKey,
     isTxHash,
     isTxHashStrict,
+    isValidHash,
+    isValidHashStrict,
 
     isValidRole: isValidRole,
 
     isEmptySig: isEmptySig,
+
+    hashMessage: hashMessage,
+    recover: recover,
 }

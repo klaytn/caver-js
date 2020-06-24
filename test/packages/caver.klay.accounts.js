@@ -2281,7 +2281,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const decryptedAccount = caver.klay.accounts.decrypt(result, password)
             isAccount(decryptedAccount, { keys: account.keys, address: account.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-041 : input: privateKey:invalid, password', () => {
@@ -2291,7 +2291,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const errorMessage = 'Invalid private key'
             expect(() => caver.klay.accounts.encrypt(invalid, password)).to.throw(errorMessage)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-096 : input: privateKey:KlaytnWalletKey, password', () => {
@@ -2304,7 +2304,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const decryptedAccount = caver.klay.accounts.decrypt(result, password)
             isAccount(decryptedAccount, { keys: account.keys, address: account.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-097 : input: privateKey:KlaytnWalletKey, password, {address:valid}', () => {
@@ -2317,7 +2317,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const decryptedAccount = caver.klay.accounts.decrypt(result, password)
             isAccount(decryptedAccount, { keys: account.keys, address: account.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-098 : input: privateKey:KlaytnWalletKey, password, {address:invalid}', () => {
@@ -2328,7 +2328,7 @@ describe('caver.klay.accounts.encrypt', () => {
             expect(() =>
                 caver.klay.accounts.encrypt(account.getKlaytnWalletKey(), password, { address: caver.klay.accounts.create().address })
             ).to.throw(errorMessage)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-099 : input: privateKey:KlaytnWalletKey(decoupled), password', () => {
@@ -2343,7 +2343,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const decryptedAccount = caver.klay.accounts.decrypt(result, password)
             isAccount(decryptedAccount, { keys: testAccount.keys, address: testAccount.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-100 : input: privateKey:KlaytnWalletKey(decoupled), password, {address:valid}', () => {
@@ -2358,7 +2358,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const decryptedAccount = caver.klay.accounts.decrypt(result, password)
             isAccount(decryptedAccount, { keys: testAccount.keys, address: testAccount.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-101 : input: privateKey:KlaytnWalletKey(decoupled), password, {address:invalid}', () => {
@@ -2371,7 +2371,7 @@ describe('caver.klay.accounts.encrypt', () => {
             expect(() =>
                 caver.klay.accounts.encrypt(testAccount.getKlaytnWalletKey(), password, { address: caver.klay.accounts.create().address })
             ).to.throw(errorMessage)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-351: input: array of private key string, password, {address:valid}', () => {
@@ -2392,7 +2392,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const decrypted = caver.klay.accounts.decrypt(result, password)
             isAccount(decrypted, { keys: testAccount.keys, address: testAccount.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-352: input: array of private key string, password', () => {
@@ -2408,7 +2408,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const errorMessage = 'The address must be defined inside the options object.'
             expect(() => caver.klay.accounts.encrypt(testAccount.keys, password)).to.throw(errorMessage)
-        })
+        }).timeout(50000)
     })
 
     context(
@@ -2434,7 +2434,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
                 const decrypted = caver.klay.accounts.decrypt(result, password)
                 isAccount(decrypted, { keys: testAccount.keys, address: testAccount.address })
-            })
+            }).timeout(50000)
         }
     )
 
@@ -2470,7 +2470,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
                 const decrypted = caver.klay.accounts.decrypt(result, password)
                 isAccount(decrypted, { keys: testAccount.keys, address: testAccount.address })
-            })
+            }).timeout(50000)
         }
     )
 
@@ -2491,7 +2491,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const decrypted = caver.klay.accounts.decrypt(result, password)
             isAccount(decrypted, { keys: testAccount.keys, address: testAccount.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-356: input: key object(updateKey is defined), password, {address:valid}', () => {
@@ -2512,7 +2512,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const decrypted = caver.klay.accounts.decrypt(result, password)
             isAccount(decrypted, { keys: testAccount.keys, address: testAccount.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-357: input: key object(feePayerKey is defined), password, {address:valid}', () => {
@@ -2534,7 +2534,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const decrypted = caver.klay.accounts.decrypt(result, password)
             isAccount(decrypted, { keys: testAccount.keys, address: testAccount.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-358: input: key object, password', () => {
@@ -2550,7 +2550,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const errorMessage = 'The address must be defined inside the options object.'
             expect(() => caver.klay.accounts.encrypt(testAccount.keys, password)).to.throw(errorMessage)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-359: input: AccountKeyPublic, password, {address:valid}', () => {
@@ -2568,7 +2568,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const decrypted = caver.klay.accounts.decrypt(result, password)
             isAccount(decrypted, { keys: testAccount.keys, address: testAccount.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-360: input: AccountKeyPublic, password', () => {
@@ -2580,7 +2580,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const errorMessage = 'The address must be defined inside the options object.'
             expect(() => caver.klay.accounts.encrypt(accountKey, password)).to.throw(errorMessage)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-361: input: AccountKeyMultiSig, password, {address:valid}', () => {
@@ -2598,7 +2598,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const decrypted = caver.klay.accounts.decrypt(result, password)
             isAccount(decrypted, { keys: testAccount.keys, address: testAccount.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-362: input: AccountKeyMultiSig, password', () => {
@@ -2610,7 +2610,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const errorMessage = 'The address must be defined inside the options object.'
             expect(() => caver.klay.accounts.encrypt(accountKey, password)).to.throw(errorMessage)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-363: input: AccountKeyRoleBased, password, {address:valid}', () => {
@@ -2639,7 +2639,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const decrypted = caver.klay.accounts.decrypt(result, password)
             isAccount(decrypted, { keys: testAccount.keys, address: testAccount.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-364: input: AccountKeyMultiSig, password', () => {
@@ -2659,7 +2659,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const errorMessage = 'The address must be defined inside the options object.'
             expect(() => caver.klay.accounts.encrypt(accountKey, password)).to.throw(errorMessage)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-365: input: Account with AccountKeyPublic, password, {address:valid}', () => {
@@ -2677,7 +2677,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const decrypted = caver.klay.accounts.decrypt(result, password)
             isAccount(decrypted, { keys: testAccount.keys, address: testAccount.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-366: input: Account with AccountKeyPublic, password, {address:different address}', () => {
@@ -2692,7 +2692,7 @@ describe('caver.klay.accounts.encrypt', () => {
             expect(() => caver.klay.accounts.encrypt(testAccount, password, { address: caver.klay.accounts.create().address })).to.throw(
                 errorMessage
             )
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-367: input: Account with AccountKeyMultiSig, password, {address:valid}', () => {
@@ -2710,7 +2710,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const decrypted = caver.klay.accounts.decrypt(result, password)
             isAccount(decrypted, { keys: testAccount.keys, address: testAccount.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-368: input: Account with AccountKeyMultiSig, password, {address:different address}', () => {
@@ -2725,7 +2725,7 @@ describe('caver.klay.accounts.encrypt', () => {
             expect(() => caver.klay.accounts.encrypt(testAccount, password, { address: caver.klay.accounts.create().address })).to.throw(
                 errorMessage
             )
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-369: input: Account with AccountKeyRoleBased, password, {address:valid}', () => {
@@ -2754,7 +2754,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const decrypted = caver.klay.accounts.decrypt(result, password)
             isAccount(decrypted, { keys: testAccount.keys, address: testAccount.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-370: input: Account with AccountKeyRoleBased, password, {address:different address}', () => {
@@ -2777,7 +2777,7 @@ describe('caver.klay.accounts.encrypt', () => {
             expect(() => caver.klay.accounts.encrypt(testAccount, password, { address: caver.klay.accounts.create().address })).to.throw(
                 errorMessage
             )
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-385: input: Account with AccountKeyMultiSig, password, option', () => {
@@ -2812,7 +2812,7 @@ describe('caver.klay.accounts.encrypt', () => {
                 keyring: [
                     [
                         {
-                            ciphertext: '5e2f95f61d7af3bebf4ff9f5d5813690c80b0b5aaebd6e8b22d0f928ff06776a',
+                            ciphertext: 'b3126f30cb419a63f367ea2313c3cf1a27ef9f08fc9a5da50aec2b93f5afbef4',
                             cipherparams: { iv: '38aa896fc128075425e512f01e4b206c' },
                             cipher: 'aes-128-ctr',
                             kdf: 'scrypt',
@@ -2823,12 +2823,12 @@ describe('caver.klay.accounts.encrypt', () => {
                                 r: 8,
                                 p: 1,
                             },
-                            mac: 'fb86255428e24ba701201d5815f2f2114214cbd34fe4bc7a24b948a8ceac9f9b',
+                            mac: 'df371741da37e778a820905f5a43f60aabd904ad81012e4c58c9eb7160cde38b',
                         },
                     ],
                     [
                         {
-                            ciphertext: '7c2ad958478c213549fdb9fd7619c6f8c7034618c83e3ab229af6332d9fa53fb',
+                            ciphertext: '9117239e91b748e805d5aa2bb05b3f7228e7d24a9a19099c0193b189d3539a65',
                             cipherparams: { iv: '38aa896fc128075425e512f01e4b206c' },
                             cipher: 'aes-128-ctr',
                             kdf: 'scrypt',
@@ -2839,10 +2839,10 @@ describe('caver.klay.accounts.encrypt', () => {
                                 r: 8,
                                 p: 1,
                             },
-                            mac: 'e6c3897772916c69f7c778ac2e0e60b786c55f17367c68b086486bd68fea9517',
+                            mac: 'ded3da00062f4e04b8248c8c6c37299c205b8e48d26c5187586dfa49959a9f9a',
                         },
                         {
-                            ciphertext: '5a17fe2af445e63ed2cdda6834d030a9391998000941c79318ab49bff092b9e7',
+                            ciphertext: 'b72a04ec227e8fe39ee5c9bef292c923d6fd0c525b66f4bd30979b04fa3b7079',
                             cipherparams: { iv: '38aa896fc128075425e512f01e4b206c' },
                             cipher: 'aes-128-ctr',
                             kdf: 'scrypt',
@@ -2853,12 +2853,12 @@ describe('caver.klay.accounts.encrypt', () => {
                                 r: 8,
                                 p: 1,
                             },
-                            mac: '633f91994f33541fbf1c3c3e973e539c12f1dd98f2757f64e3b63de986f367e0',
+                            mac: '28090ffbce196b3b2640eec40ed2964071ef1a7f5d72f4db279589115a85a94d',
                         },
                     ],
                     [
                         {
-                            ciphertext: 'd92870e0064950a7e148f5be8ce8c4c0373684f58d1f50f95524701a47fdbcf2',
+                            ciphertext: '34158a26d072397aad60e6684aaa3d4ad8d210a7df3863d77d18a2a14d54756c',
                             cipherparams: { iv: '38aa896fc128075425e512f01e4b206c' },
                             cipher: 'aes-128-ctr',
                             kdf: 'scrypt',
@@ -2869,7 +2869,7 @@ describe('caver.klay.accounts.encrypt', () => {
                                 r: 8,
                                 p: 1,
                             },
-                            mac: 'b2f0245036e7bbdea712819dfbe019c8bfb237684c67d61fa82638868a7ae752',
+                            mac: '210d28df835312ff82042b77402a6b105cdb6576a379ebae22076b5c5bfdf66f',
                         },
                     ],
                 ],
@@ -2899,7 +2899,7 @@ describe('caver.klay.accounts.encrypt', () => {
             compareEncrypted(result.keyring[2][0], expectedKeystore.keyring[2][0])
 
             isKeystore(result, testAccount)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-389: input: Account with AccountKeyMultiSig, password, option(pbkdf2)', () => {
@@ -2928,7 +2928,7 @@ describe('caver.klay.accounts.encrypt', () => {
             const result = caver.klay.accounts.encrypt(
                 testAccount.keys,
                 password,
-                Object.assign({ address: testAccount.address, encryptOption })
+                Object.assign({ address: testAccount.address }, encryptOption)
             )
 
             isKeystore(result, testAccount)
@@ -2940,7 +2940,7 @@ describe('caver.klay.accounts.encrypt', () => {
 
             const decrypted = caver.klay.accounts.decrypt(result, password)
             isAccount(decrypted, { keys: testAccount.keys, address: testAccount.address })
-        })
+        }).timeout(50000)
     })
 })
 
@@ -2961,7 +2961,7 @@ describe('caver.klay.accounts.encryptV3', () => {
 
             const decryptedAccount = caver.klay.accounts.decrypt(result, password)
             isAccount(decryptedAccount, { keys: account.keys, address: account.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-400: input: privateKey:invalid, password', () => {
@@ -2971,7 +2971,7 @@ describe('caver.klay.accounts.encryptV3', () => {
 
             const errorMessage = 'Invalid private key'
             expect(() => caver.klay.accounts.encryptV3(invalid, password)).to.throw(errorMessage)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-401: input: privateKey:KlaytnWalletKey, password', () => {
@@ -2984,7 +2984,7 @@ describe('caver.klay.accounts.encryptV3', () => {
 
             const decryptedAccount = caver.klay.accounts.decrypt(result, password)
             isAccount(decryptedAccount, { keys: account.keys, address: account.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-402: input: privateKey:KlaytnWalletKey, password, {address:valid}', () => {
@@ -2997,7 +2997,7 @@ describe('caver.klay.accounts.encryptV3', () => {
 
             const decryptedAccount = caver.klay.accounts.decrypt(result, password)
             isAccount(decryptedAccount, { keys: account.keys, address: account.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-403: input: privateKey:KlaytnWalletKey, password, {address:invalid}', () => {
@@ -3008,7 +3008,7 @@ describe('caver.klay.accounts.encryptV3', () => {
             expect(() =>
                 caver.klay.accounts.encryptV3(account.getKlaytnWalletKey(), password, { address: caver.klay.accounts.create().address })
             ).to.throw(errorMessage)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-404: input: privateKey:KlaytnWalletKey(decoupled), password', () => {
@@ -3023,7 +3023,7 @@ describe('caver.klay.accounts.encryptV3', () => {
 
             const decryptedAccount = caver.klay.accounts.decrypt(result, password)
             isAccount(decryptedAccount, { keys: testAccount.keys, address: testAccount.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-405: input: privateKey:KlaytnWalletKey(decoupled), password, {address:valid}', () => {
@@ -3038,7 +3038,7 @@ describe('caver.klay.accounts.encryptV3', () => {
 
             const decryptedAccount = caver.klay.accounts.decrypt(result, password)
             isAccount(decryptedAccount, { keys: testAccount.keys, address: testAccount.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-406: input: privateKey:KlaytnWalletKey(decoupled), password, {address:invalid}', () => {
@@ -3051,7 +3051,7 @@ describe('caver.klay.accounts.encryptV3', () => {
             expect(() =>
                 caver.klay.accounts.encryptV3(testAccount.getKlaytnWalletKey(), password, { address: caver.klay.accounts.create().address })
             ).to.throw(errorMessage)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-407: input: array of private key strings, password', () => {
@@ -3068,7 +3068,7 @@ describe('caver.klay.accounts.encryptV3', () => {
             const errorMessage =
                 'Invalid parameter: encryptV3 only supports a single private key (also supports KlantnWalletKey format), or an instance of Account or AccountKeyPublic as a parameter. If you want to encrypt multiple keys, use caver.klay.accounts.encrypt which encrypts to keystore v4.'
             expect(() => caver.klay.accounts.encryptV3(testAccount.keys, password)).to.throw(errorMessage)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-408: input: array of private key strings, password, {address:valid}', () => {
@@ -3085,7 +3085,7 @@ describe('caver.klay.accounts.encryptV3', () => {
             const errorMessage =
                 'Invalid parameter: encryptV3 only supports a single private key (also supports KlantnWalletKey format), or an instance of Account or AccountKeyPublic as a parameter. If you want to encrypt multiple keys, use caver.klay.accounts.encrypt which encrypts to keystore v4.'
             expect(() => caver.klay.accounts.encryptV3(testAccount.keys, password, { address: testAccount.address })).to.throw(errorMessage)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-409: input: key object, password', () => {
@@ -3102,7 +3102,7 @@ describe('caver.klay.accounts.encryptV3', () => {
             const errorMessage =
                 'Invalid parameter: encryptV3 only supports a single private key (also supports KlantnWalletKey format), or an instance of Account or AccountKeyPublic as a parameter. If you want to encrypt multiple keys, use caver.klay.accounts.encrypt which encrypts to keystore v4.'
             expect(() => caver.klay.accounts.encryptV3(testAccount.keys, password)).to.throw(errorMessage)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-410: input: key object, password, {address}', () => {
@@ -3119,7 +3119,7 @@ describe('caver.klay.accounts.encryptV3', () => {
             const errorMessage =
                 'Invalid parameter: encryptV3 only supports a single private key (also supports KlantnWalletKey format), or an instance of Account or AccountKeyPublic as a parameter. If you want to encrypt multiple keys, use caver.klay.accounts.encrypt which encrypts to keystore v4.'
             expect(() => caver.klay.accounts.encryptV3(testAccount.keys, password, { address: testAccount.address })).to.throw(errorMessage)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-411: input: AccountKeyPublic, password', () => {
@@ -3131,7 +3131,7 @@ describe('caver.klay.accounts.encryptV3', () => {
 
             const errorMessage = 'The address must be defined inside the options object.'
             expect(() => caver.klay.accounts.encryptV3(accountKey, password)).to.throw(errorMessage)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-412: input: AccountKeyMultiSig, password, {address}', () => {
@@ -3144,7 +3144,7 @@ describe('caver.klay.accounts.encryptV3', () => {
             const errorMessage =
                 'Invalid parameter: encryptV3 only supports a single private key (also supports KlantnWalletKey format), or an instance of Account or AccountKeyPublic as a parameter. If you want to encrypt multiple keys, use caver.klay.accounts.encrypt which encrypts to keystore v4.'
             expect(() => caver.klay.accounts.encryptV3(accountKey, password, { address: account.address })).to.throw(errorMessage)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-413: input: AccountKeyMultiSig, password', () => {
@@ -3157,7 +3157,7 @@ describe('caver.klay.accounts.encryptV3', () => {
             const errorMessage =
                 'Invalid parameter: encryptV3 only supports a single private key (also supports KlantnWalletKey format), or an instance of Account or AccountKeyPublic as a parameter. If you want to encrypt multiple keys, use caver.klay.accounts.encrypt which encrypts to keystore v4.'
             expect(() => caver.klay.accounts.encryptV3(accountKey, password)).to.throw(errorMessage)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-414: input: AccountKeyRoleBased, password, {address}', () => {
@@ -3174,7 +3174,7 @@ describe('caver.klay.accounts.encryptV3', () => {
             const errorMessage =
                 'Invalid parameter: encryptV3 only supports a single private key (also supports KlantnWalletKey format), or an instance of Account or AccountKeyPublic as a parameter. If you want to encrypt multiple keys, use caver.klay.accounts.encrypt which encrypts to keystore v4.'
             expect(() => caver.klay.accounts.encryptV3(accountKey, password, { address: account.address })).to.throw(errorMessage)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-415: input: AccountKeyRoleBased, password', () => {
@@ -3191,7 +3191,7 @@ describe('caver.klay.accounts.encryptV3', () => {
             const errorMessage =
                 'Invalid parameter: encryptV3 only supports a single private key (also supports KlantnWalletKey format), or an instance of Account or AccountKeyPublic as a parameter. If you want to encrypt multiple keys, use caver.klay.accounts.encrypt which encrypts to keystore v4.'
             expect(() => caver.klay.accounts.encryptV3(accountKey, password)).to.throw(errorMessage)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-416: input: invalid parameter, password', () => {
@@ -3223,7 +3223,7 @@ describe('caver.klay.accounts.decrypt', () => {
             isKeystore(keystoreJsonV4, result)
 
             isAccount(result, { keys: account.keys, address: account.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-103 : input: keystoreJsonV4(without 0x address format), password', () => {
@@ -3235,7 +3235,7 @@ describe('caver.klay.accounts.decrypt', () => {
             const result = caver.klay.accounts.decrypt(keystoreJsonV4, password)
 
             expect(result.address.slice(0, 2)).to.equals('0x')
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-371: input: keystoreJsonV4 that encrypts Account with AccountKeyMultiSig, password', () => {
@@ -3247,7 +3247,7 @@ describe('caver.klay.accounts.decrypt', () => {
             const result = caver.klay.accounts.decrypt(keystoreJsonV4, password)
 
             isAccount(result, { keys: key, address: account.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-372: input: keystoreJsonV4 that encrypts Account with AccountKeyRoleBased, password', () => {
@@ -3267,7 +3267,7 @@ describe('caver.klay.accounts.decrypt', () => {
             const result = caver.klay.accounts.decrypt(keystoreJsonV4, password)
 
             isAccount(result, { keys: key, address: account.address })
-        })
+        }).timeout(50000)
     })
 
     context(
@@ -3283,7 +3283,7 @@ describe('caver.klay.accounts.decrypt', () => {
                 const result = caver.klay.accounts.decrypt(keystoreJsonV4, password)
 
                 isAccount(result, { keys: key, address: account.address })
-            })
+            }).timeout(50000)
         }
     )
 
@@ -3300,7 +3300,7 @@ describe('caver.klay.accounts.decrypt', () => {
                 const result = caver.klay.accounts.decrypt(keystoreJsonV4, password)
 
                 isAccount(result, { keys: key, address: account.address })
-            })
+            }).timeout(50000)
         }
     )
 
@@ -3317,7 +3317,7 @@ describe('caver.klay.accounts.decrypt', () => {
                 const result = caver.klay.accounts.decrypt(keystoreJsonV4, password)
 
                 isAccount(result, { keys: key, address: account.address })
-            })
+            }).timeout(50000)
         }
     )
 
@@ -3333,7 +3333,7 @@ describe('caver.klay.accounts.decrypt', () => {
             const result = caver.klay.accounts.decrypt(keystore, password)
 
             isAccount(result, { keys: key, address: account.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-379: input: keystoreJsonV4 that encrypts Account, password', () => {
@@ -3346,7 +3346,7 @@ describe('caver.klay.accounts.decrypt', () => {
             const expectedError = "Invalid keystore V3 format: 'crypto' is not defined."
 
             expect(() => caver.klay.accounts.decrypt(keystore, password)).to.throws(expectedError)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-380: input: keystoreJsonV4 that encrypts Account, password', () => {
@@ -3360,7 +3360,7 @@ describe('caver.klay.accounts.decrypt', () => {
             const expectedError = "Invalid key store format: 'crypto' can not be with 'keyring'"
 
             expect(() => caver.klay.accounts.decrypt(keystore, password)).to.throws(expectedError)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-381: input: keystoreJsonV4 that encrypts Account, password', () => {
@@ -3373,7 +3373,7 @@ describe('caver.klay.accounts.decrypt', () => {
             const expectedError = "Invalid key store format: 'crypto' can not be with 'keyring'"
 
             expect(() => caver.klay.accounts.decrypt(keystore, password)).to.throws(expectedError)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-382: input: keystoreJsonV4 that encrypts Account, password', () => {
@@ -3386,7 +3386,7 @@ describe('caver.klay.accounts.decrypt', () => {
             const expectedError = 'Invalid key store format'
 
             expect(() => caver.klay.accounts.decrypt(keystore, password)).to.throws(expectedError)
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-383: input: hard coded keystoreJsonV4 that encrypts Account, password', () => {
@@ -3490,7 +3490,7 @@ describe('caver.klay.accounts.decrypt', () => {
             const result = caver.klay.accounts.decrypt(keystoreJsonV4, password)
 
             isAccount(result, { keys: expectedAccount.keys, address: expectedAccount.address })
-        })
+        }).timeout(50000)
     })
 
     context('CAVERJS-UNIT-WALLET-384: input: hard coded keystoreJsonV3 that encrypts Account, password', () => {
@@ -3523,7 +3523,7 @@ describe('caver.klay.accounts.decrypt', () => {
             const result = caver.klay.accounts.decrypt(keystoreJsonV3, password)
 
             isAccount(result, { keys: expectedAccount.keys, address: expectedAccount.address })
-        })
+        }).timeout(50000)
     })
 
     /*
@@ -5202,11 +5202,12 @@ describe('caver.klay.accounts.signTransactionWithHash', () => {
             expect(sig[0].R).not.to.be.undefined
             expect(sig[0].S).not.to.be.undefined
 
-            const sigFromSignTransaction = await caver.klay.accounts.signTransaction(legacyTx, account.keys)
+            let sigFromSignTransaction = await caver.klay.accounts.signTransaction(legacyTx, account.keys)
+            sigFromSignTransaction = caver.utils.transformSignaturesToObject(sigFromSignTransaction.signatures)
 
-            expect(sig[0].V).to.equals(sigFromSignTransaction.signatures[0])
-            expect(sig[0].R).to.equals(sigFromSignTransaction.signatures[1])
-            expect(sig[0].S).to.equals(sigFromSignTransaction.signatures[2])
+            expect(sig[0].V).to.equals(sigFromSignTransaction.V)
+            expect(sig[0].R).to.equals(sigFromSignTransaction.R)
+            expect(sig[0].S).to.equals(sigFromSignTransaction.S)
         })
     })
 
@@ -5233,14 +5234,15 @@ describe('caver.klay.accounts.signTransactionWithHash', () => {
             expect(sig[1].R).not.to.be.undefined
             expect(sig[1].S).not.to.be.undefined
 
-            const sigFromSignTransaction = await caver.klay.accounts.signTransaction(vtTx, privateKeys)
+            let sigFromSignTransaction = await caver.klay.accounts.signTransaction(vtTx, privateKeys)
+            sigFromSignTransaction = caver.utils.transformSignaturesToObject(sigFromSignTransaction.signatures)
 
-            expect(sig[0].V).to.equals(sigFromSignTransaction.signatures[0][0])
-            expect(sig[0].R).to.equals(sigFromSignTransaction.signatures[0][1])
-            expect(sig[0].S).to.equals(sigFromSignTransaction.signatures[0][2])
-            expect(sig[1].V).to.equals(sigFromSignTransaction.signatures[1][0])
-            expect(sig[1].R).to.equals(sigFromSignTransaction.signatures[1][1])
-            expect(sig[1].S).to.equals(sigFromSignTransaction.signatures[1][2])
+            expect(sig[0].V).to.equals(sigFromSignTransaction[0].V)
+            expect(sig[0].R).to.equals(sigFromSignTransaction[0].R)
+            expect(sig[0].S).to.equals(sigFromSignTransaction[0].S)
+            expect(sig[1].V).to.equals(sigFromSignTransaction[1].V)
+            expect(sig[1].R).to.equals(sigFromSignTransaction[1].R)
+            expect(sig[1].S).to.equals(sigFromSignTransaction[1].S)
         })
     })
 
@@ -5254,11 +5256,12 @@ describe('caver.klay.accounts.signTransactionWithHash', () => {
             expect(sig[0].R).not.to.be.undefined
             expect(sig[0].S).not.to.be.undefined
 
-            const sigFromSignTransaction = await caver.klay.accounts.signTransaction(legacyTx, account.keys)
+            let sigFromSignTransaction = await caver.klay.accounts.signTransaction(legacyTx, account.keys)
+            sigFromSignTransaction = caver.utils.transformSignaturesToObject(sigFromSignTransaction.signatures)
 
-            expect(sig[0].V).to.equals(sigFromSignTransaction.signatures[0])
-            expect(sig[0].R).to.equals(sigFromSignTransaction.signatures[1])
-            expect(sig[0].S).to.equals(sigFromSignTransaction.signatures[2])
+            expect(sig[0].V).to.equals(sigFromSignTransaction.V)
+            expect(sig[0].R).to.equals(sigFromSignTransaction.R)
+            expect(sig[0].S).to.equals(sigFromSignTransaction.S)
         })
     })
 
@@ -5277,14 +5280,15 @@ describe('caver.klay.accounts.signTransactionWithHash', () => {
             expect(sig[1].R).not.to.be.undefined
             expect(sig[1].S).not.to.be.undefined
 
-            const sigFromSignTransaction = await caver.klay.accounts.signTransaction(vtTx, privateKeys)
+            let sigFromSignTransaction = await caver.klay.accounts.signTransaction(vtTx, privateKeys)
+            sigFromSignTransaction = caver.utils.transformSignaturesToObject(sigFromSignTransaction.signatures)
 
-            expect(sig[0].V).to.equals(sigFromSignTransaction.signatures[0][0])
-            expect(sig[0].R).to.equals(sigFromSignTransaction.signatures[0][1])
-            expect(sig[0].S).to.equals(sigFromSignTransaction.signatures[0][2])
-            expect(sig[1].V).to.equals(sigFromSignTransaction.signatures[1][0])
-            expect(sig[1].R).to.equals(sigFromSignTransaction.signatures[1][1])
-            expect(sig[1].S).to.equals(sigFromSignTransaction.signatures[1][2])
+            expect(sig[0].V).to.equals(sigFromSignTransaction[0].V)
+            expect(sig[0].R).to.equals(sigFromSignTransaction[0].R)
+            expect(sig[0].S).to.equals(sigFromSignTransaction[0].S)
+            expect(sig[1].V).to.equals(sigFromSignTransaction[1].V)
+            expect(sig[1].R).to.equals(sigFromSignTransaction[1].R)
+            expect(sig[1].S).to.equals(sigFromSignTransaction[1].S)
         })
     })
 
@@ -5311,11 +5315,12 @@ describe('caver.klay.accounts.signTransactionWithHash', () => {
 
             const tx = Object.assign({}, legacyTx)
             delete tx.chainId
-            const sigFromSignTransaction = await caver.klay.accounts.signTransaction(tx, account.keys)
+            let sigFromSignTransaction = await caver.klay.accounts.signTransaction(tx, account.keys)
+            sigFromSignTransaction = caver.utils.transformSignaturesToObject(sigFromSignTransaction.signatures)
 
-            expect(sig[0].V).to.equals(sigFromSignTransaction.signatures[0])
-            expect(sig[0].R).to.equals(sigFromSignTransaction.signatures[1])
-            expect(sig[0].S).to.equals(sigFromSignTransaction.signatures[2])
+            expect(sig[0].V).to.equals(sigFromSignTransaction.V)
+            expect(sig[0].R).to.equals(sigFromSignTransaction.R)
+            expect(sig[0].S).to.equals(sigFromSignTransaction.S)
         })
     })
 
@@ -5336,14 +5341,15 @@ describe('caver.klay.accounts.signTransactionWithHash', () => {
 
             const tx = Object.assign({}, vtTx)
             delete tx.chainId
-            const sigFromSignTransaction = await caver.klay.accounts.signTransaction(tx, privateKeys)
+            let sigFromSignTransaction = await caver.klay.accounts.signTransaction(tx, privateKeys)
+            sigFromSignTransaction = caver.utils.transformSignaturesToObject(sigFromSignTransaction.signatures)
 
-            expect(sig[0].V).to.equals(sigFromSignTransaction.signatures[0][0])
-            expect(sig[0].R).to.equals(sigFromSignTransaction.signatures[0][1])
-            expect(sig[0].S).to.equals(sigFromSignTransaction.signatures[0][2])
-            expect(sig[1].V).to.equals(sigFromSignTransaction.signatures[1][0])
-            expect(sig[1].R).to.equals(sigFromSignTransaction.signatures[1][1])
-            expect(sig[1].S).to.equals(sigFromSignTransaction.signatures[1][2])
+            expect(sig[0].V).to.equals(sigFromSignTransaction[0].V)
+            expect(sig[0].R).to.equals(sigFromSignTransaction[0].R)
+            expect(sig[0].S).to.equals(sigFromSignTransaction[0].S)
+            expect(sig[1].V).to.equals(sigFromSignTransaction[1].V)
+            expect(sig[1].R).to.equals(sigFromSignTransaction[1].R)
+            expect(sig[1].S).to.equals(sigFromSignTransaction[1].S)
         })
     })
 

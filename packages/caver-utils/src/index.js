@@ -233,12 +233,29 @@ const unitKlayMap = {
     Mpeb: '1000000',
     Gpeb: '1000000000',
     Ston: '1000000000',
+    ston: '1000000000',
     uKLAY: '1000000000000',
     mKLAY: '1000000000000000',
     KLAY: '1000000000000000000',
     kKLAY: '1000000000000000000000',
     MKLAY: '1000000000000000000000000',
     GKLAY: '1000000000000000000000000000',
+    TKLAY: '1000000000000000000000000000000',
+}
+
+const KlayUnit = {
+    peb: { unit: 'peb', pebFactor: 0 },
+    kpeb: { unit: 'kpeb', pebFactor: 3 },
+    Mpeb: { unit: 'Mpeb', pebFactor: 6 },
+    Gpeb: { unit: 'Gpeb', pebFactor: 9 },
+    ston: { unit: 'ston', pebFactor: 9 },
+    uKLAY: { unit: 'uKLAY', pebFactor: 12 },
+    mKLAY: { unit: 'mKLAY', pebFactor: 15 },
+    KLAY: { unit: 'KLAY', pebFactor: 18 },
+    kKLAY: { unit: 'kKLAY', pebFactor: 21 },
+    MKLAY: { unit: 'MKLAY', pebFactor: 24 },
+    GKLAY: { unit: 'GKLAY', pebFactor: 27 },
+    TKLAY: { unit: 'TKLAY', pebFactor: 30 },
 }
 
 const unitKlayToEthMap = {
@@ -247,12 +264,14 @@ const unitKlayToEthMap = {
     Mpeb: 'mwei',
     Gpeb: 'gwei',
     Ston: 'gwei',
+    ston: 'gwei',
     uKLAY: 'microether',
     mKLAY: 'milliether',
     KLAY: 'ether',
     kKLAY: 'kether',
     MKLAY: 'mether',
     GKLAY: 'gether',
+    TKLAY: 'tether',
 }
 const getKlayUnitValue = function(unit) {
     unit = unit || 'KLAY'
@@ -275,7 +294,7 @@ const fromPeb = function(number, unit) {
         number = tryNumberToString(number)
     }
 
-    return utils.isBN(number) ? ethjsUnit.fromWei(number, unit) : ethjsUnit.fromWei(number, unit).toString(10)
+    return ethjsUnit.fromWei(number, unit)
 }
 
 const toPeb = function(number, unit) {
@@ -290,6 +309,34 @@ const toPeb = function(number, unit) {
     }
 
     return utils.isBN(number) ? ethjsUnit.toWei(number, unit) : ethjsUnit.toWei(number, unit).toString(10)
+}
+
+/**
+ * Converts peb amount to specific unit amount.
+ *
+ * @method convertFromPeb
+ * @param {number|string|BN|BigNumber} amount the peb amount
+ * @param {string|KlayUnit} unitString the unit to convert to
+ * @return {string}
+ */
+const convertFromPeb = function(number, unitString) {
+    if (_.isObject(unitString) && unitString.unit) unitString = unitString.unit
+    const converted = fromPeb(number, unitString)
+    return utils.isBN(converted) ? converted.toString(10) : converted
+}
+
+/**
+ * Converts amount to peb amount
+ *
+ * @method convertToPeb
+ * @param {number|string|BN|BigNumber} amount the amount to convert
+ * @param {string|KlayUnit} unitString the unit to convert from
+ * @return {string|BN}
+ */
+const convertToPeb = function(number, unitString) {
+    if (_.isObject(unitString) && unitString.unit) unitString = unitString.unit
+    const converted = toPeb(number, unitString)
+    return utils.isBN(converted) ? converted.toString(10) : converted
 }
 
 function tryNumberToString(number) {
@@ -421,6 +468,7 @@ module.exports = {
     fromAscii: asciiToHex,
 
     unitMap: unitKlayMap,
+    klayUnit: KlayUnit,
     toWei: toWei,
     fromWei: fromWei,
 
@@ -428,6 +476,8 @@ module.exports = {
     unitKlayMap: unitKlayMap,
     toPeb: toPeb,
     fromPeb: fromPeb,
+    convertFromPeb: convertFromPeb,
+    convertToPeb: convertToPeb,
 
     BN: utils.BN,
     isBN: utils.isBN,
@@ -470,6 +520,9 @@ module.exports = {
     toTwosComplement: utils.toTwosComplement,
     isTxHash: utils.isTxHash,
     isTxHashStrict: utils.isTxHashStrict,
+    isValidHash: utils.isValidHash,
+    isValidHashStrict: utils.isValidHashStrict,
+
     // Moved promiEvent to utils,
     promiEvent: promiEvent,
     Iban: Iban,
@@ -486,6 +539,7 @@ module.exports = {
     isValidPrivateKey: utils.isValidPrivateKey,
     isValidNSHSN: utils.isValidNSHSN,
     parsePrivateKey: utils.parsePrivateKey,
+    parseKlaytnWalletKey: utils.parseKlaytnWalletKey,
     isKlaytnWalletKey: utils.isKlaytnWalletKey,
     isContractDeployment: utils.isContractDeployment,
     // RLP
@@ -507,4 +561,7 @@ module.exports = {
     isValidRole: utils.isValidRole,
 
     isEmptySig: utils.isEmptySig,
+
+    hashMessage: utils.hashMessage,
+    recover: utils.recover,
 }

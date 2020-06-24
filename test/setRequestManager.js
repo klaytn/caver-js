@@ -27,7 +27,7 @@ const expect = chai.expect
 const Caver = require('../index.js')
 const testRPCURL = require('./testrpc')
 const { Manager } = require('../packages/caver-core-requestmanager/src/index')
-const { kip7JsonInterface } = require('../packages/caver-klay/caver-klay-kct/kctHelper')
+const { kip7JsonInterface } = require('../packages/caver-kct/src/kctHelper')
 
 describe('setRequestManager', () => {
     it('CAVERJS-UNIT-ETC-203: should call setRequestManager with each pacakge instead of setProvider', () => {

@@ -23,6 +23,7 @@
 //
 // To execute a specific test,
 // $ mocha --grep INT-LEGACY/012 test/intTest.js
+const _ = require('lodash')
 const RLP = require('eth-lib/lib/rlp')
 const Bytes = require('eth-lib/lib/bytes')
 
@@ -72,7 +73,7 @@ function isDict(v) {
 
 function replaceWithEnv(data) {
     function replaceElemWithEnv(elem) {
-        if (deployedContractAddr[elem] !== undefined) return deployedContractAddr[elem].address
+        if (deployedContractAddr[elem] !== undefined) return deployedContractAddr[elem].address.toLowerCase()
 
         if (elem === undefined) return elem
         if (elem === 'env.sender') return testEnv.sender.address
@@ -93,18 +94,18 @@ function replaceWithEnv(data) {
         const getRandomAccount = id => {
             if (testEnv.random === undefined) testEnv.random = {}
             if (testEnv.random[id] === undefined) {
-                const acc = caver.klay.accounts.create()
-                caver.klay.accounts.wallet.add(acc.privateKey)
-                testEnv.random[id] = acc
+                const keyring = caver.wallet.keyring.generate()
+                caver.wallet.add(keyring)
+                testEnv.random[id] = keyring
             }
             return testEnv.random[id]
         }
 
         if (elem.endsWith('.privateKey')) {
-            return getRandomAccount(elem.replace('.privateKey', '')).privateKey
+            return getRandomAccount(elem.replace('.privateKey', '')).key.privateKey
         }
         if (elem.startsWith('random')) {
-            return getRandomAccount(elem).address
+            return getRandomAccount(elem).address.toLowerCase()
         }
 
         if (elem.startsWith('contract')) {
@@ -113,7 +114,7 @@ function replaceWithEnv(data) {
 
         if (elem.startsWith('env.accounts')) {
             const k = elem.replace('env.accounts.', '')
-            return testEnv.accounts[k].address
+            return testEnv.accounts[k].address.toLowerCase()
         }
 
         return elem
@@ -217,19 +218,20 @@ function processAccountKey(tx) {
 async function processCall(t) {
     const contractAddr = deployedContractAddr[t.call.to].address
     const abi = deployedContractAddr[t.call.to].abi
-    const contract = new caver.klay.Contract(abi, contractAddr)
+    const contract = new caver.contract(abi, contractAddr)
 
     const from = replaceWithEnv(t.call.from)
     const params = replaceWithEnv(t.call.params)
 
-    const value = await contract.methods[t.call.method](...params).call({ from })
+    let value = await contract.methods[t.call.method](...params).call({ from })
+    if (_.isString(value)) value = value.toLowerCase()
     expect(value).to.equal(replaceWithEnv(t.expected.returns))
 }
 
 async function processSend(t) {
     const contractAddr = deployedContractAddr[t.send.to].address
     const abi = deployedContractAddr[t.send.to].abi
-    const contract = new caver.klay.Contract(abi, contractAddr)
+    const contract = new caver.contract(abi, contractAddr)
 
     const from = replaceWithEnv(t.send.from)
     let params = replaceWithEnv(t.send.params)
@@ -254,7 +256,7 @@ async function processSend(t) {
     // console.log(receipt)
     if (t.expected.receipt) {
         expect(receipt).to.not.undefined
-        if (t.expected.receipt.status) expect(receipt.status).to.equal(t.expected.receipt.status)
+        if (t.expected.receipt.status) expect(receipt.status).to.equal(t.expected.receipt.status ? '0x1' : '0x0')
         if (t.expected.receipt.txError) expect(receipt.txError).to.equal(t.expected.receipt.txError)
     }
 
@@ -263,7 +265,7 @@ async function processSend(t) {
             expect(receipt.events[idx].raw.topics).to.deep.equal(t.expected.rawEvents[idx].topics)
             if (t.expected.rawEvents[idx].data.encodeParameters) {
                 params = replaceWithEnv(t.expected.rawEvents[idx].data.encodeParameters)
-                const data = caver.klay.abi.encodeParameters(...params)
+                const data = caver.abi.encodeParameters(...params)
                 expect(receipt.events[idx].raw.data).to.equal(data)
             }
         })
@@ -370,7 +372,7 @@ async function processTransaction(t) {
     let actual
     let receipt
 
-    await caver.klay.sendSignedTransaction(rawTransaction).then(
+    await caver.rpc.klay.sendRawTransaction(rawTransaction).then(
         r => {
             receipt = r
             // console.log(r)
@@ -378,7 +380,7 @@ async function processTransaction(t) {
                 if (t.expected.receipt.checkContractAddress) {
                     const addrHash = caver.utils.keccak256(RLP.encode([t.tx.from.toLowerCase(), Bytes.fromNat(t.tx.nonce)]))
                     const address = caver.utils.toChecksumAddress(`0x${addrHash.slice(-40)}`)
-                    expect(r.contractAddress).to.equal(address)
+                    expect(r.contractAddress.toLowerCase()).to.equal(address.toLowerCase())
                 }
 
                 if (t.expected.receipt.codeFormat) expect(r.codeFormat).to.equal(t.expected.receipt.codeFormat)
@@ -410,7 +412,7 @@ async function processTransaction(t) {
             testEnv.contracts[t.deployedAddress] = receipt.contractAddress
         }
         if (t.expected.receipt && t.expected.receipt.status) {
-            expect(receipt.status).to.equal(t.expected.receipt.status)
+            expect(receipt.status).to.equal(t.expected.receipt.status ? '0x1' : '0x0')
         }
         if (t.expected.receipt && t.expected.receipt.txError) {
             expect(receipt.txError).to.equal(t.expected.receipt.txError)
@@ -423,13 +425,13 @@ async function processTransaction(t) {
 async function processApi(t) {
     if (t.api.pre !== undefined) {
         const rawTransaction = await getSignedRawTransaction(t.api.pre)
-        testEnv.receipt = await caver.klay.sendSignedTransaction(rawTransaction)
+        testEnv.receipt = await caver.rpc.klay.sendRawTransaction(rawTransaction)
     }
     if (t.api.preSigned !== undefined) {
         testEnv.rawTransaction = await getSignedRawTransaction(t.api.preSigned)
     }
     await new Promise((resolve, reject) => {
-        caver.klay._requestManager.send(
+        caver.rpc.klay._requestManager.send(
             {
                 method: t.api.method,
                 params: replaceWithEnv(t.api.params),
@@ -472,10 +474,16 @@ async function processApi(t) {
 
 before(() => {
     caver = new Caver(testEnv.URL)
-    caver.klay.accounts.wallet.add(testEnv.sender.privateKey)
+    // caver.klay.accounts.wallet.add(testEnv.sender.privateKey)
+
+    const keyring = caver.wallet.keyring.createFromPrivateKey(testEnv.sender.privateKey)
+    caver.wallet.add(keyring)
+
     if (testEnv.accounts) {
         Object.keys(testEnv.accounts).forEach(acc => {
-            caver.klay.accounts.wallet.add(testEnv.accounts[acc].privateKey)
+            // caver.klay.accounts.wallet.add(testEnv.accounts[acc].privateKey)
+            const testKeyring = caver.wallet.keyring.createFromPrivateKey(testEnv.accounts[acc].privateKey)
+            caver.wallet.add(testKeyring)
         })
     }
 })
@@ -536,7 +544,7 @@ describe('Integration tests', () => {
                             const gas = 100000000
 
                             const params = replaceWithEnv(tc.deploy[k].constructorParams)
-                            const contractInstance = new caver.klay.Contract(abi)
+                            const contractInstance = new caver.contract(abi)
                             const newContractInstance = await contractInstance
                                 .deploy({
                                     data: `0x${bin}`,
@@ -568,7 +576,7 @@ describe('Integration tests', () => {
                             } catch (err) {
                                 if (String(err).includes('AssertionError: expected')) throw err
 
-                                if (t.expected.status !== false) {
+                                if (t.expected === undefined || t.expected.status === undefined || t.expected.status !== false) {
                                     console.log(err)
                                 }
                                 expect(t.expected.status).to.be.false

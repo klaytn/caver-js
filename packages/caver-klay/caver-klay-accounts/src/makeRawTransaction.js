@@ -681,16 +681,14 @@ function _decodeFromRawTransaction(rawTransaction, type) {
             }
         }
         case 'CHAIN_DATA_ANCHORING': {
-            const [nonce, gasPrice, gas, to, value, from, data, signatures] = RLP.decode(rawTransaction)
+            const [nonce, gasPrice, gas, from, data, signatures] = RLP.decode(rawTransaction)
             return {
                 type: typeString,
                 nonce,
                 gasPrice,
                 gas,
-                to,
-                value,
                 from,
-                anchoredData: data,
+                data: data,
                 v: signatures[0][0],
                 r: signatures[0][1],
                 s: signatures[0][2],
