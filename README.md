@@ -187,8 +187,8 @@ API Specification
 The API lists of caver-js are described in folloinwg links:
 
 * [caver.account](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.account)
-* [caver.wallet.keyring](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet.keyring)
 * [caver.wallet](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet)
+* [caver.wallet.keyring](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.wallet/keyring)
 * [caver.transaction](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.transaction)
 * [caver.rpc.klay](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.rpc/klay)
 * [caver.rpc.net](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.rpc/net)
