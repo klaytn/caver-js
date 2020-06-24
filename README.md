@@ -15,6 +15,7 @@ Table of contents
       * [Units for KLAY](#units-for-klay)
    * [Documentation](#documentation)
    * [API Specification](#api-specification)
+   * [Web3.js Similarity](#web3.js-similarity)
    * [Error Code Improvement](#error-code-improvement)
    * [Sample Projects](#sample-projects)
    * [Github Repository](#github-repository)
@@ -196,6 +197,24 @@ The API lists of caver-js are described in folloinwg links:
 * [caver.kct.kip7](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.kct/kip7)
 * [caver.kct.kip17](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.kct/kip17)
 * [caver.utils](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.utils)
+
+Web3.js Similarity
+=================	
+Since caver-js has been evolved from web3.js, usage pattern of caver-js is very similar to that of web3.js.	
+This means a software developed using web3.js can be easily converted to caver-js.	
+The following examples are code patterns used in web3.js and caver-js, respectively.	
+
+```	
+const Web3 = require('web3');	
+const web3 = new Web3(new web3.providers.HttpProvider('http://localhost:8545'));	
+web3.eth.getBalance('0x407d73d8a49eeb85d32cf465507dd71d507100c1').then(console.log)	
+```	
+
+```	
+const Caver = require('caver-js');	
+const caver = new Caver(new Caver.providers.HttpProvider('http://localhost:8545'));	
+caver.rpc.klay.getBalance('0x407d73d8a49eeb85d32cf465507dd71d507100c1').then(console.log)	
+```	
 
 Error Code Improvement
 =================
