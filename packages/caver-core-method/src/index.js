@@ -423,7 +423,11 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
                         console.warn(`When sign/send a transaction using the Node API, existing 'feePayerSignatures' can be initialized.`)
                     }
                 }
-            } else {
+            } else if (key === 'codeFormat') {
+                tx[key] = utils.hexToNumber(payload.params[0][key])
+            } else if (key === 'account') {
+                tx.key = payload.params[0][key].getRLPEncodingAccountKey()
+            } else if (payload.params[0][key] !== '0x') {
                 tx[key] = payload.params[0][key]
             }
         })
