@@ -559,7 +559,7 @@ function checkDeployEssential(transaction) {
         return new Error('"value" is missing')
     }
 
-    if (transaction.input !== undefined && transaction.data !== undefined) {
+    if (transaction.input !== undefined && transaction.data !== undefined && !transaction.type.includes('TxType')) {
         return new Error(`"data" and "input" cannot be used as properties of transactions at the same time.`)
     }
     if (transaction.input === undefined && transaction.data === undefined) {
