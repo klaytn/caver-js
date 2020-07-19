@@ -35,7 +35,7 @@ const Bytes = require('eth-lib/lib/bytes')
 const cryp = typeof global === 'undefined' ? require('crypto-browserify') : require('crypto')
 const uuid = require('uuid')
 const elliptic = require('elliptic')
-const scrypt = require('@web3-js/scrypt-shim')
+const scrypt = require('scrypt-js')
 const utils = require('../../../caver-utils')
 const helpers = require('../../../caver-core-helpers')
 
@@ -246,7 +246,7 @@ function encryptKey(privateKey, password, options) {
             kdfparams.n = options.n || 4096 // 2048 4096 8192 16384
             kdfparams.r = options.r || 8
             kdfparams.p = options.p || 1
-            derivedKey = scrypt(
+            derivedKey = scrypt.syncScrypt(
                 Buffer.from(password),
                 Buffer.from(kdfparams.salt, 'hex'),
                 kdfparams.n,
@@ -1445,7 +1445,7 @@ Accounts.prototype.decrypt = function(v3Keystore, password, nonStrict) {
                 kdfparams = encrypted.kdfparams
 
                 // FIXME: support progress reporting callback
-                derivedKey = scrypt(
+                derivedKey = scrypt.syncScrypt(
                     Buffer.from(password),
                     Buffer.from(kdfparams.salt, 'hex'),
                     kdfparams.n,

@@ -17,7 +17,7 @@
 */
 
 const _ = require('lodash')
-const scrypt = require('@web3-js/scrypt-shim')
+const scrypt = require('scrypt-js')
 const uuid = require('uuid')
 const cryp = typeof global === 'undefined' ? require('crypto-browserify') : require('crypto')
 const utils = require('../../../caver-utils')
@@ -80,7 +80,7 @@ const decryptKey = (encryptedArray, password) => {
             kdfparams = encrypted.kdfparams
 
             // FIXME: support progress reporting callback
-            derivedKey = scrypt(
+            derivedKey = scrypt.syncScrypt(
                 Buffer.from(password),
                 Buffer.from(kdfparams.salt, 'hex'),
                 kdfparams.n,
@@ -145,7 +145,7 @@ const encryptKey = (privateKey, password, options) => {
             kdfparams.n = options.n || 4096 // 2048 4096 8192 16384
             kdfparams.r = options.r || 8
             kdfparams.p = options.p || 1
-            derivedKey = scrypt(
+            derivedKey = scrypt.syncScrypt(
                 Buffer.from(password),
                 Buffer.from(kdfparams.salt, 'hex'),
                 kdfparams.n,
