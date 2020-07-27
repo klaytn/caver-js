@@ -26,7 +26,7 @@ chai.use(sinonChai)
 
 const expect = chai.expect
 
-const websocketURL = require('./testWebsocket')
+const websocketURL = 'wss://api.baobab.klaytn.net:8652/'
 
 const Caver = require('../index.js')
 
