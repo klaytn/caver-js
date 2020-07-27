@@ -62,6 +62,9 @@ HttpProvider.prototype._prepareRequest = function() {
         })
     }
 
+    // Set https default port
+    if (request._url.port === null && this.host.slice(0, 5) === 'https') request._url.port = 443
+
     return request
 }
 
