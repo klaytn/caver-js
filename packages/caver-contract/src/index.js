@@ -91,6 +91,12 @@ const Contract = function Contract(jsonInterface, address, options) {
         }
     }
 
+    Object.defineProperty(this, 'defaultSendOptions', {
+        get() {
+            return _this.options
+        },
+    })
+
     // set address
     Object.defineProperty(this.options, 'address', {
         set(value) {
