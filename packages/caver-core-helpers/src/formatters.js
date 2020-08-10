@@ -89,7 +89,7 @@ const _txInputFormatter = function(options) {
         }
     }
 
-    if (options.data && options.input) {
+    if (options.data && options.input && !options.type.includes('TxType')) {
         throw new Error(
             'You can\'t have "data" and "input" as properties of transactions at the same time, please use either "data" or "input" instead.'
         )
@@ -182,7 +182,8 @@ const inputTransactionFormatter = function(options) {
     }
 
     // Set typeInt value in object
-    options.typeInt = getTypeInt(options.type)
+    const typeInt = getTypeInt(options.type)
+    if (typeInt !== '') options.typeInt = typeInt
 
     return options
 }

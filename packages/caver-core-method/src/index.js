@@ -409,8 +409,25 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
             let key = k
             if (key.startsWith('_')) key = key.slice(1)
             if (key === 'signatures' || key === 'feePayerSignatures') {
-                if (!utils.isEmptySig(payload.params[0][key])) tx[key] = utils.transformSignaturesToObject(payload.params[0][key])
-            } else {
+                if (!utils.isEmptySig(payload.params[0][key])) {
+                    tx[key] = utils.transformSignaturesToObject(payload.params[0][key])
+
+                    if (key === 'signatures' && (methodName === 'klay_signTransaction' || methodName === 'klay_sendTransaction')) {
+                        console.warn(`When sign/send a transaction using the Node API, existing 'signatures' can be initialized.`)
+                    }
+
+                    if (
+                        key === 'feePayerSignatures' &&
+                        (methodName === 'klay_signTransactionAsFeePayer' || methodName === 'klay_sendTransactionAsFeePayer')
+                    ) {
+                        console.warn(`When sign/send a transaction using the Node API, existing 'feePayerSignatures' can be initialized.`)
+                    }
+                }
+            } else if (key === 'codeFormat') {
+                tx[key] = utils.hexToNumber(payload.params[0][key])
+            } else if (key === 'account') {
+                tx.key = payload.params[0][key].getRLPEncodingAccountKey()
+            } else if (payload.params[0][key] !== '0x') {
                 tx[key] = payload.params[0][key]
             }
         })

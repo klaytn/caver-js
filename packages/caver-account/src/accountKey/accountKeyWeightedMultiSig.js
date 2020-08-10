@@ -114,7 +114,12 @@ class AccountKeyWeightedMultiSig {
 
         const encodedMultisigPublicKeys = []
         for (const weightedPublicKey of this.weightedPublicKeys) {
-            encodedMultisigPublicKeys.push(weightedPublicKey.encodeToBytes())
+            if (weightedPublicKey.weight === undefined) throw new Error('weight should be specified for a multisig account')
+            if (weightedPublicKey.publicKey === undefined) throw new Error('publicKey should be specified for a multisig account')
+
+            const compressedPublicKey = utils.compressPublicKey(weightedPublicKey.publicKey)
+
+            encodedMultisigPublicKeys.push([Bytes.fromNat(utils.numberToHex(weightedPublicKey.weight)), compressedPublicKey])
         }
 
         return (
