@@ -102,7 +102,7 @@ const decryptKey = (encryptedArray, password) => {
 
         const ciphertext = Buffer.from(encrypted.ciphertext, 'hex')
 
-        const mac = utils.sha3(Buffer.concat([derivedKey.slice(16, 32), ciphertext])).replace('0x', '')
+        const mac = utils.sha3(Buffer.from([...derivedKey.slice(16, 32), ...ciphertext])).replace('0x', '')
         if (mac !== encrypted.mac) {
             throw new Error('Key derivation failed - possibly wrong password')
         }
