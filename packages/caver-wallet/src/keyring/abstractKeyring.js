@@ -47,12 +47,52 @@ class AbstractKeyring {
     }
 
     /**
+     * signs with transactionHash with a key and returns signature(s).
+     * This method has to be overrided in classes which extends AbstractKeyring.
+     *
+     * @return {Array.<string>|Array.<Array.<string>>}
+     */
+    sign(transactionHash, chainId, role, index) {
+        throw new Error(`Not implemented.`)
+    }
+
+    /**
+     * signs with hashed message and returns result object that includes `signatures`, `message` and `messageHash`.
+     * This method has to be overrided in classes which extends AbstractKeyring.
+     *
+     * @return {object}
+     */
+    signMessage(message, role, index) {
+        throw new Error(`Not implemented.`)
+    }
+
+    /**
+     * encrypts a keyring and returns a keystore v4 object.
+     * This method has to be overrided in classes which extends AbstractKeyring.
+     *
+     * @return {object}
+     */
+    encrypt(password, options = {}) {
+        throw new Error(`Not implemented.`)
+    }
+
+    /**
+     * returns a copied singleKeyring instance.
+     * This method has to be overrided in classes which extends AbstractKeyring.
+     *
+     * @return {AbstractKeyring}
+     */
+    copy() {
+        throw new Error(`Not implemented.`)
+    }
+
+    /**
      * returns KlaytnWalletKey format. If keyring uses more than one private key, this function will throw error.
      *
      * @return {string}
      */
     getKlaytnWalletKey() {
-        throw new Error(`The keyring cannot be exported in KlaytnWalletKey format. Use keyring.encrypt.`)
+        throw new Error(`Not supported for this class.`)
     }
 
     /**
@@ -63,7 +103,7 @@ class AbstractKeyring {
      * @return {object}
      */
     encryptV3(password, options) {
-        throw new Error(`This keyring cannot be encrypted keystore v3. use 'keyring.encrypt(password)'.`)
+        throw new Error(`Not supported for this class. Use 'keyring.encrypt(password)'.`)
     }
 
     /**

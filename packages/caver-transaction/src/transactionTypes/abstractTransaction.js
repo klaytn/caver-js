@@ -141,6 +141,27 @@ class AbstractTransaction {
     }
 
     /**
+     * Returns the RLP-encoded string of this transaction (i.e., rawTransaction).
+     * This method has to be overrided in classes which extends AbstractTransaction.
+     *
+     * @return {string}
+     */
+    getRLPEncoding() {
+        throw new Error(`Not implemented.`)
+    }
+
+    /**
+     * Returns the RLP-encoded string to make the signature of this transaction.
+     * This method has to be overrided in classes which extends AbstractTransaction.
+     * getCommonRLPEncodingForSignature is used in getRLPEncodingForSignature.
+     *
+     * @return {string}
+     */
+    getCommonRLPEncodingForSignature() {
+        throw new Error(`Not implemented.`)
+    }
+
+    /**
      * Signs to the transaction with private key(s) in the `key`.
      * @async
      * @param {Keyring|string} key - The instance of Keyring, private key string or KlaytnWalletKey string.
@@ -286,18 +307,6 @@ class AbstractTransaction {
             throw new Error(`chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`)
 
         return RLP.encode([this.getCommonRLPEncodingForSignature(), Bytes.fromNat(this.chainId), '0x', '0x'])
-    }
-
-    /**
-     * Returns the RLP-encoded string to make the signature of this transaction.
-     * This method has to be overrided in classes which extends AbstractTransaction.
-     * getCommonRLPEncodingForSignature is used in getRLPEncodingForSignature.
-     *
-     * @return {string}
-     */
-    // eslint-disable-next-line class-methods-use-this
-    getCommonRLPEncodingForSignature() {
-        throw new Error('getCommonRLPEncodingForSignature has to be implemented')
     }
 
     /**
