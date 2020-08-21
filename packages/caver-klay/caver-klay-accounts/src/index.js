@@ -263,9 +263,9 @@ function encryptKey(privateKey, password, options) {
             throw new Error('Unsupported cipher')
         }
 
-        const ciphertext = Buffer.concat([cipher.update(Buffer.from(privateKeyArray[i].replace('0x', ''), 'hex')), cipher.final()])
+        const ciphertext = Buffer.from([...cipher.update(Buffer.from(privateKeyArray[i].replace('0x', ''), 'hex')), ...cipher.final()])
 
-        const mac = utils.sha3(Buffer.concat([derivedKey.slice(16, 32), Buffer.from(ciphertext, 'hex')])).replace('0x', '')
+        const mac = utils.sha3(Buffer.from([...derivedKey.slice(16, 32), ...ciphertext])).replace('0x', '')
 
         encryptedArray.push({
             ciphertext: ciphertext.toString('hex'),
@@ -1479,7 +1479,7 @@ Accounts.prototype.decrypt = function(v3Keystore, password, nonStrict) {
             }
 
             const decipher = cryp.createDecipheriv(encrypted.cipher, derivedKey.slice(0, 16), Buffer.from(encrypted.cipherparams.iv, 'hex'))
-            decryptedArray.push(`0x${Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('hex')}`)
+            decryptedArray.push(`0x${Buffer.from([...decipher.update(ciphertext), ...decipher.final()]).toString('hex')}`)
         }
         return decryptedArray.length === 1 ? decryptedArray[0] : decryptedArray
     }

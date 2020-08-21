@@ -21,6 +21,7 @@ const scrypt = require('scrypt-js')
 const uuid = require('uuid')
 const cryp = typeof global === 'undefined' ? require('crypto-browserify') : require('crypto')
 const utils = require('../../../caver-utils')
+const PrivateKey = require('./privateKey')
 
 const KEY_ROLE = {
     roleTransactionKey: 0,
@@ -108,7 +109,7 @@ const decryptKey = (encryptedArray, password) => {
         }
 
         const decipher = cryp.createDecipheriv(encrypted.cipher, derivedKey.slice(0, 16), Buffer.from(encrypted.cipherparams.iv, 'hex'))
-        decryptedArray.push(`0x${Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('hex')}`)
+        decryptedArray.push(`0x${Buffer.from([...decipher.update(ciphertext), ...decipher.final()]).toString('hex')}`)
     }
     return decryptedArray
 }
@@ -162,12 +163,11 @@ const encryptKey = (privateKey, password, options) => {
             throw new Error('Unsupported cipher')
         }
 
-        const ciphertext = Buffer.concat([
-            cipher.update(Buffer.from(privateKeyArray[i].privateKey.replace('0x', ''), 'hex')),
-            cipher.final(),
-        ])
+        let prv = privateKeyArray[i]
+        if (privateKeyArray[i] instanceof PrivateKey) prv = privateKeyArray[i].privateKey
+        const ciphertext = Buffer.from([...cipher.update(Buffer.from(prv.replace('0x', ''), 'hex')), ...cipher.final()])
 
-        const mac = utils.sha3(Buffer.concat([derivedKey.slice(16, 32), Buffer.from(ciphertext, 'hex')])).replace('0x', '')
+        const mac = utils.sha3(Buffer.from([...derivedKey.slice(16, 32), ...ciphertext])).replace('0x', '')
 
         encryptedArray.push({
             ciphertext: ciphertext.toString('hex'),
