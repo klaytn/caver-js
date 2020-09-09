@@ -900,7 +900,10 @@ const compressPublicKey = uncompressedPublicKey => {
 }
 
 const decompressPublicKey = compressedPublicKey => {
-    if (!isCompressedPublicKey(compressedPublicKey)) return compressedPublicKey
+    if (!isCompressedPublicKey(compressedPublicKey)) {
+        if (!isValidPublicKey(compressedPublicKey)) throw new Error(`Invalid public key`)
+        return compressedPublicKey
+    }
 
     const compressedWithoutPrefix = compressedPublicKey.replace('0x', '')
 
