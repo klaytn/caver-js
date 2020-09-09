@@ -714,6 +714,7 @@ const xyPointFromPublicKey = pub => {
     if (isCompressedPublicKey(publicKey)) publicKey = decompressPublicKey(pub)
 
     publicKey = publicKey.replace('0x', '')
+    if (publicKey.length === 130 && publicKey.slice(0, 2) === '04') publicKey = publicKey.slice(2)
     if (publicKey.length !== 128) throw Error('Invalid public key') // + 2 means '0x'
 
     const pubX = `0x${publicKey.slice(0, 64).replace(/^0+/, '')}`
