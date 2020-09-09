@@ -60,6 +60,12 @@ const testCases = [
             '0x77e05dd93cdd6362f8648447f33d5676cbc5f42f4c4946ae1ad62bd4c0c4f3570b1a104b67d1cd169bbf61dd557f15ab5ee8b661326096954caddadf34ae6ac8',
         compressed: '0x0277e05dd93cdd6362f8648447f33d5676cbc5f42f4c4946ae1ad62bd4c0c4f357',
     },
+    {
+        // Test with 04 uncompressed prefixed public key string
+        uncompressed:
+            '0x04019b186993b620455077b6bc37bf61666725d8d87ab33eb113ac0414cd48d78ff46e5ea48c6f22e8f19a77e5dbba9d209df60cbcb841b7e3e81fe444ba829831',
+        compressed: '0x03019b186993b620455077b6bc37bf61666725d8d87ab33eb113ac0414cd48d78f',
+    },
 ]
 
 describe('caver.utils.compressPublicKey', () => {
@@ -71,6 +77,7 @@ describe('caver.utils.compressPublicKey', () => {
         expect(caver.utils.compressPublicKey(testCases[4].uncompressed)).to.equal(testCases[4].compressed)
         expect(caver.utils.compressPublicKey(testCases[5].uncompressed)).to.equal(testCases[5].compressed)
         expect(caver.utils.compressPublicKey(testCases[6].uncompressed)).to.equal(testCases[6].compressed)
+        expect(caver.utils.compressPublicKey(testCases[7].uncompressed)).to.equal(testCases[7].compressed)
     })
 
     it('CAVERJS-UNIT-SER-023 : Should return same one with the argument if the argument is compressed public key', () => {
@@ -81,6 +88,13 @@ describe('caver.utils.compressPublicKey', () => {
         expect(caver.utils.compressPublicKey(testCases[4].compressed)).to.equal(testCases[4].compressed)
         expect(caver.utils.compressPublicKey(testCases[5].compressed)).to.equal(testCases[5].compressed)
         expect(caver.utils.compressPublicKey(testCases[6].compressed)).to.equal(testCases[6].compressed)
+        expect(caver.utils.compressPublicKey(testCases[7].compressed)).to.equal(testCases[7].compressed)
+    })
+
+    it('CAVERJS-UNIT-SER-068: Should throw error if public key is invalid', () => {
+        const invalidFormat = '0x019b186993b620455077b6bc37bf61666725d8d87ab33eb113ac0414cd48d78f'
+        const expectedError = `Invalid public key`
+        expect(() => caver.utils.compressPublicKey(invalidFormat)).to.throw(expectedError)
     })
 })
 
@@ -125,5 +139,12 @@ describe('caver.utils.decompressPublicKey', () => {
         expect(caver.utils.decompressPublicKey(testCases[4].uncompressed)).to.equal(testCases[4].uncompressed)
         expect(caver.utils.decompressPublicKey(testCases[5].uncompressed)).to.equal(testCases[5].uncompressed)
         expect(caver.utils.decompressPublicKey(testCases[6].uncompressed)).to.equal(testCases[6].uncompressed)
+    })
+
+    it('CAVERJS-UNIT-SER-069: Should throw error if public key is invalid', () => {
+        const invalidFormat =
+            '0xe05dd93cdd6362f8648447f33d5676cbc5f42f4c4946ae1ad62bd4c0c4f3570b1a104b67d1cd169bbf61dd557f15ab5ee8b661326096954caddadf34ae6ac8'
+        const expectedError = `Invalid public key`
+        expect(() => caver.utils.compressPublicKey(invalidFormat)).to.throw(expectedError)
     })
 })
