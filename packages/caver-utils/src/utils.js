@@ -851,6 +851,8 @@ const getTxTypeStringFromRawTransaction = rawTransaction => {
 const isValidPublicKey = publicKey => {
     let pubString = publicKey.replace('0x', '')
 
+    if (pubString.length === 130 && pubString.slice(0, 2) === '04') pubString = pubString.slice(2)
+
     if (pubString.length !== 66 && pubString.length !== 128) return false
 
     if (pubString.length === 66 && !isCompressedPublicKey(pubString)) return false
