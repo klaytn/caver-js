@@ -106,8 +106,12 @@ HttpProvider.prototype.send = function(payload, callback) {
                 try {
                     result = JSON.parse(result)
                 } catch (e) {
-                    console.error(`Invalid JSON RPC response: ${JSON.stringify(request.responseText)}`)
-                    error = errors.InvalidResponse(request.responseText)
+                    if (request.responseText === '') {
+                        error = errors.RequestFailed(request.statusText)
+                    } else {
+                        console.error(`Invalid JSON RPC response: ${JSON.stringify(request.responseText)}`)
+                        error = errors.InvalidResponse(request.responseText)
+                    }
                 }
             }
 

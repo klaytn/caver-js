@@ -63,6 +63,7 @@ const txErrorTable = {
 
 module.exports = {
     InvalidConnection: host => new Error(`CONNECTION ERROR: Couldn't connect to node ${host}.`),
+    RequestFailed: err => new Error(`Request failed: ${err}`),
     ConnectionTimeout: ms => new Error(`CONNECTION TIMEOUT: timeout of ${ms}ms achived`),
     ConnectionNotOpenError: event => {
         const error = new Error('connection not open on send()')
