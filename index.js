@@ -117,6 +117,7 @@ function Caver(provider, net) {
 }
 
 Caver.utils = utils
+Caver.abi = abi
 Caver.providers = providers
 
 module.exports = Caver
