@@ -30,11 +30,11 @@ class IPFS {
      * Create an IPFS.
      * @param {string} host The host url.
      * @param {number} port The port number to use.
-     * @param {string} protocol The protocol to use.
+     * @param {boolean} ssl With or without SSL.
      */
-    constructor(host, port, protocol) {
-        if (host !== undefined && port !== undefined && protocol !== undefined) {
-            this.setIPFSNode(host, port, protocol)
+    constructor(host, port, ssl) {
+        if (host !== undefined && port !== undefined && ssl !== undefined) {
+            this.setIPFSNode(host, port, ssl)
         }
     }
 
@@ -43,10 +43,11 @@ class IPFS {
      *
      * @param {string} host The host url.
      * @param {number} port The port number to use.
-     * @param {string} protocol The protocol to use.
+     * @param {boolean} ssl With or without SSL.
      * @return {void}
      */
-    setIPFSNode(host, port, protocol) {
+    setIPFSNode(host, port, ssl) {
+        const protocol = ssl ? 'https' : 'http'
         this.ipfs = new IPFSAPI({ host, port, protocol })
     }
 

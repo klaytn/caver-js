@@ -39,7 +39,7 @@ before(() => {
 describe('Connect IPFS with Klaytn', () => {
     it('should add file to IPFS and return hash', async () => {
         // Set IPFS Node
-        caver.ipfs.setIPFSNode('ipfs.infura.io', 5001, 'https')
+        caver.ipfs.setIPFSNode('ipfs.infura.io', 5001, true)
 
         // Create test txt file for IPFS
         const testFileName = './ipfsTestFile.txt'
