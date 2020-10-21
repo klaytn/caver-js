@@ -6,7 +6,7 @@
   "scripts": {
     "test": "npm run build && npm run transactionTest && mocha test/packages/caver.utils.js && mocha test/packages/caver.klay.net.js && npm run accountTest && npm run serTest && npm run walletTest",
     "build-all": "gulp all",
-    "build": "./node_modules/.bin/webpack --mode production --entry ./webpack.js  --output dist/caver.min.js",
+    "build": "./node_modules/.bin/webpack --mode production",
     "lint": "./node_modules/.bin/eslint './**/*.js'",
     "lintFix": "./node_modules/.bin/eslint './**/*.js' --fix",
     "serTest": "mocha test/transactionType/serializationTest.js && mocha test/compressionPublicKey.js && mocha test/encodeContractDeploy.js && mocha test/parseAccountKey.js && mocha test/decodeTransaction.js",
