@@ -21,27 +21,60 @@ const fs = require('fs')
 const IPFSAPI = require('ipfs-api')
 const multihash = require('multihashes')
 
+/**
+ * Representing a class for uploading and loading files to IPFS.
+ * @class
+ */
 class IPFS {
-    constructor() {
-        this.ipfs = new IPFSAPI({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' })
+    /**
+     * Create an IPFS.
+     * @param {object} opts - An object to use when creating an IPFS API instance.
+     */
+    constructor(opts) {
+        opts = opts || { host: 'ipfs.infura.io', port: 5001, protocol: 'https' }
+        this.ipfs = new IPFSAPI(opts)
     }
 
+    /**
+     * adds a file to IPFS
+     *
+     * @param {string} path The file path string.
+     * @return {string}
+     */
     async add(path) {
         const data = fs.readFileSync(path)
         const ret = await this.ipfs.add(data)
         return ret[0].hash
     }
 
+    /**
+     * gets a file from IPFS
+     *
+     * @param {string} hash The file hash string.
+     * @return {string}
+     */
     async get(hash) {
         const ret = await this.ipfs.cat(hash)
         return ret.toString()
     }
 
+    /**
+     * converts a hash to hex format.
+     *
+     * @param {string} hash The file hash string.
+     * @return {string}
+     */
     toHex(hash) {
         const buf = multihash.fromB58String(hash)
         return `0x${multihash.toHexString(buf)}`
     }
 
+    /**
+     * converts from a hex format.
+     *
+     * @param {string} hash The file hash string in hex format.
+     * @return {string}
+     */
     fromHex(contentHash) {
         const hex = contentHash.substring(2)
         const buf = multihash.fromHexString(hex)
