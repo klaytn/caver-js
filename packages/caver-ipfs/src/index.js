@@ -29,7 +29,7 @@ class IPFS {
     async add(path) {
         const data = fs.readFileSync(path)
         const ret = await this.ipfs.add(data)
-        return ret[0]
+        return ret[0].hash
     }
 
     async get(hash) {

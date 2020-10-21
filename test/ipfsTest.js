@@ -1,5 +1,5 @@
 /*
-    Copyright 2018 The caver-js Authors
+    Copyright 2020 The caver-js Authors
     This file is part of the caver-js library.
 
     The caver-js library is free software: you can redistribute it and/or modify
@@ -45,12 +45,10 @@ describe('Connect IPFS with Klaytn', () => {
 
         // Add file to IPFS
         const added = await caver.ipfs.add(testFileName)
-        expect(added.hash).not.to.be.undefined
-        expect(added.path).not.to.be.undefined
-        expect(added.size).not.to.be.undefined
+        expect(typeof added).to.equal('string')
 
         // Get contents from IPFS
-        const fileFromIPFS = await caver.ipfs.get(added.hash)
+        const fileFromIPFS = await caver.ipfs.get(added)
 
         // Create ValueTransferMemo transaction
         // to submit IPFS hash to Klaytn network
@@ -58,7 +56,7 @@ describe('Connect IPFS with Klaytn', () => {
             from: sender.address,
             to: sender.address,
             value: 1,
-            input: caver.ipfs.toHex(added.hash),
+            input: caver.ipfs.toHex(added),
             gas: 30000,
         })
 
@@ -67,7 +65,7 @@ describe('Connect IPFS with Klaytn', () => {
 
         // Send signed transaction
         const ret = await caver.rpc.klay.sendRawTransaction(vtm)
-        expect(ret.input).to.equal(caver.ipfs.toHex(added.hash))
+        expect(ret.input).to.equal(caver.ipfs.toHex(added))
 
         // Get a file from IPFS using the hash value recorded on the Klaytn network
         const catResult = await caver.ipfs.get(caver.ipfs.fromHex(ret.input))
