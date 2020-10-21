@@ -28,11 +28,26 @@ const multihash = require('multihashes')
 class IPFS {
     /**
      * Create an IPFS.
-     * @param {object} opts - An object to use when creating an IPFS API instance.
+     * @param {string} host The host url.
+     * @param {number} port The port number to use.
+     * @param {string} protocol The protocol to use.
      */
-    constructor(opts) {
-        opts = opts || { host: 'ipfs.infura.io', port: 5001, protocol: 'https' }
-        this.ipfs = new IPFSAPI(opts)
+    constructor(host, port, protocol) {
+        if (host !== undefined && port !== undefined && protocol !== undefined) {
+            this.setIPFSNode(host, port, protocol)
+        }
+    }
+
+    /**
+     * sets a IPFS Node
+     *
+     * @param {string} host The host url.
+     * @param {number} port The port number to use.
+     * @param {string} protocol The protocol to use.
+     * @return {void}
+     */
+    setIPFSNode(host, port, protocol) {
+        this.ipfs = new IPFSAPI({ host, port, protocol })
     }
 
     /**
@@ -42,6 +57,7 @@ class IPFS {
      * @return {string}
      */
     async add(path) {
+        if (!this.ipfs) throw new Error(`Please set IPFS Node through 'caver.ipfs.setIPFSNode'.`)
         const data = fs.readFileSync(path)
         const ret = await this.ipfs.add(data)
         return ret[0].hash
@@ -54,6 +70,7 @@ class IPFS {
      * @return {string}
      */
     async get(hash) {
+        if (!this.ipfs) throw new Error(`Please set IPFS Node through 'caver.ipfs.setIPFSNode'.`)
         const ret = await this.ipfs.cat(hash)
         return ret.toString()
     }
