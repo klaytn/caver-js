@@ -1414,7 +1414,7 @@ describe('keyring.getKlaytnWalletKey', () => {
 
     context('CAVERJS-UNIT-KEYRING-110: keyring type: multiSig', () => {
         it('should throw error when keyring has multiple keys', () => {
-            const expectedError = `The keyring cannot be exported in KlaytnWalletKey format. Use keyring.encrypt.`
+            const expectedError = `Not supported for this class.`
 
             expect(() => multiSig.getKlaytnWalletKey()).to.throw(expectedError)
         })
@@ -1422,7 +1422,7 @@ describe('keyring.getKlaytnWalletKey', () => {
 
     context('CAVERJS-UNIT-KEYRING-111: keyring type: roleBased', () => {
         it('should throw error when keyring has multiple keys', () => {
-            const expectedError = `The keyring cannot be exported in KlaytnWalletKey format. Use keyring.encrypt.`
+            const expectedError = `Not supported for this class.`
 
             expect(() => roleBased.getKlaytnWalletKey()).to.throw(expectedError)
         })
@@ -1686,7 +1686,7 @@ describe('keyring.encryptV3', () => {
     context('CAVERJS-UNIT-KEYRING-135: keyring type: multiSig, input: password', () => {
         it('should throw error when keyring use multiple private key', () => {
             const password = 'password'
-            const expectedError = `This keyring cannot be encrypted keystore v3. use 'keyring.encrypt(password)'.`
+            const expectedError = `Not supported for this class. Use 'keyring.encrypt(password)'.`
             expect(() => multiSig.encryptV3(password)).to.throw(expectedError)
         })
     })
@@ -1694,7 +1694,7 @@ describe('keyring.encryptV3', () => {
     context('CAVERJS-UNIT-KEYRING-136: keyring type: roleBased, input: password', () => {
         it('should throw error when keyring use different private keys by roles', () => {
             const password = 'password'
-            const expectedError = `This keyring cannot be encrypted keystore v3. use 'keyring.encrypt(password)'.`
+            const expectedError = `Not supported for this class. Use 'keyring.encrypt(password)'.`
             expect(() => roleBased.encryptV3(password)).to.throw(expectedError)
         })
     })

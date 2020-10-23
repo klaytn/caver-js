@@ -714,6 +714,7 @@ const xyPointFromPublicKey = pub => {
     if (isCompressedPublicKey(publicKey)) publicKey = decompressPublicKey(pub)
 
     publicKey = publicKey.replace('0x', '')
+    if (publicKey.length === 130 && publicKey.slice(0, 2) === '04') publicKey = publicKey.slice(2)
     if (publicKey.length !== 128) throw Error('Invalid public key') // + 2 means '0x'
 
     const pubX = `0x${publicKey.slice(0, 64).replace(/^0+/, '')}`
@@ -851,6 +852,8 @@ const getTxTypeStringFromRawTransaction = rawTransaction => {
 const isValidPublicKey = publicKey => {
     let pubString = publicKey.replace('0x', '')
 
+    if (pubString.length === 130 && pubString.slice(0, 2) === '04') pubString = pubString.slice(2)
+
     if (pubString.length !== 66 && pubString.length !== 128) return false
 
     if (pubString.length === 66 && !isCompressedPublicKey(pubString)) return false
@@ -897,7 +900,10 @@ const compressPublicKey = uncompressedPublicKey => {
 }
 
 const decompressPublicKey = compressedPublicKey => {
-    if (!isCompressedPublicKey(compressedPublicKey)) return compressedPublicKey
+    if (!isCompressedPublicKey(compressedPublicKey)) {
+        if (!isValidPublicKey(compressedPublicKey)) throw new Error(`Invalid public key`)
+        return compressedPublicKey
+    }
 
     const compressedWithoutPrefix = compressedPublicKey.replace('0x', '')
 
