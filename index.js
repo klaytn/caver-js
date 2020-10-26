@@ -49,6 +49,8 @@ const utils = require('./packages/caver-utils')
 const formatters = require('./packages/caver-core-helpers').formatters
 const helpers = require('./packages/caver-core-helpers')
 
+const IPFS = require('./packages/caver-ipfs')
+
 const { version } = require('./package.json')
 
 function Caver(provider, net) {
@@ -76,6 +78,8 @@ function Caver(provider, net) {
     this.klay = new Klay(this)
     this.rpc = new RPC(this)
     this.middleware = middleware
+
+    this.ipfs = new IPFS()
 
     // overwrite package setProvider
     const setProvider = this.setProvider
