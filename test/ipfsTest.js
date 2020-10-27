@@ -72,7 +72,7 @@ describe('Connect IPFS with Klaytn', () => {
 
         // Get a file from IPFS using the hash value recorded on the Klaytn network
         const catResult = await caver.ipfs.get(caver.ipfs.fromHex(ret.input))
-        expect(catResult).to.equal(fileFromIPFS)
+        expect(catResult.compare(fileFromIPFS)).to.equal(0)
 
         fs.unlinkSync(testFileName)
     }).timeout(1000000)

@@ -68,12 +68,12 @@ class IPFS {
      * gets a file from IPFS
      *
      * @param {string} hash The file hash string.
-     * @return {string}
+     * @return {Buffer}
      */
     async get(hash) {
         if (!this.ipfs) throw new Error(`Please set IPFS Node through 'caver.ipfs.setIPFSNode'.`)
         const ret = await this.ipfs.cat(hash)
-        return ret.toString()
+        return ret
     }
 
     /**
