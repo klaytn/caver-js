@@ -197,6 +197,7 @@ The API lists of caver-js are described in folloinwg links:
 * [caver.kct.kip7](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.kct/kip7)
 * [caver.kct.kip17](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.kct/kip17)
 * [caver.utils](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.utils)
+* [caver.ipfs](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.ipfs)
 
 Web3.js Similarity
 =================	
