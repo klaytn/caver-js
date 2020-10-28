@@ -37,7 +37,7 @@ before(() => {
 })
 
 describe('Connect IPFS with Klaytn', () => {
-    it('should add file to IPFS and return hash', async () => {
+    it('CAVERJS-UNIT-IPFS-001: should add file to IPFS and return hash', async () => {
         // Set IPFS Node
         caver.ipfs.setIPFSNode('ipfs.infura.io', 5001, true)
 
