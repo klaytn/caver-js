@@ -31,7 +31,7 @@ describe('CAVERJS-UNIT-ETC-044: caver.klay.net.getId', () => {
         it('should return networkId set in setting.js', async () => {
             const networkId = await caver.klay.net.getId()
             expect(networkId).to.be.a('number')
-        })
+        }).timeout(100000)
     })
 
     context('input: callback', () => {
@@ -41,7 +41,7 @@ describe('CAVERJS-UNIT-ETC-044: caver.klay.net.getId', () => {
                 expect(networkId).to.be.a('number')
                 done()
             })
-        })
+        }).timeout(100000)
     })
 })
 
@@ -50,14 +50,14 @@ describe('CAVERJS-UNIT-ETC-045: caver.klay.net.isListening', () => {
         it('should return boolean type', async () => {
             const isListening = await caver.klay.net.isListening()
             expect(isListening).to.be.a('boolean')
-        })
+        }).timeout(100000)
     })
 
     context('input: callback', () => {
         it('should return boolean type', async () => {
             const isListening = await caver.klay.net.isListening()
             expect(isListening).to.be.a('boolean')
-        })
+        }).timeout(100000)
     })
 })
 
@@ -67,7 +67,7 @@ describe('CAVERJS-UNIT-ETC-046: caver.klay.net.getPeerCount', () => {
             const peerCount = await caver.klay.net.getPeerCount()
             expect(peerCount).to.be.a('number')
             expect(peerCount).not.to.be.equal(0)
-        })
+        }).timeout(100000)
     })
 })
 
@@ -78,6 +78,6 @@ describe('CAVERJS-UNIT-ETC-047: caver.klay.net.peerCountByType', () => {
 
             expect(peerCountByType.total).not.to.be.undefined
             expect(typeof peerCountByType.total).to.equals('number')
-        })
+        }).timeout(100000)
     })
 })

@@ -32,9 +32,9 @@ Testing in caver-js is implemented using the mocha testing framework. If you wan
 - [mocha](https://mochajs.org/#installation)
 
 **Note** caver-js can run on Node.js versions 8 and 10, and the recommended versions are:
-- lts/carbon ([8.16.0](https://nodejs.org/dist/latest-v8.x/))
-- lts/dubnium ([10.16.0](https://nodejs.org/dist/latest-v10.x/))
-* lts/erbium ([12.18.0](https://nodejs.org/dist/latest-v12.x/))
+- lts/carbon ([8.17.0](https://nodejs.org/dist/latest-v8.x/))
+- lts/dubnium ([10.22.0](https://nodejs.org/dist/latest-v10.x/))
+* lts/erbium ([12.19.0](https://nodejs.org/dist/latest-v12.x/))
 
 If you are already using a different version of the node(for example, node v14), use the Node Version Manager([NVM](https://github.com/nvm-sh/nvm)) to install and use the version supported by caver-js.
 
@@ -197,6 +197,7 @@ The API lists of caver-js are described in folloinwg links:
 * [caver.kct.kip7](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.kct/kip7)
 * [caver.kct.kip17](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.kct/kip17)
 * [caver.utils](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.utils)
+* [caver.ipfs](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.ipfs)
 
 Web3.js Similarity
 =================	
