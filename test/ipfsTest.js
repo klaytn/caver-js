@@ -50,6 +50,11 @@ describe('Connect IPFS with Klaytn', () => {
         const added = await caver.ipfs.add(testFileName)
         expect(typeof added).to.equal('string')
 
+        // Add file to IPFS with file contents
+        const contents = fs.readFileSync(testFileName)
+        const addedWithContents = await caver.ipfs.add(contents)
+        expect(typeof addedWithContents).to.equal('string')
+
         // Get contents from IPFS
         const fileFromIPFS = await caver.ipfs.get(added)
 

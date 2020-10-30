@@ -17,6 +17,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+const lodash = require('lodash')
 const fs = require('fs')
 const IPFSAPI = require('ipfs-api')
 const multihash = require('multihashes')
@@ -54,12 +55,16 @@ class IPFS {
     /**
      * adds a file to IPFS
      *
-     * @param {string} path The file path string.
+     * @param {string|Buffer} data The file path string or file contents.
      * @return {string}
      */
-    async add(path) {
+    async add(data) {
         if (!this.ipfs) throw new Error(`Please set IPFS Node through 'caver.ipfs.setIPFSNode'.`)
-        const data = fs.readFileSync(path)
+
+        // Read file
+        if (lodash.isString(data)) data = fs.readFileSync(data)
+        if (!lodash.isBuffer(data)) throw new Error(`Invalid data: ${data}`)
+
         const ret = await this.ipfs.add(data)
         return ret[0].hash
     }
