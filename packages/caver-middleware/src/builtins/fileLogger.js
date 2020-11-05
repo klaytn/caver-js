@@ -47,14 +47,7 @@ const fileLogger = (options = {}) => (data, next) => {
     // Add timestamp for RPC request || response.
     data.timestamp = new Date().getTime()
 
-    switch (options.extension) {
-        case 'csv':
-            // TODO: stringify to csv.
-            appendToFile(fileName, JSON.stringify(data))
-            break
-        default:
-            appendToFile(fileName, JSON.stringify(data))
-    }
+    appendToFile(fileName, JSON.stringify(data))
 
     next()
 }
