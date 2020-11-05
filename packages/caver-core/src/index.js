@@ -25,40 +25,6 @@
  */
 
 const { Manager, BatchManager } = require('../../caver-core-requestmanager')
-const formatters = require('../../caver-core-helpers').formatters
-const Method = require('../../caver-core-method')
-const utils = require('../../caver-utils')
-
-// TODO : clarify what extend do
-// eslint-disable-next-line no-unused-vars
-const extend = pkg => {
-    const ex = extension => {
-        let extendedObject = pkg
-
-        if (extension.property) {
-            extendedObject = pkg[extension.property] = pkg[extension.property] || {}
-        }
-
-        if (extension.methods) {
-            extension.methods.forEach(method => {
-                if (!(method instanceof Method)) {
-                    method = new Method(method)
-                }
-
-                method.attachToObject(extendedObject)
-                method.setRequestManager(pkg._requestManager)
-            })
-        }
-
-        return pkg
-    }
-
-    ex.formatters = formatters
-    ex.utils = utils
-    ex.Method = Method
-
-    return ex
-}
 
 module.exports = {
     packageInit: function(pkg, args) {
