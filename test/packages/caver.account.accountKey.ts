@@ -16,37 +16,48 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const _ = require('lodash')
-const chai = require('chai')
-const sinonChai = require('sinon-chai')
-const chaiAsPromised = require('chai-as-promised')
+import _ from 'lodash'
+import chai from 'chai'
+import sinonChai from 'sinon-chai'
+import chaiAsPromised from 'chai-as-promised'
 
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
 
 const expect = chai.expect
 
-const testRPCURL = require('../testrpc')
+import testRPCURL from '../testrpc'
 
-const Caver = require('../../index.js')
-const utils = require('../../packages/caver-utils')
+import Caver from '../../index.js'
+import utils from '../../packages/caver-utils'
 
-const AccountKeyLegacy = require('../../packages/caver-account/src/accountKey/accountKeyLegacy')
-const AccountKeyPublic = require('../../packages/caver-account/src/accountKey/accountKeyPublic')
-const AccountKeyFail = require('../../packages/caver-account/src/accountKey/accountKeyFail')
-const AccountKeyWeightedMultiSig = require('../../packages/caver-account/src/accountKey/accountKeyWeightedMultiSig')
-const AccountKeyRoleBased = require('../../packages/caver-account/src/accountKey/accountKeyRoleBased')
+import AccountKeyLegacy from '../../packages/caver-account/src/accountKey/accountKeyLegacy'
+import AccountKeyPublic from '../../packages/caver-account/src/accountKey/accountKeyPublic'
+import AccountKeyFail from '../../packages/caver-account/src/accountKey/accountKeyFail'
+import AccountKeyWeightedMultiSig from '../../packages/caver-account/src/accountKey/accountKeyWeightedMultiSig'
+import AccountKeyRoleBased from '../../packages/caver-account/src/accountKey/accountKeyRoleBased'
 
-const { ACCOUNT_KEY_TAG } = require('../../packages/caver-account/src/accountKey/accountKeyHelper')
+import { ACCOUNT_KEY_TAG } from '../../packages/caver-account/src/accountKey/accountKeyHelper'
 
-let caver
+let caver: Caver
 
 beforeEach(() => {
     caver = new Caver(testRPCURL)
 })
 
-function testAccountKey(accountKey, expectedAccountKeyType, options = {}) {
-    const { expectedAccountKey, exepectedOptions } = options
+function testAccountKey(
+    accountKey: any,
+    expectedAccountKeyType:
+        | 'AccountKeyLegacy'
+        | 'AccountKeyPublic'
+        | 'AccountKeyFail'
+        | 'AccountKeyWeightedMultiSig'
+        | 'AccountKeyRoleBased',
+    options?: { expectedAccountKey: any; exepectedOptions?: any }
+) {
+    const expectedAccountKey = options?.expectedAccountKey
+    const exepectedOptions = options?.exepectedOptions
+
     switch (expectedAccountKeyType) {
         case 'AccountKeyLegacy':
             expect(accountKey instanceof AccountKeyLegacy).to.be.true
@@ -88,12 +99,12 @@ function testAccountKey(accountKey, expectedAccountKeyType, options = {}) {
     }
 }
 
-function testAccountKeyPublic(key, singlePubKey) {
+function testAccountKeyPublic(key: AccountKeyPublic, singlePubKey: any) {
     expect(key instanceof AccountKeyPublic).to.be.true
     checkEqualWithPublicKey(key.publicKey, singlePubKey)
 }
 
-function testAccountKeyWeightedMultiSig(key, multiplePubKeys, options) {
+function testAccountKeyWeightedMultiSig(key: AccountKeyWeightedMultiSig, multiplePubKeys: any[], options: { threshold: any; weights: any[] }) {
     expect(key instanceof AccountKeyWeightedMultiSig).to.be.true
     if (options) {
         expect(key.threshold).to.equal(options.threshold)
@@ -106,7 +117,7 @@ function testAccountKeyWeightedMultiSig(key, multiplePubKeys, options) {
     }
 }
 
-function checkEqualWithPublicKey(pub1, pub2) {
+function checkEqualWithPublicKey(pub1: string, pub2: any) {
     const publicKey = [pub1, pub2]
     if (!caver.utils.isCompressedPublicKey(publicKey[0])) publicKey[0] = utils.compressPublicKey(publicKey[0])
     if (!caver.utils.isCompressedPublicKey(publicKey[1])) publicKey[1] = utils.compressPublicKey(publicKey[1])
@@ -313,7 +324,7 @@ describe('caver.account.accountKey.accountKeyWeightedMultiSig', () => {
                 '0x1769a9196f523c419be50c26419ebbec34d3d6aa8b59da834212f13dbec9a9c12a4d0eeb91d7bd5d592653d43dd0593cfe24cb20a5dbef05832932e7c7191bf6',
             ]
 
-            let options = { weights: [1, 1] }
+            let options: { threshold?: number, weights?: number | number[] } = { weights: [1, 1] }
             let expectedError = `Invalid object for creating WeightedMultiSigOptions. 'threshold' and 'weights' should be defined.`
             expect(() => caver.account.accountKey.accountKeyWeightedMultiSig.fromPublicKeysAndOptions(publicArray, options)).to.throw(
                 expectedError

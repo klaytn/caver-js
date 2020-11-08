@@ -1,50 +1,46 @@
-/*
-    Copyright 2020 The caver-js Authors
-    This file is part of the caver-js library.
 
-    The caver-js library is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    The caver-js library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-    GNU Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
-*/
-
-const chai = require('chai')
-const sinon = require('sinon')
-const sinonChai = require('sinon-chai')
-const chaiAsPromised = require('chai-as-promised')
+import chai from 'chai'
+import sinon from 'sinon'
+import sinonChai from 'sinon-chai'
+import chaiAsPromised from 'chai-as-promised'
 
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
 
 const expect = chai.expect
 
-const testRPCURL = require('../testrpc')
+import testRPCURL from '../testrpc'
 
-const Caver = require('../../index.js')
-const utils = require('../../packages/caver-utils')
-const Account = require('../../packages/caver-account')
+import Caver from '../../index'
+import utils from '../../packages/caver-utils'
+import Account from '../../packages/caver-account'
 
-const AccountKeyLegacy = require('../../packages/caver-account/src/accountKey/accountKeyLegacy')
-const AccountKeyPublic = require('../../packages/caver-account/src/accountKey/accountKeyPublic')
-const AccountKeyFail = require('../../packages/caver-account/src/accountKey/accountKeyFail')
-const AccountKeyWeightedMultiSig = require('../../packages/caver-account/src/accountKey/accountKeyWeightedMultiSig')
-const AccountKeyRoleBased = require('../../packages/caver-account/src/accountKey/accountKeyRoleBased')
+import AccountKeyLegacy from '../../packages/caver-account/src/accountKey/accountKeyLegacy'
+import AccountKeyPublic from '../../packages/caver-account/src/accountKey/accountKeyPublic'
+import AccountKeyFail from '../../packages/caver-account/src/accountKey/accountKeyFail'
+import AccountKeyWeightedMultiSig from '../../packages/caver-account/src/accountKey/accountKeyWeightedMultiSig'
+import AccountKeyRoleBased from '../../packages/caver-account/src/accountKey/accountKeyRoleBased'
 
-let caver
+let caver: Caver
 
 beforeEach(() => {
     caver = new Caver(testRPCURL)
 })
 
-function testAccount(data, { expectedAddress, expectedAccountKeyType, expectedAccountKey, exepectedOptions }) {
+function testAccount(
+    data: any,
+    {
+        expectedAddress,
+        expectedAccountKeyType,
+        expectedAccountKey,
+        exepectedOptions,
+    }: {
+        expectedAddress?: string
+        expectedAccountKeyType?: 'AccountKeyPublic' | 'AccountKeyWeightedMultiSig' | 'AccountKeyRoleBased'
+        expectedAccountKey: any
+        exepectedOptions?: any
+    }
+) {
     expect(data instanceof Account).to.be.true
     const objectKeys = ['_address', '_accountKey']
 
@@ -87,12 +83,16 @@ function testAccount(data, { expectedAddress, expectedAccountKeyType, expectedAc
     }
 }
 
-function testAccountKeyPublic(key, singlePubKey) {
+function testAccountKeyPublic(key: AccountKeyPublic, singlePubKey: any) {
     expect(key instanceof AccountKeyPublic).to.be.true
     checkEqualWithPublicKey(key.publicKey, singlePubKey)
 }
 
-function testAccountKeyWeightedMultiSig(key, multiplePubKeys, options) {
+function testAccountKeyWeightedMultiSig(
+    key: AccountKeyWeightedMultiSig,
+    multiplePubKeys: any[],
+    options: { threshold: any; weights: any[] }
+) {
     expect(key instanceof AccountKeyWeightedMultiSig).to.be.true
     if (options) {
         expect(key.threshold).to.equal(options.threshold)
@@ -105,7 +105,7 @@ function testAccountKeyWeightedMultiSig(key, multiplePubKeys, options) {
     }
 }
 
-function checkEqualWithPublicKey(pub1, pub2) {
+function checkEqualWithPublicKey(pub1: string, pub2: any) {
     const publicKey = [pub1, pub2]
     if (!caver.utils.isCompressedPublicKey(publicKey[0])) publicKey[0] = utils.compressPublicKey(publicKey[0])
     if (!caver.utils.isCompressedPublicKey(publicKey[1])) publicKey[1] = utils.compressPublicKey(publicKey[1])
