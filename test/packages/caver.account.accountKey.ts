@@ -53,10 +53,10 @@ function testAccountKey(
         | 'AccountKeyFail'
         | 'AccountKeyWeightedMultiSig'
         | 'AccountKeyRoleBased',
-    options?: { expectedAccountKey: any; exepectedOptions?: any }
+    options?: { expectedAccountKey?: any; exepectedOptions?: any }
 ) {
-    const expectedAccountKey = options?.expectedAccountKey
-    const exepectedOptions = options?.exepectedOptions
+    const expectedAccountKey = options && options.expectedAccountKey ? options.expectedAccountKey : {}
+    const exepectedOptions = options && options.exepectedOptions? options.exepectedOptions : {}
 
     switch (expectedAccountKeyType) {
         case 'AccountKeyLegacy':
@@ -119,8 +119,8 @@ function testAccountKeyWeightedMultiSig(key: AccountKeyWeightedMultiSig, multipl
 
 function checkEqualWithPublicKey(pub1: string, pub2: any) {
     const publicKey = [pub1, pub2]
-    if (!caver.utils.isCompressedPublicKey(publicKey[0])) publicKey[0] = utils.compressPublicKey(publicKey[0])
-    if (!caver.utils.isCompressedPublicKey(publicKey[1])) publicKey[1] = utils.compressPublicKey(publicKey[1])
+    if (!caver.utils.isCompressedPublicKey(publicKey[0])) publicKey[0] = caver.utils.compressPublicKey(publicKey[0])
+    if (!caver.utils.isCompressedPublicKey(publicKey[1])) publicKey[1] = caver.utils.compressPublicKey(publicKey[1])
     expect(publicKey[0]).to.equal(publicKey[1])
 }
 

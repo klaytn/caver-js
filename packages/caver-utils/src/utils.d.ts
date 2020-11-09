@@ -95,7 +95,7 @@ type checkAddressChecksum = (address: string) => boolean
  * @param {String} sign, by default 0
  * @returns {String} right aligned string
  */
-type leftPad = (string: string, chars: number, sign: string) => string
+type leftPad = (string: string, chars: number, sign?: string) => string
 
 /**
  * Should be called to pad string to expected length
@@ -106,7 +106,7 @@ type leftPad = (string: string, chars: number, sign: string) => string
  * @param {String} sign, by default 0
  * @returns {String} right aligned string
  */
-type rightPad = (string: string, chars: number, sign: string) => string
+type rightPad = (string: string, chars: number, sign?: string) => string
 
 /**
  * Should be called to get hex representation (prefixed by 0x) of utf8 string
@@ -182,10 +182,10 @@ type hexToBytes = (hex: string) => Array<string>
  *
  * @method toHex
  * @param {String|Number|BN|Object} value
- * @param {Boolean} returnType
+ * @param {Boolean} [returnType]
  * @return {String}
  */
-type toHex = (value: string | number | BN | object, returnType: boolean) => string
+type toHex = (value: string | number | BN | object, returnType?: boolean) => string
 
 type bufferToHex = (buf: Buffer | Array<string> | string | number | BN | object) => string
 
@@ -340,7 +340,7 @@ type makeEven = (hex: any) => any
  */
 type resolveSignature = (signature: string | object | Array<string>) => Array<string>
 
-type transformSignaturesToObject = (signatures: any) => {}
+type transformSignaturesToObject = (signatures: any) => any
 
 type getTxTypeStringFromRawTransaction = (rawTransaction: any) => any
 
@@ -456,7 +456,7 @@ const checkAddressChecksum: (address: string) => boolean
  * @param {String} sign, by default 0
  * @returns {String} right aligned string
  */
-const leftPad: (string: string, chars: number, sign: string) => string
+const leftPad: (string: string, chars: number, sign?: string) => string
 
 /**
  * Should be called to pad string to expected length
@@ -467,7 +467,7 @@ const leftPad: (string: string, chars: number, sign: string) => string
  * @param {String} sign, by default 0
  * @returns {String} right aligned string
  */
-const rightPad: (string: string, chars: number, sign: string) => string
+const rightPad: (string: string, chars: number, sign?: string) => string
 
 /**
  * Should be called to get hex representation (prefixed by 0x) of utf8 string
@@ -543,10 +543,10 @@ const hexToBytes: (hex: string) => Array<string>
  *
  * @method toHex
  * @param {String|Number|BN|Object} value
- * @param {Boolean} returnType
+ * @param {Boolean} [returnType]
  * @return {String}
  */
-const toHex: (value: string | number | BN | object, returnType: boolean) => string
+const toHex: (value: string | number | BN | object, returnType?: boolean) => string
 
 const bufferToHex: (buf: Buffer | Array<string> | string | number | BN | object) => string
 
@@ -701,7 +701,7 @@ const makeEven: (hex: any) => any
  */
 const resolveSignature: (signature: string | object | Array<string>) => Array<string>
 
-const transformSignaturesToObject: (signatures: any) => {}
+const transformSignaturesToObject: (signatures: any) => any
 
 const getTxTypeStringFromRawTransaction: (rawTransaction: any) => any
 
