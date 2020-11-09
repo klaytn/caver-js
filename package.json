@@ -36,6 +36,7 @@
     "cover:wallet": "nyc --silent --no-clean npm run walletTest",
     "cover:report": "nyc report --reporter=html --reporter=text"
   },
+  "types": "index.d.ts",
   "keywords": [
     "caver",
     "caverjs",
@@ -91,6 +92,13 @@
     "@babel/plugin-external-helpers": "^7.0.0",
     "@babel/plugin-transform-runtime": "^7.1.0",
     "@babel/preset-env": "^7.3.1",
+    "@types/bn.js": "^4.11.6",
+    "@types/chai": "^4.2.14",
+    "@types/chai-as-promised": "^7.1.3",
+    "@types/lodash": "^4.14.165",
+    "@types/mocha": "^8.0.3",
+    "@types/sinon": "^9.0.8",
+    "@types/sinon-chai": "^3.2.5",
     "babel-eslint": "^8.2.6",
     "babel-plugin-external-helpers": "^6.22.0",
     "babelrc-rollup": "^3.0.0",
@@ -132,6 +140,7 @@
     "rollup-plugin-uglify": "^6.0.0",
     "sinon": "^9.0.0",
     "sinon-chai": "^3.5.0",
+    "typescript": "^4.0.5",
     "vinyl-source-stream": "^2.0.0"
   }
 }
