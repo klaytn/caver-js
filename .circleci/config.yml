@@ -11,8 +11,13 @@ jobs:
     steps:
       - checkout
       - run: 
-          name: "Install caver-js for testing"
-          command: npm install
+          name: "Install dependencies"
+          command: |
+            npm install
+            npm audit fix
+      - run: 
+          name: "Install global dependency"
+          command: sudo npm install -g ts-node
       - run:
           name: "Lint check"
           command: npm run lint
