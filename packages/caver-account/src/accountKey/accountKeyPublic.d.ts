@@ -2,7 +2,7 @@
  * Representing an AccountKeyPublic.
  * @class
  */
-export interface AccountKeyPublic_I {
+export interface IAccountKeyPublic {
     /**
      * Decodes an RLP-encoded AccountKeyPublic string.
      * @param {string} rlpEncodedKey - An RLP-encoded AccountKeyPublic string.
@@ -29,10 +29,8 @@ export interface AccountKeyPublic_I {
      * Creates an instance of AccountKeyPublic.
      * @param {string} publicKey - a public key
      */
-    new(publicKey: string): AccountKeyPublic
-
+    new (publicKey: string): AccountKeyPublic
 }
-
 
 /**
  * Representing an AccountKeyPublic.

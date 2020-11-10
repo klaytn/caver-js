@@ -1,11 +1,11 @@
-import { PrivateKey_I } from './privateKey'
-import { SingleKeyring_I } from './singleKeyring'
-import { MultipleKeyring_I } from './multipleKeyring'
-import { RoleBasedKeyring_I } from './roleBasedKeyring'
-import { SignatureData_I } from './signatureData'
+import { IPrivateKey } from './privateKey'
+import { ISingleKeyring } from './singleKeyring'
+import { IMultipleKeyring } from './multipleKeyring'
+import { IRoleBasedKeyring } from './roleBasedKeyring'
+import { ISignatureData } from './signatureData'
 import { KEY_ROLE } from './keyringHelper'
 
-export interface KeyringFactory_I {
+export interface IKeyringFactory {
     /**
      * generates a keyring instance
      *
@@ -112,12 +112,12 @@ export interface KeyringFactory_I {
      */
     decrypt: (keystore: object, password: string) => AbstractKeyring
 
-    privateKey: PrivateKey_I
-    singleKeyring: SingleKeyring_I
-    multipleKeyring: MultipleKeyring_I
-    roleBasedKeyring: RoleBasedKeyring_I
+    privateKey: IPrivateKey
+    singleKeyring: ISingleKeyring
+    multipleKeyring: IMultipleKeyring
+    roleBasedKeyring: IRoleBasedKeyring
     role: KEY_ROLE
-    signatureData: SignatureData_I
+    signatureData: ISignatureData
     new (): KeyringFactory
 }
 
@@ -232,10 +232,10 @@ export default class KeyringFactory {
      */
     static decrypt: (keystore: object, password: string) => AbstractKeyring
 
-    static privateKey: PrivateKey_I
-    static singleKeyring: SingleKeyring_I
-    static multipleKeyring: MultipleKeyring_I
-    static roleBasedKeyring: RoleBasedKeyring_I
+    static privateKey: IPrivateKey
+    static singleKeyring: ISingleKeyring
+    static multipleKeyring: IMultipleKeyring
+    static roleBasedKeyring: IRoleBasedKeyring
     static role: KEY_ROLE
-    static signatureData: SignatureData_I
+    static signatureData: ISignatureData
 }

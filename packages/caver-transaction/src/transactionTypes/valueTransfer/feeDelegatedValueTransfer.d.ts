@@ -1,12 +1,6 @@
-
 import AbstractFeeDelegatedTransaction from '../abstractFeeDelegatedTransaction'
 
-/**
- * Represents a fee delegated value transfer transaction.
- * Please refer to https://docs.klaytn.com/klaytn/design/transactions/fee-delegation#txtypefeedelegatedvaluetransfer to see more detail.
- * @class
- */
-export interface FeeDelegatedValueTransfer_I extends AbstractFeeDelegatedTransaction {
+export interface IFeeDelegatedValueTransfer extends AbstractFeeDelegatedTransaction {
     /**
      * decodes the RLP-encoded string and returns a FeeDelegatedValueTransfer transaction instance.
      *
@@ -22,10 +16,8 @@ export interface FeeDelegatedValueTransfer_I extends AbstractFeeDelegatedTransac
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                                      The object can define `from`, `to`, `value`, `nonce`, `gas`, `gasPrice`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
      */
-    new(createTxObj: object | string): FeeDelegatedValueTransfer
-
+    new (createTxObj: object | string): FeeDelegatedValueTransfer
 }
-
 
 /**
  * Represents a fee delegated value transfer transaction.
@@ -76,4 +68,3 @@ export default class FeeDelegatedValueTransfer extends AbstractFeeDelegatedTrans
      */
     getCommonRLPEncodingForSignature(): string
 }
-

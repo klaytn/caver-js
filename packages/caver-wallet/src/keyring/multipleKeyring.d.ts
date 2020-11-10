@@ -1,21 +1,17 @@
-
-
 import AbstractKeyring from './abstractKeyring'
 
 /**
  * representing a Keyring which includes `address` and `private keys`.
  * @class
  */
-export interface MultipleKeyring_I extends AbstractKeyring {
+export interface IMultipleKeyring extends AbstractKeyring {
     /**
      * creates a MultipleKeyring.
      * @param {string} address - The address of keyring.
      * @param {Array.<string>|Array.<PrivateKey>} keys - The keys to use in MultipleKeyring.
      */
-    new(address: string, keys: Array<string> | Array<PrivateKey>): MultipleKeyring
-
+    new (address: string, keys: Array<string> | Array<PrivateKey>): MultipleKeyring
 }
-
 
 /**
  * representing a Keyring which includes `address` and `private keys`.
@@ -32,9 +28,9 @@ export default class MultipleKeyring extends AbstractKeyring {
     /**
      * @type {Array.<PrivateKey>}
      */
-    get keys(): Array.<PrivateKey>
+    get keys(): Array<PrivateKey>
 
-    set keys(keyInput: Array.<PrivateKey>)
+    set keys(keyInput: Array<PrivateKey>)
 
     /**
      * returns public key strings.
@@ -110,10 +106,12 @@ export default class MultipleKeyring extends AbstractKeyring {
      *   cipher: ...,
      * }
      */
-    encrypt(password, options = {}): {
-        version: any;
-        id: any;
-        address: any;
+    encrypt(
+        password,
+        options = {}
+    ): {
+        version: any
+        id: any
+        address: any
     }
 }
-

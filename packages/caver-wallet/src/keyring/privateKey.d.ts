@@ -1,13 +1,10 @@
-
-export interface PrivateKey_I {
+export interface IPrivateKey {
     /**
      * creates a privateKey.
      * @param {string} key - The private key string.
      */
-    new(key: string): PrivateKey
+    new (key: string): PrivateKey
 }
-
-
 
 /**
  * Representing a PrivateKey class that includes private key string.
@@ -58,4 +55,3 @@ export default class PrivateKey {
      */
     getDerivedAddress(): string
 }
-

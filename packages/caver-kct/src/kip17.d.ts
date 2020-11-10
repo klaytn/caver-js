@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 
 import Contract from '../../caver-contract'
 
-export interface KIP17 extends Contract {
+export interface IKIP17 extends Contract {
     /**
      * deploy deploys a KIP-17 token contract to Klaytn network.
      * `const deployedContract = await caver.klay.KIP17.deploy({

@@ -2,7 +2,7 @@
  * Representing an AccountKeyRoleBased.
  * @class
  */
-export interface AccountKeyRoleBased_I {
+export interface IAccountKeyRoleBased {
     /**
      * Decodes an RLP-encoded AccountKeyRoleBased string.
      * @param {string} rlpEncodedKey - An RLP-encoded AccountKeyRoleBased string.
@@ -25,10 +25,8 @@ export interface AccountKeyRoleBased_I {
      * Create an instance of AccountKeyRoleBased.
      * @param {Array.<AccountKeyLegacy|AccountKeyPublic|AccountKeyFail|AccountKeyWeightedMultiSig>} accountKeyArray - An array containing arrays of instances of AccountKeyPublic or AccountKeyWeightedMultiSig for each role.
      */
-    new(accountKeyArray: Array<AccountKeyLegacy | AccountKeyPublic | AccountKeyFail | AccountKeyWeightedMultiSig>): AccountKeyRoleBased
-
+    new (accountKeyArray: Array<AccountKeyLegacy | AccountKeyPublic | AccountKeyFail | AccountKeyWeightedMultiSig>): AccountKeyRoleBased
 }
-
 
 /**
  * Representing an AccountKeyRoleBased.

@@ -1,12 +1,11 @@
-
 export type KEY_ROLE = {
-    roleTransactionKey: number;
-    0: string;
-    roleAccountUpdateKey: number;
-    1: string;
-    roleFeePayerKey: number;
-    2: string;
-    roleLast: number;
+    roleTransactionKey: number
+    0: string
+    roleAccountUpdateKey: number
+    1: string
+    roleFeePayerKey: number
+    2: string
+    roleLast: number
 }
 
 export type MAXIMUM_KEY_NUM = number
@@ -23,20 +22,25 @@ export type decryptKey = (encryptedArray: any, password: any) => never[] | undef
 
 export type encryptKey = (privateKey: any, password: any, options: any) => never[]
 
-export type formatEncrypted = (version: any, address: any, keyringOrCrypto: any, options: any) => {
-    version: any;
-    id: any;
-    address: any;
+export type formatEncrypted = (
+    version: any,
+    address: any,
+    keyringOrCrypto: any,
+    options: any
+) => {
+    version: any
+    id: any
+    address: any
 }
 
 export const KEY_ROLE: {
-    roleTransactionKey: number;
-    0: string;
-    roleAccountUpdateKey: number;
-    1: string;
-    roleFeePayerKey: number;
-    2: string;
-    roleLast: number;
+    roleTransactionKey: number
+    0: string
+    roleAccountUpdateKey: number
+    1: string
+    roleFeePayerKey: number
+    2: string
+    roleLast: number
 }
 
 export const MAXIMUM_KEY_NUM: number
@@ -53,8 +57,13 @@ export const decryptKey: (encryptedArray: any, password: any) => never[] | undef
 
 export const encryptKey: (privateKey: any, password: any, options: any) => never[]
 
-export const formatEncrypted: (version: any, address: any, keyringOrCrypto: any, options: any) => {
-    version: any;
-    id: any;
-    address: any;
+export const formatEncrypted: (
+    version: any,
+    address: any,
+    keyringOrCrypto: any,
+    options: any
+) => {
+    version: any
+    id: any
+    address: any
 }

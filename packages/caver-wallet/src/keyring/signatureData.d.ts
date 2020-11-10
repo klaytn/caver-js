@@ -1,13 +1,11 @@
-
-
-export interface SignatureData_I {
+export interface ISignatureData {
     emtpySig: SignatureData
 
     /**
      * creates a SignatureData.
      * @param {Array.<string>|SignatureData} key - The ECDSA signatureData
      */
-    new(signature: Array.<string> | SignatureData): SignatureData
+    new (signature: Array<string> | SignatureData): SignatureData
 }
 
 /**
@@ -21,7 +19,7 @@ export default class SignatureData {
      * creates a SignatureData.
      * @param {Array.<string>|SignatureData} key - The ECDSA signatureData
      */
-    constructor(signature: Array.<string> | SignatureData)
+    constructor(signature: Array<string> | SignatureData)
 
     /**
      * @type {string}
@@ -79,7 +77,7 @@ export default class SignatureData {
      *
      * @return {Array.<string>}
      */
-    encode(): Array.<string>
+    encode(): Array<string>
 
     /**
      * Convert to string
@@ -88,5 +86,3 @@ export default class SignatureData {
      */
     toString(): string
 }
-
-

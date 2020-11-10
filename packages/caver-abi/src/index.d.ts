@@ -248,20 +248,20 @@ const decodeParameters: (outputs: Array<any>, bytes: string) => Array<any>
  */
 const decodeLog: (inputs: object, data: string, topics: Array<any>) => Array<any>
 
-export interface ABI_I {
-    encodeFunctionSignature: encodeFunctionSignature,
-    encodeEventSignature: encodeEventSignature,
-    encodeParameter: encodeParameter,
-    encodeParameters: encodeParameters,
-    encodeContractDeploy: encodeContractDeploy,
-    mapTypes: mapTypes,
-    isSimplifiedStructFormat: isSimplifiedStructFormat,
-    mapStructNameAndType: mapStructNameAndType,
-    mapStructToCoderFormat: mapStructToCoderFormat,
-    encodeFunctionCall: encodeFunctionCall,
-    decodeParameter: decodeParameter,
-    decodeParameters: decodeParameters,
-    decodeLog: decodeLog,
+export interface IABI {
+    encodeFunctionSignature: encodeFunctionSignature
+    encodeEventSignature: encodeEventSignature
+    encodeParameter: encodeParameter
+    encodeParameters: encodeParameters
+    encodeContractDeploy: encodeContractDeploy
+    mapTypes: mapTypes
+    isSimplifiedStructFormat: isSimplifiedStructFormat
+    mapStructNameAndType: mapStructNameAndType
+    mapStructToCoderFormat: mapStructToCoderFormat
+    encodeFunctionCall: encodeFunctionCall
+    decodeParameter: decodeParameter
+    decodeParameters: decodeParameters
+    decodeLog: decodeLog
 }
 
 export default {

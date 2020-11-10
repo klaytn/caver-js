@@ -1,42 +1,41 @@
-import { ValueTransfer_I } from './transactionTypes/valueTransfer/valueTransfer'
-import { FeeDelegatedValueTransfer_I } from './transactionTypes/valueTransfer/feeDelegatedValueTransfer'
+import { IValueTransfer } from './transactionTypes/valueTransfer/valueTransfer'
+import { IFeeDelegatedValueTransfer } from './transactionTypes/valueTransfer/feeDelegatedValueTransfer'
 
+export interface ITransaction {
+    decode: TransactionDecoder.decode
 
-export interface Transaction_I {
-    decode: TransactionDecoder.decode,
+    legacyTransaction: LegacyTransaction
 
-    legacyTransaction: LegacyTransaction,
+    valueTransfer: IValueTransfer
+    feeDelegatedValueTransfer: IFeeDelegatedValueTransfer
+    feeDelegatedValueTransferWithRatio: FeeDelegatedValueTransferWithRatio
 
-    valueTransfer: ValueTransfer_I,
-    feeDelegatedValueTransfer: FeeDelegatedValueTransfer_I,
-    feeDelegatedValueTransferWithRatio: FeeDelegatedValueTransferWithRatio,
+    valueTransferMemo: ValueTransferMemo
+    feeDelegatedValueTransferMemo: FeeDelegatedValueTransferMemo
+    feeDelegatedValueTransferMemoWithRatio: FeeDelegatedValueTransferMemoWithRatio
 
-    valueTransferMemo: ValueTransferMemo,
-    feeDelegatedValueTransferMemo: FeeDelegatedValueTransferMemo,
-    feeDelegatedValueTransferMemoWithRatio: FeeDelegatedValueTransferMemoWithRatio,
+    accountUpdate: AccountUpdate
+    feeDelegatedAccountUpdate: FeeDelegatedAccountUpdate
+    feeDelegatedAccountUpdateWithRatio: FeeDelegatedAccountUpdateWithRatio
 
-    accountUpdate: AccountUpdate,
-    feeDelegatedAccountUpdate: FeeDelegatedAccountUpdate,
-    feeDelegatedAccountUpdateWithRatio: FeeDelegatedAccountUpdateWithRatio,
+    smartContractDeploy: SmartContractDeploy
+    feeDelegatedSmartContractDeploy: FeeDelegatedSmartContractDeploy
+    feeDelegatedSmartContractDeployWithRatio: FeeDelegatedSmartContractDeployWithRatio
 
-    smartContractDeploy: SmartContractDeploy,
-    feeDelegatedSmartContractDeploy: FeeDelegatedSmartContractDeploy,
-    feeDelegatedSmartContractDeployWithRatio: FeeDelegatedSmartContractDeployWithRatio,
+    smartContractExecution: SmartContractExecution
+    feeDelegatedSmartContractExecution: FeeDelegatedSmartContractExecution
+    feeDelegatedSmartContractExecutionWithRatio: FeeDelegatedSmartContractExecutionWithRatio
 
-    smartContractExecution: SmartContractExecution,
-    feeDelegatedSmartContractExecution: FeeDelegatedSmartContractExecution,
-    feeDelegatedSmartContractExecutionWithRatio: FeeDelegatedSmartContractExecutionWithRatio,
+    cancel: Cancel
+    feeDelegatedCancel: FeeDelegatedCancel
+    feeDelegatedCancelWithRatio: FeeDelegatedCancelWithRatio
 
-    cancel: Cancel,
-    feeDelegatedCancel: FeeDelegatedCancel,
-    feeDelegatedCancelWithRatio: FeeDelegatedCancelWithRatio,
+    chainDataAnchoring: ChainDataAnchoring
+    feeDelegatedChainDataAnchoring: FeeDelegatedChainDataAnchoring
+    feeDelegatedChainDataAnchoringWithRatio: FeeDelegatedChainDataAnchoringWithRatio
 
-    chainDataAnchoring: ChainDataAnchoring,
-    feeDelegatedChainDataAnchoring: FeeDelegatedChainDataAnchoring,
-    feeDelegatedChainDataAnchoringWithRatio: FeeDelegatedChainDataAnchoringWithRatio,
-
-    type: TX_TYPE_STRING,
-    tag: TX_TYPE_TAG,
+    type: TX_TYPE_STRING
+    tag: TX_TYPE_TAG
 }
 
 export default {
@@ -44,8 +43,8 @@ export default {
 
     legacyTransaction: LegacyTransaction,
 
-    valueTransfer: ValueTransfer_I,
-    feeDelegatedValueTransfer: FeeDelegatedValueTransfer_I,
+    valueTransfer: IValueTransfer,
+    feeDelegatedValueTransfer: IFeeDelegatedValueTransfer,
     feeDelegatedValueTransferWithRatio: FeeDelegatedValueTransferWithRatio,
 
     valueTransferMemo: ValueTransferMemo,

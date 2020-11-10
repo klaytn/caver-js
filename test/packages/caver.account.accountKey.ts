@@ -21,11 +21,6 @@ import chai from 'chai'
 import sinonChai from 'sinon-chai'
 import chaiAsPromised from 'chai-as-promised'
 
-chai.use(chaiAsPromised)
-chai.use(sinonChai)
-
-const expect = chai.expect
-
 import testRPCURL from '../testrpc'
 
 import Caver from '../../index.js'
@@ -38,6 +33,11 @@ import AccountKeyWeightedMultiSig from '../../packages/caver-account/src/account
 import AccountKeyRoleBased from '../../packages/caver-account/src/accountKey/accountKeyRoleBased'
 
 import { ACCOUNT_KEY_TAG } from '../../packages/caver-account/src/accountKey/accountKeyHelper'
+
+chai.use(chaiAsPromised)
+chai.use(sinonChai)
+
+const expect = chai.expect
 
 let caver: Caver
 

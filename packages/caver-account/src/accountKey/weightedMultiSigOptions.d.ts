@@ -1,4 +1,4 @@
-export interface WeightedMultiSigOptions_I {
+export interface IWeightedMultiSigOptions {
     /**
      * Creates an instance of WeightedMultiSigOptions.
      * @param {object} options - An object which defines 'threshold' and 'weights'.

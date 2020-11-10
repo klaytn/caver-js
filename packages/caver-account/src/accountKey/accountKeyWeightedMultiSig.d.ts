@@ -2,7 +2,7 @@
  * Representing an AccountKeyWeightedMultiSig.
  * @class
  */
-export interface AccountKeyWeightedMultiSig_I {
+export interface IAccountKeyWeightedMultiSig {
     /**
      * Decodes an RLP-encoded AccountKeyWeightedMultiSig string.
      * @param {string} rlpEncodedKey - An RLP-encoded AccountKeyWeightedMultiSig string.
@@ -15,19 +15,14 @@ export interface AccountKeyWeightedMultiSig_I {
      * @param {WeightedMultiSigOptions|object} options - An options which defines threshold and weight.
      * @return {AccountKeyWeightedMultiSig}
      */
-    fromPublicKeysAndOptions: (
-        publicKeyArray: Array<string>,
-        options?: WeightedMultiSigOptions | object
-    ) => AccountKeyWeightedMultiSig
+    fromPublicKeysAndOptions: (publicKeyArray: Array<string>, options?: WeightedMultiSigOptions | object) => AccountKeyWeightedMultiSig
 
     /**
      * Create an instance of AccountKeyWeightedMultiSig.
      * @param {number} threshold - The threshold of accountKey.
      * @param {Array.<WeightedPublicKey>} weightedPublicKeys - An array of instances of WeightedPublicKeys
      */
-    new(threshold: number, weightedPublicKeys: Array<WeightedPublicKey>): AccountKeyWeightedMultiSig
-
-
+    new (threshold: number, weightedPublicKeys: Array<WeightedPublicKey>): AccountKeyWeightedMultiSig
 }
 
 /**

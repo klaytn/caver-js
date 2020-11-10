@@ -1,12 +1,12 @@
 import AccountKeyFail from './packages/caver-account/src/accountKey/accountKeyFail'
-import Account, { Account_I } from './packages/caver-account/src/index'
+import Account, { IAccount } from './packages/caver-account/src/index'
 import KeyringContainer from './packages/caver-wallet'
-import { Transaction_I } from './packages/caver-transaction'
-import { Utils_I } from './packages/caver-utils'
+import { ITransaction } from './packages/caver-transaction'
+import { IUtils } from './packages/caver-utils'
 import RPC from './packages/caver-rpc'
 import KCT from './packages/caver-kct'
-import { ABI_I } from './packages/caver-abi'
-import { Contract_I } from './packages/caver-contract'
+import { IABI } from './packages/caver-abi'
+import { IContract } from './packages/caver-contract'
 import IPFS from './packages/caver-ipfs'
 
 export class Caver {
@@ -25,14 +25,14 @@ export class Caver {
 
     constructor(provider: any, net?: any)
 
-    account: Account_I
+    account: IAccount
     wallet: KeyringContainer
-    transaction: Transaction_I
+    transaction: ITransaction
     rpc: RPC
-    contract: Contract_I
-    abi: ABI_I
+    contract: IContract
+    abi: IABI
     kct: KCT
-    utils: Utils_I
+    utils: IUtils
     /**
      * @version since version v1.5.4
      */

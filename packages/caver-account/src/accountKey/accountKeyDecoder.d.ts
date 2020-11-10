@@ -2,7 +2,7 @@
  * Representing an AccountKeyDecoder which can decode RLP-encoded accountKey string.
  * @class
  */
-export interface AccountKeyDecoder_I {
+export interface IAccountKeyDecoder {
     /**
      * decodes an RLP-encoded account key string.
      *
@@ -12,9 +12,8 @@ export interface AccountKeyDecoder_I {
     decode: (
         rlpEncodedKey: string
     ) => AccountKeyLegacy | AccountKeyPublic | AccountKeyFail | AccountKeyWeightedMultiSig | AccountKeyRoleBased
-    new(): AccountKeyDecoder
+    new (): AccountKeyDecoder
 }
-
 
 /**
  * Representing an AccountKeyDecoder which can decode RLP-encoded accountKey string.

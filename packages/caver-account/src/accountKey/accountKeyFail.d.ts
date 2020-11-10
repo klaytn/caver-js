@@ -2,7 +2,7 @@
  * Representing an AccountKeyFail.
  * @class
  */
-export interface AccountKeyFail_I {
+export interface IAccountKeyFail {
     /**
      * Decodes an RLP-encoded AccountKeyFail string.
      * @param {string} rlpEncodedKey - An RLP-encoded AccountKeyFail string.
@@ -10,7 +10,7 @@ export interface AccountKeyFail_I {
      */
     decode: (rlpEncodedKey: string) => AccountKeyFail
 
-    new(): AccountKeyFail
+    new (): AccountKeyFail
 }
 
 /**

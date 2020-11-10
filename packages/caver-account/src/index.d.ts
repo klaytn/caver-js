@@ -1,14 +1,14 @@
-import AccountKeyDecoder, { AccountKeyDecoder_I } from './accountKey/accountKeyDecoder'
-import AccountKeyFail, { AccountKeyFail_I } from './accountKey/accountKeyFail'
+import AccountKeyDecoder, { IAccountKeyDecoder } from './accountKey/accountKeyDecoder'
+import AccountKeyFail, { IAccountKeyFail } from './accountKey/accountKeyFail'
 import AccountKeyHelper from './accountKey/accountKeyHelper'
-import AccountKeyLegacy, { AccountKeyLegacy_I } from './accountKey/accountKeyLegacy'
-import AccountKeyPublic, { AccountKeyPublic_I } from './accountKey/accountKeyPublic'
-import AccountKeyRoleBased, { AccountKeyRoleBased_I } from './accountKey/accountKeyRoleBased'
-import AccountKeyWeightedMultiSig, { AccountKeyWeightedMultiSig_I } from './accountKey/accountKeyWeightedMultiSig'
-import WeightedMultiSigOptions, { WeightedMultiSigOptions_I } from './accountKey/weightedMultiSigOptions'
-import WeightedPublicKey, { WeightedPublicKey_I } from './accountKey/weightedPublicKey'
+import AccountKeyLegacy, { IAccountKeyLegacy } from './accountKey/accountKeyLegacy'
+import AccountKeyPublic, { IAccountKeyPublic } from './accountKey/accountKeyPublic'
+import AccountKeyRoleBased, { IAccountKeyRoleBased } from './accountKey/accountKeyRoleBased'
+import AccountKeyWeightedMultiSig, { IAccountKeyWeightedMultiSig } from './accountKey/accountKeyWeightedMultiSig'
+import WeightedMultiSigOptions, { IWeightedMultiSigOptions } from './accountKey/weightedMultiSigOptions'
+import WeightedPublicKey, { IWeightedPublicKey } from './accountKey/weightedPublicKey'
 
-export interface Account_I {
+export interface IAccount {
     /**
      * creates an Account instance
      *
@@ -88,22 +88,22 @@ export interface Account_I {
         decode: (
             rlpEncodedKey: string
         ) => AccountKeyLegacy | AccountKeyPublic | AccountKeyFail | AccountKeyWeightedMultiSig | AccountKeyRoleBased
-        accountKeyLegacy: AccountKeyLegacy_I
-        accountKeyPublic: AccountKeyPublic_I
-        accountKeyFail: AccountKeyFail_I
-        accountKeyWeightedMultiSig: AccountKeyWeightedMultiSig_I
-        accountKeyRoleBased: AccountKeyRoleBased_I
-        weightedPublicKey: WeightedPublicKey_I
+        accountKeyLegacy: IAccountKeyLegacy
+        accountKeyPublic: IAccountKeyPublic
+        accountKeyFail: IAccountKeyFail
+        accountKeyWeightedMultiSig: IAccountKeyWeightedMultiSig
+        accountKeyRoleBased: IAccountKeyRoleBased
+        weightedPublicKey: IWeightedPublicKey
     }
 
-    weightedMultiSigOptions: WeightedMultiSigOptions_I
+    weightedMultiSigOptions: IWeightedMultiSigOptions
 
     /**
      * Create an account.
      * @param {string} address - The address of account.
      * @param {AccountKeyLegacy|AccountKeyPublic|AccountKeyFail|AccountKeyWeightedMultiSig|AccountKeyRoleBased} accountKey - The accountKey of account.
      */
-    new(
+    new (
         address: string,
         accountKey: AccountKeyLegacy | AccountKeyPublic | AccountKeyFail | AccountKeyWeightedMultiSig | AccountKeyRoleBased
     ): Account
@@ -198,15 +198,15 @@ export default class Account {
         decode: (
             rlpEncodedKey: string
         ) => AccountKeyLegacy | AccountKeyPublic | AccountKeyFail | AccountKeyWeightedMultiSig | AccountKeyRoleBased
-        accountKeyLegacy: AccountKeyLegacy_I
-        accountKeyPublic: AccountKeyPublic_I
-        accountKeyFail: AccountKeyFail_I
-        accountKeyWeightedMultiSig: AccountKeyWeightedMultiSig_I
-        accountKeyRoleBased: AccountKeyRoleBased_I
-        weightedPublicKey: WeightedPublicKey_I
+        accountKeyLegacy: IAccountKeyLegacy
+        accountKeyPublic: IAccountKeyPublic
+        accountKeyFail: IAccountKeyFail
+        accountKeyWeightedMultiSig: IAccountKeyWeightedMultiSig
+        accountKeyRoleBased: IAccountKeyRoleBased
+        weightedPublicKey: IWeightedPublicKey
     }
 
-    static weightedMultiSigOptions: WeightedMultiSigOptions_I
+    static weightedMultiSigOptions: IWeightedMultiSigOptions
 
     /**
      * Create an account.

@@ -1,10 +1,10 @@
-import { KeyringFactory_I } from './keyring/keyringFactory'
+import { IKeyringFactory } from './keyring/keyringFactory'
 /**
  * representing a Keyring container which manages keyrings.
  * @class
  */
 export default class KeyringContainer {
-    keyring: KeyringFactory_I
+    keyring: IKeyringFactory
     /**
      * creates a keyringContainer.
      * @param {Array.<Keyring>} keyrings - The keyrings to be managed in KeyringContainer.

@@ -1,15 +1,13 @@
-
 import AbstractKeyring from './abstractKeyring'
 
-export interface RoleBasedKeyring_I extends AbstractKeyring {
+export interface IRoleBasedKeyring extends AbstractKeyring {
     /**
      * creates a RoleBasedKeyring.
      * @param {string} address - The address of keyring.
      * @param {Array<Array<string>>|Array<Array<PrivateKey>>} keys - The keys to use in RoleBasedKeyring.
      */
-    new(address: string, keys: Array<Array<string>> | Array<Array<PrivateKey>>): RoleBasedKeyring
+    new (address: string, keys: Array<Array<string>> | Array<Array<PrivateKey>>): RoleBasedKeyring
 }
-
 
 /**
  * representing a Keyring which includes `address` and `private keys` by roles.

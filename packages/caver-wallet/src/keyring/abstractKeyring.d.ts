@@ -1,10 +1,9 @@
-
-export interface AbstractKeyring_I {
+export interface IAbstractKeyring {
     /**
      * creates a keyring.
      * @param {string} address - The address of keyring.
      */
-    new(address: string): AbstractKeyring
+    new (address: string): AbstractKeyring
 }
 
 /**
@@ -48,4 +47,3 @@ export default class AbstractKeyring {
      */
     isDecoupled(): boolean
 }
-

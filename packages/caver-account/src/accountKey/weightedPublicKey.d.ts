@@ -1,17 +1,11 @@
-/**
- * Representing a WeightedPublicKey.
- * @class
- */
-export interface WeightedPublicKey_I {
+export interface IWeightedPublicKey {
     /**
      * Create an instance of WeightedPublicKey.
      * @param {number} weight - The weight of the key.
      * @param {string} publicKey - The public key string.
      */
-    new(weight: number, publicKey: string): WeightedPublicKey
-
+    new (weight: number, publicKey: string): WeightedPublicKey
 }
-
 
 /**
  * Representing a WeightedPublicKey.

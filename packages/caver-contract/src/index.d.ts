@@ -1,9 +1,8 @@
-export interface Contract_I {
+export interface IContract {
     setProvider: (provider: any, accounts: any) => void
 
-    new(jsonInterface: Array<any>, address?: string, options?: object): Contract
+    new (jsonInterface: Array<any>, address?: string, options?: object): Contract
 }
-
 
 /**
  * Should be called to create new contract instance
@@ -38,7 +37,7 @@ export default class Contract {
         data: string
     }
     clone: (contractAddress?: string) => any
-    async deploy: (options: object) => Promise<object>
+    deploy: (options: object) => Promise<object>
     once: (event: string, options: any, callback: Function, ...args: any[]) => any
     events: any
     getPastEvents(...args: any[]): any

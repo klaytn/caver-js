@@ -2,14 +2,14 @@
  * Representing an AccountKeyLegacy.
  * @class
  */
-export interface AccountKeyLegacy_I {
+export interface IAccountKeyLegacy {
     /**
      * Decodes an RLP-encoded AccountKeyLegacy string.
      * @param {string} rlpEncodedKey - An RLP-encoded AccountKeyLegacy string.
      * @return {AccountKeyLegacy}
      */
     decode: (rlpEncodedKey: string) => AccountKeyLegacy
-    new(): AccountKeyLegacy
+    new (): AccountKeyLegacy
 }
 
 /**

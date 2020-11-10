@@ -1,4 +1,3 @@
-require('it-each')({ testPerIteration: true })
 import BN from 'bn.js'
 import BigNumber from 'bignumber.js'
 import _ from 'lodash'
@@ -7,6 +6,8 @@ import { expect } from '../extendedChai'
 
 import utils from './utils'
 import Caver from '../../index.js'
+
+require('it-each')({ testPerIteration: true })
 
 let caver: Caver
 beforeEach(() => {
@@ -58,7 +59,7 @@ describe('caver.utils.isBN', () => {
             { value: 0xff, expected: false },
             { value: 0o377, expected: false },
             { value: 0b11111111, expected: false },
-            { value: function () { }, expected: false },
+            { value: function() {}, expected: false },
             { value: 'function', expected: false },
             { value: {}, expected: false },
             { value: 'hello', expected: false },
@@ -391,7 +392,6 @@ describe('CAVERJS-UNIT-ETC-117: caver.utils.toHex', () => {
         },
     ]
 
-
     // @ts-ignore
     it.each(tests, 'should return hexstring', test => {
         expect(caver.utils.toHex(test.value)).to.be.equal(test.expected)
@@ -541,7 +541,6 @@ describe('caver.utils.isValidHash', () => {
             { hash: `${hash[1].slice(2)}00`, expected: false }, // length is too long (66 without 0x)
             { hash: `${hash[1]}00`, expected: false }, // length is too long (68)
         ]
-
 
         // @ts-ignore
         it.each(tests, 'should return false', test => {

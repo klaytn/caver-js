@@ -447,7 +447,7 @@ const addHexPrefix: (str: string) => string
  */
 const stripHexPrefix: (str: string | object) => string
 
-export interface Utils_I {
+export interface IUtils {
     _fireError: _fireError
     _jsonInterfaceMethodToString: _jsonInterfaceMethodToString
     _flattenTypes: _flattenTypes

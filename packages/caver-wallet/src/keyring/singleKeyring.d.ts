@@ -1,13 +1,12 @@
-
 import AbstractKeyring from './abstractKeyring'
 
-export interface SingleKeyring_I extends AbstractKeyring {
+export interface ISingleKeyring extends AbstractKeyring {
     /**
      * creates a SingleKeyring.
      * @param {string} address - The address of keyring.
      * @param {string|PrivateKey} key - The key to use in SingleKeyring.
      */
-    new(address: string, key: string | PrivateKey): SingleKeyring
+    new (address: string, key: string | PrivateKey): SingleKeyring
 }
 
 /**
@@ -127,4 +126,3 @@ export default class SingleKeyring extends AbstractKeyring {
      */
     isDecoupled(): boolean
 }
-
