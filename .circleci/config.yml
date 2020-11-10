@@ -13,6 +13,9 @@ jobs:
       - run: 
           name: "Install caver-js for testing"
           command: npm install
+      - run: 
+          name: "Install ts-node"
+          command: sudo npm install -g ts-node
       - run:
           name: "Lint check"
           command: npm run lint
