@@ -105,7 +105,7 @@ function Caver(provider, net) {
             setProvider.apply(self, arguments)
             core.packageInit(_this, [self])
         }
-        this.setKeyrings(self.wallet)
+        this.setWallet(self.wallet)
     }
 
     Contract.setProvider = function() {
