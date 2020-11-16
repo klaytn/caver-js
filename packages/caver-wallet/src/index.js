@@ -132,7 +132,7 @@ class KeyringContainer {
     /**
      * Returns whether the keyring corresponding to the address exists
      *
-     * @param {string} address The address of keyring to query.
+     * @param {string} address The address of keyring to check existence.
      * @return {Keyring}
      */
     isExisted(address) {
