@@ -82,6 +82,12 @@ class KlayRPC {
                 params: 2,
                 inputFormatter: [formatters.inputAddressFormatter, formatters.inputDefaultBlockNumberFormatter],
             }),
+            new Method({
+                name: 'getAccountKey',
+                call: 'klay_getAccountKey',
+                params: 2,
+                inputFormatter: [formatters.inputAddressFormatter, formatters.inputDefaultBlockNumberFormatter],
+            }),
         ]
         AbstractTransaction._klaytnCall = {}
         _.each(_klaytnCall, function(method) {
@@ -119,12 +125,6 @@ class KlayRPC {
             new Method({
                 name: 'getAccount',
                 call: 'klay_getAccount',
-                params: 2,
-                inputFormatter: [formatters.inputAddressFormatter, formatters.inputDefaultBlockNumberFormatter],
-            }),
-            new Method({
-                name: 'getAccountKey',
-                call: 'klay_getAccountKey',
                 params: 2,
                 inputFormatter: [formatters.inputAddressFormatter, formatters.inputDefaultBlockNumberFormatter],
             }),
