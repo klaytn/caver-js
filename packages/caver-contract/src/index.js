@@ -286,13 +286,22 @@ Contract.setProvider = function(provider, accounts) {
 
 /**
  * Set _keyrings in contract instance.
- * When _keyrings is exsit, contract will use _keyrings instead of _klayAccounts
  *
  * @param {KeyringContainer} keyrings
  */
 Contract.prototype.setKeyrings = function(keyrings) {
     if (!(keyrings instanceof KeyringContainer)) throw new Error(`keyrings should be an instance of 'KeyringContainer'`)
     this._keyrings = keyrings
+}
+
+/**
+ * Set _wallet in contract instance.
+ * When _wallet exists, contract will use _wallet instead of _klayAccounts
+ *
+ * @param {IWallet} wallet
+ */
+Contract.prototype.setWallet = function(wallet) {
+    this._wallet = wallet
 }
 
 Contract.prototype.addAccounts = function(accounts) {
@@ -612,7 +621,7 @@ Contract.prototype.deploy = function(options, callback) {
             parent: this,
             deployData: options.data,
             _klayAccounts: this.constructor._klayAccounts,
-            _keyrings: this._keyrings,
+            _wallet: this._wallet,
         },
         options.arguments
     )
@@ -867,7 +876,7 @@ Contract.prototype._createTxObject = function _createTxObject() {
     txObject._method = this.method
     txObject._parent = this.parent
     txObject._klayAccounts = this.parent.constructor._klayAccounts || this._klayAccounts
-    txObject._keyrings = this.parent._keyrings || this._keyrings
+    txObject._wallet = this.parent._wallet || this._wallet
 
     if (this.deployData) {
         txObject._deployData = this.deployData
@@ -939,12 +948,12 @@ Contract.prototype._processExecuteArguments = function _processExecuteArguments(
  * @param {Boolean} makeRequest if true, it simply returns the request parameters, rather than executing it
  */
 
-Contract.prototype._executeMethod = function _executeMethod() {
+Contract.prototype._executeMethod = async function _executeMethod() {
     const _this = this
     const args = this._parent._processExecuteArguments.call(this, Array.prototype.slice.call(arguments), defer)
     var defer = utils.promiEvent(args.type !== 'send') /* eslint-disable-line no-var */
     const klayAccounts = _this.constructor._klayAccounts || _this._klayAccounts
-    const keyrings = _this._parent._keyrings || _this._keyrings
+    const wallet = _this._parent._wallet || _this._wallet
 
     // Not allow to specify options.gas to 0.
     if (args.options && args.options.gas === 0) {
@@ -1082,10 +1091,13 @@ Contract.prototype._executeMethod = function _executeMethod() {
                 extraFormatters,
             }).createFunction()
 
-            if (keyrings) {
-                const isExisted = keyrings.getKeyring(args.options.from)
+            if (wallet) {
+                const isExisted = await wallet.isExisted(args.options.from)
                 if (!isExisted) {
-                    return sendTransaction(args.options, args.callback)
+                    if (wallet instanceof KeyringContainer) {
+                        return sendTransaction(args.options, args.callback)
+                    }
+                    throw new Error(`Failed to find ${args.options.from}. Please check that the corresponding account or keyring exists.`)
                 }
 
                 const sendRawTransaction = new Method({
@@ -1105,7 +1117,7 @@ Contract.prototype._executeMethod = function _executeMethod() {
                     transaction = new SmartContractExecution(args.options)
                 }
 
-                return keyrings.sign(transaction.from, transaction).then(signedTx => {
+                return wallet.sign(transaction.from, transaction).then(signedTx => {
                     return sendRawTransaction(signedTx.getRLPEncoding())
                 })
             }

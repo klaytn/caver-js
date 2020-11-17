@@ -130,6 +130,16 @@ class KeyringContainer {
     }
 
     /**
+     * Returns whether the keyring corresponding to the address exists
+     *
+     * @param {string} address The address of keyring to check existence.
+     * @return {Keyring}
+     */
+    isExisted(address) {
+        return this.getKeyring(address) !== undefined
+    }
+
+    /**
      * adds a keyring to the keyringContainer.
      *
      * @param {Keyring} keyring A keyring instance to add to keyringContainer.

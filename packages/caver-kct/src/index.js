@@ -74,7 +74,7 @@ class KCT {
                     core.packageInit(self, [_this])
                 }
 
-                this.setKeyrings(args[0].wallet)
+                this.setWallet(args[0].wallet)
             }
         }
 
@@ -106,7 +106,7 @@ class KCT {
                     core.packageInit(self, [_this])
                 }
 
-                this.setKeyrings(args[0].wallet)
+                this.setWallet(args[0].wallet)
             }
         }
 
