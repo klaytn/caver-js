@@ -285,13 +285,22 @@ Contract.setProvider = function(provider, accounts) {
 }
 
 /**
+ * Set _keyrings in contract instance.
+ *
+ * @param {KeyringContainer} keyrings
+ */
+Contract.prototype.setKeyrings = function(keyrings) {
+    if (!(keyrings instanceof KeyringContainer)) throw new Error(`keyrings should be an instance of 'KeyringContainer'`)
+    this._keyrings = keyrings
+}
+
+/**
  * Set _wallet in contract instance.
  * When _wallet is exsit, contract will use _wallet instead of _klayAccounts
  *
- * @param {KeyringContainer} wallet
+ * @param {IWallet} wallet
  */
 Contract.prototype.setWallet = function(wallet) {
-    // if (!(wallet instanceof KeyringContainer)) throw new Error(`wallet should be an instance of 'KeyringContainer'`)
     this._wallet = wallet
 }
 
