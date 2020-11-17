@@ -296,7 +296,7 @@ Contract.prototype.setKeyrings = function(keyrings) {
 
 /**
  * Set _wallet in contract instance.
- * When _wallet is exsit, contract will use _wallet instead of _klayAccounts
+ * When _wallet exists, contract will use _wallet instead of _klayAccounts
  *
  * @param {IWallet} wallet
  */
@@ -1097,7 +1097,7 @@ Contract.prototype._executeMethod = async function _executeMethod() {
                     if (wallet instanceof KeyringContainer) {
                         return sendTransaction(args.options, args.callback)
                     }
-                    throw new Error(`Failed to find ${args.options.from}. Please check account or keyring is exited.`)
+                    throw new Error(`Failed to find ${args.options.from}. Please check that the corresponding account or keyring exists.`)
                 }
 
                 const sendRawTransaction = new Method({
