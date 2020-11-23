@@ -25,6 +25,7 @@
  */
 
 const _ = require('lodash')
+const util = require('util')
 
 const core = require('../../caver-core')
 const { formatters } = require('../../caver-core-helpers')
@@ -181,12 +182,28 @@ const Klay = function Klay(...args) {
     this.KIP7._klayAccounts = this.accounts
     this.KIP7.currentProvider = this._requestManager.provider
 
+    const kip7Deprecated =
+        '`caver.klay.KIP7` has been deprecated. `caver.klay.KIP7` works using only `caver.klay.accounts.wallet`. If you are using `caver.wallet` then use `caver.kct.kip7`.'
+    // Overwrite constructor with deprecate warning
+    this.KIP7 = util.deprecate(this.KIP7, kip7Deprecated)
+
+    // Overwrite static deloy method with deprecate warning
+    this.KIP7.deploy = util.deprecate(this.KIP7.deploy, kip7Deprecated)
+
     this.KIP17 = KIP17
     this.KIP17.defaultAccount = this.defaultAccount
     this.KIP17.defaultBlock = this.defaultBlock
     this.KIP17._requestManager = this._requestManager
     this.KIP17._klayAccounts = this.accounts
     this.KIP17.currentProvider = this._requestManager.provider
+
+    const kip17Deprecated =
+        '`caver.klay.KIP17` has been deprecated. `caver.klay.KIP17` works using only `caver.klay.accounts.wallet`. If you are using `caver.wallet` then use `caver.kct.kip17`.'
+    // Overwrite constructor with deprecate warning
+    this.KIP17 = util.deprecate(KIP17, kip17Deprecated)
+
+    // Overwrite static deloy method with deprecate warning
+    this.KIP17.deploy = util.deprecate(this.KIP17.deploy, kip17Deprecated)
 
     // add IBAN
     this.Iban = utils.Iban
