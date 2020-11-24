@@ -55,15 +55,25 @@ class IPFS {
     /**
      * adds a file to IPFS
      *
-     * @param {string|Buffer} data The file path string or file contents.
+     * @param {string|Buffer|ArrayBuffer} data The file path string or file contents.
      * @return {string}
      */
     async add(data) {
         if (!this.ipfs) throw new Error(`Please set IPFS Node through 'caver.ipfs.setIPFSNode'.`)
 
         // Read file
-        if (lodash.isString(data)) data = fs.readFileSync(data)
-        if (!lodash.isBuffer(data)) throw new Error(`Invalid data: ${data}`)
+        if (lodash.isString(data) && fs && Object.keys(fs).length > 0) data = fs.readFileSync(data)
+        if (lodash.isArrayBuffer(data)) {
+            const buffer = Buffer.alloc(data.byteLength)
+            const view = new Uint8Array(data)
+            for (let i = 0; i < buffer.length; ++i) {
+                buffer[i] = view[i]
+            }
+            data = buffer
+        } else if (!lodash.isBuffer(data))
+            throw new Error(
+                `Invalid data: In order to upload file contents to IPFS, Buffer or ArrayBuffer must be passed as a parameter. ${data}`
+            )
 
         const ret = await this.ipfs.add(data)
         return ret[0].hash
