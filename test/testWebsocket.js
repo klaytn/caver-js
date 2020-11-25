@@ -16,6 +16,10 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const testWebsocketURL = 'wss://api.baobab.klaytn.net:8652/'
+const dotenv = require('dotenv')
+
+dotenv.config()
+
+const testWebsocketURL = process.env.EN_WS_URL_DEV || 'http://localhost:8552/'
 
 module.exports = testWebsocketURL

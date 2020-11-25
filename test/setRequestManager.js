@@ -50,7 +50,7 @@ describe('setRequestManager', () => {
         const setAccountsRequestManager = sinon.spy(caver.klay.accounts, 'setRequestManager')
         const setKlayProvider = sinon.spy(caver.klay, 'setProvider')
 
-        const newProvider = new Caver.providers.HttpProvider('https://api.baobab.klaytn.net:8651/')
+        const newProvider = new Caver.providers.HttpProvider('http://localhost:8551/')
         caver.klay.setProvider(newProvider)
 
         expect(setKlayRequestManager).to.have.been.calledOnce
