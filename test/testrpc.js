@@ -22,8 +22,4 @@ dotenv.config()
 
 const testRPCURL = process.env.EN_RPC_URL_DEV || 'http://localhost:8551/'
 
-console.log(process.env)
-console.log(process.env.EN_RPC_URL_DEV)
-console.log(`testRPCURL : ${testRPCURL}`)
-
 module.exports = testRPCURL

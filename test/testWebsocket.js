@@ -22,6 +22,4 @@ dotenv.config()
 
 const testWebsocketURL = process.env.EN_WS_URL_DEV || 'http://localhost:8552/'
 
-console.log(`testWebsocketURL : ${testWebsocketURL}`)
-
 module.exports = testWebsocketURL
