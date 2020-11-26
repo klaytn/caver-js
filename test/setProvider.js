@@ -19,10 +19,10 @@
 const Caver = require('../index')
 const { expect } = require('./extendedChai')
 
-const baobabHost = 'https://api.baobab.klaytn.net:8651/'
-const cypressHost = 'https://api.cypress.klaytn.net:8651/'
-const baobabProvider = new Caver.providers.HttpProvider(baobabHost)
-const cypressProvider = new Caver.providers.HttpProvider(cypressHost)
+const host1 = 'http://random1.test.host:8551/'
+const host2 = 'https://random2.test.host:8651/'
+const host1Provider = new Caver.providers.HttpProvider(host1)
+const host2Provider = new Caver.providers.HttpProvider(host2)
 
 const abi = [
     {
@@ -60,78 +60,78 @@ describe('Test setProvider', () => {
     }).timeout(10000)
 
     it('CAVERJS-UNIT-ETC-167: When passing host information as a parameter through a Caver contructor, the provider must be set.', () => {
-        const caver = new Caver(baobabHost)
+        const caver = new Caver(host1)
 
         expect(caver.klay.currentProvider).not.to.be.null
-        expect(caver.klay.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.currentProvider.host).to.equals(host1)
         expect(caver.klay.net.currentProvider).not.to.be.null
-        expect(caver.klay.net.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.net.currentProvider.host).to.equals(host1)
         expect(caver.klay.personal.currentProvider).not.to.be.null
-        expect(caver.klay.personal.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.personal.currentProvider.host).to.equals(host1)
         expect(caver.klay.Contract.currentProvider).not.to.be.null
-        expect(caver.klay.Contract.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.Contract.currentProvider.host).to.equals(host1)
         expect(caver.klay.accounts.currentProvider).not.to.be.null
-        expect(caver.klay.accounts.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.accounts.currentProvider.host).to.equals(host1)
     }).timeout(10000)
 
     it('CAVERJS-UNIT-ETC-168: When passing provider as a parameter through a Caver contructor, the provider must be set.', () => {
-        const caver = new Caver(baobabProvider)
+        const caver = new Caver(host1Provider)
 
         expect(caver.klay.currentProvider).not.to.be.null
-        expect(caver.klay.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.currentProvider.host).to.equals(host1)
         expect(caver.klay.net.currentProvider).not.to.be.null
-        expect(caver.klay.net.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.net.currentProvider.host).to.equals(host1)
         expect(caver.klay.personal.currentProvider).not.to.be.null
-        expect(caver.klay.personal.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.personal.currentProvider.host).to.equals(host1)
         expect(caver.klay.Contract.currentProvider).not.to.be.null
-        expect(caver.klay.Contract.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.Contract.currentProvider.host).to.equals(host1)
         expect(caver.klay.accounts.currentProvider).not.to.be.null
-        expect(caver.klay.accounts.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.accounts.currentProvider.host).to.equals(host1)
     }).timeout(10000)
 
     it('CAVERJS-UNIT-ETC-169: When setting a provider with setProvider function, the currentProvider must be set appropriately.', () => {
         const caver = new Caver()
-        caver.klay.setProvider(baobabProvider)
+        caver.klay.setProvider(host1Provider)
 
         expect(caver.klay.currentProvider).not.to.be.null
-        expect(caver.klay.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.currentProvider.host).to.equals(host1)
         expect(caver.klay.net.currentProvider).not.to.be.null
-        expect(caver.klay.net.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.net.currentProvider.host).to.equals(host1)
         expect(caver.klay.personal.currentProvider).not.to.be.null
-        expect(caver.klay.personal.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.personal.currentProvider.host).to.equals(host1)
         expect(caver.klay.Contract.currentProvider).not.to.be.null
-        expect(caver.klay.Contract.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.Contract.currentProvider.host).to.equals(host1)
         expect(caver.klay.accounts.currentProvider).not.to.be.null
-        expect(caver.klay.accounts.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.accounts.currentProvider.host).to.equals(host1)
     }).timeout(10000)
 
     it('CAVERJS-UNIT-ETC-170: If provider is set already, currentProvider must change when new provider is set with setProvider function.', () => {
         const caver = new Caver()
-        caver.klay.setProvider(baobabProvider)
+        caver.klay.setProvider(host1Provider)
 
         expect(caver.klay.currentProvider).not.to.be.null
-        expect(caver.klay.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.currentProvider.host).to.equals(host1)
         expect(caver.klay.net.currentProvider).not.to.be.null
-        expect(caver.klay.net.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.net.currentProvider.host).to.equals(host1)
         expect(caver.klay.personal.currentProvider).not.to.be.null
-        expect(caver.klay.personal.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.personal.currentProvider.host).to.equals(host1)
         expect(caver.klay.Contract.currentProvider).not.to.be.null
-        expect(caver.klay.Contract.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.Contract.currentProvider.host).to.equals(host1)
         expect(caver.klay.accounts.currentProvider).not.to.be.null
-        expect(caver.klay.accounts.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.accounts.currentProvider.host).to.equals(host1)
 
-        caver.klay.setProvider(cypressProvider)
+        caver.klay.setProvider(host2Provider)
 
         expect(caver.klay.currentProvider).not.to.be.null
-        expect(caver.klay.currentProvider.host).to.equals(cypressHost)
+        expect(caver.klay.currentProvider.host).to.equals(host2)
         expect(caver.klay.net.currentProvider).not.to.be.null
-        expect(caver.klay.net.currentProvider.host).to.equals(cypressHost)
+        expect(caver.klay.net.currentProvider.host).to.equals(host2)
         expect(caver.klay.personal.currentProvider).not.to.be.null
-        expect(caver.klay.personal.currentProvider.host).to.equals(cypressHost)
+        expect(caver.klay.personal.currentProvider.host).to.equals(host2)
         expect(caver.klay.Contract.currentProvider).not.to.be.null
-        expect(caver.klay.Contract.currentProvider.host).to.equals(cypressHost)
+        expect(caver.klay.Contract.currentProvider.host).to.equals(host2)
         expect(caver.klay.accounts.currentProvider).not.to.be.null
-        expect(caver.klay.accounts.currentProvider.host).to.equals(cypressHost)
+        expect(caver.klay.accounts.currentProvider.host).to.equals(host2)
     }).timeout(10000)
 })
 
@@ -153,51 +153,51 @@ describe('Test caver.setProvider', () => {
     }).timeout(10000)
 
     it('CAVERJS-UNIT-ETC-216: When passing host information as a parameter through a Caver contructor, the provider must be set.', () => {
-        const caver = new Caver(baobabHost)
+        const caver = new Caver(host1)
         const contract = new caver.contract(abi)
         const kip7 = new caver.kct.kip7()
         const kip17 = new caver.kct.kip17()
 
         expect(caver.klay.currentProvider).not.to.be.null
-        expect(caver.klay.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.currentProvider.host).to.equals(host1)
         expect(caver.klay.net.currentProvider).not.to.be.null
-        expect(caver.klay.net.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.net.currentProvider.host).to.equals(host1)
         expect(caver.klay.personal.currentProvider).not.to.be.null
-        expect(caver.klay.personal.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.personal.currentProvider.host).to.equals(host1)
         expect(caver.klay.Contract.currentProvider).not.to.be.null
-        expect(caver.klay.Contract.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.Contract.currentProvider.host).to.equals(host1)
         expect(caver.klay.accounts.currentProvider).not.to.be.null
-        expect(caver.klay.accounts.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.accounts.currentProvider.host).to.equals(host1)
         expect(contract.currentProvider).not.to.be.null
-        expect(contract.currentProvider.host).to.equals(baobabHost)
+        expect(contract.currentProvider.host).to.equals(host1)
         expect(kip7.currentProvider).not.to.be.null
-        expect(kip7.currentProvider.host).to.equals(baobabHost)
+        expect(kip7.currentProvider.host).to.equals(host1)
         expect(kip17.currentProvider).not.to.be.null
-        expect(kip17.currentProvider.host).to.equals(baobabHost)
+        expect(kip17.currentProvider.host).to.equals(host1)
     }).timeout(10000)
 
     it('CAVERJS-UNIT-ETC-217: When passing provider as a parameter through a Caver contructor, the provider must be set.', () => {
-        const caver = new Caver(baobabProvider)
+        const caver = new Caver(host1Provider)
         const contract = new caver.contract(abi)
         const kip7 = new caver.kct.kip7()
         const kip17 = new caver.kct.kip17()
 
         expect(caver.klay.currentProvider).not.to.be.null
-        expect(caver.klay.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.currentProvider.host).to.equals(host1)
         expect(caver.klay.net.currentProvider).not.to.be.null
-        expect(caver.klay.net.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.net.currentProvider.host).to.equals(host1)
         expect(caver.klay.personal.currentProvider).not.to.be.null
-        expect(caver.klay.personal.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.personal.currentProvider.host).to.equals(host1)
         expect(caver.klay.Contract.currentProvider).not.to.be.null
-        expect(caver.klay.Contract.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.Contract.currentProvider.host).to.equals(host1)
         expect(caver.klay.accounts.currentProvider).not.to.be.null
-        expect(caver.klay.accounts.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.accounts.currentProvider.host).to.equals(host1)
         expect(contract.currentProvider).not.to.be.null
-        expect(contract.currentProvider.host).to.equals(baobabHost)
+        expect(contract.currentProvider.host).to.equals(host1)
         expect(kip7.currentProvider).not.to.be.null
-        expect(kip7.currentProvider.host).to.equals(baobabHost)
+        expect(kip7.currentProvider.host).to.equals(host1)
         expect(kip17.currentProvider).not.to.be.null
-        expect(kip17.currentProvider.host).to.equals(baobabHost)
+        expect(kip17.currentProvider.host).to.equals(host1)
     }).timeout(10000)
 
     it('CAVERJS-UNIT-ETC-218: When setting a provider with setProvider function, the currentProvider must be set appropriately.', () => {
@@ -206,24 +206,24 @@ describe('Test caver.setProvider', () => {
         const kip7 = new caver.kct.kip7()
         const kip17 = new caver.kct.kip17()
 
-        caver.setProvider(baobabProvider)
+        caver.setProvider(host1Provider)
 
         expect(caver.klay.currentProvider).not.to.be.null
-        expect(caver.klay.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.currentProvider.host).to.equals(host1)
         expect(caver.klay.net.currentProvider).not.to.be.null
-        expect(caver.klay.net.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.net.currentProvider.host).to.equals(host1)
         expect(caver.klay.personal.currentProvider).not.to.be.null
-        expect(caver.klay.personal.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.personal.currentProvider.host).to.equals(host1)
         expect(caver.klay.Contract.currentProvider).not.to.be.null
-        expect(caver.klay.Contract.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.Contract.currentProvider.host).to.equals(host1)
         expect(contract.currentProvider).not.to.be.null
-        expect(contract.currentProvider.host).to.equals(baobabHost)
+        expect(contract.currentProvider.host).to.equals(host1)
         expect(kip7.currentProvider).not.to.be.null
-        expect(kip7.currentProvider.host).to.equals(baobabHost)
+        expect(kip7.currentProvider.host).to.equals(host1)
         expect(kip17.currentProvider).not.to.be.null
-        expect(kip17.currentProvider.host).to.equals(baobabHost)
+        expect(kip17.currentProvider.host).to.equals(host1)
         expect(caver.klay.accounts.currentProvider).not.to.be.null
-        expect(caver.klay.accounts.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.accounts.currentProvider.host).to.equals(host1)
     }).timeout(10000)
 
     it('CAVERJS-UNIT-ETC-219: If provider is set already, currentProvider must change when new provider is set with setProvider function.', () => {
@@ -232,42 +232,42 @@ describe('Test caver.setProvider', () => {
         const kip7 = new caver.kct.kip7()
         const kip17 = new caver.kct.kip17()
 
-        caver.setProvider(baobabProvider)
+        caver.setProvider(host1Provider)
 
         expect(caver.klay.currentProvider).not.to.be.null
-        expect(caver.klay.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.currentProvider.host).to.equals(host1)
         expect(caver.klay.net.currentProvider).not.to.be.null
-        expect(caver.klay.net.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.net.currentProvider.host).to.equals(host1)
         expect(caver.klay.personal.currentProvider).not.to.be.null
-        expect(caver.klay.personal.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.personal.currentProvider.host).to.equals(host1)
         expect(caver.klay.Contract.currentProvider).not.to.be.null
-        expect(caver.klay.Contract.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.Contract.currentProvider.host).to.equals(host1)
         expect(contract.currentProvider).not.to.be.null
-        expect(contract.currentProvider.host).to.equals(baobabHost)
+        expect(contract.currentProvider.host).to.equals(host1)
         expect(kip7.currentProvider).not.to.be.null
-        expect(kip7.currentProvider.host).to.equals(baobabHost)
+        expect(kip7.currentProvider.host).to.equals(host1)
         expect(kip17.currentProvider).not.to.be.null
-        expect(kip17.currentProvider.host).to.equals(baobabHost)
+        expect(kip17.currentProvider.host).to.equals(host1)
         expect(caver.klay.accounts.currentProvider).not.to.be.null
-        expect(caver.klay.accounts.currentProvider.host).to.equals(baobabHost)
+        expect(caver.klay.accounts.currentProvider.host).to.equals(host1)
 
-        caver.setProvider(cypressProvider)
+        caver.setProvider(host2Provider)
 
         expect(caver.klay.currentProvider).not.to.be.null
-        expect(caver.klay.currentProvider.host).to.equals(cypressHost)
+        expect(caver.klay.currentProvider.host).to.equals(host2)
         expect(caver.klay.net.currentProvider).not.to.be.null
-        expect(caver.klay.net.currentProvider.host).to.equals(cypressHost)
+        expect(caver.klay.net.currentProvider.host).to.equals(host2)
         expect(caver.klay.personal.currentProvider).not.to.be.null
-        expect(caver.klay.personal.currentProvider.host).to.equals(cypressHost)
+        expect(caver.klay.personal.currentProvider.host).to.equals(host2)
         expect(caver.klay.Contract.currentProvider).not.to.be.null
-        expect(caver.klay.Contract.currentProvider.host).to.equals(cypressHost)
+        expect(caver.klay.Contract.currentProvider.host).to.equals(host2)
         expect(contract.currentProvider).not.to.be.null
-        expect(contract.currentProvider.host).to.equals(cypressHost)
+        expect(contract.currentProvider.host).to.equals(host2)
         expect(kip7.currentProvider).not.to.be.null
-        expect(kip7.currentProvider.host).to.equals(cypressHost)
+        expect(kip7.currentProvider.host).to.equals(host2)
         expect(kip17.currentProvider).not.to.be.null
-        expect(kip17.currentProvider.host).to.equals(cypressHost)
+        expect(kip17.currentProvider.host).to.equals(host2)
         expect(caver.klay.accounts.currentProvider).not.to.be.null
-        expect(caver.klay.accounts.currentProvider.host).to.equals(cypressHost)
+        expect(caver.klay.accounts.currentProvider.host).to.equals(host2)
     }).timeout(10000)
 })

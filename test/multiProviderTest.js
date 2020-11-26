@@ -19,33 +19,23 @@
 const Caver = require('../index')
 const { expect } = require('./extendedChai')
 
-const baobab = new Caver('https://api.baobab.klaytn.net:8651/')
-const cypress = new Caver('https://api.cypress.klaytn.net:8651/')
+const host1URL = 'http://random1.test.host:8551/'
+const host1 = new Caver(host1URL)
+const host2URL = 'https://random2.test.host:8651/'
+const host2 = new Caver(host2URL)
 
 describe('Test multi provider', () => {
     it('CAVERJS-UNIT-ETC-077: For each provider, the request must be processed using its own requestManager.', async () => {
-        const baobabGenesis = await baobab.klay.getBlock(0)
-        const baobabNetworkId = await baobab.klay.net.getId()
-        const baobabChainId = await baobab.klay.accounts._klaytnCall.getChainId()
-        const baobabNetworkType = await baobab.klay.net.getNetworkType()
+        expect(host1.klay.currentProvider.host).to.equals(host1URL)
+        expect(host1.klay.net.currentProvider.host).to.equals(host1URL)
+        expect(host1.klay.personal.currentProvider.host).to.equals(host1URL)
+        expect(host1.klay.Contract.currentProvider.host).to.equals(host1URL)
+        expect(host1.klay.accounts.currentProvider.host).to.equals(host1URL)
 
-        const cypressGenesis = await cypress.klay.getBlock(0)
-        const cypressNetworkId = await cypress.klay.net.getId()
-        const cypressChainId = await cypress.klay.accounts._klaytnCall.getChainId()
-        const cypressNetworkType = await cypress.klay.net.getNetworkType()
-
-        expect(baobabGenesis.hash).to.not.equals(cypressGenesis.hash)
-
-        expect(baobabNetworkId).to.not.equals(cypressNetworkId)
-        expect(baobabNetworkId).to.equals(1001)
-        expect(cypressNetworkId).to.equals(8217)
-
-        expect(baobabChainId).to.not.equals(cypressChainId)
-        expect(baobabChainId).to.equals(1001)
-        expect(cypressChainId).to.equals(8217)
-
-        expect(baobabNetworkType).to.not.equals(cypressNetworkType)
-        expect(baobabNetworkType).to.equals('baobab')
-        expect(cypressNetworkType).to.equals('cypress')
+        expect(host2.klay.currentProvider.host).to.equals(host2URL)
+        expect(host2.klay.net.currentProvider.host).to.equals(host2URL)
+        expect(host2.klay.personal.currentProvider.host).to.equals(host2URL)
+        expect(host2.klay.Contract.currentProvider.host).to.equals(host2URL)
+        expect(host2.klay.accounts.currentProvider.host).to.equals(host2URL)
     }).timeout(10000)
 })
