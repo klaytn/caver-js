@@ -676,7 +676,9 @@ Contract.prototype._generateEventOptions = function() {
  * @return {Object} the event subscription
  */
 Contract.prototype.clone = function(contractAddress = this.options.address) {
-    return new this.constructor(this.options.jsonInterface, contractAddress, this.options)
+    const cloned = new this.constructor(this.options.jsonInterface, contractAddress, this.options)
+    cloned.setWallet(this._wallet)
+    return cloned
 }
 
 /**
