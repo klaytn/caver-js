@@ -65,7 +65,7 @@ describe('Decode Transaction', () => {
         expect(decodedTx.signatures[0][0]).to.equals(decodedTx.v)
         expect(decodedTx.signatures[0][1]).to.equals(decodedTx.r)
         expect(decodedTx.signatures[0][2]).to.equals(decodedTx.s)
-        expect(decodedTx.feePayer).to.equals('0x')
+        expect(decodedTx.feePayer).to.equals('0x0000000000000000000000000000000000000000')
         expect(decodedTx.payerV).to.equals('0x01')
         expect(decodedTx.payerR).to.equals('0x')
         expect(decodedTx.payerS).to.equals('0x')

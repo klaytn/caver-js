@@ -32,7 +32,7 @@ function validateParams(tx) {
 
     // validate for fee payer transaction format
     if (tx.senderRawTransaction) {
-        if (!tx.feePayer || tx.feePayer === '0x') {
+        if (!tx.feePayer || tx.feePayer === '0x' || tx.feePayer === '0x0000000000000000000000000000000000000000') {
             error = new Error(`Invalid fee payer: ${tx.feePayer}`)
         } else if (!utils.isAddress(tx.feePayer)) {
             error = new Error(`Invalid address of fee payer: ${tx.feePayer}`)
@@ -53,7 +53,7 @@ function validateParams(tx) {
     if (tx.type !== TX_TYPE_STRING.TxTypeLegacyTransaction && !tx.from) {
         error = new Error('"from" is missing')
     } else if (tx.from) {
-        if (tx.from === '0x') {
+        if (tx.from === '0x' || tx.from === '0x0000000000000000000000000000000000000000') {
             if (tx.type !== TX_TYPE_STRING.TxTypeLegacyTransaction) {
                 error = new Error(`Invalid address of from: ${tx.from}`)
             }
@@ -70,7 +70,7 @@ function validateParams(tx) {
 
     // If feePayerSignatures is set in transaction object, feePayer also should be defined together.
     if (tx.feePayerSignatures && !utils.isEmptySig(tx.feePayerSignatures)) {
-        if (!tx.feePayer || tx.feePayer === '0x') {
+        if (!tx.feePayer || tx.feePayer === '0x' || tx.feePayer === '0x0000000000000000000000000000000000000000') {
             error = new Error('"feePayer" is missing: feePayer must be defined with feePayerSignatures.')
         } else if (!utils.isAddress(tx.feePayer)) {
             error = new Error(`Invalid address of fee payer: ${tx.feePayer}`)
@@ -240,7 +240,12 @@ function validateLegacy(transaction) {
         return new Error('contract creation without any data provided')
     }
 
-    if (transaction.to && transaction.to !== '0x' && !utils.isAddress(transaction.to)) {
+    if (
+        transaction.to &&
+        transaction.to !== '0x' &&
+        transaction.to !== '0x0000000000000000000000000000000000000000' &&
+        !utils.isAddress(transaction.to)
+    ) {
         return new Error(`Invalid address of to: ${transaction.to}`)
     }
 
@@ -567,7 +572,7 @@ function checkDeployEssential(transaction) {
         return new Error('"data" is missing')
     }
 
-    if (transaction.to !== undefined && transaction.to !== '0x') {
+    if (transaction.to !== undefined && transaction.to !== '0x' && transaction.to !== '0x0000000000000000000000000000000000000000') {
         return new Error(`"to" cannot be used with ${transaction.type} transaction`)
     }
     if (transaction.codeFormat !== undefined && !validateCodeFormat(transaction.codeFormat)) {

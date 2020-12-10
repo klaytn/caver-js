@@ -77,7 +77,10 @@ class AbstractTransaction {
     }
 
     set from(address) {
-        if (this.type === TX_TYPE_STRING.TxTypeLegacyTransaction && address === '0x') {
+        if (
+            this.type === TX_TYPE_STRING.TxTypeLegacyTransaction &&
+            (address === '0x' || address === '0x0000000000000000000000000000000000000000')
+        ) {
             this._from = address.toLowerCase()
         } else {
             if (!utils.isAddress(address)) throw new Error(`Invalid address ${address}`)
@@ -190,7 +193,7 @@ class AbstractTransaction {
         if (this.type === TX_TYPE_STRING.TxTypeLegacyTransaction && keyring.isDecoupled())
             throw new Error(`A legacy transaction cannot be signed with a decoupled keyring.`)
 
-        if (!this.from || this.from === '0x') this.from = keyring.address
+        if (!this.from || this.from === '0x' || this.from === '0x0000000000000000000000000000000000000000') this.from = keyring.address
         if (this.from.toLowerCase() !== keyring.address.toLowerCase())
             throw new Error(`The from address of the transaction is different with the address of the keyring to use.`)
 

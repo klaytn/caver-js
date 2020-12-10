@@ -56,8 +56,8 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
     }
 
     set feePayer(f) {
-        if (f === undefined) f = '0x'
-        if (f !== '0x' && !utils.isAddress(f)) throw new Error(`Invalid address of fee payer: ${f}`)
+        if (!f || f === '0x') f = '0x0000000000000000000000000000000000000000'
+        if (!utils.isAddress(f)) throw new Error(`Invalid address of fee payer: ${f}`)
 
         this._feePayer = f.toLowerCase()
     }
@@ -98,7 +98,8 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
                 `Unsupported key type. The key parameter of the signAsFeePayer must be a single private key string, KlaytnWalletKey string, or Keyring instance.`
             )
 
-        if (!this.feePayer || this.feePayer === '0x') this.feePayer = keyring.address
+        if (!this.feePayer || this.feePayer === '0x' || this.feePayer === '0x0000000000000000000000000000000000000000')
+            this.feePayer = keyring.address
         if (this.feePayer.toLowerCase() !== keyring.address.toLowerCase())
             throw new Error(`The feePayer address of the transaction is different with the address of the keyring to use.`)
 
@@ -157,8 +158,13 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
             for (const k in decoded) {
                 if (k === '_signatures' || k === '_feePayerSignatures') continue
                 if (k === '_feePayer') {
-                    if ((decoded[k] !== '0x' || this[k] === '0x') && fillVariables) this[k] = decoded[k]
-                    if (decoded[k] === '0x') continue
+                    const emtpyAddress = '0x0000000000000000000000000000000000000000'
+                    if (
+                        ((decoded[k] !== '0x' && decoded[k] !== emtpyAddress) || (this[k] === '0x' || this[k] === emtpyAddress)) &&
+                        fillVariables
+                    )
+                        this[k] = decoded[k]
+                    if (decoded[k] === '0x' || decoded[k] === emtpyAddress) continue
                 }
 
                 if (this[k] === undefined && fillVariables) this[k] = decoded[k]

@@ -758,7 +758,7 @@ Accounts.prototype.signTransaction = function signTransaction() {
             const { senderRawTransaction, feePayer, feePayerSignatures } = splitFeePayer(tx.senderRawTransaction)
 
             // feePayer !== '0x' means that in senderRawTransaction there are feePayerSignatures
-            if (feePayer !== '0x') {
+            if (feePayer !== '0x' && feePayer !== '0x0000000000000000000000000000000000000000') {
                 // The feePayer inside the tx object does not match the feePayer information contained in the senderRawTransaction.
                 if (feePayer.toLowerCase() !== tx.feePayer.toLowerCase()) {
                     return handleError(
@@ -942,7 +942,7 @@ Accounts.prototype.feePayerSignTransaction = function feePayerSignTransaction() 
         return this.signTransaction({ senderRawTransaction: tx, feePayer }, privateKey, callback)
     }
 
-    if (!tx.feePayer || tx.feePayer === '0x') {
+    if (!tx.feePayer || tx.feePayer === '0x' || tx.feePayer === '0x0000000000000000000000000000000000000000') {
         tx.feePayer = feePayer
     }
 
@@ -1090,7 +1090,11 @@ Accounts.prototype.getRawTransactionWithSignatures = function getRawTransactionW
 
         const decoded = decodeFromRawTransaction(tx.senderRawTransaction)
         // feePayer !== '0x' means that in senderRawTransaction there are feePayerSignatures
-        if (decoded.feePayer !== '0x' && !utils.isEmptySig(decoded.feePayerSignatures)) {
+        if (
+            decoded.feePayer !== '0x' &&
+            decoded.feePayer !== '0x0000000000000000000000000000000000000000' &&
+            !utils.isEmptySig(decoded.feePayerSignatures)
+        ) {
             if (decoded.feePayer.toLowerCase() !== tx.feePayer.toLowerCase()) {
                 return handleError('Invalid feePayer')
             }
@@ -1169,7 +1173,7 @@ Accounts.prototype.getRawTransactionWithSignatures = function getRawTransactionW
 /**
  * combineSignatures combines RLP encoded raw transaction strings.
  * combineSignatures compares transaction before combining, and if values in field are not same, this throws error.
- * The comparison allows that the address of the fee payer is '0x'(default value) for some transactions while the other transactions have a specific fee payer. This is for the use case that some transactions do not have the fee payer's information.
+ * The comparison allows that the address of the fee payer is '0x0000000000000000000000000000000000000000'(default value) for some transactions while the other transactions have a specific fee payer. This is for the use case that some transactions do not have the fee payer's information.
  * In this case, feePayer field doesn't have to be compared with other transaction.
  *
  * @method combineSignatures
@@ -1218,15 +1222,15 @@ Accounts.prototype.combineSignatures = function combineSignatures(rawTransaction
                     continue
                 }
 
-                // feePayer field can be '0x' when after sender signs to trasnaction.
-                // For handling this, if feePayer is '0x', don't compare with other transaction
+                // feePayer field can be '0x' or '0x0000000000000000000000000000000000000000' when after sender signs to trasnaction.
+                // For handling this, if feePayer is '0x' or '0x0000000000000000000000000000000000000000', don't compare with other transaction
                 if (key === 'feePayer') {
-                    if (decodedTransaction[key] === '0x') {
+                    if (decodedTransaction[key] === '0x' || decodedTransaction[key] === '0x0000000000000000000000000000000000000000') {
                         continue
                     } else {
-                        // set feePayer letiable with valid feePayer address(not '0x')
+                        // set feePayer letiable with valid feePayer address(not '0x' and '0x0000000000000000000000000000000000000000')
                         feePayer = decodedTransaction[key]
-                        if (decodedTx[key] === '0x') {
+                        if (decodedTx[key] === '0x' || decodedTx[key] === '0x0000000000000000000000000000000000000000') {
                             // set feePayer field to decodedTx for comparing feePayer address with other transactions
                             decodedTx[key] = decodedTransaction[key]
                         }
