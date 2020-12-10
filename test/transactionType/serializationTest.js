@@ -203,7 +203,7 @@ describe('Value transfer: Fee Delegated Value Transfer With Ratio', () => {
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(senderTransaction, privateKey)
         const decoded = caver.klay.decodeTransaction(senderRawTransaction)
-        expect(decoded.feePayer).to.equals('0x')
+        expect(decoded.feePayer).to.equals('0x0000000000000000000000000000000000000000')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
         expect(decoded.payerS).to.equals('0x')
@@ -318,7 +318,7 @@ describe('Value transfer memo: Fee Delegated Value Transfer Memo', () => {
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(senderTransaction, privateKey)
         const decoded = caver.klay.decodeTransaction(senderRawTransaction)
-        expect(decoded.feePayer).to.equals('0x')
+        expect(decoded.feePayer).to.equals('0x0000000000000000000000000000000000000000')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
         expect(decoded.payerS).to.equals('0x')
@@ -388,7 +388,7 @@ describe('Value transfer memo with ratio: Fee Delegated Value Transfer Memo With
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(senderTransaction, privateKey)
         const decoded = caver.klay.decodeTransaction(senderRawTransaction)
-        expect(decoded.feePayer).to.equals('0x')
+        expect(decoded.feePayer).to.equals('0x0000000000000000000000000000000000000000')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
         expect(decoded.payerS).to.equals('0x')
@@ -502,7 +502,7 @@ describe('Account: Fee Delegated Account Update', () => {
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(senderTransaction, privateKey)
         const decoded = caver.klay.decodeTransaction(senderRawTransaction)
-        expect(decoded.feePayer).to.equals('0x')
+        expect(decoded.feePayer).to.equals('0x0000000000000000000000000000000000000000')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
         expect(decoded.payerS).to.equals('0x')
@@ -570,7 +570,7 @@ describe('Account: Fee Delegated Account Update with ratio', () => {
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(senderTransaction, privateKey)
         const decoded = caver.klay.decodeTransaction(senderRawTransaction)
-        expect(decoded.feePayer).to.equals('0x')
+        expect(decoded.feePayer).to.equals('0x0000000000000000000000000000000000000000')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
         expect(decoded.payerS).to.equals('0x')
@@ -687,7 +687,7 @@ describe('Contract: Fee Delegated Contract Deploy', () => {
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(senderTransaction, privateKey)
         const decoded = caver.klay.decodeTransaction(senderRawTransaction)
-        expect(decoded.feePayer).to.equals('0x')
+        expect(decoded.feePayer).to.equals('0x0000000000000000000000000000000000000000')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
         expect(decoded.payerS).to.equals('0x')
@@ -759,7 +759,7 @@ describe('Contract: Fee Delegated Contract Deploy With Ratio', () => {
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(senderTransaction, privateKey)
         const decoded = caver.klay.decodeTransaction(senderRawTransaction)
-        expect(decoded.feePayer).to.equals('0x')
+        expect(decoded.feePayer).to.equals('0x0000000000000000000000000000000000000000')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
         expect(decoded.payerS).to.equals('0x')
@@ -878,7 +878,7 @@ describe('Contract: Fee Delegated Contract Execution', () => {
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(senderTransaction, privateKey)
         const decoded = caver.klay.decodeTransaction(senderRawTransaction)
-        expect(decoded.feePayer).to.equals('0x')
+        expect(decoded.feePayer).to.equals('0x0000000000000000000000000000000000000000')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
         expect(decoded.payerS).to.equals('0x')
@@ -949,7 +949,7 @@ describe('Contract: Fee Delegated Contract Execution With Ratio', () => {
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(senderTransaction, privateKey)
         const decoded = caver.klay.decodeTransaction(senderRawTransaction)
-        expect(decoded.feePayer).to.equals('0x')
+        expect(decoded.feePayer).to.equals('0x0000000000000000000000000000000000000000')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
         expect(decoded.payerS).to.equals('0x')
@@ -1056,7 +1056,7 @@ describe('Cancel: Fee Delegated Cancel Transaction', () => {
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(senderTransaction, privateKey)
         const decoded = caver.klay.decodeTransaction(senderRawTransaction)
-        expect(decoded.feePayer).to.equals('0x')
+        expect(decoded.feePayer).to.equals('0x0000000000000000000000000000000000000000')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
         expect(decoded.payerS).to.equals('0x')
@@ -1120,7 +1120,7 @@ describe('Cancel: Fee Delegated Cancel Transaction With Ratio', () => {
 
         const { rawTransaction: senderRawTransaction } = await caver.klay.accounts.signTransaction(senderTransaction, privateKey)
         const decoded = caver.klay.decodeTransaction(senderRawTransaction)
-        expect(decoded.feePayer).to.equals('0x')
+        expect(decoded.feePayer).to.equals('0x0000000000000000000000000000000000000000')
         expect(decoded.payerV).to.equals('0x01')
         expect(decoded.payerR).to.equals('0x')
         expect(decoded.payerS).to.equals('0x')
