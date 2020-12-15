@@ -209,7 +209,8 @@ class KeyringFactory {
      * @return {AbstractKeyring}
      */
     static decrypt(keystore, password) {
-        const json = _.isObject(keystore) ? keystore : JSON.parse(keystore)
+        // To deep copy an object, using JSON.parse and JSON.stringify (object -> string -> object)
+        const json = _.isObject(keystore) ? _.cloneDeep(keystore) : JSON.parse(keystore)
 
         if (json.version !== 3 && json.version !== 4) console.warn('This is not a V3 or V4 wallet.')
 
