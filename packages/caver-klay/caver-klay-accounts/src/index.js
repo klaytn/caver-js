@@ -1393,7 +1393,10 @@ Accounts.prototype.decrypt = function(v3Keystore, password, nonStrict) {
         throw new Error('No password given.')
     }
 
-    const json = _.isObject(v3Keystore) ? v3Keystore : JSON.parse(nonStrict ? v3Keystore.toLowerCase() : v3Keystore)
+    // To deep copy an object, using JSON.parse and JSON.stringify (object -> string -> object)
+    const json = _.isObject(v3Keystore)
+        ? JSON.parse(JSON.stringify(v3Keystore))
+        : JSON.parse(nonStrict ? v3Keystore.toLowerCase() : v3Keystore)
 
     if (json.version !== 3 && json.version !== 4) {
         console.warn('This is not a V3 or V4 wallet.')

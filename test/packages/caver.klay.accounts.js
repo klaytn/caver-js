@@ -3531,6 +3531,7 @@ describe('caver.klay.accounts.decrypt', () => {
             const result = caver.klay.accounts.decrypt(keystoreJsonV3, password)
 
             isAccount(result, { keys: expectedAccount.keys, address: expectedAccount.address })
+            expect(keystoreJsonV3.crypto).not.to.be.undefined
         }).timeout(50000)
     })
 
