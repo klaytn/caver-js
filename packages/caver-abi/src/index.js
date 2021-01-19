@@ -26,10 +26,12 @@
  */
 
 const _ = require('lodash')
-const EthersAbi = require('ethers/utils/abi-coder').AbiCoder
+
+const EthersAbiCoder = require('@ethersproject/abi').AbiCoder
+const ParamType = require('@ethersproject/abi').ParamType
 const utils = require('../../caver-utils')
 
-const ethersAbiCoder = new EthersAbi(function(type, value) {
+const ethersAbiCoder = new EthersAbiCoder(function(type, value) {
     if (type.match(/^u?int/) && !_.isArray(value) && (!_.isObject(value) || value.constructor.name !== 'BN')) {
         return value.toString()
     }
@@ -95,7 +97,41 @@ ABICoder.prototype.encodeParameter = function(type, param) {
  * @return {String} encoded list of params
  */
 ABICoder.prototype.encodeParameters = function(types, params) {
-    return ethersAbiCoder.encode(this.mapTypes(types), params)
+    const self = this
+    types = self.mapTypes(types)
+
+    params = params.map(function(param, index) {
+        let type = types[index]
+        if (typeof type === 'object' && type.type) {
+            // We may get a named type of shape {name, type}
+            type = type.type
+        }
+
+        param = self.formatParam(type, param)
+
+        // Format params for tuples
+        if (typeof type === 'string' && type.includes('tuple')) {
+            const coder = ethersAbiCoder._getCoder(ParamType.from(type))
+            // eslint-disable-next-line no-shadow
+            const modifyParams = (coder, param) => {
+                if (coder.name === 'array') {
+                    return param.map(p => modifyParams(ethersAbiCoder._getCoder(ParamType.from(coder.type.replace('[]', ''))), p))
+                }
+                coder.coders.forEach((c, i) => {
+                    if (c.name === 'tuple') {
+                        modifyParams(c, param[i])
+                    } else {
+                        param[i] = self.formatParam(c.name, param[i])
+                    }
+                })
+            }
+            modifyParams(coder, param)
+        }
+
+        return param
+    })
+
+    return ethersAbiCoder.encode(types, params)
 }
 
 /**
@@ -143,6 +179,12 @@ ABICoder.prototype.mapTypes = function(types) {
     const self = this
     const mappedTypes = []
     types.forEach(function(type) {
+        // Remap `function` type params to bytes24 since Ethers does not
+        // recognize former type. Solidity docs say `Function` is a bytes24
+        // encoding the contract address followed by the function selector hash.
+        if (typeof type === 'object' && type.type === 'function') {
+            type = Object.assign({}, type, { type: 'bytes24' })
+        }
         if (self.isSimplifiedStructFormat(type)) {
             const structName = Object.keys(type)[0]
             mappedTypes.push(
@@ -220,6 +262,68 @@ ABICoder.prototype.mapStructToCoderFormat = function(struct) {
 }
 
 /**
+ * Handle some formatting of params for backwards compatability with Ethers V4
+ *
+ * @method formatParam
+ * @param {String} - type
+ * @param {any} - param
+ * @return {any} - The formatted param
+ */
+ABICoder.prototype.formatParam = function(type, param) {
+    const paramTypeBytes = new RegExp(/^bytes([0-9]*)$/)
+    const paramTypeBytesArray = new RegExp(/^bytes([0-9]*)\[\]$/)
+    const paramTypeNumber = new RegExp(/^(u?int)([0-9]*)$/)
+    const paramTypeNumberArray = new RegExp(/^(u?int)([0-9]*)\[\]$/)
+
+    // Format BN to string
+    if (utils.isBN(param) || utils.isBigNumber(param)) {
+        return param.toString(10)
+    }
+
+    if (type.match(paramTypeBytesArray) || type.match(paramTypeNumberArray)) {
+        return param.map(p => this.formatParam(type.replace('[]', ''), p))
+    }
+
+    // Format correct width for u?int[0-9]*
+    let match = type.match(paramTypeNumber)
+    if (match) {
+        const size = parseInt(match[2] || '256')
+        if (size / 8 < param.length) {
+            // pad to correct bit width
+            param = utils.leftPad(param, size)
+        }
+    }
+
+    // Format correct length for bytes[0-9]+
+    match = type.match(paramTypeBytes)
+    if (match) {
+        if (Buffer.isBuffer(param)) {
+            param = utils.toHex(param)
+        }
+
+        // format to correct length
+        const size = parseInt(match[1])
+        if (size) {
+            let maxSize = size * 2
+            if (param.substring(0, 2) === '0x') {
+                maxSize += 2
+            }
+            if (param.length < maxSize) {
+                // pad to correct length
+                param = utils.rightPad(param, size * 2)
+            }
+        }
+
+        // format odd-length bytes to even-length
+        if (param.length % 2 === 1) {
+            param = `0x0${param.substring(2)}`
+        }
+    }
+
+    return param
+}
+
+/**
  * Encodes a function call from its json interface and parameters.
  *
  * @method encodeFunctionCall
@@ -246,17 +350,36 @@ ABICoder.prototype.decodeParameter = function(type, bytes) {
 /**
  * Should be used to decode list of params
  *
- * @method decodeParameter
+ * @method decodeParameters
  * @param {Array} outputs
  * @param {String} bytes
  * @return {Array} array of plain params
  */
 ABICoder.prototype.decodeParameters = function(outputs, bytes) {
+    return this.decodeParametersWith(outputs, bytes, false)
+}
+
+/**
+ * Should be used to decode list of params
+ *
+ * @method decodeParametersWith
+ * @param {Array} outputs
+ * @param {String} bytes
+ * @param {Boolean} loose
+ * @return {Array} array of plain params
+ */
+ABICoder.prototype.decodeParametersWith = function(outputs, bytes, loose) {
     if (outputs.length > 0 && (!bytes || bytes === '0x' || bytes === '0X')) {
-        throw new Error("Returned values aren't valid, did it run Out of Gas?")
+        throw new Error(
+            "Returned values aren't valid, did it run Out of Gas? " +
+                'You might also see this error if you are not using the ' +
+                'correct ABI for the contract you are retrieving data from, ' +
+                'requesting data from a block number that does not exist, ' +
+                'or querying a node which is not fully synced.'
+        )
     }
 
-    const res = ethersAbiCoder.decode(this.mapTypes(outputs), `0x${bytes.replace(/0x/i, '')}`)
+    const res = ethersAbiCoder.decode(this.mapTypes(outputs), `0x${bytes.replace(/0x/i, '')}`, loose)
     const returnValue = new Result()
     returnValue.__length__ = 0
 
@@ -311,7 +434,7 @@ ABICoder.prototype.decodeLog = function(inputs, data, topics) {
     })
 
     const nonIndexedData = data
-    const notIndexedParams = nonIndexedData ? this.decodeParameters(notIndexedInputs, nonIndexedData) : []
+    const notIndexedParams = nonIndexedData ? this.decodeParametersWith(notIndexedInputs, nonIndexedData, true) : []
 
     const returnValue = new Result()
     returnValue.__length__ = 0
