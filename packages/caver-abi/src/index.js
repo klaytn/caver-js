@@ -109,6 +109,10 @@ ABICoder.prototype.encodeParameters = function(types, params) {
 
         param = self.formatParam(type, param)
 
+        // If the type is string but number comes in, ethersAbiCoder ignores the type and encodes successfully.
+        // To avoid invalid encoding value, adding error handling.
+        if (type === 'string' && typeof param !== 'string') throw new Error(`Invalid parameter: Parameter value and type do not match.`)
+
         // Format params for tuples
         if (typeof type === 'string' && type.includes('tuple')) {
             const coder = ethersAbiCoder._getCoder(ParamType.from(type))
