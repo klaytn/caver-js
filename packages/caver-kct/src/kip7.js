@@ -32,7 +32,7 @@ const { isAddress, toBuffer, isHexStrict, toHex } = require('../../caver-utils')
 class KIP7 extends Contract {
     /**
      * deploy deploys a KIP-7 token contract to Klaytn network.
-     * `const deployedContract = await caver.klay.KIP7.deploy({
+     * `const deployedContract = await caver.kct.kip7.deploy({
      *      name: 'TokenName',
      *      symbol: 'TKN',
      *      decimals: 18,

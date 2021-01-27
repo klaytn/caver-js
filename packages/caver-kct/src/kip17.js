@@ -33,7 +33,7 @@ const { isAddress } = require('../../caver-utils/src')
 class KIP17 extends Contract {
     /**
      * deploy deploys a KIP-17 token contract to Klaytn network.
-     * `const deployedContract = await caver.klay.KIP17.deploy({
+     * `const deployedContract = await caver.kct.kip17.deploy({
      *      name: 'TokenName',
      *      symbol: 'TKN',
      *  }, '0x{address in hex}')`
