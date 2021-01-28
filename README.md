@@ -1,11 +1,14 @@
-caver-js
-=================
+<p align="center">
+  <img src="assets/logo/caver-js.png" width="200" alt="caver-js" />
+</p>
+
+# caver-js
 
 caver-js is a JavaScript API library that allows developers to interact with a
 Klaytn node using a HTTP or Websocket connection. 
 
-Table of contents
-=================
+## Table of contents
+
    * [Requirements](#requirements)
    * [Installation](#installation)
    * [Getting Started](#getting-started)
@@ -21,8 +24,8 @@ Table of contents
    * [Github Repository](#github-repository)
    * [Related Projects](#related-projects)
 
-Requirements
-=================
+## Requirements
+
 The following packages are required to use the caver-js library.
 - [Node.js](https://nodejs.org/en/download/)
 - [npm](https://www.npmjs.com/get-npm)
@@ -39,8 +42,8 @@ Testing in caver-js is implemented using the mocha testing framework. If you wan
 If you are already using a different version of the node(for example, node v14), use the Node Version Manager([NVM](https://github.com/nvm-sh/nvm)) to install and use the version supported by caver-js.
 
 
-Installation
-=================
+## Installation
+
 To try it out, install caver-js with npm like following command:
 
 ```
@@ -55,24 +58,24 @@ To install a specific version of caver-js, try the following command:
 $ npm install caver-js@X.X.X
 ```
 
-Getting Started
-=================
-If you want to run your own EN (Endpoint Node), see [EN Operation Guide](https://docs.klaytn.com/node/endpoint-node) to set up. You can also use Klaytn Public EN like below:
+## Getting Started
+
+If you want to run your own EN (Endpoint Node), see [EN Operation Guide](https://docs.klaytn.com/node/endpoint-node) to set up. You can connect EN like below:
 ```
 $ node
 > const Caver = require('caver-js')
-> const caver = new Caver('https://api.baobab.klaytn.net:8651/')
+> const caver = new Caver('http://localhost:8551/')
 ```
 **Note** The above example should be executed from the location where caver-js is installed, and the example is explained using [Node.js REPL](https://nodejs.org/api/repl.html#repl_the_node_js_repl).
 
-## Check the Connection
+### Check the Connection
 You can now use caver-js. You can send a basic request to the node as shown below and check the results.
 ```
 > caver.rpc.klay.getClientVersion().then(console.log)
 Klaytn/vX.X.X/linux-amd64/goX.X.X
 ```
 
-## Using caver-js keyring/wallet
+### Using caver-js keyring/wallet
 
 You can easily use your Klaytn account when signing a transaction or message by using the [Keyring] / [wallet].
 
@@ -107,7 +110,7 @@ You can add the keyring object created in the above example to the caver.wallet,
 > caver.wallet.newKeyring('0x{address in hex}', [ ['0x{private key1}', ...], ['0x{private key2}', ...], ['0x{private key3}', ...] ])
 ```
 
-## Submitting a Transaction
+### Submitting a Transaction
 You can use caver-js to submit various types of transactions to a node. Please refer to the [caver.transaction](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.transaction/#class) to see how to create a transaction of each type.
 
 You can sign the transaction using a keyring and send a signed transaction through `caver.rpc.klay.sendRawTransaction` as shown below, and the receipt is returned as a result.
@@ -145,7 +148,7 @@ caver.rpc.klay.sendRawTransaction(signed).on('transactionHash', function(hash){
   })
 ```
 
-## Units for KLAY
+### Units for KLAY
 Units of KLAY is shown as below, and `peb` is the smallest currency unit.
 `peb` is the default unit unless the unit conversion is used.
 
@@ -176,13 +179,11 @@ caver-js provides the caver.utils.convertToPeb function for unit conversion. Ple
 '1000000000000000000'
 ```
 
-Documentation
-=================
+## Documentation
 
 Documentation can be found at [Klaytn Docs-caver-js](https://docs.klaytn.com/bapp/sdk/caver-js).
 
-API Specification
-=================
+## API Specification
 
 The API lists of caver-js are described in folloinwg links:
 
@@ -199,8 +200,8 @@ The API lists of caver-js are described in folloinwg links:
 * [caver.utils](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.utils)
 * [caver.ipfs](https://docs.klaytn.com/bapp/sdk/caver-js/api-references/caver.ipfs)
 
-Web3.js Similarity
-=================	
+## Web3.js Similarity
+
 Since caver-js has been evolved from web3.js, usage pattern of caver-js is very similar to that of web3.js.	
 This means a software developed using web3.js can be easily converted to caver-js.	
 The following examples are code patterns used in web3.js and caver-js, respectively.	
@@ -217,8 +218,8 @@ const caver = new Caver(new Caver.providers.HttpProvider('http://localhost:8545'
 caver.rpc.klay.getBalance('0x407d73d8a49eeb85d32cf465507dd71d507100c1').then(console.log)	
 ```	
 
-Error Code Improvement
-=================
+## Error Code Improvement
+
 
 Klaytn improves reporting transaction failure via txError in the receipt.
 caver-js further improves the report by presenting the error string that corresponds to txError.
@@ -269,21 +270,19 @@ The meaning of error code can be found below:
 |0x1d|not supported|
 |0x1e|smart contract code format is invalid|
 
-Sample Projects
-=================
+## Sample Projects
 
 The BApp (Blockchain Application) Development sample projects using caver-js are the following:
 
 * [Count BApp](https://docs.klaytn.com/bapp/tutorials/count-bapp)
 * [Klaystagram](https://docs.klaytn.com/bapp/tutorials/klaystagram)
 
-Github Repository
-=================
+## Github Repository
 
 * [caver-js](https://github.com/klaytn/caver-js)
 
-Related Projects
-=================
+## Related Projects
+
 [caver-java](https://github.com/klaytn/caver-java) for Java
 
 

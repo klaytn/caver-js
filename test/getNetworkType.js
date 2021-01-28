@@ -16,19 +16,45 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const { expect } = require('./extendedChai')
+const chai = require('chai')
+const sinon = require('sinon')
+const sinonChai = require('sinon-chai')
+const chaiAsPromised = require('chai-as-promised')
+
+chai.use(chaiAsPromised)
+chai.use(sinonChai)
+
+const expect = chai.expect
 
 const Caver = require('../index.js')
 
+const caver = new Caver('http://localhost:8551/')
+
+const sandbox = sinon.createSandbox()
+
 describe('getNetworkType', () => {
+    afterEach(() => {
+        sandbox.restore()
+    })
+
     it('CAVERJS-UNIT-ETC-049: cypress mainnet should return "cypress"', async () => {
-        const caver = new Caver('https://api.cypress.klaytn.net:8651/')
+        const getIdStub = sandbox.stub(caver.klay.net, 'getId')
+        getIdStub.resolves(8217)
+
+        const getBlockStub = sandbox.stub(caver.klay, 'getBlock')
+        getBlockStub.resolves({ hash: '0xc72e5293c3c3ba38ed8ae910f780e4caaa9fb95e79784f7ab74c3c262ea7137e' })
+
         const networkType = await caver.klay.net.getNetworkType()
         expect(networkType).to.equals('cypress')
     }).timeout(10000)
 
     it('CAVERJS-UNIT-ETC-050: baobab testnet should return "baobab"', async () => {
-        const caver = new Caver('https://api.baobab.klaytn.net:8651/')
+        const getIdStub = sandbox.stub(caver.klay.net, 'getId')
+        getIdStub.resolves(1001)
+
+        const getBlockStub = sandbox.stub(caver.klay, 'getBlock')
+        getBlockStub.resolves({ hash: '0xe33ff05ceec2581ca9496f38a2bf9baad5d4eed629e896ccb33d1dc991bc4b4a' })
+
         const networkType = await caver.klay.net.getNetworkType()
         expect(networkType).to.equals('baobab')
     }).timeout(10000)

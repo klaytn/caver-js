@@ -79,7 +79,9 @@ class KIP7 extends Contract {
      * @return {Object}
      */
     clone(tokenAddress = this.options.address) {
-        return new this.constructor(tokenAddress, this.options.jsonInterface)
+        const cloned = new this.constructor(tokenAddress, this.options.jsonInterface)
+        cloned.setWallet(this._wallet)
+        return cloned
     }
 
     /**

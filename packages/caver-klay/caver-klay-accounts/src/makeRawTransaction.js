@@ -137,7 +137,12 @@ function makeRawTransaction(rlpEncoded, sig, transaction) {
                 const decoded = decodeFromRawTransaction(transaction.senderRawTransaction)
                 return _combineFeePayerRawTransaction(rlpEncoded, sig, transaction, decoded.signatures)
             }
-            if (transaction.feePayer && transaction.feePayer !== '0x' && transaction.feePayerSignatures) {
+            if (
+                transaction.feePayer &&
+                transaction.feePayer !== '0x' &&
+                transaction.feePayer !== '0x0000000000000000000000000000000000000000' &&
+                transaction.feePayerSignatures
+            ) {
                 return _combineFeePayerRawTransaction(rlpEncoded, transaction.feePayerSignatures, transaction, sig)
             }
             return _combineSenderRawTransaction(rlpEncoded, sig)
@@ -166,7 +171,8 @@ function _combineSenderRawTransaction(rlpEncoded, sig) {
 
     // set default feepayer's information in rawTx
     const typeString = utils.getTxTypeStringFromRawTransaction(txType)
-    if (typeString !== undefined && typeString.includes('FEE_DELEGATED')) rawTx = [...rawTx, '0x', [['0x01', '0x', '0x']]]
+    if (typeString !== undefined && typeString.includes('FEE_DELEGATED'))
+        rawTx = [...rawTx, '0x0000000000000000000000000000000000000000', [['0x01', '0x', '0x']]]
 
     return {
         rawTransaction: txType + RLP.encode(rawTx).slice(2),
@@ -235,7 +241,7 @@ function splitFeePayer(rawTransaction) {
     const decodedValues = RLP.decode(utils.addHexPrefix(rawTransaction.slice(4)))
 
     const detachFeePayer = decodedValues.splice(0, decodedValues.length - 2)
-    detachFeePayer.push('0x')
+    detachFeePayer.push('0x0000000000000000000000000000000000000000')
     detachFeePayer.push([['0x01', '0x', '0x']])
 
     return {

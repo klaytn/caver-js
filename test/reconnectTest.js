@@ -26,7 +26,7 @@ chai.use(sinonChai)
 
 const expect = chai.expect
 
-const websocketURL = 'wss://api.baobab.klaytn.net:8652/'
+const websocketURL = require('./testWebsocket')
 
 const Caver = require('../index.js')
 
@@ -46,16 +46,13 @@ describe('websocket reconnect', () => {
         }, 90000)
     }).timeout(150000)
 
-    it('CAVERJS-UNIT-ETC-252: if user defined reconnect option, reconnect the connection when connection is removed from remote peer', done => {
+    it('CAVERJS-UNIT-ETC-252: if user defined reconnect option, reconnect the connection when connection is removed from remote peer', () => {
         const ws = new Caver.providers.WebsocketProvider(websocketURL, { reconnect: { auto: true } })
         const caver = new Caver(ws)
-        const reconnectSpy = sandbox.spy(caver.currentProvider, 'reconnect')
+        const reconnectStub = sandbox.stub(caver.currentProvider, 'reconnect')
         expect(caver.currentProvider.reconnectOptions.auto).to.be.true
 
-        setTimeout(() => {
-            expect(reconnectSpy).to.have.been.called
-            caver.currentProvider.connection.close()
-            done()
-        }, 90000)
-    }).timeout(150000)
+        caver.currentProvider.connection.close()
+        expect(reconnectStub).to.have.been.called
+    }).timeout(15000)
 })

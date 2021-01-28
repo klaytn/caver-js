@@ -1460,11 +1460,19 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
     context('CAVERJS-UNIT-WALLET-303: input: fee payer tx object(with 0x feePayer) and feePayer', () => {
         it('should set feePayer information through feePayer parameter', async () => {
-            const feePayerTx = { senderRawTransaction: withoutSig, feePayer: '0x' }
+            let feePayerTx = { senderRawTransaction: withoutSig, feePayer: '0x' }
 
-            const result = await caver.klay.accounts.feePayerSignTransaction(feePayerTx, feePayer.address)
+            let result = await caver.klay.accounts.feePayerSignTransaction(feePayerTx, feePayer.address)
 
             const keys = ['messageHash', 'v', 'r', 's', 'rawTransaction', 'txHash', 'senderTxHash', 'feePayerSignatures']
+            expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
+
+            expect(result.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
+
+            feePayerTx = { senderRawTransaction: withoutSig, feePayer: '0x0000000000000000000000000000000000000000' }
+
+            result = await caver.klay.accounts.feePayerSignTransaction(feePayerTx, feePayer.address)
+
             expect(Object.getOwnPropertyNames(result)).to.deep.equal(keys)
 
             expect(result.feePayerSignatures.length).to.equals(feePayer.feePayerKey.length)
@@ -3523,6 +3531,7 @@ describe('caver.klay.accounts.decrypt', () => {
             const result = caver.klay.accounts.decrypt(keystoreJsonV3, password)
 
             isAccount(result, { keys: expectedAccount.keys, address: expectedAccount.address })
+            expect(keystoreJsonV3.crypto).not.to.be.undefined
         }).timeout(50000)
     })
 

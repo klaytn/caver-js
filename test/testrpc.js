@@ -16,6 +16,10 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const testRPCURL = 'https://api.baobab.klaytn.net:8651/'
+const dotenv = require('dotenv')
+
+dotenv.config()
+
+const testRPCURL = process.env.EN_RPC_URL_DEV || 'http://localhost:8551/'
 
 module.exports = testRPCURL

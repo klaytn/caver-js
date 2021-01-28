@@ -56,7 +56,7 @@ class LegacyTransaction extends AbstractTransaction {
     constructor(createTxObj) {
         if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
 
-        createTxObj.from = createTxObj.from || '0x'
+        createTxObj.from = createTxObj.from || '0x0000000000000000000000000000000000000000'
 
         super(TX_TYPE_STRING.TxTypeLegacyTransaction, createTxObj)
         this.to = createTxObj.to || '0x'

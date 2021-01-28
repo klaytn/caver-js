@@ -51,11 +51,12 @@ class KCT {
         // Define KIP7 class for caver-kct
         // In this class, keyrings will be used instead of accounts
         class KIP7 extends BaseKIP7 {
-            static deploy(tokenInfo, deployer) {
+            static deploy(tokenInfo, deployer, wallet) {
                 validateDeployParameterForKIP7(tokenInfo)
 
                 const { name, symbol, decimals, initialSupply } = tokenInfo
                 const kip7 = new KIP7()
+                if (wallet !== undefined) kip7.setWallet(wallet)
 
                 return kip7
                     .deploy({
@@ -74,7 +75,7 @@ class KCT {
                     core.packageInit(self, [_this])
                 }
 
-                this.setKeyrings(args[0].wallet)
+                this.setWallet(args[0].wallet)
             }
         }
 
@@ -83,11 +84,12 @@ class KCT {
         // Define KIP7 class for caver-kct
         // In this class, keyrings will be used instead of accounts
         class KIP17 extends BaseKIP17 {
-            static deploy(tokenInfo, deployer) {
+            static deploy(tokenInfo, deployer, wallet) {
                 validateDeployParameterForKIP17(tokenInfo)
 
                 const { name, symbol } = tokenInfo
                 const kip17 = new KIP17()
+                if (wallet !== undefined) kip17.setWallet(wallet)
 
                 return kip17
                     .deploy({
@@ -106,7 +108,7 @@ class KCT {
                     core.packageInit(self, [_this])
                 }
 
-                this.setKeyrings(args[0].wallet)
+                this.setWallet(args[0].wallet)
             }
         }
 

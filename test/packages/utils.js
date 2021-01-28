@@ -16,11 +16,9 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const _ = require('lodash')
 const { expect } = require('../extendedChai')
 const AccountForUpdate = require('../../packages/caver-klay/caver-klay-accounts/src/account/accountForUpdate')
 const Account = require('../../packages/caver-account')
-const utils = require('../../packages/caver-utils')
 
 const Keyring = require('../../packages/caver-wallet/src/keyring/keyringFactory')
 const { KEY_ROLE } = require('../../packages/caver-wallet/src/keyring/keyringHelper')
@@ -185,27 +183,6 @@ const checkFeePayerSignature = (tx, expected = {}) => {
     }
 }
 
-const checkReceipt = (r, tx) => {
-    expect(r.status).to.be.true
-
-    Object.keys(tx).map(key => {
-        if (key !== '_tag' && key !== '_chainId') {
-            const keyName = key.replace('_', '')
-            if (keyName === 'signatures' || keyName === 'feePayerSignatures') {
-                const twoDimensional = _.isArray(tx[keyName][0]) ? tx[keyName] : [tx[keyName]]
-                for (let i = 0; i < r[keyName].length; i++) {
-                    const resolved = utils.resolveSignature(r[keyName][i])
-                    for (let j = 0; j < 3; j++) {
-                        expect(resolved[j]).to.equal(utils.removeLeftPad(twoDimensional[i][j]))
-                    }
-                }
-            } else if (tx[keyName] !== '0x') {
-                expect(r[keyName]).to.equal(tx[keyName])
-            }
-        }
-    })
-}
-
 const makeAccount = (address, type, options) => {
     const defaultOption = { threshold: 1, weights: [1, 1, 1] }
     switch (type) {
@@ -251,7 +228,6 @@ module.exports = {
     propertiesForUnnecessary,
     checkSignature,
     checkFeePayerSignature,
-    checkReceipt,
     makeAccount,
     accountKeyTestCases,
 }

@@ -74,6 +74,9 @@ module.exports = {
 
         return error
     },
+    MaxAttemptsReachedOnReconnectingError: () => new Error('Maximum number of reconnect attempts reached!'),
+    PendingRequestsOnReconnectingError: () =>
+        new Error('CONNECTION ERROR: Provider started to reconnect before the response got received!'),
     InvalidProvider: () => new Error('Provider not set or invalid'),
     InvalidNumberOfParams: (got, expected, method) =>
         new Error(`
