@@ -632,7 +632,7 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
 
     context('CAVERJS-UNIT-ACCOUNT-055: caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions', () => {
         it('should create AccountKeyRoleBased instances and return with AccountKeyFail', () => {
-            const pubs = [
+            let pubs = [
                 [new caver.account.accountKey.accountKeyFail()],
                 [],
                 [
@@ -647,9 +647,20 @@ describe('caver.account.accountKey.accountKeyRoleBased', () => {
                 new caver.account.weightedMultiSigOptions(),
                 new caver.account.weightedMultiSigOptions(3, [1, 1, 2, 2]),
             ]
-            const accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)
+            let accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs, options)
 
             testAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey: pubs, exepectedOptions: options })
+
+            // Test handling string
+            pubs = [['fail'], [], ['legacy']]
+            const expectedAccountKey = [
+                [new caver.account.accountKey.accountKeyFail()],
+                [],
+                [new caver.account.accountKey.accountKeyLegacy()],
+            ]
+            accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(pubs)
+
+            testAccountKey(accountKey, 'AccountKeyRoleBased', { expectedAccountKey })
         })
     })
 
