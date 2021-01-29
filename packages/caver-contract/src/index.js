@@ -864,17 +864,28 @@ Contract.prototype._createTxObject = function _createTxObject() {
     txObject.send.request = this.parent._executeMethod.bind(txObject, 'send', true) // to make batch requests
     txObject.encodeABI = this.parent._encodeMethodABI.bind(txObject)
     txObject.estimateGas = this.parent._executeMethod.bind(txObject, 'estimate')
-
-    if (args && this.method.inputs && args.length !== this.method.inputs.length) {
-        if (this.nextMethod) {
-            return this.nextMethod.apply(null, args)
-        }
-        throw errors.InvalidNumberOfParams(args.length, this.method.inputs.length, this.method.name)
-    }
-
     txObject.arguments = args || []
     txObject._method = this.method
     txObject._parent = this.parent
+
+    if (args && this.method.inputs) {
+        if (args.length !== this.method.inputs.length) {
+            if (this.nextMethod) {
+                return this.nextMethod.apply(null, args)
+            }
+            throw errors.InvalidNumberOfParams(args.length, this.method.inputs.length, this.method.name)
+        } else if (this.nextMethod) {
+            // If the number of parameters of the function is the same, but the types of parameters are different,
+            // determine whether the function is an appropriate function through encoding operation with the input parameter.
+            // If an encoding error occurs, check by using to the next method.
+            try {
+                txObject.encodeABI(args)
+            } catch (e) {
+                return this.nextMethod.apply(null, args)
+            }
+        }
+    }
+
     txObject._klayAccounts = this.parent.constructor._klayAccounts || this._klayAccounts
     txObject._wallet = this.parent._wallet || this._wallet
 
