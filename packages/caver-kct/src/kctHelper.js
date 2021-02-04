@@ -31,7 +31,7 @@ async function determineSendParams(executableObj, sendParam, defaultFrom) {
     if (gas === undefined) {
         const estimated = await executableObj.estimateGas({ from })
         const originalGas = new BigNumber(estimated, 10)
-        const bufferGas = new BigNumber(1.5, 10)
+        const bufferGas = new BigNumber(1.7, 10)
 
         gas = Math.round(originalGas.times(bufferGas))
     }
@@ -80,6 +80,10 @@ function validateDeployParameterForKIP7(obj) {
 
 function validateDeployParameterForKIP17(obj) {
     _validateCommonParam(obj)
+}
+
+function validateDeployParameterForKIP37(obj) {
+    if (!obj.uri || !_.isString(obj.uri)) throw new Error(`${errForDeployParamValidation}Invalid uri of token`)
 }
 
 // KIP-7 token contract source code
@@ -919,6 +923,7 @@ module.exports = {
     determineSendParams,
     validateDeployParameterForKIP7,
     validateDeployParameterForKIP17,
+    validateDeployParameterForKIP37,
     formatParamForUint256,
     kip17JsonInterface,
     kip17ByteCode,
