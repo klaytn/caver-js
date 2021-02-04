@@ -18,6 +18,7 @@
 
 const BaseKIP7 = require('./kip7')
 const BaseKIP17 = require('./kip17')
+const KIP37 = require('./kip37')
 const core = require('../../caver-core')
 const { validateDeployParameterForKIP7, validateDeployParameterForKIP17, kip7ByteCode, kip17ByteCode } = require('./kctHelper')
 
@@ -37,6 +38,8 @@ class KCT {
             _this.kip7.currentProvider = _this._provider
             _this.kip17._requestManager = _this._requestManager
             _this.kip17.currentProvider = _this._provider
+            _this.kip37._requestManager = _this._requestManager
+            _this.kip37.currentProvider = _this._provider
 
             return true
         }
@@ -81,7 +84,7 @@ class KCT {
 
         this.kip7 = KIP7
 
-        // Define KIP7 class for caver-kct
+        // Define KIP17 class for caver-kct
         // In this class, keyrings will be used instead of accounts
         class KIP17 extends BaseKIP17 {
             static deploy(tokenInfo, deployer, wallet) {
@@ -113,6 +116,11 @@ class KCT {
         }
 
         this.kip17 = KIP17
+
+        this.kip37 = KIP37
+        this.kip37.wallet = args[0].wallet
+        this.kip37._requestManager = this._requestManager
+        this.kip37.currentProvider = this._requestManager.provider
     }
 }
 
