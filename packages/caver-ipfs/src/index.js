@@ -70,7 +70,7 @@ class IPFS {
      * }
      * @returns {null}
      *
-     * If you use next web framework, add the following to your "next.config.json" file.
+     * If you use next-js web framework, add the following to your "next.config.json" file.
      * @example
      * module.exports = {
      *     ...
