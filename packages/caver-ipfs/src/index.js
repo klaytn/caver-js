@@ -59,7 +59,7 @@ class IPFS {
      * Since `fs` is a module that can only be used on the server side, if it is client-side code,
      * it must read the file in advance and pass the file contents in the format of `ArrayBuffer`.
      *
-     * If you get a "Error: Can't resolve'fs'" error when building your client code, add the following to your "webpack.config.json" file.
+     * If you get a "Error: Can't resolve 'fs'" error when building your client code, add the following to your "webpack.config.json" file.
      * @example
      * module.exports = {
      *     ...
