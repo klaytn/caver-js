@@ -53,19 +53,55 @@ class IPFS {
     }
 
     /**
-     * adds a file to IPFS
+     * adds a file to IPFS.
+     * If the `data` parameter is a `Buffer` or `ArrayBuffer`, upload to IPFS directly without using `fs`.
+     * If the `data` parameter is a string, use `fs` to read the file.
+     * Since `fs` is a module that can only be used on the server side, if it is client-side code,
+     * it must read the file in advance and pass the file contents in the format of `ArrayBuffer`.
      *
-     * @param {string|Buffer} data The file path string or file contents.
+     * If you get a "Error: Can't resolve'fs'" error when building your client code, add the following to your "webpack.config.json" file.
+     * @example
+     * module.exports = {
+     *     ...
+     *     node: {
+     *         fs: 'empty',
+     *     },
+     *     ...
+     * }
+     * @returns {null}
+     *
+     * If you use next web framework, add the following to your "next.config.json" file.
+     * @example
+     * module.exports = {
+     *     ...
+     *     webpack: (config, { isServer }) => {
+     *         // Fixes npm packages that depend on `fs` module
+     *         if (!isServer) {
+     *             config.node = {
+     *                 fs: 'empty'
+     *             }
+     *         }
+     *         return config
+     *     },
+     *     ...
+     * }
+     * @returns {null}
+     *
+     * @param {string|Buffer|ArrayBuffer} data The file path string or file contents.
      * @return {string}
      */
     async add(data) {
         if (!this.ipfs) throw new Error(`Please set IPFS Node through 'caver.ipfs.setIPFSNode'.`)
 
         // Read file
-        if (lodash.isString(data)) data = fs.readFileSync(data)
-        if (!lodash.isBuffer(data)) throw new Error(`Invalid data: ${data}`)
+        if (lodash.isString(data)) {
+            if (typeof window !== 'undefined')
+                throw new Error(`Cannot use fs module: Please pass the file contents as a parameter of type Buffer or ArrayBuffer.`)
+            data = fs.readFileSync(data)
+        }
+        if (!lodash.isBuffer(data) && !lodash.isArrayBuffer(data)) throw new Error(`Invalid data: ${data}`)
 
-        const ret = await this.ipfs.add(data)
+        const ret = await this.ipfs.add(Buffer.from(data))
         return ret[0].hash
     }
 
