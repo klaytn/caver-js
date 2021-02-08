@@ -39,7 +39,7 @@ class KIP37 extends Contract {
      * @method deploy
      * @param {Object} tokenInfo The object that defines the uri to deploy.
      * @param {string} deployer The address of the account to deploy the KIP-37 token contract.
-     * @param {IWallet} [wallet] The address of the account to deploy the KIP-37 token contract.
+     * @param {IWallet} [wallet] The wallet instance to sign and send a transaction.
      * @return {Object}
      */
     static deploy(tokenInfo, deployer, wallet) {
@@ -149,7 +149,7 @@ class KIP37 extends Contract {
      *
      * @method isApprovedForAll
      * @param {string} owner The id of the token.
-     * @param {string} operator The id of the token.
+     * @param {string} operator The address of the operator.
      * @return {boolean}
      */
     async isApprovedForAll(owner, operator) {
@@ -331,8 +331,8 @@ class KIP37 extends Contract {
      *
      * @method mintBatch
      * @param {string} to The address that will receive the minted tokens.
-     * @param {Array.<BigNumber|string|number>} ids The id of token to mint.
-     * @param {Array.<BigNumber|string|number>} values The quantity of tokens being minted.
+     * @param {Array.<BigNumber|string|number>} ids The list of the token ids to mint.
+     * @param {Array.<BigNumber|string|number>} values The list of the token amounts to mint.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
      * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-37 abi.
