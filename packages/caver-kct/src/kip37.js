@@ -26,8 +26,10 @@ const {
     determineSendParams,
     formatParamForUint256,
     validateDeployParameterForKIP37,
+    interfaceIds,
 } = require('./kctHelper')
 const { isAddress, toBuffer, isHexStrict, toHex, stripHexPrefix, leftPad } = require('../../caver-utils')
+const KIP13 = require('../src/kip13')
 
 class KIP37 extends Contract {
     /**
@@ -57,6 +59,18 @@ class KIP37 extends Contract {
             .send({ from: deployer, gas: 7000000, value: 0 })
     }
 
+    /**
+     * detectInterface detects which interface the KIP-37 token contract supports.
+     *
+     * @method detectInterface
+     * @param {string} contractAddress The address of the KIP-37 token contract to detect.
+     * @return {object}
+     */
+    static detectInterface(contractAddress) {
+        const kip37 = new KIP37(contractAddress)
+        return kip37.detectInterface()
+    }
+
     constructor(tokenAddress, abi = kip37JsonInterface) {
         if (tokenAddress) {
             if (_.isString(tokenAddress)) {
@@ -74,6 +88,45 @@ class KIP37 extends Contract {
         const cloned = new this.constructor(tokenAddress, this.options.jsonInterface)
         cloned.setWallet(this._wallet)
         return cloned
+    }
+
+    /**
+     * detectInterface detects which interface the KIP-37 token contract supports.
+     *
+     * @method detectInterface
+     * @return {object}
+     */
+    async detectInterface() {
+        const detected = {
+            IKIP37: false,
+            IKIP37Metadata: false,
+            IKIP37Mintable: false,
+            IKIP37Burnable: false,
+            IKIP37Pausable: false,
+        }
+
+        const notSupportedMsg = `This contract does not support KIP-13.`
+        const contractAddress = this._address
+
+        try {
+            const isSupported = await KIP13.checkImplementationOfKIP13(contractAddress)
+            if (isSupported !== true) throw new Error(notSupportedMsg)
+
+            // Since there is an extension that has the same interface id even though it is a different KCT,
+            // it must be checked first whether the contract is a KIP-37 contract.
+            detected.IKIP37 = await this.supportsInterface(interfaceIds.kip37.IKIP37)
+            if (detected.IKIP37 === false) return detected
+
+            await Promise.all(
+                Object.keys(interfaceIds.kip37).map(async interfaceName => {
+                    if (interfaceIds.kip37[interfaceName] !== interfaceIds.kip37.IKIP37)
+                        detected[interfaceName] = await this.supportsInterface(interfaceIds.kip37[interfaceName])
+                })
+            )
+            return detected
+        } catch (e) {
+            throw new Error(notSupportedMsg)
+        }
     }
 
     async supportsInterface(interfaceId) {
