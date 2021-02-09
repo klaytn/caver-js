@@ -118,7 +118,7 @@ class KIP7 extends Contract {
         const contractAddress = this._address
 
         try {
-            const isSupported = await KIP13.checkImplementationOfKIP13(contractAddress)
+            const isSupported = await KIP13.isImplementedKIP13Interface(contractAddress)
             if (isSupported !== true) throw new Error(notSupportedMsg)
 
             // Since there is an extension that has the same interface id even though it is a different KCT,
