@@ -142,7 +142,8 @@ class KIP7 extends Contract {
      * supportsInterface checks whether interface is supported or not.
      *
      * @method supportsInterface
-     * @return {Boolean}
+     * @param {string} interfaceId The interface id to check.
+     * @return {boolean}
      */
     async supportsInterface(interfaceId) {
         const supported = await this.methods.supportsInterface(interfaceId).call()

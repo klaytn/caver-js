@@ -24,16 +24,16 @@ const { isAddress } = require('../../caver-utils')
 
 class KIP13 extends Contract {
     /**
-     * checkImplementationOfKIP13 checks if the contract implements KIP-13.
+     * isImplementedKIP13Interface checks if the contract implements KIP-13.
      *
-     * @method checkImplementationOfKIP13
+     * @method isImplementedKIP13Interface
      * @param {string} contractAddress The address of the contract to check.
      * @return {boolean}
      */
-    static async checkImplementationOfKIP13(contractAddress) {
+    static async isImplementedKIP13Interface(contractAddress) {
         const kip13 = new KIP13(contractAddress)
-        const isTrue = await kip13.supportsInterface(interfaceIds.preCondition.true)
-        const isFalse = await kip13.supportsInterface(interfaceIds.preCondition.false)
+        const isTrue = await kip13.sendQuery(interfaceIds.preCondition.true)
+        const isFalse = await kip13.sendQuery(interfaceIds.preCondition.false)
         return isTrue && !isFalse
     }
 
@@ -51,12 +51,13 @@ class KIP13 extends Contract {
     }
 
     /**
-     * supportsInterface checks whether interface is supported or not.
+     * sendQuery sends query to check whether interface is supported or not.
      *
-     * @method supportsInterface
+     * @method sendQuery
+     * @param {string} interfaceId The interface id to check.
      * @return {boolean}
      */
-    async supportsInterface(interfaceId) {
+    async sendQuery(interfaceId) {
         const supported = await this.methods.supportsInterface(interfaceId).call()
         return supported
     }
