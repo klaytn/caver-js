@@ -258,7 +258,7 @@ class KIP7 extends Contract {
      * @method safeTransfer
      * @param {String} recipient The address of the account to receive the token.
      * @param {BigNumber|String|Number} amount The amount of tokens you want to transfer.
-     * @param {Buffer|String|Number} data The optional data to send along with the call.
+     * @param {Buffer|String|Number} [data] The optional data to send along with the call.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
      * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-7 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-7 abi.

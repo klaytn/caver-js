@@ -38,7 +38,7 @@ const ownerMap = {}
 
 let multiTokenAddress
 
-const tokenURI = 'https://game.example/item-id-8u5h2m.json'
+const tokenURI = 'https://game.example/item-id/{id}.json'
 const tokenInfo = { uri: tokenURI }
 
 const prepareTestSetting = async () => {
@@ -173,6 +173,41 @@ describe('KIP37 token contract class test', () => {
 
             tokenIds.push(2)
         }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-215: should create new token without uri', async () => {
+            const token = new caver.kct.kip37(multiTokenAddress)
+
+            const created = await token.create(3, 10000000000, { from: sender.address })
+
+            expect(created.from).to.be.equals(sender.address.toLowerCase())
+            expect(created.status).to.be.true
+            expect(created.events).not.to.be.undefined
+            expect(created.events.TransferSingle).not.to.be.undefined
+            expect(created.events.TransferSingle.address).to.equal(multiTokenAddress)
+            expect(created.events.URI).to.be.undefined
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-216: should create new token with various type of tokenId and initialSupply without uri', async () => {
+            const token = new caver.kct.kip37(multiTokenAddress)
+
+            let created = await token.create('0x4', '10000000000', { from: sender.address })
+
+            expect(created.from).to.be.equals(sender.address.toLowerCase())
+            expect(created.status).to.be.true
+            expect(created.events).not.to.be.undefined
+            expect(created.events.TransferSingle).not.to.be.undefined
+            expect(created.events.TransferSingle.address).to.equal(multiTokenAddress)
+            expect(created.events.URI).to.be.undefined
+
+            created = await token.create(new BigNumber(5), new BigNumber('10000000000'), { from: sender.address })
+
+            expect(created.from).to.be.equals(sender.address.toLowerCase())
+            expect(created.status).to.be.true
+            expect(created.events).not.to.be.undefined
+            expect(created.events.TransferSingle).not.to.be.undefined
+            expect(created.events.TransferSingle.address).to.equal(multiTokenAddress)
+            expect(created.events.URI).to.be.undefined
+        }).timeout(200000)
     })
 
     context('kip37.uri', () => {
@@ -181,14 +216,18 @@ describe('KIP37 token contract class test', () => {
 
             const uri = await token.uri(tokenId)
 
-            expect(uri).to.equal(tokenURI)
+            expect(uri).to.equal('https://game.example/item-id/0000000000000000000000000000000000000000000000000000000000000000.json')
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-167: should return the uri of the specific token with various tokenId types', async () => {
             const token = new caver.kct.kip37(multiTokenAddress)
 
-            expect(await token.uri(caver.utils.toHex(tokenId))).to.equal(tokenURI)
-            expect(await token.uri(new BigNumber(tokenId))).to.equal(tokenURI)
+            expect(await token.uri(caver.utils.toHex(tokenId))).to.equal(
+                'https://game.example/item-id/0000000000000000000000000000000000000000000000000000000000000000.json'
+            )
+            expect(await token.uri(new BigNumber(tokenId))).to.equal(
+                'https://game.example/item-id/0000000000000000000000000000000000000000000000000000000000000000.json'
+            )
         }).timeout(200000)
     })
 
