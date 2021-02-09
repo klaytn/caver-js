@@ -27,7 +27,7 @@ const {
     formatParamForUint256,
     validateDeployParameterForKIP37,
 } = require('./kctHelper')
-const { isAddress, toBuffer, isHexStrict, toHex } = require('../../caver-utils')
+const { isAddress, toBuffer, isHexStrict, toHex, stripHexPrefix, leftPad } = require('../../caver-utils')
 
 class KIP37 extends Contract {
     /**
@@ -83,13 +83,22 @@ class KIP37 extends Contract {
 
     /**
      * uri returns distinct Uniform Resource Identifier (URI) for a given token.
+     * If the string {id} exists in any URI, this function will replace this with the actual token ID in hexadecimal form.
+     * Please refer to http://kips.klaytn.com/KIPs/kip-37#metadata
      *
      * @method uri
      * @param {BigNumber|string|number} id The token id to get uri.
      * @return {string}
      */
     async uri(id) {
-        const uri = await this.methods.uri(formatParamForUint256(id)).call()
+        let uri = await this.methods.uri(formatParamForUint256(id)).call()
+
+        // Replace {id} to token id in hexadecimal form.
+        if (uri.includes('{id}')) {
+            let tokenIdInHex = stripHexPrefix(toHex(id))
+            tokenIdInHex = leftPad(tokenIdInHex, 64, '0')
+            uri = uri.replace('{id}', tokenIdInHex)
+        }
         return uri
     }
 
@@ -202,12 +211,20 @@ class KIP37 extends Contract {
      * @method mint
      * @param {BigNumber|string|number} id The id of token to mint.
      * @param {BigNumber|string|number} initialSupply The amount of tokens being minted.
-     * @param {string} uri The token URI of the created token.
+     * @param {string} [uri] The token URI of the created token.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
      * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-37 abi.
      */
     async create(id, initialSupply, uri, sendParam = {}) {
+        if (uri && _.isObject(uri)) {
+            if (uri.gas !== undefined || uri.from !== undefined) {
+                if (Object.keys(sendParam).length > 0) throw new Error(`Invalid parameters`)
+                sendParam = uri
+                uri = ''
+            }
+        }
+
         const executableObj = this.methods.create(formatParamForUint256(id), formatParamForUint256(initialSupply), uri)
         sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
 
