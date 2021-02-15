@@ -107,7 +107,6 @@ class KIP7 extends Contract {
     async detectInterface() {
         const detected = {
             IKIP7: false,
-            IKIP7TokenReceiver: false,
             IKIP7Metadata: false,
             IKIP7Mintable: false,
             IKIP7Burnable: false,
