@@ -217,7 +217,7 @@ class KIP37 extends Contract {
      * isApprovedForAll returns true if an operator is approved by a given owner.
      *
      * @method isApprovedForAll
-     * @param {string} owner The id of the token.
+     * @param {string} owner The address of the owner.
      * @param {string} operator The address of the operator.
      * @return {boolean}
      */
@@ -266,7 +266,7 @@ class KIP37 extends Contract {
     }
 
     /**
-     * mint creates token and assigns them to account, increasing the total supply.
+     * create creates token and assigns them to account, increasing the total supply.
      *
      * @method mint
      * @param {BigNumber|string|number} id The id of token to mint.
