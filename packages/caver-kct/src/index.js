@@ -19,6 +19,7 @@
 const BaseKIP7 = require('./kip7')
 const BaseKIP17 = require('./kip17')
 const KIP37 = require('./kip37')
+const KIP13 = require('./kip13')
 const core = require('../../caver-core')
 const { validateDeployParameterForKIP7, validateDeployParameterForKIP17, kip7ByteCode, kip17ByteCode } = require('./kctHelper')
 
@@ -121,6 +122,10 @@ class KCT {
         this.kip37.wallet = args[0].wallet
         this.kip37._requestManager = this._requestManager
         this.kip37.currentProvider = this._requestManager.provider
+
+        this.kip13 = KIP13
+        this.kip13._requestManager = this._requestManager
+        this.kip13.currentProvider = this._requestManager.provider
     }
 }
 
