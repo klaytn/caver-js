@@ -597,7 +597,7 @@ describe('KIP37 token contract class test', () => {
             }
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-KCT-185: should transfer the tokens without data', async () => {
+        it('CAVERJS-UNIT-KCT-218: should transfer the tokens without data', async () => {
             const token = new caver.kct.kip37(multiTokenAddress)
 
             const ids = [tokenIds[0], tokenIds[1]]
