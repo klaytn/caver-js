@@ -521,6 +521,25 @@ describe('KIP37 token contract class test', () => {
             expect(transfered.events.TransferSingle.returnValues.id).to.equal(tokenId.toString())
             expect(transfered.events.TransferSingle.returnValues.value).to.equal('1')
         }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-217: should transfer the token without data', async () => {
+            const token = new caver.kct.kip37(multiTokenAddress)
+
+            const transfered = await token.safeTransferFrom(sender.address, receiver.address, tokenId, 1, {
+                from: sender.address,
+            })
+
+            expect(transfered.from).to.be.equals(sender.address.toLowerCase())
+            expect(transfered.status).to.be.true
+            expect(transfered.events).not.to.be.undefined
+            expect(transfered.events.TransferSingle).not.to.be.undefined
+            expect(transfered.events.TransferSingle.address).to.equal(multiTokenAddress)
+            expect(transfered.events.TransferSingle.returnValues.operator.toLowerCase()).to.equal(sender.address.toLowerCase())
+            expect(transfered.events.TransferSingle.returnValues.from.toLowerCase()).to.equal(sender.address.toLowerCase())
+            expect(transfered.events.TransferSingle.returnValues.to.toLowerCase()).to.equal(receiver.address.toLowerCase())
+            expect(transfered.events.TransferSingle.returnValues.id).to.equal(tokenId.toString())
+            expect(transfered.events.TransferSingle.returnValues.value).to.equal('1')
+        }).timeout(200000)
     })
 
     context('kip37.safeBatchTransferFrom', () => {
@@ -566,6 +585,33 @@ describe('KIP37 token contract class test', () => {
             expect(transfered.events.TransferBatch).not.to.be.undefined
             expect(transfered.events.TransferBatch.address).to.equal(multiTokenAddress)
             expect(transfered.events.TransferBatch.returnValues.operator.toLowerCase()).to.equal(testAccount.address.toLowerCase())
+            expect(transfered.events.TransferBatch.returnValues.from.toLowerCase()).to.equal(sender.address.toLowerCase())
+            expect(transfered.events.TransferBatch.returnValues.to.toLowerCase()).to.equal(receiver.address.toLowerCase())
+            expect(_.isArray(transfered.events.TransferBatch.returnValues.ids)).to.be.true
+            expect(_.isArray(transfered.events.TransferBatch.returnValues.values)).to.be.true
+            expect(transfered.events.TransferBatch.returnValues.ids.length).to.equal(ids.length)
+            expect(transfered.events.TransferBatch.returnValues.values.length).to.equal(ids.length)
+            for (let i = 0; i < ids.length; i++) {
+                expect(transfered.events.TransferBatch.returnValues.ids[i]).to.equal(ids[i].toString())
+                expect(transfered.events.TransferBatch.returnValues.values[i]).to.equal(values[i].toString())
+            }
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-185: should transfer the tokens without data', async () => {
+            const token = new caver.kct.kip37(multiTokenAddress)
+
+            const ids = [tokenIds[0], tokenIds[1]]
+            const values = [1, 2]
+            const transfered = await token.safeBatchTransferFrom(sender.address, receiver.address, ids, values, {
+                from: sender.address,
+            })
+
+            expect(transfered.from).to.be.equals(sender.address.toLowerCase())
+            expect(transfered.status).to.be.true
+            expect(transfered.events).not.to.be.undefined
+            expect(transfered.events.TransferBatch).not.to.be.undefined
+            expect(transfered.events.TransferBatch.address).to.equal(multiTokenAddress)
+            expect(transfered.events.TransferBatch.returnValues.operator.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(transfered.events.TransferBatch.returnValues.from.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(transfered.events.TransferBatch.returnValues.to.toLowerCase()).to.equal(receiver.address.toLowerCase())
             expect(_.isArray(transfered.events.TransferBatch.returnValues.ids)).to.be.true
