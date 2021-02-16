@@ -82,7 +82,18 @@ describe('get transaction', () => {
         expect(receipt.type).not.to.undefined
         expect(receipt.typeInt).not.to.undefined
         expect(receipt.value).not.to.undefined
-
-        caver.currentProvider.connection.close()
     }).timeout(10000)
+})
+
+describe('Subscribe test throught contract event', () => {
+    it('CAVERJS-UNIT-ETC-262: should emit subscription id when subscription is created', done => {
+        caver.wallet.add(caver.wallet.keyring.createFromPrivateKey(senderPrvKey)).address
+        caver.kct.kip17.deploy({ name: 'Jasmine', symbol: 'JAS' }, senderAddress).then(deployed => {
+            deployed.events.MinterAdded({}).on('connected', subscriptionId => {
+                expect(subscriptionId).not.to.be.undefined
+                caver.currentProvider.connection.close()
+                done()
+            })
+        })
+    }).timeout(30000)
 })
