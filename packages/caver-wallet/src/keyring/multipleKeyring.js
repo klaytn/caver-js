@@ -59,12 +59,13 @@ class MultipleKeyring extends AbstractKeyring {
     /**
      * returns public key strings.
      *
+     * @param {boolean} [compressed] Whether in compressed format or not.
      * @return {Array.<string>}
      */
-    getPublicKey() {
+    getPublicKey(compressed = false) {
         const publicKeys = []
         for (let i = 0; i < this.keys.length; i++) {
-            publicKeys.push(this.keys[i].getPublicKey())
+            publicKeys.push(this.keys[i].getPublicKey(compressed))
         }
         return publicKeys
     }

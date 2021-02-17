@@ -839,6 +839,51 @@ describe('keyring.getPublicKey', () => {
             expect(pubKey[2].length).to.equal(1)
         })
     })
+
+    context('CAVERJS-UNIT-KEYRING-166: keyring type: coupled, compressed: true', () => {
+        it('return single public key with roled form', () => {
+            const keyring = caver.wallet.keyring.generate()
+            const pubKey = keyring.getPublicKey(true)
+
+            expect(pubKey).to.equal(keyring.key.getPublicKey(true))
+        })
+    })
+
+    context('CAVERJS-UNIT-KEYRING-167: keyring type: decoupled, compressed: true', () => {
+        it('return single public key with roled form', () => {
+            const keyring = generateDecoupledKeyring()
+            const pubKey = keyring.getPublicKey(true)
+
+            expect(pubKey).to.equal(keyring.key.getPublicKey(true))
+        })
+    })
+
+    context('CAVERJS-UNIT-KEYRING-168: keyring type: multiple keys, compressed: true', () => {
+        it('return multiple public keys with roled form', () => {
+            const keyring = generateMultiSigKeyring(2)
+            const pubKey = keyring.getPublicKey(true)
+
+            expect(pubKey[0]).to.equal(keyring.keys[0].getPublicKey(true))
+            expect(pubKey[1]).to.equal(keyring.keys[1].getPublicKey(true))
+        })
+    })
+
+    context('CAVERJS-UNIT-KEYRING-169: keyring type: role based keys, compressed: true', () => {
+        it('return role based public keys with roled form', () => {
+            const keyring = generateRoleBasedKeyring([2, 3, 1])
+            const pubKey = keyring.getPublicKey(true)
+
+            expect(pubKey[0][0]).to.equal(keyring.keys[0][0].getPublicKey(true))
+            expect(pubKey[0][1]).to.equal(keyring.keys[0][1].getPublicKey(true))
+            expect(pubKey[1][0]).to.equal(keyring.keys[1][0].getPublicKey(true))
+            expect(pubKey[1][1]).to.equal(keyring.keys[1][1].getPublicKey(true))
+            expect(pubKey[1][2]).to.equal(keyring.keys[1][2].getPublicKey(true))
+            expect(pubKey[2][0]).to.equal(keyring.keys[2][0].getPublicKey(true))
+            expect(pubKey[0].length).to.equal(2)
+            expect(pubKey[1].length).to.equal(3)
+            expect(pubKey[2].length).to.equal(1)
+        })
+    })
 })
 
 describe('keyring.copy', () => {

@@ -80,6 +80,7 @@ class PrivateKey {
     /**
      * returns public key string
      *
+     * @param {boolean} [compressed] Whether in compressed format or not.
      * @return {string}
      */
     getPublicKey(compressed = false) {
