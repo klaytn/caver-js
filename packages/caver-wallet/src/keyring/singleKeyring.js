@@ -56,10 +56,11 @@ class SingleKeyring extends AbstractKeyring {
     /**
      * returns public key string.
      *
+     * @param {boolean} [compressed] Whether in compressed format or not.
      * @return {string}
      */
-    getPublicKey() {
-        return this.key.getPublicKey()
+    getPublicKey(compressed = false) {
+        return this.key.getPublicKey(compressed)
     }
 
     /**

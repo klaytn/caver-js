@@ -81,13 +81,14 @@ class RoleBasedKeyring extends AbstractKeyring {
     /**
      * returns public key strings in format of role-based.
      *
+     * @param {boolean} [compressed] Whether in compressed format or not.
      * @return {Array.<Array<string>>}
      */
-    getPublicKey() {
+    getPublicKey(compressed = false) {
         const publicKeys = generateKeysFormat()
         for (let i = 0; i < KEY_ROLE.roleLast; i++) {
             for (const k of this._keys[i]) {
-                publicKeys[i].push(k.getPublicKey())
+                publicKeys[i].push(k.getPublicKey(compressed))
             }
         }
         return publicKeys
