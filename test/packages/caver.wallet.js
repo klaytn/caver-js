@@ -30,9 +30,9 @@ const expect = chai.expect
 const testRPCURL = require('../testrpc')
 
 const Caver = require('../../index.js')
-const AbstractKeyring = require('../../packages/caver-wallet/src/keyring/abstractKeyring')
 const SingleKeyring = require('../../packages/caver-wallet/src/keyring/singleKeyring')
 const MultipleKeyring = require('../../packages/caver-wallet/src/keyring/multipleKeyring')
+const RoleBasedKeyring = require('../../packages/caver-wallet/src/keyring/roleBasedKeyring')
 const PrivateKey = require('../../packages/caver-wallet/src/keyring/privateKey')
 
 const ValueTransfer = require('../../packages/caver-transaction/src/transactionTypes/valueTransfer/valueTransfer')
@@ -50,7 +50,7 @@ beforeEach(() => {
 })
 
 function validateKeyringInWallet(data, { expectedAddress, expectedKey } = {}) {
-    expect(data instanceof AbstractKeyring).to.be.true
+    expect(data instanceof SingleKeyring || data instanceof MultipleKeyring || data instanceof RoleBasedKeyring).to.be.true
     const objectKeys = ['_address']
 
     if (data instanceof SingleKeyring) {

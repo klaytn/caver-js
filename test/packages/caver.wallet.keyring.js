@@ -30,7 +30,7 @@ const testRPCURL = require('../testrpc')
 const Caver = require('../../index.js')
 const SingleKeyring = require('../../packages/caver-wallet/src/keyring/singleKeyring')
 const MultipleKeyring = require('../../packages/caver-wallet/src/keyring/multipleKeyring')
-const AbstractKeyring = require('../../packages/caver-wallet/src/keyring/abstractKeyring')
+const RoleBasedKeyring = require('../../packages/caver-wallet/src/keyring/roleBasedKeyring')
 const Account = require('../../packages/caver-account')
 const AccountKeyPublic = require('../../packages/caver-account/src/accountKey/accountKeyPublic')
 const AccountKeyWeightedMultiSig = require('../../packages/caver-account/src/accountKey/accountKeyWeightedMultiSig')
@@ -48,7 +48,7 @@ beforeEach(() => {
 })
 
 function validateKeyring(data, { expectedAddress, expectedKey } = {}) {
-    expect(data instanceof AbstractKeyring).to.be.true
+    expect(data instanceof SingleKeyring || data instanceof MultipleKeyring || data instanceof RoleBasedKeyring).to.be.true
     const objectKeys = ['_address']
 
     if (data instanceof SingleKeyring) {
