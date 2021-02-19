@@ -16,6 +16,9 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+/* eslint-disable no-unused-vars */
+/* eslint-disable class-methods-use-this */
+
 const _ = require('lodash')
 
 const utils = require('../../../caver-utils')
