@@ -1,7 +1,8 @@
 module.exports = {
     entry: './webpack.js',
     output: {
-        filename: 'dist/caver.min.js',
+        filename: 'caver.min.js',
+        path: `${__dirname}/dist`,
     },
     node: {
         fs: 'empty',
