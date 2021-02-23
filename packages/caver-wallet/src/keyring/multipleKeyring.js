@@ -16,9 +16,10 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const _ = require('lodash')
-const AbstractKeyring = require('./abstractKeyring')
+/* eslint-disable no-unused-vars */
+/* eslint-disable class-methods-use-this */
 
+const _ = require('lodash')
 const utils = require('../../../caver-utils')
 const PrivateKey = require('./privateKey')
 const { KEY_ROLE } = require('./keyringHelper')
@@ -30,15 +31,28 @@ const { validateForSigning, validateIndexWithKeys, encryptKey, formatEncrypted }
  * representing a Keyring which includes `address` and `private keys`.
  * @class
  */
-class MultipleKeyring extends AbstractKeyring {
+class MultipleKeyring {
     /**
      * creates a MultipleKeyring.
      * @param {string} address - The address of keyring.
      * @param {Array.<string>|Array.<PrivateKey>} keys - The keys to use in MultipleKeyring.
      */
     constructor(address, keys) {
-        super(address)
+        this.address = address
         this.keys = keys
+    }
+
+    /**
+     * @type {string}
+     */
+    get address() {
+        return this._address
+    }
+
+    set address(addressInput) {
+        if (!utils.isAddress(addressInput)) throw new Error(`Invalid address : ${addressInput}`)
+
+        this._address = utils.addHexPrefix(addressInput).toLowerCase()
     }
 
     /**
@@ -59,12 +73,13 @@ class MultipleKeyring extends AbstractKeyring {
     /**
      * returns public key strings.
      *
+     * @param {boolean} [compressed] Whether in compressed format or not.
      * @return {Array.<string>}
      */
-    getPublicKey() {
+    getPublicKey(compressed = false) {
         const publicKeys = []
         for (let i = 0; i < this.keys.length; i++) {
-            publicKeys.push(this.keys[i].getPublicKey())
+            publicKeys.push(this.keys[i].getPublicKey(compressed))
         }
         return publicKeys
     }
@@ -189,6 +204,35 @@ class MultipleKeyring extends AbstractKeyring {
         let keyring = []
         keyring = encryptKey(this.keys, password, options)
         return formatEncrypted(4, this.address, keyring, options)
+    }
+
+    /**
+     * returns KlaytnWalletKey format. If keyring uses more than one private key, this function will throw error.
+     *
+     * @return {string}
+     */
+    getKlaytnWalletKey() {
+        throw new Error(`Not supported for this class.`)
+    }
+
+    /**
+     * encrypts a keyring and returns a keystore v3 object.
+     *
+     * @param {string} password The password to be used for keyring encryption. The encrypted key store can be decrypted with this password.
+     * @param {object} options The options to use when encrypt a keyring. See `keyring.encrypt` for more detail about options.
+     * @return {object}
+     */
+    encryptV3(password, options) {
+        throw new Error(`Not supported for this class. Use 'keyring.encrypt(password)'.`)
+    }
+
+    /**
+     * returns true if keyring has decoupled key.
+     *
+     * @return {boolean}
+     */
+    isDecoupled() {
+        return true
     }
 }
 

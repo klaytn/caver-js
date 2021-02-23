@@ -16,7 +16,6 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const AbstractKeyring = require('./abstractKeyring')
 const utils = require('../../../caver-utils')
 const PrivateKey = require('./privateKey')
 const { KEY_ROLE } = require('./keyringHelper')
@@ -27,15 +26,28 @@ const { validateForSigning, validateIndexWithKeys, encryptKey, formatEncrypted }
  * representing a Keyring which includes `address` and a `private key`.
  * @class
  */
-class SingleKeyring extends AbstractKeyring {
+class SingleKeyring {
     /**
      * creates a SingleKeyring.
      * @param {string} address - The address of keyring.
      * @param {string|PrivateKey} key - The key to use in SingleKeyring.
      */
     constructor(address, key) {
-        super(address)
+        this.address = address
         this.key = key
+    }
+
+    /**
+     * @type {string}
+     */
+    get address() {
+        return this._address
+    }
+
+    set address(addressInput) {
+        if (!utils.isAddress(addressInput)) throw new Error(`Invalid address : ${addressInput}`)
+
+        this._address = utils.addHexPrefix(addressInput).toLowerCase()
     }
 
     /**
@@ -56,10 +68,11 @@ class SingleKeyring extends AbstractKeyring {
     /**
      * returns public key string.
      *
+     * @param {boolean} [compressed] Whether in compressed format or not.
      * @return {string}
      */
-    getPublicKey() {
-        return this.key.getPublicKey()
+    getPublicKey(compressed = false) {
+        return this.key.getPublicKey(compressed)
     }
 
     /**

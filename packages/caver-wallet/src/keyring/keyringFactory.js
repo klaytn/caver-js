@@ -116,7 +116,7 @@ class KeyringFactory {
      *
      * @param {string} address An address of keyring.
      * @param {string|Array.<string>|Array.<Array.<string>>} key Private key(s) to use in keyring.
-     * @return {AbstractKeyring}
+     * @return {SingleKeyring|MultipleKeyring|RoleBasedKeyring}
      */
     static create(address, key) {
         if (_.isString(key)) return KeyringFactory.createWithSingleKey(address, key)
@@ -206,7 +206,7 @@ class KeyringFactory {
      *
      * @param {object} keystore The encrypted keystore to decrypt.
      * @param {string} password The password to use for decryption.
-     * @return {AbstractKeyring}
+     * @return {SingleKeyring|MultipleKeyring|RoleBasedKeyring}
      */
     static decrypt(keystore, password) {
         // To deep copy an object, using JSON.parse and JSON.stringify (object -> string -> object)

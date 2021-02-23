@@ -96,6 +96,7 @@ class AccountKeyRoleBased {
         // Format will be like below
         // keyArray = [[pub, pub], [pub], [pub, pub, pub]]
         // keyArray = [[accountKeyLegacy], [accountKeyFail], [pub, pub, pub]]
+        // keyArray = [['legacy'], ['fail'], []]
         // options = [{threshold: 1, weights: [1,1]}, {}, {threshold: 1, weights: [1,1,1]}]
         for (let i = 0; i < roleBasedPubArray.length; i++) {
             if (!(options[i] instanceof WeightedMultiSigOptions)) options[i] = WeightedMultiSigOptions.fromObject(options[i])
@@ -113,8 +114,16 @@ class AccountKeyRoleBased {
             }
 
             if (roleBasedPubArray[i].length === 1) {
-                if (roleBasedPubArray[i][0] instanceof AccountKeyLegacy || roleBasedPubArray[i][0] instanceof AccountKeyFail) {
+                if (
+                    roleBasedPubArray[i][0] instanceof AccountKeyLegacy ||
+                    roleBasedPubArray[i][0] instanceof AccountKeyFail ||
+                    roleBasedPubArray[i][0] === 'legacy' ||
+                    roleBasedPubArray[i][0] === 'fail'
+                ) {
                     if (!options[i].isEmpty()) throw new Error(`Invalid options: AccountKeyLegacy or AccountKeyFail cannot have options.`)
+
+                    if (roleBasedPubArray[i][0] === 'legacy') roleBasedPubArray[i][0] = new AccountKeyLegacy()
+                    if (roleBasedPubArray[i][0] === 'fail') roleBasedPubArray[i][0] = new AccountKeyFail()
 
                     accountKeys.push(roleBasedPubArray[i][0])
                     continue
