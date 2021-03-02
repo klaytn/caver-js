@@ -13,3 +13,4 @@ package-lock.json
 .git
 dist/*
 caver-cli
+test/test-web/*

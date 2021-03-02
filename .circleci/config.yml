@@ -19,6 +19,16 @@ jobs:
       - run: 
           name: "Run test code"
           command: npm test
+      - run: 
+          name: "Run test on Web env"
+          command: |
+            sudo wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+            sudo apt-get update
+            sudo apt install --yes ./google-chrome-stable_current_amd64.deb
+            ./test/webTest.sh
+            cd ./test/test-web
+            npm run test
+            ./node_modules/pm2/bin/pm2 delete 0
 
   tag_verify:
     <<: *defaults
