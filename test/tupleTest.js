@@ -98,7 +98,7 @@ before(() => {
 })
 
 describe('Smart contract with tuple test', () => {
-    it('should encode and decode tuple type', async () => {
+    it('CAVERJS-UNIT-ETC-263: should encode and decode tuple type', async () => {
         const str = 'stringValue'
         const tuple = {
             uint256_1: '1',
@@ -116,13 +116,15 @@ describe('Smart contract with tuple test', () => {
             ],
             [str, Object.values(tuple)]
         )
+
+        // Result { '0': 'stringValue', '1': [ '1', '2', true ], __length__: 2 }
         const decoded = caver.abi.decodeParameters(['string', 'tuple(uint256,uint256,bool)'], encoded)
 
         expect(decoded[0]).to.equal(str)
         expect(decoded[1]).to.deep.equal(Object.values(tuple))
     }).timeout(100000)
 
-    it('should deploy smart contract with tuple type of constructor parameter', async () => {
+    it('CAVERJS-UNIT-ETC-264: should deploy smart contract with tuple type of constructor parameter', async () => {
         const c = new caver.contract(tupleSampleABI)
         const str = 'stringValue'
         const tuple = {
@@ -148,7 +150,7 @@ describe('Smart contract with tuple test', () => {
         contractAddress = deployed.options.address
     }).timeout(10000000)
 
-    it('should send tuple type parameter', async () => {
+    it('CAVERJS-UNIT-ETC-265: should send tuple type parameter', async () => {
         const c = new caver.contract(tupleSampleABI, contractAddress)
         const str = 'another string value'
         const tuple = {
