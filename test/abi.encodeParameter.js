@@ -1,3 +1,24 @@
+/*
+    Modifications copyright 2021 The caver-js Authors
+    This file is part of the web3.js library.
+
+    The web3.js library is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    The web3.js library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with the web3.js. If not, see <http://www.gnu.org/licenses/>.
+
+    This file is derived from web3.js/test/abi.encodeParameter.js (2021/03/04).
+    Modified and improved for the caver-js development.
+*/
+
 const chai = require('chai')
 
 const assert = chai.assert
@@ -65,28 +86,6 @@ describe('caver.abi.encodeParameter', function() {
                 '000000000000000000000000407d73d8a49eeb85d32cf465507dd71d507100c3' +
                 '000000000000000000000000407d73d8a49eeb85d32cf465507dd71d507100c4',
         })
-        // test({ type: 'address[][]', value: [['0x407d73d8a49eeb85d32cf465507dd71d507100c5'],
-        // ['0x407d73d8a49eeb85d32cf465507dd71d507100c3']],
-        // expected: '0000000000000000000000000000000000000000000000000000000000000020' +
-        // '0000000000000000000000000000000000000000000000000000000000000002' +
-        // '0000000000000000000000000000000000000000000000000000000000000080' +
-        // '00000000000000000000000000000000000000000000000000000000000000c0' +
-        // '0000000000000000000000000000000000000000000000000000000000000001' +
-        // '000000000000000000000000407d73d8a49eeb85d32cf465507dd71d507100c5' +
-        // '0000000000000000000000000000000000000000000000000000000000000001' +
-        // '000000000000000000000000407d73d8a49eeb85d32cf465507dd71d507100c3' });
-        // test({ type: 'address[][]', value: [['0x407d73d8a49eeb85d32cf465507dd71d507100cf', '0x407d73d8a49eeb85d32cf465507dd71d507100c2'],
-        // ['0x407d73d8a49eeb85d32cf465507dd71d507100c3', '0x407d73d8a49eeb85d32cf465507dd71d507100c4']],
-        // expected: '0000000000000000000000000000000000000000000000000000000000000020' +
-        // '0000000000000000000000000000000000000000000000000000000000000002' +
-        // '0000000000000000000000000000000000000000000000000000000000000080' +
-        // '00000000000000000000000000000000000000000000000000000000000000e0' +
-        // '0000000000000000000000000000000000000000000000000000000000000002' +
-        // '000000000000000000000000407d73d8a49eeb85d32cf465507dd71d507100cf' +
-        // '000000000000000000000000407d73d8a49eeb85d32cf465507dd71d507100c2' +
-        // '0000000000000000000000000000000000000000000000000000000000000002' +
-        // '000000000000000000000000407d73d8a49eeb85d32cf465507dd71d507100c3' +
-        // '000000000000000000000000407d73d8a49eeb85d32cf465507dd71d507100c4' });
         test({ type: 'bool', value: true, expected: '0000000000000000000000000000000000000000000000000000000000000001' })
         test({ type: 'bool', value: false, expected: '0000000000000000000000000000000000000000000000000000000000000000' })
         test({
@@ -117,16 +116,12 @@ describe('caver.abi.encodeParameter', function() {
         test({ type: 'int', value: 1, expected: '0000000000000000000000000000000000000000000000000000000000000001' })
         test({ type: 'int', value: 16, expected: '0000000000000000000000000000000000000000000000000000000000000010' })
         test({ type: 'int', value: -1, expected: 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' })
-        // test({ type: 'int', value: 0.1,             expected: '0000000000000000000000000000000000000000000000000000000000000000'});
-        // test({ type: 'int', value: 3.9,             expected: '0000000000000000000000000000000000000000000000000000000000000003'});
         test({ type: 'int256', value: 1, expected: '0000000000000000000000000000000000000000000000000000000000000001' })
         test({ type: 'int256', value: 16, expected: '0000000000000000000000000000000000000000000000000000000000000010' })
         test({ type: 'int256', value: -1, expected: 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff' })
 
         test({ type: 'uint', value: 1, expected: '0000000000000000000000000000000000000000000000000000000000000001' })
         test({ type: 'uint', value: 16, expected: '0000000000000000000000000000000000000000000000000000000000000010' })
-        // test({ type: 'uint', value: 0.1,             expected: '0000000000000000000000000000000000000000000000000000000000000000'});
-        // test({ type: 'uint', value: 3.9,             expected: '0000000000000000000000000000000000000000000000000000000000000003'});
         test({ type: 'uint256', value: 1, expected: '0000000000000000000000000000000000000000000000000000000000000001' })
         test({ type: 'uint256', value: 16, expected: '0000000000000000000000000000000000000000000000000000000000000010' })
         test({

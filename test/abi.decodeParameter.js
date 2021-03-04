@@ -1,3 +1,24 @@
+/*
+    Modifications copyright 2021 The caver-js Authors
+    This file is part of the web3.js library.
+
+    The web3.js library is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    The web3.js library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with the web3.js. If not, see <http://www.gnu.org/licenses/>.
+
+    This file is derived from web3.js/test/abi.decodeParameter.js (2021/03/04).
+    Modified and improved for the caver-js development.
+*/
+
 const _ = require('lodash')
 const chai = require('chai')
 
@@ -67,24 +88,6 @@ describe('caver.abi.decodeParameter', function() {
                 '000000000000000000000000407d73d8a49eeb85d32cf465507dd71d507100c3' +
                 '000000000000000000000000407d73d8a49eeb85d32cf465507dd71d507100c4',
         })
-        // test({
-        //     type: 'address[][]',
-        //     expected: [
-        //         ['0x407D73d8a49eeb85D32Cf465507dd71d507100c1', '0x407d73d8a49EEB85d32Cf465507dD71D507100c2'],
-        //         ['0x407D73d8A49eEB85D32Cf465507Dd71d507100c3', '0x407D73d8a49eeb85D32CF465507dd71d507100C4'],
-        //     ],
-        //     value:
-        //         '0000000000000000000000000000000000000000000000000000000000000020' +
-        //         '0000000000000000000000000000000000000000000000000000000000000002' /* 20 */ +
-        //         '0000000000000000000000000000000000000000000000000000000000000080' +
-        //         '00000000000000000000000000000000000000000000000000000000000000e0' +
-        //         '0000000000000000000000000000000000000000000000000000000000000002' /* 80 */ +
-        //         '000000000000000000000000407d73d8a49eeb85d32cf465507dd71d507100c1' /* a0 */ +
-        //         '000000000000000000000000407d73d8a49eeb85d32cf465507dd71d507100c2' +
-        //         '0000000000000000000000000000000000000000000000000000000000000002' /* e0 */ +
-        //         '000000000000000000000000407d73d8a49eeb85d32cf465507dd71d507100c3' +
-        //         '000000000000000000000000407d73d8a49eeb85d32cf465507dd71d507100c4',
-        // })
         test({ type: 'bool', expected: true, value: '0000000000000000000000000000000000000000000000000000000000000001' })
         test({ type: 'bool', expected: false, value: '0000000000000000000000000000000000000000000000000000000000000000' })
         test({
