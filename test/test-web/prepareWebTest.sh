@@ -21,8 +21,6 @@ cp .eslintrc_template.js .eslintrc.js
 # Make dev url file
 echo module.exports=${DEV_URL} > ./src/testrpc.js
 sed -i' ' "s/testrpc/${DEV_URL/\/\//\\/\\/}/g" ./public/index.html
-# sed -i '' "s/testrpc/${DEV_URL/\/\//\\/\\/}/g" ./public/index.html
-cat ./public/index.html
 
 # Prepare to test (background running)
 ./node_modules/pm2/bin/pm2 --name BundleTest start npm -- start
