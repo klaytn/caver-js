@@ -90,6 +90,8 @@ ABICoder.prototype.encodeParameter = function(type, param) {
 
 /**
  * Should be used to encode list of params
+ * Tuple type can be used like below
+ * `caver.abi.encodeParameters(['tuple(bytes32,bool)', 'tuple(bool,address)'], [['0xabd...', true], [true, '0x776...']])`
  *
  * @method encodeParameters
  * @param {Array} types
@@ -102,6 +104,8 @@ ABICoder.prototype.encodeParameters = function(types, params) {
 
     params = params.map(function(param, index) {
         let type = types[index]
+
+        // { components: [[Object], [Object]], name: 'b', type: 'tuple' }
         if (typeof type === 'object' && type.type) {
             // We may get a named type of shape {name, type}
             type = type.type
@@ -202,7 +206,6 @@ ABICoder.prototype.mapTypes = function(types) {
 
         mappedTypes.push(type)
     })
-
     return mappedTypes
 }
 
@@ -369,7 +372,8 @@ ABICoder.prototype.decodeParameters = function(outputs, bytes) {
  * @method decodeParametersWith
  * @param {Array} outputs
  * @param {String} bytes
- * @param {Boolean} loose
+ * @param {Boolean} loose must be passed for decoding bytes and string parameters for logs emitted with solc 0.4.x
+ *                        Please refer to https://github.com/ChainSafe/web3.js/commit/e80337e16e5c04683fc40148378775234c28e0fb.
  * @return {Array} array of plain params
  */
 ABICoder.prototype.decodeParametersWith = function(outputs, bytes, loose) {

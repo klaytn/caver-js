@@ -27,7 +27,7 @@ const BigNumber = require('bignumber.js')
 const coder = require('../packages/caver-abi')
 
 describe('caver.abi.encodeParameter', function() {
-    describe('encodeParameter', function() {
+    describe('CAVERJS-UNIT-SER-070: encodeParameter', function() {
         const test = function(t) {
             it(`should turn ${t.value} to ${t.expected} for ${t.type}`, function() {
                 assert.equal(coder.encodeParameter(t.type, t.value).replace('0x', ''), t.expected)
@@ -525,7 +525,7 @@ describe('caver.abi.encodeParameter', function() {
 })
 
 describe('caver.abi.encodeParameters', function() {
-    describe('encodeParameters', function() {
+    describe('CAVERJS-UNIT-SER-071: encodeParameters', function() {
         const test = function(t) {
             it(`should turn ${t.values} to ${t.expected}`, function() {
                 assert.equal(coder.encodeParameters(t.types, t.values).replace('0x', ''), t.expected)

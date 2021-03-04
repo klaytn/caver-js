@@ -9,7 +9,7 @@
     "build": "./node_modules/.bin/webpack --mode production",
     "lint": "./node_modules/.bin/eslint './**/*.js'",
     "lintFix": "./node_modules/.bin/eslint './**/*.js' --fix",
-    "serTest": "mocha test/transactionType/serializationTest.js && mocha test/compressionPublicKey.js && mocha test/encodeContractDeploy.js && mocha test/parseAccountKey.js && mocha test/decodeTransaction.js && mocha ./test/abi.encodeParameter.js && mocha ./test/abi.decodeParameter.js",
+    "serTest": "mocha test/transactionType/serializationTest.js && mocha test/compressionPublicKey.js && mocha test/encodeContractDeploy.js && mocha test/parseAccountKey.js && mocha test/decodeTransaction.js && mocha ./test/abi.encodeParameter.js && mocha ./test/abi.decodeParameter.js && mocha ./test/abi.decodeLog.js",
     "accountTest": "mocha test/packages/caver.account.js && mocha test/packages/caver.account.accountKey.js",
     "walletTest": "mocha test/packages/caver.wallet.js && mocha test/packages/caver.wallet.keyring.js && mocha test/accountLib.js && mocha test/accounts.privateKeyToPublicKey.js && mocha test/accounts.recover.js && mocha test/packages/caver.klay.accounts.js && mocha test/isValidPrivateKey.js && mocha test/privateKeyToAccount.js",
     "rpcTest": "mocha test/packages/caver.rpc.js",

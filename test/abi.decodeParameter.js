@@ -26,7 +26,7 @@ const assert = chai.assert
 const coder = require('../packages/caver-abi')
 
 describe('caver.abi.decodeParameter', function() {
-    describe('decodeParam', function() {
+    describe('CAVERJS-UNIT-SER-072: decodeParam', function() {
         const test = function(t) {
             it(`should turn ${t.type}: ${t.value} to ${t.expected}`, function() {
                 if (t.type === 'tuple') {
@@ -567,7 +567,7 @@ describe('caver.abi.decodeParameter', function() {
 })
 
 describe('caver.abi.decodeParameters', function() {
-    describe('decodeParams', function() {
+    describe('CAVERJS-UNIT-SER-073: decodeParams', function() {
         const test = function(t) {
             it(`should turn ${t.values} to ${t.expected}`, function() {
                 const result = coder.decodeParameters(t.types, t.values)
