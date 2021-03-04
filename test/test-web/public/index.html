@@ -29,7 +29,7 @@
           if (typeof caver !== 'undefined') {
               window.caver = new Caver(caver.currentProvider);
           } else {
-              window.caver = new Caver(new Caver.providers.HttpProvider('https://kaikas.baobab.klaytn.net:8651'));
+              window.caver = new Caver(new Caver.providers.HttpProvider(testrpc));
           }
           getBlockNumber()
       })
