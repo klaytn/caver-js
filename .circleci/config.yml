@@ -25,10 +25,10 @@ jobs:
             sudo wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
             sudo apt-get update
             sudo apt install --yes ./google-chrome-stable_current_amd64.deb
-            ./test/webTest.sh
             cd ./test/test-web
+            ./prepareWebTest.sh
             npm run test
-            ./node_modules/pm2/bin/pm2 delete 0
+            ./terminateWebTest.sh
 
   tag_verify:
     <<: *defaults
