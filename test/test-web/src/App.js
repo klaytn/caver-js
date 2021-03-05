@@ -38,7 +38,6 @@ constructor(props) {
         <header className="App-header">
           <p> Klaytn BlockNumber </p>
           <p>{this.state.blockNumber}</p>
-          <button onClick={() => this.getBlockNumber()}>GET LATEST BLOCK NUMBER</button>
         </header>
       </div>
     );
