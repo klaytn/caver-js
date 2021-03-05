@@ -22,7 +22,6 @@ module.exports = {
         'guard-for-in': 0,
         'prefer-spread': 0,
         'global-require': 0,
-        'no-multi-assign': 0,
         'no-await-in-loop': 0,
         'no-control-regex': 0,
         'object-shorthand': 0,
