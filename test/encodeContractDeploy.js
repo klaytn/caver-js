@@ -405,7 +405,7 @@ describe('caver.klay.abi.encodeContractDeploy', () => {
         // Expected arguments type: [uint256], Actual: [string]
         expect(() => caver.klay.abi.encodeContractDeploy(abi1, bytecode1, 'hello')).to.throw()
 
-        // // Expected arguments type: [uint256, uint256], Actual: [uint256, string]
+        // Expected arguments type: [uint256, uint256], Actual: [uint256, string]
         expect(() => caver.klay.abi.encodeContractDeploy(abi2, bytecode2, 1, 'hello')).to.throw()
 
         // Expected arguments type: [string], Actual: [uint256]
