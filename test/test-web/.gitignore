@@ -24,3 +24,6 @@ yarn-debug.log*
 yarn-error.log*
 
 /public/caver.min.js
+
+.eslintrc.js
+src/testrpc.js
