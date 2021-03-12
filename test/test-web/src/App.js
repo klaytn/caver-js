@@ -37,7 +37,7 @@ constructor(props) {
       <div className="App">
         <header className="App-header">
           <p> Klaytn BlockNumber </p>
-          <p>{this.state.blockNumber}</p>
+          <p id='blockNumberInReactComponent' style={{visibility: this.state.blockNumber === -1 ? 'hidden' : 'visible'}}>{this.state.blockNumber}</p>
         </header>
       </div>
     );
