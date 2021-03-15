@@ -19,7 +19,9 @@
     "build": "react-scripts build",
     "test": "npm run testWatch -- --watchAll=false",
     "testWatch": "react-scripts test --env=jest-environment-jsdom-sixteen",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run"
   },
   "browserslist": {
     "production": [
@@ -34,10 +36,7 @@
     ]
   },
   "devDependencies": {
-    "chromedriver": "^88.0.0",
-    "jest-environment-jsdom-sixteen": "^1.0.3",
-    "jest-environment-webdriver": "^0.2.0",
-    "pm2": "^4.5.5",
-    "selenium-webdriver": "^4.0.0-beta.1"
+    "cypress": "^6.6.0",
+    "pm2": "^4.5.5"
   }
 }
