@@ -283,12 +283,12 @@ const Contract = function Contract(jsonInterface, address, options) {
  *
  * @method create
  * @constructor
- * @param {Array} abi The Contract Application Binary Interface (ABI).
+ * @param {Array} jsonInterface The Contract Application Binary Interface (ABI).
  * @param {string} [address] The contract address to call.
  * @param {object} [options] The options of the contract.
  */
-Contract.create = function(abi, address, options) {
-    return new Contract(abi, address, options)
+Contract.create = function(jsonInterface, address, options) {
+    return new Contract(jsonInterface, address, options)
 }
 
 Contract.setProvider = function(provider, accounts) {
