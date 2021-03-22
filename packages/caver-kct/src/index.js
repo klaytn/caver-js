@@ -91,7 +91,7 @@ class KCT {
             }
 
             /**
-             * Wrapping class of the KIP7. 
+             * Wrapping class of the KIP7.
              * In this constructor, call `setWallet` with keyringContainer to use keyringContainer instead of accounts.
              *
              * @constructor
@@ -152,7 +152,7 @@ class KCT {
             }
 
             /**
-             * Wrapping class of the KIP17. 
+             * Wrapping class of the KIP17.
              * In this constructor, call `setWallet` with keyringContainer to use keyringContainer instead of accounts.
              *
              * @constructor
