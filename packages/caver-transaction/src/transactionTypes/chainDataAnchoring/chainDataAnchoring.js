@@ -47,6 +47,18 @@ function _decode(rlpEncoded) {
  */
 class ChainDataAnchoring extends AbstractTransaction {
     /**
+     * Creates a chain data anchoring transaction.
+     * @method create
+     * @param {object|string} createTxObj - The parameters to create a ChainDataAnchoring transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
+     *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
+     *                                      The object can define `from`, `nonce`, `gas`, `gasPrice`, `input`, `signatures` and `chainId`.
+     * @return {ChainDataAnchoring}
+     */
+    static create(createTxObj) {
+        return new ChainDataAnchoring(createTxObj)
+    }
+
+    /**
      * decodes the RLP-encoded string and returns a ChainDataAnchoring transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded chain data anchoring transaction.

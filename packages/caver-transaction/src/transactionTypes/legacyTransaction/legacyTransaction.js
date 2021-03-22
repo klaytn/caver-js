@@ -42,6 +42,24 @@ function _decode(rlpEncoded) {
  * @class
  */
 class LegacyTransaction extends AbstractTransaction {
+    /**
+     * Creates a legacy transaction.
+     * @method create
+     * @param {object|string} createTxObj - The parameters to create a LegacyTransaction transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
+     *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
+     *                                      The object can define `from`, `to`, `value`, `input`, `nonce`, `gas`, `gasPrice` and `chainId`.
+     * @return {LegacyTransaction}
+     */
+    static create(createTxObj) {
+        return new LegacyTransaction(createTxObj)
+    }
+
+    /**
+     * decodes the RLP-encoded string and returns a LegacyTransaction instance.
+     *
+     * @param {string} rlpEncoded The RLP-encoded legacy transaction.
+     * @return {LegacyTransaction}
+     */
     static decode(rlpEncoded) {
         return new LegacyTransaction(_decode(rlpEncoded))
     }

@@ -51,6 +51,18 @@ function _decode(rlpEncoded) {
  */
 class SmartContractExecution extends AbstractTransaction {
     /**
+     * Creates a smart contract execution transaction.
+     * @method create
+     * @param {object|string} createTxObj - The parameters to create a SmartContractExecution transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
+     *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
+     *                                      The object can define `from`, `to`, `value`, `input`, `nonce`, `gas`, `gasPrice`, `signatures` and `chainId`.
+     * @return {SmartContractExecution}
+     */
+    static create(createTxObj) {
+        return new SmartContractExecution(createTxObj)
+    }
+
+    /**
      * decodes the RLP-encoded transation string and returns a SmartContractExecution transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded smart contract execution transaction.

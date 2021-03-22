@@ -55,6 +55,26 @@ class KCT {
         // Define KIP7 class for caver-kct
         // In this class, keyrings will be used instead of accounts
         class KIP7 extends BaseKIP7 {
+            /**
+             * Creates an instance of KIP7.
+             * @method create
+             * @param {string} tokenAddress - The KIP-7 token contract address.
+             * @param {Array} [abi] - The Contract Application Binary Interface (ABI) of the KIP-7.
+             * @return {object}
+             */
+            static create(tokenAddress, abi) {
+                return new KIP7(tokenAddress, abi)
+            }
+
+            /**
+             * deploy deploys a KIP-7 token contract to Klaytn network.
+             * The KIP7 instance deployed and returned through this function uses the keyringContainer instead of accounts.
+             * @method deploy
+             * @param {Object} tokenInfo The object that defines the name, symbol, decimals, and initialSupply of the token to deploy.
+             * @param {String} deployer The address of the account to deploy the KIP-7 token contract.
+             * @param {IWallet} wallet The wallet instance to sign and send a transaction.
+             * @return {object}
+             */
             static deploy(tokenInfo, deployer, wallet) {
                 validateDeployParameterForKIP7(tokenInfo)
 
@@ -70,6 +90,14 @@ class KCT {
                     .send({ from: deployer, gas: 4000000, value: 0 })
             }
 
+            /**
+             * Wrapping class of the KIP7. 
+             * In this constructor, call `setWallet` with keyringContainer to use keyringContainer instead of accounts.
+             *
+             * @constructor
+             * @param {string} tokenAddress - The KIP-7 token contract address.
+             * @param {Array} [abi] - The Contract Application Binary Interface (ABI) of the KIP-7.
+             */
             constructor(tokenAddress, abi) {
                 super(tokenAddress, abi)
                 const self = this // eslint-disable-line no-shadow
@@ -88,6 +116,26 @@ class KCT {
         // Define KIP17 class for caver-kct
         // In this class, keyrings will be used instead of accounts
         class KIP17 extends BaseKIP17 {
+            /**
+             * Creates an instance of KIP17.
+             * @method create
+             * @param {string} tokenAddress - The KIP-17 token contract address.
+             * @param {Array} [abi] - The Contract Application Binary Interface (ABI) of the KIP-17.
+             * @return {object}
+             */
+            static create(tokenAddress, abi) {
+                return new KIP17(tokenAddress, abi)
+            }
+
+            /**
+             * deploy deploys a KIP-17 token contract to Klaytn network.
+             * The KIP17 instance deployed and returned through this function uses the keyringContainer instead of accounts.
+             * @method deploy
+             * @param {Object} tokenInfo The object that defines the name and symbol of the token to deploy.
+             * @param {String} deployer The address of the account to deploy the KIP-17 token contract.
+             * @param {IWallet} wallet The wallet instance to sign and send a transaction.
+             * @return {object}
+             */
             static deploy(tokenInfo, deployer, wallet) {
                 validateDeployParameterForKIP17(tokenInfo)
 
@@ -103,6 +151,14 @@ class KCT {
                     .send({ from: deployer, gas: 6600000, value: 0 })
             }
 
+            /**
+             * Wrapping class of the KIP17. 
+             * In this constructor, call `setWallet` with keyringContainer to use keyringContainer instead of accounts.
+             *
+             * @constructor
+             * @param {string} tokenAddress - The KIP-17 token contract address.
+             * @param {Array} [abi] - The Contract Application Binary Interface (ABI) of the KIP-17.
+             */
             constructor(tokenAddress, abi) {
                 super(tokenAddress, abi)
                 const self = this // eslint-disable-line no-shadow

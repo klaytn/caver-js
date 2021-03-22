@@ -43,7 +43,7 @@ class KIP7 extends Contract {
      *
      * @method deploy
      * @param {Object} tokenInfo The object that defines the name, symbol, decimals, and initialSupply of the token to deploy.
-     * @param {String} privateKey The address of the account to deploy the KIP-7 token contract.
+     * @param {String} deployer The address of the account to deploy the KIP-7 token contract.
      * @return {Object}
      */
     static deploy(tokenInfo, deployer) {
@@ -72,6 +72,13 @@ class KIP7 extends Contract {
         return kip7.detectInterface()
     }
 
+    /**
+     * KIP7 class represents the KIP-7 token contract.
+     *
+     * @constructor
+     * @param {string} tokenAddress - The KIP-7 token contract address.
+     * @param {Array} [abi] - The Contract Application Binary Interface (ABI) of the KIP-7.
+     */
     constructor(tokenAddress, abi = kip7JsonInterface) {
         if (tokenAddress) {
             if (_.isString(tokenAddress)) {

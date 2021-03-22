@@ -33,6 +33,17 @@ const KIP13 = require('../src/kip13')
 
 class KIP37 extends Contract {
     /**
+     * Creates an instance of KIP37.
+     * @method create
+     * @param {string} tokenAddress - The KIP-73 token contract address.
+     * @param {Array} [abi] - The Contract Application Binary Interface (ABI) of the KIP-37.
+     * @return {object}
+     */
+    static create(tokenAddress, abi) {
+        return new KIP37(tokenAddress, abi)
+    }
+
+    /**
      * deploy deploys a KIP-37 token contract to Klaytn network.
      * `const deployedContract = await caver.kct.kip37.deploy({
      *      uri: ''

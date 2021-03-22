@@ -48,6 +48,18 @@ function _decode(rlpEncoded) {
  */
 class ValueTransfer extends AbstractTransaction {
     /**
+     * Creates a value transfer transaction.
+     * @method create
+     * @param {object|string} createTxObj - The parameters to create a ValueTransfer transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
+     *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
+     *                                      The object can define `from`, `to`, `value`, `nonce`, `gas`, `gasPrice`, `signatures` and `chainId`.
+     * @return {ValueTransfer}
+     */
+    static create(createTxObj) {
+        return new ValueTransfer(createTxObj)
+    }
+
+    /**
      * decodes the RLP-encoded string and returns a ValueTransfer transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded value transfer transaction.

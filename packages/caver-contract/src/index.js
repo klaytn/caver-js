@@ -278,6 +278,19 @@ const Contract = function Contract(jsonInterface, address, options) {
     this.options.jsonInterface = jsonInterface
 }
 
+/**
+ * Creates an instance of Contract.
+ *
+ * @method create
+ * @constructor
+ * @param {Array} abi The Contract Application Binary Interface (ABI).
+ * @param {string} [address] The contract address to call.
+ * @param {object} [options] The options of the contract.
+ */
+Contract.create = function(abi, address, options) {
+    return new Contract(abi, address, options)
+}
+
 Contract.setProvider = function(provider, accounts) {
     core.packageInit(this, [provider])
 
