@@ -19,7 +19,7 @@
 
 const lodash = require('lodash')
 const fs = require('fs')
-const IPFSAPI = require('ipfs-api')
+const IPFSAPI = require('ipfs-http-client-lite')
 const multihash = require('multihashes')
 
 /**
@@ -49,7 +49,7 @@ class IPFS {
      */
     setIPFSNode(host, port, ssl) {
         const protocol = ssl ? 'https' : 'http'
-        this.ipfs = new IPFSAPI({ host, port, protocol })
+        this.ipfs = IPFSAPI({ apiUrl: `${protocol}://${host}:${port}` })
     }
 
     /**
