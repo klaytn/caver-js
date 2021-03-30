@@ -108,6 +108,10 @@ function Caver(provider, net) {
         this.setWallet(self.wallet)
     }
 
+    Contract.create = function() {
+        return BaseContract.create.apply(this, arguments)
+    }
+
     Contract.setProvider = function() {
         BaseContract.setProvider.apply(this, arguments)
     }

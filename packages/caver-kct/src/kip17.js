@@ -71,6 +71,13 @@ class KIP17 extends Contract {
         return kip17.detectInterface()
     }
 
+    /**
+     * KIP17 class represents the KIP-17 token contract.
+     *
+     * @constructor
+     * @param {string} tokenAddress - The KIP-17 token contract address.
+     * @param {Array} [abi] - The Contract Application Binary Interface (ABI) of the KIP-17.
+     */
     constructor(tokenAddress, abi = kip17JsonInterface) {
         if (tokenAddress) {
             if (_.isString(tokenAddress)) {

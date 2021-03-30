@@ -48,6 +48,18 @@ function _decode(rlpEncoded) {
  */
 class FeeDelegatedCancel extends AbstractFeeDelegatedTransaction {
     /**
+     * Creates a fee delegated cancel transaction.
+     * @method create
+     * @param {object|string} createTxObj - The parameters to create a FeeDelegatedCancel transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
+     *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
+     *                               The object can define `from`, `to`, `value`, `nonce`, `gas`, `gasPrice`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @return {FeeDelegatedCancel}
+     */
+    static create(createTxObj) {
+        return new FeeDelegatedCancel(createTxObj)
+    }
+
+    /**
      * decodes the RLP-encoded string and returns a FeeDelegatedCancel transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded fee delegated cancel transaction.

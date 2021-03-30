@@ -53,6 +53,18 @@ function _decode(rlpEncoded) {
  */
 class FeeDelegatedValueTransferMemo extends AbstractFeeDelegatedTransaction {
     /**
+     * Creates a fee delegated value transfer memo transaction.
+     * @method create
+     * @param {object|string} createTxObj - The parameters to create a FeeDelegatedValueTransferMemo transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
+     *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
+     *                                      The object can define `from`, `to`, `value`, `input`, `nonce`, `gas`, `gasPrice`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @return {FeeDelegatedValueTransferMemo}
+     */
+    static create(createTxObj) {
+        return new FeeDelegatedValueTransferMemo(createTxObj)
+    }
+
+    /**
      * decodes the RLP-encoded string and returns a FeeDelegatedValueTransferMemo transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded fee delegated value transfer memo transaction.

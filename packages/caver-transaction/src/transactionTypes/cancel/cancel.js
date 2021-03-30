@@ -46,6 +46,18 @@ function _decode(rlpEncoded) {
  */
 class Cancel extends AbstractTransaction {
     /**
+     * Creates a cancel transaction.
+     * @method create
+     * @param {object|string} createTxObj - The parameters to create a Cancel transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
+     *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
+     *                                      The object can define `from`, `nonce`, `gas`, `gasPrice`, `signatures` and `chainId`.
+     * @return {Cancel}
+     */
+    static create(createTxObj) {
+        return new Cancel(createTxObj)
+    }
+
+    /**
      * decodes the RLP-encoded string and returns a Cancel transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded cancel transaction.

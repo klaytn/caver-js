@@ -51,6 +51,18 @@ function _decode(rlpEncoded) {
  */
 class FeeDelegatedChainDataAnchoring extends AbstractFeeDelegatedTransaction {
     /**
+     * Creates a fee delegated chain data anchoring transaction.
+     * @method create
+     * @param {object|string} createTxObj - The parameters to create a FeeDelegatedChainDataAnchoring transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
+     *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
+     *                               The object can define `from`, `nonce`, `gas`, `gasPrice`, `input`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @return {FeeDelegatedChainDataAnchoring}
+     */
+    static create(createTxObj) {
+        return new FeeDelegatedChainDataAnchoring(createTxObj)
+    }
+
+    /**
      * decodes the RLP-encoded string and returns a FeeDelegatedChainDataAnchoring transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded fee delegated chain data anchoring transaction.
