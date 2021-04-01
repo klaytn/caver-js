@@ -277,524 +277,544 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
         }).timeout(200000)
 
         it(`CAVERJS-UNIT-ETC-279: contract.methods.set(arguments).send({ ... }) will execute the contract`, async () => {
-			const contract = new caver.contract(abiWithConstructor, contractAddress)
-			
-			const newKey = 'jasmine'
-			const newValue = 'valuable'
-            const result = await contract.methods.set(newKey, newValue).send({ 
-				from: sender.address,
-				gas: 1000000,
-			})
+            const contract = new caver.contract(abiWithConstructor, contractAddress)
+
+            const newKey = 'jasmine'
+            const newValue = 'valuable'
+            const result = await contract.methods.set(newKey, newValue).send({
+                from: sender.address,
+                gas: 1000000,
+            })
             expect(result.from).to.equal(sender.address)
-			expect(result.status).to.be.true
+            expect(result.status).to.be.true
             expect(result.type).to.equal(TX_TYPE_STRING.TxTypeSmartContractExecution)
-			
-			const value = await contract.methods.get(newKey).call({ from: sender.address })
+
+            const value = await contract.methods.get(newKey).call({ from: sender.address })
             expect(value).to.equal(newValue)
         }).timeout(200000)
 
         it(`CAVERJS-UNIT-ETC-280: contract.methods['set'](arguments).send({ ... }) will execute the contract`, async () => {
             const contract = new caver.contract(abiWithConstructor, contractAddress)
 
-			const newKey = 'caver-js'
-			const newValue = 'so nice'
+            const newKey = 'caver-js'
+            const newValue = 'so nice'
 
             // contract.methods['set'] formatted to contract.methods.set by linter
             // So eslint disable comment have to be added to block formatting
             // eslint-disable-next-line dot-notation
-            const result = await contract.methods['set'](newKey, newValue).send({ 
-				from: sender.address,
-				gas: 1000000,
-			})
+            const result = await contract.methods['set'](newKey, newValue).send({
+                from: sender.address,
+                gas: 1000000,
+            })
             expect(result.from).to.equal(sender.address)
-			expect(result.status).to.be.true
+            expect(result.status).to.be.true
             expect(result.type).to.equal(TX_TYPE_STRING.TxTypeSmartContractExecution)
-			
+
             // eslint-disable-next-line dot-notation
-			const value = await contract.methods['get'](newKey).call({ from: sender.address })
+            const value = await contract.methods['get'](newKey).call({ from: sender.address })
             expect(value).to.equal(newValue)
         }).timeout(200000)
 
         it(`CAVERJS-UNIT-ETC-281: contract.send({ ... }, functionName, arguments) will execute the contract`, async () => {
             const contract = new caver.contract(abiWithConstructor, contractAddress)
 
-			const newKey = 'contract'
-			const newValue = 'so convenient'
+            const newKey = 'contract'
+            const newValue = 'so convenient'
 
-            const result = await contract.send({ 
-				from: sender.address,
-				gas: 1000000,
-			}, 'set', newKey, newValue)
+            const result = await contract.send(
+                {
+                    from: sender.address,
+                    gas: 1000000,
+                },
+                'set',
+                newKey,
+                newValue
+            )
             expect(result.from).to.equal(sender.address)
-			expect(result.status).to.be.true
+            expect(result.status).to.be.true
             expect(result.type).to.equal(TX_TYPE_STRING.TxTypeSmartContractExecution)
-			
-			const value = await contract.call('get', newKey)
+
+            const value = await contract.call('get', newKey)
             expect(value).to.equal(newValue)
         }).timeout(200000)
-
     })
 
-    context('Fee Delegation transaction via caver.contract (TxTypeFeeDelegatedSmartContractDeploy/TxTypeFeeDelegatedSmartContractExecution)', () => {
-        it('CAVERJS-UNIT-ETC-282: contract.deploy({ data }).send({ from, feeDelegation: true, feePayer, ... }) deploys contract', async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-            const deployed = await contract.deploy({ data: byteCodeWithoutConstructor }).send({
-                from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-                gas: 1000000,
-                contractDeployFormatter,
-            })
-
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it('CAVERJS-UNIT-ETC-283: contract.deploy({ data, arguments }).send({ from, feeDelegation: true, feePayer, ... }) deploys contract', async () => {
-            const contract = new caver.contract(abiWithConstructor)
-
-            keyString = 'keyString'
-            valueString = 'valueString'
-
-            const deployed = await contract
-                .deploy({
-                    data: byteCodeWithConstructor,
-                    arguments: [keyString, valueString],
-                })
-                .send({
-                    from: sender.address,
-                    feeDelegation: true,
-                    feePayer: feePayer.address,
-                    gas: 100000000,
-                    contractDeployFormatter,
-                })
-
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-
-            contractAddress = deployed.contractAddress
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-284: contract.methods['constructor'](byteCode).send({ from, feeDelegation: true, feePayer, ... }) deploys contract`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-
-            // contract.methods['constructor'] formatted to contract.methods.constructor by linter
-            // So eslint disable comment have to be added to block formatting
-            // eslint-disable-next-line dot-notation
-            const deployed = await contract.methods['constructor'](byteCodeWithoutConstructor).send({
-                from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-                gas: 1000000,
-                contractDeployFormatter,
-            })
-
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-285: contract.methods['constructor'](byteCode, arguments).send({ from, feeDelegation: true, feePayer, ... }) deploys contract`, async () => {
-            const contract = new caver.contract(abiWithConstructor)
-
-            // contract.methods['constructor'] formatted to contract.methods.constructor by linter
-            // So eslint disable comment have to be added to block formatting
-            // eslint-disable-next-line dot-notation
-            const deployed = await contract.methods['constructor'](byteCodeWithConstructor, 'keykey', 'valuevalue').send({
-                from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-                gas: 100000000,
-                contractDeployFormatter,
-            })
-
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-286: contract.methods.constructor(byteCode).send({ from, feeDelegation: true, feePayer, ... }) deploys contract`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-
-            const deployed = await contract.methods.constructor(byteCodeWithoutConstructor).send({
-                from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-                gas: 1000000,
-                contractDeployFormatter,
-            })
-
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-287: contract.methods.constructor(byteCode, arguments).send({ from, feeDelegation: true, feePayer, ... }) deploys contract`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-
-            const deployed = await contract.methods.constructor(byteCodeWithConstructor, 'thisIsKeyString', 'thisIsValueString').send({
-                from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-                gas: 1000000,
-                contractDeployFormatter,
-            })
-
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-288: contract.deploy({ from, feeDelegation: true, feePayer, ... }, byteCode) deploys contract`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-            const deployed = await contract.deploy(
-                {
+    context(
+        'Fee Delegation transaction via caver.contract (TxTypeFeeDelegatedSmartContractDeploy/TxTypeFeeDelegatedSmartContractExecution)',
+        () => {
+            it('CAVERJS-UNIT-ETC-282: contract.deploy({ data }).send({ from, feeDelegation: true, feePayer, ... }) deploys contract', async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+                const deployed = await contract.deploy({ data: byteCodeWithoutConstructor }).send({
                     from: sender.address,
                     feeDelegation: true,
                     feePayer: feePayer.address,
                     gas: 1000000,
                     contractDeployFormatter,
-                },
-                byteCodeWithoutConstructor
-            )
+                })
 
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
+                expect(deployed.from).to.equal(sender.address)
+                expect(deployed.feePayer).to.equal(feePayer.address)
+                expect(deployed.status).to.be.true
+                expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
 
-        it(`CAVERJS-UNIT-ETC-289: contract.deploy({ from, feeDelegation: true, feePayer, ... }, byteCode, arguements) deploys contract`, async () => {
-            const contract = new caver.contract(abiWithConstructor)
-            const deployed = await contract.deploy(
-                {
+            it('CAVERJS-UNIT-ETC-283: contract.deploy({ data, arguments }).send({ from, feeDelegation: true, feePayer, ... }) deploys contract', async () => {
+                const contract = new caver.contract(abiWithConstructor)
+
+                keyString = 'keyString'
+                valueString = 'valueString'
+
+                const deployed = await contract
+                    .deploy({
+                        data: byteCodeWithConstructor,
+                        arguments: [keyString, valueString],
+                    })
+                    .send({
+                        from: sender.address,
+                        feeDelegation: true,
+                        feePayer: feePayer.address,
+                        gas: 100000000,
+                        contractDeployFormatter,
+                    })
+
+                expect(deployed.from).to.equal(sender.address)
+                expect(deployed.feePayer).to.equal(feePayer.address)
+                expect(deployed.status).to.be.true
+                expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+                contractAddress = deployed.contractAddress
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-284: contract.methods['constructor'](byteCode).send({ from, feeDelegation: true, feePayer, ... }) deploys contract`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+
+                // contract.methods['constructor'] formatted to contract.methods.constructor by linter
+                // So eslint disable comment have to be added to block formatting
+                // eslint-disable-next-line dot-notation
+                const deployed = await contract.methods['constructor'](byteCodeWithoutConstructor).send({
+                    from: sender.address,
+                    feeDelegation: true,
+                    feePayer: feePayer.address,
+                    gas: 1000000,
+                    contractDeployFormatter,
+                })
+
+                expect(deployed.from).to.equal(sender.address)
+                expect(deployed.feePayer).to.equal(feePayer.address)
+                expect(deployed.status).to.be.true
+                expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-285: contract.methods['constructor'](byteCode, arguments).send({ from, feeDelegation: true, feePayer, ... }) deploys contract`, async () => {
+                const contract = new caver.contract(abiWithConstructor)
+
+                // contract.methods['constructor'] formatted to contract.methods.constructor by linter
+                // So eslint disable comment have to be added to block formatting
+                // eslint-disable-next-line dot-notation
+                const deployed = await contract.methods['constructor'](byteCodeWithConstructor, 'keykey', 'valuevalue').send({
                     from: sender.address,
                     feeDelegation: true,
                     feePayer: feePayer.address,
                     gas: 100000000,
                     contractDeployFormatter,
-                },
-                byteCodeWithConstructor,
-                'keykey',
-                'valuevalue'
-            )
-
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-290: contract.methods.set(arguments).send({ from, feeDelegation: true, feePayer, ... }) will execute the contract`, async () => {
-			const contract = new caver.contract(abiWithConstructor, contractAddress)
-			
-			const newKey = 'jasmine'
-			const newValue = 'valuable'
-            const result = await contract.methods.set(newKey, newValue).send({ 
-				from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-				gas: 1000000,
-			})
-            expect(result.from).to.equal(sender.address)
-			expect(result.status).to.be.true
-            expect(result.feePayer).to.equal(feePayer.address)
-            expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
-			
-			const value = await contract.methods.get(newKey).call({ from: sender.address })
-            expect(value).to.equal(newValue)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-291: contract.methods['set'](arguments).send({ from, feeDelegation: true, feePayer, ... }) will execute the contract`, async () => {
-            const contract = new caver.contract(abiWithConstructor, contractAddress)
-
-			const newKey = 'caver-js'
-			const newValue = 'so nice'
-
-            // contract.methods['set'] formatted to contract.methods.set by linter
-            // So eslint disable comment have to be added to block formatting
-            // eslint-disable-next-line dot-notation
-            const result = await contract.methods['set'](newKey, newValue).send({ 
-				from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-				gas: 1000000,
-			})
-            expect(result.from).to.equal(sender.address)
-			expect(result.status).to.be.true
-            expect(result.feePayer).to.equal(feePayer.address)
-            expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
-			
-            // eslint-disable-next-line dot-notation
-			const value = await contract.methods['get'](newKey).call({ from: sender.address })
-            expect(value).to.equal(newValue)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-292: contract.send({ from, feeDelegation: true, feePayer, ... }, functionName, arguments) will execute the contract`, async () => {
-            const contract = new caver.contract(abiWithConstructor, contractAddress)
-
-			const newKey = 'contract'
-			const newValue = 'so convenient'
-
-            const result = await contract.send({ 
-				from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-				gas: 1000000,
-			}, 'set', newKey, newValue)
-            expect(result.from).to.equal(sender.address)
-			expect(result.status).to.be.true
-            expect(result.feePayer).to.equal(feePayer.address)
-            expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
-			
-			const value = await contract.call('get', newKey)
-            expect(value).to.equal(newValue)
-        }).timeout(200000)
-    })
-
-    context('Partial Fee Delegation transaction via caver.contract (TxTypeFeeDelegatedSmartContractDeployWithRatio/TxTypeFeeDelegatedSmartContractExecutionWithRatio)', () => {
-        it('CAVERJS-UNIT-ETC-293: contract.deploy({ data }).send({ from, feeDelegation: true, feePayer, feeRatio, ... }) deploys contract', async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-            const deployed = await contract.deploy({ data: byteCodeWithoutConstructor }).send({
-                from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-                feeRatio: 30,
-                gas: 1000000,
-                contractDeployFormatter,
-            })
-
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
-
-        it('CAVERJS-UNIT-ETC-294: contract.deploy({ data, arguments }).send({ from, feeDelegation: true, feePayer, feeRatio, ... }) deploys contract', async () => {
-            const contract = new caver.contract(abiWithConstructor)
-
-            keyString = 'keyString'
-            valueString = 'valueString'
-
-            const deployed = await contract
-                .deploy({
-                    data: byteCodeWithConstructor,
-                    arguments: [keyString, valueString],
                 })
-                .send({
+
+                expect(deployed.from).to.equal(sender.address)
+                expect(deployed.feePayer).to.equal(feePayer.address)
+                expect(deployed.status).to.be.true
+                expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-286: contract.methods.constructor(byteCode).send({ from, feeDelegation: true, feePayer, ... }) deploys contract`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+
+                const deployed = await contract.methods.constructor(byteCodeWithoutConstructor).send({
                     from: sender.address,
                     feeDelegation: true,
                     feePayer: feePayer.address,
-                    feeRatio: 30,
-                    gas: 100000000,
+                    gas: 1000000,
                     contractDeployFormatter,
                 })
 
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+                expect(deployed.from).to.equal(sender.address)
+                expect(deployed.feePayer).to.equal(feePayer.address)
+                expect(deployed.status).to.be.true
+                expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
 
-            contractAddress = deployed.contractAddress
-        }).timeout(200000)
+            it(`CAVERJS-UNIT-ETC-287: contract.methods.constructor(byteCode, arguments).send({ from, feeDelegation: true, feePayer, ... }) deploys contract`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
 
-        it(`CAVERJS-UNIT-ETC-295: contract.methods['constructor'](byteCode).send({ from, feeDelegation: true, feePayer, feeRatio, ... }) deploys contract`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
+                const deployed = await contract.methods.constructor(byteCodeWithConstructor, 'thisIsKeyString', 'thisIsValueString').send({
+                    from: sender.address,
+                    feeDelegation: true,
+                    feePayer: feePayer.address,
+                    gas: 1000000,
+                    contractDeployFormatter,
+                })
 
-            // contract.methods['constructor'] formatted to contract.methods.constructor by linter
-            // So eslint disable comment have to be added to block formatting
-            // eslint-disable-next-line dot-notation
-            const deployed = await contract.methods['constructor'](byteCodeWithoutConstructor).send({
-                from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-                feeRatio: 30,
-                gas: 1000000,
-                contractDeployFormatter,
-            })
+                expect(deployed.from).to.equal(sender.address)
+                expect(deployed.feePayer).to.equal(feePayer.address)
+                expect(deployed.status).to.be.true
+                expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
 
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
+            it(`CAVERJS-UNIT-ETC-288: contract.deploy({ from, feeDelegation: true, feePayer, ... }, byteCode) deploys contract`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+                const deployed = await contract.deploy(
+                    {
+                        from: sender.address,
+                        feeDelegation: true,
+                        feePayer: feePayer.address,
+                        gas: 1000000,
+                        contractDeployFormatter,
+                    },
+                    byteCodeWithoutConstructor
+                )
 
-        it(`CAVERJS-UNIT-ETC-296: contract.methods['constructor'](byteCode, arguments).send({ from, feeDelegation: true, feePayer, feeRatio, ... }) deploys contract`, async () => {
-            const contract = new caver.contract(abiWithConstructor)
+                expect(deployed.from).to.equal(sender.address)
+                expect(deployed.feePayer).to.equal(feePayer.address)
+                expect(deployed.status).to.be.true
+                expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
 
-            // contract.methods['constructor'] formatted to contract.methods.constructor by linter
-            // So eslint disable comment have to be added to block formatting
-            // eslint-disable-next-line dot-notation
-            const deployed = await contract.methods['constructor'](byteCodeWithConstructor, 'keykey', 'valuevalue').send({
-                from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-                feeRatio: 30,
-                gas: 100000000,
-                contractDeployFormatter,
-            })
+            it(`CAVERJS-UNIT-ETC-289: contract.deploy({ from, feeDelegation: true, feePayer, ... }, byteCode, arguements) deploys contract`, async () => {
+                const contract = new caver.contract(abiWithConstructor)
+                const deployed = await contract.deploy(
+                    {
+                        from: sender.address,
+                        feeDelegation: true,
+                        feePayer: feePayer.address,
+                        gas: 100000000,
+                        contractDeployFormatter,
+                    },
+                    byteCodeWithConstructor,
+                    'keykey',
+                    'valuevalue'
+                )
 
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
+                expect(deployed.from).to.equal(sender.address)
+                expect(deployed.feePayer).to.equal(feePayer.address)
+                expect(deployed.status).to.be.true
+                expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
 
-        it(`CAVERJS-UNIT-ETC-297: contract.methods.constructor(byteCode).send({ from, feeDelegation: true, feePayer, feeRatio, ... }) deploys contract`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
+            it(`CAVERJS-UNIT-ETC-290: contract.methods.set(arguments).send({ from, feeDelegation: true, feePayer, ... }) will execute the contract`, async () => {
+                const contract = new caver.contract(abiWithConstructor, contractAddress)
 
-            const deployed = await contract.methods.constructor(byteCodeWithoutConstructor).send({
-                from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-                feeRatio: 30,
-                gas: 1000000,
-                contractDeployFormatter,
-            })
+                const newKey = 'jasmine'
+                const newValue = 'valuable'
+                const result = await contract.methods.set(newKey, newValue).send({
+                    from: sender.address,
+                    feeDelegation: true,
+                    feePayer: feePayer.address,
+                    gas: 1000000,
+                })
+                expect(result.from).to.equal(sender.address)
+                expect(result.status).to.be.true
+                expect(result.feePayer).to.equal(feePayer.address)
+                expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
 
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
+                const value = await contract.methods.get(newKey).call({ from: sender.address })
+                expect(value).to.equal(newValue)
+            }).timeout(200000)
 
-        it(`CAVERJS-UNIT-ETC-298: contract.methods.constructor(byteCode, arguments).send({ from, feeDelegation: true, feePayer, feeRatio, ... }) deploys contract`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
+            it(`CAVERJS-UNIT-ETC-291: contract.methods['set'](arguments).send({ from, feeDelegation: true, feePayer, ... }) will execute the contract`, async () => {
+                const contract = new caver.contract(abiWithConstructor, contractAddress)
 
-            const deployed = await contract.methods.constructor(byteCodeWithConstructor, 'thisIsKeyString', 'thisIsValueString').send({
-                from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-                feeRatio: 30,
-                gas: 1000000,
-                contractDeployFormatter,
-            })
+                const newKey = 'caver-js'
+                const newValue = 'so nice'
 
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
+                // contract.methods['set'] formatted to contract.methods.set by linter
+                // So eslint disable comment have to be added to block formatting
+                // eslint-disable-next-line dot-notation
+                const result = await contract.methods['set'](newKey, newValue).send({
+                    from: sender.address,
+                    feeDelegation: true,
+                    feePayer: feePayer.address,
+                    gas: 1000000,
+                })
+                expect(result.from).to.equal(sender.address)
+                expect(result.status).to.be.true
+                expect(result.feePayer).to.equal(feePayer.address)
+                expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
 
-        it(`CAVERJS-UNIT-ETC-299: contract.deploy({ from, feeDelegation: true, feePayer, feeRatio, ... }, byteCode) deploys contract`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-            const deployed = await contract.deploy(
-                {
+                // eslint-disable-next-line dot-notation
+                const value = await contract.methods['get'](newKey).call({ from: sender.address })
+                expect(value).to.equal(newValue)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-292: contract.send({ from, feeDelegation: true, feePayer, ... }, functionName, arguments) will execute the contract`, async () => {
+                const contract = new caver.contract(abiWithConstructor, contractAddress)
+
+                const newKey = 'contract'
+                const newValue = 'so convenient'
+
+                const result = await contract.send(
+                    {
+                        from: sender.address,
+                        feeDelegation: true,
+                        feePayer: feePayer.address,
+                        gas: 1000000,
+                    },
+                    'set',
+                    newKey,
+                    newValue
+                )
+                expect(result.from).to.equal(sender.address)
+                expect(result.status).to.be.true
+                expect(result.feePayer).to.equal(feePayer.address)
+                expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+
+                const value = await contract.call('get', newKey)
+                expect(value).to.equal(newValue)
+            }).timeout(200000)
+        }
+    )
+
+    context(
+        'Partial Fee Delegation transaction via caver.contract (TxTypeFeeDelegatedSmartContractDeployWithRatio/TxTypeFeeDelegatedSmartContractExecutionWithRatio)',
+        () => {
+            it('CAVERJS-UNIT-ETC-293: contract.deploy({ data }).send({ from, feeDelegation: true, feePayer, feeRatio, ... }) deploys contract', async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+                const deployed = await contract.deploy({ data: byteCodeWithoutConstructor }).send({
                     from: sender.address,
                     feeDelegation: true,
                     feePayer: feePayer.address,
                     feeRatio: 30,
                     gas: 1000000,
                     contractDeployFormatter,
-                },
-                byteCodeWithoutConstructor
-            )
+                })
 
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
+                expect(deployed.from).to.equal(sender.address)
+                expect(deployed.feePayer).to.equal(feePayer.address)
+                expect(deployed.status).to.be.true
+                expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
 
-        it(`CAVERJS-UNIT-ETC-300: contract.deploy({ from, feeDelegation: true, feePayer, feeRatio, ... }, byteCode, arguements) deploys contract`, async () => {
-            const contract = new caver.contract(abiWithConstructor)
-            const deployed = await contract.deploy(
-                {
+            it('CAVERJS-UNIT-ETC-294: contract.deploy({ data, arguments }).send({ from, feeDelegation: true, feePayer, feeRatio, ... }) deploys contract', async () => {
+                const contract = new caver.contract(abiWithConstructor)
+
+                keyString = 'keyString'
+                valueString = 'valueString'
+
+                const deployed = await contract
+                    .deploy({
+                        data: byteCodeWithConstructor,
+                        arguments: [keyString, valueString],
+                    })
+                    .send({
+                        from: sender.address,
+                        feeDelegation: true,
+                        feePayer: feePayer.address,
+                        feeRatio: 30,
+                        gas: 100000000,
+                        contractDeployFormatter,
+                    })
+
+                expect(deployed.from).to.equal(sender.address)
+                expect(deployed.feePayer).to.equal(feePayer.address)
+                expect(deployed.status).to.be.true
+                expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+
+                contractAddress = deployed.contractAddress
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-295: contract.methods['constructor'](byteCode).send({ from, feeDelegation: true, feePayer, feeRatio, ... }) deploys contract`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+
+                // contract.methods['constructor'] formatted to contract.methods.constructor by linter
+                // So eslint disable comment have to be added to block formatting
+                // eslint-disable-next-line dot-notation
+                const deployed = await contract.methods['constructor'](byteCodeWithoutConstructor).send({
+                    from: sender.address,
+                    feeDelegation: true,
+                    feePayer: feePayer.address,
+                    feeRatio: 30,
+                    gas: 1000000,
+                    contractDeployFormatter,
+                })
+
+                expect(deployed.from).to.equal(sender.address)
+                expect(deployed.feePayer).to.equal(feePayer.address)
+                expect(deployed.status).to.be.true
+                expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-296: contract.methods['constructor'](byteCode, arguments).send({ from, feeDelegation: true, feePayer, feeRatio, ... }) deploys contract`, async () => {
+                const contract = new caver.contract(abiWithConstructor)
+
+                // contract.methods['constructor'] formatted to contract.methods.constructor by linter
+                // So eslint disable comment have to be added to block formatting
+                // eslint-disable-next-line dot-notation
+                const deployed = await contract.methods['constructor'](byteCodeWithConstructor, 'keykey', 'valuevalue').send({
                     from: sender.address,
                     feeDelegation: true,
                     feePayer: feePayer.address,
                     feeRatio: 30,
                     gas: 100000000,
                     contractDeployFormatter,
-                },
-                byteCodeWithConstructor,
-                'keykey',
-                'valuevalue'
-            )
+                })
 
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
+                expect(deployed.from).to.equal(sender.address)
+                expect(deployed.feePayer).to.equal(feePayer.address)
+                expect(deployed.status).to.be.true
+                expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
 
-        it(`CAVERJS-UNIT-ETC-301: contract.methods.set(arguments).send({ from, feeDelegation: true, feePayer, feeRatio, ... }) will execute the contract`, async () => {
-			const contract = new caver.contract(abiWithConstructor, contractAddress)
-			
-			const newKey = 'jasmine'
-			const newValue = 'valuable'
-            const result = await contract.methods.set(newKey, newValue).send({ 
-				from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-                feeRatio: 30,
-				gas: 1000000,
-			})
-            expect(result.from).to.equal(sender.address)
-			expect(result.status).to.be.true
-            expect(result.feePayer).to.equal(feePayer.address)
-            expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
-			
-			const value = await contract.methods.get(newKey).call({ from: sender.address })
-            expect(value).to.equal(newValue)
-        }).timeout(200000)
+            it(`CAVERJS-UNIT-ETC-297: contract.methods.constructor(byteCode).send({ from, feeDelegation: true, feePayer, feeRatio, ... }) deploys contract`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
 
-        it(`CAVERJS-UNIT-ETC-302: contract.methods['set'](arguments).send({ from, feeDelegation: true, feePayer, feeRatio, ... }) will execute the contract`, async () => {
-            const contract = new caver.contract(abiWithConstructor, contractAddress)
+                const deployed = await contract.methods.constructor(byteCodeWithoutConstructor).send({
+                    from: sender.address,
+                    feeDelegation: true,
+                    feePayer: feePayer.address,
+                    feeRatio: 30,
+                    gas: 1000000,
+                    contractDeployFormatter,
+                })
 
-			const newKey = 'caver-js'
-			const newValue = 'so nice'
+                expect(deployed.from).to.equal(sender.address)
+                expect(deployed.feePayer).to.equal(feePayer.address)
+                expect(deployed.status).to.be.true
+                expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
 
-            // contract.methods['set'] formatted to contract.methods.set by linter
-            // So eslint disable comment have to be added to block formatting
-            // eslint-disable-next-line dot-notation
-            const result = await contract.methods['set'](newKey, newValue).send({ 
-				from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-                feeRatio: 30,
-				gas: 1000000,
-			})
-            expect(result.from).to.equal(sender.address)
-			expect(result.status).to.be.true
-            expect(result.feePayer).to.equal(feePayer.address)
-            expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
-			
-            // eslint-disable-next-line dot-notation
-			const value = await contract.methods['get'](newKey).call({ from: sender.address })
-            expect(value).to.equal(newValue)
-        }).timeout(200000)
+            it(`CAVERJS-UNIT-ETC-298: contract.methods.constructor(byteCode, arguments).send({ from, feeDelegation: true, feePayer, feeRatio, ... }) deploys contract`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
 
-        it(`CAVERJS-UNIT-ETC-303: contract.send({ from, feeDelegation: true, feePayer, feeRatio, ... }, functionName, arguments) will execute the contract`, async () => {
-            const contract = new caver.contract(abiWithConstructor, contractAddress)
+                const deployed = await contract.methods.constructor(byteCodeWithConstructor, 'thisIsKeyString', 'thisIsValueString').send({
+                    from: sender.address,
+                    feeDelegation: true,
+                    feePayer: feePayer.address,
+                    feeRatio: 30,
+                    gas: 1000000,
+                    contractDeployFormatter,
+                })
 
-			const newKey = 'contract'
-			const newValue = 'so convenient'
+                expect(deployed.from).to.equal(sender.address)
+                expect(deployed.feePayer).to.equal(feePayer.address)
+                expect(deployed.status).to.be.true
+                expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
 
-            const result = await contract.send({ 
-				from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-                feeRatio: 30,
-				gas: 1000000,
-			}, 'set', newKey, newValue)
-            expect(result.from).to.equal(sender.address)
-			expect(result.status).to.be.true
-            expect(result.feePayer).to.equal(feePayer.address)
-            expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
-			
-			const value = await contract.call('get', newKey)
-            expect(value).to.equal(newValue)
-        }).timeout(200000)
-    })
+            it(`CAVERJS-UNIT-ETC-299: contract.deploy({ from, feeDelegation: true, feePayer, feeRatio, ... }, byteCode) deploys contract`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+                const deployed = await contract.deploy(
+                    {
+                        from: sender.address,
+                        feeDelegation: true,
+                        feePayer: feePayer.address,
+                        feeRatio: 30,
+                        gas: 1000000,
+                        contractDeployFormatter,
+                    },
+                    byteCodeWithoutConstructor
+                )
+
+                expect(deployed.from).to.equal(sender.address)
+                expect(deployed.feePayer).to.equal(feePayer.address)
+                expect(deployed.status).to.be.true
+                expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-300: contract.deploy({ from, feeDelegation: true, feePayer, feeRatio, ... }, byteCode, arguements) deploys contract`, async () => {
+                const contract = new caver.contract(abiWithConstructor)
+                const deployed = await contract.deploy(
+                    {
+                        from: sender.address,
+                        feeDelegation: true,
+                        feePayer: feePayer.address,
+                        feeRatio: 30,
+                        gas: 100000000,
+                        contractDeployFormatter,
+                    },
+                    byteCodeWithConstructor,
+                    'keykey',
+                    'valuevalue'
+                )
+
+                expect(deployed.from).to.equal(sender.address)
+                expect(deployed.feePayer).to.equal(feePayer.address)
+                expect(deployed.status).to.be.true
+                expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-301: contract.methods.set(arguments).send({ from, feeDelegation: true, feePayer, feeRatio, ... }) will execute the contract`, async () => {
+                const contract = new caver.contract(abiWithConstructor, contractAddress)
+
+                const newKey = 'jasmine'
+                const newValue = 'valuable'
+                const result = await contract.methods.set(newKey, newValue).send({
+                    from: sender.address,
+                    feeDelegation: true,
+                    feePayer: feePayer.address,
+                    feeRatio: 30,
+                    gas: 1000000,
+                })
+                expect(result.from).to.equal(sender.address)
+                expect(result.status).to.be.true
+                expect(result.feePayer).to.equal(feePayer.address)
+                expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+
+                const value = await contract.methods.get(newKey).call({ from: sender.address })
+                expect(value).to.equal(newValue)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-302: contract.methods['set'](arguments).send({ from, feeDelegation: true, feePayer, feeRatio, ... }) will execute the contract`, async () => {
+                const contract = new caver.contract(abiWithConstructor, contractAddress)
+
+                const newKey = 'caver-js'
+                const newValue = 'so nice'
+
+                // contract.methods['set'] formatted to contract.methods.set by linter
+                // So eslint disable comment have to be added to block formatting
+                // eslint-disable-next-line dot-notation
+                const result = await contract.methods['set'](newKey, newValue).send({
+                    from: sender.address,
+                    feeDelegation: true,
+                    feePayer: feePayer.address,
+                    feeRatio: 30,
+                    gas: 1000000,
+                })
+                expect(result.from).to.equal(sender.address)
+                expect(result.status).to.be.true
+                expect(result.feePayer).to.equal(feePayer.address)
+                expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+
+                // eslint-disable-next-line dot-notation
+                const value = await contract.methods['get'](newKey).call({ from: sender.address })
+                expect(value).to.equal(newValue)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-303: contract.send({ from, feeDelegation: true, feePayer, feeRatio, ... }, functionName, arguments) will execute the contract`, async () => {
+                const contract = new caver.contract(abiWithConstructor, contractAddress)
+
+                const newKey = 'contract'
+                const newValue = 'so convenient'
+
+                const result = await contract.send(
+                    {
+                        from: sender.address,
+                        feeDelegation: true,
+                        feePayer: feePayer.address,
+                        feeRatio: 30,
+                        gas: 1000000,
+                    },
+                    'set',
+                    newKey,
+                    newValue
+                )
+                expect(result.from).to.equal(sender.address)
+                expect(result.status).to.be.true
+                expect(result.feePayer).to.equal(feePayer.address)
+                expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+
+                const value = await contract.call('get', newKey)
+                expect(value).to.equal(newValue)
+            }).timeout(200000)
+        }
+    )
 
     context('Sign the Basic transaction via caver.contract (TxTypeSmartContractDeploy/TxTypeSmartContractExecution)', () => {
         it(`CAVERJS-UNIT-ETC-304: contract.deploy({ data }).sign({ from, ... }) will create a transaction and sign the transaction as a sender`, async () => {
@@ -818,13 +838,15 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
         it(`CAVERJS-UNIT-ETC-305: contract.deploy({ data, arguments }).sign({ from, ... }) will create a transaction and sign the transaction as a sender`, async () => {
             const contract = new caver.contract(abiWithConstructor)
 
-            const signed = await contract.deploy({
-                data: byteCodeWithConstructor,
-                arguments: [keyString, valueString]
-            }).sign({
-                from: sender.address,
-                gas: 1000000,
-            })
+            const signed = await contract
+                .deploy({
+                    data: byteCodeWithConstructor,
+                    arguments: [keyString, valueString],
+                })
+                .sign({
+                    from: sender.address,
+                    gas: 1000000,
+                })
 
             expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
             expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeSmartContractDeploy)
@@ -917,10 +939,14 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
         it(`CAVERJS-UNIT-ETC-310: contract.sign({ from, ... }, 'constructor', byteCode) will create a transaction and sign the transaction as a sender`, async () => {
             const contract = new caver.contract(abiWithoutConstructor)
 
-            const signed = await contract.sign({ 
-				from: sender.address,
-				gas: 1000000,
-			}, 'constructor', byteCodeWithoutConstructor)
+            const signed = await contract.sign(
+                {
+                    from: sender.address,
+                    gas: 1000000,
+                },
+                'constructor',
+                byteCodeWithoutConstructor
+            )
 
             expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
             expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeSmartContractDeploy)
@@ -935,10 +961,16 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
         it(`CAVERJS-UNIT-ETC-311: contract.sign({ from, ... }, 'constructor', byteCode, arguments) will create a transaction and sign the transaction as a sender`, async () => {
             const contract = new caver.contract(abiWithConstructor)
 
-            const signed = await contract.sign({ 
-				from: sender.address,
-				gas: 1000000,
-			}, 'constructor', byteCodeWithConstructor, 'keyForSign', 'valueForSign')
+            const signed = await contract.sign(
+                {
+                    from: sender.address,
+                    gas: 1000000,
+                },
+                'constructor',
+                byteCodeWithConstructor,
+                'keyForSign',
+                'valueForSign'
+            )
 
             expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
             expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeSmartContractDeploy)
@@ -954,11 +986,11 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             const contract = new caver.contract(abiWithConstructor, contractAddress)
 
             const newKey = 'contract'
-			const newValue = 'testing'
-            const signed = await contract.methods.set(newKey, newValue).sign({ 
-				from: sender.address,
-				gas: 1000000,
-			})
+            const newValue = 'testing'
+            const signed = await contract.methods.set(newKey, newValue).sign({
+                from: sender.address,
+                gas: 1000000,
+            })
 
             expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
             expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeSmartContractExecution)
@@ -968,8 +1000,8 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(receipt.from).to.equal(sender.address)
             expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
             expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeSmartContractExecution)
-			
-			const value = await contract.methods.get(newKey).call({ from: sender.address })
+
+            const value = await contract.methods.get(newKey).call({ from: sender.address })
             expect(value).to.equal(newValue)
         }).timeout(200000)
 
@@ -982,10 +1014,10 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             // contract.methods['set'] formatted to contract.methods.set by linter
             // So eslint disable comment have to be added to block formatting
             // eslint-disable-next-line dot-notation
-            const signed = await contract.methods['set'](newKey, newValue).sign({ 
-				from: sender.address,
-				gas: 1000000,
-			})
+            const signed = await contract.methods['set'](newKey, newValue).sign({
+                from: sender.address,
+                gas: 1000000,
+            })
 
             expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
             expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeSmartContractExecution)
@@ -995,8 +1027,8 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(receipt.from).to.equal(sender.address)
             expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
             expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeSmartContractExecution)
-			
-			const value = await contract.methods.get(newKey).call({ from: sender.address })
+
+            const value = await contract.methods.get(newKey).call({ from: sender.address })
             expect(value).to.equal(newValue)
         }).timeout(200000)
 
@@ -1006,10 +1038,15 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             const newKey = 'contract sign func'
             const newValue = 'should return signed tx'
 
-            const signed = await contract.sign({ 
-				from: sender.address,
-				gas: 1000000,
-			}, 'set', newKey, newValue)
+            const signed = await contract.sign(
+                {
+                    from: sender.address,
+                    gas: 1000000,
+                },
+                'set',
+                newKey,
+                newValue
+            )
 
             expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
             expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeSmartContractExecution)
@@ -1019,1094 +1056,1174 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(receipt.from).to.equal(sender.address)
             expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
             expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeSmartContractExecution)
-			
-			const value = await contract.methods.get(newKey).call({ from: sender.address })
+
+            const value = await contract.methods.get(newKey).call({ from: sender.address })
             expect(value).to.equal(newValue)
         }).timeout(200000)
     })
 
-    context('Sign the Fee Delegation transaction via caver.contract (TxTypeFeeDelegatedSmartContractDeploy/TxTypeFeeDelegatedSmartContractExecution)', () => {
-        it(`CAVERJS-UNIT-ETC-315: contract.deploy({ data }).sign({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-
-            const signed = await contract.deploy({ data: byteCodeWithoutConstructor }).sign({
-                from: sender.address,
-                feeDelegation: true,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-316: contract.deploy({ data, arguments }).sign({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithConstructor)
-
-            const signed = await contract.deploy({
-                data: byteCodeWithConstructor,
-                arguments: [keyString, valueString]
-            }).sign({
-                from: sender.address,
-                feeDelegation: true,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-317: contract.methods['constructor'](byteCode).sign({ from, feeDelegation: true,  ... }) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-
-            // contract.methods['constructor'] formatted to contract.methods.constructor by linter
-            // So eslint disable comment have to be added to block formatting
-            // eslint-disable-next-line dot-notation
-            const signed = await contract.methods['constructor'](byteCodeWithoutConstructor).sign({
-                from: sender.address,
-                feeDelegation: true,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-318: contract.methods['constructor'](byteCode, arguments).sign({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithConstructor)
-
-            // contract.methods['constructor'] formatted to contract.methods.constructor by linter
-            // So eslint disable comment have to be added to block formatting
-            // eslint-disable-next-line dot-notation
-            const signed = await contract.methods['constructor'](byteCodeWithConstructor, 'keykey', 'valuevalue').sign({
-                from: sender.address,
-                feeDelegation: true,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-            
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-319: contract.methods.constructor(byteCode).sign({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-
-            const signed = await contract.methods.constructor(byteCodeWithoutConstructor).sign({
-                from: sender.address,
-                feeDelegation: true,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-320: contract.methods.constructor(byteCode, arguments).sign({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithConstructor)
-
-            const signed = await contract.methods.constructor(byteCodeWithConstructor, 'k', 'v').sign({
-                from: sender.address,
-                feeDelegation: true,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-321: contract.sign({ from, feeDelegation: true, ... }, 'constructor', byteCode) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-
-            const signed = await contract.sign({ 
-                from: sender.address,
-                feeDelegation: true,
-				gas: 1000000,
-			}, 'constructor', byteCodeWithoutConstructor)
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-322: contract.sign({ from, feeDelegation: true, ... }, 'constructor', byteCode, arguments) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithConstructor)
-
-            const signed = await contract.sign({ 
-                from: sender.address,
-                feeDelegation: true,
-				gas: 1000000,
-			}, 'constructor', byteCodeWithConstructor, 'keyForSign', 'valueForSign')
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-323: contract.methods.set(arguments).sign({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithConstructor, contractAddress)
-
-            const newKey = 'contract'
-			const newValue = 'testing'
-            const signed = await contract.methods.set(newKey, newValue).sign({ 
-                from: sender.address,
-                feeDelegation: true,
-				gas: 1000000,
-			})
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
-
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
-			
-			const value = await contract.methods.get(newKey).call({ from: sender.address })
-            expect(value).to.equal(newValue)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-324: contract.methods['set'](arguments).sign({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithConstructor, contractAddress)
-
-            const newKey = 'how are you'
-            const newValue = 'im fine'
-
-            // contract.methods['set'] formatted to contract.methods.set by linter
-            // So eslint disable comment have to be added to block formatting
-            // eslint-disable-next-line dot-notation
-            const signed = await contract.methods['set'](newKey, newValue).sign({ 
-                from: sender.address,
-                feeDelegation: true,
-				gas: 1000000,
-			})
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
-
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
-			
-			const value = await contract.methods.get(newKey).call({ from: sender.address })
-            expect(value).to.equal(newValue)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-325: contract.sign({ from, feeDelegation: true, ... }, functionName, arguments) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor, contractAddress)
-
-            const newKey = 'contract sign func'
-            const newValue = 'should return signed tx'
-
-            const signed = await contract.sign({ 
-                from: sender.address,
-                feeDelegation: true,
-				gas: 1000000,
-			}, 'set', newKey, newValue)
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
-
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
-			
-			const value = await contract.methods.get(newKey).call({ from: sender.address })
-            expect(value).to.equal(newValue)
-        }).timeout(200000)
-    })
-
-    context('Sign the Partial Fee Delegation transaction via caver.contract (TxTypeFeeDelegatedSmartContractDeployWithRatio/TxTypeFeeDelegatedSmartContractExecutionWithRatio)', () => {
-        it(`CAVERJS-UNIT-ETC-326: contract.deploy({ data }).sign({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-
-            const signed = await contract.deploy({ data: byteCodeWithoutConstructor }).sign({
-                from: sender.address,
-                feeDelegation: true,
-                feeRatio: 30,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-327: contract.deploy({ data, arguments }).sign({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithConstructor)
-
-            const signed = await contract.deploy({
-                data: byteCodeWithConstructor,
-                arguments: [keyString, valueString]
-            }).sign({
-                from: sender.address,
-                feeDelegation: true,
-                feeRatio: 30,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-328: contract.methods['constructor'](byteCode).sign({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-
-            // contract.methods['constructor'] formatted to contract.methods.constructor by linter
-            // So eslint disable comment have to be added to block formatting
-            // eslint-disable-next-line dot-notation
-            const signed = await contract.methods['constructor'](byteCodeWithoutConstructor).sign({
-                from: sender.address,
-                feeDelegation: true,
-                feeRatio: 30,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-329: contract.methods['constructor'](byteCode, arguments).sign({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithConstructor)
-
-            // contract.methods['constructor'] formatted to contract.methods.constructor by linter
-            // So eslint disable comment have to be added to block formatting
-            // eslint-disable-next-line dot-notation
-            const signed = await contract.methods['constructor'](byteCodeWithConstructor, 'keykey', 'valuevalue').sign({
-                from: sender.address,
-                feeDelegation: true,
-                feeRatio: 30,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-            
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-330: contract.methods.constructor(byteCode).sign({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-
-            const signed = await contract.methods.constructor(byteCodeWithoutConstructor).sign({
-                from: sender.address,
-                feeDelegation: true,
-                feeRatio: 30,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-331: contract.methods.constructor(byteCode, arguments).sign({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithConstructor)
-
-            const signed = await contract.methods.constructor(byteCodeWithConstructor, 'k', 'v').sign({
-                from: sender.address,
-                feeDelegation: true,
-                feeRatio: 30,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-332: contract.sign({ from, feeDelegation: true, feeRatio, ... }, 'constructor', byteCode) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-
-            const signed = await contract.sign({ 
-                from: sender.address,
-                feeDelegation: true,
-                feeRatio: 30,
-				gas: 1000000,
-			}, 'constructor', byteCodeWithoutConstructor)
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-333: contract.sign({ from, feeDelegation: true, feeRatio, ... }, 'constructor', byteCode, arguments) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithConstructor)
-
-            const signed = await contract.sign({ 
-                from: sender.address,
-                feeDelegation: true,
-                feeRatio: 30,
-				gas: 1000000,
-			}, 'constructor', byteCodeWithConstructor, 'keyForSign', 'valueForSign')
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-334: contract.methods.set(arguments).sign({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithConstructor, contractAddress)
-
-            const newKey = 'contract'
-			const newValue = 'testing'
-            const signed = await contract.methods.set(newKey, newValue).sign({ 
-                from: sender.address,
-                feeDelegation: true,
-                feeRatio: 30,
-				gas: 1000000,
-			})
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
-
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
-			
-			const value = await contract.methods.get(newKey).call({ from: sender.address })
-            expect(value).to.equal(newValue)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-335: contract.methods['set'](arguments).sign({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithConstructor, contractAddress)
-
-            const newKey = 'how are you'
-            const newValue = 'im fine'
-
-            // contract.methods['set'] formatted to contract.methods.set by linter
-            // So eslint disable comment have to be added to block formatting
-            // eslint-disable-next-line dot-notation
-            const signed = await contract.methods['set'](newKey, newValue).sign({ 
-                from: sender.address,
-                feeDelegation: true,
-                feeRatio: 30,
-				gas: 1000000,
-			})
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
-
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
-			
-			const value = await contract.methods.get(newKey).call({ from: sender.address })
-            expect(value).to.equal(newValue)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-336: contract.sign({ from, feeDelegation: true, feeRatio, ... }, functionName, arguments) will create a transaction and sign the transaction as a sender`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor, contractAddress)
-
-            const newKey = 'contract sign func'
-            const newValue = 'should return signed tx'
-
-            const signed = await contract.sign({ 
-                from: sender.address,
-                feeDelegation: true,
-                feeRatio: 30,
-				gas: 1000000,
-			}, 'set', newKey, newValue)
-
-            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
-
-            await caver.wallet.signAsFeePayer(feePayer.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
-			
-			const value = await contract.methods.get(newKey).call({ from: sender.address })
-            expect(value).to.equal(newValue)
-        }).timeout(200000)
-    })
-
-    context('Sign as fee payer the Fee Delegation transaction via caver.contract (TxTypeFeeDelegatedSmartContractDeploy/TxTypeFeeDelegatedSmartContractExecution)', () => {
-        it(`CAVERJS-UNIT-ETC-337: contract.deploy({ data }).signAsFeePayer({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-
-            const signed = await contract.deploy({ data: byteCodeWithoutConstructor }).signAsFeePayer({
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-338: contract.deploy({ data, arguments }).signAsFeePayer({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithConstructor)
-
-            const signed = await contract.deploy({
-                data: byteCodeWithConstructor,
-                arguments: [keyString, valueString]
-            }).signAsFeePayer({
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-339: contract.methods['constructor'](byteCode).signAsFeePayer({ from, feeDelegation: true,  ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-
-            // contract.methods['constructor'] formatted to contract.methods.constructor by linter
-            // So eslint disable comment have to be added to block formatting
-            // eslint-disable-next-line dot-notation
-            const signed = await contract.methods['constructor'](byteCodeWithoutConstructor).signAsFeePayer({
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-340: contract.methods['constructor'](byteCode, arguments).signAsFeePayer({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithConstructor)
-
-            // contract.methods['constructor'] formatted to contract.methods.constructor by linter
-            // So eslint disable comment have to be added to block formatting
-            // eslint-disable-next-line dot-notation
-            const signed = await contract.methods['constructor'](byteCodeWithConstructor, 'keykey', 'valuevalue').signAsFeePayer({
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-            
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-341: contract.methods.constructor(byteCode).signAsFeePayer({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-
-            const signed = await contract.methods.constructor(byteCodeWithoutConstructor).signAsFeePayer({
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-342: contract.methods.constructor(byteCode, arguments).signAsFeePayer({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithConstructor)
-
-            const signed = await contract.methods.constructor(byteCodeWithConstructor, 'k', 'v').signAsFeePayer({
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-343: contract.signAsFeePayer({ from, feeDelegation: true, ... }, 'constructor', byteCode) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-
-            const signed = await contract.signAsFeePayer({ 
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-				gas: 1000000,
-			}, 'constructor', byteCodeWithoutConstructor)
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-344: contract.signAsFeePayer({ from, feeDelegation: true, ... }, 'constructor', byteCode, arguments) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithConstructor)
-
-            const signed = await contract.signAsFeePayer({ 
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-				gas: 1000000,
-			}, 'constructor', byteCodeWithConstructor, 'keyForSign', 'valueForSign')
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-345: contract.methods.set(arguments).signAsFeePayer({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithConstructor, contractAddress)
-
-            const newKey = 'contract'
-			const newValue = 'testing'
-            const signed = await contract.methods.set(newKey, newValue).signAsFeePayer({ 
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-				gas: 1000000,
-			})
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
-
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
-			
-			const value = await contract.methods.get(newKey).call({ from: sender.address })
-            expect(value).to.equal(newValue)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-346: contract.methods['set'](arguments).signAsFeePayer({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithConstructor, contractAddress)
-
-            const newKey = 'how are you'
-            const newValue = 'im fine'
-
-            // contract.methods['set'] formatted to contract.methods.set by linter
-            // So eslint disable comment have to be added to block formatting
-            // eslint-disable-next-line dot-notation
-            const signed = await contract.methods['set'](newKey, newValue).signAsFeePayer({ 
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-				gas: 1000000,
-			})
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
-
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
-			
-			const value = await contract.methods.get(newKey).call({ from: sender.address })
-            expect(value).to.equal(newValue)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-347: contract.signAsFeePayer({ from, feeDelegation: true, ... }, functionName, arguments) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor, contractAddress)
-
-            const newKey = 'contract sign func'
-            const newValue = 'should return signed tx'
-
-            const signed = await contract.signAsFeePayer({ 
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-				gas: 1000000,
-			}, 'set', newKey, newValue)
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
-
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
-			
-			const value = await contract.methods.get(newKey).call({ from: sender.address })
-            expect(value).to.equal(newValue)
-        }).timeout(200000)
-    })
-
-    context('Sign as fee payerthe Partial Fee Delegation transaction via caver.contract (TxTypeFeeDelegatedSmartContractDeployWithRatio/TxTypeFeeDelegatedSmartContractExecutionWithRatio)', () => {
-        it(`CAVERJS-UNIT-ETC-348: contract.deploy({ data }).signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-
-            const signed = await contract.deploy({ data: byteCodeWithoutConstructor }).signAsFeePayer({
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-                feeRatio: 30,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-349: contract.deploy({ data, arguments }).signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithConstructor)
-
-            const signed = await contract.deploy({
-                data: byteCodeWithConstructor,
-                arguments: [keyString, valueString]
-            }).signAsFeePayer({
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-                feeRatio: 30,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.feePayer).to.equal(feePayer.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-350: contract.methods['constructor'](byteCode).signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-
-            // contract.methods['constructor'] formatted to contract.methods.constructor by linter
-            // So eslint disable comment have to be added to block formatting
-            // eslint-disable-next-line dot-notation
-            const signed = await contract.methods['constructor'](byteCodeWithoutConstructor).signAsFeePayer({
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-                feeRatio: 30,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-351: contract.methods['constructor'](byteCode, arguments).signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithConstructor)
-
-            // contract.methods['constructor'] formatted to contract.methods.constructor by linter
-            // So eslint disable comment have to be added to block formatting
-            // eslint-disable-next-line dot-notation
-            const signed = await contract.methods['constructor'](byteCodeWithConstructor, 'keykey', 'valuevalue').signAsFeePayer({
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-                feeRatio: 30,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-            
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-352: contract.methods.constructor(byteCode).signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-
-            const signed = await contract.methods.constructor(byteCodeWithoutConstructor).signAsFeePayer({
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-                feeRatio: 30,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-353: contract.methods.constructor(byteCode, arguments).signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithConstructor)
-
-            const signed = await contract.methods.constructor(byteCodeWithConstructor, 'k', 'v').signAsFeePayer({
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-                feeRatio: 30,
-                gas: 1000000,
-            })
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-354: contract.signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }, 'constructor', byteCode) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor)
-
-            const signed = await contract.signAsFeePayer({ 
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-                feeRatio: 30,
-				gas: 1000000,
-			}, 'constructor', byteCodeWithoutConstructor)
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-355: contract.signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }, 'constructor', byteCode, arguments) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithConstructor)
-
-            const signed = await contract.signAsFeePayer({ 
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-                feeRatio: 30,
-				gas: 1000000,
-			}, 'constructor', byteCodeWithConstructor, 'keyForSign', 'valueForSign')
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-356: contract.methods.set(arguments).signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithConstructor, contractAddress)
-
-            const newKey = 'contract'
-			const newValue = 'testing'
-            const signed = await contract.methods.set(newKey, newValue).signAsFeePayer({ 
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-                feeRatio: 30,
-				gas: 1000000,
-			})
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
-
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
-			
-			const value = await contract.methods.get(newKey).call({ from: sender.address })
-            expect(value).to.equal(newValue)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-357: contract.methods['set'](arguments).signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithConstructor, contractAddress)
-
-            const newKey = 'how are you'
-            const newValue = 'im fine'
-
-            // contract.methods['set'] formatted to contract.methods.set by linter
-            // So eslint disable comment have to be added to block formatting
-            // eslint-disable-next-line dot-notation
-            const signed = await contract.methods['set'](newKey, newValue).signAsFeePayer({ 
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-                feeRatio: 30,
-				gas: 1000000,
-			})
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
-
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
-			
-			const value = await contract.methods.get(newKey).call({ from: sender.address })
-            expect(value).to.equal(newValue)
-        }).timeout(200000)
-
-        it(`CAVERJS-UNIT-ETC-358: contract.signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }, functionName, arguments) will create a transaction and sign the transaction as a fee payer`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor, contractAddress)
-
-            const newKey = 'contract sign func'
-            const newValue = 'should return signed tx'
-
-            const signed = await contract.signAsFeePayer({ 
-                from: sender.address,
-                feePayer: feePayer.address,
-                feeDelegation: true,
-                feeRatio: 30,
-				gas: 1000000,
-			}, 'set', newKey, newValue)
-
-            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
-            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
-
-            await caver.wallet.sign(sender.address, signed)
-            const receipt = await caver.rpc.klay.sendRawTransaction(signed)
-
-            expect(receipt.from).to.equal(sender.address)
-            expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
-            expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
-			
-			const value = await contract.methods.get(newKey).call({ from: sender.address })
-            expect(value).to.equal(newValue)
-        }).timeout(200000)
-    })
+    context(
+        'Sign the Fee Delegation transaction via caver.contract (TxTypeFeeDelegatedSmartContractDeploy/TxTypeFeeDelegatedSmartContractExecution)',
+        () => {
+            it(`CAVERJS-UNIT-ETC-315: contract.deploy({ data }).sign({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+
+                const signed = await contract.deploy({ data: byteCodeWithoutConstructor }).sign({
+                    from: sender.address,
+                    feeDelegation: true,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-316: contract.deploy({ data, arguments }).sign({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithConstructor)
+
+                const signed = await contract
+                    .deploy({
+                        data: byteCodeWithConstructor,
+                        arguments: [keyString, valueString],
+                    })
+                    .sign({
+                        from: sender.address,
+                        feeDelegation: true,
+                        gas: 1000000,
+                    })
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-317: contract.methods['constructor'](byteCode).sign({ from, feeDelegation: true,  ... }) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+
+                // contract.methods['constructor'] formatted to contract.methods.constructor by linter
+                // So eslint disable comment have to be added to block formatting
+                // eslint-disable-next-line dot-notation
+                const signed = await contract.methods['constructor'](byteCodeWithoutConstructor).sign({
+                    from: sender.address,
+                    feeDelegation: true,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-318: contract.methods['constructor'](byteCode, arguments).sign({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithConstructor)
+
+                // contract.methods['constructor'] formatted to contract.methods.constructor by linter
+                // So eslint disable comment have to be added to block formatting
+                // eslint-disable-next-line dot-notation
+                const signed = await contract.methods['constructor'](byteCodeWithConstructor, 'keykey', 'valuevalue').sign({
+                    from: sender.address,
+                    feeDelegation: true,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-319: contract.methods.constructor(byteCode).sign({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+
+                const signed = await contract.methods.constructor(byteCodeWithoutConstructor).sign({
+                    from: sender.address,
+                    feeDelegation: true,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-320: contract.methods.constructor(byteCode, arguments).sign({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithConstructor)
+
+                const signed = await contract.methods.constructor(byteCodeWithConstructor, 'k', 'v').sign({
+                    from: sender.address,
+                    feeDelegation: true,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-321: contract.sign({ from, feeDelegation: true, ... }, 'constructor', byteCode) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+
+                const signed = await contract.sign(
+                    {
+                        from: sender.address,
+                        feeDelegation: true,
+                        gas: 1000000,
+                    },
+                    'constructor',
+                    byteCodeWithoutConstructor
+                )
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-322: contract.sign({ from, feeDelegation: true, ... }, 'constructor', byteCode, arguments) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithConstructor)
+
+                const signed = await contract.sign(
+                    {
+                        from: sender.address,
+                        feeDelegation: true,
+                        gas: 1000000,
+                    },
+                    'constructor',
+                    byteCodeWithConstructor,
+                    'keyForSign',
+                    'valueForSign'
+                )
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-323: contract.methods.set(arguments).sign({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithConstructor, contractAddress)
+
+                const newKey = 'contract'
+                const newValue = 'testing'
+                const signed = await contract.methods.set(newKey, newValue).sign({
+                    from: sender.address,
+                    feeDelegation: true,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+
+                const value = await contract.methods.get(newKey).call({ from: sender.address })
+                expect(value).to.equal(newValue)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-324: contract.methods['set'](arguments).sign({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithConstructor, contractAddress)
+
+                const newKey = 'how are you'
+                const newValue = 'im fine'
+
+                // contract.methods['set'] formatted to contract.methods.set by linter
+                // So eslint disable comment have to be added to block formatting
+                // eslint-disable-next-line dot-notation
+                const signed = await contract.methods['set'](newKey, newValue).sign({
+                    from: sender.address,
+                    feeDelegation: true,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+
+                const value = await contract.methods.get(newKey).call({ from: sender.address })
+                expect(value).to.equal(newValue)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-325: contract.sign({ from, feeDelegation: true, ... }, functionName, arguments) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor, contractAddress)
+
+                const newKey = 'contract sign func'
+                const newValue = 'should return signed tx'
+
+                const signed = await contract.sign(
+                    {
+                        from: sender.address,
+                        feeDelegation: true,
+                        gas: 1000000,
+                    },
+                    'set',
+                    newKey,
+                    newValue
+                )
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+
+                const value = await contract.methods.get(newKey).call({ from: sender.address })
+                expect(value).to.equal(newValue)
+            }).timeout(200000)
+        }
+    )
+
+    context(
+        'Sign the Partial Fee Delegation transaction via caver.contract (TxTypeFeeDelegatedSmartContractDeployWithRatio/TxTypeFeeDelegatedSmartContractExecutionWithRatio)',
+        () => {
+            it(`CAVERJS-UNIT-ETC-326: contract.deploy({ data }).sign({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+
+                const signed = await contract.deploy({ data: byteCodeWithoutConstructor }).sign({
+                    from: sender.address,
+                    feeDelegation: true,
+                    feeRatio: 30,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-327: contract.deploy({ data, arguments }).sign({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithConstructor)
+
+                const signed = await contract
+                    .deploy({
+                        data: byteCodeWithConstructor,
+                        arguments: [keyString, valueString],
+                    })
+                    .sign({
+                        from: sender.address,
+                        feeDelegation: true,
+                        feeRatio: 30,
+                        gas: 1000000,
+                    })
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-328: contract.methods['constructor'](byteCode).sign({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+
+                // contract.methods['constructor'] formatted to contract.methods.constructor by linter
+                // So eslint disable comment have to be added to block formatting
+                // eslint-disable-next-line dot-notation
+                const signed = await contract.methods['constructor'](byteCodeWithoutConstructor).sign({
+                    from: sender.address,
+                    feeDelegation: true,
+                    feeRatio: 30,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-329: contract.methods['constructor'](byteCode, arguments).sign({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithConstructor)
+
+                // contract.methods['constructor'] formatted to contract.methods.constructor by linter
+                // So eslint disable comment have to be added to block formatting
+                // eslint-disable-next-line dot-notation
+                const signed = await contract.methods['constructor'](byteCodeWithConstructor, 'keykey', 'valuevalue').sign({
+                    from: sender.address,
+                    feeDelegation: true,
+                    feeRatio: 30,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-330: contract.methods.constructor(byteCode).sign({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+
+                const signed = await contract.methods.constructor(byteCodeWithoutConstructor).sign({
+                    from: sender.address,
+                    feeDelegation: true,
+                    feeRatio: 30,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-331: contract.methods.constructor(byteCode, arguments).sign({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithConstructor)
+
+                const signed = await contract.methods.constructor(byteCodeWithConstructor, 'k', 'v').sign({
+                    from: sender.address,
+                    feeDelegation: true,
+                    feeRatio: 30,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-332: contract.sign({ from, feeDelegation: true, feeRatio, ... }, 'constructor', byteCode) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+
+                const signed = await contract.sign(
+                    {
+                        from: sender.address,
+                        feeDelegation: true,
+                        feeRatio: 30,
+                        gas: 1000000,
+                    },
+                    'constructor',
+                    byteCodeWithoutConstructor
+                )
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-333: contract.sign({ from, feeDelegation: true, feeRatio, ... }, 'constructor', byteCode, arguments) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithConstructor)
+
+                const signed = await contract.sign(
+                    {
+                        from: sender.address,
+                        feeDelegation: true,
+                        feeRatio: 30,
+                        gas: 1000000,
+                    },
+                    'constructor',
+                    byteCodeWithConstructor,
+                    'keyForSign',
+                    'valueForSign'
+                )
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-334: contract.methods.set(arguments).sign({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithConstructor, contractAddress)
+
+                const newKey = 'contract'
+                const newValue = 'testing'
+                const signed = await contract.methods.set(newKey, newValue).sign({
+                    from: sender.address,
+                    feeDelegation: true,
+                    feeRatio: 30,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+
+                const value = await contract.methods.get(newKey).call({ from: sender.address })
+                expect(value).to.equal(newValue)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-335: contract.methods['set'](arguments).sign({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithConstructor, contractAddress)
+
+                const newKey = 'how are you'
+                const newValue = 'im fine'
+
+                // contract.methods['set'] formatted to contract.methods.set by linter
+                // So eslint disable comment have to be added to block formatting
+                // eslint-disable-next-line dot-notation
+                const signed = await contract.methods['set'](newKey, newValue).sign({
+                    from: sender.address,
+                    feeDelegation: true,
+                    feeRatio: 30,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+
+                const value = await contract.methods.get(newKey).call({ from: sender.address })
+                expect(value).to.equal(newValue)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-336: contract.sign({ from, feeDelegation: true, feeRatio, ... }, functionName, arguments) will create a transaction and sign the transaction as a sender`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor, contractAddress)
+
+                const newKey = 'contract sign func'
+                const newValue = 'should return signed tx'
+
+                const signed = await contract.sign(
+                    {
+                        from: sender.address,
+                        feeDelegation: true,
+                        feeRatio: 30,
+                        gas: 1000000,
+                    },
+                    'set',
+                    newKey,
+                    newValue
+                )
+
+                expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+
+                await caver.wallet.signAsFeePayer(feePayer.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+
+                const value = await contract.methods.get(newKey).call({ from: sender.address })
+                expect(value).to.equal(newValue)
+            }).timeout(200000)
+        }
+    )
+
+    context(
+        'Sign as fee payer the Fee Delegation transaction via caver.contract (TxTypeFeeDelegatedSmartContractDeploy/TxTypeFeeDelegatedSmartContractExecution)',
+        () => {
+            it(`CAVERJS-UNIT-ETC-337: contract.deploy({ data }).signAsFeePayer({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+
+                const signed = await contract.deploy({ data: byteCodeWithoutConstructor }).signAsFeePayer({
+                    from: sender.address,
+                    feePayer: feePayer.address,
+                    feeDelegation: true,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-338: contract.deploy({ data, arguments }).signAsFeePayer({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithConstructor)
+
+                const signed = await contract
+                    .deploy({
+                        data: byteCodeWithConstructor,
+                        arguments: [keyString, valueString],
+                    })
+                    .signAsFeePayer({
+                        from: sender.address,
+                        feePayer: feePayer.address,
+                        feeDelegation: true,
+                        gas: 1000000,
+                    })
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-339: contract.methods['constructor'](byteCode).signAsFeePayer({ from, feeDelegation: true,  ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+
+                // contract.methods['constructor'] formatted to contract.methods.constructor by linter
+                // So eslint disable comment have to be added to block formatting
+                // eslint-disable-next-line dot-notation
+                const signed = await contract.methods['constructor'](byteCodeWithoutConstructor).signAsFeePayer({
+                    from: sender.address,
+                    feePayer: feePayer.address,
+                    feeDelegation: true,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-340: contract.methods['constructor'](byteCode, arguments).signAsFeePayer({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithConstructor)
+
+                // contract.methods['constructor'] formatted to contract.methods.constructor by linter
+                // So eslint disable comment have to be added to block formatting
+                // eslint-disable-next-line dot-notation
+                const signed = await contract.methods['constructor'](byteCodeWithConstructor, 'keykey', 'valuevalue').signAsFeePayer({
+                    from: sender.address,
+                    feePayer: feePayer.address,
+                    feeDelegation: true,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-341: contract.methods.constructor(byteCode).signAsFeePayer({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+
+                const signed = await contract.methods.constructor(byteCodeWithoutConstructor).signAsFeePayer({
+                    from: sender.address,
+                    feePayer: feePayer.address,
+                    feeDelegation: true,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-342: contract.methods.constructor(byteCode, arguments).signAsFeePayer({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithConstructor)
+
+                const signed = await contract.methods.constructor(byteCodeWithConstructor, 'k', 'v').signAsFeePayer({
+                    from: sender.address,
+                    feePayer: feePayer.address,
+                    feeDelegation: true,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-343: contract.signAsFeePayer({ from, feeDelegation: true, ... }, 'constructor', byteCode) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+
+                const signed = await contract.signAsFeePayer(
+                    {
+                        from: sender.address,
+                        feePayer: feePayer.address,
+                        feeDelegation: true,
+                        gas: 1000000,
+                    },
+                    'constructor',
+                    byteCodeWithoutConstructor
+                )
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-344: contract.signAsFeePayer({ from, feeDelegation: true, ... }, 'constructor', byteCode, arguments) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithConstructor)
+
+                const signed = await contract.signAsFeePayer(
+                    {
+                        from: sender.address,
+                        feePayer: feePayer.address,
+                        feeDelegation: true,
+                        gas: 1000000,
+                    },
+                    'constructor',
+                    byteCodeWithConstructor,
+                    'keyForSign',
+                    'valueForSign'
+                )
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-345: contract.methods.set(arguments).signAsFeePayer({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithConstructor, contractAddress)
+
+                const newKey = 'contract'
+                const newValue = 'testing'
+                const signed = await contract.methods.set(newKey, newValue).signAsFeePayer({
+                    from: sender.address,
+                    feePayer: feePayer.address,
+                    feeDelegation: true,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+
+                const value = await contract.methods.get(newKey).call({ from: sender.address })
+                expect(value).to.equal(newValue)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-346: contract.methods['set'](arguments).signAsFeePayer({ from, feeDelegation: true, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithConstructor, contractAddress)
+
+                const newKey = 'how are you'
+                const newValue = 'im fine'
+
+                // contract.methods['set'] formatted to contract.methods.set by linter
+                // So eslint disable comment have to be added to block formatting
+                // eslint-disable-next-line dot-notation
+                const signed = await contract.methods['set'](newKey, newValue).signAsFeePayer({
+                    from: sender.address,
+                    feePayer: feePayer.address,
+                    feeDelegation: true,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+
+                const value = await contract.methods.get(newKey).call({ from: sender.address })
+                expect(value).to.equal(newValue)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-347: contract.signAsFeePayer({ from, feeDelegation: true, ... }, functionName, arguments) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor, contractAddress)
+
+                const newKey = 'contract sign func'
+                const newValue = 'should return signed tx'
+
+                const signed = await contract.signAsFeePayer(
+                    {
+                        from: sender.address,
+                        feePayer: feePayer.address,
+                        feeDelegation: true,
+                        gas: 1000000,
+                    },
+                    'set',
+                    newKey,
+                    newValue
+                )
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+
+                const value = await contract.methods.get(newKey).call({ from: sender.address })
+                expect(value).to.equal(newValue)
+            }).timeout(200000)
+        }
+    )
+
+    context(
+        'Sign as fee payerthe Partial Fee Delegation transaction via caver.contract (TxTypeFeeDelegatedSmartContractDeployWithRatio/TxTypeFeeDelegatedSmartContractExecutionWithRatio)',
+        () => {
+            it(`CAVERJS-UNIT-ETC-348: contract.deploy({ data }).signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+
+                const signed = await contract.deploy({ data: byteCodeWithoutConstructor }).signAsFeePayer({
+                    from: sender.address,
+                    feePayer: feePayer.address,
+                    feeDelegation: true,
+                    feeRatio: 30,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-349: contract.deploy({ data, arguments }).signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithConstructor)
+
+                const signed = await contract
+                    .deploy({
+                        data: byteCodeWithConstructor,
+                        arguments: [keyString, valueString],
+                    })
+                    .signAsFeePayer({
+                        from: sender.address,
+                        feePayer: feePayer.address,
+                        feeDelegation: true,
+                        feeRatio: 30,
+                        gas: 1000000,
+                    })
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.feePayer).to.equal(feePayer.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-350: contract.methods['constructor'](byteCode).signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+
+                // contract.methods['constructor'] formatted to contract.methods.constructor by linter
+                // So eslint disable comment have to be added to block formatting
+                // eslint-disable-next-line dot-notation
+                const signed = await contract.methods['constructor'](byteCodeWithoutConstructor).signAsFeePayer({
+                    from: sender.address,
+                    feePayer: feePayer.address,
+                    feeDelegation: true,
+                    feeRatio: 30,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-351: contract.methods['constructor'](byteCode, arguments).signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithConstructor)
+
+                // contract.methods['constructor'] formatted to contract.methods.constructor by linter
+                // So eslint disable comment have to be added to block formatting
+                // eslint-disable-next-line dot-notation
+                const signed = await contract.methods['constructor'](byteCodeWithConstructor, 'keykey', 'valuevalue').signAsFeePayer({
+                    from: sender.address,
+                    feePayer: feePayer.address,
+                    feeDelegation: true,
+                    feeRatio: 30,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-352: contract.methods.constructor(byteCode).signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+
+                const signed = await contract.methods.constructor(byteCodeWithoutConstructor).signAsFeePayer({
+                    from: sender.address,
+                    feePayer: feePayer.address,
+                    feeDelegation: true,
+                    feeRatio: 30,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-353: contract.methods.constructor(byteCode, arguments).signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithConstructor)
+
+                const signed = await contract.methods.constructor(byteCodeWithConstructor, 'k', 'v').signAsFeePayer({
+                    from: sender.address,
+                    feePayer: feePayer.address,
+                    feeDelegation: true,
+                    feeRatio: 30,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-354: contract.signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }, 'constructor', byteCode) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor)
+
+                const signed = await contract.signAsFeePayer(
+                    {
+                        from: sender.address,
+                        feePayer: feePayer.address,
+                        feeDelegation: true,
+                        feeRatio: 30,
+                        gas: 1000000,
+                    },
+                    'constructor',
+                    byteCodeWithoutConstructor
+                )
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-355: contract.signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }, 'constructor', byteCode, arguments) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithConstructor)
+
+                const signed = await contract.signAsFeePayer(
+                    {
+                        from: sender.address,
+                        feePayer: feePayer.address,
+                        feeDelegation: true,
+                        feeRatio: 30,
+                        gas: 1000000,
+                    },
+                    'constructor',
+                    byteCodeWithConstructor,
+                    'keyForSign',
+                    'valueForSign'
+                )
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(caver.utils.isAddress(receipt.contractAddress)).to.be.true
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-356: contract.methods.set(arguments).signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithConstructor, contractAddress)
+
+                const newKey = 'contract'
+                const newValue = 'testing'
+                const signed = await contract.methods.set(newKey, newValue).signAsFeePayer({
+                    from: sender.address,
+                    feePayer: feePayer.address,
+                    feeDelegation: true,
+                    feeRatio: 30,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+
+                const value = await contract.methods.get(newKey).call({ from: sender.address })
+                expect(value).to.equal(newValue)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-357: contract.methods['set'](arguments).signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithConstructor, contractAddress)
+
+                const newKey = 'how are you'
+                const newValue = 'im fine'
+
+                // contract.methods['set'] formatted to contract.methods.set by linter
+                // So eslint disable comment have to be added to block formatting
+                // eslint-disable-next-line dot-notation
+                const signed = await contract.methods['set'](newKey, newValue).signAsFeePayer({
+                    from: sender.address,
+                    feePayer: feePayer.address,
+                    feeDelegation: true,
+                    feeRatio: 30,
+                    gas: 1000000,
+                })
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+
+                const value = await contract.methods.get(newKey).call({ from: sender.address })
+                expect(value).to.equal(newValue)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-358: contract.signAsFeePayer({ from, feeDelegation: true, feeRatio, ... }, functionName, arguments) will create a transaction and sign the transaction as a fee payer`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor, contractAddress)
+
+                const newKey = 'contract sign func'
+                const newValue = 'should return signed tx'
+
+                const signed = await contract.signAsFeePayer(
+                    {
+                        from: sender.address,
+                        feePayer: feePayer.address,
+                        feeDelegation: true,
+                        feeRatio: 30,
+                        gas: 1000000,
+                    },
+                    'set',
+                    newKey,
+                    newValue
+                )
+
+                expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+                expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+
+                await caver.wallet.sign(sender.address, signed)
+                const receipt = await caver.rpc.klay.sendRawTransaction(signed)
+
+                expect(receipt.from).to.equal(sender.address)
+                expect(receipt.to.toLowerCase()).to.equal(contractAddress.toLowerCase())
+                expect(receipt.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+
+                const value = await contract.methods.get(newKey).call({ from: sender.address })
+                expect(value).to.equal(newValue)
+            }).timeout(200000)
+        }
+    )
 
     context('Set values via contract.options', () => {
         it(`CAVERJS-UNIT-ETC-359: Set feeDelegation in options to deploy contract`, async () => {
@@ -2126,7 +2243,7 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(deployed.status).to.be.true
             expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
 
-            deployed = await contract.methods['constructor'](byteCodeWithoutConstructor).send(sendOptions)
+            deployed = await contract.methods.constructor(byteCodeWithoutConstructor).send(sendOptions)
 
             expect(deployed.from).to.equal(sender.address)
             expect(deployed.feePayer).to.equal(feePayer.address)
@@ -2147,17 +2264,17 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(deployed.status).to.be.true
             expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
 
-            sendOptions = { 
-				from: sender.address,
-				gas: 1000000,
-			}
+            sendOptions = {
+                from: sender.address,
+                gas: 1000000,
+            }
             let signed = await contract.deploy({ data: byteCodeWithoutConstructor }).sign(sendOptions)
 
             expect(signed.from).to.equal(sender.address)
             expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
             expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
 
-            signed = await contract.methods['constructor'](byteCodeWithoutConstructor).sign(sendOptions)
+            signed = await contract.methods.constructor(byteCodeWithoutConstructor).sign(sendOptions)
 
             expect(signed.from).to.equal(sender.address)
             expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
@@ -2182,7 +2299,7 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
             expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
 
-            signed = await contract.methods['constructor'](byteCodeWithoutConstructor).signAsFeePayer(sendOptions)
+            signed = await contract.methods.constructor(byteCodeWithoutConstructor).signAsFeePayer(sendOptions)
 
             expect(signed.from).to.equal(sender.address)
             expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
@@ -2201,7 +2318,6 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
         }).timeout(200000)
 
-
         it(`CAVERJS-UNIT-ETC-360: Set feeDelegation in options when execute contract`, async () => {
             const contract = new caver.contract(abiWithoutConstructor, contractAddress)
             contract.options.feeDelegation = true
@@ -2211,14 +2327,14 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
                 feePayer: feePayer.address,
                 gas: 1000000,
             }
-            let result = await contract.methods.set('k', 'v').send(sendOptions)
+            const result = await contract.methods.set('k', 'v').send(sendOptions)
 
             expect(result.from).to.equal(sender.address)
             expect(result.feePayer).to.equal(feePayer.address)
             expect(result.status).to.be.true
             expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
 
-            deployed = await contract.methods['set']('k', 'v').send(sendOptions)
+            deployed = await contract.methods.set('k', 'v').send(sendOptions)
 
             expect(deployed.from).to.equal(sender.address)
             expect(deployed.feePayer).to.equal(feePayer.address)
@@ -2239,11 +2355,11 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(deployed.status).to.be.true
             expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
 
-            sendOptions = { 
-				from: sender.address,
-				gas: 1000000,
-			}
-            let signed = await contract.methods['set']('k', 'v').sign(sendOptions)
+            sendOptions = {
+                from: sender.address,
+                gas: 1000000,
+            }
+            let signed = await contract.methods.set('k', 'v').sign(sendOptions)
 
             expect(signed.from).to.equal(sender.address)
             expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
@@ -2262,7 +2378,7 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
 
             sendOptions.feePayer = feePayer.address
-            signed = await contract.methods['set']('k', 'v').signAsFeePayer(sendOptions)
+            signed = await contract.methods.set('k', 'v').signAsFeePayer(sendOptions)
 
             expect(signed.from).to.equal(sender.address)
             expect(signed.feePayer).to.equal(feePayer.address)
@@ -2301,7 +2417,7 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(deployed.status).to.be.true
             expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
 
-            deployed = await contract.methods['constructor'](byteCodeWithoutConstructor).send(sendOptions)
+            deployed = await contract.methods.constructor(byteCodeWithoutConstructor).send(sendOptions)
 
             expect(deployed.from).to.equal(sender.address)
             expect(deployed.feePayer).to.equal(feePayer.address)
@@ -2322,10 +2438,10 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(deployed.status).to.be.true
             expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
 
-            sendOptions = { 
-				from: sender.address,
+            sendOptions = {
+                from: sender.address,
                 feeDelegation: true,
-				gas: 1000000,
+                gas: 1000000,
             }
             let signed = await contract.deploy({ data: byteCodeWithoutConstructor }).sign(sendOptions)
 
@@ -2334,7 +2450,7 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
             expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
 
-            signed = await contract.methods['constructor'](byteCodeWithoutConstructor).sign(sendOptions)
+            signed = await contract.methods.constructor(byteCodeWithoutConstructor).sign(sendOptions)
 
             expect(signed.from).to.equal(sender.address)
             expect(signed.feePayer).to.equal(feePayer.address)
@@ -2362,7 +2478,7 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
             expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
 
-            signed = await contract.methods['constructor'](byteCodeWithoutConstructor).signAsFeePayer(sendOptions)
+            signed = await contract.methods.constructor(byteCodeWithoutConstructor).signAsFeePayer(sendOptions)
 
             expect(signed.from).to.equal(sender.address)
             expect(signed.feePayer).to.equal(feePayer.address)
@@ -2393,14 +2509,14 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
                 feeDelegation: true,
                 gas: 1000000,
             }
-            let result = await contract.methods.set('k', 'v').send(sendOptions)
+            const result = await contract.methods.set('k', 'v').send(sendOptions)
 
             expect(result.from).to.equal(sender.address)
             expect(result.feePayer).to.equal(feePayer.address)
             expect(result.status).to.be.true
             expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
 
-            deployed = await contract.methods['set']('k', 'v').send(sendOptions)
+            deployed = await contract.methods.set('k', 'v').send(sendOptions)
 
             expect(deployed.from).to.equal(sender.address)
             expect(deployed.feePayer).to.equal(feePayer.address)
@@ -2421,12 +2537,12 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(deployed.status).to.be.true
             expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
 
-            sendOptions = { 
-				from: sender.address,
+            sendOptions = {
+                from: sender.address,
                 feeDelegation: true,
-				gas: 1000000,
-			}
-            let signed = await contract.methods['set']('k', 'v').sign(sendOptions)
+                gas: 1000000,
+            }
+            let signed = await contract.methods.set('k', 'v').sign(sendOptions)
 
             expect(signed.from).to.equal(sender.address)
             expect(signed.feePayer).to.equal(feePayer.address)
@@ -2447,7 +2563,7 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
             expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
 
-            signed = await contract.methods['set']('k', 'v').signAsFeePayer(sendOptions)
+            signed = await contract.methods.set('k', 'v').signAsFeePayer(sendOptions)
 
             expect(signed.from).to.equal(sender.address)
             expect(signed.feePayer).to.equal(feePayer.address)
@@ -2488,7 +2604,7 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
             expect(deployed.feeRatio).to.equal(contract.options.feeRatio)
 
-            deployed = await contract.methods['constructor'](byteCodeWithoutConstructor).send(sendOptions)
+            deployed = await contract.methods.constructor(byteCodeWithoutConstructor).send(sendOptions)
 
             expect(deployed.from).to.equal(sender.address)
             expect(deployed.feePayer).to.equal(feePayer.address)
@@ -2512,10 +2628,10 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
             expect(deployed.feeRatio).to.equal(contract.options.feeRatio)
 
-            sendOptions = { 
-				from: sender.address,
+            sendOptions = {
+                from: sender.address,
                 feeDelegation: true,
-				gas: 1000000,
+                gas: 1000000,
             }
             let signed = await contract.deploy({ data: byteCodeWithoutConstructor }).sign(sendOptions)
 
@@ -2524,7 +2640,7 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
             expect(signed.feeRatio).to.equal(contract.options.feeRatio)
 
-            signed = await contract.methods['constructor'](byteCodeWithoutConstructor).sign(sendOptions)
+            signed = await contract.methods.constructor(byteCodeWithoutConstructor).sign(sendOptions)
 
             expect(signed.from).to.equal(sender.address)
             expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
@@ -2554,7 +2670,7 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
             expect(signed.feeRatio).to.equal(contract.options.feeRatio)
 
-            signed = await contract.methods['constructor'](byteCodeWithoutConstructor).signAsFeePayer(sendOptions)
+            signed = await contract.methods.constructor(byteCodeWithoutConstructor).signAsFeePayer(sendOptions)
 
             expect(signed.from).to.equal(sender.address)
             expect(signed.feePayer).to.equal(feePayer.address)
@@ -2589,7 +2705,7 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
                 feeDelegation: true,
                 gas: 1000000,
             }
-            let result = await contract.methods.set('k', 'v').send(sendOptions)
+            const result = await contract.methods.set('k', 'v').send(sendOptions)
 
             expect(result.from).to.equal(sender.address)
             expect(result.feePayer).to.equal(feePayer.address)
@@ -2597,7 +2713,7 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
             expect(result.feeRatio).to.equal(contract.options.feeRatio)
 
-            deployed = await contract.methods['set']('k', 'v').send(sendOptions)
+            deployed = await contract.methods.set('k', 'v').send(sendOptions)
 
             expect(deployed.from).to.equal(sender.address)
             expect(deployed.feePayer).to.equal(feePayer.address)
@@ -2621,12 +2737,12 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
             expect(result.feeRatio).to.equal(contract.options.feeRatio)
 
-            sendOptions = { 
-				from: sender.address,
+            sendOptions = {
+                from: sender.address,
                 feeDelegation: true,
-				gas: 1000000,
-			}
-            let signed = await contract.methods['set']('k', 'v').sign(sendOptions)
+                gas: 1000000,
+            }
+            let signed = await contract.methods.set('k', 'v').sign(sendOptions)
 
             expect(signed.from).to.equal(sender.address)
             expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
@@ -2648,7 +2764,7 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(signed.feeRatio).to.equal(contract.options.feeRatio)
 
             sendOptions.feePayer = feePayer.address
-            signed = await contract.methods['set']('k', 'v').signAsFeePayer(sendOptions)
+            signed = await contract.methods.set('k', 'v').signAsFeePayer(sendOptions)
 
             expect(signed.from).to.equal(sender.address)
             expect(signed.feePayer).to.equal(feePayer.address)

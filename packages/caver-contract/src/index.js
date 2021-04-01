@@ -421,7 +421,6 @@ Contract.prototype._getOrSetDefaultOptions = function getOrSetDefaultOptions(opt
     options.from = from || this.options.from
     options.gasPrice = gasPrice || this.options.gasPrice
 
-
     const feePayer = options.feePayer ? utils.toChecksumAddress(formatters.inputAddressFormatter(options.feePayer)) : null
     const feeRatio = options.feeRatio ? options.feeRatio : null
     const feeDelegation = options.feeDelegation !== undefined ? options.feeDelegation : null
@@ -754,7 +753,7 @@ Contract.prototype.call = function() {
 /**
  * Signs a transaction as a sender to deploy or execute the contract.
  * After signing, the promise will be resolved with the signed transaction.
- * 
+ *
  * If you want to use fee delegation, `feeDelegation` should be defined as `true` in the `sendOptions` parameter.
  * Also if you want to use partial fee delegation, you can define `feeRatio` in the `sendOptions` parameter.
  *
@@ -781,7 +780,7 @@ Contract.prototype.sign = function() {
 /**
  * Signs a transaction as a fee payer to deploy or execute the contract.
  * After signing, the promise will be resolved with the signed transaction.
- * 
+ *
  * To sign as a fee payer, `feeDelegation` and `feePayer` should be defined in the `sendOptions` parameter.
  * `feeDelegation` field should be true.
  * Also if you want to use partial fee delegation, you can define `feeRatio` in the `sendOptions` parameter.
