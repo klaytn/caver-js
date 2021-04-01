@@ -16,9 +16,6 @@
 	along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const BigNumber = require('bignumber.js')
-const _ = require('lodash')
-
 const testRPCURL = require('../testrpc')
 const { expect } = require('../extendedChai')
 const { TX_TYPE_STRING } = require('../../packages/caver-transaction/src/transactionHelper/transactionHelper')
@@ -2327,33 +2324,33 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
                 feePayer: feePayer.address,
                 gas: 1000000,
             }
-            const result = await contract.methods.set('k', 'v').send(sendOptions)
+            let result = await contract.methods.set('k', 'v').send(sendOptions)
 
             expect(result.from).to.equal(sender.address)
             expect(result.feePayer).to.equal(feePayer.address)
             expect(result.status).to.be.true
             expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
 
-            deployed = await contract.methods.set('k', 'v').send(sendOptions)
+            result = await contract.methods.set('k', 'v').send(sendOptions)
 
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+            expect(result.from).to.equal(sender.address)
+            expect(result.feePayer).to.equal(feePayer.address)
+            expect(result.status).to.be.true
+            expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
 
-            deployed = await contract.methods.set('k', 'v').send(sendOptions)
+            result = await contract.methods.set('k', 'v').send(sendOptions)
 
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+            expect(result.from).to.equal(sender.address)
+            expect(result.feePayer).to.equal(feePayer.address)
+            expect(result.status).to.be.true
+            expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
 
-            deployed = await contract.send(sendOptions, 'set', 'k', 'v')
+            result = await contract.send(sendOptions, 'set', 'k', 'v')
 
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+            expect(result.from).to.equal(sender.address)
+            expect(result.feePayer).to.equal(feePayer.address)
+            expect(result.status).to.be.true
+            expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
 
             sendOptions = {
                 from: sender.address,
@@ -2509,33 +2506,33 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
                 feeDelegation: true,
                 gas: 1000000,
             }
-            const result = await contract.methods.set('k', 'v').send(sendOptions)
+            let result = await contract.methods.set('k', 'v').send(sendOptions)
 
             expect(result.from).to.equal(sender.address)
             expect(result.feePayer).to.equal(feePayer.address)
             expect(result.status).to.be.true
             expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
 
-            deployed = await contract.methods.set('k', 'v').send(sendOptions)
+            result = await contract.methods.set('k', 'v').send(sendOptions)
 
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+            expect(result.from).to.equal(sender.address)
+            expect(result.feePayer).to.equal(feePayer.address)
+            expect(result.status).to.be.true
+            expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
 
-            deployed = await contract.methods.set('k', 'v').send(sendOptions)
+            result = await contract.methods.set('k', 'v').send(sendOptions)
 
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+            expect(result.from).to.equal(sender.address)
+            expect(result.feePayer).to.equal(feePayer.address)
+            expect(result.status).to.be.true
+            expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
 
-            deployed = await contract.send(sendOptions, 'set', 'k', 'v')
+            result = await contract.send(sendOptions, 'set', 'k', 'v')
 
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+            expect(result.from).to.equal(sender.address)
+            expect(result.feePayer).to.equal(feePayer.address)
+            expect(result.status).to.be.true
+            expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
 
             sendOptions = {
                 from: sender.address,
@@ -2705,7 +2702,7 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
                 feeDelegation: true,
                 gas: 1000000,
             }
-            const result = await contract.methods.set('k', 'v').send(sendOptions)
+            let result = await contract.methods.set('k', 'v').send(sendOptions)
 
             expect(result.from).to.equal(sender.address)
             expect(result.feePayer).to.equal(feePayer.address)
@@ -2713,28 +2710,28 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
             expect(result.feeRatio).to.equal(contract.options.feeRatio)
 
-            deployed = await contract.methods.set('k', 'v').send(sendOptions)
+            result = await contract.methods.set('k', 'v').send(sendOptions)
 
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+            expect(result.from).to.equal(sender.address)
+            expect(result.feePayer).to.equal(feePayer.address)
+            expect(result.status).to.be.true
+            expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
             expect(result.feeRatio).to.equal(contract.options.feeRatio)
 
-            deployed = await contract.methods.set('k', 'v').send(sendOptions)
+            result = await contract.methods.set('k', 'v').send(sendOptions)
 
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+            expect(result.from).to.equal(sender.address)
+            expect(result.feePayer).to.equal(feePayer.address)
+            expect(result.status).to.be.true
+            expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
             expect(result.feeRatio).to.equal(contract.options.feeRatio)
 
-            deployed = await contract.send(sendOptions, 'set', 'k', 'v')
+            result = await contract.send(sendOptions, 'set', 'k', 'v')
 
-            expect(deployed.from).to.equal(sender.address)
-            expect(deployed.feePayer).to.equal(feePayer.address)
-            expect(deployed.status).to.be.true
-            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+            expect(result.from).to.equal(sender.address)
+            expect(result.feePayer).to.equal(feePayer.address)
+            expect(result.status).to.be.true
+            expect(result.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
             expect(result.feeRatio).to.equal(contract.options.feeRatio)
 
             sendOptions = {
