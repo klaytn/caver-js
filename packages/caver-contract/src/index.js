@@ -38,6 +38,10 @@ const utils = require('../../caver-utils')
 const Subscription = require('../../caver-core-subscriptions').subscription
 const SmartContractDeploy = require('../../caver-transaction/src/transactionTypes/smartContractDeploy/smartContractDeploy')
 const SmartContractExecution = require('../../caver-transaction/src/transactionTypes/smartContractExecution/smartContractExecution')
+const FeeDelegatedSmartContractDeploy = require('../../caver-transaction/src/transactionTypes/smartContractDeploy/feeDelegatedSmartContractDeploy')
+const FeeDelegatedSmartContractExecution = require('../../caver-transaction/src/transactionTypes/smartContractExecution/feeDelegatedSmartContractExecution')
+const FeeDelegatedSmartContractDeployWithRatio = require('../../caver-transaction/src/transactionTypes/smartContractDeploy/feeDelegatedSmartContractDeployWithRatio')
+const FeeDelegatedSmartContractExecutionWithRatio = require('../../caver-transaction/src/transactionTypes/smartContractExecution/feeDelegatedSmartContractExecutionWithRatio')
 const KeyringContainer = require('../../caver-wallet')
 const { formatters } = require('../../caver-core-helpers')
 const { errors } = require('../../caver-core-helpers')
@@ -166,6 +170,14 @@ const Contract = function Contract(jsonInterface, address, options) {
                     _this.events[funcName] = event
                 }
 
+                // Make transaction object for constructor and add to the `this.methods`
+                const constructor = _.find(_this._jsonInterface, function(method) {
+                    return method.type === 'constructor'
+                }) || { type: 'constructor' }
+                constructor.signature = 'constructor'
+                const constructorFunc = _this._createTxObject.bind({ method: constructor, parent: _this })
+                _this.methods[constructor.signature] = constructorFunc
+
                 return method
             })
 
@@ -221,6 +233,47 @@ const Contract = function Contract(jsonInterface, address, options) {
         },
         get() {
             return _this._from
+        },
+        enumerable: true,
+    })
+
+    Object.defineProperty(this.options, 'feePayer', {
+        set(value) {
+            if (value) {
+                _this._feePayer = utils.toChecksumAddress(formatters.inputAddressFormatter(value))
+            }
+        },
+        get() {
+            return _this._feePayer
+        },
+        enumerable: true,
+    })
+
+    Object.defineProperty(this.options, 'feeDelegation', {
+        set(value) {
+            if (value !== undefined) {
+                _this._feeDelegation = value
+            }
+        },
+        get() {
+            return _this._feeDelegation
+        },
+        enumerable: true,
+    })
+
+    Object.defineProperty(this.options, 'feeRatio', {
+        set(fr) {
+            if (fr !== undefined) {
+                if (!_.isNumber(fr) && !utils.isHex(fr))
+                    throw new Error(`Invalid type fo feeRatio: feeRatio should be number type or hex number string.`)
+                if (utils.hexToNumber(fr) <= 0 || utils.hexToNumber(fr) >= 100)
+                    throw new Error(`Invalid feeRatio: feeRatio is out of range. [1, 99]`)
+
+                _this._feeRatio = utils.numberToHex(fr)
+            }
+        },
+        get() {
+            return _this._feeRatio
         },
         enumerable: true,
     })
@@ -367,6 +420,14 @@ Contract.prototype._getOrSetDefaultOptions = function getOrSetDefaultOptions(opt
 
     options.from = from || this.options.from
     options.gasPrice = gasPrice || this.options.gasPrice
+
+
+    const feePayer = options.feePayer ? utils.toChecksumAddress(formatters.inputAddressFormatter(options.feePayer)) : null
+    const feeRatio = options.feeRatio ? options.feeRatio : null
+    const feeDelegation = options.feeDelegation !== undefined ? options.feeDelegation : null
+    options.feePayer = feePayer || this.options.feePayer
+    options.feeRatio = feeRatio || this.options.feeRatio
+    options.feeDelegation = feeDelegation || this.options.feeDelegation
 
     // If options.gas isn't set manually, use options.gasLimit, this.options.gas instead.
     if (typeof options.gas === 'undefined') {
@@ -596,46 +657,151 @@ Contract.prototype._decodeMethodReturn = function(outputs, returnValues) {
 }
 
 /**
- * Deploys a contract and fire events based on its state: transactionHash, receipt
- *
- * All event listeners will be removed, once the last possible event is fired ("error", or "receipt")
+ * Deploys the contract to the Klaytn.
+ * After a successful deployment, the promise will be resolved with a new contract instance.
  *
  * @method deploy
- * @param {Object} options
- * @param {Function} callback
- * @return {Object} EventEmitter possible events are "error", "transactionHash" and "receipt"
+ * @param {Object} options An object in which data, which is the byte code of the smart contract to be deployed, and arguments, which are parameters to be passed to the constructor of the smart contract, are defined.
+ * @param {Function} [callback] The callback function.
+ * @return {object} An object in which arguments and functions for contract deployment are defined
  */
-
+/**
+ * Deploys the contract to the Klaytn.
+ * After a successful deployment, the promise will be resolved with a new contract instance.
+ *
+ * @method deploy
+ * @param {object} sendOptions An object holding parameters that are required for sending a transaction.
+ * @param {string} byteCode The byte code of the contract.
+ * @param {...*} parameters The parameters to be passed to the constructor of the smart contract.
+ * @return {object} Promise will be resolved with a new contract instance. EventEmitter possible events are "error", "transactionHash" and "receipt"
+ */
 Contract.prototype.deploy = function(options, callback) {
-    options = options || {}
+    const args = Array.prototype.slice.call(arguments)
 
-    options.arguments = options.arguments || []
-    options = this._getOrSetDefaultOptions(options)
+    // This if condition will handle original usage
+    // contract.deploy({ data, arguments })
+    // contract.deploy({ data, arguments }, callback)
+    if (args.length === 1 || (args.length === 2 && _.isFunction(args[args.length - 1]))) {
+        options = options || {}
 
-    // return error, if no "data" is specified
-    if (!options.data) {
-        const error = new Error('No "data" specified in neither the given options, nor the default options.')
-        if (callback) callback(error)
+        options.arguments = options.arguments || []
+        options = this._getOrSetDefaultOptions(options)
 
-        throw error
+        // return error, if no "data" is specified
+        if (!options.data) {
+            const error = new Error('No "data" specified in neither the given options, nor the default options.')
+            if (callback) callback(error)
+            throw error
+        }
+
+        return this.methods.constructor(options.data, ...options.arguments)
     }
 
-    const constructor =
-        _.find(this.options.jsonInterface, function(method) {
-            return method.type === 'constructor'
-        }) || {}
-    constructor.signature = 'constructor'
+    // contract.deploy({from, gas, ...}, byteCode, parameters)
+    const sendOptions = args[0]
+    const byteCode = args[1]
+    const params = args.slice(2)
 
-    return this._createTxObject.apply(
-        {
-            method: constructor,
-            parent: this,
-            deployData: options.data,
-            _klayAccounts: this.constructor._klayAccounts,
-            _wallet: this._wallet,
-        },
-        options.arguments
-    )
+    return this.methods.constructor(byteCode, ...params).send(sendOptions)
+}
+
+/**
+ * Sends a SmartContractExecution transaction to execute the function of the contract deployed in the Klaytn.
+ * After a successful deployment, the promise will be resolved with a transaction receipt.
+ *
+ * @method send
+ * @param {object} sendOptions An object holding parameters that are required for sending a transaction.
+ * @param {string} functionName The function name to execute.
+ * @param {...*} parameters The parameters to be passed to the smart contract function.
+ * @return {object} Promise will be resolved with a transaction receipt. EventEmitter possible events are "error", "transactionHash" and "receipt"
+ */
+Contract.prototype.send = function() {
+    const args = Array.prototype.slice.call(arguments)
+
+    // contract.send({from, gas, ...}, 'functionName', parameters)
+    const sendOptions = args[0]
+    const functionName = args[1]
+    const params = args.slice(2)
+
+    return this.methods[functionName](...params).send(sendOptions)
+}
+
+/**
+ * Calls a "constant" method and execute its smart contract method in the Klaytn Virtual Machine without sending any transaction.
+ *
+ * @method call
+ * @param {object} [callObject] The options used for calling.
+ * @param {string} functionName The function name to execute.
+ * @param {...*} parameters The parameters to be passed to the smart contract function.
+ * @return {object} Promise will be resolved with a transaction receipt. EventEmitter possible events are "error", "transactionHash" and "receipt"
+ */
+Contract.prototype.call = function() {
+    let args = Array.prototype.slice.call(arguments)
+
+    // contract.call('functionName', parameters)
+    // contract.call({from, gas, ...}, 'functionName', parameters)
+    let callObject = {}
+    if (_.isObject(args[0])) {
+        callObject = args[0]
+        args = args.slice(1)
+    }
+    const functionName = args[0]
+    const params = args.slice(1)
+
+    return this.methods[functionName](...params).call(callObject)
+}
+
+/**
+ * Signs a transaction as a sender to deploy or execute the contract.
+ * After signing, the promise will be resolved with the signed transaction.
+ * 
+ * If you want to use fee delegation, `feeDelegation` should be defined as `true` in the `sendOptions` parameter.
+ * Also if you want to use partial fee delegation, you can define `feeRatio` in the `sendOptions` parameter.
+ *
+ * @method sign
+ * @param {object} sendOptions An object holding parameters that are required for sending a transaction.
+ * @param {string} functionName The function name to execute. If you want to sign for deployig, please send 'constructor' here.
+ * @param {...*} parameters The parameters to be passed to the smart contract constructor or function.
+ * @return {object} Promise will be resolved with a transaction receipt. EventEmitter possible events are "error", "transactionHash" and "receipt"
+ */
+Contract.prototype.sign = function() {
+    const args = Array.prototype.slice.call(arguments)
+
+    // contract.sign({from, gas, ...}, 'constructor', arguments)
+    // contract.sign({from, gas, ...}, 'functionName', arguments)
+    // contract.sign({from, gas, feeDelegation: true ...}, 'constructor', arguments)
+    // contract.sign({from, gas, feeDelegation: true, feeRatio: 30, ...}, 'functionName', arguments)
+    const sendOptions = args[0]
+    const functionName = args[1]
+    const params = args.slice(2)
+
+    return this.methods[functionName](...params).sign(sendOptions)
+}
+
+/**
+ * Signs a transaction as a fee payer to deploy or execute the contract.
+ * After signing, the promise will be resolved with the signed transaction.
+ * 
+ * To sign as a fee payer, `feeDelegation` and `feePayer` should be defined in the `sendOptions` parameter.
+ * `feeDelegation` field should be true.
+ * Also if you want to use partial fee delegation, you can define `feeRatio` in the `sendOptions` parameter.
+ *
+ * @method sign
+ * @param {object} sendOptions An object holding parameters that are required for sending a transaction.
+ * @param {string} functionName The function name to execute. If you want to sign for deployig, please send 'constructor' here.
+ * @param {...*} parameters The parameters to be passed to the smart contract constructor or function.
+ * @return {object} Promise will be resolved with a transaction receipt. EventEmitter possible events are "error", "transactionHash" and "receipt"
+ */
+Contract.prototype.signAsFeePayer = function() {
+    const args = Array.prototype.slice.call(arguments)
+
+    // contract.signAsFeePayer({from, gas, feeDelegation: true ...}, 'constructor', arguments)
+    // contract.signAsFeePayer({from, gas, feeDelegation: true, feeRatio: 30, ...}, 'functionName', arguments)
+    const sendOptions = args[0]
+    const functionName = args[1]
+    const params = args.slice(2)
+
+    return this.methods[functionName](...params).signAsFeePayer(sendOptions)
 }
 
 /**
@@ -865,7 +1031,7 @@ Contract.prototype.getPastEvents = function() {
  */
 
 Contract.prototype._createTxObject = function _createTxObject() {
-    const args = Array.prototype.slice.call(arguments)
+    let args = Array.prototype.slice.call(arguments)
     const txObject = {}
 
     if (this.method.type === 'function') {
@@ -873,10 +1039,26 @@ Contract.prototype._createTxObject = function _createTxObject() {
         txObject.call.request = this.parent._executeMethod.bind(txObject, 'call', true) // to make batch requests
     }
 
+    txObject.sign = this.parent._executeMethod.bind(txObject, 'sign')
+    txObject.signAsFeePayer = this.parent._executeMethod.bind(txObject, 'signAsFeePayer')
+
     txObject.send = this.parent._executeMethod.bind(txObject, 'send')
     txObject.send.request = this.parent._executeMethod.bind(txObject, 'send', true) // to make batch requests
+
     txObject.encodeABI = this.parent._encodeMethodABI.bind(txObject)
     txObject.estimateGas = this.parent._executeMethod.bind(txObject, 'estimate')
+
+    // When deploying a smart contract, if a parameter is passed by directly accessing the tx object,
+    // the byte code is transferred as the first parameter.
+    // (i.e. `contract.methods['constructor'](byteCode, arguments...).send({from, ...})`)
+    // To handle such a case, when `method.type` is a "constructor" and `this.deployData` is empty,
+    // the byte code received as a parameter is allocated to `this.deployData`,
+    // and the args after that are used as parameter arguments.
+    if (this.method.type === 'constructor' && !this.deployData) {
+        this.deployData = args[0]
+        args = args.slice(1)
+    }
+
     txObject.arguments = args || []
     txObject._method = this.method
     txObject._parent = this.parent
@@ -1037,26 +1219,35 @@ Contract.prototype._executeMethod = async function _executeMethod() {
 
             return call(args.options, args.defaultBlock, args.callback)
 
+        case 'sign':
+        case 'signAsFeePayer':
+            const tx = createTransactionFromArgs(args, this._method, this._deployData, defer)
+
+            if (!wallet) {
+                return utils._fireError(
+                    new Error(
+                        `Contract sign/signAsFeePayer works with 'caver.wallet'. Set to use'caver.wallet' by calling'contract.setWallet'.`
+                    ),
+                    defer.eventEmitter,
+                    defer.reject,
+                    args.callback
+                )
+            }
+
+            const signer = args.type === 'signAsFeePayer' ? args.options.feePayer : args.options.from
+            const signFunction = args.type === 'signAsFeePayer' ? wallet.signAsFeePayer.bind(wallet) : wallet.sign.bind(wallet)
+            const isExisted = await wallet.isExisted(signer)
+
+            if (!isExisted) {
+                throw new Error(`Failed to find ${signer}. Please check that the corresponding account or keyring exists.`)
+            }
+
+            return signFunction(signer, tx).then(signedTx => {
+                return signedTx
+            })
+
         case 'send':
-            // return error, if no "from" is specified
-            if (!utils.isAddress(args.options.from)) {
-                return utils._fireError(
-                    new Error('No "from" address specified in neither the given options, nor the default options.'),
-                    defer.eventEmitter,
-                    defer.reject,
-                    args.callback
-                )
-            }
-
-            if (_.isBoolean(this._method.payable) && !this._method.payable && args.options.value && args.options.value > 0) {
-                return utils._fireError(
-                    new Error('Can not send value to non-payable contract method or constructor'),
-                    defer.eventEmitter,
-                    defer.reject,
-                    args.callback
-                )
-            }
-
+            const transaction = createTransactionFromArgs(args, this._method, this._deployData, defer)
             // make sure receipt logs are decoded
             const extraFormatters = {
                 receiptFormatter(receipt) {
@@ -1103,6 +1294,12 @@ Contract.prototype._executeMethod = async function _executeMethod() {
                 },
             }
 
+            // This is the logic for testing to check the transaction type used when deploying the smart contract.
+            // You can define and use a custom formatter in this way: `contract.deploy({ ... }).send({ ..., contractDeployFormatter })`
+            extraFormatters.contractDeployFormatter = args.options.contractDeployFormatter
+                ? args.options.contractDeployFormatter
+                : extraFormatters.contractDeployFormatter
+
             const sendTransaction = new Method({
                 name: 'sendTransaction',
                 call: 'klay_sendTransaction',
@@ -1134,15 +1331,13 @@ Contract.prototype._executeMethod = async function _executeMethod() {
                     extraFormatters,
                 }).createFunction()
 
-                let transaction
-                if (this._deployData !== undefined) {
-                    transaction = new SmartContractDeploy(args.options)
-                } else {
-                    transaction = new SmartContractExecution(args.options)
-                }
-
                 return wallet.sign(transaction.from, transaction).then(signedTx => {
-                    return sendRawTransaction(signedTx.getRLPEncoding())
+                    if (signedTx.feePayer) {
+                        return wallet.signAsFeePayer(transaction.feePayer, transaction).then(feePayerSignedTx => {
+                            return sendRawTransaction(feePayerSignedTx)
+                        })
+                    }
+                    return sendRawTransaction(signedTx)
                 })
             }
 
@@ -1165,6 +1360,88 @@ Contract.prototype._executeMethod = async function _executeMethod() {
 
             return sendTransaction(args.options, args.callback)
     }
+}
+
+function createTransactionFromArgs(args, method, deployData, defer) {
+    // Not to affect original data, copy args.options
+    const options = Object.assign({}, args.options)
+
+    options.value = options.value || 0
+
+    if (!utils.isAddress(options.from)) {
+        return utils._fireError(
+            new Error('No "from" address specified in neither the given options, nor the default options.'),
+            defer.eventEmitter,
+            defer.reject,
+            args.callback
+        )
+    }
+
+    if (_.isBoolean(method.payable) && !method.payable && options.value && options.value > 0) {
+        return utils._fireError(
+            new Error('Can not send value to non-payable contract method or constructor'),
+            defer.eventEmitter,
+            defer.reject,
+            args.callback
+        )
+    }
+
+    // If the transaction is fee delegated tx,
+    // feeDelegation field must be unconditionally defined with true.
+    if (options.feeDelegation) {
+        if (args.type === 'signAsFeePayer' || (args.type === 'send' && options.feePayer)) {
+            if (!utils.isAddress(options.feePayer)) {
+                return utils._fireError(
+                    new Error(`Invalid fee payer: ${options.feePayer}`),
+                    defer.eventEmitter,
+                    defer.reject,
+                    args.callback
+                )
+            }
+        }
+    } else if (args.type === 'signAsFeePayer') {
+        return utils._fireError(
+            new Error(`feeDelegation field should be defined as 'true' to sign as a fee payer`),
+            defer.eventEmitter,
+            defer.reject,
+            args.callback
+        )
+    } else if (options.feeRatio !== undefined) {
+        return utils._fireError(
+            new Error(`feeDelegation field should be defined as 'true' to use feeRatio`),
+            defer.eventEmitter,
+            defer.reject,
+            args.callback
+        )
+    } else if (options.feePayer) {
+        return utils._fireError(
+            new Error(`feeDelegation field should be defined as 'true' to use feePayer`),
+            defer.eventEmitter,
+            defer.reject,
+            args.callback
+        )
+    }
+
+    let transaction
+    if (deployData !== undefined) {
+        if (options.feeDelegation) {
+            transaction =
+                options.feeRatio !== undefined
+                    ? new FeeDelegatedSmartContractDeployWithRatio(options)
+                    : new FeeDelegatedSmartContractDeploy(options)
+        } else {
+            transaction = new SmartContractDeploy(options)
+        }
+    } else if (options.feeDelegation) {
+        transaction =
+            options.feeRatio !== undefined
+                ? new FeeDelegatedSmartContractExecutionWithRatio(options)
+                : new FeeDelegatedSmartContractExecution(options)
+    } else {
+        transaction = new SmartContractExecution(options)
+    }
+
+    return transaction
 }
 
 module.exports = Contract
