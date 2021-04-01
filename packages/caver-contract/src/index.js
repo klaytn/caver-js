@@ -171,8 +171,8 @@ const Contract = function Contract(jsonInterface, address, options) {
                 }
 
                 // Make transaction object for constructor and add to the `this.methods`
-                const constructor = _.find(_this._jsonInterface, function(method) {
-                    return method.type === 'constructor'
+                const constructor = _.find(_this._jsonInterface, function(mth) {
+                    return mth.type === 'constructor'
                 }) || { type: 'constructor' }
                 constructor.signature = 'constructor'
                 const constructorFunc = _this._createTxObject.bind({ method: constructor, parent: _this })
@@ -1312,8 +1312,8 @@ Contract.prototype._executeMethod = async function _executeMethod() {
             }).createFunction()
 
             if (wallet) {
-                const isExisted = await wallet.isExisted(args.options.from)
-                if (!isExisted) {
+                const isExistedInWallet = await wallet.isExisted(args.options.from)
+                if (!isExistedInWallet) {
                     if (wallet instanceof KeyringContainer) {
                         return sendTransaction(args.options, args.callback)
                     }
