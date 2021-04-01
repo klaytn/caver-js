@@ -104,6 +104,6 @@ describe('caver.contract error handling', () => {
 
     it('CAVERJS-UNIT-ETC-254: contract.deploy throw error when data is not defined', async () => {
         const contract = new caver.contract(abi)
-        expect(() => contract.deploy()).to.throw('No "data" specified in neither the given options, nor the default options.')
+        expect(() => contract.deploy({})).to.throw('No "data" specified in neither the given options, nor the default options.')
     }).timeout(200000)
 })
