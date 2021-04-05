@@ -22,11 +22,13 @@ const _ = require('lodash')
 
 const testRPCURL = require('../testrpc')
 const { expect } = require('../extendedChai')
+const { TX_TYPE_STRING } = require('../../packages/caver-transaction/src/transactionHelper/transactionHelper')
 
 const Caver = require('../../index.js')
 
 let caver
 let sender
+let feePayer
 let testAccount
 let receiver
 const testAddresses = []
@@ -36,7 +38,7 @@ const tokenIds = [tokenId]
 
 const ownerMap = {}
 
-let multiTokenAddress
+let kip37Address
 
 const tokenURI = 'https://game.example/item-id/{id}.json'
 const tokenInfo = { uri: tokenURI }
@@ -76,6 +78,14 @@ before(function(done) {
     caver.wallet.add(sender)
     ownerMap[sender.address] = []
 
+    const feePayerPrvKey =
+        process.env.privateKey2 && String(process.env.privateKey2).indexOf('0x') === -1
+            ? `0x${process.env.privateKey2}`
+            : process.env.privateKey2
+
+    feePayer = caver.wallet.keyring.createFromPrivateKey(feePayerPrvKey)
+    caver.wallet.add(feePayer)
+
     prepareTestSetting().then(() => done())
 })
 
@@ -91,7 +101,7 @@ describe('KIP37 token contract class test', () => {
             expect(account.accType).to.equal(2)
             expect(account.account.key.keyType).to.equal(3)
 
-            multiTokenAddress = deployed.options.address
+            kip37Address = deployed.options.address
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-161: should throw error when token information is insufficient or invalid', async () => {
@@ -105,7 +115,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.clone', () => {
         it('CAVERJS-UNIT-KCT-162: should clone KIP37 instance with new token contract address', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const newTokenContract = caver.wallet.keyring.generate().address
             const cloned = token.clone(newTokenContract)
@@ -117,7 +127,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.supportsInterface', () => {
         it('CAVERJS-UNIT-KCT-163: should return true if interfaceId is supported', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             expect(await token.supportsInterface('0x6433ca1f')).to.be.true // IKIP37
             expect(await token.supportsInterface('0x0e89341c')).to.be.true // IKIP37MetatdataURI
@@ -133,7 +143,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.create', () => {
         it('CAVERJS-UNIT-KCT-164: should create new token', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const created = await token.create(tokenId, 10000000000, tokenURI, { from: sender.address })
 
@@ -141,13 +151,13 @@ describe('KIP37 token contract class test', () => {
             expect(created.status).to.be.true
             expect(created.events).not.to.be.undefined
             expect(created.events.TransferSingle).not.to.be.undefined
-            expect(created.events.TransferSingle.address).to.equal(multiTokenAddress)
+            expect(created.events.TransferSingle.address).to.equal(kip37Address)
             expect(created.events.URI).not.to.be.undefined
-            expect(created.events.URI.address).to.equal(multiTokenAddress)
+            expect(created.events.URI.address).to.equal(kip37Address)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-165: should create new token with various type of tokenId and initialSupply', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             let created = await token.create('0x1', '10000000000', tokenURI, { from: sender.address })
 
@@ -155,9 +165,9 @@ describe('KIP37 token contract class test', () => {
             expect(created.status).to.be.true
             expect(created.events).not.to.be.undefined
             expect(created.events.TransferSingle).not.to.be.undefined
-            expect(created.events.TransferSingle.address).to.equal(multiTokenAddress)
+            expect(created.events.TransferSingle.address).to.equal(kip37Address)
             expect(created.events.URI).not.to.be.undefined
-            expect(created.events.URI.address).to.equal(multiTokenAddress)
+            expect(created.events.URI.address).to.equal(kip37Address)
 
             tokenIds.push(1)
 
@@ -167,15 +177,15 @@ describe('KIP37 token contract class test', () => {
             expect(created.status).to.be.true
             expect(created.events).not.to.be.undefined
             expect(created.events.TransferSingle).not.to.be.undefined
-            expect(created.events.TransferSingle.address).to.equal(multiTokenAddress)
+            expect(created.events.TransferSingle.address).to.equal(kip37Address)
             expect(created.events.URI).not.to.be.undefined
-            expect(created.events.URI.address).to.equal(multiTokenAddress)
+            expect(created.events.URI.address).to.equal(kip37Address)
 
             tokenIds.push(2)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-215: should create new token without uri', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const created = await token.create(3, 10000000000, { from: sender.address })
 
@@ -183,12 +193,12 @@ describe('KIP37 token contract class test', () => {
             expect(created.status).to.be.true
             expect(created.events).not.to.be.undefined
             expect(created.events.TransferSingle).not.to.be.undefined
-            expect(created.events.TransferSingle.address).to.equal(multiTokenAddress)
+            expect(created.events.TransferSingle.address).to.equal(kip37Address)
             expect(created.events.URI).to.be.undefined
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-216: should create new token with various type of tokenId and initialSupply without uri', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             let created = await token.create('0x4', '10000000000', { from: sender.address })
 
@@ -196,7 +206,7 @@ describe('KIP37 token contract class test', () => {
             expect(created.status).to.be.true
             expect(created.events).not.to.be.undefined
             expect(created.events.TransferSingle).not.to.be.undefined
-            expect(created.events.TransferSingle.address).to.equal(multiTokenAddress)
+            expect(created.events.TransferSingle.address).to.equal(kip37Address)
             expect(created.events.URI).to.be.undefined
 
             created = await token.create(new BigNumber(5), new BigNumber('10000000000'), { from: sender.address })
@@ -205,14 +215,14 @@ describe('KIP37 token contract class test', () => {
             expect(created.status).to.be.true
             expect(created.events).not.to.be.undefined
             expect(created.events.TransferSingle).not.to.be.undefined
-            expect(created.events.TransferSingle.address).to.equal(multiTokenAddress)
+            expect(created.events.TransferSingle.address).to.equal(kip37Address)
             expect(created.events.URI).to.be.undefined
         }).timeout(200000)
     })
 
     context('kip37.uri', () => {
         it('CAVERJS-UNIT-KCT-166: should return the uri of the specific token', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const uri = await token.uri(tokenId)
 
@@ -220,7 +230,7 @@ describe('KIP37 token contract class test', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-167: should return the uri of the specific token with various tokenId types', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             expect(await token.uri(caver.utils.toHex(tokenId))).to.equal(
                 'https://game.example/item-id/0000000000000000000000000000000000000000000000000000000000000000.json'
@@ -233,7 +243,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.totalSupply', () => {
         it('CAVERJS-UNIT-KCT-168: should return the total supply of the specific token', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const totalSupply = await token.totalSupply(tokenId)
 
@@ -241,7 +251,7 @@ describe('KIP37 token contract class test', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-169: should return the total supply of the specific token with various tokenId types', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             let totalSupply = await token.totalSupply(caver.utils.toHex(tokenId))
             expect(totalSupply.eq(new BigNumber(10000000000))).to.be.true
@@ -253,7 +263,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.mint', () => {
         it('CAVERJS-UNIT-KCT-170: should mint the specific token with single to and value', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const minted = await token.mint(testAccount.address, tokenId, 1, { from: sender.address })
 
@@ -261,7 +271,7 @@ describe('KIP37 token contract class test', () => {
             expect(minted.status).to.be.true
             expect(minted.events).not.to.be.undefined
             expect(minted.events.TransferSingle).not.to.be.undefined
-            expect(minted.events.TransferSingle.address).to.equal(multiTokenAddress)
+            expect(minted.events.TransferSingle.address).to.equal(kip37Address)
             expect(minted.events.TransferSingle.returnValues.operator.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(minted.events.TransferSingle.returnValues.from.toLowerCase()).to.equal('0x0000000000000000000000000000000000000000')
             expect(minted.events.TransferSingle.returnValues.to.toLowerCase()).to.equal(testAccount.address.toLowerCase())
@@ -269,7 +279,7 @@ describe('KIP37 token contract class test', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-171: should mint the specific token with multiple to and value', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const acct1 = caver.wallet.keyring.generate()
             const acct2 = caver.wallet.keyring.generate()
@@ -287,17 +297,17 @@ describe('KIP37 token contract class test', () => {
             expect(minted.events).not.to.be.undefined
             expect(_.isArray(minted.events.TransferSingle)).to.be.true
             expect(minted.events.TransferSingle.length).to.equal(3)
-            expect(minted.events.TransferSingle[0].address).to.equal(multiTokenAddress)
+            expect(minted.events.TransferSingle[0].address).to.equal(kip37Address)
             expect(minted.events.TransferSingle[0].returnValues.operator.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(minted.events.TransferSingle[0].returnValues.from.toLowerCase()).to.equal('0x0000000000000000000000000000000000000000')
             expect(minted.events.TransferSingle[0].returnValues.to.toLowerCase()).to.equal(acct1.address.toLowerCase())
             expect(minted.events.TransferSingle[0].returnValues.id).to.equal(tokenId.toString())
-            expect(minted.events.TransferSingle[1].address).to.equal(multiTokenAddress)
+            expect(minted.events.TransferSingle[1].address).to.equal(kip37Address)
             expect(minted.events.TransferSingle[1].returnValues.operator.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(minted.events.TransferSingle[1].returnValues.from.toLowerCase()).to.equal('0x0000000000000000000000000000000000000000')
             expect(minted.events.TransferSingle[1].returnValues.to.toLowerCase()).to.equal(acct2.address.toLowerCase())
             expect(minted.events.TransferSingle[1].returnValues.id).to.equal(tokenId.toString())
-            expect(minted.events.TransferSingle[2].address).to.equal(multiTokenAddress)
+            expect(minted.events.TransferSingle[2].address).to.equal(kip37Address)
             expect(minted.events.TransferSingle[2].returnValues.operator.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(minted.events.TransferSingle[2].returnValues.from.toLowerCase()).to.equal('0x0000000000000000000000000000000000000000')
             expect(minted.events.TransferSingle[2].returnValues.to.toLowerCase()).to.equal(sender.address.toLowerCase())
@@ -320,17 +330,17 @@ describe('KIP37 token contract class test', () => {
             expect(minted.events).not.to.be.undefined
             expect(_.isArray(minted.events.TransferSingle)).to.be.true
             expect(minted.events.TransferSingle.length).to.equal(3)
-            expect(minted.events.TransferSingle[0].address).to.equal(multiTokenAddress)
+            expect(minted.events.TransferSingle[0].address).to.equal(kip37Address)
             expect(minted.events.TransferSingle[0].returnValues.operator.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(minted.events.TransferSingle[0].returnValues.from.toLowerCase()).to.equal('0x0000000000000000000000000000000000000000')
             expect(minted.events.TransferSingle[0].returnValues.to.toLowerCase()).to.equal(acct1.address.toLowerCase())
             expect(minted.events.TransferSingle[0].returnValues.id).to.equal(tokenIds[1].toString())
-            expect(minted.events.TransferSingle[1].address).to.equal(multiTokenAddress)
+            expect(minted.events.TransferSingle[1].address).to.equal(kip37Address)
             expect(minted.events.TransferSingle[1].returnValues.operator.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(minted.events.TransferSingle[1].returnValues.from.toLowerCase()).to.equal('0x0000000000000000000000000000000000000000')
             expect(minted.events.TransferSingle[1].returnValues.to.toLowerCase()).to.equal(acct2.address.toLowerCase())
             expect(minted.events.TransferSingle[1].returnValues.id).to.equal(tokenIds[1].toString())
-            expect(minted.events.TransferSingle[2].address).to.equal(multiTokenAddress)
+            expect(minted.events.TransferSingle[2].address).to.equal(kip37Address)
             expect(minted.events.TransferSingle[2].returnValues.operator.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(minted.events.TransferSingle[2].returnValues.from.toLowerCase()).to.equal('0x0000000000000000000000000000000000000000')
             expect(minted.events.TransferSingle[2].returnValues.to.toLowerCase()).to.equal(sender.address.toLowerCase())
@@ -340,7 +350,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.balanceOf', () => {
         it('CAVERJS-UNIT-KCT-172: should return the balance of account with specific token', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const balance = await token.balanceOf(testAccount.address, tokenId)
 
@@ -348,7 +358,7 @@ describe('KIP37 token contract class test', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-173: should return the balance of account with specific token with various token type', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             let balance = await token.balanceOf(testAccount.address, caver.utils.toHex(tokenId))
             expect(balance.eq(new BigNumber(1))).to.be.true
@@ -360,7 +370,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.balanceOfBatch', () => {
         it('CAVERJS-UNIT-KCT-174: should return the balance of accounts with specific token', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const balances = await token.balanceOfBatch(testAddresses, [tokenIds[0], tokenIds[1], tokenIds[1]])
 
@@ -371,7 +381,7 @@ describe('KIP37 token contract class test', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-175: should return the balance of accounts with specific token with various tokenId types', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const balances = await token.balanceOfBatch(testAddresses, [
                 caver.utils.toHex(tokenIds[0]),
@@ -388,7 +398,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.setApprovalForAll', () => {
         it("CAVERJS-UNIT-KCT-176: should set approval of token operations for all of the caller's token", async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             let approved = await token.setApprovalForAll(testAccount.address, true, { from: sender.address })
 
@@ -396,7 +406,7 @@ describe('KIP37 token contract class test', () => {
             expect(approved.status).to.be.true
             expect(approved.events).not.to.be.undefined
             expect(approved.events.ApprovalForAll).not.to.be.undefined
-            expect(approved.events.ApprovalForAll.address).to.equal(multiTokenAddress)
+            expect(approved.events.ApprovalForAll.address).to.equal(kip37Address)
             expect(approved.events.ApprovalForAll.returnValues.account.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(approved.events.ApprovalForAll.returnValues.operator.toLowerCase()).to.equal(testAccount.address)
             expect(approved.events.ApprovalForAll.returnValues.approved).to.be.true
@@ -407,7 +417,7 @@ describe('KIP37 token contract class test', () => {
             expect(approved.status).to.be.true
             expect(approved.events).not.to.be.undefined
             expect(approved.events.ApprovalForAll).not.to.be.undefined
-            expect(approved.events.ApprovalForAll.address).to.equal(multiTokenAddress)
+            expect(approved.events.ApprovalForAll.address).to.equal(kip37Address)
             expect(approved.events.ApprovalForAll.returnValues.account.toLowerCase()).to.equal(testAccount.address.toLowerCase())
             expect(approved.events.ApprovalForAll.returnValues.operator.toLowerCase()).to.equal(sender.address)
             expect(approved.events.ApprovalForAll.returnValues.approved).to.be.true
@@ -416,7 +426,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.isApprovedForAll', () => {
         it("CAVERJS-UNIT-KCT-177: should return an approval of token operations for all of the caller's token", async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const approved = await token.isApprovedForAll(sender.address, testAccount.address)
 
@@ -426,7 +436,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.paused', () => {
         it("CAVERJS-UNIT-KCT-178: should return whether or not the token contract's transaction is paused (no parameter)", async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const paused = await token.paused()
 
@@ -434,7 +444,7 @@ describe('KIP37 token contract class test', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-179: should return whether or not the specific token is paused (with tokenId parameter)', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const paused = await token.paused(tokenId)
 
@@ -442,7 +452,7 @@ describe('KIP37 token contract class test', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-180: should return whether or not the specific token is paused (with various tokenId types parameter)', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             let paused = await token.paused(caver.utils.toHex(tokenId))
             expect(paused).to.be.false
@@ -454,7 +464,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.isPauser', () => {
         it('CAVERJS-UNIT-KCT-181: should return whether the account is pauser or not', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             let isPauser = await token.isPauser(sender.address)
             expect(isPauser).to.be.true
@@ -466,7 +476,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.isMinter', () => {
         it('CAVERJS-UNIT-KCT-182: should return whether the account is minter or not', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             let isMinter = await token.isMinter(sender.address)
             expect(isMinter).to.be.true
@@ -478,7 +488,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.safeTransferFrom', () => {
         it('CAVERJS-UNIT-KCT-183: should transfer the token from owner to receiver', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const transfered = await token.safeTransferFrom(sender.address, receiver.address, tokenId, 1, 'data to send', {
                 from: sender.address,
@@ -488,7 +498,7 @@ describe('KIP37 token contract class test', () => {
             expect(transfered.status).to.be.true
             expect(transfered.events).not.to.be.undefined
             expect(transfered.events.TransferSingle).not.to.be.undefined
-            expect(transfered.events.TransferSingle.address).to.equal(multiTokenAddress)
+            expect(transfered.events.TransferSingle.address).to.equal(kip37Address)
             expect(transfered.events.TransferSingle.returnValues.operator.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(transfered.events.TransferSingle.returnValues.from.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(transfered.events.TransferSingle.returnValues.to.toLowerCase()).to.equal(receiver.address.toLowerCase())
@@ -497,7 +507,7 @@ describe('KIP37 token contract class test', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-184: should transfer the token from owner to receiver by approved operator', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const transfered = await token.safeTransferFrom(
                 sender.address,
@@ -514,7 +524,7 @@ describe('KIP37 token contract class test', () => {
             expect(transfered.status).to.be.true
             expect(transfered.events).not.to.be.undefined
             expect(transfered.events.TransferSingle).not.to.be.undefined
-            expect(transfered.events.TransferSingle.address).to.equal(multiTokenAddress)
+            expect(transfered.events.TransferSingle.address).to.equal(kip37Address)
             expect(transfered.events.TransferSingle.returnValues.operator.toLowerCase()).to.equal(testAccount.address.toLowerCase())
             expect(transfered.events.TransferSingle.returnValues.from.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(transfered.events.TransferSingle.returnValues.to.toLowerCase()).to.equal(receiver.address.toLowerCase())
@@ -523,7 +533,7 @@ describe('KIP37 token contract class test', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-217: should transfer the token without data', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const transfered = await token.safeTransferFrom(sender.address, receiver.address, tokenId, 1, {
                 from: sender.address,
@@ -533,7 +543,7 @@ describe('KIP37 token contract class test', () => {
             expect(transfered.status).to.be.true
             expect(transfered.events).not.to.be.undefined
             expect(transfered.events.TransferSingle).not.to.be.undefined
-            expect(transfered.events.TransferSingle.address).to.equal(multiTokenAddress)
+            expect(transfered.events.TransferSingle.address).to.equal(kip37Address)
             expect(transfered.events.TransferSingle.returnValues.operator.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(transfered.events.TransferSingle.returnValues.from.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(transfered.events.TransferSingle.returnValues.to.toLowerCase()).to.equal(receiver.address.toLowerCase())
@@ -544,7 +554,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.safeBatchTransferFrom', () => {
         it('CAVERJS-UNIT-KCT-185: should transfer the tokens from owner to receiver', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const ids = [tokenIds[0], tokenIds[1]]
             const values = [1, 2]
@@ -556,7 +566,7 @@ describe('KIP37 token contract class test', () => {
             expect(transfered.status).to.be.true
             expect(transfered.events).not.to.be.undefined
             expect(transfered.events.TransferBatch).not.to.be.undefined
-            expect(transfered.events.TransferBatch.address).to.equal(multiTokenAddress)
+            expect(transfered.events.TransferBatch.address).to.equal(kip37Address)
             expect(transfered.events.TransferBatch.returnValues.operator.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(transfered.events.TransferBatch.returnValues.from.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(transfered.events.TransferBatch.returnValues.to.toLowerCase()).to.equal(receiver.address.toLowerCase())
@@ -571,7 +581,7 @@ describe('KIP37 token contract class test', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-186: should transfer the tokens from owner to receiver by approved operator', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const ids = [tokenIds[0], tokenIds[1]]
             const values = [1, 2]
@@ -583,7 +593,7 @@ describe('KIP37 token contract class test', () => {
             expect(transfered.status).to.be.true
             expect(transfered.events).not.to.be.undefined
             expect(transfered.events.TransferBatch).not.to.be.undefined
-            expect(transfered.events.TransferBatch.address).to.equal(multiTokenAddress)
+            expect(transfered.events.TransferBatch.address).to.equal(kip37Address)
             expect(transfered.events.TransferBatch.returnValues.operator.toLowerCase()).to.equal(testAccount.address.toLowerCase())
             expect(transfered.events.TransferBatch.returnValues.from.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(transfered.events.TransferBatch.returnValues.to.toLowerCase()).to.equal(receiver.address.toLowerCase())
@@ -598,7 +608,7 @@ describe('KIP37 token contract class test', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-218: should transfer the tokens without data', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const ids = [tokenIds[0], tokenIds[1]]
             const values = [1, 2]
@@ -610,7 +620,7 @@ describe('KIP37 token contract class test', () => {
             expect(transfered.status).to.be.true
             expect(transfered.events).not.to.be.undefined
             expect(transfered.events.TransferBatch).not.to.be.undefined
-            expect(transfered.events.TransferBatch.address).to.equal(multiTokenAddress)
+            expect(transfered.events.TransferBatch.address).to.equal(kip37Address)
             expect(transfered.events.TransferBatch.returnValues.operator.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(transfered.events.TransferBatch.returnValues.from.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(transfered.events.TransferBatch.returnValues.to.toLowerCase()).to.equal(receiver.address.toLowerCase())
@@ -627,7 +637,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.mintBatch', () => {
         it('CAVERJS-UNIT-KCT-187: should mint the specific tokens', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const ids = tokenIds
             const values = new Array(tokenIds.length).fill(10)
@@ -639,7 +649,7 @@ describe('KIP37 token contract class test', () => {
             expect(minted.status).to.be.true
             expect(minted.events).not.to.be.undefined
             expect(minted.events.TransferBatch).not.to.be.undefined
-            expect(minted.events.TransferBatch.address).to.equal(multiTokenAddress)
+            expect(minted.events.TransferBatch.address).to.equal(kip37Address)
             expect(minted.events.TransferBatch.returnValues.operator.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(minted.events.TransferBatch.returnValues.from.toLowerCase()).to.equal('0x0000000000000000000000000000000000000000')
             expect(minted.events.TransferBatch.returnValues.to.toLowerCase()).to.equal(testAccount.address.toLowerCase())
@@ -654,7 +664,7 @@ describe('KIP37 token contract class test', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-188: should mint the specific tokens with various tokenId types', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             let ids = tokenIds.map(id => caver.utils.toHex(id))
             let values = new Array(tokenIds.length).fill(caver.utils.toHex(10))
@@ -666,7 +676,7 @@ describe('KIP37 token contract class test', () => {
             expect(minted.status).to.be.true
             expect(minted.events).not.to.be.undefined
             expect(minted.events.TransferBatch).not.to.be.undefined
-            expect(minted.events.TransferBatch.address).to.equal(multiTokenAddress)
+            expect(minted.events.TransferBatch.address).to.equal(kip37Address)
             expect(minted.events.TransferBatch.returnValues.operator.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(minted.events.TransferBatch.returnValues.from.toLowerCase()).to.equal('0x0000000000000000000000000000000000000000')
             expect(minted.events.TransferBatch.returnValues.to.toLowerCase()).to.equal(testAccount.address.toLowerCase())
@@ -689,7 +699,7 @@ describe('KIP37 token contract class test', () => {
             expect(minted.status).to.be.true
             expect(minted.events).not.to.be.undefined
             expect(minted.events.TransferBatch).not.to.be.undefined
-            expect(minted.events.TransferBatch.address).to.equal(multiTokenAddress)
+            expect(minted.events.TransferBatch.address).to.equal(kip37Address)
             expect(minted.events.TransferBatch.returnValues.operator.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(minted.events.TransferBatch.returnValues.from.toLowerCase()).to.equal('0x0000000000000000000000000000000000000000')
             expect(minted.events.TransferBatch.returnValues.to.toLowerCase()).to.equal(testAccount.address.toLowerCase())
@@ -706,7 +716,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.addMinter', () => {
         it('CAVERJS-UNIT-KCT-189: should add minter', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const added = await token.addMinter(testAccount.address, { from: sender.address })
 
@@ -714,7 +724,7 @@ describe('KIP37 token contract class test', () => {
             expect(added.status).to.be.true
             expect(added.events).not.to.be.undefined
             expect(added.events.MinterAdded).not.to.be.undefined
-            expect(added.events.MinterAdded.address).to.equal(multiTokenAddress)
+            expect(added.events.MinterAdded.address).to.equal(kip37Address)
             expect(added.events.MinterAdded.returnValues.account.toLowerCase()).to.equal(testAccount.address.toLowerCase())
             expect(await token.isMinter(testAccount.address)).to.be.true
         }).timeout(200000)
@@ -722,7 +732,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.renounceMinter', () => {
         it('CAVERJS-UNIT-KCT-190: should renounce minter', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const removed = await token.renounceMinter({ from: testAccount.address })
 
@@ -730,7 +740,7 @@ describe('KIP37 token contract class test', () => {
             expect(removed.status).to.be.true
             expect(removed.events).not.to.be.undefined
             expect(removed.events.MinterRemoved).not.to.be.undefined
-            expect(removed.events.MinterRemoved.address).to.equal(multiTokenAddress)
+            expect(removed.events.MinterRemoved.address).to.equal(kip37Address)
             expect(removed.events.MinterRemoved.returnValues.account.toLowerCase()).to.equal(testAccount.address.toLowerCase())
             expect(await token.isMinter(testAccount.address)).to.be.false
         }).timeout(200000)
@@ -738,7 +748,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.burn', () => {
         it('CAVERJS-UNIT-KCT-191: should burn the specific token', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const originalBalance = await token.balanceOf(sender.address, tokenIds[0])
             const burned = await token.burn(sender.address, tokenIds[0], 1, { from: sender.address })
@@ -748,7 +758,7 @@ describe('KIP37 token contract class test', () => {
             expect(burned.status).to.be.true
             expect(burned.events).not.to.be.undefined
             expect(burned.events.TransferSingle).not.to.be.undefined
-            expect(burned.events.TransferSingle.address).to.equal(multiTokenAddress)
+            expect(burned.events.TransferSingle.address).to.equal(kip37Address)
             expect(burned.events.TransferSingle.returnValues.operator.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(burned.events.TransferSingle.returnValues.from.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(burned.events.TransferSingle.returnValues.to.toLowerCase()).to.equal('0x0000000000000000000000000000000000000000')
@@ -758,7 +768,7 @@ describe('KIP37 token contract class test', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-192: should burn the specific token by approved operator', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const originalBalance = await token.balanceOf(sender.address, tokenIds[0])
             const burned = await token.burn(sender.address, caver.utils.toHex(tokenIds[0]), '1', { from: testAccount.address })
@@ -768,7 +778,7 @@ describe('KIP37 token contract class test', () => {
             expect(burned.status).to.be.true
             expect(burned.events).not.to.be.undefined
             expect(burned.events.TransferSingle).not.to.be.undefined
-            expect(burned.events.TransferSingle.address).to.equal(multiTokenAddress)
+            expect(burned.events.TransferSingle.address).to.equal(kip37Address)
             expect(burned.events.TransferSingle.returnValues.operator.toLowerCase()).to.equal(testAccount.address.toLowerCase())
             expect(burned.events.TransferSingle.returnValues.from.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(burned.events.TransferSingle.returnValues.to.toLowerCase()).to.equal('0x0000000000000000000000000000000000000000')
@@ -780,7 +790,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.burnBatch', () => {
         it('CAVERJS-UNIT-KCT-193: should burn the specific tokens', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const ids = tokenIds
             const values = new Array(ids.length).fill(1)
@@ -794,7 +804,7 @@ describe('KIP37 token contract class test', () => {
             expect(burned.status).to.be.true
             expect(burned.events).not.to.be.undefined
             expect(burned.events.TransferBatch).not.to.be.undefined
-            expect(burned.events.TransferBatch.address).to.equal(multiTokenAddress)
+            expect(burned.events.TransferBatch.address).to.equal(kip37Address)
             expect(burned.events.TransferBatch.returnValues.operator.toLowerCase()).to.equal(testAccount.address.toLowerCase())
             expect(burned.events.TransferBatch.returnValues.from.toLowerCase()).to.equal(testAccount.address.toLowerCase())
             expect(burned.events.TransferBatch.returnValues.to.toLowerCase()).to.equal('0x0000000000000000000000000000000000000000')
@@ -811,7 +821,7 @@ describe('KIP37 token contract class test', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-194: should burn the specific tokens by approved operator', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const ids = tokenIds.map(id => caver.utils.toHex(id))
             const values = new Array(ids.length).fill(caver.utils.toHex(1))
@@ -825,7 +835,7 @@ describe('KIP37 token contract class test', () => {
             expect(burned.status).to.be.true
             expect(burned.events).not.to.be.undefined
             expect(burned.events.TransferBatch).not.to.be.undefined
-            expect(burned.events.TransferBatch.address).to.equal(multiTokenAddress)
+            expect(burned.events.TransferBatch.address).to.equal(kip37Address)
             expect(burned.events.TransferBatch.returnValues.operator.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(burned.events.TransferBatch.returnValues.from.toLowerCase()).to.equal(testAccount.address.toLowerCase())
             expect(burned.events.TransferBatch.returnValues.to.toLowerCase()).to.equal('0x0000000000000000000000000000000000000000')
@@ -844,7 +854,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.pause', () => {
         it('CAVERJS-UNIT-KCT-195: should pause the KIP-37 token contract (without tokenId parameter)', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const paused = await token.pause({ from: sender.address })
 
@@ -852,7 +862,7 @@ describe('KIP37 token contract class test', () => {
             expect(paused.status).to.be.true
             expect(paused.events).not.to.be.undefined
             expect(paused.events.Paused).not.to.be.undefined
-            expect(paused.events.Paused.address).to.equal(multiTokenAddress)
+            expect(paused.events.Paused.address).to.equal(kip37Address)
             expect(paused.events.Paused.returnValues.account.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(await token.paused()).to.be.true
 
@@ -860,7 +870,7 @@ describe('KIP37 token contract class test', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-196: should pause the specific token', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const paused = await token.pause(tokenIds[0], { from: sender.address })
 
@@ -868,14 +878,14 @@ describe('KIP37 token contract class test', () => {
             expect(paused.status).to.be.true
             expect(paused.events).not.to.be.undefined
             expect(paused.events.Paused).not.to.be.undefined
-            expect(paused.events.Paused.address).to.equal(multiTokenAddress)
+            expect(paused.events.Paused.address).to.equal(kip37Address)
             expect(paused.events.Paused.returnValues.account.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(paused.events.Paused.returnValues.tokenId).to.equal(tokenIds[0].toString())
             expect(await token.paused(tokenIds[0])).to.be.true
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-197: should pause the specific token with various tokenId types', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             let paused = await token.pause(caver.utils.toHex(tokenIds[1]), { from: sender.address })
 
@@ -883,7 +893,7 @@ describe('KIP37 token contract class test', () => {
             expect(paused.status).to.be.true
             expect(paused.events).not.to.be.undefined
             expect(paused.events.Paused).not.to.be.undefined
-            expect(paused.events.Paused.address).to.equal(multiTokenAddress)
+            expect(paused.events.Paused.address).to.equal(kip37Address)
             expect(paused.events.Paused.returnValues.account.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(paused.events.Paused.returnValues.tokenId).to.equal(tokenIds[1].toString())
             expect(await token.paused(tokenIds[1])).to.be.true
@@ -894,7 +904,7 @@ describe('KIP37 token contract class test', () => {
             expect(paused.status).to.be.true
             expect(paused.events).not.to.be.undefined
             expect(paused.events.Paused).not.to.be.undefined
-            expect(paused.events.Paused.address).to.equal(multiTokenAddress)
+            expect(paused.events.Paused.address).to.equal(kip37Address)
             expect(paused.events.Paused.returnValues.account.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(paused.events.Paused.returnValues.tokenId).to.equal(tokenIds[2].toString())
             expect(await token.paused(tokenIds[2])).to.be.true
@@ -903,7 +913,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.unpause', () => {
         it('CAVERJS-UNIT-KCT-198: should unpause the KIP-37 token contract (without tokenId parameter)', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             await token.pause({ from: sender.address })
             expect(await token.paused()).to.be.true
@@ -914,12 +924,12 @@ describe('KIP37 token contract class test', () => {
             expect(unpaused.status).to.be.true
             expect(unpaused.events).not.to.be.undefined
             expect(unpaused.events.Unpaused).not.to.be.undefined
-            expect(unpaused.events.Unpaused.address).to.equal(multiTokenAddress)
+            expect(unpaused.events.Unpaused.address).to.equal(kip37Address)
             expect(unpaused.events.Unpaused.returnValues.account.toLowerCase()).to.equal(sender.address.toLowerCase())
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-199: should unpause the specific token', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const paused = await token.unpause(tokenIds[0], { from: sender.address })
 
@@ -927,14 +937,14 @@ describe('KIP37 token contract class test', () => {
             expect(paused.status).to.be.true
             expect(paused.events).not.to.be.undefined
             expect(paused.events.Unpaused).not.to.be.undefined
-            expect(paused.events.Unpaused.address).to.equal(multiTokenAddress)
+            expect(paused.events.Unpaused.address).to.equal(kip37Address)
             expect(paused.events.Unpaused.returnValues.account.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(paused.events.Unpaused.returnValues.tokenId).to.equal(tokenIds[0].toString())
             expect(await token.paused(tokenIds[0])).to.be.false
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-200: should unpause the specific token with various tokenId types', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             let unpaused = await token.unpause(caver.utils.toHex(tokenIds[1]), { from: sender.address })
 
@@ -942,7 +952,7 @@ describe('KIP37 token contract class test', () => {
             expect(unpaused.status).to.be.true
             expect(unpaused.events).not.to.be.undefined
             expect(unpaused.events.Unpaused).not.to.be.undefined
-            expect(unpaused.events.Unpaused.address).to.equal(multiTokenAddress)
+            expect(unpaused.events.Unpaused.address).to.equal(kip37Address)
             expect(unpaused.events.Unpaused.returnValues.account.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(unpaused.events.Unpaused.returnValues.tokenId).to.equal(tokenIds[1].toString())
             expect(await token.paused(tokenIds[1])).to.be.false
@@ -953,7 +963,7 @@ describe('KIP37 token contract class test', () => {
             expect(unpaused.status).to.be.true
             expect(unpaused.events).not.to.be.undefined
             expect(unpaused.events.Unpaused).not.to.be.undefined
-            expect(unpaused.events.Unpaused.address).to.equal(multiTokenAddress)
+            expect(unpaused.events.Unpaused.address).to.equal(kip37Address)
             expect(unpaused.events.Unpaused.returnValues.account.toLowerCase()).to.equal(sender.address.toLowerCase())
             expect(unpaused.events.Unpaused.returnValues.tokenId).to.equal(tokenIds[2].toString())
             expect(await token.paused(tokenIds[2])).to.be.false
@@ -962,7 +972,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.addPauser', () => {
         it('CAVERJS-UNIT-KCT-201: should add pauser', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const added = await token.addPauser(testAccount.address, { from: sender.address })
 
@@ -970,7 +980,7 @@ describe('KIP37 token contract class test', () => {
             expect(added.status).to.be.true
             expect(added.events).not.to.be.undefined
             expect(added.events.PauserAdded).not.to.be.undefined
-            expect(added.events.PauserAdded.address).to.equal(multiTokenAddress)
+            expect(added.events.PauserAdded.address).to.equal(kip37Address)
             expect(added.events.PauserAdded.returnValues.account.toLowerCase()).to.equal(testAccount.address.toLowerCase())
             expect(await token.isPauser(testAccount.address)).to.be.true
         }).timeout(200000)
@@ -978,7 +988,7 @@ describe('KIP37 token contract class test', () => {
 
     context('kip37.renouncePauser', () => {
         it('CAVERJS-UNIT-KCT-202: should renounce pauser', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
 
             const removed = await token.renouncePauser({ from: testAccount.address })
 
@@ -986,7 +996,7 @@ describe('KIP37 token contract class test', () => {
             expect(removed.status).to.be.true
             expect(removed.events).not.to.be.undefined
             expect(removed.events.PauserRemoved).not.to.be.undefined
-            expect(removed.events.PauserRemoved.address).to.equal(multiTokenAddress)
+            expect(removed.events.PauserRemoved.address).to.equal(kip37Address)
             expect(removed.events.PauserRemoved.returnValues.account.toLowerCase()).to.equal(testAccount.address.toLowerCase())
             expect(await token.isPauser(testAccount.address)).to.be.false
         }).timeout(200000)
@@ -994,7 +1004,7 @@ describe('KIP37 token contract class test', () => {
 
     context('KIP37.detectInterface', () => {
         it('CAVERJS-UNIT-KCT-211: should return valid object if contract is deployed by caver', async () => {
-            const token = new caver.kct.kip37(multiTokenAddress)
+            const token = new caver.kct.kip37(kip37Address)
             let detected = await token.detectInterface()
 
             expect(detected.IKIP37).to.be.true
@@ -1004,7 +1014,7 @@ describe('KIP37 token contract class test', () => {
             expect(detected.IKIP37Pausable).to.be.true
 
             // Test static function
-            detected = await caver.kct.kip37.detectInterface(multiTokenAddress)
+            detected = await caver.kct.kip37.detectInterface(kip37Address)
 
             expect(detected.IKIP37).to.be.true
             expect(detected.IKIP37Metadata).to.be.true
@@ -1120,6 +1130,223 @@ describe('KIP37 token contract class test', () => {
             const expectedError = `This contract does not support KIP-13.`
             await expect(token.detectInterface()).to.be.rejectedWith(expectedError)
             await expect(caver.kct.kip37.detectInterface(contractAddress)).to.be.rejectedWith(expectedError)
+        }).timeout(200000)
+    })
+
+    context('KIP37 with fee delegation', () => {
+        const contractDeployFormatter = receipt => {
+            return receipt
+        }
+
+        it('CAVERJS-UNIT-KCT-244: should send TxTypeSmartContractDeploy to deploy when feeDelegation is defined as true', async () => {
+            const deployed = await caver.kct.kip37.deploy({ uri: tokenURI }, {
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                contractDeployFormatter,
+            })
+
+            expect(deployed.from).to.equals(sender.address.toLowerCase())
+            expect(deployed.status).to.be.true
+            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-245: should send TxTypeFeeDelegatedSmartContractDeployWithRatio to deploy when feeRatio is defined and feeDelegation is defined as true', async () => {
+            const deployed = await caver.kct.kip37.deploy({ uri: tokenURI }, {
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                feeRatio: 30,
+                contractDeployFormatter,
+            })
+
+            expect(deployed.from).to.equals(sender.address.toLowerCase())
+            expect(deployed.status).to.be.true
+            expect(deployed.feeRatio).to.equal(caver.utils.numberToHex(30))
+            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-246: should send TxTypeSmartContractExecution to add minter when feeDelegation is defined as true', async () => {
+            const token = caver.kct.kip37.create(kip37Address)
+
+            const added = await token.addMinter(caver.wallet.keyring.generate().address, {
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+            })
+
+            expect(added.from).to.equals(sender.address.toLowerCase())
+            expect(added.status).to.be.true
+            expect(added.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-247: should send TxTypeSmartContractExecution to add minter when feeDelegation is defined as true via options', async () => {
+            const token = caver.kct.kip37.create(kip37Address)
+
+            token.options.from = sender.address
+            token.options.feeDelegation = true
+            token.options.feePayer = feePayer.address
+
+            const added = await token.addMinter(caver.wallet.keyring.generate().address)
+
+            expect(added.from).to.equals(sender.address.toLowerCase())
+            expect(added.status).to.be.true
+            expect(added.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-248: should send TxTypeFeeDelegatedSmartContractExecutionWithRatio to add minter when feeRatio is defined and feeDelegation is defined as true', async () => {
+            const token = caver.kct.kip37.create(kip37Address)
+
+            const added = await token.addMinter(caver.wallet.keyring.generate().address, {
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                feeRatio: 30,
+            })
+
+            expect(added.from).to.equals(sender.address.toLowerCase())
+            expect(added.status).to.be.true
+            expect(added.feeRatio).to.equal(caver.utils.numberToHex(30))
+            expect(added.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-249: should send TxTypeFeeDelegatedSmartContractExecutionWithRatio to add minter when feeRatio is defined and feeDelegation is defined as true via options', async () => {
+            const token = caver.kct.kip37.create(kip37Address)
+
+            token.options.from = sender.address
+            token.options.feeDelegation = true
+            token.options.feePayer = feePayer.address
+            token.options.feeRatio = 30
+
+            const added = await token.addMinter(caver.wallet.keyring.generate().address)
+
+            expect(added.from).to.equals(sender.address.toLowerCase())
+            expect(added.status).to.be.true
+            expect(added.feeRatio).to.equal(caver.utils.numberToHex(30))
+            expect(added.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-250: should overwrite contract.options when user send sendOptions parameter', async () => {
+            const token = caver.kct.kip37.create(kip37Address)
+
+            token.options.from = feePayer.address
+            token.options.feeDelegation = false
+            token.options.feePayer = sender.address
+            token.options.feeRatio = 50
+
+            const added = await token.addMinter(caver.wallet.keyring.generate().address, {
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                feeRatio: 30,
+                gas: 1231234,
+            })
+
+            expect(added.from).to.equals(sender.address.toLowerCase())
+            expect(added.status).to.be.true
+            expect(added.feeRatio).to.equal(caver.utils.numberToHex(30))
+            expect(added.gas).to.equal(caver.utils.numberToHex(1231234))
+            expect(added.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-251: should sign and return signed TxTypeFeeDelegatedSmartContractDeploy', async () => {
+            const token = caver.kct.kip37.create()
+
+            const signed = await token.sign({
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                gas: 30000000,
+            }, 'constructor', caver.kct.kip37.byteCode, tokenURI)
+
+            expect(signed.from).to.equal(sender.address)
+            expect(signed.feePayer).to.equal(feePayer.address)
+            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+            await caver.wallet.signAsFeePayer(feePayer.address, signed)
+
+            const deployed = await caver.rpc.klay.sendRawTransaction(signed)
+
+            expect(deployed.from).to.equals(sender.address.toLowerCase())
+            expect(deployed.feePayer).to.equals(feePayer.address.toLowerCase())
+            expect(deployed.status).to.equal('0x1')
+            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-252: should sign as fee payer and return signed TxTypeFeeDelegatedSmartContractDeploy', async () => {
+            const token = caver.kct.kip37.create()
+
+            const signed = await token.signAsFeePayer({
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                gas: 30000000,
+            }, 'constructor', caver.kct.kip37.byteCode, tokenURI)
+
+            expect(signed.from).to.equal(sender.address)
+            expect(signed.feePayer).to.equal(feePayer.address)
+            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+            await caver.wallet.sign(sender.address, signed)
+
+            const deployed = await caver.rpc.klay.sendRawTransaction(signed)
+
+            expect(deployed.from).to.equals(sender.address.toLowerCase())
+            expect(deployed.feePayer).to.equals(feePayer.address.toLowerCase())
+            expect(deployed.status).to.equal('0x1')
+            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-253: should sign and return signed TxTypeFeeDelegatedSmartContractExecution', async () => {
+            const token = caver.kct.kip37.create(kip37Address)
+
+            const signed = await token.sign({
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                gas: 30000000,
+            }, 'addMinter', caver.wallet.keyring.generate().address)
+
+            expect(signed.from).to.equal(sender.address)
+            expect(signed.feePayer).to.equal(feePayer.address)
+            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+
+            await caver.wallet.signAsFeePayer(feePayer.address, signed)
+
+            const deployed = await caver.rpc.klay.sendRawTransaction(signed)
+
+            expect(deployed.from).to.equals(sender.address.toLowerCase())
+            expect(deployed.feePayer).to.equals(feePayer.address.toLowerCase())
+            expect(deployed.status).to.equal('0x1')
+            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-254: should sign as fee payer and return signed TxTypeFeeDelegatedSmartContractExecution', async () => {
+            const token = caver.kct.kip37.create(kip37Address)
+
+            const signed = await token.signAsFeePayer({
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                gas: 30000000,
+            }, 'addMinter', caver.wallet.keyring.generate().address)
+
+            expect(signed.from).to.equal(sender.address)
+            expect(signed.feePayer).to.equal(feePayer.address)
+            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+
+            await caver.wallet.sign(sender.address, signed)
+
+            const deployed = await caver.rpc.klay.sendRawTransaction(signed)
+
+            expect(deployed.from).to.equals(sender.address.toLowerCase())
+            expect(deployed.feePayer).to.equals(feePayer.address.toLowerCase())
+            expect(deployed.status).to.equal('0x1')
+            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
         }).timeout(200000)
     })
 })

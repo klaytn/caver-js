@@ -21,6 +21,7 @@ const BigNumber = require('bignumber.js')
 
 const testRPCURL = require('../testrpc')
 const { expect } = require('../extendedChai')
+const { TX_TYPE_STRING } = require('../../packages/caver-transaction/src/transactionHelper/transactionHelper')
 
 const Caver = require('../../index.js')
 
@@ -28,6 +29,7 @@ let caver
 let caver2
 let kip7s
 let sender
+let feePayer
 let testAccount
 let receiver
 
@@ -74,6 +76,14 @@ before(function(done) {
 
     sender = caver.wallet.keyring.createFromPrivateKey(senderPrvKey)
     caver.wallet.add(sender)
+
+    const feePayerPrvKey =
+        process.env.privateKey2 && String(process.env.privateKey2).indexOf('0x') === -1
+            ? `0x${process.env.privateKey2}`
+            : process.env.privateKey2
+
+    feePayer = caver.wallet.keyring.createFromPrivateKey(feePayerPrvKey)
+    caver.wallet.add(feePayer)
 
     caver2.klay.accounts.wallet.add(senderPrvKey)
 
@@ -264,7 +274,7 @@ describe(`KIP7 token contract class test`, () => {
                 expect(afterAllowance.minus(originalAllowance).eq(allowanceAmount)).to.be.true
 
                 // reset allowance
-                await token.approve(testAccount.address, 0)
+                const approved2 = await token.approve(testAccount.address, 0)
             }
         }).timeout(200000)
 
@@ -2024,6 +2034,233 @@ describe(`KIP7 token contract class test`, () => {
                 await expect(token.detectInterface()).to.be.rejectedWith(expectedError)
                 await expect(kip7.detectInterface(contractAddress)).to.be.rejectedWith(expectedError)
             }
+        }).timeout(200000)
+    })
+
+    context('KIP7 with fee delegation', () => {
+        const contractDeployFormatter = receipt => {
+            return receipt
+        }
+
+        it('CAVERJS-UNIT-KCT-222: should send TxTypeSmartContractDeploy to deploy when feeDelegation is defined as true', async () => {
+            const deployed = await caver.kct.kip7.deploy({
+                name: 'Jasmine',
+                symbol: 'JAS',
+                decimals: 18,
+                initialSupply: '10000000000000000000',
+            }, {
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                contractDeployFormatter,
+            })
+
+            expect(deployed.from).to.equals(sender.address.toLowerCase())
+            expect(deployed.status).to.be.true
+            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-223: should send TxTypeFeeDelegatedSmartContractDeployWithRatio to deploy when feeRatio is defined and feeDelegation is defined as true', async () => {
+            const deployed = await caver.kct.kip7.deploy({
+                name: 'Jasmine',
+                symbol: 'JAS',
+                decimals: 18,
+                initialSupply: '10000000000000000000',
+            }, {
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                feeRatio: 30,
+                contractDeployFormatter,
+            })
+
+            expect(deployed.from).to.equals(sender.address.toLowerCase())
+            expect(deployed.status).to.be.true
+            expect(deployed.feeRatio).to.equal(caver.utils.numberToHex(30))
+            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-224: should send TxTypeSmartContractExecution to add minter when feeDelegation is defined as true', async () => {
+            const token = caver.kct.kip7.create(kip7Address)
+
+            const added = await token.addMinter(caver.wallet.keyring.generate().address, {
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+            })
+
+            expect(added.from).to.equals(sender.address.toLowerCase())
+            expect(added.status).to.be.true
+            expect(added.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-225: should send TxTypeSmartContractExecution to add minter when feeDelegation is defined as true via options', async () => {
+            const token = caver.kct.kip7.create(kip7Address)
+
+            token.options.from = sender.address
+            token.options.feeDelegation = true
+            token.options.feePayer = feePayer.address
+
+            const added = await token.addMinter(caver.wallet.keyring.generate().address)
+
+            expect(added.from).to.equals(sender.address.toLowerCase())
+            expect(added.status).to.be.true
+            expect(added.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-226: should send TxTypeFeeDelegatedSmartContractExecutionWithRatio to add minter when feeRatio is defined and feeDelegation is defined as true', async () => {
+            const token = caver.kct.kip7.create(kip7Address)
+
+            const added = await token.addMinter(caver.wallet.keyring.generate().address, {
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                feeRatio: 30,
+            })
+
+            expect(added.from).to.equals(sender.address.toLowerCase())
+            expect(added.status).to.be.true
+            expect(added.feeRatio).to.equal(caver.utils.numberToHex(30))
+            expect(added.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-227: should send TxTypeFeeDelegatedSmartContractExecutionWithRatio to add minter when feeRatio is defined and feeDelegation is defined as true via options', async () => {
+            const token = caver.kct.kip7.create(kip7Address)
+
+            token.options.from = sender.address
+            token.options.feeDelegation = true
+            token.options.feePayer = feePayer.address
+            token.options.feeRatio = 30
+
+            const added = await token.addMinter(caver.wallet.keyring.generate().address)
+
+            expect(added.from).to.equals(sender.address.toLowerCase())
+            expect(added.status).to.be.true
+            expect(added.feeRatio).to.equal(caver.utils.numberToHex(30))
+            expect(added.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-228: should overwrite contract.options when user send sendOptions parameter', async () => {
+            const token = caver.kct.kip7.create(kip7Address)
+
+            token.options.from = feePayer.address
+            token.options.feeDelegation = false
+            token.options.feePayer = sender.address
+            token.options.feeRatio = 50
+
+            const added = await token.addMinter(caver.wallet.keyring.generate().address, {
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                feeRatio: 30,
+                gas: 1231234,
+            })
+
+            expect(added.from).to.equals(sender.address.toLowerCase())
+            expect(added.status).to.be.true
+            expect(added.feeRatio).to.equal(caver.utils.numberToHex(30))
+            expect(added.gas).to.equal(caver.utils.numberToHex(1231234))
+            expect(added.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-229: should sign and return signed TxTypeFeeDelegatedSmartContractDeploy', async () => {
+            const token = caver.kct.kip7.create()
+
+            const signed = await token.sign({
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                gas: 30000000,
+            }, 'constructor', caver.kct.kip7.byteCode, 'Jasmine', 'JAS', 18, '10000000000000000000')
+
+            expect(signed.from).to.equal(sender.address)
+            expect(signed.feePayer).to.equal(feePayer.address)
+            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+            await caver.wallet.signAsFeePayer(feePayer.address, signed)
+
+            const deployed = await caver.rpc.klay.sendRawTransaction(signed)
+
+            expect(deployed.from).to.equals(sender.address.toLowerCase())
+            expect(deployed.feePayer).to.equals(feePayer.address.toLowerCase())
+            expect(deployed.status).to.equal('0x1')
+            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-230: should sign as fee payer and return signed TxTypeFeeDelegatedSmartContractDeploy', async () => {
+            const token = caver.kct.kip7.create()
+
+            const signed = await token.signAsFeePayer({
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                gas: 30000000,
+            }, 'constructor', caver.kct.kip7.byteCode, 'Jasmine', 'JAS', 18, '10000000000000000000')
+
+            expect(signed.from).to.equal(sender.address)
+            expect(signed.feePayer).to.equal(feePayer.address)
+            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+            await caver.wallet.sign(sender.address, signed)
+
+            const deployed = await caver.rpc.klay.sendRawTransaction(signed)
+
+            expect(deployed.from).to.equals(sender.address.toLowerCase())
+            expect(deployed.feePayer).to.equals(feePayer.address.toLowerCase())
+            expect(deployed.status).to.equal('0x1')
+            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-231: should sign and return signed TxTypeFeeDelegatedSmartContractExecution', async () => {
+            const token = caver.kct.kip7.create(kip7Address)
+
+            const signed = await token.sign({
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                gas: 30000000,
+            }, 'addMinter', caver.wallet.keyring.generate().address)
+
+            expect(signed.from).to.equal(sender.address)
+            expect(signed.feePayer).to.equal(feePayer.address)
+            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+
+            await caver.wallet.signAsFeePayer(feePayer.address, signed)
+
+            const deployed = await caver.rpc.klay.sendRawTransaction(signed)
+
+            expect(deployed.from).to.equals(sender.address.toLowerCase())
+            expect(deployed.feePayer).to.equals(feePayer.address.toLowerCase())
+            expect(deployed.status).to.equal('0x1')
+            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-232: should sign as fee payer and return signed TxTypeFeeDelegatedSmartContractExecution', async () => {
+            const token = caver.kct.kip7.create(kip7Address)
+
+            const signed = await token.signAsFeePayer({
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                gas: 30000000,
+            }, 'addMinter', caver.wallet.keyring.generate().address)
+
+            expect(signed.from).to.equal(sender.address)
+            expect(signed.feePayer).to.equal(feePayer.address)
+            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+
+            await caver.wallet.sign(sender.address, signed)
+
+            const deployed = await caver.rpc.klay.sendRawTransaction(signed)
+
+            expect(deployed.from).to.equals(sender.address.toLowerCase())
+            expect(deployed.feePayer).to.equals(feePayer.address.toLowerCase())
+            expect(deployed.status).to.equal('0x1')
+            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
         }).timeout(200000)
     })
 })

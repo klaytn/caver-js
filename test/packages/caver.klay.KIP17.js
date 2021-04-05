@@ -21,6 +21,7 @@ const BigNumber = require('bignumber.js')
 
 const testRPCURL = require('../testrpc')
 const { expect } = require('../extendedChai')
+const { TX_TYPE_STRING } = require('../../packages/caver-transaction/src/transactionHelper/transactionHelper')
 
 const Caver = require('../../index.js')
 
@@ -28,6 +29,7 @@ let caver
 let caver2
 let kip17s
 let sender
+let feePayer
 let testAccount
 let receiver
 
@@ -35,7 +37,7 @@ let tokenId = 0
 
 const ownerMap = {}
 
-let nonFungibleTokenAddress
+let kip17Address
 
 const tokenInfo = {
     name: 'Jasmine',
@@ -82,6 +84,14 @@ before(function(done) {
     caver.wallet.add(sender)
     ownerMap[sender.address] = []
 
+    const feePayerPrvKey =
+        process.env.privateKey2 && String(process.env.privateKey2).indexOf('0x') === -1
+            ? `0x${process.env.privateKey2}`
+            : process.env.privateKey2
+
+    feePayer = caver.wallet.keyring.createFromPrivateKey(feePayerPrvKey)
+    caver.wallet.add(feePayer)
+
     caver2.klay.accounts.wallet.add(senderPrvKey)
 
     kip17s = [caver.kct.kip17, caver2.klay.KIP17]
@@ -102,7 +112,7 @@ describe('KIP17 token contract class test', () => {
                 expect(account.accType).to.equals(2)
                 expect(account.account.key.keyType).to.equals(3)
 
-                nonFungibleTokenAddress = deployed.options.address
+                kip17Address = deployed.options.address
             }
         }).timeout(200000)
 
@@ -126,7 +136,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.clone', () => {
         it('CAVERJS-UNIT-KCT-064: should clone KIP17 instance with new token contract address', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const newTokenContract = caver.klay.accounts.create().address
                 const cloned = token.clone(newTokenContract)
@@ -140,7 +150,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.name', () => {
         it('CAVERJS-UNIT-KCT-065: should call name method', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const name = await token.name()
 
@@ -152,7 +162,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.symbol', () => {
         it('CAVERJS-UNIT-KCT-066: should call symbol method', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const symbol = await token.symbol()
 
@@ -165,7 +175,7 @@ describe('KIP17 token contract class test', () => {
         let expectedTotal = 0
         it('CAVERJS-UNIT-KCT-067: should call totalSupply method', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 let totalSupply = await token.totalSupply()
                 expect(totalSupply.eq(expectedTotal)).to.be.true
@@ -184,7 +194,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.tokenURI', () => {
         it('CAVERJS-UNIT-KCT-068: should call tokenURI method', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 let uri = await token.tokenURI(new BigNumber(0))
                 expect(uri).to.equals(tokenURI)
@@ -201,7 +211,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.tokenOfOwnerByIndex', () => {
         it('CAVERJS-UNIT-KCT-069: should call tokenOfOwnerByIndex method', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const tokenByIndex = await token.tokenOfOwnerByIndex(sender.address, 0)
                 expect(tokenByIndex.eq(0)).to.be.true
@@ -212,7 +222,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.tokenByIndex', () => {
         it('CAVERJS-UNIT-KCT-070: should call tokenByIndex method', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 let tokenByIndex = await token.tokenByIndex(0)
                 expect(tokenByIndex.eq(0)).to.be.true
@@ -230,7 +240,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.balanceOf', () => {
         it('CAVERJS-UNIT-KCT-071: should call balanceOf method', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 let balance = await token.balanceOf(sender.address)
                 expect(balance.eq(0)).to.be.false
@@ -244,7 +254,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.ownerOf', () => {
         it('CAVERJS-UNIT-KCT-072: should call balanceOf method', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 let owner = await token.ownerOf('0')
                 expect(owner.toLowerCase()).to.equals(sender.address.toLowerCase())
@@ -259,7 +269,7 @@ describe('KIP17 token contract class test', () => {
         let approvedId = 0
         it('CAVERJS-UNIT-KCT-073: should call getApproved method', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 let approved = await token.getApproved(approvedId)
                 expect(approved).to.equals('0x0000000000000000000000000000000000000000')
@@ -276,7 +286,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.isApprovedForAll', () => {
         it('CAVERJS-UNIT-KCT-074: should call isApprovedForAll method', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 let isApprovedForAll = await token.isApprovedForAll(sender.address, testAccount.address)
                 expect(isApprovedForAll).to.be.false
@@ -294,7 +304,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.isMinter', () => {
         it('CAVERJS-UNIT-KCT-075: should call isMinter method', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 let isMinter = await token.isMinter(sender.address)
                 expect(isMinter).to.be.true
@@ -318,7 +328,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.paused', () => {
         it('CAVERJS-UNIT-KCT-076: should call paused method', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 let paused = await token.paused()
                 expect(paused).to.be.false
@@ -339,7 +349,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.isPauser', () => {
         it('CAVERJS-UNIT-KCT-077: should call isPauser method', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 let isPauser = await token.isPauser(sender.address)
                 expect(isPauser).to.be.true
@@ -363,7 +373,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.approve', () => {
         it('CAVERJS-UNIT-KCT-078: should send transaction for calling approve method and set approve with token id without sendParams', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const mintedTokenId = tokenId
                 await token.mintWithTokenURI(sender.address, mintedTokenId, tokenURI, { from: sender.address })
@@ -378,7 +388,7 @@ describe('KIP17 token contract class test', () => {
                 expect(approved.status).to.be.true
                 expect(approved.events).not.to.be.undefined
                 expect(approved.events.Approval).not.to.be.undefined
-                expect(approved.events.Approval.address).to.equals(nonFungibleTokenAddress)
+                expect(approved.events.Approval.address).to.equals(kip17Address)
 
                 const getApproved = await token.getApproved(mintedTokenId)
 
@@ -388,7 +398,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-079: should send transaction for calling approve method and set approve with token id with sendParams(from)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const mintedTokenId = tokenId
                 await token.mintWithTokenURI(sender.address, mintedTokenId, tokenURI, { from: sender.address })
@@ -400,7 +410,7 @@ describe('KIP17 token contract class test', () => {
                 expect(approved.status).to.be.true
                 expect(approved.events).not.to.be.undefined
                 expect(approved.events.Approval).not.to.be.undefined
-                expect(approved.events.Approval.address).to.equals(nonFungibleTokenAddress)
+                expect(approved.events.Approval.address).to.equals(kip17Address)
 
                 const getApproved = await token.getApproved(mintedTokenId)
 
@@ -410,7 +420,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-080: should send transaction for calling approve method and set approve with token id with sendParams(from, gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const mintedTokenId = tokenId
                 await token.mintWithTokenURI(sender.address, mintedTokenId, tokenURI, { from: sender.address })
@@ -424,7 +434,7 @@ describe('KIP17 token contract class test', () => {
                 expect(approved.status).to.be.true
                 expect(approved.events).not.to.be.undefined
                 expect(approved.events.Approval).not.to.be.undefined
-                expect(approved.events.Approval.address).to.equals(nonFungibleTokenAddress)
+                expect(approved.events.Approval.address).to.equals(kip17Address)
 
                 const getApproved = await token.getApproved(mintedTokenId)
 
@@ -434,7 +444,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-081: should send transaction for calling approve method and set approve with token id with sendParams(gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const mintedTokenId = tokenId
                 await token.mintWithTokenURI(sender.address, mintedTokenId, tokenURI, { from: sender.address })
@@ -452,7 +462,7 @@ describe('KIP17 token contract class test', () => {
                 expect(approved.status).to.be.true
                 expect(approved.events).not.to.be.undefined
                 expect(approved.events.Approval).not.to.be.undefined
-                expect(approved.events.Approval.address).to.equals(nonFungibleTokenAddress)
+                expect(approved.events.Approval.address).to.equals(kip17Address)
 
                 const getApproved = await token.getApproved(mintedTokenId)
 
@@ -464,7 +474,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.setApprovalForAll', () => {
         it('CAVERJS-UNIT-KCT-082: should send transaction for calling setApprovalForAll method and set approve with all token without sendParams', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const testKeyring = caver.wallet.keyring.generate()
 
@@ -476,7 +486,7 @@ describe('KIP17 token contract class test', () => {
                 expect(setApprovalForAll.status).to.be.true
                 expect(setApprovalForAll.events).not.to.be.undefined
                 expect(setApprovalForAll.events.ApprovalForAll).not.to.be.undefined
-                expect(setApprovalForAll.events.ApprovalForAll.address).to.equals(nonFungibleTokenAddress)
+                expect(setApprovalForAll.events.ApprovalForAll.address).to.equals(kip17Address)
 
                 const isApprovedForAll = await token.isApprovedForAll(sender.address, testKeyring.address)
 
@@ -486,7 +496,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-083: should send transaction for calling setApprovalForAll method and set approve with all token with sendParams(from)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const testKeyring = caver.wallet.keyring.generate()
 
@@ -495,7 +505,7 @@ describe('KIP17 token contract class test', () => {
                 expect(setApprovalForAll.status).to.be.true
                 expect(setApprovalForAll.events).not.to.be.undefined
                 expect(setApprovalForAll.events.ApprovalForAll).not.to.be.undefined
-                expect(setApprovalForAll.events.ApprovalForAll.address).to.equals(nonFungibleTokenAddress)
+                expect(setApprovalForAll.events.ApprovalForAll.address).to.equals(kip17Address)
 
                 const isApprovedForAll = await token.isApprovedForAll(sender.address, testKeyring.address)
 
@@ -505,7 +515,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-084: should send transaction for calling setApprovalForAll method and set approve with all token with sendParams(from, gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const testKeyring = caver.wallet.keyring.generate()
 
@@ -519,7 +529,7 @@ describe('KIP17 token contract class test', () => {
                 expect(setApprovalForAll.status).to.be.true
                 expect(setApprovalForAll.events).not.to.be.undefined
                 expect(setApprovalForAll.events.ApprovalForAll).not.to.be.undefined
-                expect(setApprovalForAll.events.ApprovalForAll.address).to.equals(nonFungibleTokenAddress)
+                expect(setApprovalForAll.events.ApprovalForAll.address).to.equals(kip17Address)
 
                 const isApprovedForAll = await token.isApprovedForAll(sender.address, testKeyring.address)
 
@@ -529,7 +539,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-085: should send transaction for calling setApprovalForAll method and set approve with all token with sendParams(gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const testKeyring = caver.wallet.keyring.generate()
 
@@ -544,7 +554,7 @@ describe('KIP17 token contract class test', () => {
                 expect(setApprovalForAll.status).to.be.true
                 expect(setApprovalForAll.events).not.to.be.undefined
                 expect(setApprovalForAll.events.ApprovalForAll).not.to.be.undefined
-                expect(setApprovalForAll.events.ApprovalForAll.address).to.equals(nonFungibleTokenAddress)
+                expect(setApprovalForAll.events.ApprovalForAll.address).to.equals(kip17Address)
 
                 const isApprovedForAll = await token.isApprovedForAll(sender.address, testKeyring.address)
 
@@ -556,7 +566,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.transferFrom', () => {
         it('CAVERJS-UNIT-KCT-086: should send transaction to transfer token and trigger Transfer event without sendParams', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const mintedTokenId = tokenId
                 await token.mintWithTokenURI(sender.address, mintedTokenId, tokenURI, { from: sender.address })
@@ -574,7 +584,7 @@ describe('KIP17 token contract class test', () => {
                 expect(transfered.status).to.be.true
                 expect(transfered.events).not.to.be.undefined
                 expect(transfered.events.Transfer).not.to.be.undefined
-                expect(transfered.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(transfered.events.Transfer.address).to.equals(kip17Address)
 
                 const owner = await token.ownerOf(tokenIdToTransfer)
                 expect(owner.toLowerCase()).to.be.equals(receiver.address.toLowerCase())
@@ -583,7 +593,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-087: should send transaction to transfer token and trigger Transfer event with sendParams(from)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const mintedTokenId = tokenId
                 await token.mintWithTokenURI(sender.address, mintedTokenId, tokenURI, { from: sender.address })
@@ -603,7 +613,7 @@ describe('KIP17 token contract class test', () => {
                 expect(transfered.status).to.be.true
                 expect(transfered.events).not.to.be.undefined
                 expect(transfered.events.Transfer).not.to.be.undefined
-                expect(transfered.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(transfered.events.Transfer.address).to.equals(kip17Address)
 
                 const owner = await token.ownerOf(tokenIdToTransfer)
                 expect(owner.toLowerCase()).to.be.equals(receiver.address.toLowerCase())
@@ -612,7 +622,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-088: should send transaction to transfer token and trigger Transfer event with sendParams(from, gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const mintedTokenId = tokenId
                 await token.mintWithTokenURI(sender.address, mintedTokenId, tokenURI, { from: sender.address })
@@ -632,7 +642,7 @@ describe('KIP17 token contract class test', () => {
                 expect(transfered.status).to.be.true
                 expect(transfered.events).not.to.be.undefined
                 expect(transfered.events.Transfer).not.to.be.undefined
-                expect(transfered.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(transfered.events.Transfer.address).to.equals(kip17Address)
 
                 const owner = await token.ownerOf(tokenIdToTransfer)
                 expect(owner.toLowerCase()).to.be.equals(receiver.address.toLowerCase())
@@ -641,7 +651,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-089: should send transaction to transfer token and trigger Transfer event with sendParams(gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const mintedTokenId = tokenId
                 await token.mintWithTokenURI(sender.address, mintedTokenId, tokenURI, { from: sender.address })
@@ -662,7 +672,7 @@ describe('KIP17 token contract class test', () => {
                 expect(transfered.status).to.be.true
                 expect(transfered.events).not.to.be.undefined
                 expect(transfered.events.Transfer).not.to.be.undefined
-                expect(transfered.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(transfered.events.Transfer.address).to.equals(kip17Address)
 
                 const owner = await token.ownerOf(tokenIdToTransfer)
                 expect(owner.toLowerCase()).to.be.equals(receiver.address.toLowerCase())
@@ -673,7 +683,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.safeTransferFrom', () => {
         it('CAVERJS-UNIT-KCT-090: should send token via safeTransferFrom without data and trigger Transfer event without sendParams', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const mintedTokenId = tokenId
                 await token.mintWithTokenURI(sender.address, mintedTokenId, tokenURI, { from: sender.address })
@@ -690,7 +700,7 @@ describe('KIP17 token contract class test', () => {
                 expect(transfered.status).to.be.true
                 expect(transfered.events).not.to.be.undefined
                 expect(transfered.events.Transfer).not.to.be.undefined
-                expect(transfered.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(transfered.events.Transfer.address).to.equals(kip17Address)
 
                 const owner = await token.ownerOf(mintedTokenId)
                 expect(owner.toLowerCase()).to.be.equals(receiver.address.toLowerCase())
@@ -699,7 +709,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-091: should send token via safeTransferFrom without data and trigger Transfer event with sendParams(from)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const mintedTokenId = tokenId
                 await token.mintWithTokenURI(sender.address, mintedTokenId, tokenURI, { from: sender.address })
@@ -718,7 +728,7 @@ describe('KIP17 token contract class test', () => {
                 expect(transfered.status).to.be.true
                 expect(transfered.events).not.to.be.undefined
                 expect(transfered.events.Transfer).not.to.be.undefined
-                expect(transfered.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(transfered.events.Transfer.address).to.equals(kip17Address)
 
                 const owner = await token.ownerOf(mintedTokenId)
                 expect(owner.toLowerCase()).to.be.equals(receiver.address.toLowerCase())
@@ -727,7 +737,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-092: should send token via safeTransferFrom without data and trigger Transfer event with sendParams(from, gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const mintedTokenId = tokenId
                 await token.mintWithTokenURI(sender.address, mintedTokenId, tokenURI, { from: sender.address })
@@ -746,7 +756,7 @@ describe('KIP17 token contract class test', () => {
                 expect(transfered.status).to.be.true
                 expect(transfered.events).not.to.be.undefined
                 expect(transfered.events.Transfer).not.to.be.undefined
-                expect(transfered.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(transfered.events.Transfer.address).to.equals(kip17Address)
 
                 const owner = await token.ownerOf(mintedTokenId)
                 expect(owner.toLowerCase()).to.be.equals(receiver.address.toLowerCase())
@@ -755,7 +765,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-093: should send token via safeTransferFrom without data and trigger Transfer event with sendParams(gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const mintedTokenId = tokenId
                 await token.mintWithTokenURI(sender.address, mintedTokenId, tokenURI, { from: sender.address })
@@ -775,7 +785,7 @@ describe('KIP17 token contract class test', () => {
                 expect(transfered.status).to.be.true
                 expect(transfered.events).not.to.be.undefined
                 expect(transfered.events.Transfer).not.to.be.undefined
-                expect(transfered.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(transfered.events.Transfer.address).to.equals(kip17Address)
 
                 const owner = await token.ownerOf(mintedTokenId)
                 expect(owner.toLowerCase()).to.be.equals(receiver.address.toLowerCase())
@@ -784,7 +794,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-094: should send token via safeTransferFrom with data and trigger Transfer event without sendParams', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const mintedTokenId = tokenId
                 await token.mintWithTokenURI(sender.address, mintedTokenId, tokenURI, { from: sender.address })
@@ -807,7 +817,7 @@ describe('KIP17 token contract class test', () => {
                 expect(transfered.status).to.be.true
                 expect(transfered.events).not.to.be.undefined
                 expect(transfered.events.Transfer).not.to.be.undefined
-                expect(transfered.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(transfered.events.Transfer.address).to.equals(kip17Address)
 
                 const owner = await token.ownerOf(mintedTokenId)
                 expect(owner.toLowerCase()).to.be.equals(receiver.address.toLowerCase())
@@ -816,7 +826,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-095: should send token via safeTransferFrom with data and trigger Transfer event with sendParams(from)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const mintedTokenId = tokenId
                 await token.mintWithTokenURI(sender.address, mintedTokenId, tokenURI, { from: sender.address })
@@ -841,7 +851,7 @@ describe('KIP17 token contract class test', () => {
                 expect(transfered.status).to.be.true
                 expect(transfered.events).not.to.be.undefined
                 expect(transfered.events.Transfer).not.to.be.undefined
-                expect(transfered.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(transfered.events.Transfer.address).to.equals(kip17Address)
 
                 const owner = await token.ownerOf(mintedTokenId)
                 expect(owner.toLowerCase()).to.be.equals(receiver.address.toLowerCase())
@@ -850,7 +860,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-096: should send token via safeTransferFrom with data and trigger Transfer event with sendParams(from, gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const mintedTokenId = tokenId
                 await token.mintWithTokenURI(sender.address, mintedTokenId, tokenURI, { from: sender.address })
@@ -875,7 +885,7 @@ describe('KIP17 token contract class test', () => {
                 expect(transfered.status).to.be.true
                 expect(transfered.events).not.to.be.undefined
                 expect(transfered.events.Transfer).not.to.be.undefined
-                expect(transfered.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(transfered.events.Transfer.address).to.equals(kip17Address)
 
                 const owner = await token.ownerOf(mintedTokenId)
                 expect(owner.toLowerCase()).to.be.equals(receiver.address.toLowerCase())
@@ -884,7 +894,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-097: should send token via safeTransferFrom with data and trigger Transfer event with sendParams(gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const mintedTokenId = tokenId
                 await token.mintWithTokenURI(sender.address, mintedTokenId, tokenURI, { from: sender.address })
@@ -912,7 +922,7 @@ describe('KIP17 token contract class test', () => {
                 expect(transfered.status).to.be.true
                 expect(transfered.events).not.to.be.undefined
                 expect(transfered.events.Transfer).not.to.be.undefined
-                expect(transfered.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(transfered.events.Transfer.address).to.equals(kip17Address)
 
                 const owner = await token.ownerOf(mintedTokenId)
                 expect(owner.toLowerCase()).to.be.equals(receiver.address.toLowerCase())
@@ -923,7 +933,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.addMinter', () => {
         it('CAVERJS-UNIT-KCT-098: should send transaction for adding minter and trigger MinterAdded event without sendParams', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const newMinter = caver.klay.accounts.create().address
                 expect(await token.isMinter(newMinter)).to.be.false
@@ -936,7 +946,7 @@ describe('KIP17 token contract class test', () => {
                 expect(minterAdded.status).to.be.true
                 expect(minterAdded.events).not.to.be.undefined
                 expect(minterAdded.events.MinterAdded).not.to.be.undefined
-                expect(minterAdded.events.MinterAdded.address).to.equals(nonFungibleTokenAddress)
+                expect(minterAdded.events.MinterAdded.address).to.equals(kip17Address)
 
                 expect(await token.isMinter(newMinter)).to.be.true
             }
@@ -944,7 +954,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-099: should send transaction for adding minter and trigger MinterAdded event with sendParams(from)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const newMinter = caver.klay.accounts.create().address
                 expect(await token.isMinter(newMinter)).to.be.false
@@ -954,7 +964,7 @@ describe('KIP17 token contract class test', () => {
                 expect(minterAdded.status).to.be.true
                 expect(minterAdded.events).not.to.be.undefined
                 expect(minterAdded.events.MinterAdded).not.to.be.undefined
-                expect(minterAdded.events.MinterAdded.address).to.equals(nonFungibleTokenAddress)
+                expect(minterAdded.events.MinterAdded.address).to.equals(kip17Address)
 
                 expect(await token.isMinter(newMinter)).to.be.true
             }
@@ -962,7 +972,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-100: should send transaction for adding minter and trigger MinterAdded event with sendParams(from, gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const newMinter = caver.klay.accounts.create().address
                 expect(await token.isMinter(newMinter)).to.be.false
@@ -974,7 +984,7 @@ describe('KIP17 token contract class test', () => {
                 expect(minterAdded.status).to.be.true
                 expect(minterAdded.events).not.to.be.undefined
                 expect(minterAdded.events.MinterAdded).not.to.be.undefined
-                expect(minterAdded.events.MinterAdded.address).to.equals(nonFungibleTokenAddress)
+                expect(minterAdded.events.MinterAdded.address).to.equals(kip17Address)
 
                 expect(await token.isMinter(newMinter)).to.be.true
             }
@@ -982,7 +992,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-101: should send transaction for adding minter and trigger MinterAdded event with sendParams(gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const newMinter = caver.klay.accounts.create().address
                 expect(await token.isMinter(newMinter)).to.be.false
@@ -996,7 +1006,7 @@ describe('KIP17 token contract class test', () => {
                 expect(minterAdded.status).to.be.true
                 expect(minterAdded.events).not.to.be.undefined
                 expect(minterAdded.events.MinterAdded).not.to.be.undefined
-                expect(minterAdded.events.MinterAdded.address).to.equals(nonFungibleTokenAddress)
+                expect(minterAdded.events.MinterAdded.address).to.equals(kip17Address)
 
                 expect(await token.isMinter(newMinter)).to.be.true
             }
@@ -1006,7 +1016,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.renounceMinter', () => {
         it('CAVERJS-UNIT-KCT-102: should send transaction for removing minter and trigger MinterRemoved event without sendParams', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 await token.addMinter(testAccount.address, { from: sender.address })
                 expect(await token.isMinter(testAccount.address)).to.be.true
@@ -1019,7 +1029,7 @@ describe('KIP17 token contract class test', () => {
                 expect(minterRemoved.status).to.be.true
                 expect(minterRemoved.events).not.to.be.undefined
                 expect(minterRemoved.events.MinterRemoved).not.to.be.undefined
-                expect(minterRemoved.events.MinterRemoved.address).to.equals(nonFungibleTokenAddress)
+                expect(minterRemoved.events.MinterRemoved.address).to.equals(kip17Address)
 
                 expect(await token.isMinter(testAccount.address)).to.be.false
             }
@@ -1027,7 +1037,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-103: should send transaction for removing minter and trigger MinterRemoved event with sendParams(from)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 await token.addMinter(testAccount.address, { from: sender.address })
                 expect(await token.isMinter(testAccount.address)).to.be.true
@@ -1037,7 +1047,7 @@ describe('KIP17 token contract class test', () => {
                 expect(minterRemoved.status).to.be.true
                 expect(minterRemoved.events).not.to.be.undefined
                 expect(minterRemoved.events.MinterRemoved).not.to.be.undefined
-                expect(minterRemoved.events.MinterRemoved.address).to.equals(nonFungibleTokenAddress)
+                expect(minterRemoved.events.MinterRemoved.address).to.equals(kip17Address)
 
                 expect(await token.isMinter(testAccount.address)).to.be.false
             }
@@ -1045,7 +1055,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-104: should send transaction for removing minter and trigger MinterRemoved event with sendParams(from, gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 await token.addMinter(testAccount.address, { from: sender.address })
                 expect(await token.isMinter(testAccount.address)).to.be.true
@@ -1057,7 +1067,7 @@ describe('KIP17 token contract class test', () => {
                 expect(minterRemoved.status).to.be.true
                 expect(minterRemoved.events).not.to.be.undefined
                 expect(minterRemoved.events.MinterRemoved).not.to.be.undefined
-                expect(minterRemoved.events.MinterRemoved.address).to.equals(nonFungibleTokenAddress)
+                expect(minterRemoved.events.MinterRemoved.address).to.equals(kip17Address)
 
                 expect(await token.isMinter(testAccount.address)).to.be.false
             }
@@ -1065,7 +1075,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-105: should send transaction for removing minter and trigger MinterRemoved event with sendParams(gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 await token.addMinter(testAccount.address, { from: sender.address })
                 expect(await token.isMinter(testAccount.address)).to.be.true
@@ -1079,7 +1089,7 @@ describe('KIP17 token contract class test', () => {
                 expect(minterRemoved.status).to.be.true
                 expect(minterRemoved.events).not.to.be.undefined
                 expect(minterRemoved.events.MinterRemoved).not.to.be.undefined
-                expect(minterRemoved.events.MinterRemoved.address).to.equals(nonFungibleTokenAddress)
+                expect(minterRemoved.events.MinterRemoved.address).to.equals(kip17Address)
 
                 expect(await token.isMinter(testAccount.address)).to.be.false
             }
@@ -1089,7 +1099,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.mintWithTokenURI', () => {
         it('CAVERJS-UNIT-KCT-106: should send transaction for minting and trigger Transfer event without sendParams', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const originalSupply = await token.totalSupply()
 
@@ -1101,7 +1111,7 @@ describe('KIP17 token contract class test', () => {
                 expect(minted.status).to.be.true
                 expect(minted.events).not.to.be.undefined
                 expect(minted.events.Transfer).not.to.be.undefined
-                expect(minted.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(minted.events.Transfer.address).to.equals(kip17Address)
 
                 const owner = await token.ownerOf(tokenId)
                 expect(owner.toLowerCase()).to.equals(testAccount.address.toLowerCase())
@@ -1115,7 +1125,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-107: should send transaction for minting and trigger Transfer event with sendParams(from)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const originalSupply = await token.totalSupply()
 
@@ -1124,7 +1134,7 @@ describe('KIP17 token contract class test', () => {
                 expect(minted.status).to.be.true
                 expect(minted.events).not.to.be.undefined
                 expect(minted.events.Transfer).not.to.be.undefined
-                expect(minted.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(minted.events.Transfer.address).to.equals(kip17Address)
 
                 const owner = await token.ownerOf(tokenId)
                 expect(owner.toLowerCase()).to.equals(testAccount.address.toLowerCase())
@@ -1138,7 +1148,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-108: should send transaction for minting and trigger Transfer event with sendParams(from, gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const originalSupply = await token.totalSupply()
 
@@ -1152,7 +1162,7 @@ describe('KIP17 token contract class test', () => {
                 expect(minted.status).to.be.true
                 expect(minted.events).not.to.be.undefined
                 expect(minted.events.Transfer).not.to.be.undefined
-                expect(minted.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(minted.events.Transfer.address).to.equals(kip17Address)
 
                 const owner = await token.ownerOf(tokenId)
                 expect(owner.toLowerCase()).to.equals(testAccount.address.toLowerCase())
@@ -1166,7 +1176,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-109: should send transaction for minting and trigger Transfer event with sendParams(gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const originalSupply = await token.totalSupply()
 
@@ -1179,7 +1189,7 @@ describe('KIP17 token contract class test', () => {
                 expect(minted.status).to.be.true
                 expect(minted.events).not.to.be.undefined
                 expect(minted.events.Transfer).not.to.be.undefined
-                expect(minted.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(minted.events.Transfer.address).to.equals(kip17Address)
 
                 const owner = await token.ownerOf(tokenId)
                 expect(owner.toLowerCase()).to.equals(testAccount.address.toLowerCase())
@@ -1195,7 +1205,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.burn', () => {
         it('CAVERJS-UNIT-KCT-110: should send transaction for burning and trigger Transfer event without sendParams', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 await token.mintWithTokenURI(sender.address, tokenId, tokenURI, { from: sender.address })
 
@@ -1209,7 +1219,7 @@ describe('KIP17 token contract class test', () => {
                 expect(burned.status).to.be.true
                 expect(burned.events).not.to.be.undefined
                 expect(burned.events.Transfer).not.to.be.undefined
-                expect(burned.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(burned.events.Transfer.address).to.equals(kip17Address)
 
                 const afterSupply = await token.totalSupply()
                 expect(Number(originalSupply) - Number(afterSupply)).to.be.equals(1)
@@ -1219,7 +1229,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-111: should send transaction for burning and trigger Transfer event with sendParams(from)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 await token.mintWithTokenURI(sender.address, tokenId, tokenURI, { from: sender.address })
 
@@ -1230,7 +1240,7 @@ describe('KIP17 token contract class test', () => {
                 expect(burned.status).to.be.true
                 expect(burned.events).not.to.be.undefined
                 expect(burned.events.Transfer).not.to.be.undefined
-                expect(burned.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(burned.events.Transfer.address).to.equals(kip17Address)
 
                 const afterSupply = await token.totalSupply()
                 expect(Number(originalSupply) - Number(afterSupply)).to.be.equals(1)
@@ -1240,7 +1250,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-112: should send transaction for burning and trigger Transfer event with sendParams(from, gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 await token.mintWithTokenURI(sender.address, tokenId, tokenURI, { from: sender.address })
 
@@ -1253,7 +1263,7 @@ describe('KIP17 token contract class test', () => {
                 expect(burned.status).to.be.true
                 expect(burned.events).not.to.be.undefined
                 expect(burned.events.Transfer).not.to.be.undefined
-                expect(burned.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(burned.events.Transfer.address).to.equals(kip17Address)
 
                 const afterSupply = await token.totalSupply()
                 expect(Number(originalSupply) - Number(afterSupply)).to.be.equals(1)
@@ -1263,7 +1273,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-113: should send transaction for burning and trigger Transfer event with sendParams(gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 await token.mintWithTokenURI(sender.address, tokenId, tokenURI, { from: sender.address })
 
@@ -1278,7 +1288,7 @@ describe('KIP17 token contract class test', () => {
                 expect(burned.status).to.be.true
                 expect(burned.events).not.to.be.undefined
                 expect(burned.events.Transfer).not.to.be.undefined
-                expect(burned.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(burned.events.Transfer.address).to.equals(kip17Address)
 
                 const afterSupply = await token.totalSupply()
                 expect(Number(originalSupply) - Number(afterSupply)).to.be.equals(1)
@@ -1290,7 +1300,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.pause', () => {
         it('CAVERJS-UNIT-KCT-114: should send transaction for pausing without sendParams', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 // set deafult from address in kip17 instance
                 token.options.from = sender.address
@@ -1300,7 +1310,7 @@ describe('KIP17 token contract class test', () => {
                 expect(doPause.status).to.be.true
                 expect(doPause.events).not.to.be.undefined
                 expect(doPause.events.Paused).not.to.be.undefined
-                expect(doPause.events.Paused.address).to.equals(nonFungibleTokenAddress)
+                expect(doPause.events.Paused.address).to.equals(kip17Address)
 
                 expect(await token.paused()).to.be.true
 
@@ -1310,14 +1320,14 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-115: should send transaction for pausing with sendParams(from)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const doPause = await token.pause({ from: sender.address })
                 expect(doPause.from).to.be.equals(sender.address.toLowerCase())
                 expect(doPause.status).to.be.true
                 expect(doPause.events).not.to.be.undefined
                 expect(doPause.events.Paused).not.to.be.undefined
-                expect(doPause.events.Paused.address).to.equals(nonFungibleTokenAddress)
+                expect(doPause.events.Paused.address).to.equals(kip17Address)
 
                 expect(await token.paused()).to.be.true
 
@@ -1327,7 +1337,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-116: should send transaction for pausing with sendParams(from, gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const customGasLimit = '0x30d40'
                 const doPause = await token.pause({ from: sender.address, gas: customGasLimit })
@@ -1336,7 +1346,7 @@ describe('KIP17 token contract class test', () => {
                 expect(doPause.status).to.be.true
                 expect(doPause.events).not.to.be.undefined
                 expect(doPause.events.Paused).not.to.be.undefined
-                expect(doPause.events.Paused.address).to.equals(nonFungibleTokenAddress)
+                expect(doPause.events.Paused.address).to.equals(kip17Address)
 
                 expect(await token.paused()).to.be.true
 
@@ -1346,7 +1356,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-117: should send transaction for pausing with sendParams(gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 // set deafult from address in kip17 instance
                 token.options.from = sender.address
@@ -1357,7 +1367,7 @@ describe('KIP17 token contract class test', () => {
                 expect(doPause.status).to.be.true
                 expect(doPause.events).not.to.be.undefined
                 expect(doPause.events.Paused).not.to.be.undefined
-                expect(doPause.events.Paused.address).to.equals(nonFungibleTokenAddress)
+                expect(doPause.events.Paused.address).to.equals(kip17Address)
 
                 expect(await token.paused()).to.be.true
 
@@ -1369,7 +1379,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.unpause', () => {
         it('CAVERJS-UNIT-KCT-118: should send transaction for unpausing without sendParams', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 await token.pause({ from: sender.address })
 
@@ -1381,7 +1391,7 @@ describe('KIP17 token contract class test', () => {
                 expect(doUnpause.status).to.be.true
                 expect(doUnpause.events).not.to.be.undefined
                 expect(doUnpause.events.Unpaused).not.to.be.undefined
-                expect(doUnpause.events.Unpaused.address).to.equals(nonFungibleTokenAddress)
+                expect(doUnpause.events.Unpaused.address).to.equals(kip17Address)
 
                 expect(await token.paused()).to.be.false
             }
@@ -1389,7 +1399,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-119: should send transaction for unpausing with sendParams(from)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 await token.pause({ from: sender.address })
 
@@ -1398,7 +1408,7 @@ describe('KIP17 token contract class test', () => {
                 expect(doUnpause.status).to.be.true
                 expect(doUnpause.events).not.to.be.undefined
                 expect(doUnpause.events.Unpaused).not.to.be.undefined
-                expect(doUnpause.events.Unpaused.address).to.equals(nonFungibleTokenAddress)
+                expect(doUnpause.events.Unpaused.address).to.equals(kip17Address)
 
                 expect(await token.paused()).to.be.false
             }
@@ -1406,7 +1416,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-120: should send transaction for unpausing with sendParams(from, gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 await token.pause({ from: sender.address })
 
@@ -1417,7 +1427,7 @@ describe('KIP17 token contract class test', () => {
                 expect(doUnpause.status).to.be.true
                 expect(doUnpause.events).not.to.be.undefined
                 expect(doUnpause.events.Unpaused).not.to.be.undefined
-                expect(doUnpause.events.Unpaused.address).to.equals(nonFungibleTokenAddress)
+                expect(doUnpause.events.Unpaused.address).to.equals(kip17Address)
 
                 expect(await token.paused()).to.be.false
             }
@@ -1425,7 +1435,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-121: should send transaction for unpausing with sendParams(gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 await token.pause({ from: sender.address })
 
@@ -1438,7 +1448,7 @@ describe('KIP17 token contract class test', () => {
                 expect(doUnpause.status).to.be.true
                 expect(doUnpause.events).not.to.be.undefined
                 expect(doUnpause.events.Unpaused).not.to.be.undefined
-                expect(doUnpause.events.Unpaused.address).to.equals(nonFungibleTokenAddress)
+                expect(doUnpause.events.Unpaused.address).to.equals(kip17Address)
 
                 expect(await token.paused()).to.be.false
             }
@@ -1448,7 +1458,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.addPauser', () => {
         it('CAVERJS-UNIT-KCT-122: should send transaction for adding pauser and trigger PauserAdded event without sendParams', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const newPauser = caver.klay.accounts.create().address
                 expect(await token.isPauser(newPauser)).to.be.false
@@ -1461,7 +1471,7 @@ describe('KIP17 token contract class test', () => {
                 expect(pauserAdded.status).to.be.true
                 expect(pauserAdded.events).not.to.be.undefined
                 expect(pauserAdded.events.PauserAdded).not.to.be.undefined
-                expect(pauserAdded.events.PauserAdded.address).to.equals(nonFungibleTokenAddress)
+                expect(pauserAdded.events.PauserAdded.address).to.equals(kip17Address)
 
                 expect(await token.isPauser(newPauser)).to.be.true
             }
@@ -1469,7 +1479,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-123: should send transaction for adding pauser and trigger PauserAdded event with sendParams(from)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const newPauser = caver.klay.accounts.create().address
                 expect(await token.isPauser(newPauser)).to.be.false
@@ -1479,7 +1489,7 @@ describe('KIP17 token contract class test', () => {
                 expect(pauserAdded.status).to.be.true
                 expect(pauserAdded.events).not.to.be.undefined
                 expect(pauserAdded.events.PauserAdded).not.to.be.undefined
-                expect(pauserAdded.events.PauserAdded.address).to.equals(nonFungibleTokenAddress)
+                expect(pauserAdded.events.PauserAdded.address).to.equals(kip17Address)
 
                 expect(await token.isPauser(newPauser)).to.be.true
             }
@@ -1487,7 +1497,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-124: should send transaction for adding pauser and trigger PauserAdded event with sendParams(from, gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const newPauser = caver.klay.accounts.create().address
                 expect(await token.isPauser(newPauser)).to.be.false
@@ -1499,7 +1509,7 @@ describe('KIP17 token contract class test', () => {
                 expect(pauserAdded.status).to.be.true
                 expect(pauserAdded.events).not.to.be.undefined
                 expect(pauserAdded.events.PauserAdded).not.to.be.undefined
-                expect(pauserAdded.events.PauserAdded.address).to.equals(nonFungibleTokenAddress)
+                expect(pauserAdded.events.PauserAdded.address).to.equals(kip17Address)
 
                 expect(await token.isPauser(newPauser)).to.be.true
             }
@@ -1507,7 +1517,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-125: should send transaction for adding pauser and trigger PauserAdded event with sendParams(gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const newPauser = caver.klay.accounts.create().address
                 expect(await token.isPauser(newPauser)).to.be.false
@@ -1521,7 +1531,7 @@ describe('KIP17 token contract class test', () => {
                 expect(pauserAdded.status).to.be.true
                 expect(pauserAdded.events).not.to.be.undefined
                 expect(pauserAdded.events.PauserAdded).not.to.be.undefined
-                expect(pauserAdded.events.PauserAdded.address).to.equals(nonFungibleTokenAddress)
+                expect(pauserAdded.events.PauserAdded.address).to.equals(kip17Address)
 
                 expect(await token.isPauser(newPauser)).to.be.true
             }
@@ -1531,7 +1541,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.renouncePauser', () => {
         it('CAVERJS-UNIT-KCT-126: should send transaction for removing pauser and trigger PauserRemoved event without sendParams', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 await token.addPauser(testAccount.address, { from: sender.address })
                 expect(await token.isPauser(testAccount.address)).to.be.true
@@ -1544,7 +1554,7 @@ describe('KIP17 token contract class test', () => {
                 expect(pauserRemoved.status).to.be.true
                 expect(pauserRemoved.events).not.to.be.undefined
                 expect(pauserRemoved.events.PauserRemoved).not.to.be.undefined
-                expect(pauserRemoved.events.PauserRemoved.address).to.equals(nonFungibleTokenAddress)
+                expect(pauserRemoved.events.PauserRemoved.address).to.equals(kip17Address)
 
                 expect(await token.isPauser(testAccount.address)).to.be.false
             }
@@ -1552,7 +1562,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-127: should send transaction for removing pauser and trigger PauserRemoved event with sendParams(from)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 await token.addPauser(testAccount.address, { from: sender.address })
                 expect(await token.isPauser(testAccount.address)).to.be.true
@@ -1562,7 +1572,7 @@ describe('KIP17 token contract class test', () => {
                 expect(pauserRemoved.status).to.be.true
                 expect(pauserRemoved.events).not.to.be.undefined
                 expect(pauserRemoved.events.PauserRemoved).not.to.be.undefined
-                expect(pauserRemoved.events.PauserRemoved.address).to.equals(nonFungibleTokenAddress)
+                expect(pauserRemoved.events.PauserRemoved.address).to.equals(kip17Address)
 
                 expect(await token.isPauser(testAccount.address)).to.be.false
             }
@@ -1570,7 +1580,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-128: should send transaction for removing pauser and trigger PauserRemoved event with sendParams(from, gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 await token.addPauser(testAccount.address, { from: sender.address })
                 expect(await token.isPauser(testAccount.address)).to.be.true
@@ -1582,7 +1592,7 @@ describe('KIP17 token contract class test', () => {
                 expect(pauserRemoved.status).to.be.true
                 expect(pauserRemoved.events).not.to.be.undefined
                 expect(pauserRemoved.events.PauserRemoved).not.to.be.undefined
-                expect(pauserRemoved.events.PauserRemoved.address).to.equals(nonFungibleTokenAddress)
+                expect(pauserRemoved.events.PauserRemoved.address).to.equals(kip17Address)
 
                 expect(await token.isPauser(testAccount.address)).to.be.false
             }
@@ -1590,7 +1600,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-129: should send transaction for removing pauser and trigger PauserRemoved event with sendParams(gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 await token.addPauser(testAccount.address, { from: sender.address })
                 expect(await token.isPauser(testAccount.address)).to.be.true
@@ -1604,7 +1614,7 @@ describe('KIP17 token contract class test', () => {
                 expect(pauserRemoved.status).to.be.true
                 expect(pauserRemoved.events).not.to.be.undefined
                 expect(pauserRemoved.events.PauserRemoved).not.to.be.undefined
-                expect(pauserRemoved.events.PauserRemoved.address).to.equals(nonFungibleTokenAddress)
+                expect(pauserRemoved.events.PauserRemoved.address).to.equals(kip17Address)
 
                 expect(await token.isPauser(testAccount.address)).to.be.false
             }
@@ -1614,7 +1624,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.supportsInterface', () => {
         it('CAVERJS-UNIT-KCT-138: should return true if interfaceId is supported', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 expect(await token.supportsInterface('0x80ac58cd')).to.be.true // kip17
                 expect(await token.supportsInterface('0x780e9d63')).to.be.true // kip17Enumerable
@@ -1634,7 +1644,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.mint', () => {
         it('CAVERJS-UNIT-KCT-140: should send transaction for minting and trigger Transfer event without sendParams', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const originalSupply = await token.totalSupply()
 
@@ -1646,7 +1656,7 @@ describe('KIP17 token contract class test', () => {
                 expect(minted.status).to.be.true
                 expect(minted.events).not.to.be.undefined
                 expect(minted.events.Transfer).not.to.be.undefined
-                expect(minted.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(minted.events.Transfer.address).to.equals(kip17Address)
 
                 const owner = await token.ownerOf(tokenId)
                 expect(owner.toLowerCase()).to.equals(testAccount.address.toLowerCase())
@@ -1660,7 +1670,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-141: should send transaction for minting and trigger Transfer event with sendParams(from)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const originalSupply = await token.totalSupply()
 
@@ -1669,7 +1679,7 @@ describe('KIP17 token contract class test', () => {
                 expect(minted.status).to.be.true
                 expect(minted.events).not.to.be.undefined
                 expect(minted.events.Transfer).not.to.be.undefined
-                expect(minted.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(minted.events.Transfer.address).to.equals(kip17Address)
 
                 const owner = await token.ownerOf(tokenId)
                 expect(owner.toLowerCase()).to.equals(testAccount.address.toLowerCase())
@@ -1683,7 +1693,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-142: should send transaction for minting and trigger Transfer event with sendParams(from, gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const originalSupply = await token.totalSupply()
 
@@ -1697,7 +1707,7 @@ describe('KIP17 token contract class test', () => {
                 expect(minted.status).to.be.true
                 expect(minted.events).not.to.be.undefined
                 expect(minted.events.Transfer).not.to.be.undefined
-                expect(minted.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(minted.events.Transfer.address).to.equals(kip17Address)
 
                 const owner = await token.ownerOf(tokenId)
                 expect(owner.toLowerCase()).to.equals(testAccount.address.toLowerCase())
@@ -1711,7 +1721,7 @@ describe('KIP17 token contract class test', () => {
 
         it('CAVERJS-UNIT-KCT-143: should send transaction for minting and trigger Transfer event with sendParams(gas)', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
 
                 const originalSupply = await token.totalSupply()
 
@@ -1724,7 +1734,7 @@ describe('KIP17 token contract class test', () => {
                 expect(minted.status).to.be.true
                 expect(minted.events).not.to.be.undefined
                 expect(minted.events.Transfer).not.to.be.undefined
-                expect(minted.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+                expect(minted.events.Transfer.address).to.equals(kip17Address)
 
                 const owner = await token.ownerOf(tokenId)
                 expect(owner.toLowerCase()).to.equals(testAccount.address.toLowerCase())
@@ -1740,7 +1750,7 @@ describe('KIP17 token contract class test', () => {
     context('KIP17.detectInterface', () => {
         it('CAVERJS-UNIT-KCT-207: should return valid object if contract is deployed by caver', async () => {
             for (const kip17 of kip17s) {
-                const token = new kip17(nonFungibleTokenAddress)
+                const token = new kip17(kip17Address)
                 let detected = await token.detectInterface()
 
                 expect(detected.IKIP17).to.be.true
@@ -1752,7 +1762,7 @@ describe('KIP17 token contract class test', () => {
                 expect(detected.IKIP17Pausable).to.be.true
 
                 // Test static function
-                detected = await kip17.detectInterface(nonFungibleTokenAddress)
+                detected = await kip17.detectInterface(kip17Address)
 
                 expect(detected.IKIP17).to.be.true
                 expect(detected.IKIP17Metadata).to.be.true
@@ -1895,6 +1905,229 @@ describe('KIP17 token contract class test', () => {
                 await expect(token.detectInterface()).to.be.rejectedWith(expectedError)
                 await expect(kip17.detectInterface(contractAddress)).to.be.rejectedWith(expectedError)
             }
+        }).timeout(200000)
+    })
+
+    context('KIP17 with fee delegation', () => {
+        const contractDeployFormatter = receipt => {
+            return receipt
+        }
+
+        it('CAVERJS-UNIT-KCT-233: should send TxTypeSmartContractDeploy to deploy when feeDelegation is defined as true', async () => {
+            const deployed = await caver.kct.kip17.deploy({
+                name: 'Jasmine',
+                symbol: 'JAS',
+            }, {
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                contractDeployFormatter,
+            })
+
+            expect(deployed.from).to.equals(sender.address.toLowerCase())
+            expect(deployed.status).to.be.true
+            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-234: should send TxTypeFeeDelegatedSmartContractDeployWithRatio to deploy when feeRatio is defined and feeDelegation is defined as true', async () => {
+            const deployed = await caver.kct.kip17.deploy({
+                name: 'Jasmine',
+                symbol: 'JAS',
+            }, {
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                feeRatio: 30,
+                contractDeployFormatter,
+            })
+
+            expect(deployed.from).to.equals(sender.address.toLowerCase())
+            expect(deployed.status).to.be.true
+            expect(deployed.feeRatio).to.equal(caver.utils.numberToHex(30))
+            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-235: should send TxTypeSmartContractExecution to add minter when feeDelegation is defined as true', async () => {
+            const token = caver.kct.kip17.create(kip17Address)
+
+            const added = await token.addMinter(caver.wallet.keyring.generate().address, {
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+            })
+
+            expect(added.from).to.equals(sender.address.toLowerCase())
+            expect(added.status).to.be.true
+            expect(added.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-236: should send TxTypeSmartContractExecution to add minter when feeDelegation is defined as true via options', async () => {
+            const token = caver.kct.kip17.create(kip17Address)
+
+            token.options.from = sender.address
+            token.options.feeDelegation = true
+            token.options.feePayer = feePayer.address
+
+            const added = await token.addMinter(caver.wallet.keyring.generate().address)
+
+            expect(added.from).to.equals(sender.address.toLowerCase())
+            expect(added.status).to.be.true
+            expect(added.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-237: should send TxTypeFeeDelegatedSmartContractExecutionWithRatio to add minter when feeRatio is defined and feeDelegation is defined as true', async () => {
+            const token = caver.kct.kip17.create(kip17Address)
+
+            const added = await token.addMinter(caver.wallet.keyring.generate().address, {
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                feeRatio: 30,
+            })
+
+            expect(added.from).to.equals(sender.address.toLowerCase())
+            expect(added.status).to.be.true
+            expect(added.feeRatio).to.equal(caver.utils.numberToHex(30))
+            expect(added.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-238: should send TxTypeFeeDelegatedSmartContractExecutionWithRatio to add minter when feeRatio is defined and feeDelegation is defined as true via options', async () => {
+            const token = caver.kct.kip17.create(kip17Address)
+
+            token.options.from = sender.address
+            token.options.feeDelegation = true
+            token.options.feePayer = feePayer.address
+            token.options.feeRatio = 30
+
+            const added = await token.addMinter(caver.wallet.keyring.generate().address)
+
+            expect(added.from).to.equals(sender.address.toLowerCase())
+            expect(added.status).to.be.true
+            expect(added.feeRatio).to.equal(caver.utils.numberToHex(30))
+            expect(added.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-239: should overwrite contract.options when user send sendOptions parameter', async () => {
+            const token = caver.kct.kip17.create(kip17Address)
+
+            token.options.from = feePayer.address
+            token.options.feeDelegation = false
+            token.options.feePayer = sender.address
+            token.options.feeRatio = 50
+
+            const added = await token.addMinter(caver.wallet.keyring.generate().address, {
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                feeRatio: 30,
+                gas: 1231234,
+            })
+
+            expect(added.from).to.equals(sender.address.toLowerCase())
+            expect(added.status).to.be.true
+            expect(added.feeRatio).to.equal(caver.utils.numberToHex(30))
+            expect(added.gas).to.equal(caver.utils.numberToHex(1231234))
+            expect(added.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-240: should sign and return signed TxTypeFeeDelegatedSmartContractDeploy', async () => {
+            const token = caver.kct.kip17.create()
+
+            const signed = await token.sign({
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                gas: 30000000,
+            }, 'constructor', caver.kct.kip17.byteCode, 'Jasmine', 'JAS')
+
+            expect(signed.from).to.equal(sender.address)
+            expect(signed.feePayer).to.equal(feePayer.address)
+            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+            await caver.wallet.signAsFeePayer(feePayer.address, signed)
+
+            const deployed = await caver.rpc.klay.sendRawTransaction(signed)
+
+            expect(deployed.from).to.equals(sender.address.toLowerCase())
+            expect(deployed.feePayer).to.equals(feePayer.address.toLowerCase())
+            expect(deployed.status).to.equal('0x1')
+            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-241: should sign as fee payer and return signed TxTypeFeeDelegatedSmartContractDeploy', async () => {
+            const token = caver.kct.kip17.create()
+
+            const signed = await token.signAsFeePayer({
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                gas: 30000000,
+            }, 'constructor', caver.kct.kip17.byteCode, 'Jasmine', 'JAS')
+
+            expect(signed.from).to.equal(sender.address)
+            expect(signed.feePayer).to.equal(feePayer.address)
+            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+
+            await caver.wallet.sign(sender.address, signed)
+
+            const deployed = await caver.rpc.klay.sendRawTransaction(signed)
+
+            expect(deployed.from).to.equals(sender.address.toLowerCase())
+            expect(deployed.feePayer).to.equals(feePayer.address.toLowerCase())
+            expect(deployed.status).to.equal('0x1')
+            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-242: should sign and return signed TxTypeFeeDelegatedSmartContractExecution', async () => {
+            const token = caver.kct.kip17.create(kip17Address)
+
+            const signed = await token.sign({
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                gas: 30000000,
+            }, 'addMinter', caver.wallet.keyring.generate().address)
+
+            expect(signed.from).to.equal(sender.address)
+            expect(signed.feePayer).to.equal(feePayer.address)
+            expect(caver.utils.isEmptySig(signed.signatures)).to.be.false
+            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+
+            await caver.wallet.signAsFeePayer(feePayer.address, signed)
+
+            const deployed = await caver.rpc.klay.sendRawTransaction(signed)
+
+            expect(deployed.from).to.equals(sender.address.toLowerCase())
+            expect(deployed.feePayer).to.equals(feePayer.address.toLowerCase())
+            expect(deployed.status).to.equal('0x1')
+            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-243: should sign as fee payer and return signed TxTypeFeeDelegatedSmartContractExecution', async () => {
+            const token = caver.kct.kip17.create(kip17Address)
+
+            const signed = await token.signAsFeePayer({
+                from: sender.address,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+                gas: 30000000,
+            }, 'addMinter', caver.wallet.keyring.generate().address)
+
+            expect(signed.from).to.equal(sender.address)
+            expect(signed.feePayer).to.equal(feePayer.address)
+            expect(caver.utils.isEmptySig(signed.feePayerSignatures)).to.be.false
+            expect(signed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+
+            await caver.wallet.sign(sender.address, signed)
+
+            const deployed = await caver.rpc.klay.sendRawTransaction(signed)
+
+            expect(deployed.from).to.equals(sender.address.toLowerCase())
+            expect(deployed.feePayer).to.equals(feePayer.address.toLowerCase())
+            expect(deployed.status).to.equal('0x1')
+            expect(deployed.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
         }).timeout(200000)
     })
 })
