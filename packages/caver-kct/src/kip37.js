@@ -64,7 +64,7 @@ class KIP37 extends Contract {
 
         // If sendOptions is string type, sendOptions means deployer's address
         if (_.isString(sendOptions)) sendOptions = { from: sendOptions, gas: 7000000, value: 0 }
-        sendOptions.gas = sendOptions.gas !== undefined? sendOptions.gas : 7000000
+        sendOptions.gas = sendOptions.gas !== undefined ? sendOptions.gas : 7000000
 
         return kip37
             .deploy({

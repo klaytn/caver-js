@@ -274,7 +274,7 @@ describe(`KIP7 token contract class test`, () => {
                 expect(afterAllowance.minus(originalAllowance).eq(allowanceAmount)).to.be.true
 
                 // reset allowance
-                const approved2 = await token.approve(testAccount.address, 0)
+                await token.approve(testAccount.address, 0)
             }
         }).timeout(200000)
 
@@ -2043,17 +2043,20 @@ describe(`KIP7 token contract class test`, () => {
         }
 
         it('CAVERJS-UNIT-KCT-222: should send TxTypeSmartContractDeploy to deploy when feeDelegation is defined as true', async () => {
-            const deployed = await caver.kct.kip7.deploy({
-                name: 'Jasmine',
-                symbol: 'JAS',
-                decimals: 18,
-                initialSupply: '10000000000000000000',
-            }, {
-                from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-                contractDeployFormatter,
-            })
+            const deployed = await caver.kct.kip7.deploy(
+                {
+                    name: 'Jasmine',
+                    symbol: 'JAS',
+                    decimals: 18,
+                    initialSupply: '10000000000000000000',
+                },
+                {
+                    from: sender.address,
+                    feeDelegation: true,
+                    feePayer: feePayer.address,
+                    contractDeployFormatter,
+                }
+            )
 
             expect(deployed.from).to.equals(sender.address.toLowerCase())
             expect(deployed.status).to.be.true
@@ -2061,18 +2064,21 @@ describe(`KIP7 token contract class test`, () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-223: should send TxTypeFeeDelegatedSmartContractDeployWithRatio to deploy when feeRatio is defined and feeDelegation is defined as true', async () => {
-            const deployed = await caver.kct.kip7.deploy({
-                name: 'Jasmine',
-                symbol: 'JAS',
-                decimals: 18,
-                initialSupply: '10000000000000000000',
-            }, {
-                from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-                feeRatio: 30,
-                contractDeployFormatter,
-            })
+            const deployed = await caver.kct.kip7.deploy(
+                {
+                    name: 'Jasmine',
+                    symbol: 'JAS',
+                    decimals: 18,
+                    initialSupply: '10000000000000000000',
+                },
+                {
+                    from: sender.address,
+                    feeDelegation: true,
+                    feePayer: feePayer.address,
+                    feeRatio: 30,
+                    contractDeployFormatter,
+                }
+            )
 
             expect(deployed.from).to.equals(sender.address.toLowerCase())
             expect(deployed.status).to.be.true
@@ -2166,12 +2172,20 @@ describe(`KIP7 token contract class test`, () => {
         it('CAVERJS-UNIT-KCT-229: should sign and return signed TxTypeFeeDelegatedSmartContractDeploy', async () => {
             const token = caver.kct.kip7.create()
 
-            const signed = await token.sign({
-                from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-                gas: 30000000,
-            }, 'constructor', caver.kct.kip7.byteCode, 'Jasmine', 'JAS', 18, '10000000000000000000')
+            const signed = await token.sign(
+                {
+                    from: sender.address,
+                    feeDelegation: true,
+                    feePayer: feePayer.address,
+                    gas: 30000000,
+                },
+                'constructor',
+                caver.kct.kip7.byteCode,
+                'Jasmine',
+                'JAS',
+                18,
+                '10000000000000000000'
+            )
 
             expect(signed.from).to.equal(sender.address)
             expect(signed.feePayer).to.equal(feePayer.address)
@@ -2191,12 +2205,20 @@ describe(`KIP7 token contract class test`, () => {
         it('CAVERJS-UNIT-KCT-230: should sign as fee payer and return signed TxTypeFeeDelegatedSmartContractDeploy', async () => {
             const token = caver.kct.kip7.create()
 
-            const signed = await token.signAsFeePayer({
-                from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-                gas: 30000000,
-            }, 'constructor', caver.kct.kip7.byteCode, 'Jasmine', 'JAS', 18, '10000000000000000000')
+            const signed = await token.signAsFeePayer(
+                {
+                    from: sender.address,
+                    feeDelegation: true,
+                    feePayer: feePayer.address,
+                    gas: 30000000,
+                },
+                'constructor',
+                caver.kct.kip7.byteCode,
+                'Jasmine',
+                'JAS',
+                18,
+                '10000000000000000000'
+            )
 
             expect(signed.from).to.equal(sender.address)
             expect(signed.feePayer).to.equal(feePayer.address)
@@ -2216,12 +2238,16 @@ describe(`KIP7 token contract class test`, () => {
         it('CAVERJS-UNIT-KCT-231: should sign and return signed TxTypeFeeDelegatedSmartContractExecution', async () => {
             const token = caver.kct.kip7.create(kip7Address)
 
-            const signed = await token.sign({
-                from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-                gas: 30000000,
-            }, 'addMinter', caver.wallet.keyring.generate().address)
+            const signed = await token.sign(
+                {
+                    from: sender.address,
+                    feeDelegation: true,
+                    feePayer: feePayer.address,
+                    gas: 30000000,
+                },
+                'addMinter',
+                caver.wallet.keyring.generate().address
+            )
 
             expect(signed.from).to.equal(sender.address)
             expect(signed.feePayer).to.equal(feePayer.address)
@@ -2241,12 +2267,16 @@ describe(`KIP7 token contract class test`, () => {
         it('CAVERJS-UNIT-KCT-232: should sign as fee payer and return signed TxTypeFeeDelegatedSmartContractExecution', async () => {
             const token = caver.kct.kip7.create(kip7Address)
 
-            const signed = await token.signAsFeePayer({
-                from: sender.address,
-                feeDelegation: true,
-                feePayer: feePayer.address,
-                gas: 30000000,
-            }, 'addMinter', caver.wallet.keyring.generate().address)
+            const signed = await token.signAsFeePayer(
+                {
+                    from: sender.address,
+                    feeDelegation: true,
+                    feePayer: feePayer.address,
+                    gas: 30000000,
+                },
+                'addMinter',
+                caver.wallet.keyring.generate().address
+            )
 
             expect(signed.from).to.equal(sender.address)
             expect(signed.feePayer).to.equal(feePayer.address)

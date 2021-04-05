@@ -24,7 +24,7 @@ async function determineSendParams(executableObj, sendParam, options) {
     let sendOptions = {}
     sendOptions = Object.assign(sendOptions, options)
     sendOptions = Object.assign(sendOptions, sendParam)
-    let { from, gas, feeDelegation, feePayer, feeRatio } = sendOptions
+    const { from, gas, feeDelegation, feePayer, feeRatio } = sendOptions
     if (!from)
         throw new Error(
             `'from' is missing. Please pass the sender's address in sendParam.from or define default sender address at 'kctContract.options.from'.`
