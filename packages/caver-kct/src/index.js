@@ -16,6 +16,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+const _ = require('lodash')
 const BaseKIP7 = require('./kip7')
 const BaseKIP17 = require('./kip17')
 const KIP37 = require('./kip37')
@@ -71,23 +72,27 @@ class KCT {
              * The KIP7 instance deployed and returned through this function uses the keyringContainer instead of accounts.
              * @method deploy
              * @param {Object} tokenInfo The object that defines the name, symbol, decimals, and initialSupply of the token to deploy.
-             * @param {String} deployer The address of the account to deploy the KIP-7 token contract.
+             * @param {Object|String} sendOptions The address of the account to deploy the KIP-7 token contract or an object holding parameters that are required for sending a transaction.
              * @param {IWallet} wallet The wallet instance to sign and send a transaction.
              * @return {object}
              */
-            static deploy(tokenInfo, deployer, wallet) {
+            static deploy(tokenInfo, sendOptions, wallet) {
                 validateDeployParameterForKIP7(tokenInfo)
 
                 const { name, symbol, decimals, initialSupply } = tokenInfo
                 const kip7 = new KIP7()
                 if (wallet !== undefined) kip7.setWallet(wallet)
 
+                // If sendOptions is string type, sendOptions means deployer's address
+                if (_.isString(sendOptions)) sendOptions = { from: sendOptions, gas: 4000000, value: 0 }
+                sendOptions.gas = sendOptions.gas !== undefined ? sendOptions.gas : 4000000
+
                 return kip7
                     .deploy({
                         data: kip7ByteCode,
                         arguments: [name, symbol, decimals, initialSupply],
                     })
-                    .send({ from: deployer, gas: 4000000, value: 0 })
+                    .send(sendOptions)
             }
 
             /**
@@ -132,23 +137,27 @@ class KCT {
              * The KIP17 instance deployed and returned through this function uses the keyringContainer instead of accounts.
              * @method deploy
              * @param {Object} tokenInfo The object that defines the name and symbol of the token to deploy.
-             * @param {String} deployer The address of the account to deploy the KIP-17 token contract.
+             * @param {Object|String} sendOptions The address of the account to deploy the KIP-17 token contract or an object holding parameters that are required for sending a transaction.
              * @param {IWallet} wallet The wallet instance to sign and send a transaction.
              * @return {object}
              */
-            static deploy(tokenInfo, deployer, wallet) {
+            static deploy(tokenInfo, sendOptions, wallet) {
                 validateDeployParameterForKIP17(tokenInfo)
 
                 const { name, symbol } = tokenInfo
                 const kip17 = new KIP17()
                 if (wallet !== undefined) kip17.setWallet(wallet)
 
+                // If sendOptions is string type, sendOptions means deployer's address
+                if (_.isString(sendOptions)) sendOptions = { from: sendOptions, gas: 6600000, value: 0 }
+                sendOptions.gas = sendOptions.gas !== undefined ? sendOptions.gas : 6600000
+
                 return kip17
                     .deploy({
                         data: kip17ByteCode,
                         arguments: [name, symbol],
                     })
-                    .send({ from: deployer, gas: 6600000, value: 0 })
+                    .send(sendOptions)
             }
 
             /**

@@ -43,21 +43,25 @@ class KIP7 extends Contract {
      *
      * @method deploy
      * @param {Object} tokenInfo The object that defines the name, symbol, decimals, and initialSupply of the token to deploy.
-     * @param {String} deployer The address of the account to deploy the KIP-7 token contract.
+     * @param {Object|String} sendOptions The address of the account to deploy the KIP-7 token contract or an object holding parameters that are required for sending a transaction.
      * @return {Object}
      */
-    static deploy(tokenInfo, deployer) {
+    static deploy(tokenInfo, sendOptions) {
         validateDeployParameterForKIP7(tokenInfo)
 
         const { name, symbol, decimals, initialSupply } = tokenInfo
         const kip7 = new KIP7()
+
+        // If sendOptions is string type, sendOptions means deployer's address
+        if (_.isString(sendOptions)) sendOptions = { from: sendOptions, gas: 4000000, value: 0 }
+        sendOptions.gas = sendOptions.gas !== undefined ? sendOptions.gas : 4000000
 
         return kip7
             .deploy({
                 data: kip7ByteCode,
                 arguments: [name, symbol, decimals, initialSupply],
             })
-            .send({ from: deployer, gas: 4000000, value: 0 })
+            .send(sendOptions)
     }
 
     /**
@@ -272,7 +276,7 @@ class KIP7 extends Contract {
      */
     async approve(spender, amount, sendParam = {}) {
         const executableObj = this.methods.approve(spender, formatParamForUint256(amount))
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -289,7 +293,7 @@ class KIP7 extends Contract {
      */
     async transfer(recipient, amount, sendParam = {}) {
         const executableObj = this.methods.transfer(recipient, formatParamForUint256(amount))
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -308,7 +312,7 @@ class KIP7 extends Contract {
      */
     async transferFrom(sender, recipient, amount, sendParam = {}) {
         const executableObj = this.methods.transferFrom(sender, recipient, formatParamForUint256(amount))
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -342,7 +346,7 @@ class KIP7 extends Contract {
             ? this.methods.safeTransfer(recipient, formatParamForUint256(amount), data)
             : this.methods.safeTransfer(recipient, formatParamForUint256(amount))
 
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -377,7 +381,7 @@ class KIP7 extends Contract {
             ? this.methods.safeTransferFrom(sender, recipient, formatParamForUint256(amount), data)
             : this.methods.safeTransferFrom(sender, recipient, formatParamForUint256(amount))
 
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -395,7 +399,7 @@ class KIP7 extends Contract {
      */
     async mint(account, amount, sendParam = {}) {
         const executableObj = this.methods.mint(account, formatParamForUint256(amount))
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -412,7 +416,7 @@ class KIP7 extends Contract {
      */
     async addMinter(account, sendParam = {}) {
         const executableObj = this.methods.addMinter(account)
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -428,7 +432,7 @@ class KIP7 extends Contract {
      */
     async renounceMinter(sendParam = {}) {
         const executableObj = this.methods.renounceMinter()
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -444,7 +448,7 @@ class KIP7 extends Contract {
      */
     async burn(amount, sendParam = {}) {
         const executableObj = this.methods.burn(formatParamForUint256(amount))
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -461,7 +465,7 @@ class KIP7 extends Contract {
      */
     async burnFrom(account, amount, sendParam = {}) {
         const executableObj = this.methods.burnFrom(account, formatParamForUint256(amount))
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -478,7 +482,7 @@ class KIP7 extends Contract {
      */
     async addPauser(account, sendParam = {}) {
         const executableObj = this.methods.addPauser(account)
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -494,7 +498,7 @@ class KIP7 extends Contract {
      */
     async pause(sendParam = {}) {
         const executableObj = this.methods.pause()
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -512,7 +516,7 @@ class KIP7 extends Contract {
      */
     async unpause(sendParam = {}) {
         const executableObj = this.methods.unpause()
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -528,10 +532,11 @@ class KIP7 extends Contract {
      */
     async renouncePauser(sendParam = {}) {
         const executableObj = this.methods.renouncePauser()
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
 }
 
+KIP7.byteCode = kip7ByteCode
 module.exports = KIP7
