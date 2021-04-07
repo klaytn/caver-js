@@ -226,18 +226,14 @@ describe('KIP37 token contract class test', () => {
 
             const uri = await token.uri(tokenId)
 
-            expect(uri).to.equal('https://game.example/item-id/0000000000000000000000000000000000000000000000000000000000000000.json')
+            expect(uri).to.equal('https://game.example/item-id/{id}.json')
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-167: should return the uri of the specific token with various tokenId types', async () => {
             const token = new caver.kct.kip37(kip37Address)
 
-            expect(await token.uri(caver.utils.toHex(tokenId))).to.equal(
-                'https://game.example/item-id/0000000000000000000000000000000000000000000000000000000000000000.json'
-            )
-            expect(await token.uri(new BigNumber(tokenId))).to.equal(
-                'https://game.example/item-id/0000000000000000000000000000000000000000000000000000000000000000.json'
-            )
+            expect(await token.uri(caver.utils.toHex(tokenId))).to.equal('https://game.example/item-id/{id}.json')
+            expect(await token.uri(new BigNumber(tokenId))).to.equal('https://game.example/item-id/{id}.json')
         }).timeout(200000)
     })
 

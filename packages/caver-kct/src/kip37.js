@@ -158,22 +158,13 @@ class KIP37 extends Contract {
 
     /**
      * uri returns distinct Uniform Resource Identifier (URI) for a given token.
-     * If the string {id} exists in any URI, this function will replace this with the actual token ID in hexadecimal form.
-     * Please refer to http://kips.klaytn.com/KIPs/kip-37#metadata
      *
      * @method uri
      * @param {BigNumber|string|number} id The token id to get uri.
      * @return {string}
      */
     async uri(id) {
-        let uri = await this.methods.uri(formatParamForUint256(id)).call()
-
-        // Replace {id} to token id in hexadecimal form.
-        if (uri.includes('{id}')) {
-            let tokenIdInHex = stripHexPrefix(toHex(id))
-            tokenIdInHex = leftPad(tokenIdInHex, 64, '0')
-            uri = uri.replace('{id}', tokenIdInHex)
-        }
+        const uri = await this.methods.uri(formatParamForUint256(id)).call()
         return uri
     }
 
