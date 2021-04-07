@@ -28,7 +28,7 @@ const {
     validateDeployParameterForKIP37,
     interfaceIds,
 } = require('./kctHelper')
-const { isAddress, toBuffer, isHexStrict, toHex, stripHexPrefix, leftPad } = require('../../caver-utils')
+const { isAddress, toBuffer, isHexStrict, toHex } = require('../../caver-utils')
 const KIP13 = require('../src/kip13')
 
 class KIP37 extends Contract {
