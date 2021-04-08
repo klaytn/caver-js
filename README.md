@@ -34,8 +34,7 @@ The following packages are required to use the caver-js library.
 Testing in caver-js is implemented using the mocha testing framework. If you want to run unit tests in caver-js, you need to install mocha first.
 - [mocha](https://mochajs.org/#installation)
 
-**Note** caver-js can run on Node.js versions 10, 12 and 14, and the recommended versions are:
-- lts/dubnium ([10.24.0](https://nodejs.org/dist/latest-v10.x/))
+**Note** caver-js can run on Node.js versions 12 and 14, and the recommended versions are:
 - lts/erbium ([12.21.0](https://nodejs.org/dist/latest-v12.x/))
 - lts/fermium ([14.16.0](https://nodejs.org/dist/latest-v14.x/))
 
