@@ -74,7 +74,7 @@
     "it-each": "^0.4.0",
     "lodash": "^4.17.15",
     "mocha": "^8.3.2",
-    "multihashes": "^3.0.1",
+    "multihashes": "^4.0.2",
     "node-fetch": "^2.2.0",
     "number-to-bn": "1.7.0",
     "oboe": "2.1.3",
