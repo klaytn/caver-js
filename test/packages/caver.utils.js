@@ -1989,6 +1989,13 @@ describe('caver.utils.convertToPeb', () => {
 
         expect(_.isString(converted)).to.be.true
         expect(converted === expected).to.be.true
+
+        const expectedForDecimalPoints = '2500000000000000000'
+
+        const convertingDecimalPoint = caver.utils.convertToPeb(new BigNumber(2.5), 'KLAY')
+
+        expect(_.isString(convertingDecimalPoint)).to.be.true
+        expect(convertingDecimalPoint === expectedForDecimalPoints).to.be.true
     })
 
     it('CAVERJS-UNIT-ETC-244: should convert to peb from kKLAY', () => {
