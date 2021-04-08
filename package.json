@@ -70,7 +70,7 @@
     "ethers": "^5.0.32",
     "ethjs-unit": "0.1.6",
     "eventemitter3": "4.0.0",
-    "ipfs-http-client-lite": "^0.3.0",
+    "ipfs-http-client": "^49.0.4",
     "it-each": "^0.4.0",
     "lodash": "^4.17.15",
     "mocha": "^8.3.2",

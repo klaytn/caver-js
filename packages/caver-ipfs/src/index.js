@@ -19,7 +19,7 @@
 
 const lodash = require('lodash')
 const fs = require('fs')
-const IPFSAPI = require('ipfs-http-client-lite')
+const createClient = require('ipfs-http-client')
 const multihash = require('multihashes')
 
 /**
@@ -49,7 +49,8 @@ class IPFS {
      */
     setIPFSNode(host, port, ssl) {
         const protocol = ssl ? 'https' : 'http'
-        this.ipfs = IPFSAPI({ apiUrl: `${protocol}://${host}:${port}` })
+        // this.ipfs = IPFSAPI({ apiUrl: `${protocol}://${host}:${port}` })
+        this.ipfs = createClient(`${protocol}://${host}:${port}`)
     }
 
     /**
@@ -102,7 +103,7 @@ class IPFS {
         if (!lodash.isBuffer(data) && !lodash.isArrayBuffer(data)) throw new Error(`Invalid data: ${data}`)
 
         const ret = await this.ipfs.add(Buffer.from(data))
-        return ret[0].hash
+        return ret.cid.toString()
     }
 
     /**
@@ -114,7 +115,14 @@ class IPFS {
     async get(hash) {
         if (!this.ipfs) throw new Error(`Please set IPFS Node through 'caver.ipfs.setIPFSNode'.`)
         const ret = await this.ipfs.cat(hash)
-        return ret
+        
+        let content = Buffer.from('')
+
+        for await (const chunk of ret) {
+            content = Buffer.concat([content, chunk])
+        }
+
+        return content
     }
 
     /**
