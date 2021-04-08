@@ -3,7 +3,7 @@ version: 2
 defaults: &defaults
   working_directory: ~/repo
   docker:
-    - image: kjhman21/node:10.15.3-mocha
+    - image: circleci/node:12.21.0
 
 orbs:
   cypress: cypress-io/cypress@1.25.0
@@ -15,7 +15,8 @@ jobs:
       - checkout
       - run: 
           name: "Install caver-js for testing"
-          command: npm install
+          command: |
+            npm install
       - run:
           name: "Lint check"
           command: npm run lint
