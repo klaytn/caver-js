@@ -2219,6 +2219,51 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
                 const value = await contract.methods.get(newKey).call({ from: sender.address })
                 expect(value).to.equal(newValue)
             }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-365: contract.signAsFeePayer({ from, feeRatio, ... }, functionName, arguments) will throw error when feeDelegation is undefined`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor, '0x1da61ed1c876206ff1aafdeb39717da7f078040b')
+
+                const newKey = 'contract sign func'
+                const newValue = 'should return signed tx'
+
+                const expectedError = `feeDelegation field should be defined as 'true' to sign as a fee payer`
+                await expect(
+                    contract.signAsFeePayer(
+                        {
+                            from: sender.address,
+                            feePayer: feePayer.address,
+                            feeRatio: 30,
+                            gas: 1000000,
+                        },
+                        'set',
+                        newKey,
+                        newValue
+                    )
+                ).to.be.rejectedWith(expectedError)
+            }).timeout(200000)
+
+            it(`CAVERJS-UNIT-ETC-366: contract.signAsFeePayer({ from, feeRatio, ... }, functionName, arguments) will throw error when feeDelegation is false`, async () => {
+                const contract = new caver.contract(abiWithoutConstructor, '0x1da61ed1c876206ff1aafdeb39717da7f078040b')
+
+                const newKey = 'contract sign func'
+                const newValue = 'should return signed tx'
+
+                const expectedError = `feeDelegation field should be defined as 'true' to sign as a fee payer`
+                await expect(
+                    contract.signAsFeePayer(
+                        {
+                            from: sender.address,
+                            feePayer: feePayer.address,
+                            feeDelegation: false,
+                            feeRatio: 30,
+                            gas: 1000000,
+                        },
+                        'set',
+                        newKey,
+                        newValue
+                    )
+                ).to.be.rejectedWith(expectedError)
+            }).timeout(200000)
         }
     )
 
