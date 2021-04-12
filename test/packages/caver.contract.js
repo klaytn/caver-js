@@ -2227,17 +2227,19 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
                 const newValue = 'should return signed tx'
 
                 const expectedError = `feeDelegation field should be defined as 'true' to sign as a fee payer`
-                await expect(contract.signAsFeePayer(
-                    {
-                        from: sender.address,
-                        feePayer: feePayer.address,
-                        feeRatio: 30,
-                        gas: 1000000,
-                    },
-                    'set',
-                    newKey,
-                    newValue
-                )).to.be.rejectedWith(expectedError)
+                await expect(
+                    contract.signAsFeePayer(
+                        {
+                            from: sender.address,
+                            feePayer: feePayer.address,
+                            feeRatio: 30,
+                            gas: 1000000,
+                        },
+                        'set',
+                        newKey,
+                        newValue
+                    )
+                ).to.be.rejectedWith(expectedError)
             }).timeout(200000)
 
             it(`CAVERJS-UNIT-ETC-366: contract.signAsFeePayer({ from, feeRatio, ... }, functionName, arguments) will throw error when feeDelegation is false`, async () => {
@@ -2247,18 +2249,20 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
                 const newValue = 'should return signed tx'
 
                 const expectedError = `feeDelegation field should be defined as 'true' to sign as a fee payer`
-                await expect(contract.signAsFeePayer(
-                    {
-                        from: sender.address,
-                        feePayer: feePayer.address,
-                        feeDelegation: false,
-                        feeRatio: 30,
-                        gas: 1000000,
-                    },
-                    'set',
-                    newKey,
-                    newValue
-                )).to.be.rejectedWith(expectedError)
+                await expect(
+                    contract.signAsFeePayer(
+                        {
+                            from: sender.address,
+                            feePayer: feePayer.address,
+                            feeDelegation: false,
+                            feeRatio: 30,
+                            gas: 1000000,
+                        },
+                        'set',
+                        newKey,
+                        newValue
+                    )
+                ).to.be.rejectedWith(expectedError)
             }).timeout(200000)
         }
     )
