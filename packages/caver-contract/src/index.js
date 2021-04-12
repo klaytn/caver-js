@@ -1220,7 +1220,7 @@ Contract.prototype._executeMethod = async function _executeMethod() {
 
         case 'sign':
         case 'signAsFeePayer':
-            const tx = createTransactionFromArgs(args, this._method, this._deployData, defer)
+            const tx = await createTransactionFromArgs(args, this._method, this._deployData, defer)
 
             if (!wallet) {
                 return utils._fireError(
@@ -1246,7 +1246,7 @@ Contract.prototype._executeMethod = async function _executeMethod() {
             })
 
         case 'send':
-            const transaction = createTransactionFromArgs(args, this._method, this._deployData, defer)
+            const transaction = await createTransactionFromArgs(args, this._method, this._deployData, defer)
             // make sure receipt logs are decoded
             const extraFormatters = {
                 receiptFormatter(receipt) {
