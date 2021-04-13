@@ -51,6 +51,7 @@ describe('caver.contract', () => {
         ]
         const created = caver.contract.create(abi)
         expect(created.constructor.name).to.equal('Contract')
+        expect(created._wallet).not.to.be.undefined
     })
 })
 
@@ -58,16 +59,19 @@ describe('caver.kct', () => {
     it('CAVERJS-UNIT-KCT-219: caver.kct.kip7.create method creates a KIP7 instance.', () => {
         const created = caver.kct.kip7.create()
         expect(created.constructor.name).to.equal('KIP7')
+        expect(created._wallet).not.to.be.undefined
     })
 
     it('CAVERJS-UNIT-KCT-220: caver.kct.kip17.create method creates a KIP17 instance.', () => {
         const created = caver.kct.kip17.create()
         expect(created.constructor.name).to.equal('KIP17')
+        expect(created._wallet).not.to.be.undefined
     })
 
     it('CAVERJS-UNIT-KCT-221: caver.kct.kip37.create method creates a KIP37 instance.', () => {
         const created = caver.kct.kip37.create()
         expect(created.constructor.name).to.equal('KIP37')
+        expect(created._wallet).not.to.be.undefined
     })
 })
 
