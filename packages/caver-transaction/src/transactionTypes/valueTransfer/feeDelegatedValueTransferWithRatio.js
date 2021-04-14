@@ -53,6 +53,18 @@ function _decode(rlpEncoded) {
  */
 class FeeDelegatedValueTransferWithRatio extends AbstractFeeDelegatedWithRatioTransaction {
     /**
+     * Creates a fee delegated value transfer with ratio transaction.
+     * @method create
+     * @param {object|string} createTxObj - The parameters to create a FeeDelegatedValueTransferWithRatio transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
+     *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
+     *                               The object can define `from`, `to`, `value`, `nonce`, `gas`, `gasPrice`, `feeRatio`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @return {FeeDelegatedValueTransferWithRatio}
+     */
+    static create(createTxObj) {
+        return new FeeDelegatedValueTransferWithRatio(createTxObj)
+    }
+
+    /**
      * decodes the RLP-encoded string and returns a FeeDelegatedValueTransferWithRatio transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded fee delegated value transfer with ratio transaction.

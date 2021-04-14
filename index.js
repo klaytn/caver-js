@@ -108,6 +108,12 @@ function Caver(provider, net) {
         this.setWallet(self.wallet)
     }
 
+    Contract.create = function() {
+        // With `caver.contract`, `caver.wallet` must be set in the `contarct._wallet`,
+        // so the Contract constructor defined above must be called here.
+        return new Contract(...arguments)
+    }
+
     Contract.setProvider = function() {
         BaseContract.setProvider.apply(this, arguments)
     }

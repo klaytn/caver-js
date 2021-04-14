@@ -52,6 +52,18 @@ function _decode(rlpEncoded) {
  */
 class FeeDelegatedAccountUpdate extends AbstractFeeDelegatedTransaction {
     /**
+     * Creates a fee delegated account update transaction.
+     * @method create
+     * @param {object|string} createTxObj - The parameters to create a FeeDelegatedAccountUpdate transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
+     *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
+     *                               The object can define `from`, `account`, `nonce`, `gas`, `gasPrice`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @return {FeeDelegatedAccountUpdate}
+     */
+    static create(createTxObj) {
+        return new FeeDelegatedAccountUpdate(createTxObj)
+    }
+
+    /**
      * decodes the RLP-encoded string and returns a FeeDelegatedAccountUpdate transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded fee delegated account update transaction.

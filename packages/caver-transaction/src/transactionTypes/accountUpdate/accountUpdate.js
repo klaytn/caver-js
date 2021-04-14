@@ -48,6 +48,18 @@ function _decode(rlpEncoded) {
  */
 class AccountUpdate extends AbstractTransaction {
     /**
+     * Creates an account update transaction.
+     * @method create
+     * @param {object|string} createTxObj - The parameters to create an AccountUpdate transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
+     *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
+     *                                      The object can define `from`, `account`, `nonce`, `gas`, `gasPrice`, `signatures` and `chainId`.
+     * @return {AccountUpdate}
+     */
+    static create(createTxObj) {
+        return new AccountUpdate(createTxObj)
+    }
+
+    /**
      * decodes the RLP-encoded string and returns an AccountUpdate transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded account update transaction.

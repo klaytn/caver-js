@@ -304,6 +304,10 @@ const toPeb = function(number, unit) {
 
     unit = getUnitValue(unit)
 
+    // BigNumber can support decimal points but BN does not support.
+    // So if BigNumber type number is came as a parameter,
+    // use `toString` function of BigNumber to prevent error while converting BigNumber to BN.
+    if (utils.isBigNumber(number)) number = number.toString()
     if (!utils.isBN(number) && !_.isString(number)) {
         number = tryNumberToString(number)
     }

@@ -42,21 +42,25 @@ class KIP17 extends Contract {
      *
      * @method deploy
      * @param {Object} tokenInfo The object that defines the name and symbol of the token to deploy.
-     * @param {String} deployer The address of the account to deploy the KIP-17 token contract.
+     * @param {Object|String} sendOptions The address of the account to deploy the KIP-17 token contract or an object holding parameters that are required for sending a transaction.
      * @return {Object}
      */
-    static deploy(tokenInfo, deployer) {
+    static deploy(tokenInfo, sendOptions) {
         validateDeployParameterForKIP17(tokenInfo)
 
         const { name, symbol } = tokenInfo
         const kip17 = new KIP17()
+
+        // If sendOptions is string type, sendOptions means deployer's address
+        if (_.isString(sendOptions)) sendOptions = { from: sendOptions, gas: 6600000, value: 0 }
+        sendOptions.gas = sendOptions.gas !== undefined ? sendOptions.gas : 6600000
 
         return kip17
             .deploy({
                 data: kip17ByteCode,
                 arguments: [name, symbol],
             })
-            .send({ from: deployer, gas: 6600000, value: 0 })
+            .send(sendOptions)
     }
 
     /**
@@ -71,6 +75,13 @@ class KIP17 extends Contract {
         return kip17.detectInterface()
     }
 
+    /**
+     * KIP17 class represents the KIP-17 token contract.
+     *
+     * @constructor
+     * @param {string} tokenAddress - The KIP-17 token contract address.
+     * @param {Array} [abi] - The Contract Application Binary Interface (ABI) of the KIP-17.
+     */
     constructor(tokenAddress, abi = kip17JsonInterface) {
         if (tokenAddress) {
             if (_.isString(tokenAddress)) {
@@ -309,7 +320,7 @@ class KIP17 extends Contract {
      */
     async approve(to, tokenId, sendParam = {}) {
         const executableObj = this.methods.approve(to, formatParamForUint256(tokenId))
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -327,7 +338,7 @@ class KIP17 extends Contract {
      */
     async setApprovalForAll(to, approved, sendParam = {}) {
         const executableObj = this.methods.setApprovalForAll(to, approved)
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -345,7 +356,7 @@ class KIP17 extends Contract {
      */
     async transferFrom(from, to, tokenId, sendParam = {}) {
         const executableObj = this.methods.transferFrom(from, to, formatParamForUint256(tokenId))
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -380,7 +391,7 @@ class KIP17 extends Contract {
             ? this.methods.safeTransferFrom(from, to, formatParamForUint256(tokenId), data)
             : this.methods.safeTransferFrom(from, to, formatParamForUint256(tokenId))
 
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -397,7 +408,7 @@ class KIP17 extends Contract {
      */
     async addMinter(account, sendParam = {}) {
         const executableObj = this.methods.addMinter(account)
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -413,7 +424,7 @@ class KIP17 extends Contract {
      */
     async renounceMinter(sendParam = {}) {
         const executableObj = this.methods.renounceMinter()
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -430,7 +441,7 @@ class KIP17 extends Contract {
      */
     async mint(to, tokenId, sendParam = {}) {
         const executableObj = this.methods.mint(to, formatParamForUint256(tokenId))
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -448,7 +459,7 @@ class KIP17 extends Contract {
      */
     async mintWithTokenURI(to, tokenId, tokenURI, sendParam = {}) {
         const executableObj = this.methods.mintWithTokenURI(to, formatParamForUint256(tokenId), tokenURI)
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -464,7 +475,7 @@ class KIP17 extends Contract {
      */
     async burn(tokenId, sendParam = {}) {
         const executableObj = this.methods.burn(formatParamForUint256(tokenId))
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -480,7 +491,7 @@ class KIP17 extends Contract {
      */
     async pause(sendParam = {}) {
         const executableObj = this.methods.pause()
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -498,7 +509,7 @@ class KIP17 extends Contract {
      */
     async unpause(sendParam = {}) {
         const executableObj = this.methods.unpause()
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -515,7 +526,7 @@ class KIP17 extends Contract {
      */
     async addPauser(account, sendParam = {}) {
         const executableObj = this.methods.addPauser(account)
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
@@ -531,10 +542,11 @@ class KIP17 extends Contract {
      */
     async renouncePauser(sendParam = {}) {
         const executableObj = this.methods.renouncePauser()
-        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
         return executableObj.send(sendParam)
     }
 }
 
+KIP17.byteCode = kip17ByteCode
 module.exports = KIP17

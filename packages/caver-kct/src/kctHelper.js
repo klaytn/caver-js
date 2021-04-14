@@ -20,9 +20,11 @@ const _ = require('lodash')
 const BigNumber = require('bignumber.js')
 const { isBigNumber } = require('../../caver-utils')
 
-async function determineSendParams(executableObj, sendParam, defaultFrom) {
-    let { from, gas } = sendParam
-    from = from || defaultFrom
+async function determineSendParams(executableObj, sendParam, options) {
+    let sendOptions = {}
+    sendOptions = Object.assign(sendOptions, options)
+    sendOptions = Object.assign(sendOptions, sendParam)
+    const { from, gas, feeDelegation, feePayer, feeRatio } = sendOptions
     if (!from)
         throw new Error(
             `'from' is missing. Please pass the sender's address in sendParam.from or define default sender address at 'kctContract.options.from'.`
@@ -33,10 +35,14 @@ async function determineSendParams(executableObj, sendParam, defaultFrom) {
         const originalGas = new BigNumber(estimated, 10)
         const bufferGas = new BigNumber(1.7, 10)
 
-        gas = Math.round(originalGas.times(bufferGas))
+        sendOptions.gas = Math.round(originalGas.times(bufferGas))
     }
 
-    return { from, gas, gasPrice: sendParam.gasPrice, value: sendParam.value }
+    if (feeDelegation === undefined && (feePayer || feeRatio !== undefined)) {
+        throw new Error('To use fee delegation with KCT, please set `feeDelegation` field to true.')
+    }
+
+    return sendOptions
 }
 
 function formatParamForUint256(param) {

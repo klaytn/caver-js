@@ -70,6 +70,19 @@ function _decode(rlpEncoded) {
  */
 class FeeDelegatedSmartContractDeployWithRatio extends AbstractFeeDelegatedWithRatioTransaction {
     /**
+     * Creates a fee delegated smart contract deploy with ratio transaction.
+     * @method create
+     * @param {object|string} createTxObj - The parameters to create a FeeDelegatedSmartContractDeployWithRatio transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
+     *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
+     *                               The object can define `from`, `to`, `value`, `input`, `humanReadable`, `codeForamt`,
+     *                               `nonce`, `gas`, `gasPrice`, `feeRatio`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @return {FeeDelegatedSmartContractDeployWithRatio}
+     */
+    static create(createTxObj) {
+        return new FeeDelegatedSmartContractDeployWithRatio(createTxObj)
+    }
+
+    /**
      * decodes the RLP-encoded string and returns a FeeDelegatedSmartContractDeployWithRatio transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded fee delegated smart contract deploy with ratio transaction.
