@@ -70,7 +70,7 @@ const createMultiSigAccount = async () => {
     }
 }
 
-before(async function () {
+before(async function() {
     this.timeout(200000)
 
     const senderPrvKey =
