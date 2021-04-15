@@ -59,10 +59,10 @@ const createMultiSigAccount = async () => {
         gas: 900000,
     }
 
-    return caver.klay.sendTransaction(accountUpdateObject)
+    await caver.klay.sendTransaction(accountUpdateObject)
 }
 
-before(function(done) {
+before(async function() {
     this.timeout(200000)
 
     const senderPrvKey =
@@ -72,7 +72,7 @@ before(function(done) {
 
     sender = caver.klay.accounts.wallet.add(senderPrvKey)
 
-    createMultiSigAccount().then(() => done())
+    await createMultiSigAccount()
 })
 
 describe('sign transaction with multi sig account key', () => {
