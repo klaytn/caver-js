@@ -42,11 +42,7 @@ const createMultiSigAccount = async () => {
         gas: 900000,
     }
 
-    try {
-        await caver.klay.sendTransaction(txObject)
-    } catch (error) {
-        throw error
-    }
+    await caver.klay.sendTransaction(txObject)
 
     // account update transaction object
     const accountUpdateObject = {
@@ -63,11 +59,7 @@ const createMultiSigAccount = async () => {
         gas: 900000,
     }
 
-    try {
-        await caver.klay.sendTransaction(accountUpdateObject)
-    } catch (error) {
-        throw error
-    }
+    await caver.klay.sendTransaction(accountUpdateObject)
 }
 
 before(async function() {
@@ -80,11 +72,7 @@ before(async function() {
 
     sender = caver.klay.accounts.wallet.add(senderPrvKey)
 
-    try {
-        await createMultiSigAccount()
-    } catch (error) {
-        throw error
-    }
+    await createMultiSigAccount()
 })
 
 describe('sign transaction with multi sig account key', () => {
