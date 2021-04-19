@@ -1,6 +1,6 @@
 {
   "name": "caver-js",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "caver-js is a JavaScript API library that allows developers to interact with a Klaytn node",
   "main": "index.js",
   "scripts": {
