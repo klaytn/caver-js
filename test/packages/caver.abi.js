@@ -16,15 +16,12 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const _ = require('lodash')
 const testRPCURL = require('../testrpc')
 const { expect } = require('../extendedChai')
 
 const Caver = require('../../index.js')
 
 let caver
-let testKeyring
-let sender
 
 beforeEach(() => {
     caver = new Caver(testRPCURL)
