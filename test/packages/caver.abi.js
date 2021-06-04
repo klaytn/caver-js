@@ -140,7 +140,7 @@ describe('caver.abi', () => {
                 caver.abi.decodeFunctionCall(abi, encodedFunctionCall)
             }).to.throw(expectedError)
 
-			expectedError = `Invalid abi parameter type: To decode function call, you need to pass an abi object of the function as a first parameter.`
+            expectedError = `Invalid abi parameter type: To decode function call, you need to pass an abi object of the function as a first parameter.`
             abi = [
                 {
                     type: 'uint256',

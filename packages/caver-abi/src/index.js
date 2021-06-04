@@ -379,7 +379,10 @@ ABICoder.prototype.encodeFunctionCall = function(jsonInterface, params) {
 ABICoder.prototype.decodeFunctionCall = function(abi, functionCall) {
     functionCall = utils.addHexPrefix(functionCall)
 
-    if (!_.isObject(abi) || _.isArray(abi)) throw new Error(`Invalid abi parameter type: To decode function call, you need to pass an abi object of the function as a first parameter.`)
+    if (!_.isObject(abi) || _.isArray(abi))
+        throw new Error(
+            `Invalid abi parameter type: To decode function call, you need to pass an abi object of the function as a first parameter.`
+        )
     if (!abi.name || !abi.inputs)
         throw new Error(`Insufficient info in abi object: The function name and inputs must be defined inside the abi function object.`)
 
