@@ -32,7 +32,7 @@ function _decode(rlpEncoded) {
         gas: utils.trimLeadingZero(gas),
         to,
         value: utils.trimLeadingZero(value),
-        input: utils.trimLeadingZero(input),
+        input: input,
         signatures: [v, r, s],
     }
 }
