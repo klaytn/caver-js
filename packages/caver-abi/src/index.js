@@ -350,6 +350,51 @@ ABICoder.prototype.encodeFunctionCall = function(jsonInterface, params) {
 }
 
 /**
+ * Decodes a function call from its abi object of a function or function abi string and returns parameters.
+ * If the function signature of the `abi` passed as a parameter does not match the function signature of the `functionCall`, an error is returned.
+ *
+ * @example
+ * const abi = {
+ *    name: 'myMethod',
+ *    type: 'function',
+ *    inputs: [
+ *        {
+ *            type: 'uint256',
+ *           name: 'myNumber',
+ *       },
+ *       {
+ *           type: 'string',
+ *           name: 'mystring',
+ *       },
+ *   ],
+ * }
+ * const functionCall = '0x24ef0...'
+ * caver.abi.decodeFunctionCall(abi, functionCall)
+ *
+ * @method decodeFunctionCall
+ * @param {Array} abi The abi object of a function.
+ * @param {string} functionCall The encoded function call string.
+ * @return {Array} An array of plain params
+ */
+ABICoder.prototype.decodeFunctionCall = function(abi, functionCall) {
+    functionCall = utils.addHexPrefix(functionCall)
+
+    if (!_.isObject(abi) || _.isArray(abi)) throw new Error(`Invalid abi parameter type: To decode function call, you need to pass an abi object of the function as a first parameter.`)
+    if (!abi.name || !abi.inputs)
+        throw new Error(`Insufficient info in abi object: The function name and inputs must be defined inside the abi function object.`)
+
+    const funcSig = this.encodeFunctionSignature(abi)
+    const extractFuncSig = functionCall.slice(0, funcSig.length)
+
+    if (funcSig !== extractFuncSig)
+        throw new Error(
+            `Invalid function signature: The function signature of the abi as a parameter and the function signatures extracted from the function call string do not match.`
+        )
+
+    return this.decodeParameters(abi.inputs, `0x${functionCall.slice(funcSig.length)}`)
+}
+
+/**
  * Should be used to decode bytes to plain param
  *
  * @method decodeParameter
