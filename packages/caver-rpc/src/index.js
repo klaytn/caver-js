@@ -18,6 +18,7 @@
 
 const Klay = require('./klay')
 const Net = require('./net')
+const Governance = require('./governance')
 const core = require('../../caver-core')
 
 class RPC {
@@ -34,6 +35,7 @@ class RPC {
 
             _this.klay.setRequestManager(manager)
             _this.net.setRequestManager(manager)
+            _this.governance.setRequestManager(manager)
 
             return true
         }
@@ -47,6 +49,7 @@ class RPC {
 
         this.klay = new Klay(this)
         this.net = new Net(this)
+        this.governance = new Governance(this)
     }
 }
 
