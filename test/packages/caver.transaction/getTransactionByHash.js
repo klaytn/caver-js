@@ -21,14 +21,10 @@ const sinon = require('sinon')
 const sinonChai = require('sinon-chai')
 const chaiAsPromised = require('chai-as-promised')
 
-const RLP = require('eth-lib/lib/rlp')
-
 chai.use(chaiAsPromised)
 chai.use(sinonChai)
 
 const expect = chai.expect
-
-const { propertiesForUnnecessary } = require('../utils')
 
 const testRPCURL = require('../../testrpc')
 const Caver = require('../../../index.js')
