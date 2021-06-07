@@ -39,10 +39,110 @@ const ChainDataAnchoring = require('./transactionTypes/chainDataAnchoring/chainD
 const FeeDelegatedChainDataAnchoring = require('./transactionTypes/chainDataAnchoring/feeDelegatedChainDataAnchoring')
 const FeeDelegatedChainDataAnchoringWithRatio = require('./transactionTypes/chainDataAnchoring/feeDelegatedChainDataAnchoringWithRatio')
 const TransactionDecoder = require('./transactionDecoder/transactionDecoder')
+const AbstractTransaction = require('./transactionTypes/abstractTransaction')
 const { TX_TYPE_STRING, TX_TYPE_TAG } = require('./transactionHelper/transactionHelper')
+const Account = require('../../caver-account')
+
+/** @module Transaction */
+
+/**
+ * Querys transaction from Klaytn and converts to a caver transaction instance.
+ * If it fails to receive a transaction from Klaytn, an error is thrown.
+ * 
+ * @example
+ * const txObject = await caver.transaction.getTransactionByHash('0x{transaction hash}')
+ * 
+ * @method getTransactionByHash
+ * @param  {string}  transactionHash
+ * @return {AbstractTransaction}
+ */
+async function getTransactionByHash(transactionHash) {
+    let txObject = await AbstractTransaction._klaytnCall.getTransactionByHash(transactionHash)
+    if (txObject === null) throw new Error(`Failed to get transaction from Klaytn with '${transactionHash}'.`)
+
+    // AccountUpdate transaction received from Klaytn defines encodedAccountKey string in `key` field.
+    // This needs to be formatted according to the caver transaction format (`account` field).
+    if (txObject.key) {
+        const account = Account.createFromRLPEncoding(txObject.from, txObject.key)
+        txObject.account = account
+        delete txObject.key
+    }
+
+    switch (txObject.type) {
+        case 'TxTypeLegacyTransaction':
+            txObject = new LegacyTransaction(txObject)
+            break
+        case 'TxTypeValueTransfer':
+            txObject = new ValueTransfer(txObject)
+            break
+        case 'TxTypeFeeDelegatedValueTransfer':
+            txObject = new FeeDelegatedValueTransfer(txObject)
+            break
+        case 'TxTypeFeeDelegatedValueTransferWithRatio':
+            txObject = new FeeDelegatedValueTransferWithRatio(txObject)
+            break
+        case 'TxTypeValueTransferMemo':
+            txObject = new ValueTransferMemo(txObject)
+            break
+        case 'TxTypeFeeDelegatedValueTransferMemo':
+            txObject = new FeeDelegatedValueTransferMemo(txObject)
+            break
+        case 'TxTypeFeeDelegatedValueTransferMemoWithRatio':
+            txObject = new FeeDelegatedValueTransferMemoWithRatio(txObject)
+            break
+        case 'TxTypeAccountUpdate':
+            txObject = new AccountUpdate(txObject)
+            break
+        case 'TxTypeFeeDelegatedAccountUpdate':
+            txObject = new FeeDelegatedAccountUpdate(txObject)
+            break
+        case 'TxTypeFeeDelegatedAccountUpdateWithRatio':
+            txObject = new FeeDelegatedAccountUpdateWithRatio(txObject)
+            break
+        case 'TxTypeSmartContractDeploy':
+            txObject = new SmartContractDeploy(txObject)
+            break
+        case 'TxTypeFeeDelegatedSmartContractDeploy':
+            txObject = new FeeDelegatedSmartContractDeploy(txObject)
+            break
+        case 'TxTypeFeeDelegatedSmartContractDeployWithRatio':
+            txObject = new FeeDelegatedSmartContractDeployWithRatio(txObject)
+            break
+        case 'TxTypeSmartContractExecution':
+            txObject = new SmartContractExecution(txObject)
+            break
+        case 'TxTypeFeeDelegatedSmartContractExecution':
+            txObject = new FeeDelegatedSmartContractExecution(txObject)
+            break
+        case 'TxTypeFeeDelegatedSmartContractExecutionWithRatio':
+            txObject = new FeeDelegatedSmartContractExecutionWithRatio(txObject)
+            break
+        case 'TxTypeCancel':
+            txObject = new Cancel(txObject)
+            break
+        case 'TxTypeFeeDelegatedCancel':
+            txObject = new FeeDelegatedCancel(txObject)
+            break
+        case 'TxTypeFeeDelegatedCancelWithRatio':
+            txObject = new FeeDelegatedCancelWithRatio(txObject)
+            break
+        case 'TxTypeChainDataAnchoring':
+            txObject = new ChainDataAnchoring(txObject)
+            break
+        case 'TxTypeFeeDelegatedChainDataAnchoring':
+            txObject = new FeeDelegatedChainDataAnchoring(txObject)
+            break
+        case 'TxTypeFeeDelegatedChainDataAnchoringWithRatio':
+            txObject = new FeeDelegatedChainDataAnchoringWithRatio(txObject)
+            break
+    }
+    return txObject
+}
+
 
 module.exports = {
     decode: TransactionDecoder.decode,
+    getTransactionByHash: getTransactionByHash,
 
     legacyTransaction: LegacyTransaction,
 

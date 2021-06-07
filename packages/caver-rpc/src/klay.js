@@ -88,6 +88,11 @@ class KlayRPC {
                 params: 2,
                 inputFormatter: [formatters.inputAddressFormatter, formatters.inputDefaultBlockNumberFormatter],
             }),
+            new Method({
+                name: 'getTransactionByHash',
+                call: 'klay_getTransactionByHash',
+                params: 1,
+            }),
         ]
         AbstractTransaction._klaytnCall = {}
         _.each(_klaytnCall, function(method) {
