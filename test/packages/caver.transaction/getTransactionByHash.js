@@ -39,15 +39,18 @@ const sandbox = sinon.createSandbox()
 
 before(() => {
     caver = new Caver(testRPCURL)
-    AbstractTransaction._klaytnCall = {
-        getGasPrice: () => {},
-        getTransactionCount: () => {},
-        getChainId: () => {},
-        getTransactionByHash: () => {},
-    }
 })
 
 describe('caver.transaction.getTransactionByHash', () => {
+    beforeEach(() => {
+        AbstractTransaction._klaytnCall = {
+            getGasPrice: () => {},
+            getTransactionCount: () => {},
+            getChainId: () => {},
+            getTransactionByHash: () => {},
+        }
+    })
+
     afterEach(() => {
         sandbox.restore()
     })
