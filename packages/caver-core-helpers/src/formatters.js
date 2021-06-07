@@ -523,6 +523,19 @@ const outputPostFormatter = function(post) {
     return post
 }
 
+/**
+ * Formats the output of a voting power.
+ * If current governing mode does not support voting power, return an error.
+ *
+ * @method outputVotingPowerFormatter
+ * @param {string}
+ * @returns {string|Error}
+ */
+const outputVotingPowerFormatter = function(options) {
+    if (_.isString(options)) options = new Error(options)
+    return options
+}
+
 const inputAddressFormatter = function(address) {
     const iban = new utils.Iban(address)
     if (iban.isValid() && iban.isDirect()) {
@@ -573,6 +586,7 @@ module.exports = {
     outputLogFormatter: outputLogFormatter,
     outputPostFormatter: outputPostFormatter,
     outputSyncingFormatter: outputSyncingFormatter,
+    outputVotingPowerFormatter: outputVotingPowerFormatter,
     // moved from util
     toChecksumAddress: utils.toChecksumAddress,
     hexToNumber: utils.hexToNumber,
