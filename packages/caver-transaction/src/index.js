@@ -48,10 +48,10 @@ const Account = require('../../caver-account')
 /**
  * Querys transaction from Klaytn and converts to a caver transaction instance.
  * If it fails to receive a transaction from Klaytn, an error is thrown.
- * 
+ *
  * @example
  * const txObject = await caver.transaction.getTransactionByHash('0x{transaction hash}')
- * 
+ *
  * @method getTransactionByHash
  * @param  {string}  transactionHash
  * @return {AbstractTransaction}
@@ -138,7 +138,6 @@ async function getTransactionByHash(transactionHash) {
     }
     return txObject
 }
-
 
 module.exports = {
     decode: TransactionDecoder.decode,

@@ -57,237 +57,237 @@ describe('caver.transaction.getTransactionByHash', () => {
 
     context('legacyTransaction', () => {
         it('CAVERJS-UNIT-TRANSACTION-399: should return a legacyTransaction instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.legacyTransaction)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.legacyTransaction)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.legacyTransaction.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeLegacyTransaction')
-		})
-	})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.legacyTransaction.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeLegacyTransaction')
+        })
+    })
 
     context('valueTransfer', () => {
         it('CAVERJS-UNIT-TRANSACTION-400: should return a valueTransfer instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.valueTransfer)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.valueTransfer)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.valueTransfer.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeValueTransfer')
-		})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.valueTransfer.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeValueTransfer')
+        })
 
         it('CAVERJS-UNIT-TRANSACTION-401: should return a feeDelegatedValueTransfer instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.feeDelegatedValueTransfer)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.feeDelegatedValueTransfer)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedValueTransfer.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeFeeDelegatedValueTransfer')
-		})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedValueTransfer.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeFeeDelegatedValueTransfer')
+        })
 
         it('CAVERJS-UNIT-TRANSACTION-402: should return a feeDelegatedValueTransferWithRatio instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.feeDelegatedValueTransferWithRatio)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.feeDelegatedValueTransferWithRatio)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedValueTransferWithRatio.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeFeeDelegatedValueTransferWithRatio')
-		})
-	})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedValueTransferWithRatio.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeFeeDelegatedValueTransferWithRatio')
+        })
+    })
 
     context('valueTransferMemo', () => {
         it('CAVERJS-UNIT-TRANSACTION-403: should return a valueTransferMemo instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.valueTransferMemo)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.valueTransferMemo)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.valueTransferMemo.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeValueTransferMemo')
-		})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.valueTransferMemo.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeValueTransferMemo')
+        })
 
         it('CAVERJS-UNIT-TRANSACTION-404: should return a feeDelegatedValueTransferMemo instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.feeDelegatedValueTransferMemo)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.feeDelegatedValueTransferMemo)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedValueTransferMemo.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeFeeDelegatedValueTransferMemo')
-		})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedValueTransferMemo.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeFeeDelegatedValueTransferMemo')
+        })
 
         it('CAVERJS-UNIT-TRANSACTION-405: should return a feeDelegatedValueTransferMemoWithRatio instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.feeDelegatedValueTransferMemoWithRatio)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.feeDelegatedValueTransferMemoWithRatio)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedValueTransferMemoWithRatio.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeFeeDelegatedValueTransferMemoWithRatio')
-		})
-	})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedValueTransferMemoWithRatio.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeFeeDelegatedValueTransferMemoWithRatio')
+        })
+    })
 
     context('accountUpdate', () => {
         it('CAVERJS-UNIT-TRANSACTION-406: should return a accountUpdate instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.accountUpdate)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.accountUpdate)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.accountUpdate.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeAccountUpdate')
-		})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.accountUpdate.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeAccountUpdate')
+        })
 
         it('CAVERJS-UNIT-TRANSACTION-407: should return a feeDelegatedAccountUpdate instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.feeDelegatedAccountUpdate)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.feeDelegatedAccountUpdate)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedAccountUpdate.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeFeeDelegatedAccountUpdate')
-		})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedAccountUpdate.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeFeeDelegatedAccountUpdate')
+        })
 
         it('CAVERJS-UNIT-TRANSACTION-408: should return a feeDelegatedAccountUpdateWithRatio instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.feeDelegatedAccountUpdateWithRatio)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.feeDelegatedAccountUpdateWithRatio)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedAccountUpdateWithRatio.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeFeeDelegatedAccountUpdateWithRatio')
-		})
-	})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedAccountUpdateWithRatio.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeFeeDelegatedAccountUpdateWithRatio')
+        })
+    })
 
     context('smartContractDeploy', () => {
         it('CAVERJS-UNIT-TRANSACTION-409: should return a smartContractDeploy instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.smartContractDeploy)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.smartContractDeploy)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.smartContractDeploy.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeSmartContractDeploy')
-		})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.smartContractDeploy.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeSmartContractDeploy')
+        })
 
         it('CAVERJS-UNIT-TRANSACTION-410: should return a feeDelegatedSmartContractDeploy instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.feeDelegatedSmartContractDeploy)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.feeDelegatedSmartContractDeploy)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedSmartContractDeploy.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeFeeDelegatedSmartContractDeploy')
-		})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedSmartContractDeploy.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeFeeDelegatedSmartContractDeploy')
+        })
 
         it('CAVERJS-UNIT-TRANSACTION-411: should return a feeDelegatedSmartContractDeployWithRatio instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.feeDelegatedSmartContractDeployWithRatio)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.feeDelegatedSmartContractDeployWithRatio)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedSmartContractDeployWithRatio.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeFeeDelegatedSmartContractDeployWithRatio')
-		})
-	})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedSmartContractDeployWithRatio.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeFeeDelegatedSmartContractDeployWithRatio')
+        })
+    })
 
     context('smartContractExecution', () => {
         it('CAVERJS-UNIT-TRANSACTION-412: should return a smartContractExecution instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.smartContractExecution)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.smartContractExecution)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.smartContractExecution.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeSmartContractExecution')
-		})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.smartContractExecution.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeSmartContractExecution')
+        })
 
         it('CAVERJS-UNIT-TRANSACTION-413: should return a feeDelegatedSmartContractExecution instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.feeDelegatedSmartContractExecution)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.feeDelegatedSmartContractExecution)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedSmartContractExecution.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeFeeDelegatedSmartContractExecution')
-		})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedSmartContractExecution.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeFeeDelegatedSmartContractExecution')
+        })
 
         it('CAVERJS-UNIT-TRANSACTION-414: should return a feeDelegatedSmartContractExecutionWithRatio instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.feeDelegatedSmartContractExecutionWithRatio)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.feeDelegatedSmartContractExecutionWithRatio)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedSmartContractExecutionWithRatio.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeFeeDelegatedSmartContractExecutionWithRatio')
-		})
-	})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedSmartContractExecutionWithRatio.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeFeeDelegatedSmartContractExecutionWithRatio')
+        })
+    })
 
     context('cancel', () => {
         it('CAVERJS-UNIT-TRANSACTION-415: should return a cancel instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.cancel)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.cancel)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.cancel.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeCancel')
-		})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.cancel.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeCancel')
+        })
 
         it('CAVERJS-UNIT-TRANSACTION-416: should return a feeDelegatedCancel instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.feeDelegatedCancel)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.feeDelegatedCancel)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedCancel.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeFeeDelegatedCancel')
-		})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedCancel.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeFeeDelegatedCancel')
+        })
 
         it('CAVERJS-UNIT-TRANSACTION-417: should return a feeDelegatedCancelWithRatio instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.feeDelegatedCancelWithRatio)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.feeDelegatedCancelWithRatio)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedCancelWithRatio.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeFeeDelegatedCancelWithRatio')
-		})
-	})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedCancelWithRatio.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeFeeDelegatedCancelWithRatio')
+        })
+    })
 
     context('chainDataAnchoring', () => {
         it('CAVERJS-UNIT-TRANSACTION-418: should return a chainDataAnchoring instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.chainDataAnchoring)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.chainDataAnchoring)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.chainDataAnchoring.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeChainDataAnchoring')
-		})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.chainDataAnchoring.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeChainDataAnchoring')
+        })
 
         it('CAVERJS-UNIT-TRANSACTION-419: should return a feeDelegatedChainDataAnchoring instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.feeDelegatedChainDataAnchoring)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.feeDelegatedChainDataAnchoring)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedChainDataAnchoring.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeFeeDelegatedChainDataAnchoring')
-		})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedChainDataAnchoring.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeFeeDelegatedChainDataAnchoring')
+        })
 
         it('CAVERJS-UNIT-TRANSACTION-420: should return a feeDelegatedChainDataAnchoringWithRatio instance', async () => {
-			getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
-			getTransactionByHashSpy.returns(txSamples.feeDelegatedChainDataAnchoringWithRatio)
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.feeDelegatedChainDataAnchoringWithRatio)
 
-			const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedChainDataAnchoringWithRatio.hash)
-			
-			expect(getTransactionByHashSpy).to.have.been.called
-			expect(txObj.type).to.equal('TxTypeFeeDelegatedChainDataAnchoringWithRatio')
-		})
-	})
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.feeDelegatedChainDataAnchoringWithRatio.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeFeeDelegatedChainDataAnchoringWithRatio')
+        })
+    })
 })
