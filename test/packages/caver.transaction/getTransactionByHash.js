@@ -37,6 +37,7 @@ const AbstractTransaction = require('../../../packages/caver-transaction/src/tra
 const txSamples = require('./transactionSamples')
 
 let caver
+let getTransactionByHashSpy
 
 const sandbox = sinon.createSandbox()
 
