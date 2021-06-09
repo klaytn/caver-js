@@ -342,10 +342,11 @@ ABICoder.prototype.formatParam = function(type, param) {
  *
  * @method encodeFunctionCall
  * @param {Array} jsonInterface
- * @param {Array} params
+ * @param {Array} [params]
  * @return {String} The encoded ABI for this function call
  */
 ABICoder.prototype.encodeFunctionCall = function(jsonInterface, params) {
+    params = params || []
     return this.encodeFunctionSignature(jsonInterface) + this.encodeParameters(jsonInterface.inputs, params).replace('0x', '')
 }
 
