@@ -568,4 +568,5 @@ module.exports = {
 
     hashMessage: utils.hashMessage,
     recover: utils.recover,
+    recoverPublicKey: utils.recoverPublicKey,
 }

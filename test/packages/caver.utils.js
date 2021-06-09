@@ -2045,3 +2045,23 @@ describe('caver.utils.recover', () => {
         expect(result).to.equal(keyring.address)
     })
 })
+
+describe('caver.utils.recoverPublicKey', () => {
+    it('CAVERJS-UNIT-ETC-379: return recovered public key when input is message, signature', () => {
+        const keyring = caver.wallet.keyring.generate()
+        const message = 'Some data'
+        const signed = keyring.signMessage(message, caver.wallet.keyring.role.roleTransactionKey)
+
+        const result = caver.utils.recoverPublicKey(signed.message, signed.signatures[0])
+        expect(result).to.equal(keyring.getPublicKey())
+    })
+
+    it('CAVERJS-UNIT-ETC-380: return recovered public key when input is messageHash, signature, prefixed', () => {
+        const keyring = caver.wallet.keyring.generate()
+        const message = 'Some data'
+        const signed = keyring.signMessage(message, caver.wallet.keyring.role.roleTransactionKey)
+
+        const result = caver.utils.recoverPublicKey(signed.messageHash, signed.signatures[0], true)
+        expect(result).to.equal(keyring.getPublicKey())
+    })
+})
