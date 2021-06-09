@@ -60,7 +60,7 @@ describe('decode function call string with various smart contracts', () => {
         caver = new Caver(testRPCURL)
     })
 
-    it('CAVERJS-UNIT-ETC-371: contract.decodeFunctionCall with params', async () => {
+    it('CAVERJS-UNIT-ETC-371: contract.decodeFunctionCall with params', () => {
 		const contract = caver.contract.create(abi)
 		
 		const params = ['keyString', 'valueString']
@@ -70,18 +70,18 @@ describe('decode function call string with various smart contracts', () => {
 		expect(params.length).to.equal(result.__length__)
 		expect(params[0]).to.equal(result[0])
 		expect(params[1]).to.equal(result[1])
-    }).timeout(200000)
+    })
 
-    it('CAVERJS-UNIT-ETC-372: contract.decodeFunctionCall without params', async () => {
+    it('CAVERJS-UNIT-ETC-372: contract.decodeFunctionCall without params', () => {
 		const contract = caver.contract.create(abi)
 		
 		const encodedString = caver.abi.encodeFunctionCall(abi[2])
 		const result = contract.decodeFunctionCall(encodedString)
 		
 		expect(result.__length__).to.equal(0)
-    }).timeout(200000)
+    })
 
-    it('CAVERJS-UNIT-ETC-373: kip7.decodeFunctionCall with params', async () => {
+    it('CAVERJS-UNIT-ETC-373: kip7.decodeFunctionCall with params', () => {
 		const kip7 = caver.kct.kip7.create()
 		
 		let transferFromABI
@@ -96,9 +96,9 @@ describe('decode function call string with various smart contracts', () => {
 		expect(params[0]).to.equal(result[0].toLowerCase())
 		expect(params[1]).to.equal(result[1].toLowerCase())
 		expect(params[2]).to.equal(parseInt(result[2]))
-    }).timeout(200000)
+    })
 
-    it('CAVERJS-UNIT-ETC-374: kip7.decodeFunctionCall without params', async () => {
+    it('CAVERJS-UNIT-ETC-374: kip7.decodeFunctionCall without params', () => {
 		const kip7 = caver.kct.kip7.create()
 		
 		let nameABI
@@ -109,9 +109,9 @@ describe('decode function call string with various smart contracts', () => {
 		const result = kip7.decodeFunctionCall(encodedString)
 
 		expect(result.__length__).to.equal(0)
-    }).timeout(200000)
+    })
 
-    it('CAVERJS-UNIT-ETC-375: kip17.decodeFunctionCall with params', async () => {
+    it('CAVERJS-UNIT-ETC-375: kip17.decodeFunctionCall with params', () => {
 		const kip17 = caver.kct.kip17.create()
 		
 		let transferFromABI
@@ -126,9 +126,9 @@ describe('decode function call string with various smart contracts', () => {
 		expect(params[0]).to.equal(result[0].toLowerCase())
 		expect(params[1]).to.equal(result[1].toLowerCase())
 		expect(params[2]).to.equal(parseInt(result[2]))
-    }).timeout(200000)
+    })
 
-    it('CAVERJS-UNIT-ETC-376: kip17.decodeFunctionCall without params', async () => {
+    it('CAVERJS-UNIT-ETC-376: kip17.decodeFunctionCall without params', () => {
 		const kip17 = caver.kct.kip17.create()
 		
 		let nameABI
@@ -139,9 +139,9 @@ describe('decode function call string with various smart contracts', () => {
 		const result = kip17.decodeFunctionCall(encodedString)
 
 		expect(result.__length__).to.equal(0)
-    }).timeout(200000)
+    })
 
-    it('CAVERJS-UNIT-ETC-377: kip37.decodeFunctionCall with params', async () => {
+    it('CAVERJS-UNIT-ETC-377: kip37.decodeFunctionCall with params', () => {
 		const kip37 = caver.kct.kip37.create()
 		
 		let safeTransferFromABI
@@ -158,9 +158,9 @@ describe('decode function call string with various smart contracts', () => {
 		expect(params[2]).to.equal(parseInt(result[2]))
 		expect(params[3]).to.equal(parseInt(result[3]))
 		expect(Buffer.compare(params[4], caver.utils.toBuffer(result[4]))).to.equal(0)
-    }).timeout(200000)
+    })
 
-    it('CAVERJS-UNIT-ETC-378: kip37.decodeFunctionCall without params', async () => {
+    it('CAVERJS-UNIT-ETC-378: kip37.decodeFunctionCall without params', () => {
 		const kip37 = caver.kct.kip37.create()
 		
 		let pausedABI
@@ -171,5 +171,5 @@ describe('decode function call string with various smart contracts', () => {
 		const result = kip37.decodeFunctionCall(encodedString)
 
 		expect(result.__length__).to.equal(0)
-    }).timeout(200000)
+    })
 })
