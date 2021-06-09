@@ -639,7 +639,7 @@ Contract.prototype._encodeMethodABI = function _encodeMethodABI() {
  * const abi = [...]
  * const contract = caver.contract.create(abi)
  * const decodedFunctionCall = contract.decodeFunctionCall('0x{encoded function call}')
- * 
+ *
  * @method decodeFunctionCall
  * @param {string} functionCall The encoded function call string.
  * @return {Array} An array of plain params
@@ -650,9 +650,9 @@ Contract.prototype.decodeFunctionCall = function decodeFunctionCall(functionCall
     let methodABI
     const funcSigLength = 10
     const extractFuncSig = functionCall.slice(0, funcSigLength)
-    for (const abi of this._jsonInterface) {
-        if (abi.type && abi.type === 'function' && extractFuncSig === abi.signature) {
-            methodABI = abi
+    for (const itf of this._jsonInterface) {
+        if (itf.type && itf.type === 'function' && extractFuncSig === itf.signature) {
+            methodABI = itf
             break
         }
     }
