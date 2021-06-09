@@ -974,7 +974,7 @@ const hashMessage = data => {
 
 /**
  * Recovers the public key that was used to sign the given data.
- * 
+ *
  * @example
  * const message = 'Some data'
  * const signature = { v: '0x1c', r: '0xd0b8d...', s: '0x5472e...' } // You can get a signature via `keyring.signMessage(...).signatures[0]`.
@@ -1002,7 +1002,7 @@ const recoverPublicKey = (message, signature, isHashed = false) => {
  * const message = 'Some data'
  * const signature = { v: '0x1c', r: '0xd0b8d...', s: '0x5472e...' } // You can get a signature via `keyring.signMessage(...).signatures[0]`.
  * const recoveredPublicKey = caver.utils.recover(message, signature)
- * 
+ *
  * @method recover
  * @param {string} message The raw message string. If this message is hased with Klaytn specific prefix, the third parameter should be passed as `true`.
  * @param {SignatureData} signature An instance of `SignatureData`.
