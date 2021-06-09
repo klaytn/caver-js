@@ -972,8 +972,45 @@ const hashMessage = data => {
     return Hash.keccak256(klayMessage)
 }
 
-const recover = (message, signature, preFixed = false) => {
-    if (!preFixed) {
+/**
+ * Recovers the public key that was used to sign the given data.
+ *
+ * @example
+ * const message = 'Some data'
+ * const signature = { v: '0x1c', r: '0xd0b8d...', s: '0x5472e...' } // You can get a signature via `keyring.signMessage(...).signatures[0]`.
+ * const recoveredPublicKey = caver.utils.recoverPublicKey(message, signature)
+ *
+ * @method recoverPublicKey
+ * @param {string} message The raw message string. If this message is hased with Klaytn specific prefix, the third parameter should be passed as `true`.
+ * @param {SignatureData} signature An instance of `SignatureData`.
+ * @param {boolean} [isHashed] (optional, default: `false`) If the `isHashed` is true, the given message will NOT automatically be prefixed with "\x19Klaytn Signed Message:\n" + message.length + message, and be assumed as already prefixed.
+ * @return {string}
+ */
+const recoverPublicKey = (message, signature, isHashed = false) => {
+    if (!isHashed) message = hashMessage(message)
+
+    const vrs = { v: parseInt(signature.v.slice(2), 16), r: signature.r.slice(2), s: signature.s.slice(2) }
+
+    const ecPublicKey = secp256k1.recoverPubKey(Buffer.from(message.slice(2), 'hex'), vrs, vrs.v < 2 ? vrs.v : 1 - (vrs.v % 2))
+    return `0x${ecPublicKey.encode('hex', false).slice(2)}`
+}
+
+/**
+ * Recovers the Klaytn address that was used to sign the given data.
+ *
+ * @example
+ * const message = 'Some data'
+ * const signature = { v: '0x1c', r: '0xd0b8d...', s: '0x5472e...' } // You can get a signature via `keyring.signMessage(...).signatures[0]`.
+ * const recoveredPublicKey = caver.utils.recover(message, signature)
+ *
+ * @method recover
+ * @param {string} message The raw message string. If this message is hased with Klaytn specific prefix, the third parameter should be passed as `true`.
+ * @param {SignatureData} signature An instance of `SignatureData`.
+ * @param {boolean} [isHashed] (optional, default: `false`) If the `isHashed` is true, the given message will NOT automatically be prefixed with "\x19Klaytn Signed Message:\n" + message.length + message, and be assumed as already prefixed.
+ * @return {string}
+ */
+const recover = (message, signature, isHashed = false) => {
+    if (!isHashed) {
         message = hashMessage(message)
     }
 
@@ -1040,4 +1077,5 @@ module.exports = {
 
     hashMessage: hashMessage,
     recover: recover,
+    recoverPublicKey: recoverPublicKey,
 }
