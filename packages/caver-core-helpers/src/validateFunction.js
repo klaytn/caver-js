@@ -572,7 +572,8 @@ function checkDeployEssential(transaction) {
         return new Error('"data" is missing')
     }
 
-    if (transaction.to !== undefined && transaction.to !== '0x') {
+    // To handle null in `to` field
+    if (transaction.to && transaction.to !== '0x') {
         return new Error(`"to" cannot be used with ${transaction.type} transaction`)
     }
     if (transaction.codeFormat !== undefined && !validateCodeFormat(transaction.codeFormat)) {
