@@ -1017,6 +1017,32 @@ const recover = (message, signature, isHashed = false) => {
     return Account.recover(message, Account.encodeSignature(signature.encode())).toLowerCase()
 }
 
+/**
+ * Returns an address which is derived by a public key.
+ * This function simply converts the public key string into address form by hashing it.
+ * It has nothing to do with the actual account in the Klaytn.
+ *
+ * @example
+ * const address = caver.utils.publicKeyToAddress('0x{public key}')
+ *
+ * @method publicKeyToAddress The public key string to get the address.
+ * @param {string} publicKey
+ * @return {string}
+ */
+const publicKeyToAddress = publicKey => {
+    publicKey = publicKey.slice(0, 2) === '0x' ? publicKey : `0x${publicKey}`
+
+    if (isCompressedPublicKey(publicKey)) publicKey = decompressPublicKey(publicKey)
+
+    const publicHash = Hash.keccak256(publicKey)
+    const address = `0x${publicHash.slice(-40)}`
+
+    const addressHash = Hash.keccak256s(address.slice(2))
+    let checksumAddress = '0x'
+    for (let i = 0; i < 40; i++) checksumAddress += parseInt(addressHash[i + 2], 16) > 7 ? address[i + 2].toUpperCase() : address[i + 2]
+    return checksumAddress
+}
+
 module.exports = {
     BN: BN,
     isBN: isBN,
@@ -1078,4 +1104,5 @@ module.exports = {
     hashMessage: hashMessage,
     recover: recover,
     recoverPublicKey: recoverPublicKey,
+    publicKeyToAddress: publicKeyToAddress,
 }
