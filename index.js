@@ -41,6 +41,7 @@ const RPC = require('./packages/caver-rpc')
 const abi = require('./packages/caver-abi')
 const BaseContract = require('./packages/caver-contract')
 const KCT = require('./packages/caver-kct')
+const Validator = require('./packages/caver-validator')
 
 const core = require('./packages/caver-core')
 const Method = require('./packages/caver-core-method')
@@ -77,6 +78,8 @@ function Caver(provider, net) {
     this.kct = new KCT(this)
     this.klay = new Klay(this)
     this.rpc = new RPC(this)
+    this.validator = new Validator()
+
     this.middleware = middleware
 
     this.ipfs = new IPFS()
