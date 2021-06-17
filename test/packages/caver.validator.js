@@ -16,7 +16,6 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const _ = require('lodash')
 const chai = require('chai')
 const sinon = require('sinon')
 const sinonChai = require('sinon-chai')
@@ -200,7 +199,6 @@ describe('caver.validator.validteSignedMessage', () => {
         const getAccountKeyResult = { keyType: 3, key: {} }
 
         const message = 'Some Message'
-        const hasedMessage = '0xa4b1069c1000981f4fdca0d62302dfff77c2d0bc17f283d961e2dc5961105b18'
 
         const signature = [
             '0x1c',

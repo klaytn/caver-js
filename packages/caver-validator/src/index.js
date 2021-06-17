@@ -16,16 +16,13 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const _ = require('lodash')
 const utils = require('../../caver-utils')
 const { refineSignatures } = require('../../caver-transaction/src/transactionHelper/transactionHelper')
 
 class Validator {
-    constructor() {}
-
     /**
      * Validate signed message.
-	 * This function will compare public key in account key information from Klaytn and public key recovered from signature.
+     * This function will compare public key in account key information from Klaytn and public key recovered from signature.
      *
      * @example
      * const address = '0x...'
