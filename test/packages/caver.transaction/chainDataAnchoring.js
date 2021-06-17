@@ -756,7 +756,7 @@ describe('TxTypeChainDataAnchoring', () => {
         const expectedPublicKeyArray = [
             '0x8bb6aaeb2d96d024754d3b50babf116cece68977acbe8ba6a66f14d5217c60d96af020a0568661e7c72e753e80efe084a3aed9f9ac87bf44d09ce67aad3d4e01',
             '0xc7751c794337a93e4db041fb5401c2c816cf0a099d8fd4b1f3f555aab5dfead2417521bb0c03d8637f350df15ef6a6cb3cdb806bd9d10bc71982dd03ff5d9ddd',
-            '0x3919091ba17c106dd034af508cfe00b963d173dffab2c7702890e25a96d107ca1bb4f148ee1984751e57d2435468558193ce84ab9a7731b842e9672e40dc0f22'
+            '0x3919091ba17c106dd034af508cfe00b963d173dffab2c7702890e25a96d107ca1bb4f148ee1984751e57d2435468558193ce84ab9a7731b842e9672e40dc0f22',
         ]
 
         it('CAVERJS-UNIT-TRANSACTION-428: should return public key string recovered from signatures in ChainDataAnchoring', async () => {
@@ -782,13 +782,13 @@ describe('TxTypeChainDataAnchoring', () => {
                         '0x0fe9',
                         '0x65a8769cb8363a9ba20f82ee5cbc4f57dd0cbf315361354d5e009963f2c47d99',
                         '0x2e39afc5004f8d65954568f8143bbaa1a8fb8fca0e981b513ee41308a46d5988',
-                    ]
-                ]
+                    ],
+                ],
             })
             const publicKeys = tx.recoverPublicKeys()
 
             expect(publicKeys.length).to.equal(expectedPublicKeyArray.length)
-            for (let i = 0 ; i < publicKeys.length; i++) {
+            for (let i = 0; i < publicKeys.length; i++) {
                 expect(publicKeys[i].toLowerCase()).to.equal(expectedPublicKeyArray[i].toLowerCase())
             }
         }).timeout(200000)

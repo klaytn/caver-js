@@ -1690,7 +1690,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
         const expectedPublicKeyArray = [
             '0xfbda4ac2c04336609f7e5a363c71c1565b442d552b82cbd0e75bbabaf215fd28b69ce88a6b9f2a463f1420bd9a0992413254748a7ab46d5ba78d09b35cf0e912',
             '0xa234bd09ea829cb39dd2f5aced2318039f30ce5fe28f5eb28a256bac8617eb5db57ac7683fa21a01c8cbd2ca31c2cf93c97871c73896bf051f9bc0885c87ebe2',
-            '0x6ed39def6b25fc001790d267922281483c372b5d2486ae955ece1f1b64b19aea85392c8555947a1c63577439afdb74c77ef07d50520435d31cf4afb3dfe0074f'
+            '0x6ed39def6b25fc001790d267922281483c372b5d2486ae955ece1f1b64b19aea85392c8555947a1c63577439afdb74c77ef07d50520435d31cf4afb3dfe0074f',
         ]
         const expectedFeePayerPublicKeyArray = [
             '0x2b557d80ddac3a0bbcc8a7861773ca7434c969e2721a574bb94a1e3aa5ceed3819f08a82b31682c038f9f691fb38ee4aaf7e016e2c973a1bd1e48a51f60a54ea',
@@ -1709,55 +1709,59 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
             signatures: [
                 [
                     '0x0fea',
-                  '0x8eb5dfc7e7a0684ec1bae214c2f8a2e1a02fa64c1f2130ebfd9a3b3a632c2c0b',
-                  '0x5c6ade954838134af916afe64107a5503c98211803dd774e75d6a70390a11456'
+                    '0x8eb5dfc7e7a0684ec1bae214c2f8a2e1a02fa64c1f2130ebfd9a3b3a632c2c0b',
+                    '0x5c6ade954838134af916afe64107a5503c98211803dd774e75d6a70390a11456',
                 ],
                 [
                     '0x0fea',
-                  '0x29b764526dfdc63fbbf0c4ba5f11f4fa1eddfda78db3a7d24ae0088f1b615724',
-                  '0x3e54b2d70e1723bebae9b4a9d5118ad0cb14dec97bce076a72551fa71901f7a0'
+                    '0x29b764526dfdc63fbbf0c4ba5f11f4fa1eddfda78db3a7d24ae0088f1b615724',
+                    '0x3e54b2d70e1723bebae9b4a9d5118ad0cb14dec97bce076a72551fa71901f7a0',
                 ],
                 [
                     '0x0fe9',
-                  '0xea4aa6a30d0c10c904db4351c1b083b49f589ea86b535b038ee9cafefbe57d18',
-                  '0x6ac7dc2d1de4ba51bab9dfd22ba566394683e2daef5e577bd36d78139bc10b00'
-                ]
-              ],
-              feePayerSignatures: [
+                    '0xea4aa6a30d0c10c904db4351c1b083b49f589ea86b535b038ee9cafefbe57d18',
+                    '0x6ac7dc2d1de4ba51bab9dfd22ba566394683e2daef5e577bd36d78139bc10b00',
+                ],
+            ],
+            feePayerSignatures: [
                 [
                     '0x0fe9',
-                  '0x0c29fc700f0fe2265411ceea1068998ea1d78f9c86fae43f29ae683747c07b42',
-                  '0x481ef864d9ab6000e187bcd5a6b2f243465e28d08da282dd66dae2009c0284e5'
+                    '0x0c29fc700f0fe2265411ceea1068998ea1d78f9c86fae43f29ae683747c07b42',
+                    '0x481ef864d9ab6000e187bcd5a6b2f243465e28d08da282dd66dae2009c0284e5',
                 ],
                 [
                     '0x0fea',
-                  '0xa175d60b8ad6b54d4e249c233a40c73d66fae599d440e244a8ba2cd0252b30df',
-                  '0x0ffa68e1c8a2060af56e0a2962fab6235233b28bb473745b2fc8c0bc1b02136a'
+                    '0xa175d60b8ad6b54d4e249c233a40c73d66fae599d440e244a8ba2cd0252b30df',
+                    '0x0ffa68e1c8a2060af56e0a2962fab6235233b28bb473745b2fc8c0bc1b02136a',
                 ],
                 [
                     '0x0fea',
-                  '0xcc6ba796398975803dc0e34ddaa2f01346f3fd9da494fe98170507a0f573d085',
-                  '0x2930d6972c4fe3b09f36a5e4921424c23396d679082b4e48d87de4e5352b2bab'
-                ]
-              ],
+                    '0xcc6ba796398975803dc0e34ddaa2f01346f3fd9da494fe98170507a0f573d085',
+                    '0x2930d6972c4fe3b09f36a5e4921424c23396d679082b4e48d87de4e5352b2bab',
+                ],
+            ],
         }
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-539: should return public key string recovered from signatures in FeeDelegatedAccountUpdateWithRatio', async () => {
-            const tx = caver.transaction.feeDelegatedAccountUpdateWithRatio.create(Object.assign({account: caver.account.createWithAccountKeyLegacy(txObj.from)}, txObj))
+            const tx = caver.transaction.feeDelegatedAccountUpdateWithRatio.create(
+                Object.assign({ account: caver.account.createWithAccountKeyLegacy(txObj.from) }, txObj)
+            )
             const publicKeys = tx.recoverPublicKeys()
 
             expect(publicKeys.length).to.equal(expectedPublicKeyArray.length)
-            for (let i = 0 ; i < publicKeys.length; i++) {
+            for (let i = 0; i < publicKeys.length; i++) {
                 expect(publicKeys[i].toLowerCase()).to.equal(expectedPublicKeyArray[i].toLowerCase())
             }
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-540: should return fee payer public key string recovered from feePayerSignatures in FeeDelegatedAccountUpdateWithRatio', async () => {
-            const tx = caver.transaction.feeDelegatedAccountUpdateWithRatio.create(Object.assign({account: caver.account.createWithAccountKeyLegacy(txObj.from)}, txObj))
+            const tx = caver.transaction.feeDelegatedAccountUpdateWithRatio.create(
+                Object.assign({ account: caver.account.createWithAccountKeyLegacy(txObj.from) }, txObj)
+            )
             const publicKeys = tx.recoverFeePayerPublicKeys()
 
             expect(publicKeys.length).to.equal(expectedFeePayerPublicKeyArray.length)
-            for (let i = 0 ; i < publicKeys.length; i++) {
+            for (let i = 0; i < publicKeys.length; i++) {
                 expect(publicKeys[i].toLowerCase()).to.equal(expectedFeePayerPublicKeyArray[i].toLowerCase())
             }
         }).timeout(200000)

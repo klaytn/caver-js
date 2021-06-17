@@ -1220,7 +1220,7 @@ describe('TxTypeFeeDelegatedCancel', () => {
         const expectedPublicKeyArray = [
             '0xfbda4ac2c04336609f7e5a363c71c1565b442d552b82cbd0e75bbabaf215fd28b69ce88a6b9f2a463f1420bd9a0992413254748a7ab46d5ba78d09b35cf0e912',
             '0xa234bd09ea829cb39dd2f5aced2318039f30ce5fe28f5eb28a256bac8617eb5db57ac7683fa21a01c8cbd2ca31c2cf93c97871c73896bf051f9bc0885c87ebe2',
-            '0x6ed39def6b25fc001790d267922281483c372b5d2486ae955ece1f1b64b19aea85392c8555947a1c63577439afdb74c77ef07d50520435d31cf4afb3dfe0074f'
+            '0x6ed39def6b25fc001790d267922281483c372b5d2486ae955ece1f1b64b19aea85392c8555947a1c63577439afdb74c77ef07d50520435d31cf4afb3dfe0074f',
         ]
         const expectedFeePayerPublicKeyArray = [
             '0x2b557d80ddac3a0bbcc8a7861773ca7434c969e2721a574bb94a1e3aa5ceed3819f08a82b31682c038f9f691fb38ee4aaf7e016e2c973a1bd1e48a51f60a54ea',
@@ -1238,37 +1238,37 @@ describe('TxTypeFeeDelegatedCancel', () => {
             signatures: [
                 [
                     '0x0fe9',
-                  '0x28ea52ee79b54fa321551689d4be9b932de1171ef239345953803c14576e10a1',
-                  '0x11cb13643552c8a73d566a2e5dea8ed95c0173afef2842e3835fc67ba0bea411'
+                    '0x28ea52ee79b54fa321551689d4be9b932de1171ef239345953803c14576e10a1',
+                    '0x11cb13643552c8a73d566a2e5dea8ed95c0173afef2842e3835fc67ba0bea411',
                 ],
                 [
                     '0x0fea',
-                  '0x6b8597441a8e1fe98a9f76bd75bafea8d0f0af2fcaadf5a8f31244e923fc5bd3',
-                  '0x7e865b1b7858866f748ac288bf5547d31d3e92ee27024c1c0c5050f03ae470f9'
+                    '0x6b8597441a8e1fe98a9f76bd75bafea8d0f0af2fcaadf5a8f31244e923fc5bd3',
+                    '0x7e865b1b7858866f748ac288bf5547d31d3e92ee27024c1c0c5050f03ae470f9',
                 ],
                 [
                     '0x0fe9',
-                  '0x1180d0ed68f60a9af4c65264dd6dc9d91cb63fa967d6c7ec7b8e79e556ba16ba',
-                  '0x7039807b648fd82799637ac0190bd8caa3945d856cbe73a34ca549d9e2ec6f99'
-                ]
-              ],
-              feePayerSignatures: [
+                    '0x1180d0ed68f60a9af4c65264dd6dc9d91cb63fa967d6c7ec7b8e79e556ba16ba',
+                    '0x7039807b648fd82799637ac0190bd8caa3945d856cbe73a34ca549d9e2ec6f99',
+                ],
+            ],
+            feePayerSignatures: [
                 [
                     '0x0fe9',
-                  '0x9a82ffdca6d654b9e65de5bab227bd4dd72c0c9e0e56e4035f2ce500b0eef297',
-                  '0x0d28d0727d497e26f6356ad943b773b14860a66b8a8b45659692254073916715'
+                    '0x9a82ffdca6d654b9e65de5bab227bd4dd72c0c9e0e56e4035f2ce500b0eef297',
+                    '0x0d28d0727d497e26f6356ad943b773b14860a66b8a8b45659692254073916715',
                 ],
                 [
                     '0x0fea',
-                  '0x36f0a2ae5dd31fb23d9e3c6991a39bf926cf4eabb268253e9e42ae909ef60ca6',
-                  '0x283c87a0bb5a38de39c6cba969ea487c7c0df3f3af1873b7058e1c7aa3a1d725'
+                    '0x36f0a2ae5dd31fb23d9e3c6991a39bf926cf4eabb268253e9e42ae909ef60ca6',
+                    '0x283c87a0bb5a38de39c6cba969ea487c7c0df3f3af1873b7058e1c7aa3a1d725',
                 ],
                 [
                     '0x0fe9',
-                  '0x2a3e055bd00aa863007b165d70749639fe26e15810dc4359c1e71bd9fe6a6b86',
-                  '0x4a7cc2f1ba8ec721ed055cbc5dd8ebf58c9aa457c93e328ccfbdf826c8e4f094'
-                ]
-              ],
+                    '0x2a3e055bd00aa863007b165d70749639fe26e15810dc4359c1e71bd9fe6a6b86',
+                    '0x4a7cc2f1ba8ec721ed055cbc5dd8ebf58c9aa457c93e328ccfbdf826c8e4f094',
+                ],
+            ],
         }
 
         it('CAVERJS-UNIT-TRANSACTIONFD-531: should return public key string recovered from signatures in FeeDelegatedCancel', async () => {
@@ -1276,7 +1276,7 @@ describe('TxTypeFeeDelegatedCancel', () => {
             const publicKeys = tx.recoverPublicKeys()
 
             expect(publicKeys.length).to.equal(expectedPublicKeyArray.length)
-            for (let i = 0 ; i < publicKeys.length; i++) {
+            for (let i = 0; i < publicKeys.length; i++) {
                 expect(publicKeys[i].toLowerCase()).to.equal(expectedPublicKeyArray[i].toLowerCase())
             }
         }).timeout(200000)
@@ -1286,7 +1286,7 @@ describe('TxTypeFeeDelegatedCancel', () => {
             const publicKeys = tx.recoverFeePayerPublicKeys()
 
             expect(publicKeys.length).to.equal(expectedFeePayerPublicKeyArray.length)
-            for (let i = 0 ; i < publicKeys.length; i++) {
+            for (let i = 0; i < publicKeys.length; i++) {
                 expect(publicKeys[i].toLowerCase()).to.equal(expectedFeePayerPublicKeyArray[i].toLowerCase())
             }
         }).timeout(200000)

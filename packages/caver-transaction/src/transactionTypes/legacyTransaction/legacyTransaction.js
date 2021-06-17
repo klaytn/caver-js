@@ -213,7 +213,7 @@ class LegacyTransaction extends AbstractTransaction {
      *
      * @example
      * const publicKey = tx.recoverPublicKeys()
-     * 
+     *
      * @method recoverPublicKeys
      * @return {Array.<string>}
      */
@@ -225,10 +225,10 @@ class LegacyTransaction extends AbstractTransaction {
         if (!this.chainId) this.chainId = chainId
         const signingDataHex = this.getRLPEncodingForSignature()
         const hasedSigningData = Hash.keccak256(signingDataHex)
-    
+
         const publicKeys = []
         publicKeys.push(utils.recoverPublicKey(hasedSigningData, this.signatures, true))
-    
+
         return publicKeys
     }
 }

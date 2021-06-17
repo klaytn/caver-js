@@ -822,11 +822,13 @@ describe('TxTypeLegacyTransaction', () => {
                     '0x0fe9',
                     '0xecdec357060dbbb4bd3790e98b1733ec3a0b02b7e4ec7a5622f93cd9bee229fe',
                     '0x0a4a5e28753e7c1d999b286fb07933c5bf353079b8ed4d1ed509a838b48be02c',
-                ]
+                ],
             })
             const publicKeys = tx.recoverPublicKeys()
 
-            expect(publicKeys[0].toLowerCase()).to.equal('0x8bb6aaeb2d96d024754d3b50babf116cece68977acbe8ba6a66f14d5217c60d96af020a0568661e7c72e753e80efe084a3aed9f9ac87bf44d09ce67aad3d4e01')
+            expect(publicKeys[0].toLowerCase()).to.equal(
+                '0x8bb6aaeb2d96d024754d3b50babf116cece68977acbe8ba6a66f14d5217c60d96af020a0568661e7c72e753e80efe084a3aed9f9ac87bf44d09ce67aad3d4e01'
+            )
         }).timeout(200000)
     })
 })

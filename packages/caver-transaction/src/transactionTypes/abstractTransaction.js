@@ -320,7 +320,7 @@ class AbstractTransaction {
      *
      * @example
      * const publicKey = tx.recoverPublicKeys()
-     * 
+     *
      * @method recoverPublicKeys
      * @return {Array.<string>}
      */
@@ -332,17 +332,18 @@ class AbstractTransaction {
         if (!this.chainId) this.chainId = chainId
         const signingDataHex = this.getRLPEncodingForSignature()
         const hasedSigningData = Hash.keccak256(signingDataHex)
-    
+
         const publicKeys = []
         for (const sig of this.signatures) {
             const sigV = Bytes.toNumber(sig.v)
             const recoveryData = sigV < 35 ? Bytes.fromNat('0x1') : Bytes.fromNumber((sigV - 35) >> 1)
-    
-            if (utils.trimLeadingZero(this.chainId) !== utils.trimLeadingZero(recoveryData)) throw new Error(`Invalid signatures data: recovery data is not matched.`)
-    
+
+            if (utils.trimLeadingZero(this.chainId) !== utils.trimLeadingZero(recoveryData))
+                throw new Error(`Invalid signatures data: recovery data is not matched.`)
+
             publicKeys.push(utils.recoverPublicKey(hasedSigningData, sig, true))
         }
-    
+
         return publicKeys
     }
 

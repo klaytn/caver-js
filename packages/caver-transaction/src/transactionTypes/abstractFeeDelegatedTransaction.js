@@ -219,29 +219,31 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
      *
      * @example
      * const publicKey = tx.recoverFeePayerPublicKeys()
-     * 
+     *
      * @method recoverFeePayerPublicKeys
      * @return {Array.<string>}
      */
     recoverFeePayerPublicKeys() {
-        if (utils.isEmptySig(this.feePayerSignatures)) throw new Error(`Failed to recover public keys from feePayerSignatures: feePayerSignatures is empty.`)
+        if (utils.isEmptySig(this.feePayerSignatures))
+            throw new Error(`Failed to recover public keys from feePayerSignatures: feePayerSignatures is empty.`)
 
         const recovery = Bytes.toNumber(this.feePayerSignatures[0].v)
         const chainId = recovery < 35 ? Bytes.fromNat('0x1') : Bytes.fromNumber((recovery - 35) >> 1)
         if (!this.chainId) this.chainId = chainId
         const signingDataHex = this.getRLPEncodingForFeePayerSignature()
         const hasedSigningData = Hash.keccak256(signingDataHex)
-    
+
         const publicKeys = []
         for (const sig of this.feePayerSignatures) {
             const sigV = Bytes.toNumber(sig.v)
             const recoveryData = sigV < 35 ? Bytes.fromNat('0x1') : Bytes.fromNumber((sigV - 35) >> 1)
-    
-            if (utils.trimLeadingZero(this.chainId) !== utils.trimLeadingZero(recoveryData)) throw new Error(`Invalid feePayerSignatures data: recovery data is not matched.`)
-    
+
+            if (utils.trimLeadingZero(this.chainId) !== utils.trimLeadingZero(recoveryData))
+                throw new Error(`Invalid feePayerSignatures data: recovery data is not matched.`)
+
             publicKeys.push(utils.recoverPublicKey(hasedSigningData, sig, true))
         }
-    
+
         return publicKeys
     }
 }
