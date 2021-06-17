@@ -790,7 +790,7 @@ describe('TxTypeValueTransferMemo', () => {
             '0x3919091ba17c106dd034af508cfe00b963d173dffab2c7702890e25a96d107ca1bb4f148ee1984751e57d2435468558193ce84ab9a7731b842e9672e40dc0f22'
         ]
 
-        it('should return public key string recovered from signatures in ValueTransferMemo', async () => {
+        it('CAVERJS-UNIT-TRANSACTION-423: should return public key string recovered from signatures in ValueTransferMemo', async () => {
             const tx = caver.transaction.valueTransferMemo.create({
                 from: '0xf21460730845e3652aa3cc9bc13b345e4f53984a',
                 to: '0x59177716c34ac6e49e295a0e78e33522f14d61ee',

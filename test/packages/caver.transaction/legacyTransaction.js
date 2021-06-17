@@ -809,7 +809,7 @@ describe('TxTypeLegacyTransaction', () => {
     })
 
     context('legacyTransaction.recoverPublicKeys', () => {
-        it('should return public key string recovered from signatures in LegacyTransaction', async () => {
+        it('CAVERJS-UNIT-TRANSACTION-421: should return public key string recovered from signatures in LegacyTransaction', async () => {
             const tx = caver.transaction.legacyTransaction.create({
                 from: '0xf21460730845e3652aa3cc9bc13b345e4f53984a',
                 to: '0x59177716c34ac6e49e295a0e78e33522f14d61ee',

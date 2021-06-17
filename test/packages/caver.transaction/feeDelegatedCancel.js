@@ -1205,4 +1205,90 @@ describe('TxTypeFeeDelegatedCancel', () => {
             expect(getChainIdSpy).to.have.been.calledOnce
         }).timeout(200000)
     })
+
+    context('feeDelegatedCancel.recoverPublicKeys feeDelegatedCancel.recoverFeePayerPublicKeys', () => {
+        // const privateKeys = [
+        //     '0x6a1e0b0094e4d168aade69f1305e4d4c26c3c68fdbea4e2ebbcb3afc6d4cecba',
+        //     '0xbb5be45662e3b95f468b5248ec18dfb5eae2c1b401277399e943614480cd35f3',
+        //     '0xffd56f5237722773702cd559fadf46a7a994e5896ef76ec7282cf55ba6017181',
+        // ]
+        // const feePayerKeys = [
+        //     '0x2ee1467444e4dca5b279014e898ab56da4c2b1ad012fa0d0856f3e3e115fedd2',
+        //     '0x73d3d825a24624656f790a2c5ac1e29e227c19208fa0c89a2828f011db078d73',
+        //     '0xa83a3afc73d18055a909973f6a126fe1506ba8a1c8bf7aad65d69ee3a6163a3f',
+        // ]
+        const expectedPublicKeyArray = [
+            '0xfbda4ac2c04336609f7e5a363c71c1565b442d552b82cbd0e75bbabaf215fd28b69ce88a6b9f2a463f1420bd9a0992413254748a7ab46d5ba78d09b35cf0e912',
+            '0xa234bd09ea829cb39dd2f5aced2318039f30ce5fe28f5eb28a256bac8617eb5db57ac7683fa21a01c8cbd2ca31c2cf93c97871c73896bf051f9bc0885c87ebe2',
+            '0x6ed39def6b25fc001790d267922281483c372b5d2486ae955ece1f1b64b19aea85392c8555947a1c63577439afdb74c77ef07d50520435d31cf4afb3dfe0074f'
+        ]
+        const expectedFeePayerPublicKeyArray = [
+            '0x2b557d80ddac3a0bbcc8a7861773ca7434c969e2721a574bb94a1e3aa5ceed3819f08a82b31682c038f9f691fb38ee4aaf7e016e2c973a1bd1e48a51f60a54ea',
+            '0x1a1cfe1e2ec4b15520c57c20c2460981a2f16003c8db11a0afc282abf929fa1c1868f60f91b330c423aa660913d86acc2a0b1b15e7ba1fe571e5928a19825a7e',
+            '0xdea23a89dbbde1a0c26466c49c1edd32785432389641797038c2b53815cb5c73d6cf5355986fd9a22a68bb57b831857fd1636362b383bd632966392714b60d72',
+        ]
+
+        const txObj = {
+            from: '0xf21460730845e3652aa3cc9bc13b345e4f53984a',
+            feePayer: '0xb5db72925b1b6b79299a1a49ae226cd7861083ac',
+            chainId: '0x7e3',
+            gasPrice: '0x5d21dba00',
+            nonce: '0x0',
+            gas: '0x2faf080',
+            signatures: [
+                [
+                    '0x0fe9',
+                  '0x28ea52ee79b54fa321551689d4be9b932de1171ef239345953803c14576e10a1',
+                  '0x11cb13643552c8a73d566a2e5dea8ed95c0173afef2842e3835fc67ba0bea411'
+                ],
+                [
+                    '0x0fea',
+                  '0x6b8597441a8e1fe98a9f76bd75bafea8d0f0af2fcaadf5a8f31244e923fc5bd3',
+                  '0x7e865b1b7858866f748ac288bf5547d31d3e92ee27024c1c0c5050f03ae470f9'
+                ],
+                [
+                    '0x0fe9',
+                  '0x1180d0ed68f60a9af4c65264dd6dc9d91cb63fa967d6c7ec7b8e79e556ba16ba',
+                  '0x7039807b648fd82799637ac0190bd8caa3945d856cbe73a34ca549d9e2ec6f99'
+                ]
+              ],
+              feePayerSignatures: [
+                [
+                    '0x0fe9',
+                  '0x9a82ffdca6d654b9e65de5bab227bd4dd72c0c9e0e56e4035f2ce500b0eef297',
+                  '0x0d28d0727d497e26f6356ad943b773b14860a66b8a8b45659692254073916715'
+                ],
+                [
+                    '0x0fea',
+                  '0x36f0a2ae5dd31fb23d9e3c6991a39bf926cf4eabb268253e9e42ae909ef60ca6',
+                  '0x283c87a0bb5a38de39c6cba969ea487c7c0df3f3af1873b7058e1c7aa3a1d725'
+                ],
+                [
+                    '0x0fe9',
+                  '0x2a3e055bd00aa863007b165d70749639fe26e15810dc4359c1e71bd9fe6a6b86',
+                  '0x4a7cc2f1ba8ec721ed055cbc5dd8ebf58c9aa457c93e328ccfbdf826c8e4f094'
+                ]
+              ],
+        }
+
+        it('CAVERJS-UNIT-TRANSACTIONFD-531: should return public key string recovered from signatures in FeeDelegatedCancel', async () => {
+            const tx = caver.transaction.feeDelegatedCancel.create(txObj)
+            const publicKeys = tx.recoverPublicKeys()
+
+            expect(publicKeys.length).to.equal(expectedPublicKeyArray.length)
+            for (let i = 0 ; i < publicKeys.length; i++) {
+                expect(publicKeys[i].toLowerCase()).to.equal(expectedPublicKeyArray[i].toLowerCase())
+            }
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-TRANSACTIONFD-532: should return fee payer public key string recovered from feePayerSignatures in FeeDelegatedCancel', async () => {
+            const tx = caver.transaction.feeDelegatedCancel.create(txObj)
+            const publicKeys = tx.recoverFeePayerPublicKeys()
+
+            expect(publicKeys.length).to.equal(expectedFeePayerPublicKeyArray.length)
+            for (let i = 0 ; i < publicKeys.length; i++) {
+                expect(publicKeys[i].toLowerCase()).to.equal(expectedFeePayerPublicKeyArray[i].toLowerCase())
+            }
+        }).timeout(200000)
+    })
 })

@@ -1247,4 +1247,92 @@ describe('TxTypeFeeDelegatedSmartContractDeploy', () => {
             expect(getChainIdSpy).to.have.been.calledOnce
         }).timeout(200000)
     })
+
+    context('feeDelegatedSmartContractDeploy.recoverPublicKeys feeDelegatedSmartContractDeploy.recoverFeePayerPublicKeys', () => {
+        // const privateKeys = [
+        //     '0x6a1e0b0094e4d168aade69f1305e4d4c26c3c68fdbea4e2ebbcb3afc6d4cecba',
+        //     '0xbb5be45662e3b95f468b5248ec18dfb5eae2c1b401277399e943614480cd35f3',
+        //     '0xffd56f5237722773702cd559fadf46a7a994e5896ef76ec7282cf55ba6017181',
+        // ]
+        // const feePayerKeys = [
+        //     '0x2ee1467444e4dca5b279014e898ab56da4c2b1ad012fa0d0856f3e3e115fedd2',
+        //     '0x73d3d825a24624656f790a2c5ac1e29e227c19208fa0c89a2828f011db078d73',
+        //     '0xa83a3afc73d18055a909973f6a126fe1506ba8a1c8bf7aad65d69ee3a6163a3f',
+        // ]
+        const expectedPublicKeyArray = [
+            '0xfbda4ac2c04336609f7e5a363c71c1565b442d552b82cbd0e75bbabaf215fd28b69ce88a6b9f2a463f1420bd9a0992413254748a7ab46d5ba78d09b35cf0e912',
+            '0xa234bd09ea829cb39dd2f5aced2318039f30ce5fe28f5eb28a256bac8617eb5db57ac7683fa21a01c8cbd2ca31c2cf93c97871c73896bf051f9bc0885c87ebe2',
+            '0x6ed39def6b25fc001790d267922281483c372b5d2486ae955ece1f1b64b19aea85392c8555947a1c63577439afdb74c77ef07d50520435d31cf4afb3dfe0074f'
+        ]
+        const expectedFeePayerPublicKeyArray = [
+            '0x2b557d80ddac3a0bbcc8a7861773ca7434c969e2721a574bb94a1e3aa5ceed3819f08a82b31682c038f9f691fb38ee4aaf7e016e2c973a1bd1e48a51f60a54ea',
+            '0x1a1cfe1e2ec4b15520c57c20c2460981a2f16003c8db11a0afc282abf929fa1c1868f60f91b330c423aa660913d86acc2a0b1b15e7ba1fe571e5928a19825a7e',
+            '0xdea23a89dbbde1a0c26466c49c1edd32785432389641797038c2b53815cb5c73d6cf5355986fd9a22a68bb57b831857fd1636362b383bd632966392714b60d72',
+        ]
+
+        const txObj = {
+            from: '0xf21460730845e3652aa3cc9bc13b345e4f53984a',
+            feePayer: '0xb5db72925b1b6b79299a1a49ae226cd7861083ac',
+            value: '0x1',
+            chainId: '0x7e3',
+            gasPrice: '0x5d21dba00',
+            nonce: '0x0',
+            gas: '0x2faf080',
+            input: '0x60806040526000805534801561001457600080fd5b506101ea806100246000396000f30060806040526004361061006d576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806306661abd1461007257806342cbb15c1461009d578063767800de146100c8578063b22636271461011f578063d14e62b814610150575b600080fd5b34801561007e57600080fd5b5061008761017d565b6040518082815260200191505060405180910390f35b3480156100a957600080fd5b506100b2610183565b6040518082815260200191505060405180910390f35b3480156100d457600080fd5b506100dd61018b565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b34801561012b57600080fd5b5061014e60048036038101908080356000191690602001909291905050506101b1565b005b34801561015c57600080fd5b5061017b600480360381019080803590602001909291905050506101b4565b005b60005481565b600043905090565b600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b50565b80600081905550505600a165627a7a7230582053c65686a3571c517e2cf4f741d842e5ee6aa665c96ce70f46f9a594794f11eb0029',
+            signatures: [
+                [
+                    '0x0fea',
+                  '0xdbc279377e1b3433877016cfa42894900a74d6f7062bca8d5b68c7db99ac2795',
+                  '0x511a93e0d98c4f720bf7d893345fdab67a197ec3e71448be891fe2f8f9add753'
+                ],
+                [
+                    '0x0fea',
+                  '0x97aa0af42193e293913bae7ac5dff8aaf92a68f897e2355398577fe9ccc240a7',
+                  '0x23c342168aeb7ea53667524c55f36ad66a084c9e262d770cd32265a628d45929'
+                ],
+                [
+                    '0x0fea',
+                  '0xa01c3ae994dda394d53d1e6a1029944ad11aa5a763893f5208d9f3912d9a245e',
+                  '0x0e9f1987785e20340c9ff0c8a7a5a8f37ebd7bf5b90f21d09fd177da7579df0c'
+                ]
+              ],
+              feePayerSignatures: [
+                [
+                    '0x0fe9',
+                  '0x895807ee1347b54531797bb31a4c1800be1939eb9583d97473b4b007b01c896a',
+                  '0x3fc1999eaf5cb3840fa45b6da381f639f3cd13817bb2b59fb46e414458e2152b'
+                ],
+                [
+                    '0x0fea',
+                  '0xfcd35961923b1b2fb7af425acece62420eb1b829adb55c7ccb942f7c399ee13d',
+                  '0x6aa4f7503fe960eed60758b1fc981ad6dd56088b14f4ff92e356f8a0073c1701'
+                ],
+                [
+                    '0x0fe9',
+                  '0x4a819e9a29ad3e55a121bf45648a10f771b8785e231636b7db7918e82f93242b',
+                  '0x578eecb0fdb10c942404907fd960c4e7b6ed381525ca1d945bca3af532260e0f'
+                ]
+              ],
+        }
+
+        it('CAVERJS-UNIT-TRANSACTIONFD-527: should return public key string recovered from signatures in FeeDelegatedSmartContractDeploy', async () => {
+            const tx = caver.transaction.feeDelegatedSmartContractDeploy.create(txObj)
+            const publicKeys = tx.recoverPublicKeys()
+
+            expect(publicKeys.length).to.equal(expectedPublicKeyArray.length)
+            for (let i = 0 ; i < publicKeys.length; i++) {
+                expect(publicKeys[i].toLowerCase()).to.equal(expectedPublicKeyArray[i].toLowerCase())
+            }
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-TRANSACTIONFD-528: should return fee payer public key string recovered from feePayerSignatures in FeeDelegatedSmartContractDeploy', async () => {
+            const tx = caver.transaction.feeDelegatedSmartContractDeploy.create(txObj)
+            const publicKeys = tx.recoverFeePayerPublicKeys()
+
+            expect(publicKeys.length).to.equal(expectedFeePayerPublicKeyArray.length)
+            for (let i = 0 ; i < publicKeys.length; i++) {
+                expect(publicKeys[i].toLowerCase()).to.equal(expectedFeePayerPublicKeyArray[i].toLowerCase())
+            }
+        }).timeout(200000)
+    })
 })

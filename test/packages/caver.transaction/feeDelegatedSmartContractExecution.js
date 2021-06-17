@@ -1245,4 +1245,93 @@ describe('TxTypeFeeDelegatedSmartContractExecution', () => {
             expect(getChainIdSpy).to.have.been.calledOnce
         }).timeout(200000)
     })
+
+    context('feeDelegatedSmartContractExecution.recoverPublicKeys feeDelegatedSmartContractExecution.recoverFeePayerPublicKeys', () => {
+        // const privateKeys = [
+        //     '0x6a1e0b0094e4d168aade69f1305e4d4c26c3c68fdbea4e2ebbcb3afc6d4cecba',
+        //     '0xbb5be45662e3b95f468b5248ec18dfb5eae2c1b401277399e943614480cd35f3',
+        //     '0xffd56f5237722773702cd559fadf46a7a994e5896ef76ec7282cf55ba6017181',
+        // ]
+        // const feePayerKeys = [
+        //     '0x2ee1467444e4dca5b279014e898ab56da4c2b1ad012fa0d0856f3e3e115fedd2',
+        //     '0x73d3d825a24624656f790a2c5ac1e29e227c19208fa0c89a2828f011db078d73',
+        //     '0xa83a3afc73d18055a909973f6a126fe1506ba8a1c8bf7aad65d69ee3a6163a3f',
+        // ]
+        const expectedPublicKeyArray = [
+            '0xfbda4ac2c04336609f7e5a363c71c1565b442d552b82cbd0e75bbabaf215fd28b69ce88a6b9f2a463f1420bd9a0992413254748a7ab46d5ba78d09b35cf0e912',
+            '0xa234bd09ea829cb39dd2f5aced2318039f30ce5fe28f5eb28a256bac8617eb5db57ac7683fa21a01c8cbd2ca31c2cf93c97871c73896bf051f9bc0885c87ebe2',
+            '0x6ed39def6b25fc001790d267922281483c372b5d2486ae955ece1f1b64b19aea85392c8555947a1c63577439afdb74c77ef07d50520435d31cf4afb3dfe0074f'
+        ]
+        const expectedFeePayerPublicKeyArray = [
+            '0x2b557d80ddac3a0bbcc8a7861773ca7434c969e2721a574bb94a1e3aa5ceed3819f08a82b31682c038f9f691fb38ee4aaf7e016e2c973a1bd1e48a51f60a54ea',
+            '0x1a1cfe1e2ec4b15520c57c20c2460981a2f16003c8db11a0afc282abf929fa1c1868f60f91b330c423aa660913d86acc2a0b1b15e7ba1fe571e5928a19825a7e',
+            '0xdea23a89dbbde1a0c26466c49c1edd32785432389641797038c2b53815cb5c73d6cf5355986fd9a22a68bb57b831857fd1636362b383bd632966392714b60d72',
+        ]
+
+        const txObj = {
+            from: '0xf21460730845e3652aa3cc9bc13b345e4f53984a',
+            feePayer: '0xb5db72925b1b6b79299a1a49ae226cd7861083ac',
+            to: '0x59177716c34ac6e49e295a0e78e33522f14d61ee',
+            value: '0x1',
+            chainId: '0x7e3',
+            gasPrice: '0x5d21dba00',
+            nonce: '0x0',
+            gas: '0x2faf080',
+            input: '0xd95aced7000000000000000000000000640a4c021cb5889fa1d37378f04a36ad452862240000000000000000000000000000000000000000000000000000000000000001',
+            signatures: [
+                [
+                    '0x0fe9',
+                  '0x42f52da40e7648cec0eb5d7f84bc5b3c4218bfc5d8056476af620e1e42cb63a5',
+                  '0x478057f9e32cdc46b57be7c5022a6d81f61e07b515481332df3479662084afff'
+                ],
+                [
+                    '0x0fea',
+                  '0x6e2d666a01df1804531c0da5cc25a3ddfcb99d506110a2c1fe2a21b09e94c562',
+                  '0x19c980243caec5d9f008be963d600d904ea3aa9ac8c453acc0d137f05b171607'
+                ],
+                [
+                    '0x0fe9',
+                  '0xcefeda599c36faffa7241e217230c6af1c87f69dd1360673c382f2529a8ab044',
+                  '0x6c3da66cd9bcd4cdf3a854da2b30ce36449554cac771aaaf4c70047906b0cd89'
+                ]
+              ],
+              feePayerSignatures: [
+                [
+                    '0x0fe9',
+                  '0x27cb27294a4a7f7fb9c1aa30348ee6b591412cfcefe4f0c28dbebdd290970703',
+                  '0x750c5466ec44e07ac67c8950b4150a654503ca13e451508595711c1b83b44d8a'
+                ],
+                [
+                    '0x0fea',
+                  '0x2b672a1f4ddac03256bcecb96b834ecc0e74430b787f722ba610f3f270d9e8a1',
+                  '0x0e10fa45ae7f06989ef1facd543458c24f37cd8d38d9a937d18a6d39dbcf82ad'
+                ],
+                [
+                    '0x0fea',
+                  '0xef6acf5c104eaf67dbd9b8de636362c0fb9445f979d948f50a95fab7a16f3d62',
+                  '0x2bfb69ad74351e9a17d529cb186df78a1e7431d3575384986aa130b233aa24d8'
+                ]
+              ],
+        }
+
+        it('CAVERJS-UNIT-TRANSACTIONFD-529: should return public key string recovered from signatures in FeeDelegatedSmartContractExecution', async () => {
+            const tx = caver.transaction.feeDelegatedSmartContractExecution.create(txObj)
+            const publicKeys = tx.recoverPublicKeys()
+
+            expect(publicKeys.length).to.equal(expectedPublicKeyArray.length)
+            for (let i = 0 ; i < publicKeys.length; i++) {
+                expect(publicKeys[i].toLowerCase()).to.equal(expectedPublicKeyArray[i].toLowerCase())
+            }
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-TRANSACTIONFD-530: should return fee payer public key string recovered from feePayerSignatures in FeeDelegatedSmartContractExecution', async () => {
+            const tx = caver.transaction.feeDelegatedSmartContractExecution.create(txObj)
+            const publicKeys = tx.recoverFeePayerPublicKeys()
+
+            expect(publicKeys.length).to.equal(expectedFeePayerPublicKeyArray.length)
+            for (let i = 0 ; i < publicKeys.length; i++) {
+                expect(publicKeys[i].toLowerCase()).to.equal(expectedFeePayerPublicKeyArray[i].toLowerCase())
+            }
+        }).timeout(200000)
+    })
 })
