@@ -2065,3 +2065,32 @@ describe('caver.utils.recoverPublicKey', () => {
         expect(result).to.equal(keyring.getPublicKey())
     })
 })
+
+describe('caver.utils.publicKeyToAddress', () => {
+    it('CAVERJS-UNIT-ETC-381: return an address which is derived by public key', () => {
+        const address = '0x5b2840bcbc2be07fb12d9129ed3a02d8e4465944'
+        const publicKey =
+            '0x68ffedd4a1d9fefa38f6ed9d58f0b85741a90ad604ab901c130c1fea42eab666dec186a48ad4db56b14898e8e18fe0176d926a2c1ffeeb6b6df805ec0bf41eb8'
+
+        const result = caver.utils.publicKeyToAddress(publicKey)
+        expect(result.toLowerCase()).to.equal(address)
+    })
+
+    it('CAVERJS-UNIT-ETC-382: return an address which is derived by uncompressed public key', () => {
+        const address = '0x5b2840bcbc2be07fb12d9129ed3a02d8e4465944'
+        const publicKey =
+            '0x68ffedd4a1d9fefa38f6ed9d58f0b85741a90ad604ab901c130c1fea42eab666dec186a48ad4db56b14898e8e18fe0176d926a2c1ffeeb6b6df805ec0bf41eb8'
+
+        const result = caver.utils.publicKeyToAddress(caver.utils.decompressPublicKey(publicKey))
+        expect(result.toLowerCase()).to.equal(address)
+    })
+
+    it('CAVERJS-UNIT-ETC-383: return an address which is derived by compressed public key', () => {
+        const address = '0x5b2840bcbc2be07fb12d9129ed3a02d8e4465944'
+        const publicKey =
+            '0x68ffedd4a1d9fefa38f6ed9d58f0b85741a90ad604ab901c130c1fea42eab666dec186a48ad4db56b14898e8e18fe0176d926a2c1ffeeb6b6df805ec0bf41eb8'
+
+        const result = caver.utils.publicKeyToAddress(caver.utils.compressPublicKey(publicKey))
+        expect(result.toLowerCase()).to.equal(address)
+    })
+})
