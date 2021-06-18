@@ -768,4 +768,48 @@ describe('TxTypeSmartContractDeploy', () => {
             expect(getChainIdSpy).to.have.been.calledOnce
         }).timeout(200000)
     })
+
+    context('smartContractDeploy.recoverPublicKeys', () => {
+        const expectedPublicKeyArray = [
+            '0x8bb6aaeb2d96d024754d3b50babf116cece68977acbe8ba6a66f14d5217c60d96af020a0568661e7c72e753e80efe084a3aed9f9ac87bf44d09ce67aad3d4e01',
+            '0xc7751c794337a93e4db041fb5401c2c816cf0a099d8fd4b1f3f555aab5dfead2417521bb0c03d8637f350df15ef6a6cb3cdb806bd9d10bc71982dd03ff5d9ddd',
+            '0x3919091ba17c106dd034af508cfe00b963d173dffab2c7702890e25a96d107ca1bb4f148ee1984751e57d2435468558193ce84ab9a7731b842e9672e40dc0f22',
+        ]
+
+        it('CAVERJS-UNIT-TRANSACTION-425: should return public key string recovered from signatures in SmartContractDeploy', async () => {
+            const tx = caver.transaction.smartContractDeploy.create({
+                from: '0xf21460730845e3652aa3cc9bc13b345e4f53984a',
+                value: '0x1',
+                chainId: '0x7e3',
+                gasPrice: '0x5d21dba00',
+                nonce: '0x0',
+                gas: '0x2faf080',
+                input:
+                    '0x60806040526000805534801561001457600080fd5b506101ea806100246000396000f30060806040526004361061006d576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806306661abd1461007257806342cbb15c1461009d578063767800de146100c8578063b22636271461011f578063d14e62b814610150575b600080fd5b34801561007e57600080fd5b5061008761017d565b6040518082815260200191505060405180910390f35b3480156100a957600080fd5b506100b2610183565b6040518082815260200191505060405180910390f35b3480156100d457600080fd5b506100dd61018b565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b34801561012b57600080fd5b5061014e60048036038101908080356000191690602001909291905050506101b1565b005b34801561015c57600080fd5b5061017b600480360381019080803590602001909291905050506101b4565b005b60005481565b600043905090565b600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b50565b80600081905550505600a165627a7a7230582053c65686a3571c517e2cf4f741d842e5ee6aa665c96ce70f46f9a594794f11eb0029',
+                signatures: [
+                    [
+                        '0x0fe9',
+                        '0xfeebbc3a1f22a6ee05ec661f2e25136c1f21923bf9208ee2b271884cf78d88d4',
+                        '0x391afac91aa0353cbab0701d412e520e7c1adba4d3283cc0dd4ea6a30f5df698',
+                    ],
+                    [
+                        '0x0fe9',
+                        '0xddef5cd655e17979ce2252c30a54d385b34d81bfa636ab269c3d998026bbe9ac',
+                        '0x5aa38b9ebca9840fd195e6d5ff6200e66c8cd5e455ccab4d90c84a34bf51851a',
+                    ],
+                    [
+                        '0x0fea',
+                        '0x9dd8f9110795b3fda8e924054e9d928e8b00bdf4c51fce70ac3981b231463003',
+                        '0x596f184a3fbead7bfa362cc2ca4d932ce2fc622a70e02beddac1c7a394b26e27',
+                    ],
+                ],
+            })
+            const publicKeys = tx.recoverPublicKeys()
+
+            expect(publicKeys.length).to.equal(expectedPublicKeyArray.length)
+            for (let i = 0; i < publicKeys.length; i++) {
+                expect(publicKeys[i].toLowerCase()).to.equal(expectedPublicKeyArray[i].toLowerCase())
+            }
+        }).timeout(200000)
+    })
 })

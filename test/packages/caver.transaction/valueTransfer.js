@@ -772,4 +772,47 @@ describe('TxTypeValueTransfer', () => {
             expect(getChainIdSpy).to.have.been.calledOnce
         }).timeout(200000)
     })
+
+    context('valueTransfer.recoverPublicKeys', () => {
+        const expectedPublicKeyArray = [
+            '0x8bb6aaeb2d96d024754d3b50babf116cece68977acbe8ba6a66f14d5217c60d96af020a0568661e7c72e753e80efe084a3aed9f9ac87bf44d09ce67aad3d4e01',
+            '0xc7751c794337a93e4db041fb5401c2c816cf0a099d8fd4b1f3f555aab5dfead2417521bb0c03d8637f350df15ef6a6cb3cdb806bd9d10bc71982dd03ff5d9ddd',
+            '0x3919091ba17c106dd034af508cfe00b963d173dffab2c7702890e25a96d107ca1bb4f148ee1984751e57d2435468558193ce84ab9a7731b842e9672e40dc0f22',
+        ]
+
+        it('CAVERJS-UNIT-TRANSACTION-422: should return public key string recovered from signatures in ValueTransfer', async () => {
+            const tx = caver.transaction.valueTransfer.create({
+                from: '0xf21460730845e3652aa3cc9bc13b345e4f53984a',
+                to: '0x59177716c34ac6e49e295a0e78e33522f14d61ee',
+                value: '0x1',
+                chainId: '0x7e3',
+                gasPrice: '0x5d21dba00',
+                nonce: '0x0',
+                gas: '0x2faf080',
+                signatures: [
+                    [
+                        '0x0fea',
+                        '0x2b5934c6d26bb3e65edf099d79c57c743d2f70744ca09d3ba9a1099edff9f173',
+                        '0x0797886edff4b449c1a599943e3a6003ae9e46b3f3f34862ced327e43fba3a6a',
+                    ],
+                    [
+                        '0x0fe9',
+                        '0x63177648732ef855f800eb9f80f68501abb507f84c0d660286a6e0801334a1d2',
+                        '0x620a996623c114f2df35b11ec8ac4f3758d3ad89cf81ba13614e51908cfe9218',
+                    ],
+                    [
+                        '0x0fe9',
+                        '0x86c8ecbfd892be41d48443a2243274beb6daed3f72895045965a3baede4c350e',
+                        '0x69ea748aff6e4c106d3a8ba597d8f134745b76f12dacb581318f9da07351511a',
+                    ],
+                ],
+            })
+            const publicKeys = tx.recoverPublicKeys()
+
+            expect(publicKeys.length).to.equal(expectedPublicKeyArray.length)
+            for (let i = 0; i < publicKeys.length; i++) {
+                expect(publicKeys[i].toLowerCase()).to.equal(expectedPublicKeyArray[i].toLowerCase())
+            }
+        }).timeout(200000)
+    })
 })
