@@ -28,7 +28,7 @@ class Validator {
      * const address = '0x...'
      * const message = 'Some data'
      * const signature = { v: '0x1c', r: '0xd0b8d...', s: '0x5472e...' } // You can get a signature via `keyring.signMessage(...).signatures[0]`.
-     * const isValid = caver.validator.validteSignedMessage(message, signature, address)
+     * const isValid = caver.validator.validateSignedMessage(message, signature, address)
      *
      * @method recoverPublicKey
      * @param {string} message The raw message string. If this message is hased with Klaytn specific prefix, the third parameter should be passed as `true`.
@@ -37,7 +37,7 @@ class Validator {
      * @param {boolean} [isHashed] (optional, default: `false`) If the `isHashed` is true, the given message will NOT automatically be prefixed with "\x19Klaytn Signed Message:\n" + message.length + message, and be assumed as already prefixed.
      * @return {boolean}
      */
-    async validteSignedMessage(message, signatures, address, isHashed = false) {
+    async validateSignedMessage(message, signatures, address, isHashed = false) {
         const getAccountKeyResult = await Validator._klaytnCall.getAccountKey(address)
 
         // Remove duplicate and format to `Array.<SignatureData>` type.
