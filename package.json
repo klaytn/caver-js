@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run build && npm run unitTest",
-    "unitTest": " npm run txUnitTest && npm run utilUnitTest && npm run netUnitTest && npm run accountUnitTest && npm run serUnitTest && npm run walletUnitTest && npm run etcUnitTest",
+    "unitTest": " npm run txUnitTest && npm run utilUnitTest && npm run netUnitTest && npm run accountUnitTest && npm run serUnitTest && npm run walletUnitTest && npm run etcUnitTest && npm run validatorUnitTest",
     "fullTest": " npm run unitTest && npm run rpcTest && npm run txOldTest && npm run etcTest && npm run accountKeyTest && npm run kctTest && npm run intTest",
     "build-all": "gulp all",
     "build": "./node_modules/.bin/webpack --mode production",
@@ -16,6 +16,7 @@
     "walletUnitTest": "./node_modules/mocha/bin/mocha test/packages/caver.wallet.js && ./node_modules/mocha/bin/mocha test/packages/caver.wallet.keyring.js && ./node_modules/mocha/bin/mocha test/accountLib.js && ./node_modules/mocha/bin/mocha test/accounts.privateKeyToPublicKey.js && ./node_modules/mocha/bin/mocha test/accounts.recover.js && ./node_modules/mocha/bin/mocha test/packages/caver.klay.accounts.js && ./node_modules/mocha/bin/mocha test/isValidPrivateKey.js && ./node_modules/mocha/bin/mocha test/privateKeyToAccount.js",
     "utilUnitTest": "./node_modules/mocha/bin/mocha test/packages/caver.utils.js",
     "netUnitTest": "./node_modules/mocha/bin/mocha test/packages/caver.klay.net.js",
+    "validatorUnitTest": "./node_modules/mocha/bin/mocha test/packages/caver.validator.js",
     "txUnitTest": "./node_modules/mocha/bin/mocha test/packages/caver.transaction/*.js && ./node_modules/mocha/bin/mocha test/createTest.js",
     "etcUnitTest": "./node_modules/mocha/bin/mocha test/decodeFunctionCall.js && ./node_modules/mocha/bin/mocha test/contractError.js && ./node_modules/mocha/bin/mocha test/contractOverloading.js && ./node_modules/mocha/bin/mocha ./test/contract.setWallet.js && ./node_modules/mocha/bin/mocha ./test/setRequestManager.js && ./node_modules/mocha/bin/mocha test/reconnectTest.js && ./node_modules/mocha/bin/mocha test/hashMessage.js && ./node_modules/mocha/bin/mocha test/iban.* && ./node_modules/mocha/bin/mocha test/randomHex.js && ./node_modules/mocha/bin/mocha test/sha3.js && ./node_modules/mocha/bin/mocha test/toChecksumAddress.js && ./node_modules/mocha/bin/mocha test/default*&& ./node_modules/mocha/bin/mocha test/getNodeInfo.js && ./node_modules/mocha/bin/mocha test/getNetworkType.js && ./node_modules/mocha/bin/mocha test/isContractDeployment.js && ./node_modules/mocha/bin/mocha test/multiProviderTest.js && ./node_modules/mocha/bin/mocha test/unitMap.js && ./node_modules/mocha/bin/mocha test/invalidResponse.js && ./node_modules/mocha/bin/mocha test/createTest.js && ./node_modules/mocha/bin/mocha test/setProvider.js && ./node_modules/mocha/bin/mocha test/contractOverloading.js && ./node_modules/mocha/bin/mocha test/supportsSubscriptions.js && ./node_modules/mocha/bin/mocha test/packages/caver.abi.js",
     "rpcTest": "./node_modules/mocha/bin/mocha test/packages/caver.rpc.js",
