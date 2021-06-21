@@ -167,7 +167,10 @@ function recoverPublicKeys(rawTx) {
  */
 function recoverFeePayerPublicKeys(rawTx) {
     const tx = TransactionDecoder.decode(rawTx)
-    if (!(tx instanceof AbstractFeeDelegatedTransaction)) throw new Error('The `caver.transaction.recoverFeePayerPublicKeys` function can only use with fee delegation transaction. For basic transactions, use `caver.transaction.recoverPublicKeys`.')
+    if (!(tx instanceof AbstractFeeDelegatedTransaction))
+        throw new Error(
+            'The `caver.transaction.recoverFeePayerPublicKeys` function can only use with fee delegation transaction. For basic transactions, use `caver.transaction.recoverPublicKeys`.'
+        )
     return tx.recoverFeePayerPublicKeys()
 }
 
