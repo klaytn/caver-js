@@ -133,6 +133,10 @@ class Validator {
 function validateWithAccountKeyAndRole(address, accountKey, publicKeys, role) {
     let isValid = false
 
+    // For accounts that have not yet been applied in Klaytn's state, the return value of `caver.rpc.klay.getAccountKey` is null.
+    // In this case, the account's key has never been updated, so the logic is the same as in AccountKeyLegacy.
+    if (accountKey === null) accountKey = { keyType: 1, key: {} }
+
     switch (accountKey.keyType) {
         case 1:
             // TODO: If an invalid signature is included, it should be changed to return false.

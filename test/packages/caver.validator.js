@@ -1590,7 +1590,7 @@ describe('caver.validator.validateTransaction', () => {
             expect(validateSenderStub).to.have.been.callCount(1)
         }).timeout(100000)
 
-        it('CAVERJS-UNIT-VALIDATOR-056: should validate sender if fee-delegated tx', async () => {
+        it('CAVERJS-UNIT-VALIDATOR-056: should validate sender and fee payer if fee-delegated tx', async () => {
             const tx = caver.transaction.feeDelegatedValueTransfer.create(fdTxObj)
 
             const validateSenderStub = sandbox.stub(caver.validator, 'validateSender')
@@ -1602,6 +1602,19 @@ describe('caver.validator.validateTransaction', () => {
             expect(isValid).to.be.true
             expect(validateSenderStub).to.have.been.callCount(1)
             expect(validateFeePayerStub).to.have.been.callCount(1)
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-VALIDATOR-057: should validate with AccountKeyLegacy when getAccountKey returns null', async () => {
+            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            getAccoutKeyStub.resolves(null)
+
+            const tx = caver.transaction.feeDelegatedValueTransfer.create(fdTxObj)
+            tx.signatures = tx.signatures[0]
+            tx.feePayerSignatures = tx.feePayerSignatures[0]
+
+            const isValid = await caver.validator.validateTransaction(tx)
+            expect(isValid).to.be.true
+            expect(getAccoutKeyStub).to.have.been.callCount(2)
         }).timeout(100000)
     })
 })
