@@ -1025,8 +1025,8 @@ const recover = (message, signature, isHashed = false) => {
  * @example
  * const address = caver.utils.publicKeyToAddress('0x{public key}')
  *
- * @method publicKeyToAddress The public key string to get the address.
- * @param {string} publicKey
+ * @method publicKeyToAddress
+ * @param {string} publicKey The public key string to get the address.
  * @return {string}
  */
 const publicKeyToAddress = publicKey => {
