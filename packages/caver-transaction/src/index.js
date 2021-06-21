@@ -42,6 +42,7 @@ const TransactionDecoder = require('./transactionDecoder/transactionDecoder')
 const AbstractTransaction = require('./transactionTypes/abstractTransaction')
 const { TX_TYPE_STRING, TX_TYPE_TAG } = require('./transactionHelper/transactionHelper')
 const Account = require('../../caver-account')
+const AbstractFeeDelegatedTransaction = require('./transactionTypes/abstractFeeDelegatedTransaction')
 
 /** @module Transaction */
 
@@ -139,9 +140,42 @@ async function getTransactionByHash(transactionHash) {
     return txObject
 }
 
+/**
+ * Recovers the public key strings from `signatures` field.
+ * If you want to derive an address from public key, please use `caver.utils.publicKeyToAddress`.
+ *
+ * @example
+ * const publicKey = caver.transaction.recoverPublicKeys('0x{RLP-encoded transaction string}')
+ *
+ * @method recoverPublicKeys
+ * @return {Array.<string>}
+ */
+function recoverPublicKeys(rawTx) {
+    const tx = TransactionDecoder.decode(rawTx)
+    return tx.recoverPublicKeys()
+}
+
+/**
+ * Recovers the public key strings from `feePayerSignatures` field.
+ * If you want to derive an address from public key, please use `caver.utils.publicKeyToAddress`.
+ *
+ * @example
+ * const publicKey = caver.transaction.recoverFeePayerPublicKeys()
+ *
+ * @method recoverFeePayerPublicKeys
+ * @return {Array.<string>}
+ */
+function recoverFeePayerPublicKeys(rawTx) {
+    const tx = TransactionDecoder.decode(rawTx)
+    if (!(tx instanceof AbstractFeeDelegatedTransaction)) throw new Error('The `caver.transaction.recoverFeePayerPublicKeys` function can only use with fee delegation transaction. For basic transactions, use `caver.transaction.recoverPublicKeys`.')
+    return tx.recoverFeePayerPublicKeys()
+}
+
 module.exports = {
     decode: TransactionDecoder.decode,
     getTransactionByHash: getTransactionByHash,
+    recoverPublicKeys: recoverPublicKeys,
+    recoverFeePayerPublicKeys: recoverFeePayerPublicKeys,
 
     legacyTransaction: LegacyTransaction,
 
