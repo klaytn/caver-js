@@ -33,7 +33,7 @@ class AccountKeyDecoder {
      * decodes an RLP-encoded account key string.
      *
      * @param {string} rlpEncodedKey An RLP-encoded account key string.
-     * @return {Account}
+     * @return {IAccountKey}
      */
     static decode(rlpEncodedKey) {
         rlpEncodedKey = utils.addHexPrefix(rlpEncodedKey)
