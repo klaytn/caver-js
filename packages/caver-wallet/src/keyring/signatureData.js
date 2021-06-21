@@ -17,7 +17,7 @@
 */
 
 const _ = require('lodash')
-const utils = require('../../../caver-utils')
+const utils = require('../../../caver-utils/src/utils')
 
 const emptySigArray = ['0x01', '0x', '0x']
 
@@ -53,6 +53,7 @@ class SignatureData {
     }
 
     set v(v) {
+        v = v.slice(0, 2) === '0x' ? v : `0x${v}`
         this._v = utils.makeEven(v)
     }
 
@@ -75,6 +76,7 @@ class SignatureData {
     }
 
     set r(r) {
+        r = r.slice(0, 2) === '0x' ? r : `0x${r}`
         this._r = utils.makeEven(r)
     }
 
@@ -97,6 +99,7 @@ class SignatureData {
     }
 
     set s(s) {
+        s = s.slice(0, 2) === '0x' ? s : `0x${s}`
         this._s = utils.makeEven(s)
     }
 
