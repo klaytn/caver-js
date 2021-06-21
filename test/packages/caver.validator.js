@@ -357,7 +357,6 @@ describe('caver.validator.validateSignedMessage', () => {
             expect(ret).to.be.true
         }).timeout(100000)
 
-        // This test case should be chagned to expect false after fork.
         it('CAVERJS-UNIT-VALIDATOR-018: should return false when invalid signatures are passed as a parameter', async () => {
             const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
@@ -684,6 +683,925 @@ describe('caver.validator.validateSignedMessage', () => {
 
             const ret = await caver.validator.validateSignedMessage(message, signatures, keyring.address)
             expect(ret).to.be.false
+        }).timeout(100000)
+    })
+})
+
+describe('caver.validator.validateSender', () => {
+    beforeEach(() => {
+        caver = new Caver(testRPCURL)
+    })
+
+    afterEach(() => {
+        sandbox.restore()
+    })
+
+    context('caver.validator.validateSender with AccountKeyLegacy', () => {
+        const txObj = {
+            from: '0xf21460730845e3652aa3cc9bc13b345e4f53984a',
+            to: '0x59177716c34ac6e49e295a0e78e33522f14d61ee',
+            value: '0x1',
+            chainId: '0x7e3',
+            gasPrice: '0x5d21dba00',
+            nonce: '0x0',
+            gas: '0x2faf080',
+            signatures: [
+                '0x0fe9',
+                '0xecdec357060dbbb4bd3790e98b1733ec3a0b02b7e4ec7a5622f93cd9bee229fe',
+                '0x0a4a5e28753e7c1d999b286fb07933c5bf353079b8ed4d1ed509a838b48be02c',
+            ],
+        }
+        function setStubResult() {
+            const getAccountKeyResult = { keyType: 1, key: {} }
+            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            getAccoutKeyStub.resolves(getAccountKeyResult)
+        }
+
+        it('CAVERJS-UNIT-VALIDATOR-030: should validate signatures in the tx', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.legacyTransaction.create(txObj)
+            const isValid = await caver.validator.validateSender(tx)
+            expect(isValid).to.be.true
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-VALIDATOR-031: should return false when signatures in the tx are invalid', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.legacyTransaction.create(txObj)
+            tx.signatures = [
+                {
+                    V: '0x0fe9',
+                    R: '0x86c8ecbfd892be41d48443a2243274beb6daed3f72895045965a3baede4c350e',
+                    S: '0x69ea748aff6e4c106d3a8ba597d8f134745b76f12dacb581318f9da07351511a',
+                },
+            ]
+            const isValid = await caver.validator.validateSender(tx)
+            expect(isValid).to.be.false
+        }).timeout(100000)
+    })
+
+    context('caver.validator.validateSender with AccountKeyPublic', () => {
+        const txObj = {
+            from: '0xf21460730845e3652aa3cc9bc13b345e4f53984a',
+            to: '0x59177716c34ac6e49e295a0e78e33522f14d61ee',
+            value: '0x1',
+            chainId: '0x7e3',
+            gasPrice: '0x5d21dba00',
+            nonce: '0x0',
+            gas: '0x2faf080',
+            signatures: [
+                [
+                    '0x0fea',
+                    '0x2b5934c6d26bb3e65edf099d79c57c743d2f70744ca09d3ba9a1099edff9f173',
+                    '0x0797886edff4b449c1a599943e3a6003ae9e46b3f3f34862ced327e43fba3a6a',
+                ],
+            ],
+        }
+        function setStubResult() {
+            const getAccountKeyResult = {
+                keyType: 2,
+                key: {
+                    x: '0x8bb6aaeb2d96d024754d3b50babf116cece68977acbe8ba6a66f14d5217c60d9',
+                    y: '0x6af020a0568661e7c72e753e80efe084a3aed9f9ac87bf44d09ce67aad3d4e01',
+                },
+            }
+            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            getAccoutKeyStub.resolves(getAccountKeyResult)
+        }
+
+        it('CAVERJS-UNIT-VALIDATOR-032: should validate signatures in the tx', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.valueTransfer.create(txObj)
+            const isValid = await caver.validator.validateSender(tx)
+            expect(isValid).to.be.true
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-VALIDATOR-033: should return false when signatures in the tx are invalid', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.valueTransfer.create(txObj)
+            tx.signatures = [
+                {
+                    V: '0x0fe9',
+                    R: '0x86c8ecbfd892be41d48443a2243274beb6daed3f72895045965a3baede4c350e',
+                    S: '0x69ea748aff6e4c106d3a8ba597d8f134745b76f12dacb581318f9da07351511a',
+                },
+            ]
+            const isValid = await caver.validator.validateSender(tx)
+            expect(isValid).to.be.false
+        }).timeout(100000)
+    })
+
+    context('caver.validator.validateSender with AccountKeyFail', () => {
+        const txObj = {
+            from: '0xf21460730845e3652aa3cc9bc13b345e4f53984a',
+            to: '0x59177716c34ac6e49e295a0e78e33522f14d61ee',
+            value: '0x1',
+            chainId: '0x7e3',
+            gasPrice: '0x5d21dba00',
+            nonce: '0x0',
+            gas: '0x2faf080',
+            signatures: [
+                [
+                    '0x0fea',
+                    '0x2b5934c6d26bb3e65edf099d79c57c743d2f70744ca09d3ba9a1099edff9f173',
+                    '0x0797886edff4b449c1a599943e3a6003ae9e46b3f3f34862ced327e43fba3a6a',
+                ],
+            ],
+        }
+        function setStubResult() {
+            const getAccountKeyResult = { keyType: 3, key: {} }
+            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            getAccoutKeyStub.resolves(getAccountKeyResult)
+        }
+
+        it('CAVERJS-UNIT-VALIDATOR-034: should validate signatures in the tx', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.valueTransfer.create(txObj)
+            const isValid = await caver.validator.validateSender(tx)
+            expect(isValid).to.be.false
+        }).timeout(100000)
+    })
+
+    context('caver.validator.validateSender with AccountKeyWeightedMultiSig', () => {
+        const txObj = {
+            from: '0xf21460730845e3652aa3cc9bc13b345e4f53984a',
+            to: '0x59177716c34ac6e49e295a0e78e33522f14d61ee',
+            value: '0x1',
+            chainId: '0x7e3',
+            gasPrice: '0x5d21dba00',
+            nonce: '0x0',
+            gas: '0x2faf080',
+            signatures: [
+                [
+                    '0x0fea',
+                    '0x2b5934c6d26bb3e65edf099d79c57c743d2f70744ca09d3ba9a1099edff9f173',
+                    '0x0797886edff4b449c1a599943e3a6003ae9e46b3f3f34862ced327e43fba3a6a',
+                ],
+                [
+                    '0x0fe9',
+                    '0x63177648732ef855f800eb9f80f68501abb507f84c0d660286a6e0801334a1d2',
+                    '0x620a996623c114f2df35b11ec8ac4f3758d3ad89cf81ba13614e51908cfe9218',
+                ],
+                [
+                    '0x0fe9',
+                    '0x86c8ecbfd892be41d48443a2243274beb6daed3f72895045965a3baede4c350e',
+                    '0x69ea748aff6e4c106d3a8ba597d8f134745b76f12dacb581318f9da07351511a',
+                ],
+            ],
+        }
+        function setStubResult() {
+            const getAccountKeyResult = {
+                keyType: 4,
+                key: {
+                    threshold: 3,
+                    keys: [
+                        {
+                            weight: 2,
+                            key: {
+                                x: '0x8bb6aaeb2d96d024754d3b50babf116cece68977acbe8ba6a66f14d5217c60d9',
+                                y: '0x6af020a0568661e7c72e753e80efe084a3aed9f9ac87bf44d09ce67aad3d4e01',
+                            },
+                        },
+                        {
+                            weight: 1,
+                            key: {
+                                x: '0xc7751c794337a93e4db041fb5401c2c816cf0a099d8fd4b1f3f555aab5dfead2',
+                                y: '0x417521bb0c03d8637f350df15ef6a6cb3cdb806bd9d10bc71982dd03ff5d9ddd',
+                            },
+                        },
+                        {
+                            weight: 1,
+                            key: {
+                                x: '0x3919091ba17c106dd034af508cfe00b963d173dffab2c7702890e25a96d107ca',
+                                y: '0x1bb4f148ee1984751e57d2435468558193ce84ab9a7731b842e9672e40dc0f22',
+                            },
+                        },
+                    ],
+                },
+            }
+            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            getAccoutKeyStub.resolves(getAccountKeyResult)
+        }
+
+        it('CAVERJS-UNIT-VALIDATOR-035: should validate signatures in the tx', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.valueTransfer.create(txObj)
+            const isValid = await caver.validator.validateSender(tx)
+            expect(isValid).to.be.true
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-VALIDATOR-036: should return false when signatures in the tx are invalid', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.valueTransfer.create(txObj)
+            tx.signatures = [
+                {
+                    V: '0x0fe9',
+                    R: '0x86c8ecbfd892be41d48443a2243274beb6daed3f72895045965a3baede4c350e',
+                    S: '0x69ea748aff6e4c106d3a8ba597d8f134745b76f12dacb581318f9da07351511a',
+                },
+            ]
+            const isValid = await caver.validator.validateSender(tx)
+            expect(isValid).to.be.false
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-VALIDATOR-037: should return false when signatures weight sum is less than threshold', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.valueTransfer.create(txObj)
+            tx.signatures = txObj.signatures[0]
+            const isValid = await caver.validator.validateSender(tx)
+            expect(isValid).to.be.false
+        }).timeout(100000)
+    })
+
+    context('caver.validator.validateSender with AccountKeyRoleBased', () => {
+        const txObj = {
+            from: '0xf21460730845e3652aa3cc9bc13b345e4f53984a',
+            to: '0x59177716c34ac6e49e295a0e78e33522f14d61ee',
+            value: '0x1',
+            chainId: '0x7e3',
+            gasPrice: '0x5d21dba00',
+            nonce: '0x0',
+            gas: '0x2faf080',
+            signatures: [
+                [
+                    '0x0fea',
+                    '0x2b5934c6d26bb3e65edf099d79c57c743d2f70744ca09d3ba9a1099edff9f173',
+                    '0x0797886edff4b449c1a599943e3a6003ae9e46b3f3f34862ced327e43fba3a6a',
+                ],
+                [
+                    '0x0fe9',
+                    '0x63177648732ef855f800eb9f80f68501abb507f84c0d660286a6e0801334a1d2',
+                    '0x620a996623c114f2df35b11ec8ac4f3758d3ad89cf81ba13614e51908cfe9218',
+                ],
+                [
+                    '0x0fe9',
+                    '0x86c8ecbfd892be41d48443a2243274beb6daed3f72895045965a3baede4c350e',
+                    '0x69ea748aff6e4c106d3a8ba597d8f134745b76f12dacb581318f9da07351511a',
+                ],
+            ],
+        }
+        function setStubResult(roleNum, fakeKey) {
+            const getAccountKeyResult = {
+                keyType: 5,
+                key: [
+                    {
+                        keyType: 4,
+                        key: {
+                            threshold: 2,
+                            keys: [
+                                {
+                                    weight: 1,
+                                    key: {
+                                        x: '0x8bb6aaeb2d96d024754d3b50babf116cece68977acbe8ba6a66f14d5217c60d9',
+                                        y: '0x6af020a0568661e7c72e753e80efe084a3aed9f9ac87bf44d09ce67aad3d4e01',
+                                    },
+                                },
+                                {
+                                    weight: 1,
+                                    key: {
+                                        x: '0xc7751c794337a93e4db041fb5401c2c816cf0a099d8fd4b1f3f555aab5dfead2',
+                                        y: '0x417521bb0c03d8637f350df15ef6a6cb3cdb806bd9d10bc71982dd03ff5d9ddd',
+                                    },
+                                },
+                                {
+                                    weight: 1,
+                                    key: {
+                                        x: '0x3919091ba17c106dd034af508cfe00b963d173dffab2c7702890e25a96d107ca',
+                                        y: '0x1bb4f148ee1984751e57d2435468558193ce84ab9a7731b842e9672e40dc0f22',
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        keyType: 4,
+                        key: {
+                            threshold: 2,
+                            keys: [
+                                {
+                                    weight: 1,
+                                    key: {
+                                        x: '0x8bb6aaeb2d96d024754d3b50babf116cece68977acbe8ba6a66f14d5217c60d9',
+                                        y: '0x6af020a0568661e7c72e753e80efe084a3aed9f9ac87bf44d09ce67aad3d4e01',
+                                    },
+                                },
+                                {
+                                    weight: 1,
+                                    key: {
+                                        x: '0xc7751c794337a93e4db041fb5401c2c816cf0a099d8fd4b1f3f555aab5dfead2',
+                                        y: '0x417521bb0c03d8637f350df15ef6a6cb3cdb806bd9d10bc71982dd03ff5d9ddd',
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        keyType: 4,
+                        key: {
+                            threshold: 2,
+                            keys: [
+                                {
+                                    weight: 1,
+                                    key: {
+                                        x: '0x8bb6aaeb2d96d024754d3b50babf116cece68977acbe8ba6a66f14d5217c60d9',
+                                        y: '0x6af020a0568661e7c72e753e80efe084a3aed9f9ac87bf44d09ce67aad3d4e01',
+                                    },
+                                },
+                                {
+                                    weight: 1,
+                                    key: {
+                                        x: '0xc7751c794337a93e4db041fb5401c2c816cf0a099d8fd4b1f3f555aab5dfead2',
+                                        y: '0x417521bb0c03d8637f350df15ef6a6cb3cdb806bd9d10bc71982dd03ff5d9ddd',
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                ],
+            }
+            if (roleNum !== undefined) getAccountKeyResult.key[roleNum] = fakeKey
+            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            getAccoutKeyStub.resolves(getAccountKeyResult)
+        }
+
+        it('CAVERJS-UNIT-VALIDATOR-038: should validate signatures in the tx', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.valueTransfer.create(txObj)
+            const isValid = await caver.validator.validateSender(tx)
+            expect(isValid).to.be.true
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-VALIDATOR-039: should return false when signatures in the tx are invalid', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.valueTransfer.create(txObj)
+            tx.signatures = [
+                {
+                    V: '0x0fe9',
+                    R: '0x86c8ecbfd892be41d48443a2243274beb6daed3f72895045965a3baede4c350e',
+                    S: '0x69ea748aff6e4c106d3a8ba597d8f134745b76f12dacb581318f9da07351511a',
+                },
+            ]
+            const isValid = await caver.validator.validateSender(tx)
+            expect(isValid).to.be.false
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-VALIDATOR-040: should return false when signatures is made by invalid role (not roleTransactionKey)', async () => {
+            setStubResult(0, {
+                keyType: 4,
+                key: {
+                    threshold: 2,
+                    keys: [
+                        {
+                            weight: 1,
+                            key: {
+                                x: '0xc734b50ddb229be5e929fc4aa8080ae8240a802d23d3290e5e6156ce029b110e',
+                                y: '0x61a443ac3ffff164d1fb3617875f07641014cf17af6b7dc38e429fe838763712',
+                            },
+                        },
+                        {
+                            weight: 1,
+                            key: {
+                                x: '0x12d45f1cc56fbd6cd8fc877ab63b5092ac77db907a8a42c41dad3e98d7c64dfb',
+                                y: '0x8ef355a8d524eb444eba507f236309ce08370debaa136cb91b2f445774bff842',
+                            },
+                        },
+                    ],
+                },
+            })
+
+            const tx = caver.transaction.valueTransfer.create(txObj)
+            const isValid = await caver.validator.validateSender(tx)
+            expect(isValid).to.be.false
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-VALIDATOR-041: should return false when signatures weight sum is less than threshold', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.valueTransfer.create(txObj)
+            tx.signatures = txObj.signatures[0]
+            const isValid = await caver.validator.validateSender(tx)
+            expect(isValid).to.be.false
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-VALIDATOR-042: should return true when signatures is made by roleAccountKey', async () => {
+            const updateTxObj = {
+                from: '0xf21460730845e3652aa3cc9bc13b345e4f53984a',
+                chainId: '0x7e3',
+                gasPrice: '0x5d21dba00',
+                nonce: '0x0',
+                gas: '0x2faf080',
+                account: caver.account.createWithAccountKeyLegacy('0xf21460730845e3652aa3cc9bc13b345e4f53984a'),
+                signatures: [
+                    [
+                        '0x0fea',
+                        '0x84299d74e8b491d7272d86b5ff4f4f4605830406befd360c90adaae56af99359',
+                        '0x196240cda43810ba4c19dd865435b991a9c16a91859357777594fb9e77d02d01',
+                    ],
+                    [
+                        '0x0fea',
+                        '0xaf27d2163b85e3de5f8b7fee56df509be231d3935890515bfe783e2f38c1c092',
+                        '0x1b5d6ff80bd3964ce311c658cdeac0e43a2171a87bb287695c9be2b3517651e9',
+                    ],
+                    [
+                        '0x0fea',
+                        '0xf17ec890c3eeae90702f811b4bb880c6631913bb307207bf0bccbcdc229f571a',
+                        '0x6f2f203218cc8ddbab785cd59dec47105c7919ab4192295c8307c9a0701605ed',
+                    ],
+                ],
+            }
+
+            setStubResult(0, {
+                keyType: 4,
+                key: {
+                    threshold: 2,
+                    keys: [
+                        {
+                            weight: 1,
+                            key: {
+                                x: '0xc734b50ddb229be5e929fc4aa8080ae8240a802d23d3290e5e6156ce029b110e',
+                                y: '0x61a443ac3ffff164d1fb3617875f07641014cf17af6b7dc38e429fe838763712',
+                            },
+                        },
+                        {
+                            weight: 1,
+                            key: {
+                                x: '0x12d45f1cc56fbd6cd8fc877ab63b5092ac77db907a8a42c41dad3e98d7c64dfb',
+                                y: '0x8ef355a8d524eb444eba507f236309ce08370debaa136cb91b2f445774bff842',
+                            },
+                        },
+                    ],
+                },
+            })
+
+            const tx = caver.transaction.accountUpdate.create(updateTxObj)
+            const isValid = await caver.validator.validateSender(tx)
+            expect(isValid).to.be.true
+        }).timeout(100000)
+    })
+})
+
+describe('caver.validator.validateFeePayer', () => {
+    const txObj = {
+        from: '0x07a9a76ef778676c3bd2b334edcf581db31a85e5',
+        feePayer: '0xb5db72925b1b6b79299a1a49ae226cd7861083ac',
+        to: '0x59177716c34ac6e49e295a0e78e33522f14d61ee',
+        value: '0x1',
+        chainId: '0x7e3',
+        gasPrice: '0x5d21dba00',
+        nonce: '0x0',
+        gas: '0x2faf080',
+        signatures: [
+            [
+                '0x0fea',
+                '0xcb2bbf04a12ec3a06163c30ce8782739ec4745a53e265aa9443f1c0d678bb871',
+                '0x7dd348c7d8fce6be36b661f116973d1c36cc92a389ad4a1a4053bd486060a083',
+            ],
+            [
+                '0x0fe9',
+                '0x6d5dfca992d6833c0da272578bc6ea941be45f44fb2fa114310ebe18d673ed52',
+                '0x4dc5cd7985c9ce7d44d46d65e65c995a4a8c97159a1eed8b2efb0510b981ab7c',
+            ],
+            [
+                '0x0fea',
+                '0x945151edf556fbcebf832092d4534b9a3b1f3d46f85bce09e7d7211070cb57be',
+                '0x1617c8f918f96970baddd12f240a9824eca6b29d91eb7333adacb987f2dcd8dd',
+            ],
+        ],
+        feePayerSignatures: [
+            [
+                '0x0fea',
+                '0x86fd17d788e89a6e0639395b3c0a04f916103debd6cbe639d6f4ff5034dde3e8',
+                '0x0795551c551d9096234c290689767f34f2d409c95166ab18d216dbc93845ba16',
+            ],
+            [
+                '0x0fea',
+                '0x0653b6d1cdb90462094b089ce8e2fed0e3b8ec2c44125965e1a5af286644c758',
+                '0x259b10e3bf594d48535fd0d95e15d095897c8d075c01dd56e7417d5943b0d53a',
+            ],
+            [
+                '0x0fe9',
+                '0xce8d051427adab10d1dc93de49123aeab18ba8aadedce0d57ef5b7fa451b1f4f',
+                '0x4fe2a845d92ff48abca3e1d59637fab5f4a4e3172d91772d9bfce60760edc506',
+            ],
+        ],
+    }
+
+    beforeEach(() => {
+        caver = new Caver(testRPCURL)
+    })
+
+    afterEach(() => {
+        sandbox.restore()
+    })
+
+    context('caver.validator.validateSender with AccountKeyLegacy', () => {
+        function setStubResult() {
+            const getAccountKeyResult = { keyType: 1, key: {} }
+            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            getAccoutKeyStub.resolves(getAccountKeyResult)
+        }
+
+        it('CAVERJS-UNIT-VALIDATOR-043: should validate feePayerSignatures in the tx', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.feeDelegatedValueTransfer.create(txObj)
+            const isValid = await caver.validator.validateFeePayer(tx)
+            expect(isValid).to.be.true
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-VALIDATOR-044: should return false when signatures in the tx are invalid', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.feeDelegatedValueTransfer.create(txObj)
+            tx.feePayerSignatures = [
+                {
+                    V: '0x0fea',
+                    R: '0x945151edf556fbcebf832092d4534b9a3b1f3d46f85bce09e7d7211070cb57be',
+                    S: '0x1617c8f918f96970baddd12f240a9824eca6b29d91eb7333adacb987f2dcd8dd',
+                },
+            ]
+            const isValid = await caver.validator.validateFeePayer(tx)
+            expect(isValid).to.be.false
+        }).timeout(100000)
+    })
+
+    context('caver.validator.validateSender with AccountKeyPublic', () => {
+        function setStubResult() {
+            const getAccountKeyResult = {
+                keyType: 2,
+                key: {
+                    x: '0x2b557d80ddac3a0bbcc8a7861773ca7434c969e2721a574bb94a1e3aa5ceed38',
+                    y: '0x19f08a82b31682c038f9f691fb38ee4aaf7e016e2c973a1bd1e48a51f60a54ea',
+                },
+            }
+            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            getAccoutKeyStub.resolves(getAccountKeyResult)
+        }
+
+        it('CAVERJS-UNIT-VALIDATOR-045: should validate feePayerSignatures in the tx', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.feeDelegatedValueTransfer.create(txObj)
+            const isValid = await caver.validator.validateFeePayer(tx)
+            expect(isValid).to.be.true
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-VALIDATOR-046: should return false when signatures in the tx are invalid', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.feeDelegatedValueTransfer.create(txObj)
+            tx.feePayerSignatures = [
+                {
+                    V: '0x0fe9',
+                    R: '0x86c8ecbfd892be41d48443a2243274beb6daed3f72895045965a3baede4c350e',
+                    S: '0x69ea748aff6e4c106d3a8ba597d8f134745b76f12dacb581318f9da07351511a',
+                },
+            ]
+            const isValid = await caver.validator.validateFeePayer(tx)
+            expect(isValid).to.be.false
+        }).timeout(100000)
+    })
+
+    context('caver.validator.validateSender with AccountKeyFail', () => {
+        function setStubResult() {
+            const getAccountKeyResult = { keyType: 3, key: {} }
+            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            getAccoutKeyStub.resolves(getAccountKeyResult)
+        }
+
+        it('CAVERJS-UNIT-VALIDATOR-047: should validate feePayerSignatures in the tx', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.feeDelegatedValueTransfer.create(txObj)
+            const isValid = await caver.validator.validateFeePayer(tx)
+            expect(isValid).to.be.false
+        }).timeout(100000)
+    })
+
+    context('caver.validator.validateSender with AccountKeyWeightedMultiSig', () => {
+        function setStubResult() {
+            const getAccountKeyResult = {
+                keyType: 4,
+                key: {
+                    threshold: 3,
+                    keys: [
+                        {
+                            weight: 2,
+                            key: {
+                                x: '0x2b557d80ddac3a0bbcc8a7861773ca7434c969e2721a574bb94a1e3aa5ceed38',
+                                y: '0x19f08a82b31682c038f9f691fb38ee4aaf7e016e2c973a1bd1e48a51f60a54ea',
+                            },
+                        },
+                        {
+                            weight: 1,
+                            key: {
+                                x: '0x1a1cfe1e2ec4b15520c57c20c2460981a2f16003c8db11a0afc282abf929fa1c',
+                                y: '0x1868f60f91b330c423aa660913d86acc2a0b1b15e7ba1fe571e5928a19825a7e',
+                            },
+                        },
+                        {
+                            weight: 1,
+                            key: {
+                                x: '0xdea23a89dbbde1a0c26466c49c1edd32785432389641797038c2b53815cb5c73',
+                                y: '0xd6cf5355986fd9a22a68bb57b831857fd1636362b383bd632966392714b60d72',
+                            },
+                        },
+                    ],
+                },
+            }
+            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            getAccoutKeyStub.resolves(getAccountKeyResult)
+        }
+
+        it('CAVERJS-UNIT-VALIDATOR-048: should validate feePayerSignatures in the tx', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.feeDelegatedValueTransfer.create(txObj)
+            const isValid = await caver.validator.validateFeePayer(tx)
+            expect(isValid).to.be.true
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-VALIDATOR-049: should return false when feePayerSignatures in the tx are invalid', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.feeDelegatedValueTransfer.create(txObj)
+            tx.feePayerSignatures = [
+                {
+                    V: '0x0fe9',
+                    R: '0x86c8ecbfd892be41d48443a2243274beb6daed3f72895045965a3baede4c350e',
+                    S: '0x69ea748aff6e4c106d3a8ba597d8f134745b76f12dacb581318f9da07351511a',
+                },
+            ]
+            const isValid = await caver.validator.validateFeePayer(tx)
+            expect(isValid).to.be.false
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-VALIDATOR-050: should return false when feePayerSignatures weight sum is less than threshold', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.feeDelegatedValueTransfer.create(txObj)
+            tx.feePayerSignatures = txObj.signatures[0]
+            const isValid = await caver.validator.validateFeePayer(tx)
+            expect(isValid).to.be.false
+        }).timeout(100000)
+    })
+
+    context('caver.validator.validateSender with AccountKeyRoleBased', () => {
+        function setStubResult(roleNum, fakeKey) {
+            const getAccountKeyResult = {
+                keyType: 5,
+                key: [
+                    {
+                        keyType: 4,
+                        key: {
+                            threshold: 2,
+                            keys: [
+                                {
+                                    weight: 1,
+                                    key: {
+                                        x: '0x8bb6aaeb2d96d024754d3b50babf116cece68977acbe8ba6a66f14d5217c60d9',
+                                        y: '0x6af020a0568661e7c72e753e80efe084a3aed9f9ac87bf44d09ce67aad3d4e01',
+                                    },
+                                },
+                                {
+                                    weight: 1,
+                                    key: {
+                                        x: '0xc7751c794337a93e4db041fb5401c2c816cf0a099d8fd4b1f3f555aab5dfead2',
+                                        y: '0x417521bb0c03d8637f350df15ef6a6cb3cdb806bd9d10bc71982dd03ff5d9ddd',
+                                    },
+                                },
+                                {
+                                    weight: 1,
+                                    key: {
+                                        x: '0x3919091ba17c106dd034af508cfe00b963d173dffab2c7702890e25a96d107ca',
+                                        y: '0x1bb4f148ee1984751e57d2435468558193ce84ab9a7731b842e9672e40dc0f22',
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        keyType: 4,
+                        key: {
+                            threshold: 2,
+                            keys: [
+                                {
+                                    weight: 1,
+                                    key: {
+                                        x: '0x8bb6aaeb2d96d024754d3b50babf116cece68977acbe8ba6a66f14d5217c60d9',
+                                        y: '0x6af020a0568661e7c72e753e80efe084a3aed9f9ac87bf44d09ce67aad3d4e01',
+                                    },
+                                },
+                                {
+                                    weight: 1,
+                                    key: {
+                                        x: '0xc7751c794337a93e4db041fb5401c2c816cf0a099d8fd4b1f3f555aab5dfead2',
+                                        y: '0x417521bb0c03d8637f350df15ef6a6cb3cdb806bd9d10bc71982dd03ff5d9ddd',
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        keyType: 4,
+                        key: {
+                            threshold: 2,
+                            keys: [
+                                {
+                                    weight: 2,
+                                    key: {
+                                        x: '0x2b557d80ddac3a0bbcc8a7861773ca7434c969e2721a574bb94a1e3aa5ceed38',
+                                        y: '0x19f08a82b31682c038f9f691fb38ee4aaf7e016e2c973a1bd1e48a51f60a54ea',
+                                    },
+                                },
+                                {
+                                    weight: 1,
+                                    key: {
+                                        x: '0x1a1cfe1e2ec4b15520c57c20c2460981a2f16003c8db11a0afc282abf929fa1c',
+                                        y: '0x1868f60f91b330c423aa660913d86acc2a0b1b15e7ba1fe571e5928a19825a7e',
+                                    },
+                                },
+                                {
+                                    weight: 1,
+                                    key: {
+                                        x: '0xdea23a89dbbde1a0c26466c49c1edd32785432389641797038c2b53815cb5c73',
+                                        y: '0xd6cf5355986fd9a22a68bb57b831857fd1636362b383bd632966392714b60d72',
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                ],
+            }
+            if (roleNum !== undefined) getAccountKeyResult.key[roleNum] = fakeKey
+            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            getAccoutKeyStub.resolves(getAccountKeyResult)
+        }
+
+        it('CAVERJS-UNIT-VALIDATOR-051: should validate feePayerSignatures in the tx', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.feeDelegatedValueTransfer.create(txObj)
+            const isValid = await caver.validator.validateFeePayer(tx)
+            expect(isValid).to.be.true
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-VALIDATOR-052: should return false when feePayerSignatures in the tx are invalid', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.feeDelegatedValueTransfer.create(txObj)
+            tx.feePayerSignatures = [
+                {
+                    V: '0x0fe9',
+                    R: '0x86c8ecbfd892be41d48443a2243274beb6daed3f72895045965a3baede4c350e',
+                    S: '0x69ea748aff6e4c106d3a8ba597d8f134745b76f12dacb581318f9da07351511a',
+                },
+            ]
+            const isValid = await caver.validator.validateFeePayer(tx)
+            expect(isValid).to.be.false
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-VALIDATOR-053: should return false when feePayerSignatures is made by invalid role (not roleFeePayerKey)', async () => {
+            setStubResult(2, {
+                keyType: 4,
+                key: {
+                    threshold: 2,
+                    keys: [
+                        {
+                            weight: 1,
+                            key: {
+                                x: '0xc734b50ddb229be5e929fc4aa8080ae8240a802d23d3290e5e6156ce029b110e',
+                                y: '0x61a443ac3ffff164d1fb3617875f07641014cf17af6b7dc38e429fe838763712',
+                            },
+                        },
+                        {
+                            weight: 1,
+                            key: {
+                                x: '0x12d45f1cc56fbd6cd8fc877ab63b5092ac77db907a8a42c41dad3e98d7c64dfb',
+                                y: '0x8ef355a8d524eb444eba507f236309ce08370debaa136cb91b2f445774bff842',
+                            },
+                        },
+                    ],
+                },
+            })
+
+            const tx = caver.transaction.feeDelegatedValueTransfer.create(txObj)
+            const isValid = await caver.validator.validateFeePayer(tx)
+            expect(isValid).to.be.false
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-VALIDATOR-054: should return false when feePayerSignatures weight sum is less than threshold', async () => {
+            setStubResult()
+
+            const tx = caver.transaction.feeDelegatedValueTransfer.create(txObj)
+            tx.feePayerSignatures = txObj.signatures[0]
+            const isValid = await caver.validator.validateFeePayer(tx)
+            expect(isValid).to.be.false
+        }).timeout(100000)
+    })
+})
+
+describe('caver.validator.validateTransaction', () => {
+    const txObj = {
+        from: '0xf21460730845e3652aa3cc9bc13b345e4f53984a',
+        to: '0x59177716c34ac6e49e295a0e78e33522f14d61ee',
+        value: '0x1',
+        chainId: '0x7e3',
+        gasPrice: '0x5d21dba00',
+        nonce: '0x0',
+        gas: '0x2faf080',
+        signatures: [
+            '0x0fe9',
+            '0xecdec357060dbbb4bd3790e98b1733ec3a0b02b7e4ec7a5622f93cd9bee229fe',
+            '0x0a4a5e28753e7c1d999b286fb07933c5bf353079b8ed4d1ed509a838b48be02c',
+        ],
+    }
+    const fdTxObj = {
+        from: '0x07a9a76ef778676c3bd2b334edcf581db31a85e5',
+        feePayer: '0xb5db72925b1b6b79299a1a49ae226cd7861083ac',
+        to: '0x59177716c34ac6e49e295a0e78e33522f14d61ee',
+        value: '0x1',
+        chainId: '0x7e3',
+        gasPrice: '0x5d21dba00',
+        nonce: '0x0',
+        gas: '0x2faf080',
+        signatures: [
+            [
+                '0x0fea',
+                '0xcb2bbf04a12ec3a06163c30ce8782739ec4745a53e265aa9443f1c0d678bb871',
+                '0x7dd348c7d8fce6be36b661f116973d1c36cc92a389ad4a1a4053bd486060a083',
+            ],
+            [
+                '0x0fe9',
+                '0x6d5dfca992d6833c0da272578bc6ea941be45f44fb2fa114310ebe18d673ed52',
+                '0x4dc5cd7985c9ce7d44d46d65e65c995a4a8c97159a1eed8b2efb0510b981ab7c',
+            ],
+            [
+                '0x0fea',
+                '0x945151edf556fbcebf832092d4534b9a3b1f3d46f85bce09e7d7211070cb57be',
+                '0x1617c8f918f96970baddd12f240a9824eca6b29d91eb7333adacb987f2dcd8dd',
+            ],
+        ],
+        feePayerSignatures: [
+            [
+                '0x0fea',
+                '0x86fd17d788e89a6e0639395b3c0a04f916103debd6cbe639d6f4ff5034dde3e8',
+                '0x0795551c551d9096234c290689767f34f2d409c95166ab18d216dbc93845ba16',
+            ],
+            [
+                '0x0fea',
+                '0x0653b6d1cdb90462094b089ce8e2fed0e3b8ec2c44125965e1a5af286644c758',
+                '0x259b10e3bf594d48535fd0d95e15d095897c8d075c01dd56e7417d5943b0d53a',
+            ],
+            [
+                '0x0fe9',
+                '0xce8d051427adab10d1dc93de49123aeab18ba8aadedce0d57ef5b7fa451b1f4f',
+                '0x4fe2a845d92ff48abca3e1d59637fab5f4a4e3172d91772d9bfce60760edc506',
+            ],
+        ],
+    }
+
+    beforeEach(() => {
+        caver = new Caver(testRPCURL)
+    })
+
+    afterEach(() => {
+        sandbox.restore()
+    })
+
+    context('caver.validator.validateTransaction', () => {
+        it('CAVERJS-UNIT-VALIDATOR-055: should validate sender if basic tx', async () => {
+            const tx = caver.transaction.valueTransfer.create(txObj)
+
+            const validateSenderStub = sandbox.stub(caver.validator, 'validateSender')
+            validateSenderStub.resolves(true)
+
+            const isValid = await caver.validator.validateTransaction(tx)
+            expect(isValid).to.be.true
+            expect(validateSenderStub).to.have.been.callCount(1)
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-VALIDATOR-056: should validate sender if fee-delegated tx', async () => {
+            const tx = caver.transaction.feeDelegatedValueTransfer.create(fdTxObj)
+
+            const validateSenderStub = sandbox.stub(caver.validator, 'validateSender')
+            validateSenderStub.resolves(true)
+            const validateFeePayerStub = sandbox.stub(caver.validator, 'validateFeePayer')
+            validateFeePayerStub.resolves(true)
+
+            const isValid = await caver.validator.validateTransaction(tx)
+            expect(isValid).to.be.true
+            expect(validateSenderStub).to.have.been.callCount(1)
+            expect(validateFeePayerStub).to.have.been.callCount(1)
         }).timeout(100000)
     })
 })
