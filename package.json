@@ -6,7 +6,7 @@
   "scripts": {
     "test": "npm run build && npm run unitTest",
     "unitTest": " npm run txUnitTest && npm run utilUnitTest && npm run netUnitTest && npm run accountUnitTest && npm run serUnitTest && npm run walletUnitTest && npm run etcUnitTest && npm run validatorUnitTest",
-    "fullTest": " npm run unitTest && npm run rpcTest && npm run txOldTest && npm run etcTest && npm run accountKeyTest && npm run kctTest && npm run intTest",
+    "fullTest": " npm run unitTest && npm run rpcTest && npm run txTest && npm run etcTest && npm run accountKeyTest && npm run kctTest && npm run intTest",
     "build-all": "gulp all",
     "build": "./node_modules/.bin/webpack --mode production",
     "lint": "./node_modules/.bin/eslint './**/*.js'",
