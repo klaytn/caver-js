@@ -982,13 +982,14 @@ const hashMessage = data => {
  *
  * @method recoverPublicKey
  * @param {string} message The raw message string. If this message is hased with Klaytn specific prefix, the third parameter should be passed as `true`.
- * @param {SignatureData} signature An instance of `SignatureData`.
+ * @param {SignatureData|Array.<string>|object} signature An instance of `SignatureData`, `[v, r, s]` or `{v, r, s}`.
  * @param {boolean} [isHashed] (optional, default: `false`) If the `isHashed` is true, the given message will NOT automatically be prefixed with "\x19Klaytn Signed Message:\n" + message.length + message, and be assumed as already prefixed.
  * @return {string}
  */
 const recoverPublicKey = (message, signature, isHashed = false) => {
     if (!isHashed) message = hashMessage(message)
 
+    if (_.isArray(signature)) signature = { v: signature[0], r: signature[1], s: signature[2] }
     const vrs = { v: parseInt(signature.v.slice(2), 16), r: signature.r.slice(2), s: signature.s.slice(2) }
 
     const ecPublicKey = secp256k1.recoverPubKey(Buffer.from(message.slice(2), 'hex'), vrs, vrs.v < 2 ? vrs.v : 1 - (vrs.v % 2))
@@ -1005,7 +1006,7 @@ const recoverPublicKey = (message, signature, isHashed = false) => {
  *
  * @method recover
  * @param {string} message The raw message string. If this message is hased with Klaytn specific prefix, the third parameter should be passed as `true`.
- * @param {SignatureData} signature An instance of `SignatureData`.
+ * @param {SignatureData|Array.<string>|object} signature An instance of `SignatureData`, `[v, r, s]` or `{v, r, s}`.
  * @param {boolean} [isHashed] (optional, default: `false`) If the `isHashed` is true, the given message will NOT automatically be prefixed with "\x19Klaytn Signed Message:\n" + message.length + message, and be assumed as already prefixed.
  * @return {string}
  */
@@ -1014,7 +1015,7 @@ const recover = (message, signature, isHashed = false) => {
         message = hashMessage(message)
     }
 
-    return Account.recover(message, Account.encodeSignature(signature.encode())).toLowerCase()
+    return Account.recover(message, Account.encodeSignature(resolveSignature(signature))).toLowerCase()
 }
 
 /**
