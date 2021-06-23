@@ -351,7 +351,7 @@ ABICoder.prototype.encodeFunctionCall = function(jsonInterface, params) {
 }
 
 /**
- * Decodes a function call from its abi object of a function or function abi string and returns parameters.
+ * Decodes a function call from its abi object of a function and returns parameters.
  * If the function signature of the `abi` passed as a parameter does not match the function signature of the `functionCall`, an error is returned.
  *
  * @example
@@ -373,9 +373,9 @@ ABICoder.prototype.encodeFunctionCall = function(jsonInterface, params) {
  * caver.abi.decodeFunctionCall(abi, functionCall)
  *
  * @method decodeFunctionCall
- * @param {Array} abi The abi object of a function.
+ * @param {object} abi The abi object of a function.
  * @param {string} functionCall The encoded function call string.
- * @return {Array} An array of plain params
+ * @return {object} An object which includes plain params. You can use `result[0]` as it is provided to be accessed like an array in the order of the parameters.
  */
 ABICoder.prototype.decodeFunctionCall = function(abi, functionCall) {
     functionCall = utils.addHexPrefix(functionCall)
@@ -416,7 +416,7 @@ ABICoder.prototype.decodeParameter = function(type, bytes) {
  * @method decodeParameters
  * @param {Array} outputs
  * @param {String} bytes
- * @return {Array} array of plain params
+ * @return {object} An object which includes plain params. You can use `result[0]` as it is provided to be accessed like an array in the order of the parameters.
  */
 ABICoder.prototype.decodeParameters = function(outputs, bytes) {
     return this.decodeParametersWith(outputs, bytes, false)

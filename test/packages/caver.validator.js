@@ -53,7 +53,7 @@ describe('caver.validator.validateSignedMessage', () => {
         const getAccountKeyResult = { keyType: 1, key: {} }
 
         const message = 'Some Message'
-        const hasedMessage = '0xa4b1069c1000981f4fdca0d62302dfff77c2d0bc17f283d961e2dc5961105b18'
+        const hashedMessage = '0xa4b1069c1000981f4fdca0d62302dfff77c2d0bc17f283d961e2dc5961105b18'
 
         const signature = [
             '0x1b',
@@ -76,7 +76,7 @@ describe('caver.validator.validateSignedMessage', () => {
 
             const keyring = caver.wallet.keyring.create(address, privateKey)
 
-            const ret = await caver.validator.validateSignedMessage(hasedMessage, signature, keyring.address, true)
+            const ret = await caver.validator.validateSignedMessage(hashedMessage, signature, keyring.address, true)
             expect(ret).to.be.true
         }).timeout(100000)
 
@@ -130,7 +130,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }
 
         const message = 'Some Message'
-        const hasedMessage = '0xa4b1069c1000981f4fdca0d62302dfff77c2d0bc17f283d961e2dc5961105b18'
+        const hashedMessage = '0xa4b1069c1000981f4fdca0d62302dfff77c2d0bc17f283d961e2dc5961105b18'
 
         const signature = [
             '0x1c',
@@ -153,7 +153,7 @@ describe('caver.validator.validateSignedMessage', () => {
 
             const keyring = caver.wallet.keyring.create(address, privateKey)
 
-            const ret = await caver.validator.validateSignedMessage(hasedMessage, signature, keyring.address, true)
+            const ret = await caver.validator.validateSignedMessage(hashedMessage, signature, keyring.address, true)
             expect(ret).to.be.true
         }).timeout(100000)
 
@@ -255,7 +255,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }
 
         const message = 'Some Message'
-        const hasedMessage = '0xa4b1069c1000981f4fdca0d62302dfff77c2d0bc17f283d961e2dc5961105b18'
+        const hashedMessage = '0xa4b1069c1000981f4fdca0d62302dfff77c2d0bc17f283d961e2dc5961105b18'
 
         const signatures = [
             [
@@ -291,7 +291,7 @@ describe('caver.validator.validateSignedMessage', () => {
 
             const keyring = caver.wallet.keyring.create(address, privateKeys)
 
-            const ret = await caver.validator.validateSignedMessage(hasedMessage, signatures, keyring.address, true)
+            const ret = await caver.validator.validateSignedMessage(hashedMessage, signatures, keyring.address, true)
             expect(ret).to.be.true
         }).timeout(100000)
 
@@ -472,7 +472,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }
 
         const message = 'Some Message'
-        const hasedMessage = '0xa4b1069c1000981f4fdca0d62302dfff77c2d0bc17f283d961e2dc5961105b18'
+        const hashedMessage = '0xa4b1069c1000981f4fdca0d62302dfff77c2d0bc17f283d961e2dc5961105b18'
 
         // signatures with roleTransactionKey
         const signatures = [
@@ -532,7 +532,7 @@ describe('caver.validator.validateSignedMessage', () => {
 
             const keyring = caver.wallet.keyring.create(address, privateKeys)
 
-            const ret = await caver.validator.validateSignedMessage(hasedMessage, signatures, keyring.address, true)
+            const ret = await caver.validator.validateSignedMessage(hashedMessage, signatures, keyring.address, true)
             expect(ret).to.be.true
         }).timeout(100000)
 
