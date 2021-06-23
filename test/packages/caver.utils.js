@@ -2045,6 +2045,28 @@ describe('caver.utils.recover', () => {
         const result = caver.utils.recover(signed.messageHash, signed.signatures[0], true)
         expect(result).to.equal(keyring.address)
     })
+
+    it('CAVERJS-UNIT-ETC-387: return recovered address when signature is an array', () => {
+        const message = 'Some Message'
+
+        const result = caver.utils.recover(message, [
+            '0x1b',
+            '0x8213e560e7bbe1f2e28fd69cbbb41c9108b84c98cd7c2c88d3c8e3549fd6ab10',
+            '0x3ca40c9e20c1525348d734a6724db152b9244bff6e0ff0c2b811d61d8f874f00',
+        ])
+        expect(result.toLowerCase()).to.equal('0xa84a1ce657e9d5b383cece6f4ba365e23fa234dd')
+    })
+
+    it('CAVERJS-UNIT-ETC-388: return recovered address when signature is an object', () => {
+        const message = 'Some Message'
+
+        const result = caver.utils.recover(message, {
+            v: '0x1b',
+            r: '0x8213e560e7bbe1f2e28fd69cbbb41c9108b84c98cd7c2c88d3c8e3549fd6ab10',
+            s: '0x3ca40c9e20c1525348d734a6724db152b9244bff6e0ff0c2b811d61d8f874f00',
+        })
+        expect(result.toLowerCase()).to.equal('0xa84a1ce657e9d5b383cece6f4ba365e23fa234dd')
+    })
 })
 
 describe('caver.utils.recoverPublicKey', () => {
@@ -2064,6 +2086,28 @@ describe('caver.utils.recoverPublicKey', () => {
 
         const result = caver.utils.recoverPublicKey(signed.messageHash, signed.signatures[0], true)
         expect(result).to.equal(keyring.getPublicKey())
+    })
+
+    it('CAVERJS-UNIT-ETC-385: return recovered public key when signature is an array', () => {
+        const message = 'Some Message'
+
+        const result = caver.utils.recoverPublicKey(message, [
+            '0x1b',
+            '0x8213e560e7bbe1f2e28fd69cbbb41c9108b84c98cd7c2c88d3c8e3549fd6ab10',
+            '0x3ca40c9e20c1525348d734a6724db152b9244bff6e0ff0c2b811d61d8f874f00',
+        ])
+        expect(result.toLowerCase()).to.equal('0xb5df4d5e6b4ee7a136460b911a69030fdd42c18ed067bcc2e25eda1b851314fad994c5fe946aad01ca2e348d4ff3094960661a8bc095f358538af54aeea48ff3')
+    })
+
+    it('CAVERJS-UNIT-ETC-386: return recovered public key when signature is an object', () => {
+        const message = 'Some Message'
+
+        const result = caver.utils.recoverPublicKey(message, {
+            v: '0x1b',
+            r: '0x8213e560e7bbe1f2e28fd69cbbb41c9108b84c98cd7c2c88d3c8e3549fd6ab10',
+            s: '0x3ca40c9e20c1525348d734a6724db152b9244bff6e0ff0c2b811d61d8f874f00',
+        })
+        expect(result.toLowerCase()).to.equal('0xb5df4d5e6b4ee7a136460b911a69030fdd42c18ed067bcc2e25eda1b851314fad994c5fe946aad01ca2e348d4ff3094960661a8bc095f358538af54aeea48ff3')
     })
 })
 
