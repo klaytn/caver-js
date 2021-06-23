@@ -57,10 +57,10 @@ class Validator {
     }
 
     /**
-     * Validate a transaction.
-     * This function will compare public keys in account key information from Klaytn and public key recovered from `signatures`.
-     * And if transaction has `feePayerSignatures`, this function will compare recovered public keys from `feePayerSignatures` and the public key of the fee payer.
-     *
+     * Validates a transaction.
+     * This function compares the public keys of the account key of the Klaytn account with the public keys recovered from `signatures`.
+     * If the transaction is fee-delegated with the `feePayerSignatures` variable inside, this function compares the public keys recovered from `feePayerSignatures` with the public keys of the fee payer.
+     * 
      * @example
      * const tx = caver.transaction.valueTransfer.create({...})
      * const isValid = caver.validator.validateTransaction(tx)
@@ -80,9 +80,9 @@ class Validator {
     }
 
     /**
-     * Validate the signatures of the sender in the transaction.
-     * This function will compare public keys in account key information from Klaytn and public key recovered from `signatures`.
-     *
+     * Validates the sender of the transaction.
+     * This function compares the public keys of the account key of the Klaytn account with the public keys recovered from `signatures`.
+     * 
      * @example
      * const tx = caver.transaction.valueTransfer.create({...})
      * const isValid = caver.validator.validateSender(tx)
@@ -105,9 +105,9 @@ class Validator {
     }
 
     /**
-     * Validate the signatures of the fee payer in the transaction.
-     * This function will compare public keys in account key information from Klaytn and public key recovered from `feePayerSignatures`.
-     *
+     * Validates a fee payer in the transaction.
+     * This function compares the public keys of the account key of the fee payer with the public keys recovered from `feePayerSignatures`.
+     * 
      * @example
      * const tx = caver.transaction.feeDelegatedValueTransfer.create({...})
      * const isValid = caver.validator.validateFeePayer(tx)

@@ -54,7 +54,7 @@ const AbstractFeeDelegatedTransaction = require('./transactionTypes/abstractFeeD
  * const txObject = await caver.transaction.getTransactionByHash('0x{transaction hash}')
  *
  * @method getTransactionByHash
- * @param  {string}  transactionHash
+ * @param  {string} transactionHash The transaction hash string to query from Klaytn.
  * @return {AbstractTransaction}
  */
 async function getTransactionByHash(transactionHash) {
@@ -148,6 +148,7 @@ async function getTransactionByHash(transactionHash) {
  * const publicKey = caver.transaction.recoverPublicKeys('0x{RLP-encoded transaction string}')
  *
  * @method recoverPublicKeys
+ * @param  {string} rawTx The RLP-encoded transaction string to recover public keys from `signatures`.
  * @return {Array.<string>}
  */
 function recoverPublicKeys(rawTx) {
@@ -163,6 +164,7 @@ function recoverPublicKeys(rawTx) {
  * const publicKey = caver.transaction.recoverFeePayerPublicKeys()
  *
  * @method recoverFeePayerPublicKeys
+ * @param  {string} rawTx The RLP-encoded transaction string to recover public keys from `feePayerSignatures`.
  * @return {Array.<string>}
  */
 function recoverFeePayerPublicKeys(rawTx) {
