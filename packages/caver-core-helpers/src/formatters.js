@@ -148,37 +148,41 @@ const inputCallFormatter = function(options) {
  * @param {Object} options
  * @returns object
  */
-const inputTransactionFormatter = function(options) {
-    options = _txInputFormatter(options)
+const inputTransactionFormatter = function(options) {    
+    // Only transaction objects prior to Common Architecture are formatted.
+    // After the Common Architecture, the transaction does all the formatting in the setter when the instance is already created.
+    if (!options.type.includes('TxType')) {
+        options = _txInputFormatter(options)
 
-    // If senderRawTransaction' exist in transaction, it means object is fee payer transaction format like below
-    // { senderRawTransaction: '', feePayer: '' }
-    if (options.senderRawTransaction) {
-        if (options.feePayer === undefined) {
-            throw new Error('The "feePayer" field must be defined for signing with feePayer!')
+        // If senderRawTransaction' exist in transaction, it means object is fee payer transaction format like below
+        // { senderRawTransaction: '', feePayer: '' }
+        if (options.senderRawTransaction) {
+            if (options.feePayer === undefined) {
+                throw new Error('The "feePayer" field must be defined for signing with feePayer!')
+            }
+            options.feePayer = inputAddressFormatter(options.feePayer)
+            return options
         }
-        options.feePayer = inputAddressFormatter(options.feePayer)
-        return options
-    }
-
-    // check from, only if not number, or object
-    if (!_.isNumber(options.from) && !_.isObject(options.from)) {
-        options.from = options.from || (this ? this.defaultAccount : null)
-
-        if (!options.from && !_.isNumber(options.from)) {
-            throw new Error('The send transactions "from" field must be defined!')
+        
+        // check from, only if not number, or object
+        if (!_.isNumber(options.from) && !_.isObject(options.from)) {
+            options.from = options.from || (this ? this.defaultAccount : null)
+            
+            if (!options.from && !_.isNumber(options.from)) {
+                throw new Error('The send transactions "from" field must be defined!')
+            }
+            
+            options.from = inputAddressFormatter(options.from)
         }
-
-        options.from = inputAddressFormatter(options.from)
-    }
-
-    if (options.data) {
-        options.data = utils.addHexPrefix(options.data)
-    }
-
-    const err = validateParams(options)
-    if (err) {
-        throw err
+        
+        if (options.data) {
+            options.data = utils.addHexPrefix(options.data)
+        }
+        
+        const err = validateParams(options)
+        if (err) {
+            throw err
+        }
     }
 
     // Set typeInt value in object
