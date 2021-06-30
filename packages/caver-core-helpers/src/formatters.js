@@ -149,36 +149,40 @@ const inputCallFormatter = function(options) {
  * @returns object
  */
 const inputTransactionFormatter = function(options) {
-    options = _txInputFormatter(options)
+    // Only transaction objects prior to Common Architecture are formatted.
+    // After the Common Architecture, the transaction does all the formatting in the setter when the instance is already created.
+    if (!options.type.includes('TxType')) {
+        options = _txInputFormatter(options)
 
-    // If senderRawTransaction' exist in transaction, it means object is fee payer transaction format like below
-    // { senderRawTransaction: '', feePayer: '' }
-    if (options.senderRawTransaction) {
-        if (options.feePayer === undefined) {
-            throw new Error('The "feePayer" field must be defined for signing with feePayer!')
-        }
-        options.feePayer = inputAddressFormatter(options.feePayer)
-        return options
-    }
-
-    // check from, only if not number, or object
-    if (!_.isNumber(options.from) && !_.isObject(options.from)) {
-        options.from = options.from || (this ? this.defaultAccount : null)
-
-        if (!options.from && !_.isNumber(options.from)) {
-            throw new Error('The send transactions "from" field must be defined!')
+        // If senderRawTransaction' exist in transaction, it means object is fee payer transaction format like below
+        // { senderRawTransaction: '', feePayer: '' }
+        if (options.senderRawTransaction) {
+            if (options.feePayer === undefined) {
+                throw new Error('The "feePayer" field must be defined for signing with feePayer!')
+            }
+            options.feePayer = inputAddressFormatter(options.feePayer)
+            return options
         }
 
-        options.from = inputAddressFormatter(options.from)
-    }
+        // check from, only if not number, or object
+        if (!_.isNumber(options.from) && !_.isObject(options.from)) {
+            options.from = options.from || (this ? this.defaultAccount : null)
 
-    if (options.data) {
-        options.data = utils.addHexPrefix(options.data)
-    }
+            if (!options.from && !_.isNumber(options.from)) {
+                throw new Error('The send transactions "from" field must be defined!')
+            }
 
-    const err = validateParams(options)
-    if (err) {
-        throw err
+            options.from = inputAddressFormatter(options.from)
+        }
+
+        if (options.data) {
+            options.data = utils.addHexPrefix(options.data)
+        }
+
+        const err = validateParams(options)
+        if (err) {
+            throw err
+        }
     }
 
     // Set typeInt value in object
@@ -523,6 +527,19 @@ const outputPostFormatter = function(post) {
     return post
 }
 
+/**
+ * Formats the output of a voting power.
+ * If current governing mode does not support voting power, return an error.
+ *
+ * @method outputVotingPowerFormatter
+ * @param {string}
+ * @returns {string|Error}
+ */
+const outputVotingPowerFormatter = function(options) {
+    if (_.isString(options)) options = new Error(options)
+    return options
+}
+
 const inputAddressFormatter = function(address) {
     const iban = new utils.Iban(address)
     if (iban.isValid() && iban.isDirect()) {
@@ -573,6 +590,7 @@ module.exports = {
     outputLogFormatter: outputLogFormatter,
     outputPostFormatter: outputPostFormatter,
     outputSyncingFormatter: outputSyncingFormatter,
+    outputVotingPowerFormatter: outputVotingPowerFormatter,
     // moved from util
     toChecksumAddress: utils.toChecksumAddress,
     hexToNumber: utils.hexToNumber,

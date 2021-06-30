@@ -19,6 +19,7 @@
 const _ = require('lodash')
 const RLP = require('eth-lib/lib/rlp')
 const Bytes = require('eth-lib/lib/bytes')
+const Hash = require('eth-lib/lib/hash')
 const AbstractTransaction = require('../abstractTransaction')
 const { TX_TYPE_STRING } = require('../../transactionHelper/transactionHelper')
 const utils = require('../../../../caver-utils/src')
@@ -204,6 +205,31 @@ class LegacyTransaction extends AbstractTransaction {
      */
     getCommonRLPEncodingForSignature() {
         return this.getRLPEncodingForSignature()
+    }
+
+    /**
+     * Recovers the public key strings from `signatures` field in transaction object.
+     * If you want to derive an address from public key, please use `caver.utils.publicKeyToAddress`.
+     *
+     * @example
+     * const publicKey = tx.recoverPublicKeys()
+     *
+     * @method recoverPublicKeys
+     * @return {Array.<string>}
+     */
+    recoverPublicKeys() {
+        if (utils.isEmptySig(this.signatures)) throw new Error(`Failed to recover public key from signatures: signatures is empty.`)
+
+        const recovery = Bytes.toNumber(this.signatures.v)
+        const chainId = recovery < 35 ? Bytes.fromNat('0x1') : Bytes.fromNumber((recovery - 35) >> 1)
+        if (!this.chainId) this.chainId = chainId
+        const signingDataHex = this.getRLPEncodingForSignature()
+        const hasedSigningData = Hash.keccak256(signingDataHex)
+
+        const publicKeys = []
+        publicKeys.push(utils.recoverPublicKey(hasedSigningData, this.signatures, true))
+
+        return publicKeys
     }
 }
 

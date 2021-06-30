@@ -770,4 +770,49 @@ describe('TxTypeSmartContractExecution', () => {
             expect(getChainIdSpy).to.have.been.calledOnce
         }).timeout(200000)
     })
+
+    context('smartContractExecution.recoverPublicKeys', () => {
+        const expectedPublicKeyArray = [
+            '0x8bb6aaeb2d96d024754d3b50babf116cece68977acbe8ba6a66f14d5217c60d96af020a0568661e7c72e753e80efe084a3aed9f9ac87bf44d09ce67aad3d4e01',
+            '0xc7751c794337a93e4db041fb5401c2c816cf0a099d8fd4b1f3f555aab5dfead2417521bb0c03d8637f350df15ef6a6cb3cdb806bd9d10bc71982dd03ff5d9ddd',
+            '0x3919091ba17c106dd034af508cfe00b963d173dffab2c7702890e25a96d107ca1bb4f148ee1984751e57d2435468558193ce84ab9a7731b842e9672e40dc0f22',
+        ]
+
+        it('CAVERJS-UNIT-TRANSACTION-426: should return public key string recovered from signatures in SmartContractExecution', async () => {
+            const tx = caver.transaction.smartContractExecution.create({
+                from: '0xf21460730845e3652aa3cc9bc13b345e4f53984a',
+                to: '0x59177716c34ac6e49e295a0e78e33522f14d61ee',
+                value: '0x1',
+                chainId: '0x7e3',
+                gasPrice: '0x5d21dba00',
+                nonce: '0x0',
+                gas: '0x2faf080',
+                input:
+                    '0xd95aced7000000000000000000000000640a4c021cb5889fa1d37378f04a36ad452862240000000000000000000000000000000000000000000000000000000000000001',
+                signatures: [
+                    [
+                        '0x0fe9',
+                        '0xd544476d9d0cadad0f5d6aea6f487d56299166af7b0c372459674a6f05ffcdd7',
+                        '0x77842050ad1b259b3ba53165784ec38ac0bfc5e1c4efb7a5cc0524cfc5e62ef2',
+                    ],
+                    [
+                        '0x0fe9',
+                        '0x10eae9aac3bb49e5ff86e69cf06ae8694f94660317adf8f43f906ad52072a5f6',
+                        '0x212130f92da5e832ac94565f245930b58aeed65775339b4aaae091971741c6e5',
+                    ],
+                    [
+                        '0x0fe9',
+                        '0xc63d6be7f19c43d529d90dfe317db3cc5bee27f54c9141ae86e771b06756f528',
+                        '0x3bf1621074fdad4c37c7575a76bde0e937d8e72db914df87080d35763dea4567',
+                    ],
+                ],
+            })
+            const publicKeys = tx.recoverPublicKeys()
+
+            expect(publicKeys.length).to.equal(expectedPublicKeyArray.length)
+            for (let i = 0; i < publicKeys.length; i++) {
+                expect(publicKeys[i].toLowerCase()).to.equal(expectedPublicKeyArray[i].toLowerCase())
+            }
+        }).timeout(200000)
+    })
 })

@@ -34,6 +34,7 @@ const MethodBase = require('../../caver-core-method')
 const utils = require('../../caver-utils')
 
 const AbstractTransaction = require('../../caver-transaction/src/transactionTypes/abstractTransaction')
+const Validator = require('../../caver-validator')
 
 class KlayRPC {
     constructor(...args) {
@@ -88,11 +89,18 @@ class KlayRPC {
                 params: 2,
                 inputFormatter: [formatters.inputAddressFormatter, formatters.inputDefaultBlockNumberFormatter],
             }),
+            new Method({
+                name: 'getTransactionByHash',
+                call: 'klay_getTransactionByHash',
+                params: 1,
+            }),
         ]
         AbstractTransaction._klaytnCall = {}
+        Validator._klaytnCall = {}
         _.each(_klaytnCall, function(method) {
             method = new Method(method)
             method.attachToObject(AbstractTransaction._klaytnCall)
+            method.attachToObject(Validator._klaytnCall)
             method.setRequestManager(_this._requestManager)
         })
 

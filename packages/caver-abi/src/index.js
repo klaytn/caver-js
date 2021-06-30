@@ -342,11 +342,60 @@ ABICoder.prototype.formatParam = function(type, param) {
  *
  * @method encodeFunctionCall
  * @param {Array} jsonInterface
- * @param {Array} params
+ * @param {Array} [params]
  * @return {String} The encoded ABI for this function call
  */
 ABICoder.prototype.encodeFunctionCall = function(jsonInterface, params) {
+    params = params || []
     return this.encodeFunctionSignature(jsonInterface) + this.encodeParameters(jsonInterface.inputs, params).replace('0x', '')
+}
+
+/**
+ * Decodes a function call from its abi object of a function and returns parameters.
+ * If the function signature of the `abi` passed as a parameter does not match the function signature of the `functionCall`, an error is returned.
+ *
+ * @example
+ * const abi = {
+ *    name: 'myMethod',
+ *    type: 'function',
+ *    inputs: [
+ *        {
+ *            type: 'uint256',
+ *           name: 'myNumber',
+ *       },
+ *       {
+ *           type: 'string',
+ *           name: 'mystring',
+ *       },
+ *   ],
+ * }
+ * const functionCall = '0x24ef0...'
+ * caver.abi.decodeFunctionCall(abi, functionCall)
+ *
+ * @method decodeFunctionCall
+ * @param {object} abi The abi object of a function.
+ * @param {string} functionCall The encoded function call string.
+ * @return {object} An object which includes plain params. You can use `result[0]` as it is provided to be accessed like an array in the order of the parameters.
+ */
+ABICoder.prototype.decodeFunctionCall = function(abi, functionCall) {
+    functionCall = utils.addHexPrefix(functionCall)
+
+    if (!_.isObject(abi) || _.isArray(abi))
+        throw new Error(
+            `Invalid abi parameter type: To decode function call, you need to pass an abi object of the function as a first parameter.`
+        )
+    if (!abi.name || !abi.inputs)
+        throw new Error(`Insufficient info in abi object: The function name and inputs must be defined inside the abi function object.`)
+
+    const funcSig = this.encodeFunctionSignature(abi)
+    const extractFuncSig = functionCall.slice(0, funcSig.length)
+
+    if (funcSig !== extractFuncSig)
+        throw new Error(
+            `Invalid function signature: The function signature of the abi as a parameter and the function signatures extracted from the function call string do not match.`
+        )
+
+    return this.decodeParameters(abi.inputs, `0x${functionCall.slice(funcSig.length)}`)
 }
 
 /**
@@ -367,7 +416,7 @@ ABICoder.prototype.decodeParameter = function(type, bytes) {
  * @method decodeParameters
  * @param {Array} outputs
  * @param {String} bytes
- * @return {Array} array of plain params
+ * @return {object} An object which includes plain params. You can use `result[0]` as it is provided to be accessed like an array in the order of the parameters.
  */
 ABICoder.prototype.decodeParameters = function(outputs, bytes) {
     return this.decodeParametersWith(outputs, bytes, false)

@@ -27,11 +27,13 @@
 
 const _ = require('lodash')
 const ethjsUnit = require('ethjs-unit')
+const Account = require('eth-lib/lib/account')
 const utils = require('./utils.js')
 const soliditySha3 = require('./soliditySha3.js')
 const randomHex = require('../randomhex')
 const promiEvent = require('../promievent')
 const Iban = require('../iban')
+const SignatureData = require('../../caver-wallet/src/keyring/signatureData')
 
 /**
  * Fires an error in an event emitter and callback and returns the eventemitter
@@ -456,6 +458,21 @@ const stripHexPrefix = function(str) {
     return isHexPrefixed(str) ? str.slice(2) : str
 }
 
+/**
+ * Decodes a raw signature data that composed of R(32 byte) + S(32 byte) + V(1byte).
+ *
+ * @example
+ * const decoded = caver.utils.decodeSignature('0xb9146...')
+ *
+ * @method decodeSignature
+ * @param {string} signature The signature string to decode. It composed of R(32 byte) + S(32 byte) + V(1byte).
+ * @return {SignatureData}
+ */
+const decodeSignature = signature => {
+    const ret = Account.decodeSignature(signature).map(sig => utils.makeEven(utils.trimLeadingZero(sig)))
+    return new SignatureData(ret)
+}
+
 module.exports = {
     _fireError: _fireError,
     _jsonInterfaceMethodToString: _jsonInterfaceMethodToString,
@@ -568,4 +585,8 @@ module.exports = {
 
     hashMessage: utils.hashMessage,
     recover: utils.recover,
+    recoverPublicKey: utils.recoverPublicKey,
+    publicKeyToAddress: utils.publicKeyToAddress,
+
+    decodeSignature: decodeSignature,
 }

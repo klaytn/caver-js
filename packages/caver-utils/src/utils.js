@@ -972,12 +972,76 @@ const hashMessage = data => {
     return Hash.keccak256(klayMessage)
 }
 
-const recover = (message, signature, preFixed = false) => {
-    if (!preFixed) {
+/**
+ * Recovers the public key that was used to sign the given data.
+ *
+ * @example
+ * const message = 'Some data'
+ * const signature = { v: '0x1c', r: '0xd0b8d...', s: '0x5472e...' } // You can get a signature via `keyring.signMessage(...).signatures[0]`.
+ * const recoveredPublicKey = caver.utils.recoverPublicKey(message, signature)
+ *
+ * @method recoverPublicKey
+ * @param {string} message The raw message string. If this message is hased with Klaytn specific prefix, the third parameter should be passed as `true`.
+ * @param {SignatureData|Array.<string>|object} signature An instance of `SignatureData`, `[v, r, s]` or `{v, r, s}`.
+ * @param {boolean} [isHashed] (optional, default: `false`) If the `isHashed` is true, the given message will NOT automatically be prefixed with "\x19Klaytn Signed Message:\n" + message.length + message, and be assumed as already prefixed.
+ * @return {string}
+ */
+const recoverPublicKey = (message, signature, isHashed = false) => {
+    if (!isHashed) message = hashMessage(message)
+
+    if (_.isArray(signature)) signature = { v: signature[0], r: signature[1], s: signature[2] }
+    const vrs = { v: parseInt(signature.v.slice(2), 16), r: signature.r.slice(2), s: signature.s.slice(2) }
+
+    const ecPublicKey = secp256k1.recoverPubKey(Buffer.from(message.slice(2), 'hex'), vrs, vrs.v < 2 ? vrs.v : 1 - (vrs.v % 2))
+    return `0x${ecPublicKey.encode('hex', false).slice(2)}`
+}
+
+/**
+ * Recovers the Klaytn address that was used to sign the given data.
+ *
+ * @example
+ * const message = 'Some data'
+ * const signature = { v: '0x1c', r: '0xd0b8d...', s: '0x5472e...' } // You can get a signature via `keyring.signMessage(...).signatures[0]`.
+ * const recoveredPublicKey = caver.utils.recover(message, signature)
+ *
+ * @method recover
+ * @param {string} message The raw message string. If this message is hased with Klaytn specific prefix, the third parameter should be passed as `true`.
+ * @param {SignatureData|Array.<string>|object} signature An instance of `SignatureData`, `[v, r, s]` or `{v, r, s}`.
+ * @param {boolean} [isHashed] (optional, default: `false`) If the `isHashed` is true, the given message will NOT automatically be prefixed with "\x19Klaytn Signed Message:\n" + message.length + message, and be assumed as already prefixed.
+ * @return {string}
+ */
+const recover = (message, signature, isHashed = false) => {
+    if (!isHashed) {
         message = hashMessage(message)
     }
 
-    return Account.recover(message, Account.encodeSignature(signature.encode())).toLowerCase()
+    return Account.recover(message, Account.encodeSignature(resolveSignature(signature))).toLowerCase()
+}
+
+/**
+ * Returns an address which is derived by a public key.
+ * This function simply converts the public key string into address form by hashing it.
+ * It has nothing to do with the actual account in the Klaytn.
+ *
+ * @example
+ * const address = caver.utils.publicKeyToAddress('0x{public key}')
+ *
+ * @method publicKeyToAddress
+ * @param {string} publicKey The public key string to get the address.
+ * @return {string}
+ */
+const publicKeyToAddress = publicKey => {
+    publicKey = publicKey.slice(0, 2) === '0x' ? publicKey : `0x${publicKey}`
+
+    if (isCompressedPublicKey(publicKey)) publicKey = decompressPublicKey(publicKey)
+
+    const publicHash = Hash.keccak256(publicKey)
+    const address = `0x${publicHash.slice(-40)}`
+
+    const addressHash = Hash.keccak256s(address.slice(2))
+    let checksumAddress = '0x'
+    for (let i = 0; i < 40; i++) checksumAddress += parseInt(addressHash[i + 2], 16) > 7 ? address[i + 2].toUpperCase() : address[i + 2]
+    return checksumAddress
 }
 
 module.exports = {
@@ -1040,4 +1104,6 @@ module.exports = {
 
     hashMessage: hashMessage,
     recover: recover,
+    recoverPublicKey: recoverPublicKey,
+    publicKeyToAddress: publicKeyToAddress,
 }

@@ -1041,4 +1041,46 @@ describe('TxTypeAccountUpdate', () => {
             expect(getChainIdSpy).to.have.been.callCount(Object.values(expectedValues).length)
         }).timeout(200000)
     })
+
+    context('accountUpdate.recoverPublicKeys', () => {
+        const expectedPublicKeyArray = [
+            '0x8bb6aaeb2d96d024754d3b50babf116cece68977acbe8ba6a66f14d5217c60d96af020a0568661e7c72e753e80efe084a3aed9f9ac87bf44d09ce67aad3d4e01',
+            '0xc7751c794337a93e4db041fb5401c2c816cf0a099d8fd4b1f3f555aab5dfead2417521bb0c03d8637f350df15ef6a6cb3cdb806bd9d10bc71982dd03ff5d9ddd',
+            '0x3919091ba17c106dd034af508cfe00b963d173dffab2c7702890e25a96d107ca1bb4f148ee1984751e57d2435468558193ce84ab9a7731b842e9672e40dc0f22',
+        ]
+
+        it('CAVERJS-UNIT-TRANSACTION-424: should return public key string recovered from signatures in AccountUpdate', async () => {
+            const tx = caver.transaction.accountUpdate.create({
+                from: '0xf21460730845e3652aa3cc9bc13b345e4f53984a',
+                chainId: '0x7e3',
+                gasPrice: '0x5d21dba00',
+                nonce: '0x0',
+                gas: '0x2faf080',
+                account: caver.account.createWithAccountKeyLegacy('0xf21460730845e3652aa3cc9bc13b345e4f53984a'),
+                signatures: [
+                    [
+                        '0x0fea',
+                        '0x84299d74e8b491d7272d86b5ff4f4f4605830406befd360c90adaae56af99359',
+                        '0x196240cda43810ba4c19dd865435b991a9c16a91859357777594fb9e77d02d01',
+                    ],
+                    [
+                        '0x0fea',
+                        '0xaf27d2163b85e3de5f8b7fee56df509be231d3935890515bfe783e2f38c1c092',
+                        '0x1b5d6ff80bd3964ce311c658cdeac0e43a2171a87bb287695c9be2b3517651e9',
+                    ],
+                    [
+                        '0x0fea',
+                        '0xf17ec890c3eeae90702f811b4bb880c6631913bb307207bf0bccbcdc229f571a',
+                        '0x6f2f203218cc8ddbab785cd59dec47105c7919ab4192295c8307c9a0701605ed',
+                    ],
+                ],
+            })
+            const publicKeys = tx.recoverPublicKeys()
+
+            expect(publicKeys.length).to.equal(expectedPublicKeyArray.length)
+            for (let i = 0; i < publicKeys.length; i++) {
+                expect(publicKeys[i].toLowerCase()).to.equal(expectedPublicKeyArray[i].toLowerCase())
+            }
+        }).timeout(200000)
+    })
 })

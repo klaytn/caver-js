@@ -633,6 +633,34 @@ Contract.prototype._encodeMethodABI = function _encodeMethodABI() {
 }
 
 /**
+ * Decodes a function call from its abi object of a function or function abi string and returns parameters.
+ *
+ * @example
+ * const abi = [...]
+ * const contract = caver.contract.create(abi)
+ * const decodedFunctionCall = contract.decodeFunctionCall('0x{encoded function call}')
+ *
+ * @method decodeFunctionCall
+ * @param {string} functionCall The encoded function call string.
+ * @return {Array} An array of plain params
+ */
+Contract.prototype.decodeFunctionCall = function decodeFunctionCall(functionCall) {
+    functionCall = utils.addHexPrefix(functionCall)
+
+    let methodABI
+    const funcSigLength = 10
+    const extractFuncSig = functionCall.slice(0, funcSigLength)
+    for (const itf of this._jsonInterface) {
+        if (itf.type && itf.type === 'function' && extractFuncSig === itf.signature) {
+            methodABI = itf
+            break
+        }
+    }
+
+    return abi.decodeFunctionCall(methodABI, functionCall)
+}
+
+/**
  * Decode method return values
  *
  * @method _decodeMethodReturn

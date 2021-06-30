@@ -729,4 +729,45 @@ describe('TxTypeCancel', () => {
             expect(getChainIdSpy).to.have.been.calledOnce
         }).timeout(200000)
     })
+
+    context('cancel.recoverPublicKeys', () => {
+        const expectedPublicKeyArray = [
+            '0x8bb6aaeb2d96d024754d3b50babf116cece68977acbe8ba6a66f14d5217c60d96af020a0568661e7c72e753e80efe084a3aed9f9ac87bf44d09ce67aad3d4e01',
+            '0xc7751c794337a93e4db041fb5401c2c816cf0a099d8fd4b1f3f555aab5dfead2417521bb0c03d8637f350df15ef6a6cb3cdb806bd9d10bc71982dd03ff5d9ddd',
+            '0x3919091ba17c106dd034af508cfe00b963d173dffab2c7702890e25a96d107ca1bb4f148ee1984751e57d2435468558193ce84ab9a7731b842e9672e40dc0f22',
+        ]
+
+        it('CAVERJS-UNIT-TRANSACTION-427: should return public key string recovered from signatures in Cancel', async () => {
+            const tx = caver.transaction.cancel.create({
+                from: '0xf21460730845e3652aa3cc9bc13b345e4f53984a',
+                chainId: '0x7e3',
+                gasPrice: '0x5d21dba00',
+                nonce: '0x0',
+                gas: '0x2faf080',
+                signatures: [
+                    [
+                        '0x0fea',
+                        '0xac0efc65393b4136e474c8185af7f44491e797d8aa2e07d6853703c4efdbf7dc',
+                        '0x3691224986fec26012fe329f6bed56c6964a3d4f3bc8ff704131970735cd0a2f',
+                    ],
+                    [
+                        '0x0fea',
+                        '0x04f1bbc8767546157bdae445b7e88722c0f94a29efa47d1a3d2241954c3bc816',
+                        '0x5701a35937563b3a7542c5766a6218698424c60c0a63b8e463ba88b21e6dbee3',
+                    ],
+                    [
+                        '0x0fea',
+                        '0xb1f2d463eee52f6f03f3a5320eb863f964a89b1fdc466ccc93ae22b96044e6ef',
+                        '0x3ea104cc4de8f071d9b5cc3da4197b3299408d7da44e8359bb7b36fde9bf3b30',
+                    ],
+                ],
+            })
+            const publicKeys = tx.recoverPublicKeys()
+
+            expect(publicKeys.length).to.equal(expectedPublicKeyArray.length)
+            for (let i = 0; i < publicKeys.length; i++) {
+                expect(publicKeys[i].toLowerCase()).to.equal(expectedPublicKeyArray[i].toLowerCase())
+            }
+        }).timeout(200000)
+    })
 })

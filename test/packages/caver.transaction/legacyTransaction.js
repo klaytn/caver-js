@@ -807,4 +807,28 @@ describe('TxTypeLegacyTransaction', () => {
             expect(getChainIdSpy).to.have.been.calledOnce
         }).timeout(200000)
     })
+
+    context('legacyTransaction.recoverPublicKeys', () => {
+        it('CAVERJS-UNIT-TRANSACTION-421: should return public key string recovered from signatures in LegacyTransaction', async () => {
+            const tx = caver.transaction.legacyTransaction.create({
+                from: '0xf21460730845e3652aa3cc9bc13b345e4f53984a',
+                to: '0x59177716c34ac6e49e295a0e78e33522f14d61ee',
+                value: '0x1',
+                chainId: '0x7e3',
+                gasPrice: '0x5d21dba00',
+                nonce: '0x0',
+                gas: '0x2faf080',
+                signatures: [
+                    '0x0fe9',
+                    '0xecdec357060dbbb4bd3790e98b1733ec3a0b02b7e4ec7a5622f93cd9bee229fe',
+                    '0x0a4a5e28753e7c1d999b286fb07933c5bf353079b8ed4d1ed509a838b48be02c',
+                ],
+            })
+            const publicKeys = tx.recoverPublicKeys()
+
+            expect(publicKeys[0].toLowerCase()).to.equal(
+                '0x8bb6aaeb2d96d024754d3b50babf116cece68977acbe8ba6a66f14d5217c60d96af020a0568661e7c72e753e80efe084a3aed9f9ac87bf44d09ce67aad3d4e01'
+            )
+        }).timeout(200000)
+    })
 })

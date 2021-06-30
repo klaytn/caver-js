@@ -25,6 +25,7 @@ const { expect } = require('../extendedChai')
 
 const utils = require('./utils')
 const Caver = require('../../index.js')
+const SignatureData = require('../../packages/caver-wallet/src/keyring/signatureData')
 
 let caver
 beforeEach(() => {
@@ -2043,5 +2044,136 @@ describe('caver.utils.recover', () => {
 
         const result = caver.utils.recover(signed.messageHash, signed.signatures[0], true)
         expect(result).to.equal(keyring.address)
+    })
+
+    it('CAVERJS-UNIT-ETC-387: return recovered address when signature is an array', () => {
+        const message = 'Some Message'
+
+        const result = caver.utils.recover(message, [
+            '0x1b',
+            '0x8213e560e7bbe1f2e28fd69cbbb41c9108b84c98cd7c2c88d3c8e3549fd6ab10',
+            '0x3ca40c9e20c1525348d734a6724db152b9244bff6e0ff0c2b811d61d8f874f00',
+        ])
+        expect(result.toLowerCase()).to.equal('0xa84a1ce657e9d5b383cece6f4ba365e23fa234dd')
+    })
+
+    it('CAVERJS-UNIT-ETC-388: return recovered address when signature is an object', () => {
+        const message = 'Some Message'
+
+        const result = caver.utils.recover(message, {
+            v: '0x1b',
+            r: '0x8213e560e7bbe1f2e28fd69cbbb41c9108b84c98cd7c2c88d3c8e3549fd6ab10',
+            s: '0x3ca40c9e20c1525348d734a6724db152b9244bff6e0ff0c2b811d61d8f874f00',
+        })
+        expect(result.toLowerCase()).to.equal('0xa84a1ce657e9d5b383cece6f4ba365e23fa234dd')
+    })
+})
+
+describe('caver.utils.recoverPublicKey', () => {
+    it('CAVERJS-UNIT-ETC-379: return recovered public key when input is message, signature', () => {
+        const keyring = caver.wallet.keyring.generate()
+        const message = 'Some data'
+        const signed = keyring.signMessage(message, caver.wallet.keyring.role.roleTransactionKey)
+
+        const result = caver.utils.recoverPublicKey(signed.message, signed.signatures[0])
+        expect(result).to.equal(keyring.getPublicKey())
+    })
+
+    it('CAVERJS-UNIT-ETC-380: return recovered public key when input is messageHash, signature, prefixed', () => {
+        const keyring = caver.wallet.keyring.generate()
+        const message = 'Some data'
+        const signed = keyring.signMessage(message, caver.wallet.keyring.role.roleTransactionKey)
+
+        const result = caver.utils.recoverPublicKey(signed.messageHash, signed.signatures[0], true)
+        expect(result).to.equal(keyring.getPublicKey())
+    })
+
+    it('CAVERJS-UNIT-ETC-385: return recovered public key when signature is an array', () => {
+        const message = 'Some Message'
+
+        const result = caver.utils.recoverPublicKey(message, [
+            '0x1b',
+            '0x8213e560e7bbe1f2e28fd69cbbb41c9108b84c98cd7c2c88d3c8e3549fd6ab10',
+            '0x3ca40c9e20c1525348d734a6724db152b9244bff6e0ff0c2b811d61d8f874f00',
+        ])
+        expect(result.toLowerCase()).to.equal(
+            '0xb5df4d5e6b4ee7a136460b911a69030fdd42c18ed067bcc2e25eda1b851314fad994c5fe946aad01ca2e348d4ff3094960661a8bc095f358538af54aeea48ff3'
+        )
+    })
+
+    it('CAVERJS-UNIT-ETC-386: return recovered public key when signature is an object', () => {
+        const message = 'Some Message'
+
+        const result = caver.utils.recoverPublicKey(message, {
+            v: '0x1b',
+            r: '0x8213e560e7bbe1f2e28fd69cbbb41c9108b84c98cd7c2c88d3c8e3549fd6ab10',
+            s: '0x3ca40c9e20c1525348d734a6724db152b9244bff6e0ff0c2b811d61d8f874f00',
+        })
+        expect(result.toLowerCase()).to.equal(
+            '0xb5df4d5e6b4ee7a136460b911a69030fdd42c18ed067bcc2e25eda1b851314fad994c5fe946aad01ca2e348d4ff3094960661a8bc095f358538af54aeea48ff3'
+        )
+    })
+})
+
+describe('caver.utils.publicKeyToAddress', () => {
+    it('CAVERJS-UNIT-ETC-381: return an address which is derived by public key', () => {
+        const address = '0x5b2840bcbc2be07fb12d9129ed3a02d8e4465944'
+        const publicKey =
+            '0x68ffedd4a1d9fefa38f6ed9d58f0b85741a90ad604ab901c130c1fea42eab666dec186a48ad4db56b14898e8e18fe0176d926a2c1ffeeb6b6df805ec0bf41eb8'
+
+        const result = caver.utils.publicKeyToAddress(publicKey)
+        expect(result.toLowerCase()).to.equal(address)
+    })
+
+    it('CAVERJS-UNIT-ETC-382: return an address which is derived by uncompressed public key', () => {
+        const address = '0x5b2840bcbc2be07fb12d9129ed3a02d8e4465944'
+        const publicKey =
+            '0x68ffedd4a1d9fefa38f6ed9d58f0b85741a90ad604ab901c130c1fea42eab666dec186a48ad4db56b14898e8e18fe0176d926a2c1ffeeb6b6df805ec0bf41eb8'
+
+        const result = caver.utils.publicKeyToAddress(caver.utils.decompressPublicKey(publicKey))
+        expect(result.toLowerCase()).to.equal(address)
+    })
+
+    it('CAVERJS-UNIT-ETC-383: return an address which is derived by compressed public key', () => {
+        const address = '0x5b2840bcbc2be07fb12d9129ed3a02d8e4465944'
+        const publicKey =
+            '0x68ffedd4a1d9fefa38f6ed9d58f0b85741a90ad604ab901c130c1fea42eab666dec186a48ad4db56b14898e8e18fe0176d926a2c1ffeeb6b6df805ec0bf41eb8'
+
+        const result = caver.utils.publicKeyToAddress(caver.utils.compressPublicKey(publicKey))
+        expect(result.toLowerCase()).to.equal(address)
+    })
+})
+
+describe('caver.utils.decodeSignature', () => {
+    it('CAVERJS-UNIT-ETC-384: decode a raw signature string', () => {
+        const rawSigs = [
+            '0xc69018da9396c4b87947e0784625af7475caf46e2af9cf57a44673ff0f625258642d8993751ae67271bcc131aa065adccf9f16fc4953f9c48f4a80d675c09ae81b',
+            '0x4c78ba080e717534772c4a9714b06a12f8d41062fca72885dafa8f1e1d6d78de35a50522df6361d16c05d1368bb9d86da1054f153301d5dedc6658d222616edd1b',
+            '0xacfc5c417a8506eb1bd8394553fbde4a9097ea854bdbbe0de2bfaebcc9a26f45521773632317323f3d3da09bf06185af1ee0481ef0d1abb8a790f3a110eadfc31c',
+        ]
+        const expectedResult = [
+            new SignatureData([
+                '1b',
+                'c69018da9396c4b87947e0784625af7475caf46e2af9cf57a44673ff0f625258',
+                '642d8993751ae67271bcc131aa065adccf9f16fc4953f9c48f4a80d675c09ae8',
+            ]),
+            new SignatureData([
+                '1b',
+                '4c78ba080e717534772c4a9714b06a12f8d41062fca72885dafa8f1e1d6d78de',
+                '35a50522df6361d16c05d1368bb9d86da1054f153301d5dedc6658d222616edd',
+            ]),
+            new SignatureData([
+                '1c',
+                'acfc5c417a8506eb1bd8394553fbde4a9097ea854bdbbe0de2bfaebcc9a26f45',
+                '521773632317323f3d3da09bf06185af1ee0481ef0d1abb8a790f3a110eadfc3',
+            ]),
+        ]
+
+        for (let i = 0; i < rawSigs.length; i++) {
+            const decoded = caver.utils.decodeSignature(rawSigs[i])
+            expect(expectedResult[i].v).to.equal(decoded.v)
+            expect(expectedResult[i].r).to.equal(decoded.r)
+            expect(expectedResult[i].s).to.equal(decoded.s)
+        }
     })
 })
