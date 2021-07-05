@@ -1377,7 +1377,6 @@ describe('TxTypeFeeDelegatedSmartContractDeployWithRatio', () => {
 
     context('feeDelegatedSmartContractDeployWithRatio should encoding odd feeRatio', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-559: should encode and decode correctly with feeDelegatedSmartContractDeployWithRatio', async () => {
-            const sender = caver.wallet.keyring.generate()
             const tx = caver.transaction.feeDelegatedSmartContractDeployWithRatio.create({
                 from: sender.address,
                 feePayer: '0xb5db72925b1b6b79299a1a49ae226cd7861083ac',

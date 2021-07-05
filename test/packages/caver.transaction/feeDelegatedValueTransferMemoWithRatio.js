@@ -1383,7 +1383,6 @@ describe('TxTypeFeeDelegatedValueTransferMemoWithRatio', () => {
 
     context('feeDelegatedValueTransferMemoWithRatio should encoding odd feeRatio', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-557: should encode and decode correctly with feeDelegatedValueTransferMemoWithRatio', async () => {
-            const sender = caver.wallet.keyring.generate()
             const tx = caver.transaction.feeDelegatedValueTransferMemoWithRatio.create({
                 from: sender.address,
                 feePayer: '0xb5db72925b1b6b79299a1a49ae226cd7861083ac',

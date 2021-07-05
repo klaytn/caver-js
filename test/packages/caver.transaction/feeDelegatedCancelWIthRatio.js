@@ -1329,7 +1329,6 @@ describe('TxTypeFeeDelegatedCancelWithRatio', () => {
 
     context('feeDelegatedCancelWithRatio should encoding odd feeRatio', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-561: should encode and decode correctly with feeDelegatedCancelWithRatio', async () => {
-            const sender = caver.wallet.keyring.generate()
             const tx = caver.transaction.feeDelegatedCancelWithRatio.create({
                 from: sender.address,
                 feePayer: '0xb5db72925b1b6b79299a1a49ae226cd7861083ac',

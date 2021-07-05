@@ -1769,7 +1769,6 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
 
     context('feeDelegatedAccountUpdateWithRatio should encoding odd feeRatio', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-558: should encode and decode correctly with feeDelegatedAccountUpdateWithRatio', async () => {
-            const sender = caver.wallet.keyring.generate()
             const tx = caver.transaction.feeDelegatedAccountUpdateWithRatio.create({
                 from: sender.address,
                 feePayer: '0xb5db72925b1b6b79299a1a49ae226cd7861083ac',
