@@ -430,7 +430,7 @@ ABICoder.prototype.decodeParameters = function(outputs, bytes) {
  * @param {String} bytes
  * @param {Boolean} loose must be passed for decoding bytes and string parameters for logs emitted with solc 0.4.x
  *                        Please refer to https://github.com/ChainSafe/web3.js/commit/e80337e16e5c04683fc40148378775234c28e0fb.
- * @return {Array} array of plain params
+ * @return {object} An object which includes plain params. You can use `result[0]` as it is provided to be accessed like an array in the order of the parameters.
  */
 ABICoder.prototype.decodeParametersWith = function(outputs, bytes, loose) {
     if (outputs.length > 0 && (!bytes || bytes === '0x' || bytes === '0X')) {
