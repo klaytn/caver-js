@@ -281,7 +281,7 @@ ABICoder.prototype.mapStructToCoderFormat = function(struct) {
  * @method formatParam
  * @param {String} - type
  * @param {any} - param
- * @return {String | Array<String>} - The formatted param
+ * @return {string | Array.<string>} - The formatted param
  */
 ABICoder.prototype.formatParam = function(type, param) {
     const paramTypeBytes = new RegExp(/^bytes([0-9]*)$/)
@@ -404,7 +404,7 @@ ABICoder.prototype.decodeFunctionCall = function(abi, functionCall) {
  * @method decodeParameter
  * @param {String} type
  * @param {String} bytes
- * @return {String} plain param
+ * @return {string} plain param
  */
 ABICoder.prototype.decodeParameter = function(type, bytes) {
     return this.decodeParameters([type], bytes)[0]
