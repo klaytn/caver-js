@@ -404,7 +404,7 @@ ABICoder.prototype.decodeFunctionCall = function(abi, functionCall) {
  * @method decodeParameter
  * @param {String} type
  * @param {String} bytes
- * @return {Object} plain param
+ * @return {String} plain param
  */
 ABICoder.prototype.decodeParameter = function(type, bytes) {
     return this.decodeParameters([type], bytes)[0]
