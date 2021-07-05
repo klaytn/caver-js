@@ -119,7 +119,7 @@ class FeeDelegatedChainDataAnchoringWithRatio extends AbstractFeeDelegatedWithRa
                 Bytes.fromNat(this.gas),
                 this.from.toLowerCase(),
                 this.input,
-                this.feeRatio,
+                Bytes.fromNat(this.feeRatio),
                 signatures,
                 this.feePayer.toLowerCase(),
                 feePayerSignatures,
@@ -141,7 +141,7 @@ class FeeDelegatedChainDataAnchoringWithRatio extends AbstractFeeDelegatedWithRa
             Bytes.fromNat(this.gas),
             this.from.toLowerCase(),
             this.input,
-            this.feeRatio,
+            Bytes.fromNat(this.feeRatio),
         ])
     }
 }

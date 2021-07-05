@@ -204,7 +204,7 @@ class FeeDelegatedSmartContractDeployWithRatio extends AbstractFeeDelegatedWithR
                 this.from.toLowerCase(),
                 this.input,
                 Bytes.fromNat(this.humanReadable === true ? '0x1' : '0x0'),
-                this.feeRatio,
+                Bytes.fromNat(this.feeRatio),
                 Bytes.fromNat(this.codeFormat),
                 signatures,
                 this.feePayer.toLowerCase(),
@@ -230,7 +230,7 @@ class FeeDelegatedSmartContractDeployWithRatio extends AbstractFeeDelegatedWithR
             this.from.toLowerCase(),
             this.input,
             Bytes.fromNat(this.humanReadable === true ? '0x1' : '0x0'),
-            this.feeRatio,
+            Bytes.fromNat(this.feeRatio),
             Bytes.fromNat(this.codeFormat),
         ])
     }

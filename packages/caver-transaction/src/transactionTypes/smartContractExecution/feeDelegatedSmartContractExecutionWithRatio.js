@@ -161,7 +161,7 @@ class FeeDelegatedSmartContractExecutionWithRatio extends AbstractFeeDelegatedWi
                 Bytes.fromNat(this.value),
                 this.from.toLowerCase(),
                 this.input,
-                this.feeRatio,
+                Bytes.fromNat(this.feeRatio),
                 signatures,
                 this.feePayer.toLowerCase(),
                 feePayerSignatures,
@@ -185,7 +185,7 @@ class FeeDelegatedSmartContractExecutionWithRatio extends AbstractFeeDelegatedWi
             Bytes.fromNat(this.value),
             this.from.toLowerCase(),
             this.input,
-            this.feeRatio,
+            Bytes.fromNat(this.feeRatio),
         ])
     }
 }

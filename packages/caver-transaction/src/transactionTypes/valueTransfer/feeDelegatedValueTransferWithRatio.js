@@ -129,7 +129,7 @@ class FeeDelegatedValueTransferWithRatio extends AbstractFeeDelegatedWithRatioTr
                 this.to.toLowerCase(),
                 Bytes.fromNat(this.value),
                 this.from.toLowerCase(),
-                this.feeRatio,
+                Bytes.fromNat(this.feeRatio),
                 signatures,
                 this.feePayer.toLowerCase(),
                 feePayerSignatures,
@@ -152,7 +152,7 @@ class FeeDelegatedValueTransferWithRatio extends AbstractFeeDelegatedWithRatioTr
             this.to.toLowerCase(),
             Bytes.fromNat(this.value),
             this.from.toLowerCase(),
-            this.feeRatio,
+            Bytes.fromNat(this.feeRatio),
         ])
     }
 }

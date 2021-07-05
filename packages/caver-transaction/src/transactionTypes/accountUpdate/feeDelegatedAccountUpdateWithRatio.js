@@ -125,7 +125,7 @@ class FeeDelegatedAccountUpdateWithRatio extends AbstractFeeDelegatedWithRatioTr
                 Bytes.fromNat(this.gas),
                 this.from.toLowerCase(),
                 this.account.getRLPEncodingAccountKey(),
-                this.feeRatio,
+                Bytes.fromNat(this.feeRatio),
                 signatures,
                 this.feePayer.toLowerCase(),
                 feePayerSignatures,
@@ -147,7 +147,7 @@ class FeeDelegatedAccountUpdateWithRatio extends AbstractFeeDelegatedWithRatioTr
             Bytes.fromNat(this.gas),
             this.from.toLowerCase(),
             this.account.getRLPEncodingAccountKey(),
-            this.feeRatio,
+            Bytes.fromNat(this.feeRatio),
         ])
     }
 }
