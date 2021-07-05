@@ -470,7 +470,7 @@ ABICoder.prototype.decodeParametersWith = function(outputs, bytes, loose) {
  * @param {Object} inputs
  * @param {String} data
  * @param {Array} topics
- * @return {Array} array of plain params
+ * @return {object} An object which includes plain params. You can use `result[0]` as it is provided to be accessed like an array in the order of the parameters.
  */
 ABICoder.prototype.decodeLog = function(inputs, data, topics) {
     const _this = this
