@@ -281,7 +281,7 @@ ABICoder.prototype.mapStructToCoderFormat = function(struct) {
  * @method formatParam
  * @param {String} - type
  * @param {any} - param
- * @return {any} - The formatted param
+ * @return {String | Array<String>} - The formatted param
  */
 ABICoder.prototype.formatParam = function(type, param) {
     const paramTypeBytes = new RegExp(/^bytes([0-9]*)$/)
