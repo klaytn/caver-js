@@ -1766,4 +1766,24 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
             }
         }).timeout(200000)
     })
+
+    context('feeDelegatedAccountUpdateWithRatio should encoding odd feeRatio', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-558: should encode and decode correctly with feeDelegatedAccountUpdateWithRatio', async () => {
+            const tx = caver.transaction.feeDelegatedAccountUpdateWithRatio.create({
+                from: sender.address,
+                feePayer: '0xb5db72925b1b6b79299a1a49ae226cd7861083ac',
+                feeRatio: '0xa',
+                chainId: '0x7e3',
+                gasPrice: '0x5d21dba00',
+                nonce: '0x0',
+                gas: '0x2faf080',
+                account: caver.account.createWithAccountKeyLegacy(sender.address),
+            })
+            await tx.sign(sender)
+            const rawTx = tx.getRLPEncoding()
+            const decoded = caver.transaction.decode(rawTx)
+
+            expect(tx.feeRatio).to.equal(decoded.feeRatio)
+        }).timeout(200000)
+    })
 })

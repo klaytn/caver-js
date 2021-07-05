@@ -100,7 +100,7 @@ class FeeDelegatedCancelWithRatio extends AbstractFeeDelegatedWithRatioTransacti
                 Bytes.fromNat(this.gasPrice),
                 Bytes.fromNat(this.gas),
                 this.from.toLowerCase(),
-                this.feeRatio,
+                Bytes.fromNat(this.feeRatio),
                 signatures,
                 this.feePayer.toLowerCase(),
                 feePayerSignatures,
@@ -121,7 +121,7 @@ class FeeDelegatedCancelWithRatio extends AbstractFeeDelegatedWithRatioTransacti
             Bytes.fromNat(this.gasPrice),
             Bytes.fromNat(this.gas),
             this.from.toLowerCase(),
-            this.feeRatio,
+            Bytes.fromNat(this.feeRatio),
         ])
     }
 }

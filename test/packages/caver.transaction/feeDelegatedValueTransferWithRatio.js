@@ -1368,4 +1368,25 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
             }
         }).timeout(200000)
     })
+
+    context('feeDelegatedValueTransferWithRatio should encoding odd feeRatio', () => {
+        it('CAVERJS-UNIT-TRANSACTIONFDR-556: should encode and decode correctly with feeDelegatedValueTransferWithRatio', async () => {
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create({
+                from: sender.address,
+                feePayer: '0xb5db72925b1b6b79299a1a49ae226cd7861083ac',
+                feeRatio: '0xa',
+                to: '0x59177716c34ac6e49e295a0e78e33522f14d61ee',
+                value: '0x1',
+                chainId: '0x7e3',
+                gasPrice: '0x5d21dba00',
+                nonce: '0x0',
+                gas: '0x2faf080',
+            })
+            await tx.sign(sender)
+            const rawTx = tx.getRLPEncoding()
+            const decoded = caver.transaction.decode(rawTx)
+
+            expect(tx.feeRatio).to.equal(decoded.feeRatio)
+        }).timeout(200000)
+    })
 })
