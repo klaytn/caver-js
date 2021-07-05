@@ -341,7 +341,7 @@ ABICoder.prototype.formatParam = function(type, param) {
  * Encodes a function call from its json interface and parameters.
  *
  * @method encodeFunctionCall
- * @param {Array} jsonInterface
+ * @param {object} jsonInterface
  * @param {Array} [params]
  * @return {String} The encoded ABI for this function call
  */
