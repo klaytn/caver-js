@@ -642,7 +642,7 @@ Contract.prototype._encodeMethodABI = function _encodeMethodABI() {
  *
  * @method decodeFunctionCall
  * @param {string} functionCall The encoded function call string.
- * @return {Array} An array of plain params
+ * @return {object} An object which includes plain params.
  */
 Contract.prototype.decodeFunctionCall = function decodeFunctionCall(functionCall) {
     functionCall = utils.addHexPrefix(functionCall)
