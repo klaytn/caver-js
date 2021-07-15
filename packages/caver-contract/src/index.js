@@ -43,6 +43,7 @@ const FeeDelegatedSmartContractExecution = require('../../caver-transaction/src/
 const FeeDelegatedSmartContractDeployWithRatio = require('../../caver-transaction/src/transactionTypes/smartContractDeploy/feeDelegatedSmartContractDeployWithRatio')
 const FeeDelegatedSmartContractExecutionWithRatio = require('../../caver-transaction/src/transactionTypes/smartContractExecution/feeDelegatedSmartContractExecutionWithRatio')
 const KeyringContainer = require('../../caver-wallet')
+const TransactionDecoder = require('../../caver-transaction/src/transactionDecoder/transactionDecoder')
 const { formatters } = require('../../caver-core-helpers')
 const { errors } = require('../../caver-core-helpers')
 const abi = require('../../caver-abi')
@@ -1188,6 +1189,28 @@ Contract.prototype._executeMethod = async function _executeMethod() {
     const klayAccounts = _this.constructor._klayAccounts || _this._klayAccounts
     const wallet = _this._parent._wallet || _this._wallet
 
+    const signTransaction = new Method({
+        name: 'signTransaction',
+        call: 'klay_signTransaction',
+        params: 1,
+        inputFormatter: [formatters.inputTransactionFormatter],
+        requestManager: _this._parent._requestManager,
+        accounts: klayAccounts, // is klay.accounts (necessary for wallet signing)
+        defaultAccount: _this._parent.defaultAccount,
+        defaultBlock: _this._parent.defaultBlock,
+    }).createFunction()
+
+    const signTransactionAsFeePayer = new Method({
+        name: 'signTransactionAsFeePayer',
+        call: 'klay_signTransactionAsFeePayer',
+        params: 1,
+        inputFormatter: [formatters.inputTransactionFormatter],
+        requestManager: _this._parent._requestManager,
+        accounts: klayAccounts, // is klay.accounts (necessary for wallet signing)
+        defaultAccount: _this._parent.defaultAccount,
+        defaultBlock: _this._parent.defaultBlock,
+    }).createFunction()
+
     // Not allow to specify options.gas to 0.
     if (args.options && args.options.gas === 0) {
         throw errors.notAllowedZeroGas()
@@ -1262,19 +1285,26 @@ Contract.prototype._executeMethod = async function _executeMethod() {
             }
 
             const signer = args.type === 'signAsFeePayer' ? args.options.feePayer : args.options.from
-            const signFunction = args.type === 'signAsFeePayer' ? wallet.signAsFeePayer.bind(wallet) : wallet.sign.bind(wallet)
+
+            // Check a keyring existence to make a judgment for what to use
+            // among `caver.wallet.sign(AsFeePayer)` or `klay_signTransaction(AsFeePayer)` RPC call.
             const isExisted = await wallet.isExisted(signer)
+            const signFunction = isExisted
+                ? args.type === 'signAsFeePayer'
+                    ? wallet.signAsFeePayer.bind(wallet)
+                    : wallet.sign.bind(wallet)
+                : args.type === 'signAsFeePayer'
+                ? signTransactionAsFeePayer
+                : signTransaction
 
-            if (!isExisted) {
-                throw new Error(`Failed to find ${signer}. Please check that the corresponding account or keyring exists.`)
-            }
-
-            return signFunction(signer, tx).then(signedTx => {
-                return signedTx
-            })
+            return isExisted
+                ? signFunction(signer, tx).then(signedTx => signedTx)
+                : signFunction(tx).then(signedTx => {
+                      return TransactionDecoder.decode(signedTx.raw)
+                  })
 
         case 'send':
-            const transaction = await createTransactionFromArgs(args, this._method, this._deployData, defer)
+            let transaction = await createTransactionFromArgs(args, this._method, this._deployData, defer)
             // make sure receipt logs are decoded
             const extraFormatters = {
                 receiptFormatter(receipt) {
@@ -1339,32 +1369,63 @@ Contract.prototype._executeMethod = async function _executeMethod() {
                 extraFormatters,
             }).createFunction()
 
+            const sendRawTransaction = new Method({
+                name: 'sendRawTransaction',
+                call: 'klay_sendRawTransaction',
+                params: 1,
+                requestManager: _this._parent._requestManager,
+                defaultAccount: _this._parent.defaultAccount,
+                defaultBlock: _this._parent.defaultBlock,
+                extraFormatters,
+            }).createFunction()
+
             if (wallet) {
+                // When sending transactions for smart contract deployment or execution on the Klaytn, all of the following scenarios should be covered.
+                // 1. Basic Transaction
+                //    1.1. `from` is existed in the `caver.wallet` -> caver.wallet.sign
+                //    1.2. `from` is not existed in the `caver.wallet` -> `klay_sendTransaction`
+                // 2. FD/FDR Transaction
+                //    2.1. `from` is existed in the `caver.wallet`
+                //        2.1.1. `feePayer` is existed in the `caver.wallet` -> caver.wallet.sign / caver.wallet.signAsFeePayer
+                //        2.1.2. `feePayer` is not existed in the `caver.wallet` -> caver.wallet.sign / `klay_sendTransactionAsFeePayer`
+                //    2.2. `from` is not existed in the `caver.wallet`
+                //        2.2.1. `feePayer` is existed in the `caver.wallet` -> `klay_signTransaction` / caver.wallet.signAsFeePayer
+                //        2.2.2. `feePayer` is not existed in the `caver.wallet` -> `klay_signTransaction` / klay_signTransactionAsFeePayer`
                 const isExistedInWallet = await wallet.isExisted(args.options.from)
+
+                async function fillFeePayerSignatures(txToSign) {
+                    // To fill the optional values (chainId, nonde, gasPrice)
+                    await txToSign.fillTransaction()
+
+                    // Check whether tx is FD or not, and then signAsFeePayer
+                    // If transaction is basic tx, this function won't do anything
+                    if (txToSign.type.includes('TxTypeFeeDelegated')) {
+                        if (await wallet.isExisted(txToSign.feePayer)) {
+                            await wallet.signAsFeePayer(txToSign.feePayer, txToSign)
+                        } else {
+                            const feePayerSigned = await signTransactionAsFeePayer(txToSign)
+                            txToSign = TransactionDecoder.decode(feePayerSigned.raw)
+                        }
+                    }
+                    return txToSign
+                }
+
                 if (!isExistedInWallet) {
                     if (wallet instanceof KeyringContainer) {
-                        return sendTransaction(transaction, args.callback)
+                        return fillFeePayerSignatures(transaction).then(filledTx => {
+                            return signTransaction(filledTx).then(signed => {
+                                filledTx.signatures = signed.tx.signatures
+                                return sendRawTransaction(filledTx)
+                            })
+                        })
                     }
                     throw new Error(`Failed to find ${args.options.from}. Please check that the corresponding account or keyring exists.`)
                 }
 
-                const sendRawTransaction = new Method({
-                    name: 'sendRawTransaction',
-                    call: 'klay_sendRawTransaction',
-                    params: 1,
-                    requestManager: _this._parent._requestManager,
-                    defaultAccount: _this._parent.defaultAccount,
-                    defaultBlock: _this._parent.defaultBlock,
-                    extraFormatters,
-                }).createFunction()
-
                 return wallet.sign(transaction.from, transaction).then(signedTx => {
-                    if (signedTx.feePayer) {
-                        return wallet.signAsFeePayer(transaction.feePayer, transaction).then(feePayerSignedTx => {
-                            return sendRawTransaction(feePayerSignedTx)
-                        })
-                    }
-                    return sendRawTransaction(signedTx)
+                    return fillFeePayerSignatures(signedTx).then(filled => {
+                        return sendRawTransaction(filled.getRLPEncoding())
+                    })
                 })
             }
 
