@@ -1343,7 +1343,7 @@ Contract.prototype._executeMethod = async function _executeMethod() {
                 const isExistedInWallet = await wallet.isExisted(args.options.from)
                 if (!isExistedInWallet) {
                     if (wallet instanceof KeyringContainer) {
-                        return sendTransaction(args.options, args.callback)
+                        return sendTransaction(transaction, args.callback)
                     }
                     throw new Error(`Failed to find ${args.options.from}. Please check that the corresponding account or keyring exists.`)
                 }
