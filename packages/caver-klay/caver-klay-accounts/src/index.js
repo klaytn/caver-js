@@ -998,7 +998,7 @@ Accounts.prototype.feePayerSignTransaction = function feePayerSignTransaction() 
  * @param {String|Array} privateKeys The private key(s) to use for signing.
  * @param {String|Number} chainId The chain id of the network.
  * @param {Function} callback The callback function to call.
- * @return {Object}
+ * @return {Array}
  */
 Accounts.prototype.signTransactionWithHash = function signTransactionWithHash() {
     const _this = this
