@@ -1304,7 +1304,7 @@ Contract.prototype._executeMethod = async function _executeMethod() {
                   })
 
         case 'send':
-            let transaction = await createTransactionFromArgs(args, this._method, this._deployData, defer)
+            const transaction = await createTransactionFromArgs(args, this._method, this._deployData, defer)
             // make sure receipt logs are decoded
             const extraFormatters = {
                 receiptFormatter(receipt) {
@@ -1387,10 +1387,10 @@ Contract.prototype._executeMethod = async function _executeMethod() {
                 // 2. FD/FDR Transaction
                 //    2.1. `from` is existed in the `caver.wallet`
                 //        2.1.1. `feePayer` is existed in the `caver.wallet` -> caver.wallet.sign / caver.wallet.signAsFeePayer
-                //        2.1.2. `feePayer` is not existed in the `caver.wallet` -> caver.wallet.sign / `klay_sendTransactionAsFeePayer`
+                //        2.1.2. `feePayer` is not existed in the `caver.wallet` -> caver.wallet.sign / `klay_signTransactionAsFeePayer`
                 //    2.2. `from` is not existed in the `caver.wallet`
                 //        2.2.1. `feePayer` is existed in the `caver.wallet` -> `klay_signTransaction` / caver.wallet.signAsFeePayer
-                //        2.2.2. `feePayer` is not existed in the `caver.wallet` -> `klay_signTransaction` / klay_signTransactionAsFeePayer`
+                //        2.2.2. `feePayer` is not existed in the `caver.wallet` -> `klay_signTransaction` / `klay_signTransactionAsFeePayer`
                 const isExistedInWallet = await wallet.isExisted(args.options.from)
 
                 async function fillFeePayerSignatures(txToSign) {

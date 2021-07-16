@@ -2836,7 +2836,7 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
         it(`CAVERJS-UNIT-ETC-389: should throw an error if Node also does not have that account when send basic`, async () => {
             const contract = new caver.contract(abiWithoutConstructor, contractAddress)
 
-            let sendOptions = {
+            const sendOptions = {
                 from: caver.wallet.keyring.generate().address,
                 gas: 1000000,
             }
@@ -2848,7 +2848,7 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
         it(`CAVERJS-UNIT-ETC-390: should throw an error if Node also does not have that account when send fd`, async () => {
             const contract = new caver.contract(abiWithoutConstructor, contractAddress)
 
-            let sendOptions = {
+            const sendOptions = {
                 from: caver.wallet.keyring.generate().address,
                 gas: 1000000,
                 feeDelegation: true,
@@ -2862,7 +2862,7 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
         it(`CAVERJS-UNIT-ETC-391: should throw an error if Node also does not have that account when sign`, async () => {
             const contract = new caver.contract(abiWithoutConstructor, contractAddress)
 
-            let sendOptions = {
+            const sendOptions = {
                 from: caver.wallet.keyring.generate().address,
                 gas: 1000000,
             }
@@ -2874,7 +2874,7 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
         it(`CAVERJS-UNIT-ETC-392: should throw an error if Node also does not have that account when signAsFeePayer`, async () => {
             const contract = new caver.contract(abiWithoutConstructor, contractAddress)
 
-            let sendOptions = {
+            const sendOptions = {
                 from: caver.wallet.keyring.generate().address,
                 gas: 1000000,
                 feeDelegation: true,
