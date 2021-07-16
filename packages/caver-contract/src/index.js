@@ -1393,6 +1393,7 @@ Contract.prototype._executeMethod = async function _executeMethod() {
                 //        2.2.2. `feePayer` is not existed in the `caver.wallet` -> `klay_signTransaction` / `klay_signTransactionAsFeePayer`
                 const isExistedInWallet = await wallet.isExisted(args.options.from)
 
+                // eslint-disable-next-line no-inner-declarations
                 async function fillFeePayerSignatures(txToSign) {
                     // To fill the optional values (chainId, nonde, gasPrice)
                     await txToSign.fillTransaction()
