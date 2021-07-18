@@ -208,7 +208,7 @@ class KIP37 extends Contract {
      * @method balanceOfBatch
      * @param {Array.<string>} accounts The address of the accounts for which you want to see balance.
      * @param {Array.<BigNumber|string|number>} ids An array of ids of token you want to see balance.
-     * @return {BigNumber}
+     * @return {Array.<BigNumber>}
      */
     async balanceOfBatch(accounts, ids) {
         if (ids.length !== accounts.length) throw new Error(`ids and accounts must have the same length.`)

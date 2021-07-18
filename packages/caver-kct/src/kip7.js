@@ -508,8 +508,6 @@ class KIP7 extends Contract {
      * The account sending transaction to execute the unpause must be a Pauser with a PauserRole.
      *
      * @method unpause
-     * @param {String} spender The address of the account to use on behalf of owner for the amount to be set in allowance.
-     * @param {BigNumber|String|Number} amount The amount of tokens the spender allows to use on behalf of the owner.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
      * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-7 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-7 abi.
