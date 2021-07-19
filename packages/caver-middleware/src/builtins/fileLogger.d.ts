@@ -1,0 +1,1 @@
+export function fileLogger(options?: object): void

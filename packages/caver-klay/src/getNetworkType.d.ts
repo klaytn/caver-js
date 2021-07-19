@@ -1,0 +1,1 @@
+export function getNetworkType(callback: Function): string
