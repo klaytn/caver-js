@@ -2103,7 +2103,7 @@ describe('caver.klay.accounts.recoverTransaction', () => {
         it('should not equal to account.address', () => {
             const invalid = rawTx.slice(0, -2)
             const result = caver.klay.accounts.recoverTransaction(invalid)
-            expect(result).to.not.equal(account.addrss)
+            expect(result).to.not.equal(account.address)
         })
     })
 
@@ -2128,7 +2128,7 @@ describe('caver.klay.accounts.recoverTransaction', () => {
             expect(rlpDecoded[7].length).not.to.equals(rlpDecoded[8].length)
 
             const result = caver.klay.accounts.recoverTransaction(signed.rawTransaction)
-            expect(result).to.not.equal(account.addrss)
+            expect(result).to.not.equal(account.address)
         })
     })
 

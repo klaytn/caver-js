@@ -241,7 +241,7 @@ class KIP17 extends Contract {
      *
      * @method ownerOf
      * @param {BigNumber|String|Number} tokenId The id of the token.
-     * @return {BigNumber}
+     * @return {string}
      */
     async ownerOf(tokenId) {
         const owner = await this.methods.ownerOf(formatParamForUint256(tokenId)).call()
@@ -253,7 +253,7 @@ class KIP17 extends Contract {
      *
      * @method getApproved
      * @param {BigNumber|String|Number} tokenId The id of the token.
-     * @return {Boolean}
+     * @return {string}
      */
     async getApproved(tokenId) {
         const isApproved = await this.methods.getApproved(formatParamForUint256(tokenId)).call()
