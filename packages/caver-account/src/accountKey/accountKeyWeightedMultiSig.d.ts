@@ -5,11 +5,6 @@ import AccountKeyPublic from './accountKeyPublic'
 import WeightedMultiSigOptions, { WeightedMultiSigOptionsObject } from './weightedMultiSigOptions'
 import WeightedPublicKey from './weightedPublicKey'
 
-type NotRoleBasedAccountKey = 
-  | AccountKeyLegacy
-  | AccountKeyPublic
-  | AccountKeyFail
-  | AccountKeyWeightedMultiSig
 
 export default class AccountKeyWeightedMultiSig implements IAccountKey {
   constructor(threshold: number, weightedPublicKeys: WeightedPublicKey[])
