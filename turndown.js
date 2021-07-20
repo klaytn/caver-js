@@ -5,8 +5,8 @@ const turndownService = new TurndownService()
 turndownService.remove('nav')
 
 // out directory will have HTML files which is generated from jsdoc
-const docsDirectory = __dirname + '/out'
-const mdDirectory = docsDirectory + '/md'
+const docsDirectory = `${__dirname}/out`
+const mdDirectory = `${docsDirectory}/md`
 
 const files = fs.readdirSync(docsDirectory)
 
@@ -17,7 +17,7 @@ for (const file of files) {
     if (!file.endsWith('.html') || file === 'index.html') continue
 
     // Converts a HTML file
-    let markdown = turndownService.turndown(fs.readFileSync(docsDirectory + `/${file}`).toString())
+    let markdown = turndownService.turndown(fs.readFileSync(`${docsDirectory}/${file}`).toString())
     markdown = markdown.replace(/.html|_/g, '.md')
 
     // Writes a Markdown result to md file
