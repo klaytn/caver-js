@@ -1,3 +1,21 @@
+/*
+    Copyright 2021 The caver-js Authors
+    This file is part of the caver-js library.
+
+    The caver-js library is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    The caver-js library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 import RpcCallToMethod from '../../../caver-rtm/src'
 import { SignatureObject } from '../../../caver-utils/src/utils'
 import { EncryptedKeyOptions, Keystore } from '../../../caver-wallet/src/keyring/keyringHelper'
@@ -89,23 +107,42 @@ export default class Accounts {
     createWithAccountKeyRoleBased(address: string, keyObject: string | object): AccountWithFunctions
     privateKeyToAccount(key: string, userInputAddress?: string): AccountWithFunctions
     createAccountForUpdate(address: string, accountKey: string | string[] | object, options?: UpdateOptionsObject): AccountForUpdate
-    createAccountForUpdateWithPublicKey(address: string, keyForUpdate: string | string[] | object, options?: UpdateOptionsObject): AccountForUpdate
+    createAccountForUpdateWithPublicKey(
+        address: string,
+        keyForUpdate: string | string[] | object,
+        options?: UpdateOptionsObject
+    ): AccountForUpdate
     createAccountForUpdateWithLegacyKey(address: string): AccountForUpdate
     createAccountForUpdateWithFailKey(address: string): AccountForUpdate
     isDecoupled(key: string, userInputAddress?: string): boolean
-    getLegacyAccount(key: string): {
+    getLegacyAccount(
+        key: string
+    ): {
         legacyAccount: AccountWithFunctions
         klaytnWalletKeyAddress: string
     }
     signTransaction(tx: string | object, privateKey?: string | string[], callback?: Function): Promise<TransactionObject>
     signTransaction(tx: string | object, callback?: Function): Promise<TransactionObject>
-    feePayerSignTransaction(tx: string | object, feePayer: string, privateKey?: string | string[], callback?: Function): Promise<TransactionObject>
-    signTransactionWithHash(hash: string | object, privateKeys: string | string[], chainId?: string | number, callback?: Function): Promise<SignatureObject[]>
+    feePayerSignTransaction(
+        tx: string | object,
+        feePayer: string,
+        privateKey?: string | string[],
+        callback?: Function
+    ): Promise<TransactionObject>
+    signTransactionWithHash(
+        hash: string | object,
+        privateKeys: string | string[],
+        chainId?: string | number,
+        callback?: Function
+    ): Promise<SignatureObject[]>
     getRawTransactionWithSignatures(tx: object, callback?: Function): Promise<TransactionObject>
     combineSignatures(rawTransactions: string[], callback?: Function): Promise<TransactionObject>
     recoverTransaction(rawTx: string): string
     hashMessage(data: string): string
-    sign(data: string, privateKey: string): {
+    sign(
+        data: string,
+        privateKey: string
+    ): {
         message: string
         v: string
         r: string

@@ -1,3 +1,21 @@
+/*
+    Copyright 2021 The caver-js Authors
+    This file is part of the caver-js library.
+
+    The caver-js library is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    The caver-js library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 import TransactionDecoder from './transactionDecoder/transactionDecoder'
 import AbstractTransaction from './transactionTypes/abstractTransaction'
 import AccountUpdate from './transactionTypes/accountUpdate/accountUpdate'
@@ -68,7 +86,7 @@ export default interface ITransaction {
     smartContractExecution: typeof SmartContractExecution
     feeDelegatedSmartContractExecution: typeof FeeDelegatedSmartContractExecution
     feeDelegatedSmartContractExecutionWithRatio: typeof FeeDelegatedSmartContractExecutionWithRatio
-    cancel: typeof Cancel,
+    cancel: typeof Cancel
     feeDelegatedCancel: typeof FeeDelegatedCancel
     feeDelegatedCancelWithRatio: typeof FeeDelegatedCancelWithRatio
     chainDataAnchoring: typeof ChainDataAnchoring
@@ -76,73 +94,73 @@ export default interface ITransaction {
     feeDelegatedChainDataAnchoringWithRatio: typeof FeeDelegatedChainDataAnchoringWithRatio
 
     type: {
-        TxTypeLegacyTransaction: 'TxTypeLegacyTransaction',
-        TxTypeValueTransfer: 'TxTypeValueTransfer',
-        TxTypeFeeDelegatedValueTransfer: 'TxTypeFeeDelegatedValueTransfer',
-        TxTypeFeeDelegatedValueTransferWithRatio: 'TxTypeFeeDelegatedValueTransferWithRatio',
-        TxTypeValueTransferMemo: 'TxTypeValueTransferMemo',
-        TxTypeFeeDelegatedValueTransferMemo: 'TxTypeFeeDelegatedValueTransferMemo',
-        TxTypeFeeDelegatedValueTransferMemoWithRatio: 'TxTypeFeeDelegatedValueTransferMemoWithRatio',
-        TxTypeAccountUpdate: 'TxTypeAccountUpdate',
-        TxTypeFeeDelegatedAccountUpdate: 'TxTypeFeeDelegatedAccountUpdate',
-        TxTypeFeeDelegatedAccountUpdateWithRatio: 'TxTypeFeeDelegatedAccountUpdateWithRatio',
-        TxTypeSmartContractDeploy: 'TxTypeSmartContractDeploy',
-        TxTypeFeeDelegatedSmartContractDeploy: 'TxTypeFeeDelegatedSmartContractDeploy',
-        TxTypeFeeDelegatedSmartContractDeployWithRatio: 'TxTypeFeeDelegatedSmartContractDeployWithRatio',
-        TxTypeSmartContractExecution: 'TxTypeSmartContractExecution',
-        TxTypeFeeDelegatedSmartContractExecution: 'TxTypeFeeDelegatedSmartContractExecution',
-        TxTypeFeeDelegatedSmartContractExecutionWithRatio: 'TxTypeFeeDelegatedSmartContractExecutionWithRatio',
-        TxTypeCancel: 'TxTypeCancel',
-        TxTypeFeeDelegatedCancel: 'TxTypeFeeDelegatedCancel',
-        TxTypeFeeDelegatedCancelWithRatio: 'TxTypeFeeDelegatedCancelWithRatio',
-        TxTypeChainDataAnchoring: 'TxTypeChainDataAnchoring',
-        TxTypeFeeDelegatedChainDataAnchoring: 'TxTypeFeeDelegatedChainDataAnchoring',
-        TxTypeFeeDelegatedChainDataAnchoringWithRatio: 'TxTypeFeeDelegatedChainDataAnchoringWithRatio',
+        TxTypeLegacyTransaction: 'TxTypeLegacyTransaction'
+        TxTypeValueTransfer: 'TxTypeValueTransfer'
+        TxTypeFeeDelegatedValueTransfer: 'TxTypeFeeDelegatedValueTransfer'
+        TxTypeFeeDelegatedValueTransferWithRatio: 'TxTypeFeeDelegatedValueTransferWithRatio'
+        TxTypeValueTransferMemo: 'TxTypeValueTransferMemo'
+        TxTypeFeeDelegatedValueTransferMemo: 'TxTypeFeeDelegatedValueTransferMemo'
+        TxTypeFeeDelegatedValueTransferMemoWithRatio: 'TxTypeFeeDelegatedValueTransferMemoWithRatio'
+        TxTypeAccountUpdate: 'TxTypeAccountUpdate'
+        TxTypeFeeDelegatedAccountUpdate: 'TxTypeFeeDelegatedAccountUpdate'
+        TxTypeFeeDelegatedAccountUpdateWithRatio: 'TxTypeFeeDelegatedAccountUpdateWithRatio'
+        TxTypeSmartContractDeploy: 'TxTypeSmartContractDeploy'
+        TxTypeFeeDelegatedSmartContractDeploy: 'TxTypeFeeDelegatedSmartContractDeploy'
+        TxTypeFeeDelegatedSmartContractDeployWithRatio: 'TxTypeFeeDelegatedSmartContractDeployWithRatio'
+        TxTypeSmartContractExecution: 'TxTypeSmartContractExecution'
+        TxTypeFeeDelegatedSmartContractExecution: 'TxTypeFeeDelegatedSmartContractExecution'
+        TxTypeFeeDelegatedSmartContractExecutionWithRatio: 'TxTypeFeeDelegatedSmartContractExecutionWithRatio'
+        TxTypeCancel: 'TxTypeCancel'
+        TxTypeFeeDelegatedCancel: 'TxTypeFeeDelegatedCancel'
+        TxTypeFeeDelegatedCancelWithRatio: 'TxTypeFeeDelegatedCancelWithRatio'
+        TxTypeChainDataAnchoring: 'TxTypeChainDataAnchoring'
+        TxTypeFeeDelegatedChainDataAnchoring: 'TxTypeFeeDelegatedChainDataAnchoring'
+        TxTypeFeeDelegatedChainDataAnchoringWithRatio: 'TxTypeFeeDelegatedChainDataAnchoringWithRatio'
     }
     tag: {
-        TxTypeLegacyTransaction: '',
-        '': ITransaction['type']['TxTypeLegacyTransaction'],
-        TxTypeValueTransfer: '0x08',
+        TxTypeLegacyTransaction: ''
+        '': ITransaction['type']['TxTypeLegacyTransaction']
+        TxTypeValueTransfer: '0x08'
         '0x08': ITransaction['type']['TxTypeValueTransfer']
-        TxTypeFeeDelegatedValueTransfer: '0x09',
+        TxTypeFeeDelegatedValueTransfer: '0x09'
         '0x09': ITransaction['type']['TxTypeFeeDelegatedValueTransfer']
-        TxTypeFeeDelegatedValueTransferWithRatio: '0x0a',
+        TxTypeFeeDelegatedValueTransferWithRatio: '0x0a'
         '0x0a': ITransaction['type']['TxTypeFeeDelegatedValueTransferWithRatio']
-        TxTypeValueTransferMemo: '0x10',
+        TxTypeValueTransferMemo: '0x10'
         '0x10': ITransaction['type']['TxTypeValueTransferMemo']
-        TxTypeFeeDelegatedValueTransferMemo: '0x11',
+        TxTypeFeeDelegatedValueTransferMemo: '0x11'
         '0x11': ITransaction['type']['TxTypeFeeDelegatedValueTransferMemo']
-        TxTypeFeeDelegatedValueTransferMemoWithRatio: '0x12',
+        TxTypeFeeDelegatedValueTransferMemoWithRatio: '0x12'
         '0x12': ITransaction['type']['TxTypeFeeDelegatedValueTransferMemoWithRatio']
-        TxTypeAccountUpdate: '0x20',
+        TxTypeAccountUpdate: '0x20'
         '0x20': ITransaction['type']['TxTypeAccountUpdate']
-        TxTypeFeeDelegatedAccountUpdate: '0x21',
+        TxTypeFeeDelegatedAccountUpdate: '0x21'
         '0x21': ITransaction['type']['TxTypeFeeDelegatedAccountUpdate']
-        TxTypeFeeDelegatedAccountUpdateWithRatio: '0x22',
+        TxTypeFeeDelegatedAccountUpdateWithRatio: '0x22'
         '0x22': ITransaction['type']['TxTypeFeeDelegatedAccountUpdateWithRatio']
-        TxTypeSmartContractDeploy: '0x28',
+        TxTypeSmartContractDeploy: '0x28'
         '0x28': ITransaction['type']['TxTypeSmartContractDeploy']
-        TxTypeFeeDelegatedSmartContractDeploy: '0x29',
+        TxTypeFeeDelegatedSmartContractDeploy: '0x29'
         '0x29': ITransaction['type']['TxTypeFeeDelegatedSmartContractDeploy']
-        TxTypeFeeDelegatedSmartContractDeployWithRatio: '0x2a',
+        TxTypeFeeDelegatedSmartContractDeployWithRatio: '0x2a'
         '0x2a': ITransaction['type']['TxTypeFeeDelegatedSmartContractDeployWithRatio']
-        TxTypeSmartContractExecution: '0x30',
+        TxTypeSmartContractExecution: '0x30'
         '0x30': ITransaction['type']['TxTypeSmartContractExecution']
-        TxTypeFeeDelegatedSmartContractExecution: '0x31',
+        TxTypeFeeDelegatedSmartContractExecution: '0x31'
         '0x31': ITransaction['type']['TxTypeFeeDelegatedSmartContractExecution']
-        TxTypeFeeDelegatedSmartContractExecutionWithRatio: '0x32',
+        TxTypeFeeDelegatedSmartContractExecutionWithRatio: '0x32'
         '0x32': ITransaction['type']['TxTypeFeeDelegatedSmartContractExecutionWithRatio']
-        TxTypeCancel: '0x38',
+        TxTypeCancel: '0x38'
         '0x38': ITransaction['type']['TxTypeCancel']
-        TxTypeFeeDelegatedCancel: '0x39',
+        TxTypeFeeDelegatedCancel: '0x39'
         '0x39': ITransaction['type']['TxTypeFeeDelegatedCancel']
-        TxTypeFeeDelegatedCancelWithRatio: '0x3a',
+        TxTypeFeeDelegatedCancelWithRatio: '0x3a'
         '0x3a': ITransaction['type']['TxTypeFeeDelegatedCancelWithRatio']
-        TxTypeChainDataAnchoring: '0x48',
+        TxTypeChainDataAnchoring: '0x48'
         '0x48': ITransaction['type']['TxTypeChainDataAnchoring']
-        TxTypeFeeDelegatedChainDataAnchoring: '0x49',
+        TxTypeFeeDelegatedChainDataAnchoring: '0x49'
         '0x49': ITransaction['type']['TxTypeFeeDelegatedChainDataAnchoring']
-        TxTypeFeeDelegatedChainDataAnchoringWithRatio: '0x4a',
+        TxTypeFeeDelegatedChainDataAnchoringWithRatio: '0x4a'
         '0x4a': ITransaction['type']['TxTypeFeeDelegatedChainDataAnchoringWithRatio']
     }
 }

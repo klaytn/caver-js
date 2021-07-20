@@ -1,38 +1,43 @@
+/*
+    Copyright 2021 The caver-js Authors
+    This file is part of the caver-js library.
+
+    The caver-js library is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    The caver-js library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 import BigNumber from 'bignumber.js'
 import BN from 'bn.js'
 import _ from 'lodash'
 import SignatureData from '../../caver-wallet/src/keyring/signatureData'
 import BaseUtils from './utils'
 import Iban from '../iban'
-    
-export type Unit =
-    | 'peb'
-    | 'kpeb'
-    | 'Mpeb'
-    | 'Gpeb'
-    | 'Ston'
-    | 'ston'
-    | 'uKLAY'
-    | 'mKLAY'
-    | 'KLAY'
-    | 'kKLAY'
-    | 'MKLAY'
-    | 'GKLAY'
-    | 'TKLAY'
+
+export type Unit = 'peb' | 'kpeb' | 'Mpeb' | 'Gpeb' | 'Ston' | 'ston' | 'uKLAY' | 'mKLAY' | 'KLAY' | 'kKLAY' | 'MKLAY' | 'GKLAY' | 'TKLAY'
 
 export interface KlayUnit {
-    peb: { unit: 'peb', pebFactor: 0 }
-    kpeb: { unit: 'kpeb', pebFactor: 3 }
-    Mpeb: { unit: 'Mpeb', pebFactor: 6 }
-    Gpeb: { unit: 'Gpeb', pebFactor: 9 }
-    ston: { unit: 'ston', pebFactor: 9 }
-    uKLAY: { unit: 'uKLAY', pebFactor: 12 }
-    mKLAY: { unit: 'mKLAY', pebFactor: 15 }
-    KLAY: { unit: 'KLAY', pebFactor: 18 }
-    kKLAY: { unit: 'kKLAY', pebFactor: 21 }
-    MKLAY: { unit: 'MKLAY', pebFactor: 24 }
-    GKLAY: { unit: 'GKLAY', pebFactor: 27 }
-    TKLAY: { unit: 'TKLAY', pebFactor: 30 }
+    peb: { unit: 'peb'; pebFactor: 0 }
+    kpeb: { unit: 'kpeb'; pebFactor: 3 }
+    Mpeb: { unit: 'Mpeb'; pebFactor: 6 }
+    Gpeb: { unit: 'Gpeb'; pebFactor: 9 }
+    ston: { unit: 'ston'; pebFactor: 9 }
+    uKLAY: { unit: 'uKLAY'; pebFactor: 12 }
+    mKLAY: { unit: 'mKLAY'; pebFactor: 15 }
+    KLAY: { unit: 'KLAY'; pebFactor: 18 }
+    kKLAY: { unit: 'kKLAY'; pebFactor: 21 }
+    MKLAY: { unit: 'MKLAY'; pebFactor: 24 }
+    GKLAY: { unit: 'GKLAY'; pebFactor: 27 }
+    TKLAY: { unit: 'TKLAY'; pebFactor: 30 }
 }
 
 export interface UnitMap {
@@ -56,13 +61,13 @@ export type Mixed =
     | number
     | BN
     | {
-        type: string
-        value: string
-    }
+          type: string
+          value: string
+      }
     | {
-        t: string
-        v: string | BN | number
-    }
+          t: string
+          v: string | BN | number
+      }
     | boolean
 
 export type StateMutabilityType = 'pure' | 'view' | 'nonpayable' | 'payable'
@@ -96,7 +101,7 @@ export interface AbiOutput {
 
 export interface PromiEvent {
     resolve: (value: unknown) => void
-    reject: (reason?: any) => void;
+    reject: (reason?: any) => void
     eventEmitter: Promise<any> | object
 }
 

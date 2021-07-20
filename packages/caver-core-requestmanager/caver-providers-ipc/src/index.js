@@ -108,6 +108,7 @@ IpcProvider.prototype.addDefaultEvents = function() {
 
  @method _parseResponse
  @param {String} data
+ @return {Array}
  */
 IpcProvider.prototype._parseResponse = function(data) {
     const _this = this
@@ -230,7 +231,7 @@ IpcProvider.prototype.on = function(type, callback) {
 /**
  Subscribes to provider events.provider
 
- @method on
+ @method once
  @param {String} type    'connect', 'error', 'end' or 'data'
  @param {Function} callback   the callback to call
  */

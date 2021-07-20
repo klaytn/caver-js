@@ -1,3 +1,21 @@
+/*
+    Copyright 2021 The caver-js Authors
+    This file is part of the caver-js library.
+
+    The caver-js library is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    The caver-js library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 import BN from 'bn.js'
 import { TransactionObject } from '../../caver-rtm/src'
 import SignatureData from '../../caver-wallet/src/keyring/signatureData'
@@ -53,7 +71,9 @@ export default interface Utils {
     isValidBlockNumberCandidate(blockNumber: string | number): boolean
     isValidPrivateKey(privateKey: string): boolean
     isValidNSHSN(value: string | number): boolean
-    parsePrivateKey(privateKey: string): {
+    parsePrivateKey(
+        privateKey: string
+    ): {
         privateKey: string
         address: string
         isHumanReadable: boolean
@@ -67,7 +87,9 @@ export default interface Utils {
     resolveSignature(signature: string | string[] | object): string[]
     transformSignaturesToObject(signatures: string | string[] | SignatureData | SignatureObject): SignatureObject
     transformSignaturesToObject(signatures: string[][] | SignatureData[] | SignatureObject[]): SignatureObject[]
-    transformSignaturesToObject(signatures: string | string[] | string [][] | SignatureData | SignatureData[] | SignatureObject | SignatureObject[]): SignatureObject | SignatureObject[]
+    transformSignaturesToObject(
+        signatures: string | string[] | string[][] | SignatureData | SignatureData[] | SignatureObject | SignatureObject[]
+    ): SignatureObject | SignatureObject[]
     getTxTypeStringFromRawTransaction(rawTransaction: string): string
     trimLeadingZero(hex: string): string
     makeEven(hex: string): string
@@ -119,7 +141,9 @@ export function isPredefinedBlockNumber(blockNumber: string): boolean
 export function isValidBlockNumberCandidate(blockNumber: string | number): boolean
 export function isValidPrivateKey(privateKey: string): boolean
 export function isValidNSHSN(value: string | number): boolean
-export function parsePrivateKey(privateKey: string): {
+export function parsePrivateKey(
+    privateKey: string
+): {
     privateKey: string
     address: string
     isHumanReadable: boolean
