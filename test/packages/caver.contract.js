@@ -2831,4 +2831,140 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
             expect(signed.feeRatio).to.equal(contract.options.feeRatio)
         }).timeout(200000)
     })
+
+    context('Send to the Klaytn if a keyring cannnot be found in caver.wallet', () => {
+        it(`CAVERJS-UNIT-ETC-389: should throw an error if Node also does not have that account when send basic`, async () => {
+            const contract = new caver.contract(abiWithoutConstructor, contractAddress)
+
+            const sendOptions = {
+                from: caver.wallet.keyring.generate().address,
+                gas: 1000000,
+            }
+
+            const expectedError = `Returned error: unknown account`
+            await expect(contract.send(sendOptions, 'set', 'k', 'v')).to.be.rejectedWith(expectedError)
+        }).timeout(200000)
+
+        it(`CAVERJS-UNIT-ETC-390: should throw an error if Node also does not have that account when send fd`, async () => {
+            const contract = new caver.contract(abiWithoutConstructor, contractAddress)
+
+            const sendOptions = {
+                from: caver.wallet.keyring.generate().address,
+                gas: 1000000,
+                feeDelegation: true,
+                feePayer: caver.wallet.keyring.generate().address,
+            }
+
+            const expectedError = `Returned error: unknown account`
+            await expect(contract.send(sendOptions, 'set', 'k', 'v')).to.be.rejectedWith(expectedError)
+        }).timeout(200000)
+
+        it(`CAVERJS-UNIT-ETC-391: should throw an error if Node also does not have that account when sign`, async () => {
+            const contract = new caver.contract(abiWithoutConstructor, contractAddress)
+
+            const sendOptions = {
+                from: caver.wallet.keyring.generate().address,
+                gas: 1000000,
+            }
+
+            const expectedError = `Returned error: unknown account`
+            await expect(contract.sign(sendOptions, 'set', 'k', 'v')).to.be.rejectedWith(expectedError)
+        }).timeout(200000)
+
+        it(`CAVERJS-UNIT-ETC-392: should throw an error if Node also does not have that account when signAsFeePayer`, async () => {
+            const contract = new caver.contract(abiWithoutConstructor, contractAddress)
+
+            const sendOptions = {
+                from: caver.wallet.keyring.generate().address,
+                gas: 1000000,
+                feeDelegation: true,
+                feePayer: caver.wallet.keyring.generate().address,
+            }
+
+            const expectedError = `Returned error: unknown account`
+            await expect(contract.signAsFeePayer(sendOptions, 'set', 'k', 'v')).to.be.rejectedWith(expectedError)
+        }).timeout(200000)
+
+        it(`CAVERJS-UNIT-ETC-393: should send to the Klaytn if in-memory wallet does not have a from account`, async () => {
+            try {
+                await caver.klay.personal.importRawKey(sender.key.privateKey, 'passphrase')
+            } catch (e) {}
+            await caver.klay.personal.unlockAccount(sender.address, 'passphrase')
+
+            const contract = new caver.contract(abiWithoutConstructor, contractAddress)
+
+            // To send to the Klaytn, should remove in the in-memory wallet
+            caver.wallet.remove(sender.address)
+
+            // Basic Transaction - `from` is not existed in the `caver.wallet`
+            const sendOptionsForBasic = {
+                from: sender.address,
+                gas: 1000000,
+            }
+
+            const resultBasic = await contract.send(sendOptionsForBasic, 'set', 'k', 'v')
+
+            expect(resultBasic.from).to.equal(sender.address)
+            expect(resultBasic.status).to.be.true
+            expect(resultBasic.type).to.equal(TX_TYPE_STRING.TxTypeSmartContractExecution)
+
+            // FD/FDR Transaction - `from` is not existed in the `caver.wallet` / `feePayer` is existed in the `caver.wallet`
+            const sendOptionsForFD = {
+                from: sender.address,
+                gas: 1000000,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+            }
+
+            const resultFD = await contract.send(sendOptionsForFD, 'set', 'k', 'v')
+
+            expect(resultFD.from).to.equal(sender.address)
+            expect(resultFD.feePayer).to.equal(feePayer.address)
+            expect(resultFD.status).to.be.true
+            expect(resultFD.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+
+            // FD/FDR Transaction - `from` is not existed in the `caver.wallet` / `feePayer` is not existed in the `caver.wallet`
+            try {
+                await caver.klay.personal.importRawKey(feePayer.key.privateKey, 'passphrase')
+            } catch (e) {}
+            await caver.klay.personal.unlockAccount(feePayer.address, 'passphrase')
+
+            caver.wallet.remove(feePayer.address)
+            const sendOptionsForFDWithNodeAccount = {
+                from: sender.address,
+                gas: 1000000,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+            }
+
+            const resultForFDWithNodeAccount = await contract.send(sendOptionsForFDWithNodeAccount, 'set', 'k', 'v')
+
+            expect(resultForFDWithNodeAccount.from).to.equal(sender.address)
+            expect(resultForFDWithNodeAccount.feePayer).to.equal(feePayer.address)
+            expect(resultForFDWithNodeAccount.status).to.be.true
+            expect(resultForFDWithNodeAccount.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+        }).timeout(200000)
+
+        it(`CAVERJS-UNIT-ETC-394: should send to the Klaytn if in-memory wallet does not have a feePayer account`, async () => {
+            const contract = new caver.contract(abiWithoutConstructor, contractAddress)
+
+            // To send to the Klaytn, should remove in the in-memory wallet
+            caver.wallet.add(sender)
+
+            // FD/FDR Transaction - `feePayer` is not existed in the `caver.wallet`. And `from` is existed in the `caver.wallet`.
+            const sendOptionsForFD = {
+                from: sender.address,
+                gas: 1000000,
+                feeDelegation: true,
+                feePayer: feePayer.address,
+            }
+
+            const resultFD = await contract.send(sendOptionsForFD, 'set', 'k', 'v')
+
+            expect(resultFD.from).to.equal(sender.address)
+            expect(resultFD.feePayer).to.equal(feePayer.address)
+            expect(resultFD.status).to.be.true
+            expect(resultFD.type).to.equal(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution)
+        }).timeout(200000)
+    })
 })

@@ -151,7 +151,7 @@ const inputCallFormatter = function(options) {
 const inputTransactionFormatter = function(options) {
     // Only transaction objects prior to Common Architecture are formatted.
     // After the Common Architecture, the transaction does all the formatting in the setter when the instance is already created.
-    if (!options.type.includes('TxType')) {
+    if (!options.type || !options.type.includes('TxType')) {
         options = _txInputFormatter(options)
 
         // If senderRawTransaction' exist in transaction, it means object is fee payer transaction format like below
