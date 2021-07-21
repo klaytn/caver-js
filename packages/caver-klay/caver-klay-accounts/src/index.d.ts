@@ -50,6 +50,7 @@ export interface UpdateOptionsObject {
     weight?: number[]
     updateKey?: UpdateOptionsObject
     transactionKey?: UpdateOptionsObject
+    feePayerKey?: UpdateOptionsObject
 }
 
 export class AccountWithFunctions extends Account {
