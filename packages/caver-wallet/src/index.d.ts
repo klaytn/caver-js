@@ -23,7 +23,7 @@ import RoleBasedKeyring from './keyring/roleBasedKeyring'
 import SignatureData from './keyring/signatureData'
 import SingleKeyring from './keyring/singleKeyring'
 
-export interface SignMessageObject {
+export interface MessageSigned {
     message: string
     messageHash: string
     signatures: SignatureData[]
