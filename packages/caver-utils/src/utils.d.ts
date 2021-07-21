@@ -23,14 +23,6 @@ import SignatureData from '../../caver-wallet/src/keyring/signatureData'
 export type EncodeScalarInput = Buffer | string | number
 export type EncodeInput = EncodeScalarInput | EncodeScalarInput[]
 
-export type Role =
-    | 'roleTransactionKey'
-    | 'roleAccountUpdateKey'
-    | 'roleFeePayerKey'
-    | 'transactionKey'
-    | 'updateKey'
-    | 'feePayerKey'
-    | unknown
 
 export interface SignatureObject {
     V?: string
