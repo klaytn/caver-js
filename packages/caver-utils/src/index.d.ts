@@ -25,20 +25,11 @@ import Iban from '../iban'
 
 export type Unit = 'peb' | 'kpeb' | 'Mpeb' | 'Gpeb' | 'Ston' | 'ston' | 'uKLAY' | 'mKLAY' | 'KLAY' | 'kKLAY' | 'MKLAY' | 'GKLAY' | 'TKLAY'
 
-export interface KlayUnit {
-    peb: { unit: 'peb'; pebFactor: 0 }
-    kpeb: { unit: 'kpeb'; pebFactor: 3 }
-    Mpeb: { unit: 'Mpeb'; pebFactor: 6 }
-    Gpeb: { unit: 'Gpeb'; pebFactor: 9 }
-    ston: { unit: 'ston'; pebFactor: 9 }
-    uKLAY: { unit: 'uKLAY'; pebFactor: 12 }
-    mKLAY: { unit: 'mKLAY'; pebFactor: 15 }
-    KLAY: { unit: 'KLAY'; pebFactor: 18 }
-    kKLAY: { unit: 'kKLAY'; pebFactor: 21 }
-    MKLAY: { unit: 'MKLAY'; pebFactor: 24 }
-    GKLAY: { unit: 'GKLAY'; pebFactor: 27 }
-    TKLAY: { unit: 'TKLAY'; pebFactor: 30 }
-}
+export interface KlayUnit {[key: string]: {
+    unit: string
+    pebFactor: number
+}}
+
 
 export interface UnitMap {
     peb: '1'
