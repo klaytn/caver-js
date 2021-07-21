@@ -20,7 +20,17 @@ import BigNumber from 'bignumber.js'
 import Contract, { SendData, SendOptions } from '../../caver-contract/src'
 import { ReceiptObject } from '../../caver-rtm/src'
 import { AbiItem } from '../../caver-utils/src'
-import { Amount, Data, DetectedObject, TokenInfoObject } from './kip7'
+import { Amount, Data, TokenInfoObject } from './kip7'
+
+export interface KIP17DetectedObject {
+    IKIP17?: boolean
+    IKIP17Metadata?: boolean
+    IKIP17Enumerable?: boolean
+    IKIP17Mintable?: boolean
+    IKIP17MetadataMintable?: boolean
+    IKIP17Burnable?: boolean
+    IKIP17Pausable?: boolean
+}
 
 export default class KIP17 extends Contract {
     constructor(tokenAddress: string, abi?: AbiItem[])
@@ -28,9 +38,9 @@ export default class KIP17 extends Contract {
     static byteCode: string
 
     static deploy(tokenInfo: TokenInfoObject, sendOptions?: string | SendOptions): Promise<SendData>
-    static detectInterface(contractAddress: string): Promise<DetectedObject>
+    static detectInterface(contractAddress: string): Promise<KIP17DetectedObject>
     clone: Contract['clone']
-    detectInterface(): Promise<DetectedObject>
+    detectInterface(): Promise<KIP17DetectedObject>
     supportsInterface(interfaceId: string): Promise<boolean>
     name(): Promise<string>
     symbol(): Promise<string>

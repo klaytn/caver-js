@@ -21,7 +21,15 @@ import { Wallet } from '../../..'
 import Contract, { SendData, SendOptions } from '../../caver-contract/src'
 import { ReceiptObject } from '../../caver-rtm/src'
 import { AbiItem } from '../../caver-utils/src'
-import { Amount, Data, DetectedObject } from './kip7'
+import { Amount, Data } from './kip7'
+
+export interface KIP37DetectedObject {
+    IKIP37?: boolean
+    IKIP37Metadata?: boolean
+    IKIP37Mintable?: boolean
+    IKIP37Burnable?: boolean
+    IKIP37Pausable?: boolean
+}
 
 export default class KIP37 extends Contract {
     constructor(tokenAddress?: string, abi?: AbiItem[])
@@ -30,8 +38,8 @@ export default class KIP37 extends Contract {
 
     static create(tokenAddress?: string, abi?: AbiItem[]): KIP37
     static deploy(tokenInfo: object, sendOptions: string | SendOptions, wallet?: Wallet): Promise<SendData>
-    static detectInterface(contractAddress: string): Promise<DetectedObject>
-    detectInterface(): Promise<DetectedObject>
+    static detectInterface(contractAddress: string): Promise<KIP37DetectedObject>
+    detectInterface(): Promise<KIP37DetectedObject>
     supportsInterface(interfaceId: string): Promise<boolean>
     uri(id: Amount): Promise<string>
     totalSupply(id: Amount): Promise<BigNumber>

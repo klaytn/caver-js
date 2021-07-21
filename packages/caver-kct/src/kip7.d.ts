@@ -29,24 +29,12 @@ export interface TokenInfoObject {
     initialSupply?: BigNumber | string
 }
 
-export interface DetectedObject {
+export interface KIP7DetectedObject {
     IKIP7?: boolean
     IKIP7Metadata?: boolean
     IKIP7Mintable?: boolean
     IKIP7Burnable?: boolean
     IKIP7Pausable?: boolean
-    IKIP17?: boolean
-    IKIP17Metadata?: boolean
-    IKIP17Enumerable?: boolean
-    IKIP17Mintable?: boolean
-    IKIP17MetadataMintable?: boolean
-    IKIP17Burnable?: boolean
-    IKIP17Pausable?: boolean
-    IKIP37: boolean
-    IKIP37Metadata: boolean
-    IKIP37Mintable: boolean
-    IKIP37Burnable: boolean
-    IKIP37Pausable: boolean
 }
 
 export type Amount = string | number | BigNumber
@@ -60,9 +48,9 @@ export default class KIP7 extends Contract {
 
     static deploy(tokenInfo: TokenInfoObject, sendOptions: string | SendOptions): Promise<SendData>
     static deploy(tokenInfo: TokenInfoObject, sendOptions: string | SendOptions, wallet: Wallet): Promise<SendData> // override from caver-kct
-    static detectInterface(contractAddress: string): Promise<DetectedObject>
+    static detectInterface(contractAddress: string): Promise<KIP7DetectedObject>
     clone: Contract['clone']
-    detectInterface(): Promise<DetectedObject>
+    detectInterface(): Promise<KIP7DetectedObject>
     supportsInterface(interfaceId: string): Promise<boolean>
     name(): Promise<string>
     symbol(): Promise<string>
