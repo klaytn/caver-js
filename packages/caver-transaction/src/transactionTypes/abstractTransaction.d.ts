@@ -29,8 +29,8 @@ export interface CreateTransactionOptions {
     input?: string
     nonce?: string | number
     gas?: string | number
-    gasPrice?: string
-    chainId?: string
+    gasPrice?: string | number
+    chainId?: string | number
     feePayer?: string
     signatures?: string[] | SignatrueData[]
     feePayerSignatures?: string[] | SignatrueData[]
