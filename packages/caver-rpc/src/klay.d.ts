@@ -22,7 +22,7 @@ import AbstractFeeDelegatedTransaction from '../../caver-transaction/src/transac
 import { PromiEvent } from '../../caver-utils/src'
 import Validator from '../../caver-validator/src'
 
-export interface DecodeAanchoredObject {
+export interface DecodeAanchoringTransaction {
     BlockHash: string
     BlockNumber: number
     ParentHash: string
