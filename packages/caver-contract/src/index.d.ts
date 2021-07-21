@@ -29,9 +29,9 @@ export interface ContractOptions {
     from: string
     feePayer: string
     feeDelegation: boolean
-    feeRatio: number
-    gasPrice: number
-    gas: number
+    feeRatio: number | string
+    gasPrice: number | string
+    gas: number | string
     data: string
 }
 
