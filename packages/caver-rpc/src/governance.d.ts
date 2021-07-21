@@ -76,7 +76,7 @@ export interface GovernanceInformation {
     'reward.stakingupdateinterval'?: number
 }
 
-export interface StakingInformationObject {
+export interface StakingInformation {
     BlockNum: number
     CouncilNodeAddrs: string[]
     CouncilRewardAddrs: string[]
