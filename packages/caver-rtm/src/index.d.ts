@@ -52,7 +52,7 @@ export interface Block {
     voteData: string
 }
 
-export interface BlockWithConsensusInfoObject extends BlockObject {
+export interface BlockWithConsensusInfo extends Block {
     committee: string[]
     originProposer: string
     proposer: string
