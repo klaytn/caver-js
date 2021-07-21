@@ -163,7 +163,7 @@ export function isTxHash(txHash: string): boolean
 export function isTxHashStrict(txHash: string): boolean
 export function isValidHash(hash: string): boolean
 export function isValidHashStrict(hash: string): boolean
-export function isValidRole(role: Role): boolean
+export function isValidRole(role: string): boolean
 export function isEmptySig(sig: string | string[] | string[][] | object | SignatureData | SignatureData[]): boolean
 export function hashMessage(data: string): string
 export function recover(message: string, signature: SignatureData | string[] | object, isHashed?: boolean): string
