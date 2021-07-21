@@ -45,7 +45,7 @@ export interface Keystore {
     id: string
     address: string
     crypto?: EncryptedKey[]
-    keyring?: EncryptedKey[][]
+    keyring?: EncryptedKey[] | EncryptedKey[][]
 }
 
 export const KEY_ROLE: {
