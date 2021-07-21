@@ -27,7 +27,7 @@ export interface CreateTransactionOptions {
     to?: string
     value?: string | number
     input?: string
-    nonce?: string
+    nonce?: string | number
     gas?: string | number
     gasPrice?: string
     chainId?: string
