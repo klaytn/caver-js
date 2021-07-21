@@ -22,7 +22,7 @@ import AbstractTransaction from '../../caver-transaction/src/transactionTypes/ab
 import ValueTransfer from '../../caver-transaction/src/transactionTypes/valueTransfer/valueTransfer'
 import { SignatureObject } from '../../caver-utils/src/utils'
 
-export interface AccountObject {
+export interface KlaytnAccount {
     accType: number
     account: {
         balance: string
