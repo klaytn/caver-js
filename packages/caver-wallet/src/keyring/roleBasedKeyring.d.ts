@@ -17,7 +17,7 @@
 */
 
 import { EncryptOptions } from 'ethers/lib/utils'
-import { SignMessageObject } from '..'
+import { MessageSigned } from '..'
 import Account from '../../../caver-account/src'
 import { WeightedMultiSigOptionsObject } from '../../../caver-account/src/accountKey/weightedMultiSigOptions'
 import { Keystore } from './keyringHelper'
@@ -29,7 +29,7 @@ export default class RoleBasedKeyring {
     getPublicKey(compressed?: boolean): string[][]
     copy(): RoleBasedKeyring
     sign(transactionHash: string, chainId: string | number, role: number, index?: number): string[] | string[][]
-    signMessage(message: string, role: number, index?: number): SignMessageObject
+    signMessage(message: string, role: number, index?: number): MessageSigned
     getKeyByRole(role: number): PrivateKey[]
     toAccount(options?: WeightedMultiSigOptionsObject | WeightedMultiSigOptionsObject[]): Account
     encrypt(password: string, options?: EncryptOptions): Keystore

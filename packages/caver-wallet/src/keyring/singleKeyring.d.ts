@@ -16,7 +16,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SignMessageObject } from '..'
+import { MessageSigned } from '..'
 import Account from '../../../caver-account/src'
 import { EncryptedKeyOptions, Keystore } from './keyringHelper'
 import PrivateKey from './privateKey'
@@ -27,7 +27,7 @@ export default class SingleKeyring {
     getPublicKey(compressed?: boolean): string
     copy(): SingleKeyring
     sign(transactionHash: string, chainId: string | number, role: number, index?: number): string[] | string[][]
-    signMessage(message: string, role: number, index?: number): SignMessageObject
+    signMessage(message: string, role: number, index?: number): MessageSigned
     getKeyByRole(role: number): PrivateKey[]
     getKlaytnWalletKey(): string
     toAccount(): Account

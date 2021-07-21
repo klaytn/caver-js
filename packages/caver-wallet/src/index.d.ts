@@ -41,7 +41,7 @@ export default class KeyringContainer {
     isExisted(address: string): Keyring
     add(keyring: Keyring): Keyring
     remove(address: string): boolean
-    signMessage(address: string, data: string, role?: number, index?: number): SignMessageObject
+    signMessage(address: string, data: string, role?: number, index?: number): MessageSigned
     sign(address: string, transaction: Transaction, hasher?: Function): Promise<Transaction>
     sign(address: string, transaction: Transaction, index: number, hasher?: Function): Promise<Transaction>
     signAsFeePayer(address: string, transaction: Transaction, hasher?: Function): Promise<Transaction>
