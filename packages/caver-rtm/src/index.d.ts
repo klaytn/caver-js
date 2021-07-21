@@ -113,7 +113,7 @@ export interface ReceiptObject extends TransactionObject {
     options?: ContractOptions
 }
 
-export interface SignResultObject {
+export interface SignResult {
     raw: string
     tx: TransactionObject
 }
