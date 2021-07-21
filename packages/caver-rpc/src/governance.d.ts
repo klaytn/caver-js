@@ -34,7 +34,7 @@ export interface Vote {
     value?: string | number
 }
 
-export interface ChainConfigObject {
+export interface ChainConfig {
     chainId: number
     deriveShaImpl: number
     governance: {
