@@ -104,7 +104,7 @@ export default interface Utils {
     isTxHashStrict(txHash: string): boolean
     isValidHash(hash: string): boolean
     isValidHashStrict(hash: string): boolean
-    isValidRole(role: Role): boolean
+    isValidRole(role: string): boolean
     isEmptySig(sig: string | string[] | string[][] | object | SignatureData | SignatureData[]): boolean
     hashMessage(data: string): string
     recover(message: string, signature: SignatureData | string[] | object, isHashed?: boolean): string
