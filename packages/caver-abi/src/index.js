@@ -528,7 +528,7 @@ ABI.prototype.decodeFunctionCall = function(abi, functionCall) {
  * @return {string} plain param
  */
 ABI.prototype.decodeParameter = function(type, encodedString) {
-    return this.decodeParameters([type], bytes)[0]
+    return this.decodeParameters([type], encodedString)[0]
 }
 
 /**
