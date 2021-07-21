@@ -24,7 +24,7 @@ export interface Tally {
     Value: string | number
 }
 
-export interface VoteObject {
+export interface Vote {
     BlockNum?: number
     Casted?: boolean
     Key?: string
