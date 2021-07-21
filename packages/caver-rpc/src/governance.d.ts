@@ -99,7 +99,7 @@ export default class GovernanceRPC {
     showTally: {
         method: Method
         request: Function
-        (): Promise<TallyObject>
+        (): Promise<Tally>
     }
     getTotalVotingPower: {
         method: Method
@@ -114,12 +114,12 @@ export default class GovernanceRPC {
     getMyVotes: {
         method: Method
         request: Function
-        (): Promise<VoteObject[]>
+        (): Promise<Vote[]>
     }
     getChainConfig: {
         method: Method
         request: Function
-        (): Promise<ChainConfigObject>
+        (): Promise<ChainConfig>
     }
     getNodeAddress: {
         method: Method
@@ -129,17 +129,17 @@ export default class GovernanceRPC {
     getItemsAt: {
         method: Method
         request: Function
-        (index: number): Promise<DomainFieldObject>
+        (index: number): Promise<GovernanceInformation>
     }
     getPendingChanges: {
         method: Method
         request: Function
-        (): Promise<DomainFieldObject>
+        (): Promise<GovernanceInformation>
     }
     getVotes: {
         method: Method
         request: Function
-        (): Promise<VoteObject[]>
+        (): Promise<Vote[]>
     }
     getIdxCache: {
         method: Method
@@ -154,11 +154,11 @@ export default class GovernanceRPC {
     getItemCacheFromDb: {
         method: Method
         request: Function
-        (index: number): Promise<DomainFieldObject>
+        (index: number): Promise<GovernanceInformation>
     }
     getStakingInfo: {
         method: Method
         request: Function
-        (blockTag?: string): Promise<StakingInformationObject>
+        (blockTag?: string): Promise<StakingInformation>
     }
 }
