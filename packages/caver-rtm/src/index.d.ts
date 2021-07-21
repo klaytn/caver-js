@@ -31,7 +31,7 @@ export interface KlaytnAccount {
     }
 }
 
-export interface BlockObject {
+export interface Block {
     blockscore: string
     extraData: string
     gasUsed: string
