@@ -18,7 +18,7 @@
 
 import Method from '../../caver-core-method/src'
 
-export interface TallyObject {
+export interface Tally {
     ApprovalPercentage: number
     Key: string
     Value: string | number
