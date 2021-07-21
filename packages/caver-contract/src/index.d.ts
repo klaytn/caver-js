@@ -35,8 +35,8 @@ export interface ContractOptions {
     data: string
 }
 
-export interface DeployOptions extends SendOptions {
-    data: string
+export interface ContractDeployParams extends SendOptions {
+    data?: string
     arguments?: any[]
 }
 
@@ -55,7 +55,7 @@ export interface CallOptions {
     gas?: number
 }
 
-export interface ContractSendMethod extends SendData {
+export interface ContractMethod extends SendData {
     send: Contract['send']
     call: Contract['call']
     sign: Contract['sign']
@@ -76,6 +76,9 @@ export interface SendData {
 
 export interface EventOptions {
     filter?: object
+    fromBlock?: number
+    toBlock?: number
+    topics?: string[]
 }
 
 export interface EventData {
@@ -121,7 +124,7 @@ export default class Contract {
     setWallet(wallet: Wallet): void
     addAccounts(accounts: string[]): void
     decodeFunctionCall(functionCall: string): Result
-    deploy(options: DeployOptions, byteCode?: string, ...args: any[]): ContractSendMethod
+    deploy(options: ContractDeployParams, byteCode?: string, ...args: any[]): ContractMethod
     send(sendOptions: SendOptions, functionName?: string, ...args: any[]): Promise<SendData>
     call(functionName: string, ...args: any[]): Promise<any>
     call(callObject: CallOptions, functionName: string, ...args: any[]): Promise<any>
