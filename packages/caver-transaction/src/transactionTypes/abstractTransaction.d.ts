@@ -32,6 +32,11 @@ export interface CreateTransactionOptions {
     gasPrice?: string
     chainId?: string
     feePayer?: string
+    signatures?: string[] | SignatrueData[]
+    feePayerSignatures?: string[] | SignatrueData[]
+    feeRatio?: string | number
+    humanReadable?: boolean
+    codeFormat?: string
 }
 
 export default class AbstractTransaction {
