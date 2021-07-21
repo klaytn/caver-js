@@ -64,6 +64,6 @@ export default class Account {
         accountKeyFail: typeof AccountKeyFail
         accountKeyWeightedMultiSig: typeof AccountKeyWeightedMultiSig
         accountKeyRoleBased: typeof AccountKeyRoleBased
-        weightedPublicKey: WeightedPublicKey
+        weightedPublicKey: typeof WeightedPublicKey
     }
 }
