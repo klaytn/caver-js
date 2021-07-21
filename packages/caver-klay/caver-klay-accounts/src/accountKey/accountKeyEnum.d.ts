@@ -16,8 +16,4 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-export const AccountKeyEnum: {
-    ACCOUNT_KEY_PUBLIC: 'AccountKeyPublic'
-    ACCOUNT_KEY_MULTISIG: 'AccountKeyMultiSig'
-    ACCOUNT_KEY_ROLEBASED: 'AccountKeyRoleBased'
-}
+export const AccountKeyEnum: {[key: string]: string}
