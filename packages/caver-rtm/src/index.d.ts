@@ -118,7 +118,7 @@ export interface SignResult {
     tx: TransactionObject
 }
 
-export interface PeerCountType {
+export interface PeerCountByType {
     en: number
     pn: number
     total: number
