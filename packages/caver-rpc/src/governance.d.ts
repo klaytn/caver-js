@@ -58,7 +58,7 @@ export interface ChainConfig {
     unitPrice: number
 }
 
-export interface DomainFieldObject {
+export interface GovernanceInformation {
     'governance.governancemode'?: string
     'governance.governingnode'?: string
     'governance.unitprice'?: number
