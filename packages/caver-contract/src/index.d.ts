@@ -36,7 +36,7 @@ export interface ContractOptions {
 }
 
 export interface DeployOptions extends SendOptions {
-    data?: string
+    data: string
     arguments?: any[]
 }
 
