@@ -183,7 +183,7 @@ export default class RpcCallToMethod {
     klay_getTransactionCount(address: string, blockNumber: number): Promise<string>
     klay_getTransactionCount(address: string, blockTag: string): Promise<string>
     klay_sendRawTransaction(rawTransaction: string | ValueTransfer): Promise<ReceiptObject>
-    klay_signTransaction(tx: AbstractTransaction): Promise<SignResultObject>
+    klay_signTransaction(tx: AbstractTransaction): Promise<SignResult>
     klay_sendTransaction(tx: AbstractTransaction): Promise<string>
     klay_call(callObject: object): Promise<string>
     klay_call(callObject: object, blockNumber: number): Promise<string>
@@ -191,10 +191,10 @@ export default class RpcCallToMethod {
     klay_estimateGas(callObject: CallObject): Promise<string>
     klay_getLogs(filterOption: FilterOptions): Promise<LogObject[]>
     klay_sign(address: string, message: string): Promise<string>
-    klay_getBlockByNumber(blockNumber: number): Promise<BlockObject>
-    klay_getBlockByNumber(blockNumber: number, fullTxs: boolean): Promise<BlockObject>
-    klay_getBlockByNumber(blockTag: string): Promise<BlockObject>
-    klay_getBlockByNumber(blockTag: string, fullTxs: boolean): Promise<BlockObject>
+    klay_getBlockByNumber(blockNumber: number): Promise<Block>
+    klay_getBlockByNumber(blockNumber: number, fullTxs: boolean): Promise<Block>
+    klay_getBlockByNumber(blockTag: string): Promise<Block>
+    klay_getBlockByNumber(blockTag: string, fullTxs: boolean): Promise<Block>
     klay_getBlockTransactionCountByNumber(blockNumber: number): Promise<string>
     klay_getBlockTransactionCountByNumber(blockTag: string): Promise<string>
     klay_getTransactionByBlockNumberAndIndex(blockNumber: number, index: number): Promise<TransactionObject>
@@ -213,8 +213,8 @@ export default class RpcCallToMethod {
     personal_signTransaction(txObj: TransactionObject, passphrase: string): Promise<any>
     personal_sign(message: string, account: string, password?: string): Promise<string>
     personal_ecRecover(message: string, signature: string): Promise<string>
-    klay_getBlockWithConsensusInfoByNumber(blockNumber: number): Promise<BlockWithConsensusInfoObject>
-    klay_getBlockWithConsensusInfoByNumber(blockTag: string): Promise<BlockWithConsensusInfoObject>
+    klay_getBlockWithConsensusInfoByNumber(blockNumber: number): Promise<BlockWithConsensusInfo>
+    klay_getBlockWithConsensusInfoByNumber(blockTag: string): Promise<BlockWithConsensusInfo>
     debug_traceTransaction(txHash: string, options?: TracingOptions): Promise<string>
     klay_accountCreated(address: string): Promise<boolean>
     klay_accountCreated(address: string, blockNumber: number): Promise<boolean>
@@ -240,9 +240,9 @@ export default class RpcCallToMethod {
     klay_getCypressCredit(blockNumber: number): Promise<any>
     klay_getCypressCredit(blockTag: string): Promise<any>
     klay_sha3(data: string): Promise<string>
-    klay_getAccount(address: string): Promise<AccountObject>
-    klay_getAccount(address: string, blockNumber: number): Promise<AccountObject>
-    klay_getAccount(address: string, blockTag: string): Promise<AccountObject>
+    klay_getAccount(address: string): Promise<KlaytnAccount>
+    klay_getAccount(address: string, blockNumber: number): Promise<KlaytnAccount>
+    klay_getAccount(address: string, blockTag: string): Promise<KlaytnAccount>
     klay_getTransactionBySenderTxHash(senderTxHash: string): Promise<TransactionObject>
     klay_getTransactionReceiptBySenderTxHash(senderTxHash: string): Promise<ReceiptObject>
     klay_gasPriceAt(): Promise<string>
@@ -259,7 +259,7 @@ export default class RpcCallToMethod {
     klay_newPendingTransactionFilter(): Promise<string>
     klay_uninstallFilter(filterId: string): Promise<boolean>
     klay_getBlockReceipts(blockHash: string): Promise<ReceiptObject>
-    net_peerCountByType(): Promise<PeerCountType>
+    net_peerCountByType(): Promise<PeerCountByType>
     klay_estimateComputationCost(callObject: CallObject): Promise<string>
     klay_estimateComputationCost(callObject: CallObject, blockNumber: number): Promise<string>
     klay_estimateComputationCost(callObject: CallObject, blockTag: string): Promise<string>

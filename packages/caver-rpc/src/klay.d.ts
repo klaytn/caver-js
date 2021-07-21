@@ -17,7 +17,7 @@
 */
 
 import { AccountKeyFormat, AccountKeyObject } from '../../caver-core-helpers/src/formatters'
-import RpcCallToMethod, { BlockObject, BlockWithConsensusInfoObject, SignResultObject, TransactionObject } from '../../caver-rtm/src'
+import RpcCallToMethod, { Block, BlockWithConsensusInfo, SignResult, TransactionObject } from '../../caver-rtm/src'
 import AbstractFeeDelegatedTransaction from '../../caver-transaction/src/transactionTypes/abstractFeeDelegatedTransaction'
 import { PromiEvent } from '../../caver-utils/src'
 import Validator from '../../caver-validator/src'
@@ -62,13 +62,13 @@ export default class KlayRPC {
     getBlockNumber: RpcCallToMethod['klay_blockNumber']
     getBlock: RpcCallToMethod['klay_getBlockByNumber']
     getBlockByNumber: RpcCallToMethod['klay_getBlockByNumber']
-    getBlockByHash(blockHash: string): Promise<BlockObject>
-    getBlockByHash(blockHash: string, fullTxs: boolean): Promise<BlockObject>
+    getBlockByHash(blockHash: string): Promise<Block>
+    getBlockByHash(blockHash: string, fullTxs: boolean): Promise<Block>
     getBlockReceipts: RpcCallToMethod['klay_getBlockReceipts']
     getBlockTransactionCount: RpcCallToMethod['klay_getBlockTransactionCountByNumber']
     getBlockTransactionCountByNumber: RpcCallToMethod['klay_getBlockTransactionCountByNumber']
     getBlockTransactionCountByHash(blockHash: string): Promise<string>
-    getBlockWithConsensusInfoByHash(blockHash: string): Promise<BlockWithConsensusInfoObject>
+    getBlockWithConsensusInfoByHash(blockHash: string): Promise<BlockWithConsensusInfo>
     getBlockWithConsensusInfo: RpcCallToMethod['klay_getBlockWithConsensusInfoByNumber']
     getBlockWithConsensusInfoByNumber: RpcCallToMethod['klay_getBlockWithConsensusInfoByNumber']
     getCommittee: RpcCallToMethod['klay_getCommittee']
@@ -94,7 +94,7 @@ export default class KlayRPC {
     sendTransaction: RpcCallToMethod['klay_sendTransaction']
     sendTransactionAsFeePayer(tx: AbstractFeeDelegatedTransaction): Promise<PromiEvent>
     signTransaction: RpcCallToMethod['klay_signTransaction']
-    signTransactionAsFeePayer(tx: AbstractFeeDelegatedTransaction): Promise<SignResultObject>
+    signTransactionAsFeePayer(tx: AbstractFeeDelegatedTransaction): Promise<SignResult>
     getDecodedAnchoringTransactionByHash(hash: string): Promise<DecodeAanchoringTransaction>
     getChainId: RpcCallToMethod['klay_chainID']
     getClientVersion: RpcCallToMethod['klay_clientVersion']
