@@ -95,7 +95,7 @@ export default class KlayRPC {
     sendTransactionAsFeePayer(tx: AbstractFeeDelegatedTransaction): Promise<PromiEvent>
     signTransaction: RpcCallToMethod['klay_signTransaction']
     signTransactionAsFeePayer(tx: AbstractFeeDelegatedTransaction): Promise<SignResultObject>
-    getDecodedAnchoringTransactionByHash(hash: string): Promise<DecodeAanchoredObject>
+    getDecodedAnchoringTransactionByHash(hash: string): Promise<DecodeAanchoringTransaction>
     getChainId: RpcCallToMethod['klay_chainID']
     getClientVersion: RpcCallToMethod['klay_clientVersion']
     getGasPrice: RpcCallToMethod['klay_gasPrice']
