@@ -128,6 +128,7 @@
     "gulp-replace": "1.0.0",
     "gulp-streamify": "1.0.2",
     "gulp-uglify": "3.0.1",
+    "jsdoc-typeof-plugin": "^1.0.0",
     "jshint": "2.9.7",
     "nock": "10.0.6",
     "nyc": "14.1.1",
