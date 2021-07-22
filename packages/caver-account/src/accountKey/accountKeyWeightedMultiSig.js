@@ -25,10 +25,15 @@ const { ACCOUNT_KEY_TAG, fillWeightedMultiSigOptionsForMultiSig } = require('./a
 /**
  * Representing an AccountKeyWeightedMultiSig.
  * @class
+ * @hideconstructor
  */
 class AccountKeyWeightedMultiSig {
     /**
      * Decodes an RLP-encoded AccountKeyWeightedMultiSig string.
+     *
+     * @example
+     * const accountKey = caver.account.accountKey.accountKeyWeightedMultiSig.decode('0x{encoded account key}')
+     *
      * @param {string} rlpEncodedKey - An RLP-encoded AccountKeyWeightedMultiSig string.
      * @return {AccountKeyWeightedMultiSig}
      */
@@ -48,8 +53,20 @@ class AccountKeyWeightedMultiSig {
 
     /**
      * Creates an instance of AccountKeyWeighedMultiSig.
+     *
+     * @example
+     * const publicKeyArray = [ '0x{public key1}', '0x{public key2}' ]
+     * const accountKey = caver.account.accountKey.accountKeyWeightedMultiSig.fromPublicKeysAndOptions(publicKeyArray)
+     *
+     * // with options
+     * const publicKeyArray = [ '0x{public key1}', '0x{public key2}' ]
+     * // For option object, you can use `new caver.account.weightedMultiSigOptions(2, [1, 1])`
+     * // instead of `{ threshold: 2, weights: [1, 1] }`.
+     * const options = { threshold: 2, weights: [1, 1] }
+     * const accountKey = caver.account.accountKey.accountKeyWeightedMultiSig.fromPublicKeysAndOptions(publicKeyArray, options)
+     *
      * @param {Array.<string>} publicKeyArray - An array of public key strings.
-     * @param {WeightedMultiSigOptions|object} options - An options which defines threshold and weight.
+     * @param {WeightedMultiSigOptions|object} [options] - An options which defines threshold and weight.
      * @return {AccountKeyWeightedMultiSig}
      */
     static fromPublicKeysAndOptions(publicKeyArray, options) {
@@ -106,6 +123,10 @@ class AccountKeyWeightedMultiSig {
 
     /**
      * Returns an RLP-encoded AccountKeyWeightedMultiSig string.
+     *
+     * @example
+     * const encoding = accountKeyWeightedMultiSig.getRLPEncoding()
+     *
      * @return {string}
      */
     getRLPEncoding() {

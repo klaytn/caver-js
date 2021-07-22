@@ -21,7 +21,10 @@ const utils = require('../../../caver-utils')
 
 /**
  * Representing a WeightedPublicKey.
+ * This class is used to represent each public key with weight in {@link AccountKeyWeightedMultiSig}.
+ *
  * @class
+ * @hideconstructor
  */
 class WeightedPublicKey {
     /**
@@ -59,6 +62,10 @@ class WeightedPublicKey {
 
     /**
      * Returns an encoded weighted public key string.
+     *
+     * @example
+     * const bytes = weightedPublicKey.encodeToBytes()
+     *
      * @return {string}
      */
     encodeToBytes() {

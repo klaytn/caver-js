@@ -85,7 +85,7 @@ function Caver(provider, net) {
 
     /** @type {module:utils} */
     this.utils = utils
-    /** @type {Class<Account>} */
+    /** @type {typeof Account} */
     this.account = Account
     /** @type {module:Transaction} */
     this.transaction = Transaction
@@ -153,7 +153,7 @@ function Caver(provider, net) {
     Contract.prototype = Object.create(BaseContract.prototype)
     Contract.prototype.constructor = Contract
 
-    /** @type {Class<Contract>} */
+    /** @type {typeof Contract} */
     this.contract = Contract
     this.contract._requestManager = this._requestManager
     this.contract.currentProvider = this._requestManager.provider

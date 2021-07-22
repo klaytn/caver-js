@@ -18,7 +18,8 @@
     "excludePattern": "(node_modules/|docs)"
   },
   "plugins": [
-    "plugins/markdown"
+    "plugins/markdown",
+    "node_modules/jsdoc-typeof-plugin"
   ],
   "opts": {
     "template": "node_modules/docdash",
