@@ -48,10 +48,15 @@ function isValidRoleBasedKeyFormat(roleBasedAccountKeys) {
 /**
  * Representing an AccountKeyRoleBased.
  * @class
+ * @hideconstructor
  */
 class AccountKeyRoleBased {
     /**
      * Decodes an RLP-encoded AccountKeyRoleBased string.
+     *
+     * @example
+     * const accountKey = caver.account.accountKey.accountKeyRoleBased.decode('0x{encoded account key}')
+     *
      * @param {string} rlpEncodedKey - An RLP-encoded AccountKeyRoleBased string.
      * @return {AccountKeyRoleBased}
      */
@@ -85,6 +90,48 @@ class AccountKeyRoleBased {
 
     /**
      * Creates an instance of AccountKeyRoleBased.
+     *
+     * @example
+     * const publicKeyArray = [
+     *      [ '0x{public key1}', '0x{public key2}' ], // roleTransactionKey
+     *      [ '0x{public key3}', '0x{public key4}', '0x{public key5}' ], // roleAccountUpdateKey
+     *      [ '0x{public key6}', '0x{public key7}', '0x{public key8}', '0x{public key9}' ], // roleFeePayerKey
+     * ]
+     * // For option object, you can use `new caver.account.weightedMultiSigOptions(2, [1, 1])`
+     * // instead of `{ threshold: 2, weights: [1, 1] }`.
+     * const options = [
+     *      { threshold: 2, weights: [1, 1] },
+     *      { threshold: 2, weights: [1, 1, 2] },
+     *      { threshold: 3, weights: [1, 1, 2, 2] }
+     * ]
+     * const accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(publicKeyArray, options)
+     *
+     * // Update only roleTransactionKey and roleFeePayerKey
+     * const publicKeyArrayToUpdatePartial = [
+     *      [ '0x{public key1}', '0x{public key2}' ], // roleTransactionKey
+     *      [], // roleAccountUpdateKey -> If not defined the key(s) to use in the specific role, this role key is not updated.
+     *      [ '0x{public key3}', '0x{public key4}' ], // roleFeePayerKey
+     * ]
+     * const options = [
+     *      { threshold: 2, weights: [1, 1] },
+     *      {},
+     *      { threshold: 3, weights: [1, 2] }
+     * ]
+     * const accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(publicKeyArrayToUpdatePartial, options)
+     *
+     * // Update to AccountKeyLegacy or AccountKeyFail
+     * const publicKeyArrayWithLegacyAndFail = [
+     *      [ '0x{public key1}', '0x{public key2}' ], // roleTransactionKey
+     *      [ new caver.account.accountKey.accountKeyLegacy() ], // roleAccountUpdateKey will use AccountKeyLegacy when update an account key of the Klaytn account.
+     *      [ new caver.account.accountKey.accountKeyFail() ], // roleFeePayerKey will be updated to AccountKeyFail, so this Klaytn account cannot pay a fee as a fee payer.
+     * ]
+     * const options = [
+     *      { threshold: 2, weights: [1, 1] },
+     *      {},
+     *      {}
+     * ]
+     * const accountKey = caver.account.accountKey.accountKeyRoleBased.fromRoleBasedPublicKeysAndOptions(publicKeyArrayWithLegacyAndFail, options)
+     *
      * @param {Array.<AccountKeyLegacy|AccountKeyFail|Array.<string>>} roleBasedPubArray - An array of public key strings.
      * @param {Array.<WeightedMultiSigOptions|object>} options - An array of options which defines threshold and weight.
      * @return {AccountKeyRoleBased}
@@ -161,6 +208,10 @@ class AccountKeyRoleBased {
 
     /**
      * Returns an RLP-encoded AccountKeyRoleBased string.
+     *
+     * @example
+     * const encoding = accountKeyRoleBased.getRLPEncoding()
+     *
      * @return {string}
      */
     getRLPEncoding() {

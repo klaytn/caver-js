@@ -23,10 +23,15 @@ const { ACCOUNT_KEY_TAG } = require('./accountKeyHelper')
 /**
  * Representing an AccountKeyPublic.
  * @class
+ * @hideconstructor
  */
 class AccountKeyPublic {
     /**
      * Decodes an RLP-encoded AccountKeyPublic string.
+     *
+     * @example
+     * const accountKey = caver.account.accountKey.accountKeyPublic.decode('0x{encoded account key}')
+     *
      * @param {string} rlpEncodedKey - An RLP-encoded AccountKeyPublic string.
      * @return {AccountKeyPublic}
      */
@@ -43,6 +48,12 @@ class AccountKeyPublic {
 
     /**
      * Creates AccountKeyPublic instance from x, y point
+     *
+     * @example
+     * const pubKey = '0x{public key string}'
+     * const [ x, y ] = caver.utils.xyPointFromPublicKey(pubKey)
+     * const accountKey = caver.account.accountKey.accountKeyPublic.fromXYPoint(x, y)
+     *
      * @param {string} x - The x point.
      * @param {string} y - The y point.
      * @return {AccountKeyPublic}
@@ -56,6 +67,11 @@ class AccountKeyPublic {
 
     /**
      * Creates AccountKeyPublic instance from public key string
+     *
+     * @example
+     * const pubKey = '0x{public key string}'
+     * const accountKey = caver.account.accountKey.accountKeyPublic.fromPublicKey(pubKey)
+     *
      * @param {string} pubKey - The public key string. This can be in format of compressed or uncompressed.
      * @return {AccountKeyPublic}
      */
@@ -85,6 +101,10 @@ class AccountKeyPublic {
 
     /**
      * Returns an RLP-encoded AccountKeyPublic string.
+     *
+     * @example
+     * const encoding = accountKeyPublic.getRLPEncoding()
+     *
      * @return {string}
      */
     getRLPEncoding() {
@@ -94,6 +114,10 @@ class AccountKeyPublic {
 
     /**
      * Returns the x and y coordinates of publicKey.
+     *
+     * @example
+     * const xyPoint = accountKeyPublic.getXYPoint()
+     *
      * @return {Array.<string>}
      */
     getXYPoint() {

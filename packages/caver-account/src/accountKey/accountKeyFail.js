@@ -22,10 +22,15 @@ const { ACCOUNT_KEY_TAG } = require('./accountKeyHelper')
 /**
  * Representing an AccountKeyFail.
  * @class
+ * @hideconstructor
  */
 class AccountKeyFail {
     /**
      * Decodes an RLP-encoded AccountKeyFail string.
+     *
+     * @example
+     * const accountKey = caver.account.accountKey.accountKeyFail.decode('0x{encoded account key}')
+     *
      * @param {string} rlpEncodedKey - An RLP-encoded AccountKeyFail string.
      * @return {AccountKeyFail}
      */
@@ -39,6 +44,10 @@ class AccountKeyFail {
 
     /**
      * Returns an RLP-encoded AccountKeyFail string.
+     *
+     * @example
+     * const encoding = accountKeyFail.getRLPEncoding()
+     *
      * @return {string}
      */
     // eslint-disable-next-line class-methods-use-this
