@@ -17,7 +17,7 @@
 */
 
 import BN from 'bn.js'
-import { TransactionObject } from '../../caver-rtm/src'
+import { TransactionFromNode } from '../../caver-rtm/src'
 import SignatureData from '../../caver-wallet/src/keyring/signatureData'
 
 export type EncodeScalarInput = Buffer | string | number
@@ -72,7 +72,7 @@ export default interface Utils {
     }
     parseKlaytnWalletKey(key: string): string[]
     isKlaytnWalletKey(privateKey: string): boolean
-    isContractDeployment(txObject: TransactionObject): boolean
+    isContractDeployment(txObject: TransactionFromNode): boolean
     rlpEncode(data: EncodeInput): string
     rlpDecode(encodedData: string): string | string[]
     xyPointFromPublicKey(pub: string): [string, string]
@@ -142,7 +142,7 @@ export function parsePrivateKey(
 }
 export function parseKlaytnWalletKey(key: string): string[]
 export function isKlaytnWalletKey(privateKey: string): boolean
-export function isContractDeployment(txObject: TransactionObject): boolean
+export function isContractDeployment(txObject: TransactionFromNode): boolean
 export function rlpEncode(data: EncodeInput): string
 export function rlpDecode(encodedData: string): string | string[]
 export function xyPointFromPublicKey(pub: string): [string, string]

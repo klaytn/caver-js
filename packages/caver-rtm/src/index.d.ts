@@ -47,7 +47,7 @@ export interface Block {
     timestamp: string
     timestampFoS: string
     totalBlockScore: string
-    transactions: TransactionObject[]
+    transactions: TransactionFromNode[]
     transactionsRoot: string
     voteData: string
 }
@@ -59,7 +59,7 @@ export interface BlockWithConsensusInfo extends Block {
     round: number
 }
 
-export interface TransactionObject {
+export interface TransactionFromNode {
     blockHash?: string
     blockNumber?: string
     codeFormat?: string
@@ -85,7 +85,7 @@ export interface TransactionObject {
     data?: string
 }
 
-export interface ReceiptObject extends TransactionObject {
+export interface ReceiptObject extends TransactionFromNode {
     transactionIndex?: string
     contractAddress: string
     gasUsed: string
@@ -115,7 +115,7 @@ export interface ReceiptObject extends TransactionObject {
 
 export interface SignResult {
     raw: string
-    tx: TransactionObject
+    tx: TransactionFromNode
 }
 
 export interface PeerCountByType {
@@ -177,7 +177,7 @@ export default class RpcCallToMethod {
     klay_getCode(address: string): Promise<string>
     klay_getCode(address: string, blockNumber: number): Promise<string>
     klay_getCode(address: string, blockTag: string): Promise<string>
-    klay_getTransactionByHash(hash: string): Promise<TransactionObject>
+    klay_getTransactionByHash(hash: string): Promise<TransactionFromNode>
     klay_getTransactionReceipt(hash: string): Promise<ReceiptObject>
     klay_getTransactionCount(address: string): Promise<string>
     klay_getTransactionCount(address: string, blockNumber: number): Promise<string>
@@ -197,8 +197,8 @@ export default class RpcCallToMethod {
     klay_getBlockByNumber(blockTag: string, fullTxs: boolean): Promise<Block>
     klay_getBlockTransactionCountByNumber(blockNumber: number): Promise<string>
     klay_getBlockTransactionCountByNumber(blockTag: string): Promise<string>
-    klay_getTransactionByBlockNumberAndIndex(blockNumber: number, index: number): Promise<TransactionObject>
-    klay_getTransactionByBlockNumberAndIndex(blockTag: string, index: number): Promise<TransactionObject>
+    klay_getTransactionByBlockNumberAndIndex(blockNumber: number, index: number): Promise<TransactionFromNode>
+    klay_getTransactionByBlockNumberAndIndex(blockTag: string, index: number): Promise<TransactionFromNode>
     net_networkID(): Promise<number>
     net_networkID(callback: Function): Promise<number>
     net_listening(): Promise<boolean>
@@ -210,7 +210,7 @@ export default class RpcCallToMethod {
     personal_lockAccount(address: string): Promise<boolean>
     personal_importRawKey(keydata: string, passphrase: string): Promise<string>
     personal_sendTransaction(tx: string, passphrase: string): Promise<string>
-    personal_signTransaction(txObj: TransactionObject, passphrase: string): Promise<any>
+    personal_signTransaction(txObj: TransactionFromNode, passphrase: string): Promise<any>
     personal_sign(message: string, account: string, password?: string): Promise<string>
     personal_ecRecover(message: string, signature: string): Promise<string>
     klay_getBlockWithConsensusInfoByNumber(blockNumber: number): Promise<BlockWithConsensusInfo>
@@ -243,7 +243,7 @@ export default class RpcCallToMethod {
     klay_getAccount(address: string): Promise<KlaytnAccount>
     klay_getAccount(address: string, blockNumber: number): Promise<KlaytnAccount>
     klay_getAccount(address: string, blockTag: string): Promise<KlaytnAccount>
-    klay_getTransactionBySenderTxHash(senderTxHash: string): Promise<TransactionObject>
+    klay_getTransactionBySenderTxHash(senderTxHash: string): Promise<TransactionFromNode>
     klay_getTransactionReceiptBySenderTxHash(senderTxHash: string): Promise<ReceiptObject>
     klay_gasPriceAt(): Promise<string>
     klay_gasPriceAt(blockNumber: number): Promise<string>

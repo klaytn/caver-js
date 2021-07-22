@@ -17,7 +17,7 @@
 */
 
 import { AccountKeyFormat, AccountKeyObject } from '../../caver-core-helpers/src/formatters'
-import RpcCallToMethod, { Block, BlockWithConsensusInfo, SignResult, TransactionObject } from '../../caver-rtm/src'
+import RpcCallToMethod, { Block, BlockWithConsensusInfo, SignResult, TransactionFromNode } from '../../caver-rtm/src'
 import AbstractFeeDelegatedTransaction from '../../caver-transaction/src/transactionTypes/abstractFeeDelegatedTransaction'
 import { PromiEvent } from '../../caver-utils/src'
 import Validator from '../../caver-validator/src'
@@ -81,7 +81,7 @@ export default class KlayRPC {
     call: RpcCallToMethod['klay_call']
     estimateGas: RpcCallToMethod['klay_estimateGas']
     estimateComputationCost: RpcCallToMethod['klay_estimateComputationCost']
-    getTransactionByBlockHashAndIndex(hash: string, index: number): Promise<TransactionObject>
+    getTransactionByBlockHashAndIndex(hash: string, index: number): Promise<TransactionFromNode>
     getTransactionFromBlock: RpcCallToMethod['klay_getTransactionByBlockNumberAndIndex']
     getTransactionByBlockNumberAndIndex: RpcCallToMethod['klay_getTransactionByBlockNumberAndIndex']
     getTransaction: RpcCallToMethod['klay_getTransactionByHash']
