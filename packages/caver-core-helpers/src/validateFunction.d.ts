@@ -17,9 +17,10 @@
 */
 
 import { TransactionObject } from '../../caver-rtm/src'
+import { Transaction } from '../../caver-transaction/src'
 
 export default interface IValidateFunction {
-    validateParams(tx: TransactionObject): Error
+    validateParams(tx: TransactionObject | Transaction): Error
     validateTxType(txType: string): boolean
     validateCodeFormat(cf: string): boolean
 }
