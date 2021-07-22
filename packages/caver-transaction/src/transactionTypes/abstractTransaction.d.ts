@@ -32,8 +32,8 @@ export interface CreateTransactionOptions {
     gasPrice?: string | number
     chainId?: string | number
     feePayer?: string
-    signatures?: string[] | SignatrueData[]
-    feePayerSignatures?: string[] | SignatrueData[]
+    signatures?: string[] | string[][] | SignatureData[]
+    feePayerSignatures?: string[] | string[][] | SignatureData[]
     feeRatio?: string | number
     humanReadable?: boolean
     codeFormat?: string
