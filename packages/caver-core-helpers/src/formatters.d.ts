@@ -19,7 +19,7 @@
 import BigNumber from 'bignumber.js'
 import { AccountKey } from '../../caver-account/src'
 import { Amount } from '../../caver-kct/src/kip7'
-import { ReceiptObject, TransactionFromNode } from '../../caver-rtm/src'
+import { TransactionReceipt, TransactionFromNode } from '../../caver-rtm/src'
 import Utils from '../../caver-utils/src'
 
 export type AccountKeyFormat = AccountKeyObject | AccountKey
@@ -55,7 +55,7 @@ export default interface IFormatters {
     inputAccountKeyFormatter(accountKey: AccountKey): AccountKeyObject
     outputBigNumberFormatter(number: Amount): BigNumber
     outputTransactionFormatter(tx: TransactionFromNode): TransactionFromNode
-    outputTransactionReceiptFormatter(receipt: ReceiptObject): ReceiptObject
+    outputTransactionReceiptFormatter(receipt: TransactionReceipt): TransactionReceipt
     outputBlockFormatter(block: object): object
     outputLogFormatter(log: object): object
     outputPostFormatter(post: object): object

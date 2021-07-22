@@ -18,7 +18,7 @@
 
 import BigNumber from 'bignumber.js'
 import Contract, { SendData, SendOptions } from '../../caver-contract/src'
-import { ReceiptObject } from '../../caver-rtm/src'
+import { TransactionReceipt } from '../../caver-rtm/src'
 import { AbiItem } from '../../caver-utils/src'
 import { Amount, Data, TokenInfoObject } from './kip7'
 
@@ -55,18 +55,18 @@ export default class KIP17 extends Contract {
     isMinter(account: string): Promise<boolean>
     paused(): Promise<boolean>
     isPauser(account: string): Promise<boolean>
-    approve(to: string, tokenId: Amount, sendParam?: SendOptions): Promise<ReceiptObject>
-    setApprovalForAll(to: string, approved: boolean, sendParam?: SendOptions): Promise<ReceiptObject>
-    transferFrom(from: string, to: string, tokenId: Amount, sendParam?: SendOptions): Promise<ReceiptObject>
-    safeTransferFrom(from: string, to: string, tokenId: Amount, sendParam?: SendOptions): Promise<ReceiptObject>
-    safeTransferFrom(from: string, to: string, tokenId: Amount, data: Data, sendParam?: SendOptions): Promise<ReceiptObject>
-    addMinter(account: string, sendParam?: SendOptions): Promise<ReceiptObject>
-    renounceMinter(sendParam?: SendOptions): Promise<ReceiptObject>
-    mint(to: string, tokenId: Amount, sendParam?: SendOptions): Promise<ReceiptObject>
-    mintWithTokenURI(to: string, tokenId: Amount, tokenURI: string, sendParam?: SendOptions): Promise<ReceiptObject>
-    burn(tokenId: Amount, sendParam?: SendOptions): Promise<ReceiptObject>
-    pause(sendParam?: SendOptions): Promise<ReceiptObject>
-    unpause(sendParam?: SendOptions): Promise<ReceiptObject>
-    addPauser(account: string, sendParam?: SendOptions): Promise<ReceiptObject>
-    renouncePauser(sendParam?: SendOptions): Promise<ReceiptObject>
+    approve(to: string, tokenId: Amount, sendParam?: SendOptions): Promise<TransactionReceipt>
+    setApprovalForAll(to: string, approved: boolean, sendParam?: SendOptions): Promise<TransactionReceipt>
+    transferFrom(from: string, to: string, tokenId: Amount, sendParam?: SendOptions): Promise<TransactionReceipt>
+    safeTransferFrom(from: string, to: string, tokenId: Amount, sendParam?: SendOptions): Promise<TransactionReceipt>
+    safeTransferFrom(from: string, to: string, tokenId: Amount, data: Data, sendParam?: SendOptions): Promise<TransactionReceipt>
+    addMinter(account: string, sendParam?: SendOptions): Promise<TransactionReceipt>
+    renounceMinter(sendParam?: SendOptions): Promise<TransactionReceipt>
+    mint(to: string, tokenId: Amount, sendParam?: SendOptions): Promise<TransactionReceipt>
+    mintWithTokenURI(to: string, tokenId: Amount, tokenURI: string, sendParam?: SendOptions): Promise<TransactionReceipt>
+    burn(tokenId: Amount, sendParam?: SendOptions): Promise<TransactionReceipt>
+    pause(sendParam?: SendOptions): Promise<TransactionReceipt>
+    unpause(sendParam?: SendOptions): Promise<TransactionReceipt>
+    addPauser(account: string, sendParam?: SendOptions): Promise<TransactionReceipt>
+    renouncePauser(sendParam?: SendOptions): Promise<TransactionReceipt>
 }

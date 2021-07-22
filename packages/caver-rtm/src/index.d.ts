@@ -85,7 +85,7 @@ export interface TransactionFromNode {
     data?: string
 }
 
-export interface ReceiptObject extends TransactionFromNode {
+export interface TransactionReceipt extends TransactionFromNode {
     transactionIndex?: string
     contractAddress: string
     gasUsed: string
@@ -178,11 +178,11 @@ export default class RpcCallToMethod {
     klay_getCode(address: string, blockNumber: number): Promise<string>
     klay_getCode(address: string, blockTag: string): Promise<string>
     klay_getTransactionByHash(hash: string): Promise<TransactionFromNode>
-    klay_getTransactionReceipt(hash: string): Promise<ReceiptObject>
+    klay_getTransactionReceipt(hash: string): Promise<TransactionReceipt>
     klay_getTransactionCount(address: string): Promise<string>
     klay_getTransactionCount(address: string, blockNumber: number): Promise<string>
     klay_getTransactionCount(address: string, blockTag: string): Promise<string>
-    klay_sendRawTransaction(rawTransaction: string | ValueTransfer): Promise<ReceiptObject>
+    klay_sendRawTransaction(rawTransaction: string | ValueTransfer): Promise<TransactionReceipt>
     klay_signTransaction(tx: AbstractTransaction): Promise<SignResult>
     klay_sendTransaction(tx: AbstractTransaction): Promise<string>
     klay_call(callObject: object): Promise<string>
@@ -244,7 +244,7 @@ export default class RpcCallToMethod {
     klay_getAccount(address: string, blockNumber: number): Promise<KlaytnAccount>
     klay_getAccount(address: string, blockTag: string): Promise<KlaytnAccount>
     klay_getTransactionBySenderTxHash(senderTxHash: string): Promise<TransactionFromNode>
-    klay_getTransactionReceiptBySenderTxHash(senderTxHash: string): Promise<ReceiptObject>
+    klay_getTransactionReceiptBySenderTxHash(senderTxHash: string): Promise<TransactionReceipt>
     klay_gasPriceAt(): Promise<string>
     klay_gasPriceAt(blockNumber: number): Promise<string>
     klay_gasPriceAt(blockTag: string): Promise<string>
@@ -258,7 +258,7 @@ export default class RpcCallToMethod {
     klay_newFilter(filterOptions?: FilterOptions): Promise<string>
     klay_newPendingTransactionFilter(): Promise<string>
     klay_uninstallFilter(filterId: string): Promise<boolean>
-    klay_getBlockReceipts(blockHash: string): Promise<ReceiptObject>
+    klay_getBlockReceipts(blockHash: string): Promise<TransactionReceipt>
     net_peerCountByType(): Promise<PeerCountByType>
     klay_estimateComputationCost(callObject: CallObject): Promise<string>
     klay_estimateComputationCost(callObject: CallObject, blockNumber: number): Promise<string>

@@ -19,7 +19,7 @@
 import BigNumber from 'bignumber.js'
 import { Wallet } from '../../..'
 import Contract, { SendData, SendOptions } from '../../caver-contract/src'
-import { ReceiptObject } from '../../caver-rtm/src'
+import { TransactionReceipt } from '../../caver-rtm/src'
 import { AbiItem } from '../../caver-utils/src'
 import { Amount, Data } from './kip7'
 
@@ -49,12 +49,12 @@ export default class KIP37 extends Contract {
     paused(id?: Amount): Promise<boolean>
     isPauser(account: string): Promise<boolean>
     isMinter(account: string): Promise<boolean>
-    create(id: Amount, initialSupply: Amount, sendParam?: SendOptions): Promise<ReceiptObject>
-    create(id: Amount, initialSupply: Amount, uri: string, sendParam?: SendOptions): Promise<ReceiptObject>
-    setApprovalForAll(operator: string, approved: boolean, sendParam?: SendOptions): Promise<ReceiptObject>
-    safeTransferFrom(from: string, to: string, id: Amount, amount: Amount, sendParam?: SendOptions): Promise<ReceiptObject>
-    safeTransferFrom(from: string, to: string, id: Amount, amount: Amount, data: Data, sendParam?: SendOptions): Promise<ReceiptObject>
-    safeBatchTransferFrom(from: string, to: string, ids: Amount[], amounts: Amount[], sendParam?: SendOptions): Promise<ReceiptObject>
+    create(id: Amount, initialSupply: Amount, sendParam?: SendOptions): Promise<TransactionReceipt>
+    create(id: Amount, initialSupply: Amount, uri: string, sendParam?: SendOptions): Promise<TransactionReceipt>
+    setApprovalForAll(operator: string, approved: boolean, sendParam?: SendOptions): Promise<TransactionReceipt>
+    safeTransferFrom(from: string, to: string, id: Amount, amount: Amount, sendParam?: SendOptions): Promise<TransactionReceipt>
+    safeTransferFrom(from: string, to: string, id: Amount, amount: Amount, data: Data, sendParam?: SendOptions): Promise<TransactionReceipt>
+    safeBatchTransferFrom(from: string, to: string, ids: Amount[], amounts: Amount[], sendParam?: SendOptions): Promise<TransactionReceipt>
     safeBatchTransferFrom(
         from: string,
         to: string,
@@ -62,17 +62,17 @@ export default class KIP37 extends Contract {
         amounts: Amount[],
         data: Data,
         sendParam?: SendOptions
-    ): Promise<ReceiptObject>
-    mint(toList: string | string[], id: Amount, values: Amount | Amount[], sendParam?: SendOptions): Promise<ReceiptObject>
-    mintBatch(to: string, ids: Amount[], values: Amount[], sendParam?: SendOptions): Promise<ReceiptObject>
-    addMinter(account: string, sendParam?: SendOptions): Promise<ReceiptObject>
-    renounceMinter(sendParam?: SendOptions): Promise<ReceiptObject>
-    burn(account: string, id: Amount, value: Amount, sendParam?: SendOptions): Promise<ReceiptObject>
-    burnBatch(account: string, ids: Amount[], values: Amount[], sendParam?: SendOptions): Promise<ReceiptObject>
-    pause(sendParam?: SendOptions): Promise<ReceiptObject>
-    pause(id: Amount, sendParam?: SendOptions): Promise<ReceiptObject>
-    unpause(sendParam?: SendOptions): Promise<ReceiptObject>
-    unpause(id: Amount, sendParam?: SendOptions): Promise<ReceiptObject>
-    addPauser(account: string, sendParam?: SendOptions): Promise<ReceiptObject>
-    renouncePauser(sendParam?: SendOptions): Promise<ReceiptObject>
+    ): Promise<TransactionReceipt>
+    mint(toList: string | string[], id: Amount, values: Amount | Amount[], sendParam?: SendOptions): Promise<TransactionReceipt>
+    mintBatch(to: string, ids: Amount[], values: Amount[], sendParam?: SendOptions): Promise<TransactionReceipt>
+    addMinter(account: string, sendParam?: SendOptions): Promise<TransactionReceipt>
+    renounceMinter(sendParam?: SendOptions): Promise<TransactionReceipt>
+    burn(account: string, id: Amount, value: Amount, sendParam?: SendOptions): Promise<TransactionReceipt>
+    burnBatch(account: string, ids: Amount[], values: Amount[], sendParam?: SendOptions): Promise<TransactionReceipt>
+    pause(sendParam?: SendOptions): Promise<TransactionReceipt>
+    pause(id: Amount, sendParam?: SendOptions): Promise<TransactionReceipt>
+    unpause(sendParam?: SendOptions): Promise<TransactionReceipt>
+    unpause(id: Amount, sendParam?: SendOptions): Promise<TransactionReceipt>
+    addPauser(account: string, sendParam?: SendOptions): Promise<TransactionReceipt>
+    renouncePauser(sendParam?: SendOptions): Promise<TransactionReceipt>
 }
