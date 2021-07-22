@@ -17,12 +17,12 @@
 */
 
 import AbstractFeeDelegatedTransaction from '../abstractFeeDelegatedTransaction'
-import { CreateTransactionOptions } from '../abstractTransaction'
+import { CreateTransactionObject } from '../abstractTransaction'
 
 export default class FeeDelegatedValueTransferMemo extends AbstractFeeDelegatedTransaction {
-    constructor(createTxObj: string | CreateTransactionOptions)
+    constructor(createTxObj: string | CreateTransactionObject)
 
-    static create(createTxObj: string | CreateTransactionOptions): FeeDelegatedValueTransferMemo
+    static create(createTxObj: string | CreateTransactionObject): FeeDelegatedValueTransferMemo
     static decode(rlpEncoded: string): FeeDelegatedValueTransferMemo
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string

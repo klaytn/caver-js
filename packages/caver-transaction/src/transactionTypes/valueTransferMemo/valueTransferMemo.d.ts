@@ -16,12 +16,12 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import AbstractTransaction, { CreateTransactionOptions } from '../abstractTransaction'
+import AbstractTransaction, { CreateTransactionObject } from '../abstractTransaction'
 
 export default class ValueTransferMemo extends AbstractTransaction {
-    constructor(createTxObj: string | CreateTransactionOptions)
+    constructor(createTxObj: string | CreateTransactionObject)
 
-    static create(createTxObj: string | CreateTransactionOptions): ValueTransferMemo
+    static create(createTxObj: string | CreateTransactionObject): ValueTransferMemo
     static decode(rlpEncoded: string): ValueTransferMemo
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string

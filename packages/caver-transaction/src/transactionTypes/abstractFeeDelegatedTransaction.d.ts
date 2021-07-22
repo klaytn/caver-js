@@ -18,10 +18,10 @@
 
 import { Keyring } from '../../../caver-wallet/src/keyring/keyringFactory'
 import SignatureData from '../../../caver-wallet/src/keyring/signatureData'
-import AbstractTransaction, { CreateTransactionOptions } from './abstractTransaction'
+import AbstractTransaction, { CreateTransactionObject } from './abstractTransaction'
 
 export default class AbstractFeeDelegatedTransaction extends AbstractTransaction {
-    constructor(typeString: string, createTxObj: CreateTransactionOptions)
+    constructor(typeString: string, createTxObj: CreateTransactionObject)
 
     signAsFeePayer(key: string | Keyring, index?: number, hasher?: Function): Promise<AbstractFeeDelegatedTransaction>
     appendFeePayerSignatures(signatures: string[] | string[][] | SignatureData | SignatureData[]): void

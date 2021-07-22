@@ -17,12 +17,12 @@
 */
 
 import AbstractFeeDelegatedTransaction from '../abstractFeeDelegatedTransaction'
-import { CreateTransactionOptions } from '../abstractTransaction'
+import { CreateTransactionObject } from '../abstractTransaction'
 
 export default class FeeDelegatedChainDataAnchoring extends AbstractFeeDelegatedTransaction {
-    constructor(createTxObj: string | CreateTransactionOptions)
+    constructor(createTxObj: string | CreateTransactionObject)
 
-    static create(createTxObj: string | CreateTransactionOptions): FeeDelegatedChainDataAnchoring
+    static create(createTxObj: string | CreateTransactionObject): FeeDelegatedChainDataAnchoring
     static decode(rlpEncoded: string): FeeDelegatedChainDataAnchoring
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string

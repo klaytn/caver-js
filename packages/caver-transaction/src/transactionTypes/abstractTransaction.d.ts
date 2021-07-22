@@ -21,7 +21,7 @@ import { KlaytnCall } from '../../../caver-rpc/src/klay'
 import { Keyring } from '../../../caver-wallet/src/keyring/keyringFactory'
 import SignatureData from '../../../caver-wallet/src/keyring/signatureData'
 
-export interface CreateTransactionOptions {
+export interface CreateTransactionObject {
     account?: Account
     from?: string
     to?: string
@@ -40,7 +40,7 @@ export interface CreateTransactionOptions {
 }
 
 export default class AbstractTransaction {
-    constructor(typeString: string, createTxObj: CreateTransactionOptions)
+    constructor(typeString: string, createTxObj: CreateTransactionObject)
 
     static _klaytnCall: KlaytnCall
 

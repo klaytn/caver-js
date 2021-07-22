@@ -17,12 +17,12 @@
 */
 
 import AbstractFeeDelegatedWithRatioTransaction from '../abstractFeeDelegatedWithRatioTransaction'
-import { CreateTransactionOptions } from '../abstractTransaction'
+import { CreateTransactionObject } from '../abstractTransaction'
 
 export default class FeeDelegatedChainDataAnchoringWithRatio extends AbstractFeeDelegatedWithRatioTransaction {
-    constructor(createTxObj: string | CreateTransactionOptions)
+    constructor(createTxObj: string | CreateTransactionObject)
 
-    static create(createTxObj: string | CreateTransactionOptions): FeeDelegatedChainDataAnchoringWithRatio
+    static create(createTxObj: string | CreateTransactionObject): FeeDelegatedChainDataAnchoringWithRatio
     static decode(rlpEncoded: string): FeeDelegatedChainDataAnchoringWithRatio
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string

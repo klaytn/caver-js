@@ -17,10 +17,10 @@
 */
 
 import AbstractFeeDelegatedTransaction from './abstractFeeDelegatedTransaction'
-import { CreateTransactionOptions } from './abstractTransaction'
+import { CreateTransactionObject } from './abstractTransaction'
 
 export default class AbstractFeeDelegatedWithRatioTransaction extends AbstractFeeDelegatedTransaction {
-    constructor(typeString: string, createTxObj: CreateTransactionOptions)
+    constructor(typeString: string, createTxObj: CreateTransactionObject)
 
     get feeRatio(): string
     set feeRatio(fr)

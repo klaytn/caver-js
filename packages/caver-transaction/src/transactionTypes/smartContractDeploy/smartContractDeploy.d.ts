@@ -16,12 +16,12 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import AbstractTransaction, { CreateTransactionOptions } from '../abstractTransaction'
+import AbstractTransaction, { CreateTransactionObject } from '../abstractTransaction'
 
 export default class SmartContractDeploy extends AbstractTransaction {
-    constructor(createTxObj: string | CreateTransactionOptions)
+    constructor(createTxObj: string | CreateTransactionObject)
 
-    static create(createTxObj: string | CreateTransactionOptions): SmartContractDeploy
+    static create(createTxObj: string | CreateTransactionObject): SmartContractDeploy
     static decode(rlpEncoded: string): SmartContractDeploy
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string

@@ -17,12 +17,12 @@
 */
 
 import AbstractFeeDelegatedTransaction from '../abstractFeeDelegatedTransaction'
-import { CreateTransactionOptions } from '../abstractTransaction'
+import { CreateTransactionObject } from '../abstractTransaction'
 
 export default class FeeDelegatedSmartContractDeploy extends AbstractFeeDelegatedTransaction {
-    constructor(createTxObj: string | CreateTransactionOptions)
+    constructor(createTxObj: string | CreateTransactionObject)
 
-    static create(createTxObj: string | CreateTransactionOptions): FeeDelegatedSmartContractDeploy
+    static create(createTxObj: string | CreateTransactionObject): FeeDelegatedSmartContractDeploy
     static decode(rlpEncoded: string): FeeDelegatedSmartContractDeploy
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string

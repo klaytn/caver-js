@@ -16,12 +16,12 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import AbstractTransaction, { CreateTransactionOptions } from '../abstractTransaction'
+import AbstractTransaction, { CreateTransactionObject } from '../abstractTransaction'
 
 export default class LegacyTransaction extends AbstractTransaction {
-    constructor(createTxObj: CreateTransactionOptions)
+    constructor(createTxObj: CreateTransactionObject)
 
-    static create(createTxObj: CreateTransactionOptions): LegacyTransaction
+    static create(createTxObj: CreateTransactionObject): LegacyTransaction
     static decode(rlpEncoded: string): LegacyTransaction
     appendSignatures(sig: string[] | string[][]): void
     getRLPEncoding(): string

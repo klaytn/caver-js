@@ -18,12 +18,12 @@
 
 import Account from '../../../../caver-account/src'
 import AbstractFeeDelegatedTransaction from '../abstractFeeDelegatedTransaction'
-import { CreateTransactionOptions } from '../abstractTransaction'
+import { CreateTransactionObject } from '../abstractTransaction'
 
 export default class FeeDelegatedAccountUpdate extends AbstractFeeDelegatedTransaction {
-    constructor(createTxObj: string | CreateTransactionOptions)
+    constructor(createTxObj: string | CreateTransactionObject)
 
-    static create(createTxObj: string | CreateTransactionOptions): FeeDelegatedAccountUpdate
+    static create(createTxObj: string | CreateTransactionObject): FeeDelegatedAccountUpdate
     static decode(rlpEncoded: string): FeeDelegatedAccountUpdate
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string
