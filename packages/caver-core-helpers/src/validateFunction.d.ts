@@ -16,11 +16,11 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { TransactionObject } from '../../caver-rtm/src'
+import { TransactionFromNode } from '../../caver-rtm/src'
 import { Transaction } from '../../caver-transaction/src'
 
 export default interface IValidateFunction {
-    validateParams(tx: TransactionObject | Transaction): Error
+    validateParams(tx: TransactionFromNode | Transaction): Error
     validateTxType(txType: string): boolean
     validateCodeFormat(cf: string): boolean
 }
