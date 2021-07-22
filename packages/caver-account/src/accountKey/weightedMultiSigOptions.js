@@ -26,6 +26,10 @@ const _ = require('lodash')
 class WeightedMultiSigOptions {
     /**
      * Creates an instance of WeightedMultiSigOptions.
+     *
+     * @example
+     * const options = caver.account.weightedMultiSigOptions.fromObject({ threshold: 2, weights: [1, 1] })
+     *
      * @param {object} options - An object which defines 'threshold' and 'weights'.
      * @return {WeightedMultiSigOptions}
      */
@@ -47,6 +51,10 @@ class WeightedMultiSigOptions {
 
     /**
      * Creates an instance of WeightedMultiSigOptions.
+     *
+     * @example
+     * const options = new caver.account.weightedMultiSigOptions(2, [1, 1])
+     *
      * @param {number} threshold - a threshold
      * @param {Array.<number>} weights - an array of weight of key
      */
@@ -95,6 +103,10 @@ class WeightedMultiSigOptions {
 
     /**
      * Returns 'true' if WeightedMultiSigOptions is empty.
+     *
+     * @example
+     * const isEmpty = options.isEmpty()
+     *
      * @return {Boolean}
      */
     isEmpty() {
@@ -104,6 +116,7 @@ class WeightedMultiSigOptions {
 
 /**
  * validates threshold and sum of weights.
+ * @ignore
  * @param {number} threshold - The threshold of the AccountKeyWeightedMultiSig.
  * @param {Array.<number>} weights - An array of weights.
  * @return {Boolean}

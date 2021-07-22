@@ -27,10 +27,14 @@ const AccountKeyRoleBased = require('./accountKeyRoleBased')
 /**
  * Representing an AccountKeyDecoder which can decode RLP-encoded accountKey string.
  * @class
+ * @hideconstructor
  */
 class AccountKeyDecoder {
     /**
      * decodes an RLP-encoded account key string.
+     *
+     * @example
+     * const accountKey = caver.account.accountKey.decode('0x{encoded account key}')
      *
      * @param {string} rlpEncodedKey An RLP-encoded account key string.
      * @return {IAccountKey}
