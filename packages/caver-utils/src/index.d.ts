@@ -47,20 +47,6 @@ export interface UnitMap {
     TKLAY: '1000000000000000000000000000000'
 }
 
-export type Mixed =
-    | string
-    | number
-    | BN
-    | {
-          type: string
-          value: string
-      }
-    | {
-          t: string
-          v: string | BN | number
-      }
-    | boolean
-
 export type StateMutabilityType = 'pure' | 'view' | 'nonpayable' | 'payable'
 
 export interface AbiItem {
@@ -101,7 +87,7 @@ export default class Utils {
     static _jsonInterfaceMethodToString(abiItem: AbiItem): string
     static _flattenTypes(includeTuple: boolean, puts: object): string[]
     static randomHex(bytesSize: number): string
-    static soliditySha3(...val: Mixed[]): string | null
+    static soliditySha3(...val: any[]): string | null
     static toChecksumAddress(address: string): string
     static hexToAscii(hex: string): string
     static toAscii(hex: string): string
