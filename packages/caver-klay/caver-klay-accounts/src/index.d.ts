@@ -39,12 +39,6 @@ export interface TransactionObject {
     v: string
 }
 
-export interface PublicKeyObject {
-    feePayerKey?: string | string[]
-    transactionKey?: string
-    updateKey?: string | string[]
-}
-
 export interface UpdateOptionsObject {
     threshold?: number
     weight?: number[]
@@ -74,7 +68,7 @@ export class Wallet {
     create(numberOfAccounts: number, entropy?: string): Wallet
     add(account: string | Account | AccountKey | object, userInputAddrees?: string): AccountInWallet
     updatePrivateKey(privateKey: string, address: string): AccountInWallet
-    updateAccountKey(address: string, accountKey: string | string[] | PublicKeyObject | AccountKey): AccountInWallet
+    updateAccountKey(address: string, accountKey: string | string[] | RoleBasedKeyObject | AccountKey): AccountInWallet
     remove(addressOrIndex: string | number): boolean
     clear(): Wallet
     encrypt(password: string, options?: EncryptedKeyOptions): Keystore[]
@@ -99,7 +93,7 @@ export default class Accounts {
     createAccountKeyPublic(privateKey: string | AccountKeyPublic): AccountKeyPublic
     createAccountKeyMultiSig(privateKeys: string[] | AccountKeyMultiSig): AccountKeyMultiSig
     createAccountKeyRoleBased(keyObject: RoleBasedKeyObject): AccountKeyRoleBased
-    accountKeyToPublicKey(accountKey: PublicKeyObject | AccountKeyRoleBased): PublicKeyObject
+    accountKeyToPublicKey(accountKey: RoleBasedKeyObject | AccountKeyRoleBased): RoleBasedKeyObject
     accountKeyToPublicKey(accountKey: string | AccountKeyPublic): string
     accountKeyToPublicKey(accountKey: string[] | AccountKeyMultiSig): string[]
     createWithAccountKey(address: string, accountKey: string | string[] | object): AccountWithFunctions
