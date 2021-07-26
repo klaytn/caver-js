@@ -19,19 +19,19 @@
 import { WeightedMultiSigOptionsObject } from '../../../../caver-account/src/accountKey/weightedMultiSigOptions'
 
 export interface KeyForUpdateObject {
-    legacyKey: boolean
-    failKey: boolean
-    publicKey: string
-    multisig: {
-        threshold: number
-        keys: {
-            weight: number
-            publicKey: string
+    legacyKey?: boolean
+    failKey?: boolean
+    publicKey?: string
+    multisig?: {
+        threshold?: number
+        keys?: {
+            weight?: number
+            publicKey?: string
         }[]
     }
-    roleTransactionKey: KeyForUpdateObject
-    roleAccountUpdateKey: KeyForUpdateObject
-    roleFeePayerKey: KeyForUpdateObject
+    roleTransactionKey?: KeyForUpdateObject
+    roleAccountUpdateKey?: KeyForUpdateObject
+    roleFeePayerKey?: KeyForUpdateObject
 }
 
 export default class AccountForUpdate {

@@ -22,9 +22,9 @@ import KIP17 from '../../caver-kct/src/kip17'
 import KIP7 from '../../caver-kct/src/kip7'
 import Net from '../../caver-net/src'
 import KlayRPC from '../../caver-rpc/src/klay'
-import { TransactionObject } from '../../caver-rtm/src'
 import Utils from '../../caver-utils/src'
 import Accounts from '../caver-klay-accounts/src'
+import { KeyForUpdateObject } from '../caver-klay-accounts/src/account/accountForUpdate'
 import Personal from '../caver-klay-personal/src'
 import { getNetworkType } from './getNetworkType'
 
@@ -34,8 +34,31 @@ export class KlayNet extends Net {
     getNetworkType: typeof getNetworkType
 }
 
+export interface DecodedFromRawTransactionObject extends KeyForUpdateObject {
+    type: string
+    nonce: string
+    gasPrice: string
+    gas: string
+    to?: string
+    value?: string
+    from: string
+    data?: string
+    humanReadable?: boolean
+    feeRatio?: string
+    codeFormat?: string
+    v: string
+    r: string
+    s: string
+    signatures: string[] | string[][]
+    feePayer?: string
+    payerV?: string
+    payerR?: string
+    payerS?: string
+    feePayerSignatures?: string[][]
+}
+
 export default class Klay extends KlayRPC {
-    decodeTransaction(rawTransaction: string, type?: string): TransactionObject
+    decodeTransaction(rawTransaction: string, type?: string): DecodedFromRawTransactionObject | KeyForUpdateObject
     net: KlayNet
     accounts: Accounts
     personal: Personal
