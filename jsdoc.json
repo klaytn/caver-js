@@ -7,11 +7,10 @@
     "includePattern": ".js$",
     "exclude": [
       "./docs",
-      "./packages/caver-core",
+      "./packages/caver-core/*",
       "./packages/caver-core-helpers",
       "./packages/caver-core-method",
       "./packages/caver-core-requestmanager",
-      "./packages/caver-core-subscriptions",
       "./packages/caver-middleware",
       "./packages/caver-rtm"
     ],
