@@ -24,14 +24,15 @@ const multihash = require('multihashes')
 
 /**
  * Representing a class for uploading and loading files to IPFS.
+ * @hideconstructor
  * @class
  */
 class IPFS {
     /**
-     * Create an IPFS.
-     * @param {string} host The host url.
+     * Create an IPFS instance.
+     * @param {string} host The IPFS Node url to connect with.
      * @param {number} port The port number to use.
-     * @param {boolean} ssl With or without SSL.
+     * @param {boolean} ssl With or without SSL. If true, the https protocol is used. Otherwise, the http protocol is used.
      */
     constructor(host, port, ssl) {
         if (host !== undefined && port !== undefined && ssl !== undefined) {
@@ -40,11 +41,15 @@ class IPFS {
     }
 
     /**
-     * sets a IPFS Node
+     * Initializes a connection with an IPFS Node.
+     * When an IPFS Node information is set through this function, you can upload files to IPFS or load files from IPFS.
      *
-     * @param {string} host The host url.
+     * @example
+     * caver.ipfs.setIPFSNode('localhost', 5001, false)
+     *
+     * @param {string} host The IPFS Node url to connect with.
      * @param {number} port The port number to use.
-     * @param {boolean} ssl With or without SSL.
+     * @param {boolean} ssl With or without SSL. If true, the https protocol is used. Otherwise, the http protocol is used.
      * @return {void}
      */
     setIPFSNode(host, port, ssl) {
@@ -53,14 +58,16 @@ class IPFS {
     }
 
     /**
-     * adds a file to IPFS.
+     * Adds a file to IPFS. The {@link https://docs.ipfs.io/concepts/content-addressing/#content-addressing-and-cids|CID(Content Identifier)} of the uploaded file is returned.
+     * If the path of a file is passed, the contents of the file are loaded from the path and uploaded to IPFS. If a buffer is passed, it is uploaded to IPFS directly.
+     *
      * If the `data` parameter is a `Buffer` or `ArrayBuffer`, upload to IPFS directly without using `fs`.
      * If the `data` parameter is a string, use `fs` to read the file.
      * Since `fs` is a module that can only be used on the server side, if it is client-side code,
      * it must read the file in advance and pass the file contents in the format of `ArrayBuffer`.
      *
      * If you get a "Error: Can't resolve 'fs'" error when building your client code, add the following to your "webpack.config.json" file.
-     * @example
+     * ```
      * module.exports = {
      *     ...
      *     node: {
@@ -68,10 +75,10 @@ class IPFS {
      *     },
      *     ...
      * }
-     * @returns {null}
+     * ```
      *
      * If you use Next.js web framework(https://nextjs.org/), add the following to your "next.config.json" file.
-     * @example
+     * ```
      * module.exports = {
      *     ...
      *     webpack: (config, { isServer }) => {
@@ -85,7 +92,11 @@ class IPFS {
      *     },
      *     ...
      * }
-     * @returns {null}
+     * ```
+     *
+     * @example
+     * const cid = await caver.ipfs.add('./test.txt')
+     * const cid = await caver.ipfs.add(Buffer.from('test data'))
      *
      * @param {string|Buffer|ArrayBuffer} data The file path string or file contents.
      * @return {string}
@@ -106,9 +117,12 @@ class IPFS {
     }
 
     /**
-     * gets a file from IPFS
+     * Returns a file addressed by a valid IPFS path.
      *
-     * @param {string} hash The file hash string.
+     * @example
+     * const fileContents = await caver.ipfs.get('Qmd9thymMS6mejhEDZfwXPowSDunzgma9ex4ezpCSRZGwC')
+     *
+     * @param {string} hash An {@link https://docs.ipfs.io/concepts/content-addressing/#content-addressing-and-cids|CID(Content Identifier)} of the file to download.
      * @return {Buffer}
      */
     async get(hash) {
@@ -118,9 +132,13 @@ class IPFS {
     }
 
     /**
-     * converts a hash to hex format.
+     * Converts a {@link https://docs.ipfs.io/concepts/content-addressing/#content-addressing-and-cids|CID(Content Identifier)} to a {@link https://multiformats.io/multihash/|Multihash}.
      *
-     * @param {string} hash The file hash string.
+     * @example
+     * // This will return '0x1220dc1dbe0bcf1e5f6cce80bd3d7e7d873801c5a1732add889c0f25391d53470dc3'
+     * const multihash = caver.ipfs.toHex('Qmd9thymMS6mejhEDZfwXPowSDunzgma9ex4ezpCSRZGwC')
+     *
+     * @param {string} hash A {@link https://docs.ipfs.io/concepts/content-addressing/#content-addressing-and-cids|CID(Content Identifier)} to convert.
      * @return {string}
      */
     toHex(hash) {
@@ -129,9 +147,13 @@ class IPFS {
     }
 
     /**
-     * converts from a hex format.
+     * Converts to {@link https://docs.ipfs.io/concepts/content-addressing/#content-addressing-and-cids|CID(Content Identifier)} from a {@link https://multiformats.io/multihash/|Multihash}.
      *
-     * @param {string} hash The file hash string in hex format.
+     * @example
+     * // This will return 'Qmd9thymMS6mejhEDZfwXPowSDunzgma9ex4ezpCSRZGwC'
+     * const multihash = caver.ipfs.fromHex('0x1220dc1dbe0bcf1e5f6cce80bd3d7e7d873801c5a1732add889c0f25391d53470dc3')
+     *
+     * @param {string} hash A {@link https://multiformats.io/multihash/|Multihash} to convert.
      * @return {string}
      */
     fromHex(contentHash) {
