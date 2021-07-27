@@ -231,6 +231,7 @@ class Account {
      * const account = new caver.account('0x{address in hex}', accountKey)
      *
      * @constructor
+     * @hideconstructor
      * @param {string} address - The address of account.
      * @param {AccountKeyLegacy|AccountKeyPublic|AccountKeyFail|AccountKeyWeightedMultiSig|AccountKeyRoleBased} accountKey - The accountKey of account.
      */
