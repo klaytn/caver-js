@@ -47,6 +47,9 @@ const AbstractFeeDelegatedTransaction = require('./transactionTypes/abstractFeeD
 /** @module Transaction */
 
 /**
+ * @typedef {LegacyTransaction|ValueTransfer|FeeDelegatedValueTransfer|FeeDelegatedValueTransferWithRatio|ValueTransferMemo|FeeDelegatedValueTransferMemo|FeeDelegatedValueTransferMemoWithRatio|AccountUpdate|FeeDelegatedAccountUpdate|FeeDelegatedAccountUpdateWithRatio|SmartContractDeploy|FeeDelegatedSmartContractDeploy|FeeDelegatedSmartContractDeployWithRatio|SmartContractExecution|FeeDelegatedSmartContractExecution|FeeDelegatedSmartContractExecution|FeeDelegatedSmartContractExecutionWithRatio|Cancel|FeeDelegatedCancel|FeeDelegatedCancelWithRatio|ChainDataAnchoring|FeeDelegatedChainDataAnchoring|FeeDelegatedChainDataAnchoringWithRatio} module:Transaction.Transaction
+ */
+/**
  * Querys transaction from Klaytn and converts to a caver transaction instance.
  * If it fails to receive a transaction from Klaytn, an error is thrown.
  *

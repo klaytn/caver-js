@@ -49,22 +49,22 @@ const { errors } = require('../../caver-core-helpers')
 const abi = require('../../caver-abi')
 
 /**
- * Should be called to create new contract instance
- *
- * @method Contract
- * @constructor
- * @param {Array} jsonInterface
- * @param {String} address
- * @param {Object} options
- */
-
-/**
  * let myContract = new cav.klay.Contract([...], '0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe', {
  *   from: '0x1234567890123456789012345678901234567891', // default from address
  *   gasPrice: '20000000000', // default gas price in wei, 20 gwei in this case
  *   data: '',(bytecode, when contract deploy)
  *   gas: 200000, (gas limit)
  * });
+ */
+
+/**
+ * @classdesc A contract class implemented to deploy/execute the smart contract easily.
+ * @class
+ * @hideconstructor
+ *
+ * @param {Array.<object>} jsonInterface - The JSON interface for the contract to instantiate.
+ * @param {string} [address] - The address of the smart contract to call. This can be added later using `contract.options.address = '0x1234..'`.
+ * @param {SendOptions} [options] - The default send options of the contract. This value is used if the user does not define sendOptions separately when calling a function that deploys or executes a smart contract.
  */
 const Contract = function Contract(jsonInterface, address, options) {
     const _this = this
@@ -84,6 +84,17 @@ const Contract = function Contract(jsonInterface, address, options) {
     }
 
     // create the options object
+    /**
+     * @typedef {SendOptions} ContractOptions
+     * @property {string} address
+     * @property {Array.<object>} jsonInterface
+     */
+    /**
+     * @example
+     * contract.options
+     *
+     * @type {ContractOptions}
+     * */
     this.options = {}
 
     const lastArg = args[args.length - 1]
@@ -96,6 +107,13 @@ const Contract = function Contract(jsonInterface, address, options) {
         }
     }
 
+    /**
+     * @example
+     * contract.defaultSendOptions
+     *
+     * @type {ContractOptions}
+     * @name Contract#defaultSendOptions
+     */
     Object.defineProperty(this, 'defaultSendOptions', {
         get() {
             return _this.options
@@ -103,6 +121,15 @@ const Contract = function Contract(jsonInterface, address, options) {
     })
 
     // set address
+    /**
+     * The address where the contract is deployed.
+     *
+     * @example
+     * contract.options.address // Deployed smart contract address
+     *
+     * @type {string}
+     * @name ContractOptions#address
+     */
     Object.defineProperty(this.options, 'address', {
         set(value) {
             if (value) {
@@ -116,6 +143,15 @@ const Contract = function Contract(jsonInterface, address, options) {
     })
 
     // add method and event signatures, when the jsonInterface gets set
+    /**
+     * The JSON interface of the contract.
+     *
+     * @example
+     * contract.options.jsonInterface
+     *
+     * @type {Array.<object>}
+     * @name ContractOptions#jsonInterface
+     */
     Object.defineProperty(this.options, 'jsonInterface', {
         set(value) {
             _this.methods = {}
@@ -226,6 +262,21 @@ const Contract = function Contract(jsonInterface, address, options) {
     })
 
     // Check for setting options property.
+    /**
+     * The option values for the contract instance.
+     * Those values will be used for default value when make a transaction to deploy or execute the smart contract.
+     * If the user passes the object defined in the fields below as a parameter when deploying or executing the contract,
+     * the values defined for default in the contract are not used.
+     *
+     * @typedef {object} Contract.SendOptions
+     * @property {string} [from] - The default address from which the contract deployment/execution transaction is sent. If the from address is not defined when creating the transaction, this `contract.options.from` is always used to create the transaction.
+     * @property {string|number} [gasPrice] - The gas price in peb to use for transactions.
+     * @property {string|number} [gas] - The maximum gas provided for a transaction (gas limit).
+     * @property {string} [data] - The byte code of the contract. Used when the contract gets deployed
+     * @property {boolean} [feeDelegation] - Whether to use fee delegation transaction.
+     * @property {string} [feePayer] - The address of the fee payer paying the transaction fee. When `feeDelegation` is `true`, the value is set to the `feePayer` field in the transaction.
+     * @property {string|number} [feeRatio] - The ratio of the transaction fee the fee payer will be burdened with. If `feeDelegation` is `true` and `feeRatio` is set to a valid value, a partial fee delegation transaction is used. The valid range of this is between 1 and 99. The ratio of 0, or 100 and above are not allowed.
+     */
     Object.defineProperty(this.options, 'from', {
         set(value) {
             if (value) {
@@ -321,10 +372,176 @@ const Contract = function Contract(jsonInterface, address, options) {
     })
 
     // properties
+    /**
+     * A transaction object for the method, which then can be called, sent, estimated or ABI encoded.
+     *
+     * @typedef {function} Contract.MethodFunction
+     * @param {...*} [args] - The default address from which the contract deployment/execution transaction is sent. If the from address is not defined when creating the transaction, this `contract.options.from` is always used to create the transaction.
+     * @return {Contract.ContractMethod}
+     */
+    /**
+     * A transaction object for the method, which then can be called, sent, estimated or ABI encoded.
+     *
+     * @typedef {object} Contract.ContractMethod
+     * @property {Contract.CallFunction} [call] - The call function.
+     * @property {Contract.SendFunction} send - The send function.
+     * @property {Contract.EncodeABIFunction} encodeABI - The encode ABI function.
+     * @property {Contract.EstimateGasFunction} estimateGas - The estimate gas function.
+     * @property {Contract.SignFunction} sign - The sign as a sender function.
+     * @property {Contract.SignFunction} signAsFeePayer - The sign as a fee payer function.
+     */
+    /**
+     * Calls a constant method and execute its smart contract method in the Klaytn Virtual Machine without sending any transaction.
+     *
+     * @example
+     * const result = await contract.methods.methodName(123).call({ from: '0x{address in hex}' })
+     *
+     * @typedef {function} Contract.CallFunction
+     * @param {Contract.CallObject} callObject - The options used for calling.
+     * @param {function} [callback] - This callback will be fired with the result of the smart contract method execution as the second argument, or with an error object as the first argument.
+     * @return {Promise<*>}
+     */
+    /**
+     * The options used for calling.
+     *
+     * @typedef {object} Contract.CallObject
+     * @property {string} [from] - The address which calling contract methods should be made from.
+     * @property {string|number} [gasPrice] - The gas price in peb to use for this call.
+     * @property {string|number} [gas] - The maximum gas provided for this call (gas limit).
+     */
+    /**
+     * Sends a transaction to deploy the smart contract or execute the function of the smart contract.
+     * This can alter the smart contract state.
+     *
+     * @example
+     * // With execution => resolved with a transaction receipt
+     * const result = await contract.methods.methodName(123).send({ from: '0x{address in hex}' })
+     *
+     * // With deployment => resolved with a contract instance
+     * const result = await contract.methods.constructor('0x{byte code}', 123).send({ from: '0x{address in hex}' })
+     *
+     * @typedef {function} Contract.SendFunction
+     * @param {Contract.SendOptions} sendOptions - The options used for sending.
+     * @param {function} [callback] - This callback will be fired with the result of the smart contract method execution as the second argument, or with an error object as the first argument.
+     * @return {Promise<*>}
+     */
+    /**
+     * Signs a smart contract transaction as a sender to deploy the smart contract or execute the function of the smart contract.
+     *
+     * @example
+     * // With execution
+     * const result = await contract.methods.methodName(123).sign({ from: '0x{address in hex}' })
+     * const result = await contract.methods.methodName(123).signAsFeePayer({ from: '0x{address in hex}', feeDelegation: true, feePayer: '0x{address in hex}' })
+     *
+     * // With deployment
+     * const result = await contract.methods.constructor('0x{byte code}', 123).sign({ from: '0x{address in hex}' })
+     * const result = await contract.methods.constructor('0x{byte code}', 123).signAsFeePayer({ from: '0x{address in hex}', feeDelegation: true, feePayer: '0x{address in hex}' })
+     *
+     * @typedef {function} Contract.SignFunction
+     * @param {Contract.SendOptions} sendOptions - The options used for creating a transaction.
+     * @return {Promise<module:Transaction.Transaction>}
+     */
+    /**
+     * Estimates the gas that a method execution will take when executed in the Klaytn Virtual Machine.
+     * The estimation can differ from the actual gas used when later sending a transaction, as the state of the smart contract can be different at that time.
+     *
+     * @example
+     * // With execution
+     * const result = await contract.methods.methodName(123).estimateGas({ from: '0x{address in hex}' })
+     *
+     * // With deployment
+     * const result = await contract.methods.constructor('0x{byte code}', 123).estimateGas({ from: '0x{address in hex}' })
+     *
+     * @typedef {function} Contract.EstimateGasFunction
+     * @param {Contract.SendOptions} sendOptions - The options used for calling.
+     * @param {function} [callback] - This callback will be fired with the result of the smart contract method execution as the second argument, or with an error object as the first argument.
+     * @return {Promise<number>}
+     */
+    /**
+     * Encodes the ABI for this method. This can be used to send a transaction or call a method, or pass it into another smart contract method as arguments.
+     *
+     * @example
+     * const result = contract.methods.methodName(123).encodeABI()
+     *
+     * @typedef {function} Contract.EncodeABIFunction
+     * @return {string}
+     */
+
+    /**
+     * @example
+     * const result = await contract.methods.methodName(123).call({ from: '0x{address in hex}' })
+     * const result = await contract.methods.methodName(123).send({ from: '0x{address in hex}' })
+     * const result = await contract.methods.methodName(123).sign({ from: '0x{address in hex}' })
+     * const result = await contract.methods.methodName(123).signAsFeePayer({ from: '0x{address in hex}', feeDelegation: true, feePayer: '0x{address in hex}' })
+     * const result = await contract.methods.methodName(123).estimateGas({ from: '0x{address in hex}' })
+     * const result = contract.methods.methodName(123).encodeABI()
+     *
+     * @type {Map<string, Contract.MethodFunction>}
+     * @name Contract#methods
+     */
     this.methods = {}
+
+    /**
+     * Estimates the gas that a method execution will take when executed in the Klaytn Virtual Machine.
+     * The estimation can differ from the actual gas used when later sending a transaction, as the state of the smart contract can be different at that time.
+     *
+     * @example
+     * contract.events.eventName({
+     *     filter: { myIndexedParam: [20,23], myOtherIndexedParam: '0x123456789...' }, // Using an array means OR: e.g. 20 or 23
+     *     fromBlock: 0
+     * }, function(error, event) { console.log(event) })
+     * .on('connected', function(subscriptionId){
+     *     console.log(subscriptionId)
+     * })
+     * .on('data', function(event){
+     *     console.log(event) // same results as the optional callback above
+     * })
+     * .on('error', console.error)
+     *
+     * @typedef {function} Contract.EventFunction
+     * @param {object} options The options used for subscription.
+     * @param {object} [options.filter] Lets you filter events by indexed parameters, e.g., `{ filter: {mynumber: [12,13]} }` means all events where "mynumber" is 12 or 13.
+     * @param {string|number} [options.fromBlock] The block number from which to get events.
+     * @param {Array.<string>} [options.topics] This allows you to manually set the topics for the event filter. Given the filter property and event signature, `topic[0]` would not be set automatically.
+     * @param {Subscription} callback This callback will be fired for the first event as the second argument, or an error as the first argument. The event is returned as an {@link Contract.EventObject} type.
+     */
+    /**
+     * @example
+     * contract.events.eventName({
+     *     filter: { myIndexedParam: [20,23], myOtherIndexedParam: '0x123456789...' }, // Using an array means OR: e.g. 20 or 23
+     *     fromBlock: 0
+     * }, function(error, event) { console.log(event) })
+     * .on('connected', function(subscriptionId){
+     *     console.log(subscriptionId)
+     * })
+     * .on('data', function(event){
+     *     console.log(event) // same results as the optional callback above
+     * })
+     * .on('error', console.error)
+     *
+     * @type {Map<string, Contract.EventFunction>}
+     * @name Contract#events
+     */
     this.events = {}
 
+    /**
+     * The address where the contract is deployed.
+     *
+     * @example
+     * contract._address // Deployed smart contract address
+     *
+     * @type {string}
+     */
     this._address = null
+
+    /**
+     * The JSON interface of the contract.
+     *
+     * @example
+     * contract._jsonInterface
+     *
+     * @type {Array.<object>}
+     */
     this._jsonInterface = []
 
     // set getter/setter properties
@@ -333,13 +550,21 @@ const Contract = function Contract(jsonInterface, address, options) {
 }
 
 /**
- * Creates an instance of Contract.
+ * Creates a new contract instance with all its methods and events defined in its JSON interface object.
+ * This function works the same as `new caver.contract`.
+ *
+ * @example
+ * const abi = [...]
+ * const address = '0x{contract address}'
+ * const contract = caver.contract.create(abi, address)
  *
  * @method create
- * @constructor
- * @param {Array} jsonInterface The Contract Application Binary Interface (ABI).
- * @param {string} [address] The contract address to call.
- * @param {object} [options] The options of the contract.
+ * @memberof Contract
+ * @static
+ * @param {Array.<object>} jsonInterface - The JSON interface for the contract to instantiate.
+ * @param {string} [address] - The address of the smart contract to call. This can be added later using `contract.options.address = '0x1234..'`.
+ * @param {SendOptions} [options] - The default send options of the contract. This value is used if the user does not define sendOptions separately when calling a function that deploys or executes a smart contract.
+ * @return {Contract}
  */
 Contract.create = function(jsonInterface, address, options) {
     return new Contract(jsonInterface, address, options)
@@ -354,6 +579,7 @@ Contract.setProvider = function(provider, accounts) {
 /**
  * Set _keyrings in contract instance.
  *
+ * @ignore
  * @param {KeyringContainer} keyrings
  */
 Contract.prototype.setKeyrings = function(keyrings) {
@@ -362,8 +588,14 @@ Contract.prototype.setKeyrings = function(keyrings) {
 }
 
 /**
- * Set _wallet in contract instance.
- * When _wallet exists, contract will use _wallet instead of _klayAccounts
+ * Set `_wallet` in contract instance.
+ * When _wallet exists, contract will use `_wallet` instead of `_klayAccounts`.
+ * Using `_wallet` means that it operates using functions after Common Architecture.
+ * You can use Contract with any wallet instance that implements the IWallet interface.
+ * For more information on the IWallet interface, please check the {@link http://kips.klaytn.com/KIPs/kip-34#wallet-layer|KIP-34}.
+ *
+ * @example
+ * contract.setWallet(keyringContainer)
  *
  * @param {IWallet} wallet
  */
@@ -378,9 +610,10 @@ Contract.prototype.addAccounts = function(accounts) {
 /**
  * Get the callback and modiufy the array if necessary
  *
+ * @ignore
  * @method _getCallback
  * @param {Array} args
- * @return {Function} the callback
+ * @return {function} the callback
  */
 Contract.prototype._getCallback = function getCallback(args) {
     if (args && _.isFunction(args[args.length - 1])) {
@@ -391,14 +624,15 @@ Contract.prototype._getCallback = function getCallback(args) {
 /**
  * Checks that no listener with name "newListener" or "removeListener" is added.
  *
- * @method _checkListener
- * @param {String} type
- * @param {String} event
- * @return {Object} the contract instance
- */
-/**
+ * @example
  * this._checkListener('newListener', subOptions.event.name);
  * this._checkListener('removeListener', subOptions.event.name);
+ *
+ * @ignore
+ * @method _checkListener
+ * @param {string} type
+ * @param {string} event
+ * @return {object} the contract instance
  */
 Contract.prototype._checkListener = function(type, event) {
     if (event === type) {
@@ -409,9 +643,10 @@ Contract.prototype._checkListener = function(type, event) {
 /**
  * Use default values, if options are not available
  *
+ * @ignore
  * @method _getOrSetDefaultOptions
- * @param {Object} options the options gived by the user
- * @return {Object} the options with gaps filled by defaults
+ * @param {object} options the options gived by the user
+ * @return {object} the options with gaps filled by defaults
  */
 Contract.prototype._getOrSetDefaultOptions = function getOrSetDefaultOptions(options) {
     const gasPrice = options.gasPrice ? String(options.gasPrice) : null
@@ -441,15 +676,8 @@ Contract.prototype._getOrSetDefaultOptions = function getOrSetDefaultOptions(opt
 }
 
 /**
- * Should be used to encode indexed params and options to one final object
+ * Should be used to encode indexed params and options to one final object.
  *
- * @method _encodeEventABI
- * @param {Object} event
- * @param {Object} options
- * @return {Object} everything combined together and encoded
- */
-
-/**
  * _encodeEventABI
  * 1. options
  * options = {
@@ -473,6 +701,12 @@ Contract.prototype._getOrSetDefaultOptions = function getOrSetDefaultOptions(opt
  * - unless you used the anonymous specifier to declare the event.
  * - This would mean filtering for anonymous, specific events by name is not possible.
  * - keccak256("burned(address,uint)") = 0x0970ce1235167a71...
+ *
+ * @ignore
+ * @method _encodeEventABI
+ * @param {object} event
+ * @param {object} options
+ * @return {object} everything combined together and encoded
  */
 Contract.prototype._encodeEventABI = function(event, options) {
     options = options || {}
@@ -529,9 +763,10 @@ Contract.prototype._encodeEventABI = function(event, options) {
 /**
  * Should be used to decode indexed params and options
  *
+ * @ignore
  * @method _decodeEventABI
- * @param {Object} data
- * @return {Object} result object with decoded indexed && not indexed params
+ * @param {object} data
+ * @return {object} result object with decoded indexed && not indexed params
  */
 
 Contract.prototype._decodeEventABI = function(data) {
@@ -577,9 +812,10 @@ Contract.prototype._decodeEventABI = function(data) {
  * Encodes an ABI for a method, including signature or the method.
  * Or when constructor encodes only the constructor parameters.
  *
+ * @ignore
  * @method _encodeMethodABI
  * @param {Mixed} args the arguments to encode
- * @param {String} the encoded ABI
+ * @param {string} the encoded ABI
  */
 Contract.prototype._encodeMethodABI = function _encodeMethodABI() {
     const methodSignature = this._method.signature
@@ -641,7 +877,6 @@ Contract.prototype._encodeMethodABI = function _encodeMethodABI() {
  * const contract = caver.contract.create(abi)
  * const decodedFunctionCall = contract.decodeFunctionCall('0x{encoded function call}')
  *
- * @method decodeFunctionCall
  * @param {string} functionCall The encoded function call string.
  * @return {object} An object which includes plain params.
  */
@@ -664,10 +899,11 @@ Contract.prototype.decodeFunctionCall = function decodeFunctionCall(functionCall
 /**
  * Decode method return values
  *
+ * @ignore
  * @method _decodeMethodReturn
  * @param {Array} outputs
- * @param {String} returnValues
- * @return {Object} decoded output return values
+ * @param {string} returnValues
+ * @return {object} decoded output return values
  */
 Contract.prototype._decodeMethodReturn = function(outputs, returnValues) {
     if (!returnValues) {
@@ -688,20 +924,33 @@ Contract.prototype._decodeMethodReturn = function(outputs, returnValues) {
  * Deploys the contract to the Klaytn.
  * After a successful deployment, the promise will be resolved with a new contract instance.
  *
- * @method deploy
- * @param {Object} options An object in which data, which is the byte code of the smart contract to be deployed, and arguments, which are parameters to be passed to the constructor of the smart contract, are defined.
- * @param {Function} [callback] The callback function.
- * @return {object} An object in which arguments and functions for contract deployment are defined
+ * @example
+ * const contract = await myContract.deploy({
+ *     from: '0x{address in hex}',
+ *     gas: 1500000,
+ * }, '0x{byte code}', 'This is contructor arguments')
+ *
+ * @param {object} sendOptions An object holding parameters that are required for sending a transaction.
+ * @param {string} byteCode The byte code of the contract.
+ * @param {...*} parameters The parameters to be passed to the constructor of the smart contract.
+ * @return {Promise<*>} The default return value will be `Promise<Contract>`. EventEmitter possible events are "error", "transactionHash" and "receipt". If you define a custom function in the `contractDeployFormatter` field in `SendOptions`, you can control return type.
  */
 /**
  * Deploys the contract to the Klaytn.
  * After a successful deployment, the promise will be resolved with a new contract instance.
  *
- * @method deploy
- * @param {object} sendOptions An object holding parameters that are required for sending a transaction.
- * @param {string} byteCode The byte code of the contract.
- * @param {...*} parameters The parameters to be passed to the constructor of the smart contract.
- * @return {object} Promise will be resolved with a new contract instance. EventEmitter possible events are "error", "transactionHash" and "receipt"
+ * @example
+ * myContract.deploy({
+ *     data: '0x12345...',
+ *     arguments: [123, 'My string']
+ * }).send({
+ *     from: '0x1234567890123456789012345678901234567891',
+ *     gas: 1500000,
+ *     value: 0,
+ * })
+ *
+ * @param {object} options An object in which data, which is the byte code of the smart contract to be deployed, and arguments, which are parameters to be passed to the constructor of the smart contract, are defined.
+ * @return {ContractMethod} An object in which arguments and functions for contract deployment are defined
  */
 Contract.prototype.deploy = function(options, callback) {
     const args = Array.prototype.slice.call(arguments)
@@ -737,11 +986,21 @@ Contract.prototype.deploy = function(options, callback) {
  * Sends a SmartContractExecution transaction to execute the function of the contract deployed in the Klaytn.
  * After a successful deployment, the promise will be resolved with a transaction receipt.
  *
- * @method send
+ * @example
+ * const receipt = await contract.send({ from: '0x{address in hex}', gas: 1000000 }, 'methodName', 123)
+ *
+ * const receipt = await contract.send({
+ *     from: '0x{address in hex}',
+ *     gas: 1000000,
+ *     feeDelegation: true,
+ *     feePayer: '0x{address in hex}',
+ *     feeRatio: 30,
+ * }, 'methodName', 123)
+ *
  * @param {object} sendOptions An object holding parameters that are required for sending a transaction.
  * @param {string} functionName The function name to execute.
  * @param {...*} parameters The parameters to be passed to the smart contract function.
- * @return {object} Promise will be resolved with a transaction receipt. EventEmitter possible events are "error", "transactionHash" and "receipt"
+ * @return {Promise<object>} Promise will be resolved with a transaction receipt. EventEmitter possible events are "error", "transactionHash" and "receipt"
  */
 Contract.prototype.send = function() {
     const args = Array.prototype.slice.call(arguments)
@@ -757,11 +1016,15 @@ Contract.prototype.send = function() {
 /**
  * Calls a "constant" method and execute its smart contract method in the Klaytn Virtual Machine without sending any transaction.
  *
- * @method call
+ * @example
+ * const result = await contract.call('methodName')
+ *
+ * const result = await myContract.call({ from: '0x{address in hex}' }, 'methodName', 123)
+ *
  * @param {object} [callObject] The options used for calling.
  * @param {string} functionName The function name to execute.
  * @param {...*} parameters The parameters to be passed to the smart contract function.
- * @return {object} Promise will be resolved with a transaction receipt. EventEmitter possible events are "error", "transactionHash" and "receipt"
+ * @return {Promise<*>} Promise will be resolved with a transaction receipt. EventEmitter possible events are "error", "transactionHash" and "receipt"
  */
 Contract.prototype.call = function() {
     let args = Array.prototype.slice.call(arguments)
@@ -786,11 +1049,24 @@ Contract.prototype.call = function() {
  * If you want to use fee delegation, `feeDelegation` should be defined as `true` in the `sendOptions` parameter.
  * Also if you want to use partial fee delegation, you can define `feeRatio` in the `sendOptions` parameter.
  *
- * @method sign
+ * @example
+ * // Smart contract deployement
+ * const signed = await contract.sign({ from: '0x{address in hex}', gas: 1000000 }, 'constructor', byteCode, 123)
+ *
+ * // Smart contract execution
+ * const signed = await contract.sign({ from: '0x{address in hex}', gas: 1000000 }, 'methodName', 123)
+ *
+ * // Smart contract execution with fee-delegated tx
+ * const signed = await myContract.sign({
+ *     from: '0x{address in hex}',
+ *     gas: 1000000,
+ *     feeDelegation: true,
+ * }, 'methodName', 123)
+ *
  * @param {object} sendOptions An object holding parameters that are required for sending a transaction.
  * @param {string} functionName The function name to execute. If you want to sign for deployig, please send 'constructor' here.
  * @param {...*} parameters The parameters to be passed to the smart contract constructor or function.
- * @return {object} Promise will be resolved with a transaction receipt. EventEmitter possible events are "error", "transactionHash" and "receipt"
+ * @return {Promise<module:Transaction.Transaction>} Promise will be resolved with a transaction receipt. EventEmitter possible events are "error", "transactionHash" and "receipt"
  */
 Contract.prototype.sign = function() {
     const args = Array.prototype.slice.call(arguments)
@@ -814,11 +1090,17 @@ Contract.prototype.sign = function() {
  * `feeDelegation` field should be true.
  * Also if you want to use partial fee delegation, you can define `feeRatio` in the `sendOptions` parameter.
  *
- * @method sign
+ * @example
+ * // Smart contract deployement
+ * const signed = await contract.signAsFeePayer({ from: '0x{address in hex}', feeDelegation: true, feePayer: '0x{address in hex}', gas: 1000000 }, 'constructor', byteCode, 123)
+ *
+ * // Smart contract execution
+ * const signed = await contract.signAsFeePayer({ from: '0x{address in hex}', feeDelegation: true, feePayer: '0x{address in hex}', gas: 1000000 }, 'methodName', 123)
+ *
  * @param {object} sendOptions An object holding parameters that are required for sending a transaction.
  * @param {string} functionName The function name to execute. If you want to sign for deployig, please send 'constructor' here.
  * @param {...*} parameters The parameters to be passed to the smart contract constructor or function.
- * @return {object} Promise will be resolved with a transaction receipt. EventEmitter possible events are "error", "transactionHash" and "receipt"
+ * @return {Promise<module:Transaction.Transaction>} Promise will be resolved with a transaction receipt. EventEmitter possible events are "error", "transactionHash" and "receipt"
  */
 Contract.prototype.signAsFeePayer = function() {
     const args = Array.prototype.slice.call(arguments)
@@ -835,11 +1117,12 @@ Contract.prototype.signAsFeePayer = function() {
 /**
  * Gets the event signature and outputformatters
  *
+ * @ignore
  * @method _generateEventOptions
- * @param {Object} event
- * @param {Object} options
- * @param {Function} callback
- * @return {Object} the event options object
+ * @param {object} event
+ * @param {object} options
+ * @param {function} callback
+ * @return {object} the event options object
  */
 Contract.prototype._generateEventOptions = function() {
     const args = Array.prototype.slice.call(arguments)
@@ -879,8 +1162,11 @@ Contract.prototype._generateEventOptions = function() {
 /**
  * Adds event listeners and creates a subscription, and remove it once its fired.
  *
- * @method clone
- * @return {Object} the event subscription
+ * @example
+ * const cloned = contract.clone('0x{new address}')
+ *
+ * @param {string} [address] The smart contract address to use in the new instance.
+ * @return {object} the event subscription
  */
 Contract.prototype.clone = function(contractAddress = this.options.address) {
     const cloned = new this.constructor(this.options.jsonInterface, contractAddress, this.options)
@@ -889,41 +1175,38 @@ Contract.prototype.clone = function(contractAddress = this.options.address) {
 }
 
 /**
+ * An event object.
+ *
+ * @typedef {object} Contract.EventObject
+ * @property {string} event - The event name.
+ * @property {string|null} signature - The event signature, `null` if it’s an anonymous event.
+ * @property {string} address - Address this event originated from.
+ * @property {object} returnValues - The return values coming from the event, e.g. `{ myVar: 1, myVar2: '0x234...' }`.
+ * @property {number} logIndex - The event index position in the block.
+ * @property {number} transactionIndex - The transaction’s index position the event was created in.
+ * @property {string} transactionHash - The hash of the transaction this event was created in.
+ * @property {string} blockHash - The hash of the block this event was created in. null when it’s still pending.
+ * @property {number} blockNumber - The block number this log was created in. null when still pending.
+ * @property {object} raw - An object defines `data` and `topic`. raw.data containing non-indexed log parameter. raw.topic is an array with a maximum of four 32 Byte topics, and topic 1-3 contains indexed parameters of the event.
+ * @property {string} raw.data - The `data` is containing non-indexed log parameter. raw.topic is an array with a maximum of four 32 Byte topics, and topic 1-3 contains indexed parameters of the event.
+ * @property {Array.<string>} raw.topic - The `topic` is an array with a maximum of four 32 Byte topics, and topic 1-3 contains indexed parameters of the event.
+ */
+
+/**
  * Adds event listeners and creates a subscription, and remove it once its fired.
  * (Subscribes to an event and unsubscribes immediately after the first event or error. Will only fire for a single event.)
  *
+ * @example
+ * contract.once('MyEvent', {
+ *     filter: { myIndexedParam: [20,23], myOtherIndexedParam: '0x123456789...' }, // Using an array means OR: e.g. 20 or 23
+ *     fromBlock: 0
+ * }, function(error, event){ console.log(event) })
  *
- * @method once
- * @param {String} event
- * @param {Object} options
- * @param {Function} callback
- * @return {Object} the event subscription
- *
- * myContract.once('MyEvent', {
-      filter: {myIndexedParam: [20,23], myOtherIndexedParam: '0x123456789...'}, // Using an array means OR: e.g. 20 or 23
-      fromBlock: 0
-  }, function(error, event){ console.log(event); });
-
-  // event output example
-  > {
-      returnValues: {
-          myIndexedParam: 20,
-          myOtherIndexedParam: '0x123456789...',
-          myNonIndexParam: 'My String'
-      },
-      raw: {
-          data: '0x7f9fade1c0d57a7af66ab4ead79fade1c0d57a7af66ab4ead7c2c2eb7b11a91385',
-          topics: ['0xfd43ade1c09fade1c0d57a7af66ab4ead7c2c2eb7b11a91ffdd57a7af66ab4ead7', '0x7f9fade1c0d57a7af66ab4ead79fade1c0d57a7af66ab4ead7c2c2eb7b11a91385']
-      },
-      event: 'MyEvent',
-      signature: '0xfd43ade1c09fade1c0d57a7af66ab4ead7c2c2eb7b11a91ffdd57a7af66ab4ead7',
-      logIndex: 0,
-      transactionIndex: 0,
-      transactionHash: '0x7f9fade1c0d57a7af66ab4ead79fade1c0d57a7af66ab4ead7c2c2eb7b11a91385',
-      blockHash: '0xfd43ade1c09fade1c0d57a7af66ab4ead7c2c2eb7b11a91ffdd57a7af66ab4ead7',
-      blockNumber: 1234,
-      address: '0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe'
-  }
+ * @param {string} event The name of the event in the contract, or "allEvents" to get all events.
+ * @param {object} options The options used for subscription.
+ * @param {object} [options.filter] Lets you filter events by indexed parameters, e.g., `{ filter: {mynumber: [12,13]} }` means all events where "mynumber" is 12 or 13.
+ * @param {Array.<string>} [options.topics] This allows you to manually set the topics for the event filter. Given the filter property and event signature, `topic[0]` would not be set automatically.
+ * @param {function} callback This callback will be fired for the first event as the second argument, or an error as the first argument. The event is returned as an {@link Contract.EventObject} type.
  */
 Contract.prototype.once = function(event, options, callback) {
     const args = Array.prototype.slice.call(arguments)
@@ -954,11 +1237,12 @@ Contract.prototype.once = function(event, options, callback) {
 /**
  * Adds event listeners and creates a subscription.
  *
+ * @ignore
  * @method _on
- * @param {String} event
- * @param {Object} options
- * @param {Function} callback
- * @return {Object} the event subscription
+ * @param {string} event
+ * @param {object} options
+ * @param {function} callback
+ * @return {object} the event subscription
  */
 Contract.prototype._on = function() {
     const subOptions = this._generateEventOptions.apply(this, arguments)
@@ -994,44 +1278,21 @@ Contract.prototype._on = function() {
 /**
  * Get past events from contracts
  *
- * @method getPastEvents
- * @param {String} event
- * @param {Object} options
- * @param {Function} callback
- * @return {Object} the promievent
- */
-
-/**
- * myContract.getPastEvents('MyEvent', {
-      filter: {myIndexedParam: [20,23], myOtherIndexedParam: '0x123456789...'}, // Using an array means OR: e.g. 20 or 23
-      fromBlock: 0,
-      toBlock: 'latest'
-  }, function(error, events){ console.log(events); })
-  .then(function(events){
-      console.log(events) // same results as the optional callback above
-  });
-
-  > [{
-      returnValues: {
-          myIndexedParam: 20,
-          myOtherIndexedParam: '0x123456789...',
-          myNonIndexParam: 'My String'
-      },
-      raw: {
-          data: '0x7f9fade1c0d57a7af66ab4ead79fade1c0d57a7af66ab4ead7c2c2eb7b11a91385',
-          topics: ['0xfd43ade1c09fade1c0d57a7af66ab4ead7c2c2eb7b11a91ffdd57a7af66ab4ead7', '0x7f9fade1c0d57a7af66ab4ead79fade1c0d57a7af66ab4ead7c2c2eb7b11a91385']
-      },
-      event: 'MyEvent',
-      signature: '0xfd43ade1c09fade1c0d57a7af66ab4ead7c2c2eb7b11a91ffdd57a7af66ab4ead7',
-      logIndex: 0,
-      transactionIndex: 0,
-      transactionHash: '0x7f9fade1c0d57a7af66ab4ead79fade1c0d57a7af66ab4ead7c2c2eb7b11a91385',
-      blockHash: '0xfd43ade1c09fade1c0d57a7af66ab4ead7c2c2eb7b11a91ffdd57a7af66ab4ead7',
-      blockNumber: 1234,
-      address: '0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe'
-  },{
-      ...
-  }]
+ * @example
+ * const events = await contract.getPastEvents('MyEvent', {
+ *     filter: { myIndexedParam: [20,23], myOtherIndexedParam: '0x123456789...' }, // Using an array means OR: e.g. 20 or 23
+ *     fromBlock: 0,
+ *     toBlock: 'latest'
+ * }, function(error, events){ console.log(events) })
+ *
+ * @param {string} event
+ * @param {object} options
+ * @param {object} [options.filter] Lets you filter events by indexed parameters, e.g., `{ filter: {mynumber: [12,13]} }` means all events where "mynumber" is 12 or 13.
+ * @param {string|number} [options.fromBlock] The block number from which to get events.
+ * @param {string|number} [options.toBlock] The block number to get events up to (defaults to "latest").
+ * @param {Array.<string>} [options.topics] This allows you to manually set the topics for the event filter. Given the filter property and event signature, `topic[0]` would not be set automatically.
+ * @param {function} [callback] This callback will be fired for the first event logs as the second argument, or an error as the first argument. The event logs is returned as an array of {@link Contract.EventObject} type.
+ * @return {Promise<Array.<Contract.EventObject>>}
  */
 Contract.prototype.getPastEvents = function() {
     const subOptions = this._generateEventOptions.apply(this, arguments)
@@ -1054,8 +1315,9 @@ Contract.prototype.getPastEvents = function() {
 /**
  * returns the an object with call, send, estimate functions
  *
+ * @ignore
  * @method _createTxObject
- * @returns {Object} an object with functions to call the methods
+ * @returns {object} an object with functions to call the methods
  */
 
 Contract.prototype._createTxObject = function _createTxObject() {
@@ -1122,6 +1384,7 @@ Contract.prototype._createTxObject = function _createTxObject() {
 /**
  * Generates the options for the execute call
  *
+ * @ignore
  * @method _processExecuteArguments
  * @param {Array} args
  * @param {Promise} defer
@@ -1177,8 +1440,9 @@ Contract.prototype._processExecuteArguments = function _processExecuteArguments(
 /**
  * Executes a call, transact or estimateGas on a contract function
  *
+ * @ignore
  * @method _executeMethod
- * @param {String} type the type this execute function should execute
+ * @param {string} type the type this execute function should execute
  * @param {Boolean} makeRequest if true, it simply returns the request parameters, rather than executing it
  */
 
