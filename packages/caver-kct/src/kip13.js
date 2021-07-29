@@ -22,13 +22,21 @@ const Contract = require('../../caver-contract')
 const { kip13JsonInterface, interfaceIds } = require('./kctHelper')
 const { isAddress } = require('../../caver-utils')
 
+/**
+ * The KIP13 class allows you to easily check whether a SmartContract implements the KIP-13 standard.
+ * It also provides the ability to query whether an interface id is implemented as a parameter.
+ *
+ * @class
+ */
 class KIP13 extends Contract {
     /**
-     * isImplementedKIP13Interface checks if the contract implements KIP-13.
+     * Checks if the contract implements the KIP-13 standard.
      *
-     * @method isImplementedKIP13Interface
+     * @example
+     * const isImplemented = await caver.kct.kip13.isImplementedKIP13Interface('0x{address in hex}')
+     *
      * @param {string} contractAddress The address of the contract to check.
-     * @return {boolean}
+     * @return {Promise<boolean>}
      */
     static async isImplementedKIP13Interface(contractAddress) {
         const kip13 = new KIP13(contractAddress)
@@ -37,6 +45,16 @@ class KIP13 extends Contract {
         return isTrue && !isFalse
     }
 
+    /**
+     * KIP13 class represents the KIP-13 contract.
+     *
+     * @example
+     * const kip13 = new caver.kct.kip13('0x{address in hex}')
+     *
+     * @constructor
+     * @param {string} [contractAddress] - The smart contract address.
+     * @param {Array} [abi] - The Contract Application Binary Interface (ABI) of the KIP-13.
+     */
     constructor(contractAddress, abi = kip13JsonInterface) {
         if (contractAddress) {
             if (_.isString(contractAddress)) {
@@ -51,11 +69,14 @@ class KIP13 extends Contract {
     }
 
     /**
-     * sendQuery sends query to check whether interface is supported or not.
+     * Sends query to check whether the interface is supported or not.
+     * Using `supportsInterface` method supported in the each KCT class is recommended to use instead of the `kip13.sendQuery`.
      *
-     * @method sendQuery
+     * @example
+     * const isImplemented = await kip13.sendQuery('0x{interface id}')
+     *
      * @param {string} interfaceId The interface id to check.
-     * @return {boolean}
+     * @return {Promise<boolean>}
      */
     async sendQuery(interfaceId) {
         const supported = await this.methods.supportsInterface(interfaceId).call()
