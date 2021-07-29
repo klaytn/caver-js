@@ -711,7 +711,7 @@ class KIP37 extends Contract {
 
     /**
      * Adds an account as a pauser that has the right to suspend the contract.
-     * 
+     *
      * If `sendParam.from` or `kip37.options.from` were given, it should be a pauser with PauserRole.
      *
      * @example
@@ -730,8 +730,8 @@ class KIP37 extends Contract {
     }
 
     /**
-     * Renounces the right to pause the contract. Only a pauser address can renounce the pausing right. 
-     * 
+     * Renounces the right to pause the contract. Only a pauser address can renounce the pausing right.
+     *
      * If `sendParam.from` or `kip37.options.from` were given, it should be a pauser with PauserRole.
      *
      * @example

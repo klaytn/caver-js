@@ -22,7 +22,6 @@ const BaseKIP17 = require('./kip17')
 const KIP37 = require('./kip37')
 const KIP13 = require('./kip13')
 const core = require('../../caver-core')
-const Contract = require('../../caver-contract')
 const { validateDeployParameterForKIP7, validateDeployParameterForKIP17, kip7ByteCode, kip17ByteCode } = require('./kctHelper')
 
 /**

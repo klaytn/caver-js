@@ -25,13 +25,13 @@ const { isAddress } = require('../../caver-utils')
 /**
  * The KIP13 class allows you to easily check whether a SmartContract implements the KIP-13 standard.
  * It also provides the ability to query whether an interface id is implemented as a parameter.
- * 
+ *
  * @class
  */
 class KIP13 extends Contract {
     /**
      * Checks if the contract implements the KIP-13 standard.
-     * 
+     *
      * @example
      * const isImplemented = await caver.kct.kip13.isImplementedKIP13Interface('0x{address in hex}')
      *
@@ -47,7 +47,7 @@ class KIP13 extends Contract {
 
     /**
      * KIP13 class represents the KIP-13 contract.
-     * 
+     *
      * @example
      * const kip13 = new caver.kct.kip13('0x{address in hex}')
      *
@@ -71,7 +71,7 @@ class KIP13 extends Contract {
     /**
      * Sends query to check whether the interface is supported or not.
      * Using `supportsInterface` method supported in the each KCT class is recommended to use instead of the `kip13.sendQuery`.
-     * 
+     *
      * @example
      * const isImplemented = await kip13.sendQuery('0x{interface id}')
      *
