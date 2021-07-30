@@ -60,33 +60,30 @@ export interface BlockWithConsensusInfo extends Block {
 }
 
 export interface TransactionFromNode {
-    blockHash?: string
-    blockNumber?: string
+    blockHash: string
+    blockNumber: string
     codeFormat?: string
     feePayer?: string
     feePayerSignatures?: SignatureObject[]
     feeRatio?: string
-    from?: string
-    gas?: string | number
-    gasPrice?: string | number
-    hash?: string
+    from: string
+    gas: string | number
+    gasPrice: string | number
+    hash: string
     humanReadable?: boolean
     key?: string
     input?: string
-    nonce?: string
-    senderTxHash?: string
-    signatures?: SignatureObject[] | string[] | string[][]
-    to?: string | null
-    transactionIndex?: string | null
-    type?: string
-    typeInt?: number
+    nonce: string
+    senderTxHash: string
+    signatures: SignatureObject[] | string[] | string[][]
+    to: string | null
+    transactionIndex: string | null
+    type: string
+    typeInt: number
     value?: string
-    chainId?: string | number
-    data?: string
 }
 
 export interface TransactionReceipt extends TransactionFromNode {
-    transactionIndex?: string
     contractAddress: string
     gasUsed: string
     logs?: LogObject[]
