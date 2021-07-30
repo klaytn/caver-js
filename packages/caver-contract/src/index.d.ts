@@ -59,7 +59,7 @@ export interface CallOptions {
     gas?: number
 }
 
-export interface ContractMethods {
+export interface ContractMethod {
     arguments?: any[]
     send?: Contract['send']
     sign?: Contract['sign']
@@ -111,14 +111,17 @@ export default class Contract {
     defaultAccount: string | null
     defaultBlock: string
     events: any
-    methods: any
+    // methods: any
+    methods: {
+        [methodName: string]: (...args: any) => ContractMethod
+    }
     _wallet: Wallet
 
     setKeyrings(keyrings: KeyringContainer): void
     setWallet(wallet: Wallet): void
     addAccounts(accounts: string[]): void
     decodeFunctionCall(functionCall: string): Result
-    deploy(options: ContractDeployParams): ContractMethods
+    deploy(options: ContractDeployParams): ContractMethod
     deploy(options: SendOptionsWithFormatter, byteCode: string, ...args: any[]): Promise<any>
     deploy(options: SendOptions, byteCode: string, ...args: any[]): Promise<Contract>
     send(sendOptions: SendOptionsWithFormatter, functionName?: string, ...args: any[]): Promise<any>
