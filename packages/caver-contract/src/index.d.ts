@@ -59,7 +59,7 @@ export interface CallOptions {
     gas?: number
 }
 
-export interface DeployedTransactionObject {
+export interface ContractMethods {
     arguments?: any[]
     send?: Contract['send']
     sign?: Contract['sign']
@@ -118,7 +118,7 @@ export default class Contract {
     setWallet(wallet: Wallet): void
     addAccounts(accounts: string[]): void
     decodeFunctionCall(functionCall: string): Result
-    deploy(options: ContractDeployParams): DeployedTransactionObject
+    deploy(options: ContractDeployParams): ContractMethods
     deploy(options: SendOptionsWithFormatter, byteCode: string, ...args: any[]): Promise<any>
     deploy(options: SendOptions, byteCode: string, ...args: any[]): Promise<Contract>
     send(sendOptions: SendOptionsWithFormatter, functionName?: string, ...args: any[]): Promise<any>
