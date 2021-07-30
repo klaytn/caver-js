@@ -95,20 +95,7 @@ export interface TransactionReceipt extends TransactionFromNode {
     txError?: string
     transactionHash: string
     events?: {
-        Approval?: EventData | EventData[]
-        Transfer?: EventData | EventData[]
-        MinterAdded?: EventData | EventData[]
-        MinterRemoved?: EventData | EventData[]
-        PauserAdded?: EventData | EventData[]
-        PauserRemoved?: EventData | EventData[]
-        Paused?: EventData | EventData[]
-        Unpaused?: EventData | EventData[]
-        ApprovalForAll?: EventData | EventData[]
-        TransferSingle?: EventData | EventData[]
-        URI?: {
-            address: string
-        }
-        TransferBatch?: EventData | EventData[]
+        [eventName: string]: EventData | EventData[]
     }
     options?: ContractOptions
 }
