@@ -21,6 +21,11 @@ const Net = require('./net')
 const Governance = require('./governance')
 const core = require('../../caver-core')
 
+/**
+ * A class that manages RPC call classes supported by caver.
+ * @hideconstructor
+ * @class
+ */
 class RPC {
     constructor(...args) {
         const _this = this
@@ -47,8 +52,13 @@ class RPC {
             _this.setRequestManager(_this._requestManager)
         }
 
+        /** @type {Klay} */
         this.klay = new Klay(this)
+
+        /** @type {Net} */
         this.net = new Net(this)
+
+        /** @type {Governance} */
         this.governance = new Governance(this)
     }
 }

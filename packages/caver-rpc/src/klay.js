@@ -36,7 +36,7 @@ const utils = require('../../caver-utils')
 const AbstractTransaction = require('../../caver-transaction/src/transactionTypes/abstractTransaction')
 const Validator = require('../../caver-validator')
 
-class KlayRPC {
+class Klay {
     constructor(...args) {
         const _this = this
 
@@ -545,4 +545,4 @@ class KlayRPC {
     }
 }
 
-module.exports = KlayRPC
+module.exports = Klay
