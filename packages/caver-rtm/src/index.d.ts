@@ -100,9 +100,28 @@ export interface TransactionReceipt extends TransactionFromNode {
     options?: ContractOptions
 }
 
-export interface SignResult {
+export interface SignResultFromNode {
     raw: string
-    tx: TransactionFromNode
+    tx: SignedTransactionFromNode
+}
+
+export interface SignedTransactionFromNode {
+    nonce: string
+    gasPrice: string
+    gas: string
+    to: string
+    value: string
+    input: string
+    v?: string
+    r?: string
+    s?: string
+    signatures: SignatureObject[]
+    hash: string
+    typeInt?: number
+    type?: string
+    from?: string
+    feePayer?: string
+    feePayerSignatures?: SignatureObject[]
 }
 
 export interface PeerCountByType {
@@ -170,7 +189,7 @@ export default class RpcCallToMethod {
     klay_getTransactionCount(address: string, blockNumber: number): Promise<string>
     klay_getTransactionCount(address: string, blockTag: string): Promise<string>
     klay_sendRawTransaction(rawTransaction: string | ValueTransfer): Promise<TransactionReceipt>
-    klay_signTransaction(tx: AbstractTransaction): Promise<SignResult>
+    klay_signTransaction(tx: AbstractTransaction): Promise<SignResultFromNode>
     klay_sendTransaction(tx: AbstractTransaction): Promise<string>
     klay_call(callObject: object): Promise<string>
     klay_call(callObject: object, blockNumber: number): Promise<string>

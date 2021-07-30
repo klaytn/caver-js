@@ -17,7 +17,7 @@
 */
 
 import { AccountKeyFormat, AccountKeyObject } from '../../caver-core-helpers/src/formatters'
-import RpcCallToMethod, { Block, BlockWithConsensusInfo, SignResult, TransactionFromNode } from '../../caver-rtm/src'
+import RpcCallToMethod, { Block, BlockWithConsensusInfo, SignResultFromNode, TransactionFromNode } from '../../caver-rtm/src'
 import AbstractFeeDelegatedTransaction from '../../caver-transaction/src/transactionTypes/abstractFeeDelegatedTransaction'
 import { PromiEvent } from '../../caver-utils/src'
 import Validator from '../../caver-validator/src'
@@ -94,7 +94,7 @@ export default class KlayRPC {
     sendTransaction: RpcCallToMethod['klay_sendTransaction']
     sendTransactionAsFeePayer(tx: AbstractFeeDelegatedTransaction): Promise<PromiEvent>
     signTransaction: RpcCallToMethod['klay_signTransaction']
-    signTransactionAsFeePayer(tx: AbstractFeeDelegatedTransaction): Promise<SignResult>
+    signTransactionAsFeePayer(tx: AbstractFeeDelegatedTransaction): Promise<SignResultFromNode>
     getDecodedAnchoringTransactionByHash(hash: string): Promise<DecodeAanchoringTransaction>
     getChainId: RpcCallToMethod['klay_chainID']
     getClientVersion: RpcCallToMethod['klay_clientVersion']
