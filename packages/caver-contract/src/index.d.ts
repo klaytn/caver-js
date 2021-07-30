@@ -20,6 +20,7 @@ import { Wallet } from '../../..'
 import { Result } from '../../caver-abi/src'
 import { KIP37 } from '../../caver-kct/src'
 import KIP7 from '../../caver-kct/src/kip7'
+import RpcCallToMethod, { TransactionReceipt } from '../../caver-rtm/src'
 import { AbiItem } from '../../caver-utils/src'
 import KeyringContainer from '../../caver-wallet/src'
 
@@ -35,7 +36,7 @@ export interface ContractOptions {
     data: string
 }
 
-export interface ContractDeployParams extends SendOptions {
+export interface ContractDeployParams {
     data?: string
     arguments?: any[]
 }
@@ -46,6 +47,9 @@ export interface SendOptions {
     feePayer?: string
     feeRatio?: number
     gas?: number | string
+}
+
+export interface SendOptionsWithFormatter extends SendOptions {
     contractDeployFormatter?: Function
 }
 
@@ -55,23 +59,13 @@ export interface CallOptions {
     gas?: number
 }
 
-export interface ContractMethod extends SendData {
-    send: Contract['send']
-    call: Contract['call']
-    sign: Contract['sign']
-    signAsFeePayer: Contract['signAsFeePayer']
-}
-
-export interface SendData {
-    from?: string
-    status?: string
-    type?: string
-    feePayer?: string
-    contractAddress?: string
-    feeRatio?: number
-    options?: {
-        address: string
-    }
+export interface DeployedTransactionObject {
+    arguments?: any[]
+    send?: Contract['send']
+    sign?: Contract['sign']
+    signAsFeePayer?: Contract['signAsFeePayer']
+    estimateGas?: RpcCallToMethod['klay_estimateGas']
+    encodeABI?: () => string
 }
 
 export interface EventOptions {
@@ -124,8 +118,10 @@ export default class Contract {
     setWallet(wallet: Wallet): void
     addAccounts(accounts: string[]): void
     decodeFunctionCall(functionCall: string): Result
-    deploy(options: ContractDeployParams, byteCode?: string, ...args: any[]): ContractMethod
-    send(sendOptions: SendOptions, functionName?: string, ...args: any[]): Promise<SendData>
+    deploy(options: ContractDeployParams): DeployedTransactionObject
+    deploy(options: SendOptionsWithFormatter, byteCode: string, ...args: any[]): Promise<TransactionReceipt>
+    deploy(options: SendOptions, byteCode: string, ...args: any[]): Promise<Contract>
+    send(sendOptions: SendOptionsWithFormatter, functionName?: string, ...args: any[]): Promise<TransactionReceipt>
     call(functionName: string, ...args: any[]): Promise<any>
     call(callObject: CallOptions, functionName: string, ...args: any[]): Promise<any>
     sign(sendOptions: SendOptions, functionName?: string, ...args: any[]): Promise<any>
