@@ -111,10 +111,7 @@ export default class Contract {
     defaultAccount: string | null
     defaultBlock: string
     events: any
-    // methods: any
-    methods: {
-        [methodName: string]: (...args: any) => ContractMethod
-    }
+    methods: any
     _wallet: Wallet
 
     setKeyrings(keyrings: KeyringContainer): void
