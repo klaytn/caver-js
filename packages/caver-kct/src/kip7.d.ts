@@ -18,7 +18,7 @@
 
 import BigNumber from 'bignumber.js'
 import { Wallet } from '../../..'
-import Contract, { SendData, SendOptions } from '../../caver-contract/src'
+import Contract, { SendOptions, SendOptionsWithFormatter } from '../../caver-contract/src'
 import { TransactionReceipt } from '../../caver-rtm/src'
 import { AbiItem } from '../../caver-utils/src'
 
@@ -46,8 +46,10 @@ export default class KIP7 extends Contract {
 
     static byteCode: string
 
-    static deploy(tokenInfo: TokenInfoObject, sendOptions: string | SendOptions): Promise<SendData>
-    static deploy(tokenInfo: TokenInfoObject, sendOptions: string | SendOptions, wallet: Wallet): Promise<SendData> // override from caver-kct
+    static deploy(tokenInfo: TokenInfoObject, sendOptions: string | SendOptionsWithFormatter): Promise<any>
+    static deploy(tokenInfo: TokenInfoObject, sendOptions: string | SendOptions): Promise<TransactionReceipt>
+    static deploy(tokenInfo: TokenInfoObject, sendOptions: string | SendOptionsWithFormatter, wallet: Wallet): Promise<any> // override from caver-kct
+    static deploy(tokenInfo: TokenInfoObject, sendOptions: string | SendOptions, wallet: Wallet): Promise<TransactionReceipt> // override from caver-kct
     static detectInterface(contractAddress: string): Promise<KIP7DetectedObject>
     clone: Contract['clone']
     detectInterface(): Promise<KIP7DetectedObject>
@@ -61,20 +63,36 @@ export default class KIP7 extends Contract {
     isMinter(account: string): Promise<boolean>
     isPauser(account: string): Promise<boolean>
     paused(): Promise<boolean>
+    approve(spender: string, amount: Amount, sendParam?: SendOptionsWithFormatter): Promise<any>
     approve(spender: string, amount: Amount, sendParam?: SendOptions): Promise<TransactionReceipt>
+    transfer(recipient: string, amount: Amount, sendParam?: SendOptionsWithFormatter): Promise<any>
     transfer(recipient: string, amount: Amount, sendParam?: SendOptions): Promise<TransactionReceipt>
+    transferFrom(sender: string, recipient: string, amount: Amount, sendParam?: SendOptionsWithFormatter): Promise<any>
     transferFrom(sender: string, recipient: string, amount: Amount, sendParam?: SendOptions): Promise<TransactionReceipt>
+    safeTransfer(recipient: string, amount: Amount, sendParam?: SendOptionsWithFormatter): Promise<any>
     safeTransfer(recipient: string, amount: Amount, sendParam?: SendOptions): Promise<TransactionReceipt>
+    safeTransfer(recipient: string, amount: Amount, data: Data, sendParam?: SendOptionsWithFormatter): Promise<any>
     safeTransfer(recipient: string, amount: Amount, data: Data, sendParam?: SendOptions): Promise<TransactionReceipt>
+    safeTransferFrom(sender: string, recipient: string, amount: Amount, sendParam?: SendOptionsWithFormatter): Promise<any>
     safeTransferFrom(sender: string, recipient: string, amount: Amount, sendParam?: SendOptions): Promise<TransactionReceipt>
+    safeTransferFrom(sender: string, recipient: string, amount: Amount, data: Data, sendParam?: SendOptionsWithFormatter): Promise<any>
     safeTransferFrom(sender: string, recipient: string, amount: Amount, data: Data, sendParam?: SendOptions): Promise<TransactionReceipt>
+    mint(account: string, amount: Amount, sendParam?: SendOptionsWithFormatter): Promise<any>
     mint(account: string, amount: Amount, sendParam?: SendOptions): Promise<TransactionReceipt>
+    addMinter(account: string, sendParam?: SendOptionsWithFormatter): Promise<any>
     addMinter(account: string, sendParam?: SendOptions): Promise<TransactionReceipt>
+    renounceMinter(sendParam?: SendOptionsWithFormatter): Promise<any>
     renounceMinter(sendParam?: SendOptions): Promise<TransactionReceipt>
+    burn(amount: Amount, sendParam?: SendOptionsWithFormatter): Promise<any>
     burn(amount: Amount, sendParam?: SendOptions): Promise<TransactionReceipt>
+    burnFrom(account: string, amount: Amount, sendParam?: SendOptionsWithFormatter): Promise<any>
     burnFrom(account: string, amount: Amount, sendParam?: SendOptions): Promise<TransactionReceipt>
+    addPauser(account: string, sendParam?: SendOptionsWithFormatter): Promise<any>
     addPauser(account: string, sendParam?: SendOptions): Promise<TransactionReceipt>
+    pause(sendParam?: SendOptionsWithFormatter): Promise<any>
     pause(sendParam?: SendOptions): Promise<TransactionReceipt>
+    unpause(sendParam?: SendOptionsWithFormatter): Promise<any>
     unpause(sendParam?: SendOptions): Promise<TransactionReceipt>
+    renouncePauser(sendParam?: SendOptionsWithFormatter): Promise<any>
     renouncePauser(sendParam?: SendOptions): Promise<TransactionReceipt>
 }

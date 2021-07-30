@@ -119,13 +119,16 @@ export default class Contract {
     addAccounts(accounts: string[]): void
     decodeFunctionCall(functionCall: string): Result
     deploy(options: ContractDeployParams): DeployedTransactionObject
-    deploy(options: SendOptionsWithFormatter, byteCode: string, ...args: any[]): Promise<TransactionReceipt>
+    deploy(options: SendOptionsWithFormatter, byteCode: string, ...args: any[]): Promise<any>
     deploy(options: SendOptions, byteCode: string, ...args: any[]): Promise<Contract>
-    send(sendOptions: SendOptionsWithFormatter, functionName?: string, ...args: any[]): Promise<TransactionReceipt>
+    send(sendOptions: SendOptionsWithFormatter, functionName?: string, ...args: any[]): Promise<any>
+    send(sendOptions: SendOptions, functionName?: string, ...args: any[]): Promise<TransactionReceipt>
     call(functionName: string, ...args: any[]): Promise<any>
     call(callObject: CallOptions, functionName: string, ...args: any[]): Promise<any>
-    sign(sendOptions: SendOptions, functionName?: string, ...args: any[]): Promise<any>
-    signAsFeePayer(sendOptions: SendOptions, functionName?: string, ...args: any[]): Promise<any>
+    sign(sendOptions: SendOptionsWithFormatter, functionName?: string, ...args: any[]): Promise<any>
+    sign(sendOptions: SendOptions, functionName?: string, ...args: any[]): Promise<TransactionReceipt>
+    signAsFeePayer(sendOptions: SendOptionsWithFormatter, functionName?: string, ...args: any[]): Promise<any>
+    signAsFeePayer(sendOptions: SendOptions, functionName?: string, ...args: any[]): Promise<TransactionReceipt>
     clone(contractAddress?: object): Contract
     clone(contractAddress?: string): KIP7 // override from kip7
     clone(tokenAddress?: string): KIP37 // override from kip37
