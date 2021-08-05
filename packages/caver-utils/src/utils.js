@@ -575,6 +575,18 @@ const isValidBlockNumberCandidate = blockNumber => {
  */
 const SHA3_NULL_S = '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'
 
+/**
+ * Calculates the sha3 of the input.
+ *
+ * @example
+ * const hash = caver.utils.sha3('234')
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} str - A string to hash.
+ * @return {string} The result hash.
+ */
 const sha3 = function(value) {
     // return null when value is not string type.
     if (typeof value === 'number') return null
