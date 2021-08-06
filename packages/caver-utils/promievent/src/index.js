@@ -35,6 +35,18 @@ const mergeEmitterProp = obj => {
     return obj
 }
 
+/**
+ * A promise combined event emitter.
+ * @class
+ *
+ * @example
+ * const promiEvent = caver.utils.promiEvent(false)
+ * promiEvent.eventEmitter.emit('event name', 'evnet value')
+ * promiEvent.resolve(resolvedObject)
+ * promiEvent.reject(error)
+ *
+ * @param {boolean} promiseOnly - Whether use promise only or not.
+ */
 function PromiEvent(promiseOnly) {
     let resolve
     let reject

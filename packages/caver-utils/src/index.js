@@ -36,6 +36,14 @@ const Iban = require('../iban')
 const SignatureData = require('../../caver-wallet/src/keyring/signatureData')
 
 /**
+ * The util module.
+ * @module utils
+ *
+ * @example
+ * caver.utils
+ */
+
+/**
  * Fires an error in an event emitter and callback and returns the eventemitter
  *
  * @method _fireError
@@ -545,6 +553,7 @@ module.exports = {
     isValidHashStrict: utils.isValidHashStrict,
 
     // Moved promiEvent to utils,
+    /** @type {typeof PromiEvent} */
     promiEvent: promiEvent,
     Iban: Iban,
     // Newly added for supporting rpc.js
