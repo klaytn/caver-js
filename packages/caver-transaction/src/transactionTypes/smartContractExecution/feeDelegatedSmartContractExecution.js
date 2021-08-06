@@ -48,8 +48,10 @@ function _decode(rlpEncoded) {
 
 /**
  * Represents a fee delegated smart contract execution transaction.
- * Please refer to https://docs.klaytn.com/klaytn/design/transactions/fee-delegation#txtypefeedelegatedsmartcontractexecution to see more detail.
+ * Please refer to {@link https://docs.klaytn.com/klaytn/design/transactions/fee-delegation#txtypefeedelegatedsmartcontractexecution|FeeDelegatedSmartContractExecution} to see more detail.
  * @class
+ * @hideconstructor
+ * @augments AbstractFeeDelegatedTransaction
  */
 class FeeDelegatedSmartContractExecution extends AbstractFeeDelegatedTransaction {
     /**
@@ -143,7 +145,11 @@ class FeeDelegatedSmartContractExecution extends AbstractFeeDelegatedTransaction
 
     /**
      * Returns the RLP-encoded string of this transaction (i.e., rawTransaction).
-     * @return {string}
+     *
+     * @example
+     * const result = tx.getRLPEncoding()
+     *
+     * @return {string} An RLP-encoded transaction string.
      */
     getRLPEncoding() {
         this.validateOptionalValues()
@@ -169,7 +175,13 @@ class FeeDelegatedSmartContractExecution extends AbstractFeeDelegatedTransaction
 
     /**
      * Returns the RLP-encoded string to make the signature of this transaction.
-     * @return {string}
+     * This method has to be overrided in classes which extends AbstractTransaction.
+     * getCommonRLPEncodingForSignature is used in getRLPEncodingForSignature.
+     *
+     * @example
+     * const result = tx.getCommonRLPEncodingForSignature()
+     *
+     * @return {string} An RLP-encoded transaction string without signature.
      */
     getCommonRLPEncodingForSignature() {
         this.validateOptionalValues()

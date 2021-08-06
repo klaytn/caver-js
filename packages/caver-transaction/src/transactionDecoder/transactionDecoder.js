@@ -43,12 +43,19 @@ const FeeDelegatedChainDataAnchoringWithRatio = require('../transactionTypes/cha
 /**
  * Representing a transaction decoder.
  * @class
+ * @hideconstructor
  */
 class TransactionDecoder {
     /**
      * Decodes RLP-encoded transaction string and returns a Transaction instance.
+     *
+     * @example
+     * const tx = caver.transaction.decode('0x{RLP-encoded transaction string}')
+     *
+     * @alias module:Transaction.decode
+     *
      * @param {string} rlpEncoded - An RLP-encoded transaction string to decode.
-     * @return {Transaction}
+     * @return {module:Transaction.Transaction}
      */
     static decode(rlpEncoded) {
         const type = typeDetectionFromRLPEncoding(rlpEncoded)
