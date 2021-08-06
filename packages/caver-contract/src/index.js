@@ -64,7 +64,7 @@ const abi = require('../../caver-abi')
  *
  * @param {Array.<object>} jsonInterface - The JSON interface for the contract to instantiate.
  * @param {string} [address] - The address of the smart contract to call. This can be added later using `contract.options.address = '0x1234..'`.
- * @param {SendOptions} [options] - The default send options of the contract. This value is used if the user does not define sendOptions separately when calling a function that deploys or executes a smart contract.
+ * @param {Contract.SendOptions} [options] - The default send options of the contract. This value is used if the user does not define sendOptions separately when calling a function that deploys or executes a smart contract.
  */
 const Contract = function Contract(jsonInterface, address, options) {
     const _this = this
@@ -85,7 +85,7 @@ const Contract = function Contract(jsonInterface, address, options) {
 
     // create the options object
     /**
-     * @typedef {SendOptions} ContractOptions
+     * @typedef {Contract.SendOptions} Contract.ContractOptions
      * @property {string} address
      * @property {Array.<object>} jsonInterface
      */
@@ -93,7 +93,7 @@ const Contract = function Contract(jsonInterface, address, options) {
      * @example
      * contract.options
      *
-     * @type {ContractOptions}
+     * @type {Contract.ContractOptions}
      * */
     this.options = {}
 
@@ -111,7 +111,7 @@ const Contract = function Contract(jsonInterface, address, options) {
      * @example
      * contract.defaultSendOptions
      *
-     * @type {ContractOptions}
+     * @type {Contract.ContractOptions}
      * @name Contract#defaultSendOptions
      */
     Object.defineProperty(this, 'defaultSendOptions', {
@@ -128,7 +128,7 @@ const Contract = function Contract(jsonInterface, address, options) {
      * contract.options.address // Deployed smart contract address
      *
      * @type {string}
-     * @name ContractOptions#address
+     * @name Contract.ContractOptions#address
      */
     Object.defineProperty(this.options, 'address', {
         set(value) {
@@ -150,7 +150,7 @@ const Contract = function Contract(jsonInterface, address, options) {
      * contract.options.jsonInterface
      *
      * @type {Array.<object>}
-     * @name ContractOptions#jsonInterface
+     * @name Contract.ContractOptions#jsonInterface
      */
     Object.defineProperty(this.options, 'jsonInterface', {
         set(value) {
@@ -410,18 +410,28 @@ const Contract = function Contract(jsonInterface, address, options) {
      * @property {string|number} [gas] - The maximum gas provided for this call (gas limit).
      */
     /**
+     * @typedef {Contract.SendOptions} Contract.SendOptionsWithContractDeployFormatter
+     * @property {function} [contractDeployFormatter] This can be used when smart contract is deployed. This value is not used unless the smart contract is deployed.
+     */
+    /**
      * Sends a transaction to deploy the smart contract or execute the function of the smart contract.
      * This can alter the smart contract state.
+     *
+     * For default return value, this will return {@link PromiEvent|PromiEvent} which is combined promise with event emitter.
+     * It will be resolved when a {@link Klay.TransactionReceipt|transaction receipt} is available.
+     * And for event emitter, `transactionHash`('string' type) which is fired right after a transaction is sent and a transaction hash is available, `receipt`('{@link Klay.TransactionReceipt|TransactionReceipt}' type) which is fired when a transaction receipt is available and `error`('Error' type) which is fired if an error occurs during sending. On an out-of-gas error, the second parameter is the receipt.
+     *
+     * If you define your own formatter for deploying the smart contract at `contractDeployFormatter` of the {@link Contract.SendOptionsWithContractDeployFormatter|SendOptionsWithContractDeployFormatter}.
      *
      * @example
      * // With execution => resolved with a transaction receipt
      * const result = await contract.methods.methodName(123).send({ from: '0x{address in hex}' })
      *
-     * // With deployment => resolved with a contract instance
+     * // With deployment => resolved with a contract instance (default)
      * const result = await contract.methods.constructor('0x{byte code}', 123).send({ from: '0x{address in hex}' })
      *
      * @typedef {function} Contract.SendFunction
-     * @param {Contract.SendOptions} sendOptions - The options used for sending.
+     * @param {Contract.SendOptionsWithContractDeployFormatter} sendOptions - The options used for sending.
      * @param {function} [callback] - This callback will be fired with the result of the smart contract method execution as the second argument, or with an error object as the first argument.
      * @return {Promise<*>}
      */
@@ -439,7 +449,7 @@ const Contract = function Contract(jsonInterface, address, options) {
      *
      * @typedef {function} Contract.SignFunction
      * @param {Contract.SendOptions} sendOptions - The options used for creating a transaction.
-     * @return {Promise<module:Transaction.Transaction>}
+     * @return {Promise<module:Transaction.FeeDelegatedTransaction>}
      */
     /**
      * Estimates the gas that a method execution will take when executed in the Klaytn Virtual Machine.
@@ -930,7 +940,7 @@ Contract.prototype._decodeMethodReturn = function(outputs, returnValues) {
  *     gas: 1500000,
  * }, '0x{byte code}', 'This is contructor arguments')
  *
- * @param {object} sendOptions An object holding parameters that are required for sending a transaction.
+ * @param {Contract.SendOptions} sendOptons An object holding parameters that are required for sending a transaction.
  * @param {string} byteCode The byte code of the contract.
  * @param {...*} parameters The parameters to be passed to the constructor of the smart contract.
  * @return {Promise<*>} The default return value will be `Promise<Contract>`. EventEmitter possible events are "error", "transactionHash" and "receipt". If you define a custom function in the `contractDeployFormatter` field in `SendOptions`, you can control return type.
@@ -997,10 +1007,10 @@ Contract.prototype.deploy = function(options, callback) {
  *     feeRatio: 30,
  * }, 'methodName', 123)
  *
- * @param {object} sendOptions An object holding parameters that are required for sending a transaction.
+ * @param {Contract.SendOptions} sendOptons An object holding parameters that are required for sending a transaction.
  * @param {string} functionName The function name to execute.
  * @param {...*} parameters The parameters to be passed to the smart contract function.
- * @return {Promise<object>} Promise will be resolved with a transaction receipt. EventEmitter possible events are "error", "transactionHash" and "receipt"
+ * @return {PromiEvent} A promise combined event emitter. It will be resolved when a {@link Klay.TransactionReceipt|transaction receipt} is available. And for event emitter, `transactionHash`('string' type) which is fired right after a transaction is sent and a transaction hash is available, `receipt`('{@link Klay.TransactionReceipt|TransactionReceipt}' type) which is fired when a transaction receipt is available and `error`('Error' type) which is fired if an error occurs during sending. On an out-of-gas error, the second parameter is the receipt.
  */
 Contract.prototype.send = function() {
     const args = Array.prototype.slice.call(arguments)
@@ -1024,7 +1034,7 @@ Contract.prototype.send = function() {
  * @param {object} [callObject] The options used for calling.
  * @param {string} functionName The function name to execute.
  * @param {...*} parameters The parameters to be passed to the smart contract function.
- * @return {Promise<*>} Promise will be resolved with a transaction receipt. EventEmitter possible events are "error", "transactionHash" and "receipt"
+ * @return {Promise<*>} Promise will be resolved with returned data of the call.
  */
 Contract.prototype.call = function() {
     let args = Array.prototype.slice.call(arguments)
@@ -1063,10 +1073,10 @@ Contract.prototype.call = function() {
  *     feeDelegation: true,
  * }, 'methodName', 123)
  *
- * @param {object} sendOptions An object holding parameters that are required for sending a transaction.
+ * @param {Contract.SendOptions} sendOptons An object holding parameters that are required for sending a transaction.
  * @param {string} functionName The function name to execute. If you want to sign for deployig, please send 'constructor' here.
  * @param {...*} parameters The parameters to be passed to the smart contract constructor or function.
- * @return {Promise<module:Transaction.Transaction>} Promise will be resolved with a transaction receipt. EventEmitter possible events are "error", "transactionHash" and "receipt"
+ * @return {Promise<module:Transaction.Transaction>} Promise will be resolved with a signed transaction.
  */
 Contract.prototype.sign = function() {
     const args = Array.prototype.slice.call(arguments)
@@ -1097,10 +1107,10 @@ Contract.prototype.sign = function() {
  * // Smart contract execution
  * const signed = await contract.signAsFeePayer({ from: '0x{address in hex}', feeDelegation: true, feePayer: '0x{address in hex}', gas: 1000000 }, 'methodName', 123)
  *
- * @param {object} sendOptions An object holding parameters that are required for sending a transaction.
+ * @param {Contract.SendOptions} sendOptons An object holding parameters that are required for sending a transaction.
  * @param {string} functionName The function name to execute. If you want to sign for deployig, please send 'constructor' here.
  * @param {...*} parameters The parameters to be passed to the smart contract constructor or function.
- * @return {Promise<module:Transaction.Transaction>} Promise will be resolved with a transaction receipt. EventEmitter possible events are "error", "transactionHash" and "receipt"
+ * @return {Promise<module:Transaction.FeeDelegatedTransaction>} Promise will be resolved with a fee payer signed transaction.
  */
 Contract.prototype.signAsFeePayer = function() {
     const args = Array.prototype.slice.call(arguments)
