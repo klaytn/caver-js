@@ -85,6 +85,13 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
      * If the user has not defined an `index`, `transaction.signAsFeePayer` signs the transaction using "all the private keys" used by the role.
      * If `index` is defined, the `transaction.signAsFeePayer` signs the transaction using "only one private key" at the given index.
      *
+     * @example
+     * const feePayer = caver.wallet.keyring.create('0x{address in hex}', '0x{private key}')
+     * const signedTx = await tx.signAsFeePayer(feePayer)
+     *
+     * const keyring = caver.wallet.keyring.create('0x{address in hex}', [['0x{private key}'], ['0x{private key}', '0x{private key}'], ['0x{private key}']]) // The third `roleFeePayerKey` will be used.
+     * const signedTx = await tx.signAsFeePayer(feePayer, 1) // sign the transaction with index. If omitted, sign with all private keys.
+     *
      * @param {KeyringContainer.Keyring|string} key - A private key string ({@link https://docs.klaytn.com/klaytn/design/accounts#klaytn-wallet-key-format|KlaytnWalletKey} format is also allowed) or an instance of {@link KeyringContainer.Keyring|Keyring}. If a private key string or a KlaytnWalletKey is passed as a parameter, the keyring instance is created internally.
      * @param {number} [index] - The index of the private key you want to use. The index must be less than the length of the array of the private keys defined for each role. If an index is not defined, this method will use all the private keys.
      * @param {function} [hasher] - The hash function to get the hash of the transaction.
