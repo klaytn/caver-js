@@ -24,6 +24,10 @@ const RoleBasedKeyring = require('./keyring/roleBasedKeyring')
 const utils = require('../../caver-utils/src')
 
 /**
+ * @typedef {SingleKeyring|MultipleKeyring|RoleBasedKeyring} KeyringContainer.Keyring
+ */
+
+/**
  * representing a Keyring container which manages keyrings.
  * @class
  */
@@ -201,10 +205,10 @@ class KeyringContainer {
      * signs the transaction using one key and return the transactionHash
      *
      * @param {string} address An address of keyring in keyringContainer.
-     * @param {Transaction} transaction A transaction object.
+     * @param {module:Transaction.Transaction} transaction A transaction object.
      * @param {number} [index] An index of key to use for signing. If index is undefined, all private keys in keyring will be used.
      * @param {function} [hasher] A function to return hash of transaction.
-     * @return {Transaction}
+     * @return {module:Transaction.Transaction}
      */
     async sign(address, transaction, index, hasher) {
         const keyring = this.getKeyring(address)
@@ -218,10 +222,10 @@ class KeyringContainer {
      * signs the transaction as a fee payer using one key and return the transactionHash
      *
      * @param {string} address An address of keyring in keyringContainer.
-     * @param {Transaction} transaction A transaction object. This should be `FEE_DELEGATED` type.
+     * @param {module:Transaction.Transaction} transaction A transaction object. This should be `FEE_DELEGATED` type.
      * @param {number} [index] An index of key to use for signing. If index is undefined, all private keys in keyring will be used.
      * @param {function} [hasher] A function to return hash of transaction.
-     * @return {Transaction}
+     * @return {module:Transaction.Transaction}
      */
     async signAsFeePayer(address, transaction, index, hasher) {
         const keyring = this.getKeyring(address)
