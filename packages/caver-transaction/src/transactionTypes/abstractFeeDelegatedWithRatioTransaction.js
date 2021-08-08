@@ -23,6 +23,9 @@ const utils = require('../../../caver-utils/src')
 /**
  * Abstract class that implements common logic for each fee delegated with ratio transaction type.
  * @class
+ * @hideconstructor
+ * @abstract
+ * @augments AbstractFeeDelegatedTransaction
  */
 class AbstractFeeDelegatedWithRatioTransaction extends AbstractFeeDelegatedTransaction {
     /**
