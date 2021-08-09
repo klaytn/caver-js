@@ -673,10 +673,11 @@ function parsePrivateKey(privateKey) {
         }
     }
 
-    if (!isKlaytnWalletKey(privateKey)) throw new Error(`Invalid KlaytnWalletKey format.`)
-
     const type = privateKey.slice(66, 68)
     if (type === '01') throw new Error('Invalid type: Currently only type `0x00` is supported.')
+
+    if (!isKlaytnWalletKey(privateKey)) throw new Error(`Invalid KlaytnWalletKey format.`)
+
     const parsedAddress = privateKey.slice(68)
     return {
         privateKey: `0x${parsedPrivateKey}`,
