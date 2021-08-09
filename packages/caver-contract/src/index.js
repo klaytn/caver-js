@@ -1688,10 +1688,7 @@ Contract.prototype._executeMethod = async function _executeMethod() {
                 if (!isExistedInWallet) {
                     if (wallet instanceof KeyringContainer) {
                         return fillFeePayerSignatures(transaction).then(filledTx => {
-                            return signTransaction(filledTx).then(signed => {
-                                filledTx.signatures = signed.tx.signatures
-                                return sendRawTransaction(filledTx)
-                            })
+                            return sendTransaction(filledTx, args.callback)
                         })
                     }
                     throw new Error(`Failed to find ${args.options.from}. Please check that the corresponding account or keyring exists.`)
