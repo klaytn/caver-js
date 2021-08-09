@@ -408,16 +408,32 @@ const bufferToHex = function(buf) {
 }
 
 /**
- * Convert a input into a Buffer.
+ * This function converts the input to a Buffer.
+ * To convert an object into a Buffer using `caver.utils.toBuffer`, the object must implement `toArray` function.
+ * For string type input, this function only works with a 0x-prefixed hex string.
  *
- * @method toBuffer
- * @param {Buffer|Array|String|Number|BN|Object} input
- * @return {Buffer}
+ * @example
+ * const result = caver.utils.toBuffer(Buffer.alloc(0))
+ * const result = caver.utils.toBuffer('0x1234')
+ * const result = caver.utils.toBuffer(1)
+ * const result = caver.utils.toBuffer([1,2,3])
+ * const result = caver.utils.toBuffer(new caver.utils.BN(255))
+ * const result = caver.utils.toBuffer(new caver.utils.BigNumber(255))
+ * const result = caver.utils.toBuffer({toArray: function() {return [1,2,3,4]}}) // An object that implements `toArray` function
+ * const result = caver.utils.toBuffer(null)
+ * const result = caver.utils.toBuffer(undefined)
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {Buffer|Array.<number>|string|number|BN|BigNumber|object} input The value to be converted to a Buffer.
+ * @return {Buffer} The value converted to Buffer type is returned.
  */
 const toBuffer = function(input) {
     if (Buffer.isBuffer(input)) return input
     if (input === null || input === undefined) return Buffer.alloc(0)
     if (Array.isArray(input)) return Buffer.from(input)
+    if (isBigNumber(input)) input = toBN(input)
     if (isBN(input)) return input.toArrayLike(Buffer)
     if (_.isObject(input)) {
         if (input.toArray && _.isFunction(input.toArray)) return Buffer.from(input.toArray())
@@ -609,6 +625,18 @@ const sha3 = function(value) {
 // expose the under the hood keccak256
 sha3._Hash = Hash
 
+/**
+ * Parses private key string to { privateKey, address, type }.
+ *
+ * @example
+ * const hash = caver.utils.sha3('234')
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} str - A string to hash.
+ * @return {string} The result hash.
+ */
 function parsePrivateKey(privateKey) {
     if (typeof privateKey !== 'string') throw new Error('The private key must be of type string')
 
@@ -629,19 +657,19 @@ function parsePrivateKey(privateKey) {
         return {
             privateKey: `0x${privateKey}`,
             address: '',
-            isHumanReadable: false,
+            type: '',
         }
     }
 
     if (!isKlaytnWalletKey(privateKey)) throw new Error(`Invalid KlaytnWalletKey format.`)
 
-    const humanReadableFlag = privateKey.slice(66, 68)
-    if (humanReadableFlag === '01') throw new Error('HumanReadableAddress is not supported yet.')
+    const type = privateKey.slice(66, 68)
+    if (type === '01') throw new Error('Invalid type: Currently only type `0x00` is supported.')
     const parsedAddress = privateKey.slice(68)
     return {
         privateKey: `0x${parsedPrivateKey}`,
         address: parsedAddress,
-        isHumanReadable: false,
+        type: `0x${type}`,
     }
 }
 
