@@ -674,7 +674,7 @@ function parsePrivateKey(privateKey) {
     }
 
     const type = privateKey.slice(66, 68)
-    if (type === '01') throw new Error('Invalid type: Currently only type `0x00` is supported.')
+    if (type !== '00') throw new Error('Invalid type: Currently only type `0x00` is supported.')
 
     if (!isKlaytnWalletKey(privateKey)) throw new Error(`Invalid KlaytnWalletKey format.`)
 
