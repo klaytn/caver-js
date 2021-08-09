@@ -712,7 +712,7 @@ const isKlaytnWalletKey = privateKey => {
                 if (splited[i].length !== 64 || !isValidPrivateKey(splited[i])) return false
                 break
             case 1:
-                if (splited[i].length !== 2 || (splited[i] !== '00' && splited[i] !== '01')) return false
+                if (splited[i].length !== 2 || splited[i] !== '00') return false
                 break
             case 2:
                 if (splited[i].length !== 40 || !isAddress(splited[i])) return false
