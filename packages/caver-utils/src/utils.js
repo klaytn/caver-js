@@ -1089,6 +1089,7 @@ const publicKeyToAddress = publicKey => {
 
 module.exports = {
     BN: BN,
+    BigNumber: BigNumber,
     isBN: isBN,
     isBigNumber: isBigNumber,
     toBN: toBN,
