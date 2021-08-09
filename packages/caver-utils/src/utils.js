@@ -408,16 +408,32 @@ const bufferToHex = function(buf) {
 }
 
 /**
- * Convert a input into a Buffer.
+ * This function converts the input to a Buffer.
+ * To convert an object into a Buffer using `caver.utils.toBuffer`, the object must implement `toArray` function.
+ * For string type input, this function only works with a 0x-prefixed hex string.
  *
- * @method toBuffer
- * @param {Buffer|Array|String|Number|BN|Object} input
- * @return {Buffer}
+ * @example
+ * const result = caver.utils.toBuffer(Buffer.alloc(0))
+ * const result = caver.utils.toBuffer('0x1234')
+ * const result = caver.utils.toBuffer(1)
+ * const result = caver.utils.toBuffer([1,2,3])
+ * const result = caver.utils.toBuffer(new caver.utils.BN(255))
+ * const result = caver.utils.toBuffer(new caver.utils.BigNumber(255))
+ * const result = caver.utils.toBuffer({toArray: function() {return [1,2,3,4]}}) // An object that implements `toArray` function
+ * const result = caver.utils.toBuffer(null)
+ * const result = caver.utils.toBuffer(undefined)
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {Buffer|Array.<number>|string|number|BN|BigNumber|object} input The value to be converted to a Buffer.
+ * @return {Buffer} The value converted to Buffer type is returned.
  */
 const toBuffer = function(input) {
     if (Buffer.isBuffer(input)) return input
     if (input === null || input === undefined) return Buffer.alloc(0)
     if (Array.isArray(input)) return Buffer.from(input)
+    if (isBigNumber(input)) input = toBN(input)
     if (isBN(input)) return input.toArrayLike(Buffer)
     if (_.isObject(input)) {
         if (input.toArray && _.isFunction(input.toArray)) return Buffer.from(input.toArray())
@@ -609,6 +625,30 @@ const sha3 = function(value) {
 // expose the under the hood keccak256
 sha3._Hash = Hash
 
+/**
+ * An object defines the AccountKeyLegacy.
+ *
+ * @example
+ * { privateKey: '0x{private key}', address: '0x{address in hex}', type: '0x00' }
+ *
+ * @typedef {object} module:utils.ParsedPrivateKey
+ * @property {string} privateKey - The private key string.
+ * @property {string} address - The address string.
+ * @property {string} type - The type string. Currently only `0x00` is supported.
+ */
+/**
+ * Parses private key string to { privateKey, address, type }.
+ *
+ * @example
+ * const { privateKey, address, type } = caver.utils.parsePrivateKey('0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d8')
+ * const { privateKey, address, type } = caver.utils.parsePrivateKey('0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b')
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} privateKey - A private key or KlaytnWalletKey string to parse.
+ * @return {module:utils.ParsedPrivateKey} A parsed private key object.
+ */
 function parsePrivateKey(privateKey) {
     if (typeof privateKey !== 'string') throw new Error('The private key must be of type string')
 
@@ -629,19 +669,20 @@ function parsePrivateKey(privateKey) {
         return {
             privateKey: `0x${privateKey}`,
             address: '',
-            isHumanReadable: false,
+            type: '',
         }
     }
 
+    const type = privateKey.slice(66, 68)
+    if (type !== '00') throw new Error('Invalid type: Currently only type `0x00` is supported.')
+
     if (!isKlaytnWalletKey(privateKey)) throw new Error(`Invalid KlaytnWalletKey format.`)
 
-    const humanReadableFlag = privateKey.slice(66, 68)
-    if (humanReadableFlag === '01') throw new Error('HumanReadableAddress is not supported yet.')
     const parsedAddress = privateKey.slice(68)
     return {
         privateKey: `0x${parsedPrivateKey}`,
         address: parsedAddress,
-        isHumanReadable: false,
+        type: `0x${type}`,
     }
 }
 
@@ -672,7 +713,7 @@ const isKlaytnWalletKey = privateKey => {
                 if (splited[i].length !== 64 || !isValidPrivateKey(splited[i])) return false
                 break
             case 1:
-                if (splited[i].length !== 2 || (splited[i] !== '00' && splited[i] !== '01')) return false
+                if (splited[i].length !== 2 || splited[i] !== '00') return false
                 break
             case 2:
                 if (splited[i].length !== 40 || !isAddress(splited[i])) return false
@@ -1061,6 +1102,7 @@ const publicKeyToAddress = publicKey => {
 
 module.exports = {
     BN: BN,
+    BigNumber: BigNumber,
     isBN: isBN,
     isBigNumber: isBigNumber,
     toBN: toBN,
