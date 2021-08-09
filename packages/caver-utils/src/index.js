@@ -36,14 +36,6 @@ const Iban = require('../iban')
 const SignatureData = require('../../caver-wallet/src/keyring/signatureData')
 
 /**
- * The util module.
- * @module utils
- *
- * @example
- * caver.utils
- */
-
-/**
  * Fires an error in an event emitter and callback and returns the eventemitter
  *
  * @method _fireError
@@ -481,6 +473,13 @@ const decodeSignature = signature => {
     return new SignatureData(ret)
 }
 
+/**
+ * The util module.
+ * @module utils
+ *
+ * @example
+ * caver.utils
+ */
 module.exports = {
     _fireError: _fireError,
     _jsonInterfaceMethodToString: _jsonInterfaceMethodToString,
@@ -510,6 +509,7 @@ module.exports = {
 
     BN: utils.BN,
     isBN: utils.isBN,
+    BigNumber: utils.BigNumber,
     isBigNumber: utils.isBigNumber,
     isHex: utils.isHex,
     isHexStrict: utils.isHexStrict,
@@ -598,4 +598,7 @@ module.exports = {
     publicKeyToAddress: utils.publicKeyToAddress,
 
     decodeSignature: decodeSignature,
+
+    isBloom: utils.isBloom,
+    isTopic: utils.isTopic,
 }
