@@ -626,16 +626,28 @@ const sha3 = function(value) {
 sha3._Hash = Hash
 
 /**
+ * An object defines the AccountKeyLegacy.
+ *
+ * @example
+ * { privateKey: '0x{private key}', address: '0x{address in hex}', type: '0x00' }
+ *
+ * @typedef {object} module:utils.ParsedPrivateKey
+ * @property {string} privateKey - The private key string.
+ * @property {string} address - The address string.
+ * @property {string} type - The type string. Currently only `0x00` is supported.
+ */
+/**
  * Parses private key string to { privateKey, address, type }.
  *
  * @example
- * const hash = caver.utils.sha3('234')
+ * const { privateKey, address, type } = caver.utils.parsePrivateKey('0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d8')
+ * const { privateKey, address, type } = caver.utils.parsePrivateKey('0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b')
  *
  * @memberof module:utils
  * @inner
  *
- * @param {string} str - A string to hash.
- * @return {string} The result hash.
+ * @param {string} privateKey - A private key or KlaytnWalletKey string to parse.
+ * @return {module:utils.ParsedPrivateKey} A parsed private key object.
  */
 function parsePrivateKey(privateKey) {
     if (typeof privateKey !== 'string') throw new Error('The private key must be of type string')
