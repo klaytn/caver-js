@@ -22,10 +22,14 @@ const { refineSignatures } = require('../../caver-transaction/src/transactionHel
 const AbstractTransaction = require('../../caver-transaction/src/transactionTypes/abstractTransaction')
 const AbstractFeeDelegatedTransaction = require('../../caver-transaction/src/transactionTypes/abstractFeeDelegatedTransaction')
 
+/**
+ * Representing a class to support validation functions.
+ * @class
+ * @hideconstructor
+ */
 class Validator {
     /**
-     * Validate a signed message.
-     * This function will compare public key in account key information from Klaytn and public key recovered from signature.
+     * Validates a signed message by comparing the public key recovered from the signature with the account key of the Klaytn account.
      *
      * @example
      * const address = '0x...'
@@ -33,12 +37,14 @@ class Validator {
      * const signature = { v: '0x1c', r: '0xd0b8d...', s: '0x5472e...' } // You can get a signature via `keyring.signMessage(...).signatures[0]`.
      * const isValid = caver.validator.validateSignedMessage(message, signature, address)
      *
-     * @method recoverPublicKey
+     * @memberof Validator
+     * @inner
+     *
      * @param {string} message The raw message string. If this message is hased with Klaytn specific prefix, the third parameter should be passed as `true`.
      * @param {SignatureData|Array.<SignatureData>} signatures An instance of `SignatureData` or an array of `SignatureData`.
      * @param {string} address The address of the account that signed the message.
      * @param {boolean} [isHashed] (optional, default: `false`) If the `isHashed` is true, the given message will NOT automatically be prefixed with "\x19Klaytn Signed Message:\n" + message.length + message, and be assumed as already prefixed.
-     * @return {boolean}
+     * @return {Promise<boolean>} The promise will be resolved with a boolean value of whether the signature on the message is valid or not.
      */
     async validateSignedMessage(message, signatures, address, isHashed = false) {
         const getAccountKeyResult = await Validator._klaytnCall.getAccountKey(address)
@@ -58,15 +64,17 @@ class Validator {
 
     /**
      * Validates a transaction.
-     * This function compares the public keys of the account key of the Klaytn account with the public keys recovered from `signatures`.
+     * This function compares the public keys from the account key of the Klaytn account with the public keys recovered from `signatures`.
      * If the transaction is fee-delegated with the `feePayerSignatures` variable inside, this function compares the public keys recovered from `feePayerSignatures` with the public keys of the fee payer.
      *
      * @example
      * const tx = caver.transaction.valueTransfer.create({...})
      * const isValid = caver.validator.validateTransaction(tx)
      *
-     * @method validateTransaction
-     * @param {AbstractTransaction} tx An instance of transaction to validate.
+     * @memberof Validator
+     * @inner
+     *
+     * @param {module:Transaction.Transaction} tx An instance of transaction to validate.
      * @return {boolean}
      */
     async validateTransaction(tx) {
@@ -87,8 +95,10 @@ class Validator {
      * const tx = caver.transaction.valueTransfer.create({...})
      * const isValid = caver.validator.validateSender(tx)
      *
-     * @method validateSender
-     * @param {AbstractTransaction} tx An instance of transaction to validate.
+     * @memberof Validator
+     * @inner
+     *
+     * @param {module:Transaction.Transaction} tx An instance of transaction to validate.
      * @return {boolean}
      */
     async validateSender(tx) {
@@ -112,8 +122,10 @@ class Validator {
      * const tx = caver.transaction.feeDelegatedValueTransfer.create({...})
      * const isValid = caver.validator.validateFeePayer(tx)
      *
-     * @method validateFeePayer
-     * @param {AbstractFeeDelegatedTransaction} tx An instance of transaction to validate.
+     * @memberof Validator
+     * @inner
+     *
+     * @param {module:Transaction.FeeDelegatedTransaction} tx An instance of transaction to validate.
      * @return {boolean}
      */
     async validateFeePayer(tx) {
