@@ -1047,7 +1047,7 @@ const makeEven = function(hex) {
  * const result = caver.utils.resolveSignature('0x7e85aaff6a6ef0730308af49f6b512741e61f958a21df387a0d0e8973fb40ca0307a8b87f6ac249f7218b4ee1a1d2f7d764ec2d20d9824e7b7b842dd214f139c7f6')
  *
  * @ignore
- * @param {string|object|Array.<string>|KeyringFactory.SignatureData} signature A signature string, object or array.
+ * @param {string|object|Array.<string>|SignatureData} signature A signature string, object or array.
  * @return {Array.<string>} A signature array.
  */
 const resolveSignature = signature => {
@@ -1084,7 +1084,7 @@ const resolveSignature = signature => {
  * ])
  *
  * @ignore
- * @param {string|object|Array.<string>|KeyringFactory.SignatureData} signature A signature string, object or array.
+ * @param {string|object|Array.<string>|SignatureData} signature A signature string, object or array.
  * @return {Klay.SignatureData} A signature object.
  */
 const transformSignaturesToObject = signatures => {
@@ -1348,7 +1348,7 @@ const isValidRole = role => {
  * @memberof module:utils
  * @inner
  *
- * @param {object|Array.<object>|Array.<string>|Array.<Array.<string>>|KeyringFactory.SignatureData|Array.<KeyringFactory.SignatureData>} sig An instance of {@link KeyringFactory.SignatureData|SignatureData} or array of {@link KeyringFactory.SignatureData|SignatureData} to check empty or not.
+ * @param {object|Array.<object>|Array.<string>|Array.<Array.<string>>|SignatureData|Array.<SignatureData>} sig An instance of {@link SignatureData|SignatureData} or array of {@link SignatureData|SignatureData} to check empty or not.
  * @return {boolean} `true` means the sig is empty.
  */
 const isEmptySig = sig => {
