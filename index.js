@@ -94,8 +94,6 @@ function Caver(provider, net) {
     this.abi = abi
     /** @type {KeyringContainer} */
     this.wallet = new KeyringContainer()
-    /** @type {module:KeyringFactory~keyring} */
-    this.wallet.keyring = Keyring
 
     // ex) call `caver.klay.property` || `caver.klay.method(...)`
     /** @type {KCT} */

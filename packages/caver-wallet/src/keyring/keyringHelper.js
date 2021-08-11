@@ -23,6 +23,17 @@ const cryp = typeof global === 'undefined' ? require('crypto-browserify') : requ
 const utils = require('../../../caver-utils')
 const PrivateKey = require('./privateKey')
 
+/**
+ * The key role string.
+ *
+ * @example
+ * caver.wallet.keyring.role.roleTransactionKey // caver.wallet.keyring.role[0]
+ * caver.wallet.keyring.role.roleAccountUpdateKey // // caver.wallet.keyring.role[1]
+ * caver.wallet.keyring.role.roleFeePayerKey // // caver.wallet.keyring.role[2]
+ *
+ * @alias KeyringFactory.role
+ * @type {Map<string|number:string>}
+ */
 const KEY_ROLE = {
     roleTransactionKey: 0,
     0: 'roleTransactionKey',
