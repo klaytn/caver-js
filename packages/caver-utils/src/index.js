@@ -502,7 +502,7 @@ function _flattenTypes(includeTuple, puts) {
  */
 const isHexPrefixed = function(str) {
     if (typeof str !== 'string') return false
-    return str.slice(0, 2) === '0x'
+    return str.slice(0, 2) === '0x' || str.slice(0, 2) === '0X'
 }
 
 /**
@@ -521,7 +521,7 @@ const isHexPrefixed = function(str) {
 const addHexPrefix = function(str) {
     if (typeof str !== 'string') return str
 
-    return isHexPrefixed(str) ? str : `0x${str}`
+    return isHexPrefixed(str) ? `0x${str.slice(2)}` : `0x${str}`
 }
 
 /**
