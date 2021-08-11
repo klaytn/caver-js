@@ -35,7 +35,6 @@ const { packageInit, providers } = require('./packages/caver-core')
 const Klay = require('./packages/caver-klay')
 const Account = require('./packages/caver-account')
 const KeyringContainer = require('./packages/caver-wallet')
-const Keyring = require('./packages/caver-wallet/src/keyring/keyringFactory')
 const Transaction = require('./packages/caver-transaction')
 const RPC = require('./packages/caver-rpc')
 const abi = require('./packages/caver-abi')
@@ -94,8 +93,6 @@ function Caver(provider, net) {
     this.abi = abi
     /** @type {KeyringContainer} */
     this.wallet = new KeyringContainer()
-    /** @type {module:KeyringFactory~keyring} */
-    this.wallet.keyring = Keyring
 
     // ex) call `caver.klay.property` || `caver.klay.method(...)`
     /** @type {KCT} */
