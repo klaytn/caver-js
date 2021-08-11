@@ -177,7 +177,7 @@ class AbstractTransaction {
     /**
      * Signs the transaction as a transaction sender with the private key(s) in the `keyring` and appends `signatures` in the transaction object.
      *
-     * For {@link AccountUpdate|Account Update} transaction, use "roleAccountUpdateKey", or otherwise, use "roleTransactionKey" in {@link RoleBasedKeyring|RoleBasedKeyring}.
+     * For {@link AccountUpdate|Account Update} transaction, use "roleAccountUpdateKey", or otherwise, use "roleTransactionKey" in {@link RoleBasedKeyring}.
      * If the user has not defined an `index`, `transaction.sign` signs the transaction using "all the private keys" used by the role.
      * If `index` is defined, the `transaction.sign` signs the transaction using "only one private key" at the given index.
      *
@@ -238,7 +238,7 @@ class AbstractTransaction {
      * const sig = [[ '0x0fea', '0xade94...', '0x38160...' ], [ '0x0fea', '0xbde66...', '0x546eb...' ]]
      * tx.appendSignatures(sig)
      *
-     * @param {SignatureData|Array.<SignatureData>|Array.<string>|Array.<Array.<string>>} signatures - The `signatures` to be appended to the transaction. {@link SignatureData|SignatureData} instance or an array containing {@link SignatureData|SignatureData} instances.
+     * @param {SignatureData|Array.<SignatureData>|Array.<string>|Array.<Array.<string>>} signatures - The `signatures` to be appended to the transaction. {@link SignatureData} instance or an array containing {@link SignatureData} instances.
      *                                                                                                 An array in which each 'v', 'r', and 's' are sequentially defined as string formats or a 2D array containing those arrays can also be taken as parameters.
      */
     appendSignatures(signatures) {

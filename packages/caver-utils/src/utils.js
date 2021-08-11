@@ -1348,7 +1348,7 @@ const isValidRole = role => {
  * @memberof module:utils
  * @inner
  *
- * @param {object|Array.<object>|Array.<string>|Array.<Array.<string>>|SignatureData|Array.<SignatureData>} sig An instance of {@link SignatureData|SignatureData} or array of {@link SignatureData|SignatureData} to check empty or not.
+ * @param {object|Array.<object>|Array.<string>|Array.<Array.<string>>|SignatureData|Array.<SignatureData>} sig An instance of {@link SignatureData} or array of {@link SignatureData} to check empty or not.
  * @return {boolean} `true` means the sig is empty.
  */
 const isEmptySig = sig => {
