@@ -298,7 +298,7 @@ Account.weightedMultiSigOptions = WeightedMultiSigOptions
 /**
  * A module that provides functions for accountKey.
  *
- * @typedef {Object} AccountKeyModule
+ * @typedef {object} AccountKeyModule
  * @property {function} decode - A function to decode the accountKey. Please refer to {@link AccountKeyDecoder.decode|caver.account.accountKey.decode}.
  * @property {typeof AccountKeyLegacy} accountKeyLegacy - Class representing accountKeyLegacy.
  * @property {typeof AccountKeyPublic} accountKeyPublic - Class representing AccountKeyPublic.
