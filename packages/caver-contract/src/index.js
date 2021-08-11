@@ -417,7 +417,7 @@ const Contract = function Contract(jsonInterface, address, options) {
      * Sends a transaction to deploy the smart contract or execute the function of the smart contract.
      * This can alter the smart contract state.
      *
-     * For default return value, this will return {@link PromiEvent|PromiEvent} which is combined promise with event emitter.
+     * For default return value, this will return {@link PromiEvent} which is combined promise with event emitter.
      * It will be resolved when a {@link Klay.TransactionReceipt|transaction receipt} is available.
      * And for event emitter, `transactionHash`('string' type) which is fired right after a transaction is sent and a transaction hash is available, `receipt`('{@link Klay.TransactionReceipt|TransactionReceipt}' type) which is fired when a transaction receipt is available and `error`('Error' type) which is fired if an error occurs during sending. On an out-of-gas error, the second parameter is the receipt.
      *

@@ -81,7 +81,7 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
     /**
      * Signs the transaction as a transaction fee payer with the private key(s) in the `keyring` and appends `feePayerSignatures` in the transaction object.
      *
-     * This will use "roleFeePayerKey" in {@link RoleBasedKeyring|RoleBasedKeyring}.
+     * This will use "roleFeePayerKey" in {@link RoleBasedKeyring}.
      * If the user has not defined an `index`, `transaction.signAsFeePayer` signs the transaction using "all the private keys" used by the role.
      * If `index` is defined, the `transaction.signAsFeePayer` signs the transaction using "only one private key" at the given index.
      *
@@ -95,7 +95,7 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
      * @param {KeyringContainer.Keyring|string} key - A private key string ({@link https://docs.klaytn.com/klaytn/design/accounts#klaytn-wallet-key-format|KlaytnWalletKey} format is also allowed) or an instance of {@link KeyringContainer.Keyring|Keyring}. If a private key string or a KlaytnWalletKey is passed as a parameter, the keyring instance is created internally.
      * @param {number} [index] - The index of the private key you want to use. The index must be less than the length of the array of the private keys defined for each role. If an index is not defined, this method will use all the private keys.
      * @param {function} [hasher] - The hash function to get the hash of the transaction.
-     * @return {module:Transaction.Transaction} An instance of signed Transaction. The `feePayerSignatures` is appended to the `transaction.feePayerSignatures`.
+     * @return {module:Transaction.FeeDelegatedTransaction} An instance of signed fee delegated Transaction. The `feePayerSignatures` is appended to the `transaction.feePayerSignatures`.
      */
     async signAsFeePayer(key, index, hasher = TransactionHasher.getHashForFeePayerSignature) {
         // User parameter input cases
@@ -137,7 +137,7 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
      * const sig = [[ '0x0fea', '0xade94...', '0x38160...' ], [ '0x0fea', '0xbde66...', '0x546eb...' ]]
      * tx.appendFeePayerSignatures(sig)
      *
-     * @param {SignatureData|Array.<SignatureData>|Array.<string>|Array.<Array.<string>>} signatures - The `feePayerSignatures` to be appended to the transaction. {@link SignatureData|SignatureData} instance or an array containing {@link SignatureData|SignatureData} instances.
+     * @param {SignatureData|Array.<SignatureData>|Array.<string>|Array.<Array.<string>>} signatures - The `feePayerSignatures` to be appended to the transaction. {@link SignatureData} instance or an array containing {@link SignatureData} instances.
      *                                                                                                 An array in which each 'v', 'r', and 's' are sequentially defined as string formats or a 2D array containing those arrays can also be taken as parameters.
      */
     appendFeePayerSignatures(signatures) {
