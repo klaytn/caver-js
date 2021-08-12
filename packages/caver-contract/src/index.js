@@ -1688,7 +1688,16 @@ Contract.prototype._executeMethod = async function _executeMethod() {
                 if (!isExistedInWallet) {
                     if (wallet instanceof KeyringContainer) {
                         return fillFeePayerSignatures(transaction).then(filledTx => {
-                            return sendTransaction(filledTx, args.callback)
+                            // klay_sendTransaction currently does not support FD transactions.
+                            // So for Basic transaction, use sendTransaction, otherwise use sendRawTransaction after signTransaction.
+                            if (filledTx.type.includes('TxTypeFeeDelegated')) {
+                                return signTransaction(filledTx).then(signed => {
+                                    filledTx.signatures = signed.tx.signatures
+                                    return sendRawTransaction(filledTx)
+                                })
+                            } else {
+                                return sendTransaction(filledTx, args.callback)
+                            }
                         })
                     }
                     throw new Error(`Failed to find ${args.options.from}. Please check that the corresponding account or keyring exists.`)
