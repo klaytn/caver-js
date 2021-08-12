@@ -2833,57 +2833,57 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
     })
 
     context('Send to the Klaytn if a keyring cannnot be found in caver.wallet', () => {
-        it(`CAVERJS-UNIT-ETC-389: should throw an error if Node also does not have that account when send basic`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor, contractAddress)
+        // it(`CAVERJS-UNIT-ETC-389: should throw an error if Node also does not have that account when send basic`, async () => {
+        //     const contract = new caver.contract(abiWithoutConstructor, contractAddress)
 
-            const sendOptions = {
-                from: caver.wallet.keyring.generate().address,
-                gas: 1000000,
-            }
+        //     const sendOptions = {
+        //         from: caver.wallet.keyring.generate().address,
+        //         gas: 1000000,
+        //     }
 
-            const expectedError = `Returned error: unknown account`
-            await expect(contract.send(sendOptions, 'set', 'k', 'v')).to.be.rejectedWith(expectedError)
-        }).timeout(200000)
+        //     const expectedError = `Returned error: unknown account`
+        //     await expect(contract.send(sendOptions, 'set', 'k', 'v')).to.be.rejectedWith(expectedError)
+        // }).timeout(200000)
 
-        it(`CAVERJS-UNIT-ETC-390: should throw an error if Node also does not have that account when send fd`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor, contractAddress)
+        // it(`CAVERJS-UNIT-ETC-390: should throw an error if Node also does not have that account when send fd`, async () => {
+        //     const contract = new caver.contract(abiWithoutConstructor, contractAddress)
 
-            const sendOptions = {
-                from: caver.wallet.keyring.generate().address,
-                gas: 1000000,
-                feeDelegation: true,
-                feePayer: caver.wallet.keyring.generate().address,
-            }
+        //     const sendOptions = {
+        //         from: caver.wallet.keyring.generate().address,
+        //         gas: 1000000,
+        //         feeDelegation: true,
+        //         feePayer: caver.wallet.keyring.generate().address,
+        //     }
 
-            const expectedError = `Returned error: unknown account`
-            await expect(contract.send(sendOptions, 'set', 'k', 'v')).to.be.rejectedWith(expectedError)
-        }).timeout(200000)
+        //     const expectedError = `Returned error: unknown account`
+        //     await expect(contract.send(sendOptions, 'set', 'k', 'v')).to.be.rejectedWith(expectedError)
+        // }).timeout(200000)
 
-        it(`CAVERJS-UNIT-ETC-391: should throw an error if Node also does not have that account when sign`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor, contractAddress)
+        // it(`CAVERJS-UNIT-ETC-391: should throw an error if Node also does not have that account when sign`, async () => {
+        //     const contract = new caver.contract(abiWithoutConstructor, contractAddress)
 
-            const sendOptions = {
-                from: caver.wallet.keyring.generate().address,
-                gas: 1000000,
-            }
+        //     const sendOptions = {
+        //         from: caver.wallet.keyring.generate().address,
+        //         gas: 1000000,
+        //     }
 
-            const expectedError = `Returned error: unknown account`
-            await expect(contract.sign(sendOptions, 'set', 'k', 'v')).to.be.rejectedWith(expectedError)
-        }).timeout(200000)
+        //     const expectedError = `Returned error: unknown account`
+        //     await expect(contract.sign(sendOptions, 'set', 'k', 'v')).to.be.rejectedWith(expectedError)
+        // }).timeout(200000)
 
-        it(`CAVERJS-UNIT-ETC-392: should throw an error if Node also does not have that account when signAsFeePayer`, async () => {
-            const contract = new caver.contract(abiWithoutConstructor, contractAddress)
+        // it(`CAVERJS-UNIT-ETC-392: should throw an error if Node also does not have that account when signAsFeePayer`, async () => {
+        //     const contract = new caver.contract(abiWithoutConstructor, contractAddress)
 
-            const sendOptions = {
-                from: caver.wallet.keyring.generate().address,
-                gas: 1000000,
-                feeDelegation: true,
-                feePayer: caver.wallet.keyring.generate().address,
-            }
+        //     const sendOptions = {
+        //         from: caver.wallet.keyring.generate().address,
+        //         gas: 1000000,
+        //         feeDelegation: true,
+        //         feePayer: caver.wallet.keyring.generate().address,
+        //     }
 
-            const expectedError = `Returned error: unknown account`
-            await expect(contract.signAsFeePayer(sendOptions, 'set', 'k', 'v')).to.be.rejectedWith(expectedError)
-        }).timeout(200000)
+        //     const expectedError = `Returned error: unknown account`
+        //     await expect(contract.signAsFeePayer(sendOptions, 'set', 'k', 'v')).to.be.rejectedWith(expectedError)
+        // }).timeout(200000)
 
         it(`CAVERJS-UNIT-ETC-393: should send to the Klaytn if in-memory wallet does not have a from account`, async () => {
             try {
