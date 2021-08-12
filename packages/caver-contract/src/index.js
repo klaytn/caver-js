@@ -1688,6 +1688,14 @@ Contract.prototype._executeMethod = async function _executeMethod() {
                 if (!isExistedInWallet) {
                     if (wallet instanceof KeyringContainer) {
                         return fillFeePayerSignatures(transaction).then(filledTx => {
+                            // klay_sendTransaction currently does not support FD transactions.
+                            // So for Basic transaction, use sendTransaction, otherwise use sendRawTransaction after signTransaction.
+                            if (filledTx.type.includes('TxTypeFeeDelegated')) {
+                                return signTransaction(filledTx).then(signed => {
+                                    filledTx.signatures = signed.tx.signatures
+                                    return sendRawTransaction(filledTx)
+                                })
+                            }
                             return sendTransaction(filledTx, args.callback)
                         })
                     }
