@@ -49,8 +49,10 @@ function _decode(rlpEncoded) {
 
 /**
  * Represents a fee delegated smart contract execution with ratio transaction.
- * Please refer to https://docs.klaytn.com/klaytn/design/transactions/partial-fee-delegation#txtypefeedelegatedsmartcontractexecutionwithratio to see more detail.
+ * Please refer to {@link https://docs.klaytn.com/klaytn/design/transactions/partial-fee-delegation#txtypefeedelegatedsmartcontractexecutionwithratio|FeeDelegatedSmartContractExecutionWithRatio} to see more detail.
  * @class
+ * @hideconstructor
+ * @augments AbstractFeeDelegatedWithRatioTransaction
  */
 class FeeDelegatedSmartContractExecutionWithRatio extends AbstractFeeDelegatedWithRatioTransaction {
     /**
@@ -144,7 +146,11 @@ class FeeDelegatedSmartContractExecutionWithRatio extends AbstractFeeDelegatedWi
 
     /**
      * Returns the RLP-encoded string of this transaction (i.e., rawTransaction).
-     * @return {string}
+     *
+     * @example
+     * const result = tx.getRLPEncoding()
+     *
+     * @return {string} An RLP-encoded transaction string.
      */
     getRLPEncoding() {
         this.validateOptionalValues()
@@ -161,7 +167,7 @@ class FeeDelegatedSmartContractExecutionWithRatio extends AbstractFeeDelegatedWi
                 Bytes.fromNat(this.value),
                 this.from.toLowerCase(),
                 this.input,
-                this.feeRatio,
+                Bytes.fromNat(this.feeRatio),
                 signatures,
                 this.feePayer.toLowerCase(),
                 feePayerSignatures,
@@ -171,7 +177,13 @@ class FeeDelegatedSmartContractExecutionWithRatio extends AbstractFeeDelegatedWi
 
     /**
      * Returns the RLP-encoded string to make the signature of this transaction.
-     * @return {string}
+     * This method has to be overrided in classes which extends AbstractTransaction.
+     * getCommonRLPEncodingForSignature is used in getRLPEncodingForSignature.
+     *
+     * @example
+     * const result = tx.getCommonRLPEncodingForSignature()
+     *
+     * @return {string} An RLP-encoded transaction string without signature.
      */
     getCommonRLPEncodingForSignature() {
         this.validateOptionalValues()
@@ -185,7 +197,7 @@ class FeeDelegatedSmartContractExecutionWithRatio extends AbstractFeeDelegatedWi
             Bytes.fromNat(this.value),
             this.from.toLowerCase(),
             this.input,
-            this.feeRatio,
+            Bytes.fromNat(this.feeRatio),
         ])
     }
 }

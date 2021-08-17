@@ -35,7 +35,6 @@ const { packageInit, providers } = require('./packages/caver-core')
 const Klay = require('./packages/caver-klay')
 const Account = require('./packages/caver-account')
 const KeyringContainer = require('./packages/caver-wallet')
-const Keyring = require('./packages/caver-wallet/src/keyring/keyringFactory')
 const Transaction = require('./packages/caver-transaction')
 const RPC = require('./packages/caver-rpc')
 const abi = require('./packages/caver-abi')
@@ -44,16 +43,34 @@ const KCT = require('./packages/caver-kct')
 const Validator = require('./packages/caver-validator')
 
 const core = require('./packages/caver-core')
-const Method = require('./packages/caver-core-method')
 const middleware = require('./packages/caver-middleware')
 const utils = require('./packages/caver-utils')
 const formatters = require('./packages/caver-core-helpers').formatters
-const helpers = require('./packages/caver-core-helpers')
 
 const IPFS = require('./packages/caver-ipfs')
 
 const { version } = require('./package.json')
 
+/**
+ * A caver class implemented to use Klaytn easily.
+ *
+ * @example
+ * const Caver = require('caver-js')
+ * const caver = new Caver('http://{your en url}:{port}')
+ *
+ * // If you want to create a provider, you can do like below.
+ * const httpProvider = new Caver.providers.HttpProvider('http://{your en url}:{port}')
+ * const caver = new Caver(httpProvider)
+ *
+ * // Use websocket provider with Caver.
+ * const websocketProvider = new Caver.providers.WebsocketProvider('ws://{your en url}:{port}')
+ * const caver = new Caver(websocketProvider)
+ * caver.currentProvider.connection.close()
+ *
+ * @class
+ * @constructor
+ * @param {string|HttpProvider|WebsocketProvider|IpcProvider} [provider] - The url string of the Node to connect with. You can pass the provider instance directly.
+ */
 function Caver(provider, net) {
     const _this = this
 
@@ -61,31 +78,49 @@ function Caver(provider, net) {
     // sets _requestmanager etc
     packageInit(this, [provider, net])
 
+    /** @type {string} */
     this.version = version
+
+    /** @type {module:utils} */
     this.utils = utils
-    this.abi = abi
-    this.formatters = formatters
-    this.helpers = helpers
-    this.Method = Method
-
+    /** @type {typeof Account} */
     this.account = Account
-    this.wallet = new KeyringContainer()
-    this.wallet.keyring = Keyring
-
+    /** @type {module:Transaction} */
     this.transaction = Transaction
 
+    /** @type {ABI} */
+    this.abi = abi
+    /** @type {KeyringContainer} */
+    this.wallet = new KeyringContainer()
+
     // ex) call `caver.klay.property` || `caver.klay.method(...)`
+    /** @type {KCT} */
     this.kct = new KCT(this)
     this.klay = new Klay(this)
+    /** @type {RPC} */
     this.rpc = new RPC(this)
+    /** @type {Validator} */
     this.validator = new Validator()
 
-    this.middleware = middleware
-
+    /** @type {IPFS} */
     this.ipfs = new IPFS()
 
     // overwrite package setProvider
     const setProvider = this.setProvider
+    /**
+     * Changes the current provider of the Caver.
+     * You can access the provider's constructor via `const Caver = require('caver-js'); const provider = new Caver.providers.XXXProvider('...')`.
+     *
+     * @example
+     * const isSet = caver.setProvider('http://{your en url}:{port}')
+     * const isSet = caver.setProvider(new Caver.providers.HttpProvider('http://{your en url}:{port}'))
+     *
+     * const isSet = caver.setProvider('ws://{your en url}:{port}')
+     * const isSet = caver.setProvider(new Caver.providers.WebsocketProvider('http://{your en url}:{port}'))
+     *
+     * @param {string|HttpProvider|WebsocketProvider|IpcProvider} p - The url string of the Node or the provider instance.
+     * @return {boolean} `true` means provider is set successfully.
+     */
     this.setProvider = (p, n) => {
         setProvider.apply(this, [p, n])
         _this.klay.setRequestManager(_this._requestManager)
@@ -124,13 +159,42 @@ function Caver(provider, net) {
     Contract.prototype = Object.create(BaseContract.prototype)
     Contract.prototype.constructor = Contract
 
+    /** @type {typeof Contract} */
     this.contract = Contract
     this.contract._requestManager = this._requestManager
     this.contract.currentProvider = this._requestManager.provider
 }
 
+/**
+ * @type {module:utils}
+ *
+ * @example
+ * const utils = require('caver-js').utils
+ * */
 Caver.utils = utils
+
+/**
+ * @type {ABI}
+ *
+ * @example
+ * const abi = require('caver-js').abi
+ * */
 Caver.abi = abi
+
+/**
+ * The account key types which are used in the `caver.account` package.
+ *
+ * @typedef {object} Caver.Providers
+ * @property {typeof WebsocketProvider} WebsocketProvider - Class representing WebsocketProvider.
+ * @property {typeof HttpProvider} HttpProvider - Class representing HttpProvider.
+ * @property {typeof IpcProvider} IpcProvider - Class representing IpcProvider.
+ */
+/**
+ * @type {Caver.Providers}
+ *
+ * @example
+ * const providers = require('./index').providers
+ * */
 Caver.providers = providers
 
 module.exports = Caver

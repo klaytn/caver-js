@@ -28,6 +28,11 @@ const _ = require('lodash')
 const EventEmitter = require('eventemitter3')
 const errors = require('../../caver-core-helpers').errors
 
+/**
+ * @classdesc A subscription class implemented to subscribe the specific events in the blockchain.
+ * @class
+ * @hideconstructor
+ */
 function Subscription(options) {
     EventEmitter.call(this)
 
@@ -50,7 +55,8 @@ Subscription.prototype = Object.create(EventEmitter.prototype, {
 /**
  * Should be used to extract callback from array of arguments. Modifies input param
  *
- * @method extractCallback
+ * @ignore
+ * @method _extractCallback
  * @param {Array} arguments
  * @return {Function|Null} callback, if exists
  */
@@ -63,7 +69,8 @@ Subscription.prototype._extractCallback = function(args) {
 /**
  * Should be called to check if the number of arguments is correct
  *
- * @method validateArgs
+ * @ignore
+ * @method _validateArgs
  * @param {Array} arguments
  * @throws {Error} if it is not
  */
@@ -86,7 +93,8 @@ Subscription.prototype._validateArgs = function(args) {
 /**
  * Should be called to format input args of method
  *
- * @method formatInput
+ * @ignore
+ * @method _formatInput
  * @param {Array}
  * @return {Array}
  */
@@ -111,7 +119,8 @@ Subscription.prototype._formatInput = function(args) {
 /**
  * Should be called to format output(result) of method
  *
- * @method formatOutput
+ * @ignore
+ * @method _formatOutput
  * @param {Object}
  * @return {Object}
  */
@@ -124,14 +133,10 @@ Subscription.prototype._formatOutput = function(result) {
 /**
  * Should create payload from given input args
  *
- * @method toPayload
+ * @ignore
+ * @method _toPayload
  * @param {Array} args
  * @return {Object}
- */
-
-/**
- * _toPayload
- *
  */
 Subscription.prototype._toPayload = function(args) {
     let params = []
@@ -166,9 +171,8 @@ Subscription.prototype._toPayload = function(args) {
 }
 
 /**
- * Unsubscribes and clears callbacks
+ * Unsubscribes and clears callbacks.
  *
- * @method unsubscribe
  * @return {Object}
  */
 Subscription.prototype.unsubscribe = function(callback) {
@@ -181,7 +185,6 @@ Subscription.prototype.unsubscribe = function(callback) {
 /**
  * Subscribes and watches for changes
  *
- * @method subscribe
  * @param {String} subscription the subscription
  * @param {Object} options the options object with address topics and fromBlock
  * @return {Object}
@@ -198,6 +201,13 @@ Subscription.prototype.subscribe = function() {
     if (!this.options.requestManager.provider) {
         const err1 = new Error('No provider set.')
         this.callback(err1, null, this)
+
+        /**
+         * Subscription 'error' event.
+         *
+         * @event Subscription#error
+         * @type {Error}
+         */
         this.emit('error', err1)
         return this
     }
@@ -235,6 +245,12 @@ Subscription.prototype.subscribe = function() {
                     logs.forEach(function(log) {
                         const output = _this._formatOutput(log)
                         _this.callback(null, output, _this)
+                        /**
+                         * Subscription 'data' event.
+                         *
+                         * @event Subscription#data
+                         * @type {object}
+                         */
                         _this.emit('data', output)
                     })
 
@@ -257,6 +273,12 @@ Subscription.prototype.subscribe = function() {
     this.options.requestManager.send(payload, function(err, result) {
         if (!err && result) {
             _this.id = result
+            /**
+             * Subscription 'connected' event.
+             *
+             * @event Subscription#connected
+             * @type {string}
+             */
             _this.emit('connected', result)
 
             // call callback on notifications

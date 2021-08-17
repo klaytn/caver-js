@@ -1,0 +1,46 @@
+{
+  "tags": {
+    "allowUnknownTags": true
+  },
+  "source": {
+    "include": ["./index.js", "./packages"], 
+    "includePattern": ".js$",
+    "exclude": [
+      "./docs",
+      "./packages/caver-core/*",
+      "./packages/caver-core-helpers",
+      "./packages/caver-core-method",
+      "./packages/caver-core-requestmanager",
+      "./packages/caver-middleware",
+      "./packages/caver-rtm"
+    ],
+    "excludePattern": "(node_modules/|docs)"
+  },
+  "plugins": [
+    "plugins/markdown",
+    "node_modules/jsdoc-typeof-plugin"
+  ],
+  "opts": {
+    "template": "node_modules/docdash",
+    "encoding": "utf8",
+    "destination": "./out",
+    "recurse": true,
+    "verbose": true
+  },
+  "templates": {
+    "cleverLinks": false,
+    "monospaceLinks": false,
+    "default": {
+      "outputSourceFiles": false
+    }
+  },
+  "docdash": {
+    "static": false,
+    "sort": false
+  },
+  "markdown": {
+    "idInHeadings": true,
+    "hardwrap": true,
+    "excludeTags": ["author","file","date","authors"]
+  }
+}

@@ -363,7 +363,7 @@ describe('caver.wallet.keyring.createFromPrivateKey', () => {
             const klaytnWalletKey = keyring.getKlaytnWalletKey()
 
             const result = caver.wallet.keyring.createFromPrivateKey(utils.stripHexPrefix(klaytnWalletKey))
-            validateKeyring(result, { expectedKey: keyring.keys, expectedAddress: keyring.address })
+            validateKeyring(result, { expectedKey: keyring.key, expectedAddress: keyring.address })
         })
     })
 
@@ -385,7 +385,7 @@ describe('caver.wallet.keyring.createFromKlaytnWalletKey', () => {
             const klaytnWalletKey = keyring.getKlaytnWalletKey()
 
             const result = caver.wallet.keyring.createFromKlaytnWalletKey(klaytnWalletKey)
-            validateKeyring(result, { expectedKey: keyring.keys, expectedAddress: keyring.address })
+            validateKeyring(result, { expectedKey: keyring.key, expectedAddress: keyring.address })
         })
     })
 
@@ -406,7 +406,7 @@ describe('caver.wallet.keyring.create', () => {
             const keyring = caver.wallet.keyring.generate()
             const created = caver.wallet.keyring.create(keyring.address, keyring.key.privateKey)
 
-            validateKeyring(created, { expectedAddress: keyring.address, expectedKey: keyring.keys })
+            validateKeyring(created, { expectedAddress: keyring.address, expectedKey: keyring.key })
         })
     })
 
@@ -602,7 +602,7 @@ describe('caver.wallet.keyring.decrypt', () => {
             const encrypted = keyring.encrypt(password)
             const decrypted = caver.wallet.keyring.decrypt(encrypted, password)
 
-            validateKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.keys })
+            validateKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.key })
         })
     })
 
@@ -614,7 +614,7 @@ describe('caver.wallet.keyring.decrypt', () => {
             const encrypted = keyring.encrypt(password)
             const decrypted = caver.wallet.keyring.decrypt(encrypted, password)
 
-            validateKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.keys })
+            validateKeyring(decrypted, { expectedAddress: keyring.address, expectedKey: keyring.key })
         })
     })
 
@@ -788,7 +788,7 @@ describe('caver.wallet.keyring.decrypt', () => {
 
             const result = caver.wallet.keyring.decrypt(keystoreJsonV3, password)
 
-            validateKeyring(result, { keys: expectedAccount.keys, address: expectedAccount.address })
+            validateKeyring(result, { expectedKey: expectedAccount.key, expectedAddress: expectedAccount.address })
             expect(keystoreJsonV3.crypto).not.to.be.undefined
         })
     })

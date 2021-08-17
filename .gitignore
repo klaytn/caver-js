@@ -13,7 +13,7 @@ node_modules
 .vscode/
 /packages/**/lib/*
 /.nyc_output
-package-lock.json
 .git
 dist/*
 .env
+out/*

@@ -23,11 +23,23 @@ const emptySigArray = ['0x01', '0x', '0x']
 
 /**
  * Representing a SignatureData class that includes ECDSA signature data string.
+ *
+ * @example
+ * caver.wallet.keyring.signatureData
+ *
  * @class
  */
 class SignatureData {
     /**
      * creates a SignatureData.
+     *
+     * @example
+     * const signature = new caver.wallet.keyring.signatureData([
+     *     '0x0fea',
+     *     '0xade9480f584fe481bf070ab758ecc010afa15debc33e1bd75af637d834073a6e',
+     *     '0x38160105d78cef4529d765941ad6637d8dcf6bd99310e165fee1c39fff2aa27e',
+     * ])
+     *
      * @param {Array.<string>|SignatureData} key - The ECDSA signatureData
      */
     constructor(signature) {
@@ -115,9 +127,12 @@ class SignatureData {
     }
 
     /**
-     * Return `true` if signature is same with emptySig.
+     * Returns `true` if signature is same with emptySig.
      *
-     * @return {boolean}
+     * @example
+     * const isEmpty = signatureData.isEmpty()
+     *
+     * @return {boolean} `ture` means the signatureData is empty.
      */
     isEmpty() {
         if (this.v === '0x01' && this.r === '0x' && this.s === '0x') return true
@@ -125,16 +140,22 @@ class SignatureData {
     }
 
     /**
-     * Convert to array and return
+     * Convert to array and return.
      *
-     * @return {Array.<string>}
+     * @example
+     * const arrayFormat = signatureData.encode()
+     *
+     * @return {Array.<string>} An array format of signature.
      */
     encode() {
         return [this.v, this.r, this.s]
     }
 
     /**
-     * Convert to string
+     * Converts to combined string.
+     *
+     * @example
+     * const sig = signatureData.toString()
      *
      * @return {string}
      */
@@ -143,6 +164,12 @@ class SignatureData {
     }
 }
 
+/**
+ * @type {SignatureData}
+ *
+ * @example
+ * caver.wallet.keyring.signatureData.emtpySig
+ */
 SignatureData.emtpySig = new SignatureData(emptySigArray)
 
 module.exports = SignatureData

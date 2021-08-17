@@ -31,29 +31,55 @@ const {
 const { isAddress, toBuffer, isHexStrict, toHex, stripHexPrefix, leftPad } = require('../../caver-utils')
 const KIP13 = require('../src/kip13')
 
+/**
+ * The KIP37 class that helps you easily handle a smart contract that implements KIP-37 as a JavaScript object on the Klaytn blockchain platform (Klaytn).
+ * @hideconstructor
+ * @class
+ */
 class KIP37 extends Contract {
     /**
-     * Creates an instance of KIP37.
-     * @method create
-     * @param {string} tokenAddress - The KIP-73 token contract address.
+     * Creates a new KIP37 instance with its bound methods and events.
+     *
+     * @example
+     * const kip37 = caver.kct.kip37.create('0x{address in hex}')
+     *
+     * @param {string} tokenAddress - The KIP-37 token contract address.
      * @param {Array} [abi] - The Contract Application Binary Interface (ABI) of the KIP-37.
-     * @return {object}
+     * @return {KIP37}
      */
     static create(tokenAddress, abi) {
         return new KIP37(tokenAddress, abi)
     }
 
     /**
-     * deploy deploys a KIP-37 token contract to Klaytn network.
-     * `const deployedContract = await caver.kct.kip37.deploy({
-     *      uri: ''
-     *  }, '0x{address in hex}')`
+     * An object that defines the parameters required to deploy the KIP-37 contract.
      *
-     * @method deploy
-     * @param {Object} tokenInfo The object that defines the uri to deploy.
-     * @param {Object|String} sendOptions The address of the account to deploy the KIP-37 token contract or an object holding parameters that are required for sending a transaction.
+     * @typedef {object} KIP37.KIP37DeployParams
+     * @property {string} uri - The URI for all token types, by relying on the {@link http://kips.klaytn.com/KIPs/kip-37#metadata|token type ID substitution mechanism}.
+     */
+    /**
+     * Deploys a KIP-37 token contract to Klaytn network.
+     *
+     * By default, it returns a KIP37 instance when the deployment is finished.
+     * If you define a custom function in the `contractDeployFormatter` field in {@link Contract.SendOptions|SendOptions}, you can control return type.
+     *
+     * @example
+     * const tokenInfo = { uri: 'uri string' }
+     *
+     * // Below example will use `caver.wallet`.
+     * const deployed = await caver.kct.kip37.deploy(tokenInfo, '0x{deployer address}')
+     *
+     * // Use sendOptions instead of deployer address.
+     * const sendOptions = { from: '0x{deployer address}', feeDelegation: true, feePayer: '0x{fee payer address}' }
+     * const deployed = await caver.kct.kip37.deploy(tokenInfo, sendOptions)
+     *
+     * // If you want to use your own wallet that implements the 'IWallet' interface, pass it into the last parameter.
+     * const deployed = await caver.kct.kip37.deploy(tokenInfo, '0x{deployer address}', wallet)
+     *
+     * @param {KIP37.KIP37DeployParams} tokenInfo The object that defines the uri to deploy.
+     * @param {Contract.SendOptions|string} sendOptions An object holding parameters that are required for sending a transaction.
      * @param {IWallet} [wallet] The wallet instance to sign and send a transaction.
-     * @return {Object}
+     * @return {Promise<*>}
      */
     static deploy(tokenInfo, sendOptions, wallet) {
         validateDeployParameterForKIP37(tokenInfo)
@@ -75,11 +101,23 @@ class KIP37 extends Contract {
     }
 
     /**
-     * detectInterface detects which interface the KIP-37 token contract supports.
+     * An object that defines the parameters required to deploy the KIP-37 contract.
      *
-     * @method detectInterface
+     * @typedef {object} KIP37.KIP37DetectedObject
+     * @property {boolean} IKIP37 - Whether to implement `IKIP37` interface.
+     * @property {boolean} IKIP37Metadata - Whether to implement `IKIP37Metadata` interface.
+     * @property {boolean} IKIP37Mintable - Whether to implement `IKIP37Mintable` interface.
+     * @property {boolean} IKIP37Burnable - Whether to implement `IKIP37Burnable` interface.
+     * @property {boolean} IKIP37Pausable - Whether to implement `IKIP37Pausable` interface.
+     */
+    /**
+     * Returns the information of the interface implemented by the token contract.
+     *
+     * @example
+     * const detected = await caver.kct.kip37.detectInterface('0x{address in hex}')
+     *
      * @param {string} contractAddress The address of the KIP-37 token contract to detect.
-     * @return {object}
+     * @return {Promise<KIP37.KIP37DetectedObject>}
      */
     static detectInterface(contractAddress) {
         const kip37 = new KIP37(contractAddress)
@@ -99,6 +137,16 @@ class KIP37 extends Contract {
         this.setWallet(KIP37.wallet)
     }
 
+    /**
+     * Clones the current KIP37 instance.
+     *
+     * @example
+     * const cloned = kip37.clone()
+     * const cloned = kip37.clone('0x{new kip7 address}')
+     *
+     * @param {string} [tokenAddress] The address of the token contract.
+     * @return {KIP37}
+     */
     clone(tokenAddress = this.options.address) {
         const cloned = new this.constructor(tokenAddress, this.options.jsonInterface)
         cloned.setWallet(this._wallet)
@@ -106,10 +154,12 @@ class KIP37 extends Contract {
     }
 
     /**
-     * detectInterface detects which interface the KIP-37 token contract supports.
+     * Returns the information of the interface implemented by the token contract.
      *
-     * @method detectInterface
-     * @return {object}
+     * @example
+     * const detected = await kip37.detectInterface()
+     *
+     * @return {Promise<KIP37.KIP37DetectedObject>}
      */
     async detectInterface() {
         const detected = {
@@ -145,11 +195,13 @@ class KIP37 extends Contract {
     }
 
     /**
-     * supportsInterface checks whether interface is supported or not.
+     * Returns `true` if this contract implements the interface defined by `interfaceId`.
      *
-     * @method supportsInterface
+     * @example
+     * const supported = await kip37.supportsInterface('0x6433ca1f')
+     *
      * @param {string} interfaceId The interface id to check.
-     * @return {boolean}
+     * @return {Promise<boolean>}
      */
     async supportsInterface(interfaceId) {
         const isSupported = await this.methods.supportsInterface(interfaceId).call()
@@ -157,13 +209,15 @@ class KIP37 extends Contract {
     }
 
     /**
-     * uri returns distinct Uniform Resource Identifier (URI) for a given token.
+     * Returns distinct Uniform Resource Identifier (URI) of the given token.
      * If the string {id} exists in any URI, this function will replace this with the actual token ID in hexadecimal form.
-     * Please refer to http://kips.klaytn.com/KIPs/kip-37#metadata
+     * Please refer to {@link http://kips.klaytn.com/KIPs/kip-37#metadata|KIP-34 Metadata}.
      *
-     * @method uri
+     * @example
+     * const uri = await kip37.uri('0x0')
+     *
      * @param {BigNumber|string|number} id The token id to get uri.
-     * @return {string}
+     * @return {Promise<string>}
      */
     async uri(id) {
         let uri = await this.methods.uri(formatParamForUint256(id)).call()
@@ -178,11 +232,13 @@ class KIP37 extends Contract {
     }
 
     /**
-     * totalSupply returns the total supply of the specific token.
+     * Returns the total token supply of the specific token.
+     *
+     * @example
+     * const totalSupply = await kip37.totalSupply(0)
      *
      * @param {BigNumber|string|number} id The token id to see the total supply.
-     * @method totalSupply
-     * @return {BigNumber}
+     * @return {Promise<BigNumber>}
      */
     async totalSupply(id) {
         const totalSupply = await this.methods.totalSupply(formatParamForUint256(id)).call()
@@ -190,12 +246,14 @@ class KIP37 extends Contract {
     }
 
     /**
-     * balanceOf returns the balance of the account.
+     * Returns the amount of tokens of token type `id` owned by `account`.
      *
-     * @method balanceOf
+     * @example
+     * const balance = await kip37.balanceOf('0x{address in hex}', 0)
+     *
      * @param {string} account The address of the account for which you want to see balance.
      * @param {BigNumber|string|number} id The token id to see balance.
-     * @return {BigNumber}
+     * @return {Promise<BigNumber>}
      */
     async balanceOf(account, id) {
         const balance = await this.methods.balanceOf(account, formatParamForUint256(id)).call()
@@ -203,12 +261,12 @@ class KIP37 extends Contract {
     }
 
     /**
-     * Batch returns the balance of multiple account/token pairs. `accounts` and `ids` must have the same length.
+     * Returns the balance of multiple account/token pairs.
+     * `balanceOfBatch` is a batch operation of {@link balanceOf}, and the length of arrays with `accounts` and `ids` must be the same.
      *
-     * @method balanceOfBatch
      * @param {Array.<string>} accounts The address of the accounts for which you want to see balance.
      * @param {Array.<BigNumber|string|number>} ids An array of ids of token you want to see balance.
-     * @return {BigNumber}
+     * @return {Promise<Array.<BigNumber>>}
      */
     async balanceOfBatch(accounts, ids) {
         if (ids.length !== accounts.length) throw new Error(`ids and accounts must have the same length.`)
@@ -229,12 +287,14 @@ class KIP37 extends Contract {
     }
 
     /**
-     * isApprovedForAll returns true if an operator is approved by a given owner.
+     * Queries the approval status of an operator for a given owner. Returns true if an operator is approved by a given owner.
      *
-     * @method isApprovedForAll
+     * @example
+     * const isApprovedForAll = await kip37.isApprovedForAll('0x{address in hex}', '0x{address in hex}')
+     *
      * @param {string} owner The address of the owner.
      * @param {string} operator The address of the operator.
-     * @return {boolean}
+     * @return {Promise<boolean>}
      */
     async isApprovedForAll(owner, operator) {
         const isApprovedForAll = await this.methods.isApprovedForAll(owner, operator).call()
@@ -242,13 +302,19 @@ class KIP37 extends Contract {
     }
 
     /**
-     * paused returns whether or not the token contract's transaction (or specific token) is paused.
-     * If id is not defined, checks whether the token contract's transaction is paused.
-     * If id is defined, checks whether the specific token is paused.
+     * Returns whether or not the token contract's transaction (or specific token) is paused.
      *
-     * @param {BigNumber|string|number} [id] The id of token to check wether paused or not.
-     * @method paused
-     * @return {boolean}
+     * If `id` parameter is not defined, return whether the token contract's transaction is paused.
+     * If `id` parameter is defined, return whether the specific token is paused.
+     *
+     * @example
+     * // without token id parameter
+     * const isPaused = await kip37.paused()
+     * // with token id parameter
+     * const isPaused = await kip37.paused(0)
+     *
+     * @param {BigNumber|string|number} [id] The token id to check wether paused or not. If this parameter is omitted, the `paused` function return whether the contract is in paused state.
+     * @return {Promise<boolean>}
      */
     async paused(id) {
         const callObject = id !== undefined ? this.methods.paused(formatParamForUint256(id)) : this.methods.paused()
@@ -257,11 +323,13 @@ class KIP37 extends Contract {
     }
 
     /**
-     * isPauser returns whether the account is pauser or not.
+     * Returns `true` if the given account is a pauser who can suspend transferring tokens.
      *
-     * @method isPauser
-     * @param {string} account The address of the account you want to check pauser or not.
-     * @return {boolean}
+     * @example
+     * const isPauser = await kip37.isPauser('0x{address in hex}')
+     *
+     * @param {string} account The address of the account to be checked for having the right to suspend transferring tokens.
+     * @return {Promise<boolean>}
      */
     async isPauser(account) {
         const isPauser = await this.methods.isPauser(account).call()
@@ -269,11 +337,13 @@ class KIP37 extends Contract {
     }
 
     /**
-     * isMinter returns whether the account is minter or not.
+     * Returns `true` if the given account is a minter who can issue new KIP37 tokens.
      *
-     * @method isMinter
-     * @param {string} account The address of the account you want to check minter or not.
-     * @return {boolean}
+     * @example
+     * const isMinter = await kip37.isMinter('0x{address in hex}')
+     *
+     * @param {string} account The address of the account to be checked for having the minting right.
+     * @return {Promise<boolean>}
      */
     async isMinter(account) {
         const isMinter = await this.methods.isMinter(account).call()
@@ -283,12 +353,15 @@ class KIP37 extends Contract {
     /**
      * create creates token and assigns them to account, increasing the total supply.
      *
-     * @method mint
-     * @param {BigNumber|string|number} id The id of token to mint.
+     * @example
+     * // Send via a sendParam object with the from field given
+     * const receipt = await kip37.create(2, '1000000000000000000', { from: '0x{address in hex}' })
+     *
+     * @param {BigNumber|string|number} id The token id to create.
      * @param {BigNumber|string|number} initialSupply The amount of tokens being minted.
      * @param {string} [uri] The token URI of the created token.
-     * @param {Object} [sendParam] (optional) An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
+     * @param {Contract.SendOptios} [sendParam] (optional) An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-37 abi.
      */
     async create(id, initialSupply, uri, sendParam = {}) {
@@ -307,14 +380,16 @@ class KIP37 extends Contract {
     }
 
     /**
-     * setApprovalForAll enables or disables approval for a third party ("operator") to manage all of the caller's tokens.
+     * Approves the given operator, or disallow the given operator, to transfer all tokens of the owner.
      * An operator is allowed to transfer all tokens of the sender on their behalf.
      *
-     * @method setApprovalForAll
-     * @param {string} operator The address to add to the set of authorized operators.
-     * @param {boolean} approved True if the operator is approved, false to revoke approval.
-     * @param {Object} [sendParam] (optional) An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
+     * @example
+     * const receipt = await kip37.setApprovalForAll('0x{address in hex}', true, { from: '0x{address in hex}' })
+     *
+     * @param {string} operator The address of an account to be approved/prohibited to transfer the owner's all tokens.
+     * @param {boolean} approved This operator will be approved if `true`. The operator will be disallowed if `false`.
+     * @param {Contract.SendOptios} [sendParam] (optional) An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-37 abi.
      */
     async setApprovalForAll(operator, approved, sendParam = {}) {
@@ -325,16 +400,24 @@ class KIP37 extends Contract {
     }
 
     /**
-     * safeTransferFrom safely transfers the ownership of a given token id to another address.
+     * Safely transfers the given `amount` tokens of specific token type `id` from `from` to the `recipient`.
      *
-     * @method safeTransferFrom
-     * @param {string} from The address of the owner or approved of the given token.
+     * The address who was approved to send the owner's token (the operator) or the token owner itself is expected to execute this token transferring transaction.
+     * Thus, the approved one or the token owner should be the sender of this transaction whose address must be given at `sendParam.from` or `kip37.options.from`.
+     * Without `sendParam.from` nor `kip37.options.from` being provided, an error would occur.
+     *
+     * If the `recipient` was a contract address, it should implement `IKIP37Receiver.onKIP37Received`. Otherwise, the transfer is reverted.
+     *
+     * @example
+     * const receipt = await kip37.safeTransferFrom('0x{address in hex}', '0x{address in hex}', 2, 10000, { from: '0x{address in hex}' })
+     *
+     * @param {string} from The address of the account that owns the token to be sent with allowance mechanism.
      * @param {string} to The address of the account to receive the token.
-     * @param {BigNumber|string|number} id The id of token you want to transfer.
-     * @param {BigNumber|string|number} amount The amount of tokens you want to transfer.
+     * @param {BigNumber|string|number} id The token id to transfer.
+     * @param {BigNumber|string|number} amount The amount of token you want to transfer.
      * @param {Buffer|string|number} [data] (optional) The data to send along with the call.
-     * @param {Object} [sendParam] (optional) An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
+     * @param {Contract.SendOptios} [sendParam] (optional) An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-37 abi.
      */
     async safeTransferFrom(from, to, id, amount, data, sendParam = {}) {
@@ -358,19 +441,27 @@ class KIP37 extends Contract {
     }
 
     /**
-     * safeBatchTransferFrom safely transfers the ownership of given token ids to another address.
+     * Safely batch transfers of multiple token ids and values from `from` to the `recipient`.
      *
-     * @method safeBatchTransferFrom
-     * @param {string} from The address of the owner or approved of the given token.
-     * @param {string} to The address of the account to receive the token.
-     * @param {Array.<BigNumber|string|number>} ids An array of ids of token you want to transfer.
-     * @param {Array.<BigNumber|string|number>} amounts An array of amount of tokens you want to transfer.
+     * The address who was approved to send the owner's token (the operator) or the token owner itself is expected to execute this token transferring transaction.
+     * Thus, the approved one or the token owner should be the sender of this transaction whose address must be given at `sendParam.from` or `kip37.options.from`.
+     * Without `sendParam.from` nor `kip37.options.from` being provided, an error would occur.
+     *
+     * If the `recipient` was a contract address, it should implement `IKIP37Receiver.onKIP37Received`. Otherwise, the transfer is reverted.
+     *
+     * @example
+     * const receipt = await kip37.safeBatchTransferFrom('0x{address in hex}', '0x{address in hex}', [1, 2], [10, 1000], { from: '0x{address in hex}' })
+     *
+     * @param {string} from The address of the account that owns the token to be sent with allowance mechanism.
+     * @param {string} recipient The address of the account to receive the token.
+     * @param {Array.<BigNumber|string|number>} ids An array of the token ids to transfer.
+     * @param {Array.<BigNumber|string|number>} amounts An array of the token amounts you want to transfer.
      * @param {Buffer|string|number} [data] (optional) The data to send along with the call.
-     * @param {Object} [sendParam] (optional) An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
+     * @param {Contract.SendOptios} [sendParam] (optional) An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-37 abi.
      */
-    async safeBatchTransferFrom(from, to, ids, amounts, data, sendParam = {}) {
+    async safeBatchTransferFrom(from, recipient, ids, amounts, data, sendParam = {}) {
         if (data && _.isObject(data)) {
             if (data.gas !== undefined || data.from !== undefined) {
                 if (Object.keys(sendParam).length > 0) throw new Error(`Invalid parameters`)
@@ -393,7 +484,7 @@ class KIP37 extends Contract {
             formattedTokenAmounts.push(formatParamForUint256(amounts[i]))
         }
 
-        const executableObj = this.methods.safeBatchTransferFrom(from, to, formattedTokenIds, formattedTokenAmounts, data)
+        const executableObj = this.methods.safeBatchTransferFrom(from, recipient, formattedTokenIds, formattedTokenAmounts, data)
 
         sendParam = await determineSendParams(executableObj, sendParam, this.options)
 
@@ -401,14 +492,19 @@ class KIP37 extends Contract {
     }
 
     /**
-     * mint mints tokens of the specific token type `id` and assigns the tokens according to the variables `to` and `value`.
+     * Mints the token of the specific token type `id` and assigns the tokens according to the variables `to` and `value`.
+     * The mint function allows you to mint specific token to multiple accounts at once by passing arrays `to` to and `value` as parameters.
      *
-     * @method mint
-     * @param {string|Array.<string>} toList The address that will receive the minted tokens. If there are multiple to accounts, the values mapped to each to must also be an array.
-     * @param {BigNumber|string|number} id The id of token to mint.
-     * @param {BigNumber|string|number|Array.<BigNumber|string|number>} values The quantity of tokens being minted.
-     * @param {Object} [sendParam] (optional) An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
+     * If `sendParam.from` or `kip37.options.from` were given, it should be a minter with MinterRole.
+     *
+     * @example
+     * const receipt = await kip37.mint('0x{address in hex}', 2, 1000, { from: '0x{address in hex}' })
+     *
+     * @param {string|Array.<string>} toList An address of the account or an array of addresses to which the minted token will be issued.
+     * @param {BigNumber|string|number} id The token id to mint.
+     * @param {BigNumber|string|number|Array.<BigNumber|string|number>} values The amount of token to be minted. If an array containing multiple addresses is delivered to `to` parameter, the value must be delivered in the form of an array.
+     * @param {Contract.SendOptios} [sendParam] (optional) An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-37 abi.
      */
     async mint(toList, id, values, sendParam = {}) {
@@ -435,14 +531,18 @@ class KIP37 extends Contract {
     }
 
     /**
-     * mintBatch mints multiple KIP-37 tokens of the specific token types `ids` in a batch and assigns the tokens according to the variables `to` and `values`.
+     * Mints the multiple KIP-37 tokens of the specific token types `ids` in a batch and assigns the tokens according to the variables `to` and `values`.
      *
-     * @method mintBatch
-     * @param {string} to The address that will receive the minted tokens.
-     * @param {Array.<BigNumber|string|number>} ids The list of the token ids to mint.
-     * @param {Array.<BigNumber|string|number>} values The list of the token amounts to mint.
-     * @param {Object} [sendParam] (optional) An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
+     * If `sendParam.from` or `kip37.options.from` were given, it should be a minter with MinterRole.
+     *
+     * @example
+     * const receipt = await kip37.mintBatch('0x{address in hex}', [1, 2], [100, 200], { from: '0x{address in hex}' })
+     *
+     * @param {string} to An address of the account to which the minted tokens will be issued.
+     * @param {Array.<BigNumber|string|number>} ids An array of the token ids to mint.
+     * @param {Array.<BigNumber|string|number>} values An array of the token amounts to mint.
+     * @param {Contract.SendOptios} [sendParam] (optional) An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-37 abi.
      */
     async mintBatch(to, ids, values, sendParam = {}) {
@@ -462,13 +562,16 @@ class KIP37 extends Contract {
     }
 
     /**
-     * addMinter adds an account as a minter that has the permission of MinterRole and can mint.
-     * The account sending transaction to execute the addMinter must be a Minter with a MinterRole.
+     * Adds an account as a minter, who are permitted to mint tokens.
      *
-     * @method addMinter
-     * @param {string} account The address of account to add as minter.
-     * @param {Object} [sendParam] (optional) An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
+     * If `sendParam.from` or `kip37.options.from` were given, it should be a minter with MinterRole.
+     *
+     * @example
+     * const receipt = await kip37.addMinter('0x{address in hex}', { from: '0x{address in hex}' })
+     *
+     * @param {string} account The address of the account to be added as a minter.
+     * @param {Contract.SendOptios} [sendParam] (optional) An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-37 abi.
      */
     async addMinter(account, sendParam = {}) {
@@ -479,12 +582,15 @@ class KIP37 extends Contract {
     }
 
     /**
-     * renounceMinter renounces privilege of MinterRole.
-     * The account sending transaction to execute the renounceMinter must be a Minter with a MinterRole.
+     * Renounces the right to mint tokens. Only a minter address can renounce the minting right.
      *
-     * @method renounceMinter
-     * @param {Object} [sendParam] (optional) An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
+     * If `sendParam.from` or `kip37.options.from` were given, it should be a minter with MinterRole.
+     *
+     * @example
+     * const receipt = await kip37.renounceMinter({ from: '0x{address in hex}' })
+     *
+     * @param {Contract.SendOptios} [sendParam] (optional) An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-37 abi.
      */
     async renounceMinter(sendParam = {}) {
@@ -495,14 +601,20 @@ class KIP37 extends Contract {
     }
 
     /**
-     * burn destroys specific KIP37 tokens.
+     * Burns specific KIP-37 tokens.
      *
-     * @method burn
-     * @param {string} account The account that owns tokens.
-     * @param {BigNumber|string|number} id The token id to burn.
-     * @param {BigNumber|string|number} value The token amount to burn.
-     * @param {Object} [sendParam] (optional) An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-7 token contract.
+     * The address who was approved to operate the owner's token (the operator) or the token owner itself is expected to execute this token transferring transaction.
+     * Thus, the approved one or the token owner should be the sender of this transaction whose address must be given at `sendParam.from` or `kip37.options.from`.
+     * Without `sendParam.from` nor `kip37.options.from` being provided, an error would occur.
+     *
+     * @example
+     * const receipt = await kip37.burn('0x{address in hex}', 2, 10, { from: '0x{address in hex}' })
+     *
+     * @param {string} account The address of the account that owns the token to be destroyed.
+     * @param {BigNumber|string|number} id The id of token to be destroyed.
+     * @param {BigNumber|string|number} value The amount of token to be destroyed.
+     * @param {Contract.SendOptios} [sendParam] (optional) An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-7 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-7 abi.
      */
     async burn(account, id, value, sendParam = {}) {
@@ -513,14 +625,20 @@ class KIP37 extends Contract {
     }
 
     /**
-     * burnBatch burns multiple KIP37 tokens.
+     * Burns the multiple KIP-37 tokens.
      *
-     * @method burnBatch
-     * @param {string} account The account that owns tokens.
-     * @param {Array.<BigNumber|string|number>} ids The list of the token ids to burn.
-     * @param {Array.<BigNumber|string|number>} values The list of the token amounts to burn.
-     * @param {Object} [sendParam] (optional) An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
+     * The address who was approved to operate the owner's token (the operator) or the token owner itself is expected to execute this token transferring transaction.
+     * Thus, the approved one or the token owner should be the sender of this transaction whose address must be given at `sendParam.from` or `kip37.options.from`.
+     * Without `sendParam.from` nor `kip37.options.from` being provided, an error would occur.
+     *
+     * @example
+     * const receipt = await kip37.burnBatch('0x{address in hex}', [1, 2], [100, 200], { from: '0x{address in hex}' })
+     *
+     * @param {string} account The address of the account that owns the token to be destroyed.
+     * @param {Array.<BigNumber|string|number>} ids An array of the token ids to burn.
+     * @param {Array.<BigNumber|string|number>} values An array of the token amounts to burn.
+     * @param {Contract.SendOptios} [sendParam] (optional) An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-37 abi.
      */
     async burnBatch(account, ids, values, sendParam = {}) {
@@ -540,15 +658,17 @@ class KIP37 extends Contract {
     }
 
     /**
-     * pause pauses actions related to transfer and approval.
-     * If id is not defined, pauses the token contract.
-     * If id is defined, pauses the specific token.
-     * The account sending transaction to execute the pause must be a Pauser with a PauserRole.
+     * Suspends functions related to token operation.
+     * If `id` parameter is defined, pause the specific token. Otherwise pause the token contract.
      *
-     * @method pause
-     * @param {BigNumber|string|number} [id] The id of token to pause.
-     * @param {Object} [sendParam] (optional) An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
+     * If `sendParam.from` or `kip37.options.from` were given, it should be a pauser with PauserRole.
+     *
+     * @example
+     * const receipt = await kip37.pause({ from: '0x{address in hex}' })
+     *
+     * @param {BigNumber|string|number} [id] The token id to pause. If this parameter is omitted, the `pause` function pause the token contract.
+     * @param {Contract.SendOptios} [sendParam] (optional) An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-37 abi.
      */
     async pause(id, sendParam = {}) {
@@ -564,15 +684,17 @@ class KIP37 extends Contract {
     }
 
     /**
-     * unpause resumes from the paused state.
-     * If id is not defined, unpauses the token contract.
-     * If id is defined, unpauses the specific token.
-     * The account sending transaction to execute the unpause must be a Pauser with a PauserRole.
+     * Resumes the paused contract or specific token.
+     * If `id` parameter is defined, unpause the specific token. Otherwise unpause the token contract.
      *
-     * @method unpause
-     * @param {BigNumber|string|number} [id] The id of token to unpause.
-     * @param {Object} [sendParam] (optional) An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
+     * If `sendParam.from` or `kip37.options.from` were given, it should be a pauser with PauserRole.
+     *
+     * @example
+     * const receipt = await kip37.unpause({ from: '0x{address in hex}' })
+     *
+     * @param {BigNumber|string|number} [id] The token id to unpause. If this parameter is omitted, the `unpause` function unpause the token contract.
+     * @param {Contract.SendOptios} [sendParam] (optional) An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-37 abi.
      */
     async unpause(id, sendParam = {}) {
@@ -588,13 +710,16 @@ class KIP37 extends Contract {
     }
 
     /**
-     * addPauser adds an account as a pauser that has the permission of PauserRole and can pause.
-     * The account sending transaction to execute the addPauser must be a Pauser with a PauserRole.
+     * Adds an account as a pauser that has the right to suspend the contract.
      *
-     * @method addPauser
-     * @param {string} account The address of account to add as pauser.
-     * @param {Object} [sendParam] (optional) An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
+     * If `sendParam.from` or `kip37.options.from` were given, it should be a pauser with PauserRole.
+     *
+     * @example
+     * const receipt = await kip37.addPauser('0x{address in hex}', { from: '0x{address in hex}' })
+     *
+     * @param {string} account The address of the account to be a new pauser.
+     * @param {Contract.SendOptios} [sendParam] (optional) An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-37 abi.
      */
     async addPauser(account, sendParam = {}) {
@@ -605,12 +730,15 @@ class KIP37 extends Contract {
     }
 
     /**
-     * renouncePauser renounces privilege of PauserRole.
-     * The account sending transaction to execute the renouncePauser must be a Pauser with a PauserRole.
+     * Renounces the right to pause the contract. Only a pauser address can renounce the pausing right.
      *
-     * @method renouncePauser
-     * @param {Object} [sendParam] (optional) An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
+     * If `sendParam.from` or `kip37.options.from` were given, it should be a pauser with PauserRole.
+     *
+     * @example
+     * const receipt = await kip37.renouncePauser({ from: '0x{address in hex}' })
+     *
+     * @param {Contract.SendOptios} [sendParam] (optional) An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-37 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-37 abi.
      */
     async renouncePauser(sendParam = {}) {
@@ -621,5 +749,14 @@ class KIP37 extends Contract {
     }
 }
 
+/**
+ * The byte code of the KIP-37 token contract.
+ *
+ * @example
+ * caver.kct.kip37.byteCode
+ *
+ * @static
+ * @type {string}
+ */
 KIP37.byteCode = kip37ByteCode
 module.exports = KIP37

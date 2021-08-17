@@ -131,7 +131,7 @@ describe('wallet.newKeyring', () => {
             const keyring = caver.wallet.keyring.generate()
             const added = caver.wallet.newKeyring(keyring.address, keyring.key.privateKey)
 
-            validateKeyringInWallet(added, { expectedAddress: keyring.address, expectedKey: keyring.keys })
+            validateKeyringInWallet(added, { expectedAddress: keyring.address, expectedKey: keyring.key })
             expect(addSpy).to.have.been.calledOnce
             expect(caver.wallet.length).to.equal(1)
         })
@@ -253,7 +253,7 @@ describe('wallet.getKeyring', () => {
 
             const keyring = caver.wallet.getKeyring(added.address)
 
-            validateKeyringInWallet(keyring, { expectedAddress: added.address, expectedKey: added.keys })
+            validateKeyringInWallet(keyring, { expectedAddress: added.address, expectedKey: added.key })
         })
     })
 
@@ -284,8 +284,8 @@ describe('wallet.add', () => {
             const added = caver.wallet.add(keyringToAdd)
             const keyringFromContainer = caver.wallet.getKeyring(added.address)
 
-            validateKeyringInWallet(added, { expectedAddress: keyringToAdd.address, expectedKey: keyringToAdd.keys })
-            validateKeyringInWallet(keyringFromContainer, { expectedAddress: keyringToAdd.address, expectedKey: keyringToAdd.keys })
+            validateKeyringInWallet(added, { expectedAddress: keyringToAdd.address, expectedKey: keyringToAdd.key })
+            validateKeyringInWallet(keyringFromContainer, { expectedAddress: keyringToAdd.address, expectedKey: keyringToAdd.key })
 
             expect(caver.wallet.length).to.equal(1)
         })
@@ -298,8 +298,8 @@ describe('wallet.add', () => {
             const added = caver.wallet.add(keyringToAdd)
             const keyringFromContainer = caver.wallet.getKeyring(added.address)
 
-            validateKeyringInWallet(added, { expectedAddress: keyringToAdd.address, expectedKey: keyringToAdd.keys })
-            validateKeyringInWallet(keyringFromContainer, { expectedAddress: keyringToAdd.address, expectedKey: keyringToAdd.keys })
+            validateKeyringInWallet(added, { expectedAddress: keyringToAdd.address, expectedKey: keyringToAdd.key })
+            validateKeyringInWallet(keyringFromContainer, { expectedAddress: keyringToAdd.address, expectedKey: keyringToAdd.key })
 
             expect(caver.wallet.length).to.equal(1)
         })

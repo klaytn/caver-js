@@ -20,6 +20,36 @@ const _ = require('lodash')
 const utils = require('../../../caver-utils/src')
 const SignatureData = require('../../../caver-wallet/src/keyring/signatureData')
 
+/**
+ * The transaction type strings.
+ *
+ * @example
+ * caver.transaction.type.TxTypeLegacyTransaction
+ * caver.transaction.type.TxTypeValueTransfer
+ * caver.transaction.type.TxTypeFeeDelegatedValueTransfer
+ * caver.transaction.type.TxTypeFeeDelegatedValueTransferWithRatio
+ * caver.transaction.type.TxTypeValueTransferMemo
+ * caver.transaction.type.TxTypeFeeDelegatedValueTransferMemo
+ * caver.transaction.type.TxTypeFeeDelegatedValueTransferMemoWithRatio
+ * caver.transaction.type.TxTypeAccountUpdate
+ * caver.transaction.type.TxTypeFeeDelegatedAccountUpdate
+ * caver.transaction.type.TxTypeFeeDelegatedAccountUpdateWithRatio
+ * caver.transaction.type.TxTypeSmartContractDeploy
+ * caver.transaction.type.TxTypeFeeDelegatedSmartContractDeploy
+ * caver.transaction.type.TxTypeFeeDelegatedSmartContractDeployWithRatio
+ * caver.transaction.type.TxTypeSmartContractExecution
+ * caver.transaction.type.TxTypeFeeDelegatedSmartContractExecution
+ * caver.transaction.type.TxTypeFeeDelegatedSmartContractExecutionWithRatio
+ * caver.transaction.type.TxTypeCancel
+ * caver.transaction.type.TxTypeFeeDelegatedCancel
+ * caver.transaction.type.TxTypeFeeDelegatedCancelWithRatio
+ * caver.transaction.type.TxTypeChainDataAnchoring
+ * caver.transaction.type.TxTypeFeeDelegatedChainDataAnchoring
+ * caver.transaction.type.TxTypeFeeDelegatedChainDataAnchoringWithRatio
+ *
+ * @alias module:Transaction.type
+ * @type {Map<string:string>}
+ */
 const TX_TYPE_STRING = {
     TxTypeLegacyTransaction: 'TxTypeLegacyTransaction',
 
@@ -52,6 +82,37 @@ const TX_TYPE_STRING = {
     TxTypeFeeDelegatedChainDataAnchoringWithRatio: 'TxTypeFeeDelegatedChainDataAnchoringWithRatio',
 }
 
+/**
+ * The transaction tag hex strings.
+ * This is because the transaction type tag string and the transaction type string are mapped, so the transaction type tag can be used as a key value.
+ *
+ * @example
+ * caver.transaction.tag.TxTypeLegacyTransaction // caver.transaction.tag['']
+ * caver.transaction.tag.TxTypeValueTransfer // caver.transaction.tag['0x08']
+ * caver.transaction.tag.TxTypeFeeDelegatedValueTransfer // caver.transaction.tag['0x09']
+ * caver.transaction.tag.TxTypeFeeDelegatedValueTransferWithRatio // caver.transaction.tag['0x0a']
+ * caver.transaction.tag.TxTypeValueTransferMemo // caver.transaction.tag['0x10']
+ * caver.transaction.tag.TxTypeFeeDelegatedValueTransferMemo // caver.transaction.tag['0x11']
+ * caver.transaction.tag.TxTypeFeeDelegatedValueTransferMemoWithRatio // caver.transaction.tag['0x12']
+ * caver.transaction.tag.TxTypeAccountUpdate // caver.transaction.tag['0x20']
+ * caver.transaction.tag.TxTypeFeeDelegatedAccountUpdate // caver.transaction.tag['0x21']
+ * caver.transaction.tag.TxTypeFeeDelegatedAccountUpdateWithRatio // caver.transaction.tag['0x22']
+ * caver.transaction.tag.TxTypeSmartContractDeploy // caver.transaction.tag['0x28']
+ * caver.transaction.tag.TxTypeFeeDelegatedSmartContractDeploy // caver.transaction.tag['0x29']
+ * caver.transaction.tag.TxTypeFeeDelegatedSmartContractDeployWithRatio // caver.transaction.tag['0x2a']
+ * caver.transaction.tag.TxTypeSmartContractExecution // caver.transaction.tag['0x30']
+ * caver.transaction.tag.TxTypeFeeDelegatedSmartContractExecution // caver.transaction.tag['0x31']
+ * caver.transaction.tag.TxTypeFeeDelegatedSmartContractExecutionWithRatio // caver.transaction.tag['0x32']
+ * caver.transaction.tag.TxTypeCancel // caver.transaction.tag['0x38']
+ * caver.transaction.tag.TxTypeFeeDelegatedCancel // caver.transaction.tag['0x39']
+ * caver.transaction.tag.TxTypeFeeDelegatedCancelWithRatio // caver.transaction.tag['0x3a']
+ * caver.transaction.tag.TxTypeChainDataAnchoring // caver.transaction.tag['0x48']
+ * caver.transaction.tag.TxTypeFeeDelegatedChainDataAnchoring // caver.transaction.tag['0x49']
+ * caver.transaction.tag.TxTypeFeeDelegatedChainDataAnchoringWithRatio // caver.transaction.tag['0x4a']
+ *
+ * @alias module:Transaction.type
+ * @type {Map<string:string>}
+ */
 const TX_TYPE_TAG = {
     TxTypeLegacyTransaction: '',
     '': TX_TYPE_STRING.TxTypeLegacyTransaction,

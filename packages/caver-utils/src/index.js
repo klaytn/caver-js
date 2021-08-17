@@ -38,7 +38,7 @@ const SignatureData = require('../../caver-wallet/src/keyring/signatureData')
 /**
  * Fires an error in an event emitter and callback and returns the eventemitter
  *
- * @method _fireError
+ * @ignore
  * @param {Object} error a string, a error, or an object with {message, data}
  * @param {Object} emitter
  * @param {Function} reject
@@ -88,7 +88,7 @@ const _fireError = function(error, emitter, reject, callback) {
 /**
  * Should be used to create full function/event name from json abi
  *
- * @method _jsonInterfaceMethodToString
+ * @ignore
  * @param {Object} json
  * @return {String} full function/event name
  */
@@ -101,11 +101,16 @@ const _jsonInterfaceMethodToString = function(json) {
 }
 
 /**
- * Should be called to get ascii from it's hex representation
+ * Returns the ASCII string representation of a given HEX value.
  *
- * @method hexToAscii
- * @param {String} hex
- * @returns {String} ascii string representation of hex value
+ * @example
+ * const result = caver.utils.hexToAscii('0x4920686176652031303021') // 'I have 100!'
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} hex A HEX string to convert to an ASCII string.
+ * @returns {string} The ASCII string.
  */
 const hexToAscii = function(hex) {
     if (!utils.isHexStrict(hex)) {
@@ -127,11 +132,16 @@ const hexToAscii = function(hex) {
 }
 
 /**
- * Should be called to get hex representation (prefixed by 0x) of ascii string
+ * Returns the HEX representation of a given ASCII string.
  *
- * @method asciiToHex
- * @param {String} str
- * @returns {String} hex representation of input string
+ * @example
+ * const result = caver.utils.asciiToHex('I have 100!') // '0x4920686176652031303021'
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} str An ASCII string to convert to a HEX string.
+ * @returns {string} The HEX string.
  */
 const asciiToHex = function(str) {
     if (!str) {
@@ -150,8 +160,8 @@ const asciiToHex = function(str) {
 /**
  * Returns value of unit in Wei
  *
- * @method getUnitValue
- * @param {String} unit the unit to convert to, default ether
+ * @ignore
+ * @param {string} unit the unit to convert to, default ether
  * @returns {BN} value of the unit (in Wei)
  * @throws error if the unit is not correct:w
  */
@@ -181,7 +191,7 @@ const getUnitValue = function(unit) {
  * - gether
  * - tether
  *
- * @method fromWei
+ * @ignore
  * @param {Number|String} number can be a number, number string or a HEX of a decimal
  * @param {String} unit the unit to convert to, default ether
  * @return {String|Object} When given a BN object it returns one as well, otherwise a number
@@ -213,7 +223,7 @@ const fromWei = function(number, unit) {
  * - gether
  * - tether
  *
- * @method toWei
+ * @ignore
  * @param {Number|String|BN} number can be a number, number string or a HEX of a decimal
  * @param {String} unit the unit to convert from, default ether
  * @return {String|Object} When given a BN object it returns one as well, otherwise a number
@@ -229,6 +239,18 @@ const toWei = function(number, unit) {
 }
 
 // For Klay unit
+/**
+ * Shows all possible KLAY values and their amount in peb.
+ *
+ * @example
+ * caver.utils.unitMap
+ *
+ * @alias unitMap
+ * @memberof module:utils
+ * @inner
+ *
+ * @type {Map<string,string>}
+ */
 const unitKlayMap = {
     peb: '1',
     kpeb: '1000',
@@ -245,6 +267,26 @@ const unitKlayMap = {
     TKLAY: '1000000000000000000000000000000',
 }
 
+/**
+ * @example
+ * { unit: 'peb', pebFactor: 0 }
+ *
+ * @typedef {object} module:utils.Unit
+ * @property {string} unit - The unit string.
+ * @property {number} pebFactor - The peb factor.
+ */
+/**
+ * Shows all KLAY units.
+ *
+ * @example
+ * caver.utils.klayUnit
+ *
+ * @alias klayUnit
+ * @memberof module:utils
+ * @inner
+ *
+ * @type {Map<string,module:utils.Unit>}
+ */
 const KlayUnit = {
     peb: { unit: 'peb', pebFactor: 0 },
     kpeb: { unit: 'kpeb', pebFactor: 3 },
@@ -275,6 +317,7 @@ const unitKlayToEthMap = {
     GKLAY: 'gether',
     TKLAY: 'tether',
 }
+
 const getKlayUnitValue = function(unit) {
     unit = unit || 'KLAY'
     if (!unitKlayMap[unit]) {
@@ -318,25 +361,42 @@ const toPeb = function(number, unit) {
 }
 
 /**
- * Converts peb amount to specific unit amount.
+ * Converts `peb` amount to specific unit amount.
+ * Please note that "peb" is the smallest KLAY unit, and you should always use "peb" as the unit of KLAY.
+ * Convert to "KLAY" only for display reasons.
  *
- * @method convertFromPeb
- * @param {number|string|BN|BigNumber} amount the peb amount
- * @param {string|KlayUnit} unitString the unit to convert to
- * @return {string}
+ * @example
+ * const result = caver.utils.convertFromPeb('1', 'KLAY') // '0.000000000000000001'
+ * const result = caver.utils.convertFromPeb(1, 'KLAY') // '0.000000000000000001'
+ * const result = caver.utils.convertFromPeb(1, caver.utils.klayUnit.KLAY) // '0.000000000000000001'
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {number|string|BN|BigNumber} amount The value in peb.
+ * @param {string|KlayUnit} [unitString] (default, `'KLAY'`) The unit of KLAY to convert your "peb" into. `number` will be divided by one of the following denominators for the unit provided:<br>- `peb`: '1' <br> - `kpeb`: '1000' <br> - `Mpeb`: '1000000' <br> - `Gpeb`: '1000000000' <br> - `Ston`: '1000000000' <br> - `uKLAY`: '1000000000000' <br> - `mKLAY`: '1000000000000000' <br> - `KLAY`: '1000000000000000000' <br> - `kKLAY`: '1000000000000000000000' <br> - `MKLAY`: '1000000000000000000000000' <br> - `GKLAY`: '1000000000000000000000000000' <br>
+ * @return {string} The string number.
  */
-const convertFromPeb = function(number, unitString) {
+const convertFromPeb = function(amount, unitString) {
     if (_.isObject(unitString) && unitString.unit) unitString = unitString.unit
-    const converted = fromPeb(number, unitString)
+    const converted = fromPeb(amount, unitString)
     return utils.isBN(converted) ? converted.toString(10) : converted
 }
 
 /**
- * Converts amount to peb amount
+ * Converts any KLAY value into peb.
+ * Please note that "peb" is the smallest KLAY unit, and you should always use "peb" as the unit of KLAY.
  *
- * @method convertToPeb
+ * @example
+ * const result = caver.utils.convertToPeb('1', 'KLAY') // '1000000000000000000'
+ * const result = caver.utils.convertToPeb(1, 'KLAY') // '1000000000000000000'
+ * const result = caver.utils.convertToPeb(1, caver.utils.klayUnit.KLAY) // '1000000000000000000'
+ *
+ * @memberof module:utils
+ * @inner
+ *
  * @param {number|string|BN|BigNumber} amount the amount to convert
- * @param {string|KlayUnit} unitString the unit to convert from
+ * @param {string|KlayUnit} [unitString] (default, `'KLAY'`) The unit of KLAY to convert from. `number` will be divided by one of the following denominators for the unit provided:<br>- `peb`: '1' <br> - `kpeb`: '1000' <br> - `Mpeb`: '1000000' <br> - `Gpeb`: '1000000000' <br> - `Ston`: '1000000000' <br> - `uKLAY`: '1000000000000' <br> - `mKLAY`: '1000000000000000' <br> - `KLAY`: '1000000000000000000' <br> - `kKLAY`: '1000000000000000000000' <br> - `MKLAY`: '1000000000000000000000000' <br> - `GKLAY`: '1000000000000000000000000000' <br>
  * @return {string|BN}
  */
 const convertToPeb = function(number, unitString) {
@@ -354,11 +414,16 @@ function tryNumberToString(number) {
 }
 
 /**
- * Converts to a checksum address
+ * Converts an upper or lowercase Klaytn address to a checksum address.
  *
- * @method toChecksumAddress
- * @param {String} address the given HEX address
- * @return {String}
+ * @example
+ * const result = caver.utils.toChecksumAddress('0xc1912fee45d61c87cc5ea59dae31190fffff232d') // '0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d'
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} address An address string.
+ * @return {string} The checksum address.
  */
 const toChecksumAddress = function(address) {
     if (typeof address === 'undefined') return ''
@@ -390,7 +455,7 @@ const isHexParameter = a => {
 /**
  * Should be used to flatten json abi inputs/outputs into an array of type-representing-strings
  *
- * @method _flattenTypes
+ * @ignore
  * @param {bool} includeTuple
  * @param {Object} puts
  * @return {Array} parameters as strings
@@ -424,33 +489,52 @@ function _flattenTypes(includeTuple, puts) {
 }
 
 /**
+ * Returns `true` if the input is a 0x-prefixed hex string, otherwise it returns `false`.
  *
- * @method isHexPrefixed
- * @param {String} string
- * @return {bool}
+ * @example
+ * const result = caver.utils.isHexPrefixed('0xa5b0cd8c87e77879d64cc064ee239ed6f71cacf9')
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} string The value to be determined if the parameter is 0x-prefixed hex string or not.
+ * @return {boolean} `true` means the input is 0x-prefixed hex string.
  */
 const isHexPrefixed = function(str) {
     if (typeof str !== 'string') return false
-    return str.slice(0, 2) === '0x'
+    return str.slice(0, 2) === '0x' || str.slice(0, 2) === '0X'
 }
 
 /**
+ * Returns a 0x-prefixed hex string.
+ * If the input is already 0x-prefixed or a non-hex string, the input value is returned as-is.
  *
- * @method addHexPrefix
- * @param {String} string
- * @return {String}
+ * @example
+ * const result = caver.utils.addHexPrefix('a5b0cd8c87e77879d64cc064ee239ed6f71cacf9')
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} string string value to be prefixed with 0x.
+ * @return {string} 0x-prefixed hex string is returned.
  */
 const addHexPrefix = function(str) {
     if (typeof str !== 'string') return str
 
-    return isHexPrefixed(str) ? str : `0x${str}`
+    return isHexPrefixed(str) ? `0x${str.slice(2)}` : `0x${str}`
 }
 
 /**
+ * Returns the result with 0x prefix stripped from input.
  *
- * @method stripHexPrefix
- * @param {String} string
- * @return {String}
+ * @example
+ * const result = caver.utils.stripHexPrefix('0xa5b0cd8c87e77879d64cc064ee239ed6f71cacf9')
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} string string to remove 0x prefix.
+ * @return {string} A string stripped of 0x is returned.
  */
 const stripHexPrefix = function(str) {
     if (typeof str !== 'string') return str
@@ -464,7 +548,9 @@ const stripHexPrefix = function(str) {
  * @example
  * const decoded = caver.utils.decodeSignature('0xb9146...')
  *
- * @method decodeSignature
+ * @memberof module:utils
+ * @inner
+ *
  * @param {string} signature The signature string to decode. It composed of R(32 byte) + S(32 byte) + V(1byte).
  * @return {SignatureData}
  */
@@ -473,6 +559,13 @@ const decodeSignature = signature => {
     return new SignatureData(ret)
 }
 
+/**
+ * The util module.
+ * @module utils
+ *
+ * @example
+ * caver.utils
+ */
 module.exports = {
     _fireError: _fireError,
     _jsonInterfaceMethodToString: _jsonInterfaceMethodToString,
@@ -502,6 +595,7 @@ module.exports = {
 
     BN: utils.BN,
     isBN: utils.isBN,
+    BigNumber: utils.BigNumber,
     isBigNumber: utils.isBigNumber,
     isHex: utils.isHex,
     isHexStrict: utils.isHexStrict,
@@ -545,6 +639,7 @@ module.exports = {
     isValidHashStrict: utils.isValidHashStrict,
 
     // Moved promiEvent to utils,
+    /** @type {typeof PromiEvent} */
     promiEvent: promiEvent,
     Iban: Iban,
     // Newly added for supporting rpc.js
@@ -589,4 +684,7 @@ module.exports = {
     publicKeyToAddress: utils.publicKeyToAddress,
 
     decodeSignature: decodeSignature,
+
+    isBloom: utils.isBloom,
+    isTopic: utils.isTopic,
 }

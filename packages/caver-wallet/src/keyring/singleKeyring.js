@@ -23,8 +23,13 @@ const Account = require('../../../caver-account')
 const { validateForSigning, validateIndexWithKeys, encryptKey, formatEncrypted } = require('./keyringHelper')
 
 /**
- * representing a Keyring which includes `address` and a `private key`.
+ * `SingleKeyring` is a class that stores the address of the account and a private key.
+ *
+ * To create a `SingleKeyring` instance with a private key string, please refer to {@link KeyringFactory.create|caver.wallet.keyring.create}.
+ * SingleKeyring uses a private key with which no roles assigned.
+ *
  * @class
+ * @hideconstructor
  */
 class SingleKeyring {
     /**
@@ -66,32 +71,46 @@ class SingleKeyring {
     }
 
     /**
-     * returns public key string.
+     * Returns a public key string.
+     *
+     * @example
+     * const publicKey = keyring.getPublicKey()
      *
      * @param {boolean} [compressed] Whether in compressed format or not.
-     * @return {string}
+     * @return {string} The public key of the keyring.
      */
     getPublicKey(compressed = false) {
         return this.key.getPublicKey(compressed)
     }
 
     /**
-     * returns a copied singleKeyring instance
+     * Returns a copied SingleKeyring instance.
      *
-     * @return {SingleKeyring}
+     * @example
+     * const copied = keyring.copy()
+     *
+     * @return {SingleKeyring} A copied SingleKeyring instance.
      */
     copy() {
         return new SingleKeyring(this.address, this.key)
     }
 
     /**
-     * signs with transactionHash with a key and returns signature(s).
+     * Signs with transactionHash with the private key and returns signature.
+     *
+     * If you want to define an `index` when using SingleKeyring, the `index` must be `0`.
+     * And `SingleKeyring` doesn't have a key defined by {@link KeyringFactory.role|caver.wallet.keyring.role}, so they all use the same private key.
+     *
+     * @example
+     * const signed = keyring.sign('0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550', '0x2810', caver.wallet.keyring.role.roleTransactionKey)
+     * const signed = keyring.sign('0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550', '0x2810', caver.wallet.keyring.role.roleAccountUpdateKey, 0)
+     * const signed = keyring.sign('0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550', '0x2810', caver.wallet.keyring.role.roleFeePayerKey)
      *
      * @param {string} transactionHash The hash of transaction.
-     * @param {string|number} chainId The chainId specific to the network.
-     * @param {number} role A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
-     * @param {number} [index] The index of the key to be used. If index is undefined, all private keys in keyring will be used.
-     * @return {Array.<string>|Array.<Array.<string>>}
+     * @param {string|number} chainId The chain id of the Klaytn blockchain platform.
+     * @param {number} role A number indicating the role of the key. You can use {@link KeyringFactory.role|caver.wallet.keyring.role}.
+     * @param {number} [index] The index of the private key you want to use. The index must be less than the length of the array of the private keys defined for each role. If an index is not defined, this method will use all the private keys.
+     * @return {SignatureData|Array.<SignatureData>} A {@link SignatureData} when `index` is deinfed, otherwise an array of {@link SignatureData}.
      */
     sign(transactionHash, chainId, role, index) {
         validateForSigning(transactionHash, chainId)
@@ -107,12 +126,21 @@ class SingleKeyring {
     }
 
     /**
-     * signs with hashed message and returns result object that includes `signatures`, `message` and `messageHash`
+     * Signs message with Klaytn-specific prefix.
+     *
+     * This calculates a Klaytn-specific signature with:
+     * `sign(keccak256("\x19Klaytn Signed Message:\n" + len(message) + message)))`.
+     *
+     * If you want to define an `index` when using SingleKeyring, the `index` must be `0`.
+     * And `SingleKeyring` doesn't have a key defined by {@link KeyringFactory.role|caver.wallet.keyring.role}, so they all use the same private key.
+     *
+     * @example
+     * const signed = keyring.signMessage('message to sign', caver.wallet.keyring.role.roleTransactionKey)
      *
      * @param {string} message The message string to sign.
-     * @param {number} role A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
-     * @param {number} [index] The index of the key to be used.
-     * @return {object}
+     * @param {number} role A number indicating the role of the key. You can use {@link KeyringFactory.role|caver.wallet.keyring.role}.
+     * @param {number} [index] The index of the private key you want to use. The index must be less than the length of the array of the private keys defined for each role. If an index is not defined, this method will use all the private keys.
+     * @return {KeyringContainer.SignedMessage} An object that includes the result of signing.
      */
     signMessage(message, role, index) {
         if (role === undefined) throw new Error(`role should be defined for signMessage. Please use 'caver.wallet.keyring.role'.`)
@@ -133,10 +161,13 @@ class SingleKeyring {
     }
 
     /**
-     * returns keys by role. If the key of the role passed as parameter is empty, the default key is returned.
+     * Returns the private key(s) used by the role entered as a parameter.
      *
-     * @param {number} role A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
-     * @return {Array.<PrivateKey>}
+     * @example
+     * const key = keyring.getKeyByRole(caver.wallet.keyring.role.roleTransactionKey)
+     *
+     * @param {number} role A number indicating the role of the key. You can use {@link KeyringFactory.role|caver.wallet.keyring.role}.
+     * @return {Array.<PrivateKey>} An instance of PrivateKey.
      */
     getKeyByRole(role) {
         if (role === undefined) throw new Error(`role should be defined.`)
@@ -145,7 +176,10 @@ class SingleKeyring {
     }
 
     /**
-     * returns KlaytnWalletKey format. If keyring uses more than one private key, this function will throw error.
+     * Returns the {@link https://docs.klaytn.com/klaytn/design/accounts#klaytn-wallet-key-format|KlaytnWalletKey} string for the keyring.
+     *
+     * @example
+     * const klaytnWalletKey = keyring.getKlaytnWalletKey()
      *
      * @return {string}
      */
@@ -154,9 +188,16 @@ class SingleKeyring {
     }
 
     /**
-     * returns an instance of Account.
+     * Returns the {@link Account} instance for updating the {@link Account.AccountKey|AccountKey} of the Klaytn accounts.
+     * The {@link Account} instance has an {@link Account.AccountKey|AccountKey} instance that can contain public key(s) inside, which will be sent to Klaytn Network and used for validating transactions.
+     * Please note that if you update the AccountKey of the Account stored in the Klaytn, the old private key(s) cannot be used anymore.
      *
-     * @return {Account}
+     * `SingleKeyring` returns an {@link Account} instance that includes the address in the keyring and an instance of {@link AccountKeyPublic}.
+     *
+     * @example
+     * const account = keyring.toAccount()
+     *
+     * @return {Account} An Account instance to be used when a user updates AccountKey for their account in the Klaytn. Note that if you want to replace the existing keyring (or the existing private key) with a new keyring (or a new private key) for your account, you must update your AccountKey by sending an Account Update transaction to Klaytn beforehand.
      */
     toAccount() {
         if (!this.key) throw new Error(`Failed to create Account instance: Empty key in keyring.`)
@@ -165,14 +206,10 @@ class SingleKeyring {
     }
 
     /**
-     * encrypts a keyring and returns a keystore v4 object.
+     * Encrypts a keyring and returns a keystore v4 standard.
+     * For more information, please refer to {@link https://kips.klaytn.com/KIPs/kip-3|KIP-3}.
      *
-     * @param {string} password The password to be used for encryption. The encrypted key store can be decrypted with this password.
-     * @param {object} options The options to use when encrypt a keyring. Also address can be defined specifically in options object.
-     * @return {object}
-     */
-    /**
-     * options can include below
+     * `options` can include below:
      * {
      *   salt: ...,
      *   iv: ...,
@@ -186,6 +223,13 @@ class SingleKeyring {
      *   uuid: ...,
      *   cipher: ...,
      * }
+     *
+     * @example
+     * const encrypted = keyring.encrypt('password')
+     *
+     * @param {string} password The password to be used for encryption. The encrypted key store can be decrypted with this password.
+     * @param {object} [options] The options parameter allows you to specify the values to use when using encrypt.
+     * @return {KeyringFactory.Keystore} The encrypted keystore v4.
      */
     encrypt(password, options = {}) {
         let keyring = []
@@ -194,11 +238,14 @@ class SingleKeyring {
     }
 
     /**
-     * encrypts a keyring and returns a keystore v3 object.
+     * Encrypts an instance of {@link SingleKeyring} and returns a keystore v3 standard.
+     *
+     * @example
+     * const encrypted = keyring.encryptV3('password')
      *
      * @param {string} password The password to be used for keyring encryption. The encrypted key store can be decrypted with this password.
-     * @param {object} options The options to use when encrypt a keyring. See `keyring.encrypt` for more detail about options.
-     * @return {object}
+     * @param {object} [options] The options to use when encrypt a keyring. See {@link SingleKeyring#encrypt|keyring.encrypt} for more detail about options.
+     * @return {KeyringFactory.Keystore} The encrypted keystore v3.
      */
     encryptV3(password, options) {
         options = options || {}
@@ -209,9 +256,12 @@ class SingleKeyring {
     }
 
     /**
-     * returns true if keyring has decoupled key.
+     * Returns `true` if keyring has decoupled key.
      *
-     * @return {boolean}
+     * @example
+     * const isDecupled = keyring.isDecoupled()
+     *
+     * @return {boolean} `true` if keyring has decoupled key.
      */
     isDecoupled() {
         return this.address.toLowerCase() !== this.key.getDerivedAddress().toLowerCase()

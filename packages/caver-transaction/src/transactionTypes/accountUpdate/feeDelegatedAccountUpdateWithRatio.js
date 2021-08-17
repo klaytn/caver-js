@@ -48,8 +48,10 @@ function _decode(rlpEncoded) {
 
 /**
  * Represents a fee delegated account update with ratio transaction.
- * Please refer to https://docs.klaytn.com/klaytn/design/transactions/partial-fee-delegation#txtypefeedelegatedaccountupdatewithratio to see more detail.
+ * Please refer to {@link https://docs.klaytn.com/klaytn/design/transactions/partial-fee-delegation#txtypefeedelegatedaccountupdatewithratio|FeeDelegatedAccountUpdateWithRatio} to see more detail.
  * @class
+ * @hideconstructor
+ * @augments AbstractFeeDelegatedWithRatioTransaction
  */
 class FeeDelegatedAccountUpdateWithRatio extends AbstractFeeDelegatedWithRatioTransaction {
     /**
@@ -110,7 +112,11 @@ class FeeDelegatedAccountUpdateWithRatio extends AbstractFeeDelegatedWithRatioTr
 
     /**
      * Returns the RLP-encoded string of this transaction (i.e., rawTransaction).
-     * @return {string}
+     *
+     * @example
+     * const result = tx.getRLPEncoding()
+     *
+     * @return {string} An RLP-encoded transaction string.
      */
     getRLPEncoding() {
         this.validateOptionalValues()
@@ -125,7 +131,7 @@ class FeeDelegatedAccountUpdateWithRatio extends AbstractFeeDelegatedWithRatioTr
                 Bytes.fromNat(this.gas),
                 this.from.toLowerCase(),
                 this.account.getRLPEncodingAccountKey(),
-                this.feeRatio,
+                Bytes.fromNat(this.feeRatio),
                 signatures,
                 this.feePayer.toLowerCase(),
                 feePayerSignatures,
@@ -135,7 +141,13 @@ class FeeDelegatedAccountUpdateWithRatio extends AbstractFeeDelegatedWithRatioTr
 
     /**
      * Returns the RLP-encoded string to make the signature of this transaction.
-     * @return {string}
+     * This method has to be overrided in classes which extends AbstractTransaction.
+     * getCommonRLPEncodingForSignature is used in getRLPEncodingForSignature.
+     *
+     * @example
+     * const result = tx.getCommonRLPEncodingForSignature()
+     *
+     * @return {string} An RLP-encoded transaction string without signature.
      */
     getCommonRLPEncodingForSignature() {
         this.validateOptionalValues()
@@ -147,7 +159,7 @@ class FeeDelegatedAccountUpdateWithRatio extends AbstractFeeDelegatedWithRatioTr
             Bytes.fromNat(this.gas),
             this.from.toLowerCase(),
             this.account.getRLPEncodingAccountKey(),
-            this.feeRatio,
+            Bytes.fromNat(this.feeRatio),
         ])
     }
 }

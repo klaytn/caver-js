@@ -57,7 +57,7 @@ describe('caver.klay.accounts.privateKeyToAccount', () => {
             caver.klay.accounts.privateKeyToAccount(
                 '0x600dfc414fe433881f6606c24955e4143df9d203ccb3e335efe970a4ad017d040x010x6a61736d696e652e6b6c6179746e000000000000'
             )
-        ).to.throw('HumanReadableAddress is not supported yet.')
+        ).to.throw('Invalid type: Currently only type `0x00` is supported.')
     })
 })
 

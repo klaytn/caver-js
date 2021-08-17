@@ -1005,7 +1005,9 @@ describe('CAVERJS-UNIT-ETC-144: caver.utils.toTwosComplement', () => {
 describe('CAVERJS-UNIT-ETC-145: caver.utils.isHexPrefixed', () => {
     it('caver.utils.isHexPrefixed should return boolean depends on parameter', () => {
         expect(caver.utils.isHexPrefixed('0x')).to.be.true
+        expect(caver.utils.isHexPrefixed('0X')).to.be.true
         expect(caver.utils.isHexPrefixed('0x0x')).to.be.true
+        expect(caver.utils.isHexPrefixed('0X0x')).to.be.true
         expect(caver.utils.isHexPrefixed('01')).to.be.false
         expect(caver.utils.isHexPrefixed({})).to.be.false
     })
@@ -1014,6 +1016,7 @@ describe('CAVERJS-UNIT-ETC-145: caver.utils.isHexPrefixed', () => {
 describe('CAVERJS-UNIT-ETC-146: caver.utils.addHexPrefix', () => {
     it('caver.utils.addHexPrefix should return 0x hex format string', () => {
         expect(caver.utils.addHexPrefix('0x')).to.equals('0x')
+        expect(caver.utils.addHexPrefix('0X')).to.equals('0x')
         expect(caver.utils.addHexPrefix('01')).to.equals('0x01')
         expect(caver.utils.addHexPrefix('x')).to.equals('0xx')
         expect(typeof caver.utils.addHexPrefix({})).to.equals('object')
@@ -1023,9 +1026,12 @@ describe('CAVERJS-UNIT-ETC-146: caver.utils.addHexPrefix', () => {
 describe('CAVERJS-UNIT-ETC-147: caver.utils.stripHexPrefix', () => {
     it('caver.utils.stripHexPrefix should strip 0x prefix and return string', () => {
         expect(caver.utils.stripHexPrefix('0x')).to.equals('')
+        expect(caver.utils.stripHexPrefix('0X')).to.equals('')
         expect(caver.utils.stripHexPrefix('01')).to.equals('01')
         expect(caver.utils.stripHexPrefix('0x01')).to.equals('01')
+        expect(caver.utils.stripHexPrefix('0X01')).to.equals('01')
         expect(caver.utils.stripHexPrefix('0xx')).to.equals('x')
+        expect(caver.utils.stripHexPrefix('0Xx')).to.equals('x')
         expect(typeof caver.utils.stripHexPrefix({})).to.equals('object')
     })
 })
@@ -1048,6 +1054,13 @@ describe('caver.utils.toBuffer', () => {
         expect(caver.utils.toBuffer(new BN('ff', 16)).toString('hex')).to.deep.equal('ff')
         expect(caver.utils.toBuffer(new BN('377', 8)).toString('hex')).to.deep.equal('ff')
         expect(caver.utils.toBuffer(new BN('11111111', 2)).toString('hex')).to.deep.equal('ff')
+    })
+    it('CAVERJS-UNIT-ETC-395: caver.utils.toBuffer should convert BN to buffer', () => {
+        expect(caver.utils.toBuffer(new caver.utils.BigNumber(1))).to.deep.equal(Buffer.from([1]))
+        expect(caver.utils.toBuffer(new caver.utils.BigNumber(255)).toString('hex')).to.deep.equal('ff')
+        expect(caver.utils.toBuffer(new caver.utils.BigNumber('ff', 16)).toString('hex')).to.deep.equal('ff')
+        expect(caver.utils.toBuffer(new caver.utils.BigNumber('377', 8)).toString('hex')).to.deep.equal('ff')
+        expect(caver.utils.toBuffer(new caver.utils.BigNumber('11111111', 2)).toString('hex')).to.deep.equal('ff')
     })
     it('CAVERJS-UNIT-ETC-152: caver.utils.toBuffer should convert Object has toArray function to buffer', () => {
         expect(
@@ -1576,7 +1589,7 @@ describe('caver.utils.isKlaytnWalletKey', () => {
         isKlaytnWalletKey = caver.utils.isKlaytnWalletKey(key)
         expect(isKlaytnWalletKey).to.be.false
 
-        // without '0x' for human readable
+        // without '0x' for type
         key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d8000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
         isKlaytnWalletKey = caver.utils.isKlaytnWalletKey(key)
         expect(isKlaytnWalletKey).to.be.false
@@ -1623,30 +1636,32 @@ describe('caver.utils.isKlaytnWalletKey', () => {
 })
 
 describe('caver.utils.parsePrivateKey', () => {
-    it('CAVERJS-UNIT-ETC-198: should return parsed private key, address and isHumanReadable when key parameter is single private key string', () => {
+    it('CAVERJS-UNIT-ETC-198: should return parsed private key, address and type when key parameter is single private key string', () => {
         const key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d8'
 
         const parsed = caver.utils.parsePrivateKey(key)
 
         expect(parsed.privateKey).to.be.equals(key)
         expect(parsed.address).to.be.equals('')
-        expect(parsed.isHumanReadable).to.be.false
+        expect(parsed.isHumanReadable).to.be.undefined
+        expect(parsed.type).to.be.equals('')
     })
 
-    it('CAVERJS-UNIT-ETC-199: should return parsed private key, address and isHumanReadable when key parameter is in format of KlaytnWalletKey', () => {
+    it('CAVERJS-UNIT-ETC-199: should return parsed private key, address and type when key parameter is in format of KlaytnWalletKey', () => {
         const key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
 
         const parsed = caver.utils.parsePrivateKey(key)
 
         expect(parsed.privateKey).to.be.equals('0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d8')
         expect(parsed.address).to.be.equals('0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b')
-        expect(parsed.isHumanReadable).to.be.false
+        expect(parsed.isHumanReadable).to.be.undefined
+        expect(parsed.type).to.be.equals('0x00')
     })
 
-    it('CAVERJS-UNIT-ETC-200: should throw error when humanReadable flag is true', () => {
+    it('CAVERJS-UNIT-ETC-200: should throw error when type is not 00', () => {
         const key = '0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x010xa94f5374fce5edbc8e2a8697c15331677e6ebf0b'
 
-        const expectedError = 'HumanReadableAddress is not supported yet.'
+        const expectedError = 'Invalid type: Currently only type `0x00` is supported.'
 
         expect(() => caver.utils.parsePrivateKey(key)).to.throws(expectedError)
     })

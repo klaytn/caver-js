@@ -22,10 +22,15 @@ const { ACCOUNT_KEY_TAG } = require('./accountKeyHelper')
 /**
  * Representing an AccountKeyLegacy.
  * @class
+ * @hideconstructor
  */
 class AccountKeyLegacy {
     /**
      * Decodes an RLP-encoded AccountKeyLegacy string.
+     *
+     * @example
+     * const accountKey = caver.account.accountKey.accountKeyLegacy.decode('0x{encoded account key}')
+     *
      * @param {string} rlpEncodedKey - An RLP-encoded AccountKeyLegacy string.
      * @return {AccountKeyLegacy}
      */
@@ -41,6 +46,10 @@ class AccountKeyLegacy {
 
     /**
      * Returns an RLP-encoded AccountKeyLegacy string.
+     *
+     * @example
+     * const encoding = accountKeyLegacy.getRLPEncoding()
+     *
      * @return {string}
      */
     // eslint-disable-next-line class-methods-use-this

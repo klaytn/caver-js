@@ -24,6 +24,11 @@ const KIP13 = require('./kip13')
 const core = require('../../caver-core')
 const { validateDeployParameterForKIP7, validateDeployParameterForKIP17, kip7ByteCode, kip17ByteCode } = require('./kctHelper')
 
+/**
+ * A class that manages KCT supported by caver.
+ * @hideconstructor
+ * @class
+ */
 class KCT {
     constructor(...args) {
         const _this = this
@@ -53,28 +58,65 @@ class KCT {
             _this.setRequestManager(_this._requestManager)
         }
 
-        // Define KIP7 class for caver-kct
-        // In this class, keyrings will be used instead of accounts
+        /**
+         * The KIP7 wrapping class that helps you to use KIP7 class with common architecture features.
+         * This class can be used via `caver.kct.kip7`, and this will use `keyrings` intead of `accounts` when operate with smart contract.
+         * @ignore
+         * @class
+         */
         class KIP7 extends BaseKIP7 {
             /**
-             * Creates an instance of KIP7.
-             * @method create
+             * Creates a new KIP7 instance with its bound methods and events.
+             *
+             * @example
+             * const kip7 = caver.kct.kip7.create('0x{address in hex}')
+             *
              * @param {string} tokenAddress - The KIP-7 token contract address.
-             * @param {Array} [abi] - The Contract Application Binary Interface (ABI) of the KIP-7.
-             * @return {object}
+             * @param {Array.<object>} [abi] - The Contract Application Binary Interface (ABI) of the KIP-7.
+             * @return {KIP7}
              */
             static create(tokenAddress, abi) {
                 return new KIP7(tokenAddress, abi)
             }
 
             /**
-             * deploy deploys a KIP-7 token contract to Klaytn network.
-             * The KIP7 instance deployed and returned through this function uses the keyringContainer instead of accounts.
-             * @method deploy
-             * @param {Object} tokenInfo The object that defines the name, symbol, decimals, and initialSupply of the token to deploy.
-             * @param {Object|String} sendOptions The address of the account to deploy the KIP-7 token contract or an object holding parameters that are required for sending a transaction.
-             * @param {IWallet} wallet The wallet instance to sign and send a transaction.
-             * @return {object}
+             * An object that defines the parameters required to deploy the KIP-7 contract.
+             *
+             * @typedef {object} KIP7.KIP7DeployParams
+             * @property {string} name - The name of the token.
+             * @property {string} symbol - The symbol of the token.
+             * @property {number} decimals - The number of decimal places the token uses.
+             * @property {string|BigNumber|number} initialSupply - The total amount of token to be supplied initially.
+             */
+            /**
+             * Deploys the KIP-7 token contract to the Klaytn blockchain.
+             * A contract deployed using `caver.kct.kip7.deploy` is a fungible token that follows the KIP-7 standard.
+             * The KIP7 instance deployed and returned through this function uses the `keyringContainer` instead of accounts.
+             *
+             * By default, it returns a KIP7 instance when the deployment is finished.
+             * If you define a custom function in the `contractDeployFormatter` field in {@link Contract.SendOptions|SendOptions}, you can control return type.
+             *
+             * @example
+             * const tokenInfo = {
+             *     name: 'Test',
+             *     symbol: 'TST',
+             *     decimals: 10,
+             *     initialSupply: '1000000000000000000',
+             * }
+             * // Below example will use `caver.wallet`.
+             * const deployed = await caver.kct.kip7.deploy(tokenInfo, '0x{deployer address}')
+             *
+             * // Use sendOptions instead of deployer address.
+             * const sendOptions = { from: '0x{deployer address}', feeDelegation: true, feePayer: '0x{fee payer address}' }
+             * const deployed = await caver.kct.kip7.deploy(tokenInfo, sendOptions)
+             *
+             * // If you want to use your own wallet that implements the 'IWallet' interface, pass it into the last parameter.
+             * const deployed = await caver.kct.kip7.deploy(tokenInfo, '0x{deployer address}', wallet)
+             *
+             * @param {KIP7.KIP7DeployParams} tokenInfo The object that defines the name, symbol, decimals, and initialSupply of the token to deploy.
+             * @param {Contract.SendOptions|String} sendOptions The address of the account to deploy the KIP-7 token contract or a {@link Contract.SendOptions|SendOptions object} holding parameters that are required for sending a transaction.
+             * @param {IWallet} [wallet] The wallet instance to sign and send a transaction.
+             * @return {Promise<*>}
              */
             static deploy(tokenInfo, sendOptions, wallet) {
                 validateDeployParameterForKIP7(tokenInfo)
@@ -115,31 +157,49 @@ class KCT {
                 this.setWallet(args[0].wallet)
             }
         }
-
+        /** @type {typeof KIP7} */
         this.kip7 = KIP7
 
-        // Define KIP17 class for caver-kct
-        // In this class, keyrings will be used instead of accounts
+        /**
+         * The KIP17 wrapping class that helps you to use KIP17 class with common architecture features.
+         * This class can be used via `caver.kct.kip17`, and this will use `keyrings` intead of `accounts` when operate with smart contract.
+         * @ignore
+         * @class
+         */
         class KIP17 extends BaseKIP17 {
             /**
              * Creates an instance of KIP17.
-             * @method create
+             *
+             * @example
+             * const kip17 = caver.kct.kip17.create('0x{address in hex}')
+             *
              * @param {string} tokenAddress - The KIP-17 token contract address.
-             * @param {Array} [abi] - The Contract Application Binary Interface (ABI) of the KIP-17.
-             * @return {object}
+             * @param {Array.<object>} [abi] - The Contract Application Binary Interface (ABI) of the KIP-17.
+             * @return {KIP17}
              */
             static create(tokenAddress, abi) {
                 return new KIP17(tokenAddress, abi)
             }
 
             /**
-             * deploy deploys a KIP-17 token contract to Klaytn network.
-             * The KIP17 instance deployed and returned through this function uses the keyringContainer instead of accounts.
-             * @method deploy
-             * @param {Object} tokenInfo The object that defines the name and symbol of the token to deploy.
-             * @param {Object|String} sendOptions The address of the account to deploy the KIP-17 token contract or an object holding parameters that are required for sending a transaction.
-             * @param {IWallet} wallet The wallet instance to sign and send a transaction.
-             * @return {object}
+             * An object that defines the parameters required to deploy the KIP-17 contract.
+             *
+             * @typedef {object} KIP17.KIP17DeployParams
+             * @property {string} name - The name of the token.
+             * @property {string} symbol - The symbol of the token.
+             */
+            /**
+             * Deploys the KIP-17 token contract to the Klaytn blockchain.
+             * A contract deployed using `caver.kct.kip17.deploy` is a non-fungible token that follows the KIP-17 standard.
+             * The KIP17 instance deployed and returned through this function uses the `keyringContainer` instead of accounts.
+             *
+             * By default, it returns a KIP17 instance when the deployment is finished.
+             * If you define a custom function in the `contractDeployFormatter` field in {@link Contract.SendOptions|SendOptions}, you can control return type.
+             *
+             * @param {KIP17.KIP17DeployParams} tokenInfo The object that defines the name and symbol of the token to deploy.
+             * @param {Contract.SendOptions|String} sendOptions The address of the account to deploy the KIP-17 token contract or a {@link Contract.SendOptions|SendOptions object} holding parameters that are required for sending a transaction.
+             * @param {IWallet} [wallet] The wallet instance to sign and send a transaction.
+             * @return {Promise<*>}
              */
             static deploy(tokenInfo, sendOptions, wallet) {
                 validateDeployParameterForKIP17(tokenInfo)
@@ -180,14 +240,16 @@ class KCT {
                 this.setWallet(args[0].wallet)
             }
         }
-
+        /** @type {typeof KIP17} */
         this.kip17 = KIP17
 
+        /** @type {typeof KIP37} */
         this.kip37 = KIP37
         this.kip37.wallet = args[0].wallet
         this.kip37._requestManager = this._requestManager
         this.kip37.currentProvider = this._requestManager.provider
 
+        /** @type {typeof KIP13} */
         this.kip13 = KIP13
         this.kip13._requestManager = this._requestManager
         this.kip13.currentProvider = this._requestManager.provider

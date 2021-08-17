@@ -42,63 +42,118 @@ const ethersAbiCoder = new EthersAbiCoder(function(type, value) {
 function Result() {}
 
 /**
- * ABICoder prototype should be used to encode/decode solidity params of any type
+ * ABI prototype should be used to encode/decode solidity params of any type.
+ * The Caver instance has an ABI instance in `abi` variable, so you can use ABI functions via `caver.abi`.
+ *
+ * @example
+ * caver.abi
+ *
+ * @class
+ * @hideconstructor
  */
-const ABICoder = function() {}
+const ABI = function() {}
 
 /**
- * Encodes the function name to its ABI representation, which are the first 4 bytes of the sha3 of the function name including  types.
+ * Encodes the function signature to its ABI signature, which are the first 4 bytes of the sha3 hash of the function name including parameter types.
+ *
+ * @example
+ * caver.abi.encodeFunctionSignature({ name: 'myMethod', type: 'function', inputs: [{ type: 'uint256', name: 'myNumber' },{ type: 'string', name: 'mystring' }]})
+ *
+ * caver.abi.encodeFunctionSignature('myMethod(uint256,string)')
  *
  * @method encodeFunctionSignature
- * @param {String|Object} functionName
- * @return {String} encoded function name
+ * @memberof ABI
+ * @instance
+ * @param {string|object} functionSignature The function signature or the JSON interface object of the function to encode. If this is a string, it has to be in the form `function(type, type,...)`, e.g: `myFunction(uint256,uint32[],bytes10,bytes)`.
+ * @return {string} function signature
  */
-ABICoder.prototype.encodeFunctionSignature = function(functionName) {
-    if (_.isObject(functionName)) {
-        functionName = utils._jsonInterfaceMethodToString(functionName)
+ABI.prototype.encodeFunctionSignature = function(functionSignature) {
+    if (_.isObject(functionSignature)) {
+        functionSignature = utils._jsonInterfaceMethodToString(functionSignature)
     }
 
-    return utils.sha3(functionName).slice(0, 10)
+    return utils.sha3(functionSignature).slice(0, 10)
 }
 
 /**
- * Encodes the function name to its ABI representation, which are the first 4 bytes of the sha3 of the function name including  types.
+ * Encodes the event signature to its ABI signature, which is the sha3 hash of the event name including input parameter types.
+ *
+ * @example
+ * caver.abi.encodeEventSignature({ name: 'myEvent', type: 'event', inputs: [{ type: 'uint256', name: 'myNumber' },{ type: 'string', name: 'mystring' }]})
+ *
+ * caver.abi.encodeEventSignature('myEvent(uint256,bytes32)')
  *
  * @method encodeEventSignature
- * @param {String|Object} functionName
- * @return {String} encoded function name
+ * @memberof ABI
+ * @instance
+ * @param {string|object} eventSignature The event signature or the JSON interface object of the event to encode. If this is a string, it has to be in the form `event(type,type,...)`, e.g: `myEvent(uint256,uint32[],bytes10,bytes)`.
+ * @return {string} event signature
  */
-ABICoder.prototype.encodeEventSignature = function(functionName) {
-    if (_.isObject(functionName)) {
-        functionName = utils._jsonInterfaceMethodToString(functionName)
+ABI.prototype.encodeEventSignature = function(eventSignature) {
+    if (_.isObject(eventSignature)) {
+        eventSignature = utils._jsonInterfaceMethodToString(eventSignature)
     }
 
-    return utils.sha3(functionName)
+    return utils.sha3(eventSignature)
 }
 
 /**
- * Should be used to encode plain param
+ * Encodes a parameter based on its type to its ABI representation.
+ *
+ * @example
+ * caver.abi.encodeParameter('uint256', '2345675643')
+ * caver.abi.encodeParameter('bytes32[]', [caver.utils.rightPad('0xdf3234', 64), caver.utils.rightPad('0xfdfd', 64)])
+ * caver.abi.encodeParameter('tuple(bytes32,bool)', ['0xabdef18710a18a18abdef18710a18a18abdef18710a18a18abdef18710a18a18', true])
  *
  * @method encodeParameter
- * @param {String} type
- * @param {Object} param
- * @return {String} encoded plain param
+ * @memberof ABI
+ * @instance
+ * @param {string|object} type The type of the parameter, see the {@link http://solidity.readthedocs.io/en/develop/types.html|solidity documentation}  for a list of types.
+ * @param {*} param The actual parameter to encode.
+ * @return {string} encoded plain param
  */
-ABICoder.prototype.encodeParameter = function(type, param) {
+ABI.prototype.encodeParameter = function(type, param) {
     return this.encodeParameters([type], [param])
 }
 
 /**
- * Should be used to encode list of params
- * Tuple type can be used like below
- * `caver.abi.encodeParameters(['tuple(bytes32,bool)', 'tuple(bool,address)'], [['0xabd...', true], [true, '0x776...']])`
+ * Encodes function parameters based on its JSON interface object.
+ *
+ * @example
+ * caver.abi.encodeParameters(['uint256','string'], ['2345675643', 'Hello!%'])
+ *
+ * caver.abi.encodeParameters(
+ *      ['tuple(bytes32,bool)', 'tuple(bool,address)'],
+ *      [['0xabdef18710a18a18abdef18710a18a18abdef18710a18a18abdef18710a18a18', true], [true, '0x77656c636f6d6520746f20657468657265756d2e']]
+ * )
+ *
+ * caver.abi.encodeParameters(
+ *   [
+ *       {
+ *           components: [{ name: 'a', type: 'bytes32' }, { name: 'b', type: 'bool' }],
+ *           name: 'tupleExample',
+ *           type: 'tuple',
+ *       },
+ *       {
+ *           components: [{ name: 'c', type: 'bool' }, { name: 'd', type: 'address' }],
+ *           name: 'tupleExample2',
+ *          type: 'tuple',
+ *      },
+ *  ],
+ *  [
+ *      ['0xabdef18710a18a18abdef18710a18a18abdef18710a18a18abdef18710a18a18', true],
+ *      [true, '0x77656c636f6d6520746f20657468657265756d2e']
+ *  ]
+ *)
  *
  * @method encodeParameters
- * @param {Array} types
- * @param {Array} params
- * @return {String} encoded list of params
+ * @memberof ABI
+ * @instance
+ * @param {Array.<string|object>} types An array with types or a JSON interface of a function. See the {@link http://solidity.readthedocs.io/en/develop/types.html|solidity documentation} for a list of types.
+ * @param {Array.<*>} params The parameters to encode.
+ * @return {string} encoded list of params
  */
-ABICoder.prototype.encodeParameters = function(types, params) {
+ABI.prototype.encodeParameters = function(types, params) {
     const self = this
     types = self.mapTypes(types)
 
@@ -150,14 +205,33 @@ ABICoder.prototype.encodeParameters = function(types, params) {
 }
 
 /**
- * Should be used to encode smart contract deployment with constructor arguments
+ * Should be used to encode smart contract deployment with constructor arguments.
+ *
+ * @example
+ * // There is no argument for constructor
+ * caver.abi.encodeContractDeploy([
+ *     { "constant": true, "inputs": [], "name": "count", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" },
+ *     { "constant": true, "inputs": [], "name": "getBlockNumber", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" },
+ *     { "constant": false, "inputs": [ { "name": "_count", "type": "uint256" } ], "name": "setCount", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }
+ * ],'0x{byte code}')
+ *
+ * // There is one argument for constructor
+ * caver.abi.encodeContractDeploy([
+ *     { "constant": true, "inputs": [], "name": "count", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" },
+ *     { "constant": true, "inputs": [], "name": "getBlockNumber", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" },
+ *     { "constant": false, "inputs": [ { "name": "_count", "type": "uint256" } ], "name": "setCount", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" },
+ *     { "inputs": [ { "name": "_a", "type": "uint256" } ], "payable": false, "stateMutability": "nonpayable", "type": "constructor" }
+ * ],'0x{byte code}', 1)
  *
  * @method encodeContractDeploy
- * @param {Array} types
- * @param {Array} params
- * @return {String} bytecode + args
+ * @memberof ABI
+ * @instance
+ * @param {Array.<object>} jsonInterface The JSON interface of the contract.
+ * @param {string} bytecode A bytecode of smart contract to be deployed.
+ * @param {...*} [args] Arguments to pass to the constructor.
+ * @return {string} bytecode + args
  */
-ABICoder.prototype.encodeContractDeploy = function(jsonInterface, bytecode, ...args) {
+ABI.prototype.encodeContractDeploy = function(jsonInterface, bytecode, ...args) {
     if (!jsonInterface) {
         throw new Error('jsonInterface should be provided for encoding contract deployment.')
     }
@@ -187,10 +261,13 @@ ABICoder.prototype.encodeContractDeploy = function(jsonInterface, bytecode, ...a
  * Map types if simplified format is used
  *
  * @method mapTypes
+ * @memberof ABI
+ * @ignore
+ * @instance
  * @param {Array} types
  * @return {Array}
  */
-ABICoder.prototype.mapTypes = function(types) {
+ABI.prototype.mapTypes = function(types) {
     const self = this
     const mappedTypes = []
     types.forEach(function(type) {
@@ -220,10 +297,13 @@ ABICoder.prototype.mapTypes = function(types) {
  * Check if type is simplified struct format
  *
  * @method isSimplifiedStructFormat
- * @param {string | Object} type
+ * @memberof ABI
+ * @ignore
+ * @instance
+ * @param {string|Object} type
  * @returns {boolean}
  */
-ABICoder.prototype.isSimplifiedStructFormat = function(type) {
+ABI.prototype.isSimplifiedStructFormat = function(type) {
     return typeof type === 'object' && typeof type.components === 'undefined' && typeof type.name === 'undefined'
 }
 
@@ -231,10 +311,13 @@ ABICoder.prototype.isSimplifiedStructFormat = function(type) {
  * Maps the correct tuple type and name when the simplified format in encode/decodeParameter is used
  *
  * @method mapStructNameAndType
+ * @memberof ABI
+ * @ignore
+ * @instance
  * @param {string} structName
  * @return {{type: string, name: *}}
  */
-ABICoder.prototype.mapStructNameAndType = function(structName) {
+ABI.prototype.mapStructNameAndType = function(structName) {
     let type = 'tuple'
 
     if (structName.indexOf('[]') > -1) {
@@ -246,13 +329,16 @@ ABICoder.prototype.mapStructNameAndType = function(structName) {
 }
 
 /**
- * Maps the simplified format in to the expected format of the ABICoder
+ * Maps the simplified format in to the expected format of the ABI
  *
  * @method mapStructToCoderFormat
- * @param {Object} struct
+ * @memberof ABI
+ * @ignore
+ * @instance
+ * @param {object} struct
  * @return {Array}
  */
-ABICoder.prototype.mapStructToCoderFormat = function(struct) {
+ABI.prototype.mapStructToCoderFormat = function(struct) {
     const self = this
     const components = []
     Object.keys(struct).forEach(function(key) {
@@ -279,11 +365,13 @@ ABICoder.prototype.mapStructToCoderFormat = function(struct) {
  * Handle some formatting of params for backwards compatability with Ethers V4
  *
  * @method formatParam
- * @param {String} - type
+ * @memberof ABI
+ * @ignore
+ * @param {string} - type
  * @param {any} - param
- * @return {any} - The formatted param
+ * @return {string|Array.<string>} - The formatted param
  */
-ABICoder.prototype.formatParam = function(type, param) {
+ABI.prototype.formatParam = function(type, param) {
     const paramTypeBytes = new RegExp(/^bytes([0-9]*)$/)
     const paramTypeBytesArray = new RegExp(/^bytes([0-9]*)\[\]$/)
     const paramTypeNumber = new RegExp(/^(u?int)([0-9]*)$/)
@@ -340,12 +428,27 @@ ABICoder.prototype.formatParam = function(type, param) {
 /**
  * Encodes a function call from its json interface and parameters.
  *
+ * @example
+ * caver.abi.encodeFunctionCall({
+ *     name: 'myMethod',
+ *     type: 'function',
+ *     inputs: [{
+ *         type: 'uint256',
+ *         name: 'myNumber'
+ * },{
+ *         type: 'string',
+ *         name: 'mystring'
+ *     }]
+ * }, ['2345675643', 'Hello!%'])
+ *
  * @method encodeFunctionCall
- * @param {Array} jsonInterface
- * @param {Array} [params]
- * @return {String} The encoded ABI for this function call
+ * @memberof ABI
+ * @instance
+ * @param {object} jsonInterface The JSON interface object of a function.
+ * @param {Array.<*>} [params] The parameters to encode.
+ * @return {string} The encoded ABI for this function call
  */
-ABICoder.prototype.encodeFunctionCall = function(jsonInterface, params) {
+ABI.prototype.encodeFunctionCall = function(jsonInterface, params) {
     params = params || []
     return this.encodeFunctionSignature(jsonInterface) + this.encodeParameters(jsonInterface.inputs, params).replace('0x', '')
 }
@@ -373,11 +476,13 @@ ABICoder.prototype.encodeFunctionCall = function(jsonInterface, params) {
  * caver.abi.decodeFunctionCall(abi, functionCall)
  *
  * @method decodeFunctionCall
+ * @memberof ABI
+ * @instance
  * @param {object} abi The abi object of a function.
  * @param {string} functionCall The encoded function call string.
  * @return {object} An object which includes plain params. You can use `result[0]` as it is provided to be accessed like an array in the order of the parameters.
  */
-ABICoder.prototype.decodeFunctionCall = function(abi, functionCall) {
+ABI.prototype.decodeFunctionCall = function(abi, functionCall) {
     functionCall = utils.addHexPrefix(functionCall)
 
     if (!_.isObject(abi) || _.isArray(abi))
@@ -399,40 +504,94 @@ ABICoder.prototype.decodeFunctionCall = function(abi, functionCall) {
 }
 
 /**
- * Should be used to decode bytes to plain param
+ * Decodes an ABI encoded parameter to its JavaScript type.
+ *
+ * @example
+ * caver.abi.decodeParameter('uint256', '0x0000000000000000000000000000000000000000000000000000000000000010')
+ *
+ * caver.abi.decodeParameter('string', '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000848656c6c6f212521000000000000000000000000000000000000000000000000')
+ *
+ * caver.abi.decodeParameter('tuple(bytes32,bool)', '0xabdef18710a18a18abdef18710a18a18abdef18710a18a18abdef18710a18a180000000000000000000000000000000000000000000000000000000000000001')
+ *
+ * caver.abi.decodeParameter(
+ *     {
+ *         components: [{ name: 'a', type: 'bytes32' }, { name: 'b', type: 'bool' }],
+ *         name: 'tupleExample',
+ *         type: 'tuple',
+ *     }, '0xabdef18710a18a18abdef18710a18a18abdef18710a18a18abdef18710a18a180000000000000000000000000000000000000000000000000000000000000001'
+ * )
  *
  * @method decodeParameter
- * @param {String} type
- * @param {String} bytes
- * @return {Object} plain param
+ * @memberof ABI
+ * @instance
+ * @param {string|object} type The type of the parameter, see the {@link http://solidity.readthedocs.io/en/develop/types.html|solidity documentation} for a list of types.
+ * @param {string} encodedString The ABI byte code to decode.
+ * @return {string} plain param
  */
-ABICoder.prototype.decodeParameter = function(type, bytes) {
-    return this.decodeParameters([type], bytes)[0]
+ABI.prototype.decodeParameter = function(type, encodedString) {
+    return this.decodeParameters([type], encodedString)[0]
 }
 
 /**
- * Should be used to decode list of params
+ * Decodes ABI encoded parameters to its JavaScript types.
+ *
+ * @example
+ * caver.abi.decodeParameters(['string', 'uint256'], '0x000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000ea000000000000000000000000000000000000000000000000000000000000000848656c6c6f212521000000000000000000000000000000000000000000000000')
+ *
+ * caver.abi.decodeParameters(
+ *  ['tuple(bytes32,bool)', 'tuple(bool,address)'],
+ *  '0xabdef18710a18a18abdef18710a18a18abdef18710a18a18abdef18710a18a180000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000100000000000000000000000077656c636f6d6520746f20657468657265756d2e'
+ * )
+ *
+ * caver.abi.decodeParameters([{
+ *     type: 'string',
+ *     name: 'mystring'
+ * },{
+ *     type: 'uint256',
+ *     name: 'myNumber'
+ * }], '0x000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000ea000000000000000000000000000000000000000000000000000000000000000848656c6c6f212521000000000000000000000000000000000000000000000000')
+ *
+ * caver.abi.decodeParameters(
+ *     [
+ *         {
+ *             components: [{ name: 'a', type: 'bytes32' }, { name: 'b', type: 'bool' }],
+ *             name: 'tupleExample',
+ *             type: 'tuple',
+ *         },
+ *         {
+ *             components: [{ name: 'c', type: 'bool' }, { name: 'd', type: 'address' }],
+ *             name: 'tupleExample2',
+ *             type: 'tuple',
+ *         },
+ *     ],
+ *     '0xabdef18710a18a18abdef18710a18a18abdef18710a18a18abdef18710a18a180000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000100000000000000000000000077656c636f6d6520746f20657468657265756d2e'
+ * )
  *
  * @method decodeParameters
- * @param {Array} outputs
- * @param {String} bytes
+ * @memberof ABI
+ * @instance
+ * @param {Array.<string|object>} typesArray An array with types or an array of JSON interface outputs. See the {@link http://solidity.readthedocs.io/en/develop/types.html|solidity documentation} for a list of types.
+ * @param {string} encodedString The ABI byte code to decode.
  * @return {object} An object which includes plain params. You can use `result[0]` as it is provided to be accessed like an array in the order of the parameters.
  */
-ABICoder.prototype.decodeParameters = function(outputs, bytes) {
-    return this.decodeParametersWith(outputs, bytes, false)
+ABI.prototype.decodeParameters = function(outputs, encodedString) {
+    return this.decodeParametersWith(outputs, encodedString, false)
 }
 
 /**
  * Should be used to decode list of params
  *
  * @method decodeParametersWith
+ * @memberof ABI
+ * @instance
+ * @ignore
  * @param {Array} outputs
- * @param {String} bytes
+ * @param {string} bytes
  * @param {Boolean} loose must be passed for decoding bytes and string parameters for logs emitted with solc 0.4.x
  *                        Please refer to https://github.com/ChainSafe/web3.js/commit/e80337e16e5c04683fc40148378775234c28e0fb.
- * @return {Array} array of plain params
+ * @return {object} An object which includes plain params. You can use `result[0]` as it is provided to be accessed like an array in the order of the parameters.
  */
-ABICoder.prototype.decodeParametersWith = function(outputs, bytes, loose) {
+ABI.prototype.decodeParametersWith = function(outputs, bytes, loose) {
     if (outputs.length > 0 && (!bytes || bytes === '0x' || bytes === '0X')) {
         throw new Error(
             "Returned values aren't valid, did it run Out of Gas? " +
@@ -464,15 +623,38 @@ ABICoder.prototype.decodeParametersWith = function(outputs, bytes, loose) {
 }
 
 /**
- * Decodes events non- and indexed parameters.
+ * Decodes ABI encoded log data and indexed topic data.
+ *
+ * @example
+ * caver.abi.decodeLog(
+ *     [
+ *         {
+ *             type: 'string',
+ *             name: 'mystring'
+ *         },{
+ *             type: 'uint256',
+ *             name: 'myNumber',
+ *             indexed: true
+ *         },{
+ *             type: 'uint8',
+ *             name: 'mySmallNumber',
+ *             indexed: true
+ *          }
+ *     ],
+ *     '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000748656c6c6f252100000000000000000000000000000000000000000000000000',
+ *      ['0x000000000000000000000000000000000000000000000000000000000000f310', '0x0000000000000000000000000000000000000000000000000000000000000010']
+ * )
+ *
  *
  * @method decodeLog
- * @param {Object} inputs
- * @param {String} data
- * @param {Array} topics
- * @return {Array} array of plain params
+ * @memberof ABI
+ * @instance
+ * @param {Array.<object>} inputs An array of JSON interface inputs. See the solidity documentation for a list of types.
+ * @param {string} data The ABI byte code in the data field of a log.
+ * @param {*} topics An array of the index parameter topics of the log. This array doesn't have topic[0] if it is a non-anonymous event, or otherwise, it has topic[0].
+ * @return {object} An object which includes plain params. You can use `result[0]` as it is provided to be accessed like an array in the order of the parameters.
  */
-ABICoder.prototype.decodeLog = function(inputs, data, topics) {
+ABI.prototype.decodeLog = function(inputs, data, topics) {
     const _this = this
     topics = _.isArray(topics) ? topics : [topics]
 
@@ -523,6 +705,7 @@ ABICoder.prototype.decodeLog = function(inputs, data, topics) {
     return returnValue
 }
 
-const coder = new ABICoder()
+/** @instance */
+const abi = new ABI()
 
-module.exports = coder
+module.exports = abi

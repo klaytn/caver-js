@@ -47,6 +47,12 @@ const AbstractFeeDelegatedTransaction = require('./transactionTypes/abstractFeeD
 /** @module Transaction */
 
 /**
+ * @typedef {LegacyTransaction|ValueTransfer|FeeDelegatedValueTransfer|FeeDelegatedValueTransferWithRatio|ValueTransferMemo|FeeDelegatedValueTransferMemo|FeeDelegatedValueTransferMemoWithRatio|AccountUpdate|FeeDelegatedAccountUpdate|FeeDelegatedAccountUpdateWithRatio|SmartContractDeploy|FeeDelegatedSmartContractDeploy|FeeDelegatedSmartContractDeployWithRatio|SmartContractExecution|FeeDelegatedSmartContractExecution|FeeDelegatedSmartContractExecution|FeeDelegatedSmartContractExecutionWithRatio|Cancel|FeeDelegatedCancel|FeeDelegatedCancelWithRatio|ChainDataAnchoring|FeeDelegatedChainDataAnchoring|FeeDelegatedChainDataAnchoringWithRatio} module:Transaction.Transaction
+ */
+/**
+ * @typedef {FeeDelegatedValueTransfer|FeeDelegatedValueTransferWithRatio|FeeDelegatedValueTransferMemo|FeeDelegatedValueTransferMemoWithRatio|FeeDelegatedAccountUpdate|FeeDelegatedAccountUpdateWithRatio|FeeDelegatedSmartContractDeploy|FeeDelegatedSmartContractDeployWithRatio|FeeDelegatedSmartContractExecution|FeeDelegatedSmartContractExecution|FeeDelegatedSmartContractExecutionWithRatio|FeeDelegatedCancel|FeeDelegatedCancelWithRatio|FeeDelegatedChainDataAnchoring|FeeDelegatedChainDataAnchoringWithRatio} module:Transaction.FeeDelegatedTransaction
+ */
+/**
  * Querys transaction from Klaytn and converts to a caver transaction instance.
  * If it fails to receive a transaction from Klaytn, an error is thrown.
  *
@@ -182,34 +188,210 @@ module.exports = {
     recoverPublicKeys: recoverPublicKeys,
     recoverFeePayerPublicKeys: recoverFeePayerPublicKeys,
 
+    /**
+     * The LegacyTransaction class.
+     *
+     * @example
+     * caver.transaction.legacyTransaction
+     *
+     * @type {typeof LegacyTransaction}
+     * */
     legacyTransaction: LegacyTransaction,
 
+    /**
+     * The ValueTransfer class.
+     *
+     * @example
+     * caver.transaction.valueTransfer
+     *
+     * @type {typeof ValueTransfer}
+     * */
     valueTransfer: ValueTransfer,
+    /**
+     * The FeeDelegatedValueTransfer class.
+     *
+     * @example
+     * caver.transaction.feeDelegatedValueTransfer
+     *
+     * @type {typeof FeeDelegatedValueTransfer}
+     * */
     feeDelegatedValueTransfer: FeeDelegatedValueTransfer,
+    /**
+     * The FeeDelegatedValueTransferWithRatio class.
+     *
+     * @example
+     * caver.transaction.feeDelegatedValueTransferWithRatio
+     *
+     * @type {typeof FeeDelegatedValueTransferWithRatio}
+     * */
     feeDelegatedValueTransferWithRatio: FeeDelegatedValueTransferWithRatio,
 
+    /**
+     * The ValueTransferMemo class.
+     *
+     * @example
+     * caver.transaction.valueTransferMemo
+     *
+     * @type {typeof ValueTransferMemo}
+     * */
     valueTransferMemo: ValueTransferMemo,
+    /**
+     * The FeeDelegatedValueTransferMemo class.
+     *
+     * @example
+     * caver.transaction.feeDelegatedValueTransferMemo
+     *
+     * @type {typeof FeeDelegatedValueTransferMemo}
+     * */
     feeDelegatedValueTransferMemo: FeeDelegatedValueTransferMemo,
+    /**
+     * The FeeDelegatedValueTransferMemoWithRatio class.
+     *
+     * @example
+     * caver.transaction.feeDelegatedValueTransferMemoWithRatio
+     *
+     * @type {typeof FeeDelegatedValueTransferMemoWithRatio}
+     * */
     feeDelegatedValueTransferMemoWithRatio: FeeDelegatedValueTransferMemoWithRatio,
 
+    /**
+     * The AccountUpdate class.
+     *
+     * @example
+     * caver.transaction.accountUpdate
+     *
+     * @type {typeof AccountUpdate}
+     * */
     accountUpdate: AccountUpdate,
+    /**
+     * The FeeDelegatedAccountUpdate class.
+     *
+     * @example
+     * caver.transaction.feeDelegatedAccountUpdate
+     *
+     * @type {typeof FeeDelegatedAccountUpdate}
+     * */
     feeDelegatedAccountUpdate: FeeDelegatedAccountUpdate,
+    /**
+     * The FeeDelegatedAccountUpdateWithRatio class.
+     *
+     * @example
+     * caver.transaction.feeDelegatedAccountUpdateWithRatio
+     *
+     * @type {typeof FeeDelegatedAccountUpdateWithRatio}
+     * */
     feeDelegatedAccountUpdateWithRatio: FeeDelegatedAccountUpdateWithRatio,
 
+    /**
+     * The SmartContractDeploy class.
+     *
+     * @example
+     * caver.transaction.smartContractDeploy
+     *
+     * @type {typeof SmartContractDeploy}
+     * */
     smartContractDeploy: SmartContractDeploy,
+    /**
+     * The FeeDelegatedSmartContractDeploy class.
+     *
+     * @example
+     * caver.transaction.feeDelegatedSmartContractDeploy
+     *
+     * @type {typeof FeeDelegatedSmartContractDeploy}
+     * */
     feeDelegatedSmartContractDeploy: FeeDelegatedSmartContractDeploy,
+    /**
+     * The FeeDelegatedSmartContractDeployWithRatio class.
+     *
+     * @example
+     * caver.transaction.feeDelegatedSmartContractDeployWithRatio
+     *
+     * @type {typeof FeeDelegatedSmartContractDeployWithRatio}
+     * */
     feeDelegatedSmartContractDeployWithRatio: FeeDelegatedSmartContractDeployWithRatio,
 
+    /**
+     * The SmartContractExecution class.
+     *
+     * @example
+     * caver.transaction.smartContractExecution
+     *
+     * @type {typeof SmartContractExecution}
+     * */
     smartContractExecution: SmartContractExecution,
+    /**
+     * The FeeDelegatedSmartContractExecution class.
+     *
+     * @example
+     * caver.transaction.feeDelegatedSmartContractExecution
+     *
+     * @type {typeof FeeDelegatedSmartContractExecution}
+     * */
     feeDelegatedSmartContractExecution: FeeDelegatedSmartContractExecution,
+    /**
+     * The FeeDelegatedSmartContractExecutionWithRatio class.
+     *
+     * @example
+     * caver.transaction.feeDelegatedSmartContractExecutionWithRatio
+     *
+     * @type {typeof FeeDelegatedSmartContractExecutionWithRatio}
+     * */
     feeDelegatedSmartContractExecutionWithRatio: FeeDelegatedSmartContractExecutionWithRatio,
 
+    /**
+     * The Cancel class.
+     *
+     * @example
+     * caver.transaction.cancel
+     *
+     * @type {typeof Cancel}
+     * */
     cancel: Cancel,
+    /**
+     * The FeeDelegatedCancel class.
+     *
+     * @example
+     * caver.transaction.feeDelegatedCancel
+     *
+     * @type {typeof FeeDelegatedCancel}
+     * */
     feeDelegatedCancel: FeeDelegatedCancel,
+    /**
+     * The FeeDelegatedCancelWithRatio class.
+     *
+     * @example
+     * caver.transaction.feeDelegatedCancelWithRatio
+     *
+     * @type {typeof FeeDelegatedCancelWithRatio}
+     * */
     feeDelegatedCancelWithRatio: FeeDelegatedCancelWithRatio,
 
+    /**
+     * The ChainDataAnchoring class.
+     *
+     * @example
+     * caver.transaction.chainDataAnchoring
+     *
+     * @type {typeof ChainDataAnchoring}
+     * */
     chainDataAnchoring: ChainDataAnchoring,
+    /**
+     * The FeeDelegatedChainDataAnchoring class.
+     *
+     * @example
+     * caver.transaction.feeDelegatedChainDataAnchoring
+     *
+     * @type {typeof FeeDelegatedChainDataAnchoring}
+     * */
     feeDelegatedChainDataAnchoring: FeeDelegatedChainDataAnchoring,
+    /**
+     * The FeeDelegatedChainDataAnchoringWithRatio class.
+     *
+     * @example
+     * caver.transaction.feeDelegatedChainDataAnchoringWithRatio
+     *
+     * @type {typeof FeeDelegatedChainDataAnchoringWithRatio}
+     * */
     feeDelegatedChainDataAnchoringWithRatio: FeeDelegatedChainDataAnchoringWithRatio,
 
     type: TX_TYPE_STRING,

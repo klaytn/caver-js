@@ -1,6 +1,6 @@
 {
   "name": "caver-js",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "description": "caver-js is a JavaScript API library that allows developers to interact with a Klaytn node",
   "main": "index.js",
   "scripts": {
@@ -41,7 +41,8 @@
     "cover": "npm run build && nyc --silent ./node_modules/mocha/bin/mocha test/packages/caver.utils.js && nyc --silent --no-clean ./node_modules/mocha/bin/mocha test/packages/caver.klay.net.js && npm run cover:serialization && npm run cover:wallet && npm run cover:report",
     "cover:serialization": "nyc --silent --no-clean npm run serTest",
     "cover:wallet": "nyc --silent --no-clean npm run walletTest",
-    "cover:report": "nyc report --reporter=html --reporter=text"
+    "cover:report": "nyc report --reporter=html --reporter=text",
+    "generateDocs": "jsdoc -c jsdoc.json && node ./turndown.js"
   },
   "keywords": [
     "caver",
@@ -71,14 +72,16 @@
     "bn.js": "4.11.6",
     "chai": "4.1.2",
     "crypto-browserify": "3.12.0",
+    "docdash": "^1.2.0",
     "dotenv": "8.2.0",
     "elliptic": "6.5.4",
     "eth-lib": "0.2.8",
-    "ethers": "5.0.32",
+    "ethers": "5.4.1",
     "ethjs-unit": "0.1.6",
     "eventemitter3": "4.0.0",
     "ipfs-http-client-lite": "0.3.0",
     "it-each": "0.4.0",
+    "jsdoc": "^3.6.7",
     "lodash": "4.17.21",
     "mocha": "8.3.2",
     "multihashes": "4.0.2",
@@ -125,6 +128,7 @@
     "gulp-replace": "1.0.0",
     "gulp-streamify": "1.0.2",
     "gulp-uglify": "3.0.1",
+    "jsdoc-typeof-plugin": "^1.0.0",
     "jshint": "2.9.7",
     "nock": "10.0.6",
     "nyc": "14.1.1",
@@ -132,6 +136,7 @@
     "prettier": "1.18.2",
     "sinon": "9.0.0",
     "sinon-chai": "3.5.0",
+    "turndown": "^7.1.1",
     "vinyl-source-stream": "2.0.0"
   }
 }

@@ -62,33 +62,50 @@ const txTypeToString = {
 const HASH_LENGTH = 66
 
 /**
- * Returns true if object is BN, otherwise false
+ * Returns `true` if parameter is a BN instance, otherwise `false`.
  *
- * @method isBN
- * @param {Object} object
- * @return {Boolean}
+ * @example
+ * const bn = new caver.utils.BN(10)
+ * const result = caver.utils.isBN(bn)
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {*} bn
+ * @return {boolean} `true` if a given value is a `BN.js` instance.
  */
-const isBN = function(object) {
-    return BN.isBN(object)
+const isBN = function(bn) {
+    return BN.isBN(bn)
 }
 
 /**
- * Returns true if object is BigNumber, otherwise false
+ * Returns `true` if object is a BigNumber instance, otherwise `false`.
  *
- * @method isBigNumber
- * @param {Object} object
- * @return {Boolean}
+ * @example
+ * const bigNumber = new caver.utils.BigNumber(10)
+ * const result = caver.utils.isBigNumber(bigNumber)
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {*} bigNumber
+ * @return {boolean} `true` if a given value is a `Bignumber.js` instance.
  */
-const isBigNumber = function(num) {
-    return BigNumber.isBigNumber(num)
+const isBigNumber = function(bigNumber) {
+    return BigNumber.isBigNumber(bigNumber)
 }
 
 /**
- * Takes an input and transforms it into an BN
+ * Safely converts any given value (including `Bignumber.js` instances) into a `BN.js` instance, for handling big numbers in JavaScript.
  *
- * @method toBN
- * @param {Number|String|BN} number, string, HEX string or BN
- * @return {BN} BN
+ * @example
+ * const result = caver.utils.toBN(num)
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {number|string|BN|BigNumber} number The number to convert to a BN.js instance.
+ * @return {BN} The {@link https://github.com/indutny/bn.js/|BN.js} instance.
  */
 function toBN(number) {
     try {
@@ -99,11 +116,16 @@ function toBN(number) {
 }
 
 /**
- * Takes and input transforms it into BN and if it is negative value, into two's complement
+ * Converts a negative number into a two's complement.
  *
- * @method toTwosComplement
- * @param {Number|String|BN} number
- * @return {String}
+ * @example
+ * const result = caver.utils.toTwosComplement(num)
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {number|string|BN|BigNumber} number The number to convert.
+ * @return {string} The converted hex string.
  */
 const toTwosComplement = function(number) {
     return `0x${toBN(number)
@@ -112,11 +134,17 @@ const toTwosComplement = function(number) {
 }
 
 /**
- * Checks if the given string is an address
+ * Checks if a given string is a valid Klaytn address.
+ * It will also check the checksum if the address has upper and lowercase letters.
  *
- * @method isAddress
- * @param {String} address the given HEX address
- * @return {Boolean}
+ * @example
+ * const result = caver.utils.isAddress('0x{address in hex}')
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} address An address string.
+ * @return {boolean} `true` if a given string is a valid Klaytn address.
  */
 const isAddress = function(address) {
     // check if it has the basic requirements of an address
@@ -132,11 +160,17 @@ const isAddress = function(address) {
 }
 
 /**
- * Checks if the given string is a checksummed address
+ * Checks the checksum of a given address.
+ * Will also return `false` on non-checksum addresses.
  *
- * @method checkAddressChecksum
- * @param {String} address the given HEX address
- * @return {Boolean}
+ * @example
+ * const result = caver.utils.checkAddressChecksum('0x{address in hex}')
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} address An address string.
+ * @return {boolean}
  */
 const checkAddressChecksum = function(address) {
     // Check each case
@@ -156,13 +190,20 @@ const checkAddressChecksum = function(address) {
 }
 
 /**
- * Should be called to pad string to expected length
+ * Adds padding on the left of a string. Useful for adding paddings to HEX strings.
  *
- * @method leftPad
- * @param {String} string to be padded
- * @param {Number} chars that result string should have
- * @param {String} sign, by default 0
- * @returns {String} right aligned string
+ * @example
+ * const result = caver.utils.padLeft('0x3456ff', 20) // '0x000000000000003456ff'
+ * const result = caver.utils.padLeft('Hello', 20, 'x') // 'xxxxxxxxxxxxxxxHello'
+ *
+ * @memberof module:utils
+ * @inner
+ * @alias padLeft
+ *
+ * @param {string} string The string to add padding on the left.
+ * @param {number} chars The number of characters the total string should have.
+ * @param {string} [sign] The character sign to use, defaults to `0`.
+ * @returns {string} The padded string.
  */
 const leftPad = function(string, chars, sign) {
     const hasPrefix = /^0x/i.test(string) || typeof string === 'number'
@@ -174,13 +215,20 @@ const leftPad = function(string, chars, sign) {
 }
 
 /**
- * Should be called to pad string to expected length
+ * Adds padding on the right of a string, Useful for adding paddings to HEX strings.
  *
- * @method rightPad
- * @param {String} string to be padded
- * @param {Number} chars that result string should have
- * @param {String} sign, by default 0
- * @returns {String} right aligned string
+ * @example
+ * const result = caver.utils.rightPad('0x3456ff', 20) // '0x3456ff00000000000000'
+ * const result = caver.utils.rightPad('Hello', 20, 'x') // 'Helloxxxxxxxxxxxxxxx'
+ *
+ * @memberof module:utils
+ * @inner
+ * @alias padRight
+ *
+ * @param {string} string The string to add padding on the right.
+ * @param {number} chars The number of characters the total string should have.
+ * @param {string} [sign] The character sign to use, defaults to `0`.
+ * @returns {string} The padded string.
  */
 const rightPad = function(string, chars, sign) {
     const hasPrefix = /^0x/i.test(string) || typeof string === 'number'
@@ -192,11 +240,16 @@ const rightPad = function(string, chars, sign) {
 }
 
 /**
- * Should be called to get hex representation (prefixed by 0x) of utf8 string
+ * Returns the HEX representation of a given UTF-8 string.
  *
- * @method utf8ToHex
- * @param {String} str
- * @returns {String} hex representation of input string
+ * @example
+ * const result = caver.utils.utf8ToHex('I have 100€') // '0x49206861766520313030e282ac'
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} str A UTF-8 string to convert to a HEX string.
+ * @returns {string} The HEX string.
  */
 const utf8ToHex = function(str) {
     str = utf8.encode(str)
@@ -226,11 +279,16 @@ const utf8ToHex = function(str) {
 }
 
 /**
- * Should be called to get utf8 from it's hex representation
+ * Returns the UTF-8 string representation of a given HEX value.
  *
- * @method hexToUtf8
- * @param {String} hex
- * @returns {String} ascii string representation of hex value
+ * @example
+ * const result = caver.utils.hexToUtf8('0x49206861766520313030e282ac') // 'I have 100€'
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} hex A HEX string to convert to a UTF-8 string.
+ * @returns {string} The UTF-8 string.
  */
 const hexToUtf8 = function(hex) {
     if (!isHexStrict(hex)) {
@@ -266,11 +324,17 @@ const hexToUtf8 = function(hex) {
 }
 
 /**
- * Converts value to it's number representation
+ * Returns the number representation of a given HEX value.
+ * Please note that this function is not useful for big numbers, rather use `caver.utils.toBN`.
  *
- * @method hexToNumber
- * @param {String|Number|BN} value
- * @return {String}
+ * @example
+ * const result = caver.utils.hexToNumber('0xea') // 234
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} A HEX string to be converted.
+ * @return {number} The number representation of a given HEX value.
  */
 const hexToNumber = function(value) {
     if (!value) return value
@@ -278,11 +342,16 @@ const hexToNumber = function(value) {
 }
 
 /**
- * Converts value to it's decimal representation in string
+ * Returns the number representation of a given HEX value as a string.
  *
- * @method hexToNumberString
- * @param {String|Number|BN} value
- * @return {String}
+ * @example
+ * const result = caver.utils.hexToNumberString('0xea') // '234'
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} A HEX string to be converted.
+ * @return {string} The number as a string.
  */
 const hexToNumberString = function(value) {
     if (!value) return value
@@ -291,11 +360,19 @@ const hexToNumberString = function(value) {
 }
 
 /**
- * Converts value to it's hex representation
+ * Returns the HEX representation of a given number value.
  *
- * @method numberToHex
- * @param {String|Number|BN} value
- * @return {String}
+ * @example
+ * const result = caver.utils.numberToHex(234) // '0xea'
+ * const result = caver.utils.numberToHex('234')
+ * const result = caver.utils.numberToHex(new caver.utils.BN(234))
+ * const result = caver.utils.numberToHex(new caver.utils.BigNumber(234))
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string|number|BN|BigNumber} value A number as string or number.
+ * @return {string} The HEX value of the given number.
  */
 const numberToHex = function(value) {
     if (_.isNull(value) || _.isUndefined(value)) {
@@ -313,13 +390,16 @@ const numberToHex = function(value) {
 }
 
 /**
- * Convert a byte array to a hex string
+ * Returns a HEX string from a byte array.
  *
- * Note: Implementation from crypto-js
+ * @example
+ * const result = caver.utils.bytesToHex([ 72, 101, 108, 108, 111, 33, 36 ]) // '0x48656c6c6f2124'
  *
- * @method bytesToHex
- * @param {Array} bytes
- * @return {String} the hex string
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {Array} bytes A byte array to convert.
+ * @return {string} The HEX string.
  */
 const bytesToHex = function(bytes) {
     const hex = []
@@ -334,13 +414,16 @@ const bytesToHex = function(bytes) {
 }
 
 /**
- * Convert a hex string to a byte array
+ * Returns a byte array from the given HEX string.
  *
- * Note: Implementation from crypto-js
+ * @example
+ * const result = caver.utils.hexToBytes('0x000000ea') // [ 0, 0, 0, 234 ]
  *
- * @method hexToBytes
- * @param {string} hex
- * @return {Array} the byte array
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} hex A HEX string to be converted.
+ * @return {Array.<number>} The byte array.
  */
 const hexToBytes = function(hex) {
     hex = hex.toString(16)
@@ -359,14 +442,22 @@ const hexToBytes = function(hex) {
 }
 
 /**
- * Auto converts any given value into it's hex representation.
+ * Converts any given value to HEX.
+ * The numeric strings will be interpreted as numbers.
+ * Text strings will be interpreted as UTF-8 strings.
  *
- * And even stringifys objects before.
+ * @example
+ * const result = caver.utils.toHex('234') // '0xea'
+ * const result = caver.utils.toHex(234) // '0xea'
+ * const result = caver.utils.toHex(new caver.utils.BN('234')) // '0xea'
+ * const result = caver.utils.toHex(new caver.utils.Bignumber('234')) // '0xea'
+ * const result = caver.utils.toHex('I have 100€') // '0x49206861766520313030e282ac'
  *
- * @method toHex
- * @param {String|Number|BN|Object} value
- * @param {Boolean} returnType
- * @return {String}
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string|number|BN|BigNumber|Buffer} value The input to convert to HEX.
+ * @return {string} The resulting HEX string.
  */
 /* eslint-disable complexity */
 const toHex = function(value, returnType) {
@@ -402,22 +493,50 @@ const toHex = function(value, returnType) {
 }
 /* eslint-enable complexity */
 
+/**
+ * Converts buffer to 0x-prefixed hex string.
+ *
+ * @example
+ * const result = caver.utils.bufferToHex(Buffer.from('5b9ac8', 'hex')) // '0x5b9ac8'
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {Buffer} buf A buffer to convert to hex string.
+ * @return {string} The 0x-prefixed hex string.
+ */
 const bufferToHex = function(buf) {
     buf = toBuffer(buf)
     return `0x${buf.toString('hex')}`
 }
 
 /**
- * Convert a input into a Buffer.
+ * This function converts the input to a Buffer.
+ * To convert an object into a Buffer using `caver.utils.toBuffer`, the object must implement `toArray` function.
+ * For string type input, this function only works with a 0x-prefixed hex string.
  *
- * @method toBuffer
- * @param {Buffer|Array|String|Number|BN|Object} input
- * @return {Buffer}
+ * @example
+ * const result = caver.utils.toBuffer(Buffer.alloc(0))
+ * const result = caver.utils.toBuffer('0x1234')
+ * const result = caver.utils.toBuffer(1)
+ * const result = caver.utils.toBuffer([1,2,3])
+ * const result = caver.utils.toBuffer(new caver.utils.BN(255))
+ * const result = caver.utils.toBuffer(new caver.utils.BigNumber(255))
+ * const result = caver.utils.toBuffer({toArray: function() {return [1,2,3,4]}}) // An object that implements `toArray` function
+ * const result = caver.utils.toBuffer(null)
+ * const result = caver.utils.toBuffer(undefined)
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {Buffer|Array.<number>|string|number|BN|BigNumber|object} input The value to be converted to a Buffer.
+ * @return {Buffer} The value converted to Buffer type is returned.
  */
 const toBuffer = function(input) {
     if (Buffer.isBuffer(input)) return input
     if (input === null || input === undefined) return Buffer.alloc(0)
     if (Array.isArray(input)) return Buffer.from(input)
+    if (isBigNumber(input)) input = toBN(input)
     if (isBN(input)) return input.toArrayLike(Buffer)
     if (_.isObject(input)) {
         if (input.toArray && _.isFunction(input.toArray)) return Buffer.from(input.toArray())
@@ -435,10 +554,20 @@ const toBuffer = function(input) {
 }
 
 /**
- * Convert a number to a Buffer.
+ * This function converts a number to a Buffer.
+ * The {@link module:utils~toBuffer|caver.utils.toBuffer} has the same behavior as this function when the input is a number.
  *
- * @method numberToBuffer
- * @param {Number|String|BN} num
+ * @example
+ * const result = caver.utils.numberToBuffer(1)
+ * const result = caver.utils.numberToBuffer('2')
+ * const result = caver.utils.numberToBuffer('0x3')
+ * const result = caver.utils.numberToBuffer(new caver.utils.BN(4))
+ * const result = caver.utils.numberToBuffer(new caver.utils.BigNumber(4))
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {number|string|BN|BigNumber} num A number to be converted to a Buffer.
  * @return {Buffer}
  */
 const numberToBuffer = function(num) {
@@ -446,22 +575,37 @@ const numberToBuffer = function(num) {
 }
 
 /**
- * Check if string is HEX, requires a 0x in front
+ * Checks if a given string is a HEX string.
+ * Difference to {@link module:utils~isHex|caver.utils.isHex} is that it expects HEX to be prefixed with `0x`.
  *
- * @method isHexStrict
- * @param {String} hex to be checked
- * @returns {Boolean}
+ * @example
+ * const result = caver.utils.isHexStrict('0xc1912') // true
+ * const result = caver.utils.isHexStrict('c1912') // false
+ * const result = caver.utils.isHexStrict('Hello') // false
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} hex The given HEX string.
+ * @returns {boolean} `true` if a given string is a HEX string.
  */
 const isHexStrict = function(hex) {
     return (_.isString(hex) || _.isNumber(hex)) && /^(-)?0x[0-9a-f]*$/i.test(hex)
 }
 
 /**
- * Check if string is HEX
+ * Checks if a given string is a HEX string.
  *
- * @method isHex
- * @param {String} hex to be checked
- * @returns {Boolean}
+ * @example
+ * const result = caver.utils.isHex('0xc1912') // true
+ * const result = caver.utils.isHex('c1912') // true
+ * const result = caver.utils.isHex('Hello') // false
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} hex The given HEX string.
+ * @returns {boolean} `true` if a given parameter is a HEX string.
  */
 const isHex = function(hex) {
     return (_.isString(hex) || _.isNumber(hex)) && /^(-0x|0x)?[0-9a-f]*$/i.test(hex)
@@ -470,6 +614,7 @@ const isHex = function(hex) {
 /**
  * Checks if the given string is a hexadecimal transaction hash with or without prefix 0x
  * @deprecated since version v1.5.0
+ * @ignore
  * @method isTxHash
  * @param {String} txHash given hexadecimal transaction hash
  * @return {Boolean}
@@ -477,16 +622,25 @@ const isHex = function(hex) {
 const isTxHash = txHash => isValidHash(txHash)
 
 /**
- * Checks if the given string is a hexadecimal hash with or without prefix 0x
- * @method isValidHash
- * @param {String} hash given hexadecimal hash
- * @return {Boolean}
+ * Returns `true` if the input is in 32-bytes hash format, otherwise it returns `false`.
+ *
+ * @example
+ * const result = caver.utils.isValidHash('0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550') // true
+ * const result = caver.utils.isValidHash('e9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550') // true
+ * const result = caver.utils.isValidHash('0x1') // false
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} hash The value to be examined that if it is in 32-bytes hash format or not.
+ * @return {boolean} `true` means the input is in the format of 32-bytes hash.
  */
 const isValidHash = hash => new RegExp(`^(0x|0X)?[0-9a-fA-F]{${HASH_LENGTH - 2}}$`).test(hash)
 
 /**
  * Checks if the given string is a hexadecimal transaction hash that starts with 0x
  * @deprecated since version v1.5.0
+ * @ignore
  * @method isTxHashStrict
  * @param {String} txHash given hexadecimal transaction hash
  * @return {Boolean}
@@ -494,21 +648,34 @@ const isValidHash = hash => new RegExp(`^(0x|0X)?[0-9a-fA-F]{${HASH_LENGTH - 2}}
 const isTxHashStrict = txHash => isValidHashStrict(txHash)
 
 /**
- * Checks if the given string is a hexadecimal hash with prefix 0x
- * @method isValidHashStrict
- * @param {String} hash given hexadecimal hash
- * @return {Boolean}
+ * Returns `true` if the input is in 0x-prefixed 32-bytes hash format, otherwise it returns `false`.
+ * This function only looks at the input and determines if it is in the format of 0x-prefixed 32-bytes hash.
+ * Difference to {@link module:utils~isValidHash|caver.utils.isValidHash} is that it expects HEX to be prefixed with 0x.
+ *
+ * @example
+ * const result = caver.utils.isValidHashStrict('0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550') // true
+ * const result = caver.utils.isValidHashStrict('e9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550') // false
+ * const result = caver.utils.isValidHashStrict('0x1') // false
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} hash The value to be examined that if it is in the format of 0x-prefixed 32-bytes hash or not.
+ * @return {boolean} `true` means the input is in the format of 0x-prefixed 32-bytes hash.
  */
 const isValidHashStrict = hash => new RegExp(`^(0x|0X)[0-9a-fA-F]{${HASH_LENGTH - 2}}$`).test(hash)
 
 /**
- * Returns true if given string is a valid Klaytn block header bloom.
+ * Returns `true` if the bloom is a valid bloom.
  *
- * TODO UNDOCUMENTED
+ * @example
+ * const result = caver.utils.isBloom('0x00000...')
  *
- * @method isBloom
- * @param {String} hex encoded bloom filter
- * @return {Boolean}
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} bloom An encoded bloom filter.
+ * @return {boolean} `true` means the input bloom parameter is valid.
  */
 const isBloom = function(bloom) {
     if (!/^(0x)?[0-9a-f]{512}$/i.test(bloom)) {
@@ -521,13 +688,16 @@ const isBloom = function(bloom) {
 }
 
 /**
- * Returns true if given string is a valid log topic.
+ * Returns `true` if the topic is valid.
  *
- * TODO UNDOCUMENTED
+ * @example
+ * const result = caver.utils.isBloom('0x00000...')
  *
- * @method isTopic
- * @param {String} hex encoded topic
- * @return {Boolean}
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} hex An encoded topic.
+ * @return {boolean}
  */
 const isTopic = function(topic) {
     if (!/^(0x)?[0-9a-f]{64}$/i.test(topic)) {
@@ -549,17 +719,41 @@ const parsePredefinedBlockNumber = blockNumber => {
     }
 }
 
-const isPredefinedBlockNumber = function(blockNumber) {
-    return blockNumber === 'latest' || blockNumber === 'pending' || blockNumber === 'earliest' || blockNumber === 'genesis'
+/**
+ * Returns `true` if the parameter is predefined block tag.
+ *
+ * @example
+ * const result = caver.utils.isPredefinedBlockNumber('latest') // true
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} predefinedBlock The predefined block.
+ * @return {boolean} `true` means predefinedBlock is valid predefined block tag.
+ */
+const isPredefinedBlockNumber = function(predefinedBlock) {
+    return predefinedBlock === 'latest' || predefinedBlock === 'pending' || predefinedBlock === 'earliest' || predefinedBlock === 'genesis'
 }
 
 /**
- * valid block number should be one of a type below:
+ * Validtes block number (or block tag string).
+ *
+ * The block number should be one of a type below:
  * 1) predefined block number ex:) 'latest', 'earliest', 'pending', 'genesis'
  * 2) hex
  * 3) finite number
- * @param  {String | Number}  blockNumber
- * @return {Boolean}
+ *
+ * @example
+ * const result = caver.utils.isValidBlockNumberCandidate('latest') // true
+ * const result = caver.utils.isValidBlockNumberCandidate('0x1') // true
+ * const result = caver.utils.isValidBlockNumberCandidate('1') // true
+ * const result = caver.utils.isValidBlockNumberCandidate(1) // true
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param  {string|number} blockNumber The block number to validate. This can be block number in number type or block tag(`latest`, `pending`, `earliest`, `genesis`) string.
+ * @return {boolean} `true` means blockNumber is valid.
  */
 const isValidBlockNumberCandidate = blockNumber => {
     return isPredefinedBlockNumber(blockNumber) || isHexStrict(blockNumber) || Number.isFinite(Number(blockNumber))
@@ -570,11 +764,22 @@ const isValidBlockNumberCandidate = blockNumber => {
  *
  * To hash a HEX string the hex must have 0x in front.
  *
- * @method sha3
  * @return {String} the sha3 string
  */
 const SHA3_NULL_S = '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'
 
+/**
+ * Calculates the sha3 of the input.
+ *
+ * @example
+ * const hash = caver.utils.sha3('234')
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} str - A string to hash.
+ * @return {string} The result hash.
+ */
 const sha3 = function(value) {
     // return null when value is not string type.
     if (typeof value === 'number') return null
@@ -597,6 +802,30 @@ const sha3 = function(value) {
 // expose the under the hood keccak256
 sha3._Hash = Hash
 
+/**
+ * An object defines the AccountKeyLegacy.
+ *
+ * @example
+ * { privateKey: '0x{private key}', address: '0x{address in hex}', type: '0x00' }
+ *
+ * @typedef {object} module:utils.ParsedPrivateKey
+ * @property {string} privateKey - The private key string.
+ * @property {string} address - The address string.
+ * @property {string} type - The type string. Currently only `0x00` is supported.
+ */
+/**
+ * Parses private key string to { privateKey, address, type }.
+ *
+ * @example
+ * const { privateKey, address, type } = caver.utils.parsePrivateKey('0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d8')
+ * const { privateKey, address, type } = caver.utils.parsePrivateKey('0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b')
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} privateKey - A private key or KlaytnWalletKey string to parse.
+ * @return {module:utils.ParsedPrivateKey} A parsed private key object.
+ */
 function parsePrivateKey(privateKey) {
     if (typeof privateKey !== 'string') throw new Error('The private key must be of type string')
 
@@ -617,22 +846,35 @@ function parsePrivateKey(privateKey) {
         return {
             privateKey: `0x${privateKey}`,
             address: '',
-            isHumanReadable: false,
+            type: '',
         }
     }
 
+    const type = privateKey.slice(66, 68)
+    if (type !== '00') throw new Error('Invalid type: Currently only type `0x00` is supported.')
+
     if (!isKlaytnWalletKey(privateKey)) throw new Error(`Invalid KlaytnWalletKey format.`)
 
-    const humanReadableFlag = privateKey.slice(66, 68)
-    if (humanReadableFlag === '01') throw new Error('HumanReadableAddress is not supported yet.')
     const parsedAddress = privateKey.slice(68)
     return {
         privateKey: `0x${parsedPrivateKey}`,
         address: parsedAddress,
-        isHumanReadable: false,
+        type: `0x${type}`,
     }
 }
 
+/**
+ * Parses KlatynWalletKey to [ '0x{privateKey}', '0x{type}', '0x{address}' ].
+ *
+ * @example
+ * const parsed = caver.utils.parseKlaytnWalletKey('0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b')
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} key - A KlaytnWalletKey string to parse.
+ * @return {Array.<string>} An array that includes parsed KlaytnWalletKey.
+ */
 function parseKlaytnWalletKey(key) {
     if (!isKlaytnWalletKey(key)) throw new Error(`Invalid KlaytnWalletKey format: ${key}`)
     const klaytnWalletKey = key.startsWith('0x') ? key.slice(2) : key
@@ -640,6 +882,18 @@ function parseKlaytnWalletKey(key) {
     return [`0x${splitted[0]}`, `0x${splitted[1]}`, `0x${splitted[2]}`]
 }
 
+/**
+ * Validate a KlaytnWalletKey string.
+ *
+ * @example
+ * const result = caver.utils.isKlaytnWalletKey('0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d80x000xa94f5374fce5edbc8e2a8697c15331677e6ebf0b')
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} privateKey - A KlaytnWalletKey string to validate.
+ * @return {boolean} `true` means valid KlaytnWalletKey.
+ */
 const isKlaytnWalletKey = privateKey => {
     if (!_.isString(privateKey)) return false
 
@@ -660,7 +914,7 @@ const isKlaytnWalletKey = privateKey => {
                 if (splited[i].length !== 64 || !isValidPrivateKey(splited[i])) return false
                 break
             case 1:
-                if (splited[i].length !== 2 || (splited[i] !== '00' && splited[i] !== '01')) return false
+                if (splited[i].length !== 2 || splited[i] !== '00') return false
                 break
             case 2:
                 if (splited[i].length !== 40 || !isAddress(splited[i])) return false
@@ -671,6 +925,18 @@ const isKlaytnWalletKey = privateKey => {
     return true
 }
 
+/**
+ * Validate a private key string.
+ *
+ * @example
+ * const result = caver.utils.isValidPrivateKey('0x45a915e4d060149eb4365960e6a7a45f334393093061116b197e3240065ff2d8')
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} privateKey - A private key string to validate.
+ * @return {boolean} `true` means valid private key.
+ */
 function isValidPrivateKey(privateKey) {
     if (typeof privateKey !== 'string') return false
 
@@ -709,6 +975,18 @@ const rlpEncode = data => RLP.encode(data)
 
 const rlpDecode = encodedData => RLP.decode(encodedData)
 
+/**
+ * Converts from public key to x, y points.
+ *
+ * @example
+ * const result = caver.utils.xyPointFromPublicKey('0x04019b186993b620455077b6bc37bf61666725d8d87ab33eb113ac0414cd48d78ff46e5ea48c6f22e8f19a77e5dbba9d209df60cbcb841b7e3e81fe444ba829831')
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} publicKey - A public key string.
+ * @return {Array.<string>} An array with x, y points.
+ */
 const xyPointFromPublicKey = pub => {
     let publicKey = pub
     if (isCompressedPublicKey(publicKey)) publicKey = decompressPublicKey(pub)
@@ -722,6 +1000,18 @@ const xyPointFromPublicKey = pub => {
     return [pubX, pubY]
 }
 
+/**
+ * Trims leading zero from 0x-prefixed hex string.
+ *
+ * @example
+ * const result = caver.utils.trimLeadingZero('0x0000011') // '0x11'
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} hex - A hex string to trim.
+ * @return {string} A hex string without leading zero.
+ */
 const trimLeadingZero = function(hex) {
     while (hex && hex.startsWith('0x0')) {
         hex = `0x${hex.slice(3)}`
@@ -729,6 +1019,18 @@ const trimLeadingZero = function(hex) {
     return hex
 }
 
+/**
+ * Returns a string to an even length.
+ *
+ * @example
+ * const result = caver.utils.makeEven('0x011') // '0x0011'
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} hex - A hex string to make even.
+ * @return {string} A string with even length.
+ */
 const makeEven = function(hex) {
     if (hex.length % 2 === 1) {
         hex = hex.replace('0x', '0x0')
@@ -737,10 +1039,16 @@ const makeEven = function(hex) {
 }
 
 /**
- * Returns an array of signatures.
+ * Converts the signature to an array format.
  *
- * @param {string|object|Array.<string>} signature The address entered by the user for use in creating an account.
- * @return {Array.<string>} the sha3 string
+ * @example
+ * const result = caver.utils.resolveSignature({ v: '0x0fe9', r: '0x02aca...', s: '0x20502...' })
+ * const result = caver.utils.resolveSignature({ V: '0x0fe9', R: '0x02aca...', S: '0x20502...' })
+ * const result = caver.utils.resolveSignature('0x7e85aaff6a6ef0730308af49f6b512741e61f958a21df387a0d0e8973fb40ca0307a8b87f6ac249f7218b4ee1a1d2f7d764ec2d20d9824e7b7b842dd214f139c7f6')
+ *
+ * @ignore
+ * @param {string|object|Array.<string>|SignatureData} signature A signature string, object or array.
+ * @return {Array.<string>} A signature array.
  */
 const resolveSignature = signature => {
     if (_.isArray(signature)) {
@@ -764,6 +1072,21 @@ const resolveSignature = signature => {
     }
 }
 
+/**
+ * Converts the signature to an `{ V, R, S }` format.
+ * Klaytn Node uses `{ V, R, S }` format, so you can use this function to convert caver signature format to `{ V, R, S }`.
+ *
+ * @example
+ * const result = caver.utils.transformSignaturesToObject([
+ *     '0x7f6',
+ *     '0x7e85aaff6a6ef0730308af49f6b512741e61f958a21df387a0d0e8973fb40ca0',
+ *     '0x307a8b87f6ac249f7218b4ee1a1d2f7d764ec2d20d9824e7b7b842dd214f139c'
+ * ])
+ *
+ * @ignore
+ * @param {string|object|Array.<string>|SignatureData} signature A signature string, object or array.
+ * @return {Klay.SignatureData} A signature object.
+ */
 const transformSignaturesToObject = signatures => {
     let isSingular = false
 
@@ -839,6 +1162,18 @@ const transformSignaturesToObject = signatures => {
     return isSingular ? ret[0] : ret
 }
 
+/**
+ * Returns tx type string.
+ * This function uses an old type string.
+ *
+ * @example
+ * const result = caver.utils.getTxTypeStringFromRawTransaction('0x08f83a808505d21dba00824e20945b2840bcbc2be07fb12d9129ed3a02d8e446594401945b2840bcbc2be07fb12d9129ed3a02d8e4465944c4c3018080')
+ *
+ * @deprecated
+ * @ignore
+ * @param {string} rawTransaction An RLP-encoded transaction string.
+ * @return {string} A transaction type string.
+ */
 const getTxTypeStringFromRawTransaction = rawTransaction => {
     if (typeof rawTransaction !== 'string') throw new Error('Invalid raw Tx', rawTransaction)
 
@@ -849,6 +1184,19 @@ const getTxTypeStringFromRawTransaction = rawTransaction => {
     return typeString
 }
 
+/**
+ * Returns tx type string.
+ * This function uses an old type string.
+ *
+ * @example
+ * const result = caver.utils.isValidPublicKey('0x3a06fcf2eb4f096e01bc70ab2c81ba79e82af9c62a3ef5fe1fef329c3ad89e8622aed245899ffa530ddd8ebf1a0a66f157b75a38a715f82ad6061af36cbd9cd8')
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} rawTransaction An RLP-encoded transaction string.
+ * @return {string} A transaction type string.
+ */
 const isValidPublicKey = publicKey => {
     let pubString = publicKey.replace('0x', '')
 
@@ -867,12 +1215,36 @@ const isValidPublicKey = publicKey => {
     return secp256k1.keyFromPublic(point).validate().result
 }
 
+/**
+ * Return `true` is public key is compressed, otherwise `false`.
+ *
+ * @example
+ * const result = caver.utils.isCompressedPublicKey('0x023a06fcf2eb4f096e01bc70ab2c81ba79e82af9c62a3ef5fe1fef329c3ad89e86')
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} publicKey A public key string.
+ * @return {boolean} `true` means compressed.
+ */
 const isCompressedPublicKey = publicKey => {
     const compressedIndicators = ['02', '03']
     const withoutPrefix = publicKey.replace('0x', '')
     return withoutPrefix.length === 66 && compressedIndicators.includes(withoutPrefix.slice(0, 2))
 }
 
+/**
+ * Compresses the uncompressed public key.
+ *
+ * @example
+ * const result = caver.utils.compressPublicKey('0x62cef87819b82f62e9c0a38c1fa7dfa089084959df86aca19ff2f6c903db2248b45dc23220ee6bcd8753bb9df8ce7d58e56eabebb14479f3a0ca5ccd4bdea632')
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} publicKey A public key string.
+ * @return {string} A compressed public key.
+ */
 const compressPublicKey = uncompressedPublicKey => {
     const isAlreadyCompressed = isCompressedPublicKey(uncompressedPublicKey)
 
@@ -899,6 +1271,18 @@ const compressPublicKey = uncompressedPublicKey => {
     return compressedPublicKey
 }
 
+/**
+ * Decompresses the compressed public key.
+ *
+ * @example
+ * const result = caver.utils.decompressPublicKey('0x0262cef87819b82f62e9c0a38c1fa7dfa089084959df86aca19ff2f6c903db2248')
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} publicKey A public key string.
+ * @return {string} A uncompressed public key.
+ */
 const decompressPublicKey = compressedPublicKey => {
     if (!isCompressedPublicKey(compressedPublicKey)) {
         if (!isValidPublicKey(compressedPublicKey)) throw new Error(`Invalid public key`)
@@ -944,6 +1328,29 @@ const isValidRole = role => {
 // { v: '0x01', r: '0x', s:'0x' }
 // SignatureData { _v: '0x01', _r: '0x', _s:'0x' }
 // [SignatureData { _v: '0x01', _r: '0x', _s:'0x' }]
+/**
+ * Returns `true` if sig is in the format of empty signature (`SignatureData { _v: '0x01', _r: '0x', _s: '0x' }` or `[SignatureData { _v: '0x01', _r: '0x', _s: '0x' }]`), otherwise it returns `false`.
+ *
+ * In caver-js, if signatures or feePayerSignatures is empty, the value representing an empty signature, `[SignatureData { _v: '0x01', _r: '0x', _s: '0x' }]`, is returned for the property.
+ * This function is used to check whether the given signature is `[SignatureData { _v: '0x01', _r: '0x', _s: '0x' }]` (or `SignatureData { _v: '0x01', _r: '0x', _s: '0x' }` in the 'LEGACY' transaction).
+ *
+ * @example
+ * const result = caver.utils.isEmptySig(['0x01', '0x', '0x'])
+ * const result = caver.utils.isEmptySig({ v: '0x01', r: '0x', s: '0x' })
+ * const result = caver.utils.isEmptySig({ V: '0x01', R: '0x', S: '0x' })
+ * const result = caver.utils.isEmptySig(new caver.wallet.keyring.signatureData(['0x01', '0x', '0x']))
+ *
+ * const result = caver.utils.isEmptySig([['0x01', '0x', '0x']])
+ * const result = caver.utils.isEmptySig([{ v: '0x01', r: '0x', s: '0x' }])
+ * const result = caver.utils.isEmptySig([{ V: '0x01', R: '0x', S: '0x' }])
+ * const result = caver.utils.isEmptySig([new caver.wallet.keyring.signatureData(['0x01', '0x', '0x'])])
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {object|Array.<object>|Array.<string>|Array.<Array.<string>>|SignatureData|Array.<SignatureData>} sig An instance of {@link SignatureData} or array of {@link SignatureData} to check empty or not.
+ * @return {boolean} `true` means the sig is empty.
+ */
 const isEmptySig = sig => {
     let sigs = sig
 
@@ -961,6 +1368,18 @@ const isEmptySig = sig => {
     return true
 }
 
+/**
+ * Hashes message with Klaytn specific prefix: `keccak256("\x19Klaytn Signed Message:\n" + len(message) + message))`
+ *
+ * @example
+ * const result = caver.utils.hashMessage('Hello') // '0x640bfab59b6e27468abd367888f4ab1a1c77aa2b45e76a1d3adcbd039c305917'
+ *
+ * @memberof module:utils
+ * @inner
+ *
+ * @param {string} data A message to hash. If it is a HEX string, it will be UTF-8 decoded first.
+ * @return {string} The hashed message with Klaytn specific prefix.
+ */
 const hashMessage = data => {
     const message = isHexStrict(data) ? hexToBytes(data) : data
     const messageBuffer = Buffer.from(message)
@@ -980,7 +1399,9 @@ const hashMessage = data => {
  * const signature = { v: '0x1c', r: '0xd0b8d...', s: '0x5472e...' } // You can get a signature via `keyring.signMessage(...).signatures[0]`.
  * const recoveredPublicKey = caver.utils.recoverPublicKey(message, signature)
  *
- * @method recoverPublicKey
+ * @memberof module:utils
+ * @inner
+ *
  * @param {string} message The raw message string. If this message is hased with Klaytn specific prefix, the third parameter should be passed as `true`.
  * @param {SignatureData|Array.<string>|object} signature An instance of `SignatureData`, `[v, r, s]` or `{v, r, s}`.
  * @param {boolean} [isHashed] (optional, default: `false`) If the `isHashed` is true, the given message will NOT automatically be prefixed with "\x19Klaytn Signed Message:\n" + message.length + message, and be assumed as already prefixed.
@@ -1004,7 +1425,9 @@ const recoverPublicKey = (message, signature, isHashed = false) => {
  * const signature = { v: '0x1c', r: '0xd0b8d...', s: '0x5472e...' } // You can get a signature via `keyring.signMessage(...).signatures[0]`.
  * const recoveredPublicKey = caver.utils.recover(message, signature)
  *
- * @method recover
+ * @memberof module:utils
+ * @inner
+ *
  * @param {string} message The raw message string. If this message is hased with Klaytn specific prefix, the third parameter should be passed as `true`.
  * @param {SignatureData|Array.<string>|object} signature An instance of `SignatureData`, `[v, r, s]` or `{v, r, s}`.
  * @param {boolean} [isHashed] (optional, default: `false`) If the `isHashed` is true, the given message will NOT automatically be prefixed with "\x19Klaytn Signed Message:\n" + message.length + message, and be assumed as already prefixed.
@@ -1025,6 +1448,9 @@ const recover = (message, signature, isHashed = false) => {
  *
  * @example
  * const address = caver.utils.publicKeyToAddress('0x{public key}')
+ *
+ * @memberof module:utils
+ * @inner
  *
  * @method publicKeyToAddress
  * @param {string} publicKey The public key string to get the address.
@@ -1047,6 +1473,7 @@ const publicKeyToAddress = publicKey => {
 module.exports = {
     BN: BN,
     isBN: isBN,
+    BigNumber: BigNumber,
     isBigNumber: isBigNumber,
     toBN: toBN,
     isAddress: isAddress,

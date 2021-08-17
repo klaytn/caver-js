@@ -32,18 +32,35 @@ const { toBuffer, isHexStrict, toHex } = require('../../caver-utils/src')
 const { isAddress } = require('../../caver-utils/src')
 const KIP13 = require('../src/kip13')
 
+/**
+ * The KIP17 class that helps you easily handle a smart contract that implements KIP-17 as a JavaScript object on the Klaytn blockchain platform (Klaytn).
+ * @hideconstructor
+ * @class
+ */
 class KIP17 extends Contract {
     /**
-     * deploy deploys a KIP-17 token contract to Klaytn network.
-     * `const deployedContract = await caver.kct.kip17.deploy({
-     *      name: 'TokenName',
-     *      symbol: 'TKN',
-     *  }, '0x{address in hex}')`
+     * Deploys a KIP-17 token contract to Klaytn network.
      *
-     * @method deploy
-     * @param {Object} tokenInfo The object that defines the name and symbol of the token to deploy.
-     * @param {Object|String} sendOptions The address of the account to deploy the KIP-17 token contract or an object holding parameters that are required for sending a transaction.
-     * @return {Object}
+     * By default, it returns a KIP17 instance when the deployment is finished.
+     * If you define a custom function in the `contractDeployFormatter` field in {@link Contract.SendOptions|SendOptions}, you can control return type.
+     *
+     * @example
+     * const tokenInfo = { name: 'TokenName', symbol: 'TKN' }
+     *
+     * // Below example will use `caver.wallet`.
+     * const deployed = await caver.kct.kip17.deploy(tokenInfo, '0x{deployer address}')
+     *
+     * // Use sendOptions instead of deployer address.
+     * const sendOptions = { from: '0x{deployer address}', feeDelegation: true, feePayer: '0x{fee payer address}' }
+     * const deployed = await caver.kct.kip17.deploy(tokenInfo, sendOptions)
+     *
+     * // If you want to use your own wallet that implements the 'IWallet' interface, pass it into the last parameter.
+     * const deployed = await caver.kct.kip17.deploy(tokenInfo, '0x{deployer address}', wallet)
+     *
+     * @ignore
+     * @param {KIP17.KIP17DeployParams} tokenInfo The object that defines the name and symbol of the token to deploy.
+     * @param {Contract.SendOptions|string} sendOptions The address of the account to deploy the KIP-17 token contract or an object holding parameters that are required for sending a transaction.
+     * @return {Promise<*>}
      */
     static deploy(tokenInfo, sendOptions) {
         validateDeployParameterForKIP17(tokenInfo)
@@ -64,11 +81,25 @@ class KIP17 extends Contract {
     }
 
     /**
-     * detectInterface detects which interface the KIP-17 token contract supports.
+     * An object that defines the parameters required to deploy the KIP-17 contract.
      *
-     * @method detectInterface
+     * @typedef {object} KIP17.KIP17DetectedObject
+     * @property {boolean} IKIP17 - Whether to implement `IKIP17` interface.
+     * @property {boolean} IKIP17Metadata - Whether to implement `IKIP17Metadata` interface.
+     * @property {boolean} IKIP17Enumerable - Whether to implement `IKIP17Enumerable` interface.
+     * @property {boolean} IKIP17Mintable - Whether to implement `IKIP17Mintable` interface.
+     * @property {boolean} IKIP17MetadataMintable - Whether to implement `IKIP17MetadataMintable` interface.
+     * @property {boolean} IKIP17Burnable - Whether to implement `IKIP17Burnable` interface.
+     * @property {boolean} IKIP17Pausable - Whether to implement `IKIP17Pausable` interface.
+     */
+    /**
+     * Returns the information of the interface implemented by the token contract.
+     *
+     * @example
+     * const detected = await caver.kct.kip17.detectInterface('0x{address in hex}')
+     *
      * @param {string} contractAddress The address of the KIP-17 token contract to detect.
-     * @return {object}
+     * @return {Promise<KIP17.KIP17DetectedObject>}
      */
     static detectInterface(contractAddress) {
         const kip17 = new KIP17(contractAddress)
@@ -94,6 +125,16 @@ class KIP17 extends Contract {
         super(abi, tokenAddress)
     }
 
+    /**
+     * Clones the current KIP17 instance.
+     *
+     * @example
+     * const cloned = kip17.clone()
+     * const cloned = kip17.clone('0x{new kip17 address}')
+     *
+     * @param {string} [tokenAddress] The address of the token contract.
+     * @return {KIP17}
+     */
     clone(tokenAddress = this.options.address) {
         const cloned = new this.constructor(tokenAddress, this.options.jsonInterface)
         cloned.setWallet(this._wallet)
@@ -101,10 +142,12 @@ class KIP17 extends Contract {
     }
 
     /**
-     * detectInterface detects which interface the KIP-17 token contract supports.
+     * Returns the information of the interface implemented by the token contract.
      *
-     * @method detectInterface
-     * @return {object}
+     * @example
+     * const detected = await kip17.detectInterface()
+     *
+     * @return {Promise<KIP17.KIP17DetectedObject>}
      */
     async detectInterface() {
         const detected = {
@@ -142,11 +185,13 @@ class KIP17 extends Contract {
     }
 
     /**
-     * supportsInterface checks whether interface is supported or not.
+     * Returns `true` if this contract implements the interface defined by `interfaceId`.
      *
-     * @method supportsInterface
+     * @example
+     * const supported = await kip17.supportsInterface('0x80ac58cd')
+     *
      * @param {string} interfaceId The interface id to check.
-     * @return {boolean}
+     * @return {Promise<boolean>}
      */
     async supportsInterface(interfaceId) {
         const isSupported = await this.methods.supportsInterface(interfaceId).call()
@@ -154,10 +199,12 @@ class KIP17 extends Contract {
     }
 
     /**
-     * name returns the name of the token.
+     * Returns the name of the token.
      *
-     * @method name
-     * @return {String}
+     * @example
+     * const name = await kip17.name()
+     *
+     * @return {Promise<string>}
      */
     async name() {
         const name = await this.methods.name().call()
@@ -165,10 +212,12 @@ class KIP17 extends Contract {
     }
 
     /**
-     * symbol returns the symbol of the token.
+     * Returns the symbol of the token.
      *
-     * @method symbol
-     * @return {String}
+     * @example
+     * const symbol = await kip17.symbol()
+     *
+     * @return {Promise<string>}
      */
     async symbol() {
         const symbol = await this.methods.symbol().call()
@@ -176,11 +225,13 @@ class KIP17 extends Contract {
     }
 
     /**
-     * tokenURI returns the uri of the token.
+     * Returns the URI for a given token id.
      *
-     * @method tokenURI
-     * @param {BigNumber|String|Number} tokenId The id of the token.
-     * @return {String}
+     * @example
+     * const tokenURI = await kip17.tokenURI(0)
+     *
+     * @param {BigNumber|string|number} tokenId The id of the token.
+     * @return {Promise<string>}
      */
     async tokenURI(tokenId) {
         const tokenURI = await this.methods.tokenURI(formatParamForUint256(tokenId)).call()
@@ -188,10 +239,12 @@ class KIP17 extends Contract {
     }
 
     /**
-     * totalSupply returns the total amount of tokens stored by the contract.
+     * Returns the total number of tokens minted by the contract.
      *
-     * @method totalSupply
-     * @return {BigNumber}
+     * @example
+     * const totalSupply = await kip17.totalSupply()
+     *
+     * @return {Promise<BigNumber>}
      */
     async totalSupply() {
         const totalSupply = await this.methods.totalSupply().call()
@@ -199,12 +252,14 @@ class KIP17 extends Contract {
     }
 
     /**
-     * tokenOfOwnerByIndex returns the token id at a given index of the tokens list of the requested owner.
+     * Searches the `owner`'s token list for the given index, and returns the token id of a token positioned at the matched index in the list if there is a match.
      *
-     * @method tokenOfOwnerByIndex
-     * @param {String} owner The address of the account whose token you want to query.
-     * @param {BigNumber|String|Number} index The index of the token to be searched among the tokens owned by a owner account.
-     * @return {BigNumber}
+     * @example
+     * const token = await kip17.tokenOfOwnerByIndex('0x{address in hex}', 5)
+     *
+     * @param {string} owner The address of the account who owns tokens.
+     * @param {BigNumber|string|number} index The index of a token in owner's token list.
+     * @return {Promise<BigNumber>}
      */
     async tokenOfOwnerByIndex(owner, index) {
         const token = await this.methods.tokenOfOwnerByIndex(owner, formatParamForUint256(index)).call()
@@ -212,11 +267,14 @@ class KIP17 extends Contract {
     }
 
     /**
-     * tokenByIndex returns the token id at a given index of all the tokens in this contract.
+     * Searches the list of all tokens in this contract for the given index, and returns the token id of a token positioned at the matched index in the list if there is a match.
+     * It reverts if the index is greater or equal to the total number of tokens.
      *
-     * @method tokenByIndex
-     * @param {BigNumber|String|Number} index The index of the token to query.
-     * @return {BigNumber}
+     * @example
+     * const token = await kip17.tokenByIndex(1)
+     *
+     * @param {BigNumber|string|number} index The index of the token to query.
+     * @return {Promise<BigNumber>}
      */
     async tokenByIndex(index) {
         const token = await this.methods.tokenByIndex(formatParamForUint256(index)).call()
@@ -224,12 +282,14 @@ class KIP17 extends Contract {
     }
 
     /**
-     * balanceOf returns the balance of the specified address.
-     * The balance of an account in KIP-17 means that the total number of NFT(Non Fungible Token) owned by the account.
+     * Returns the balance of the given account address.
+     * The balance of an account in KIP-17 is the total number of NFTs (Non-Fungible Tokens) owned by the account.
      *
-     * @method balanceOf
-     * @param {String} account The address of the account whose number of tokens you want to see.
-     * @return {BigNumber}
+     * @example
+     * const balance = await kip17.balanceOf('0x{address in hex}')
+     *
+     * @param {string} account The address of the account to be checked for its balance.
+     * @return {Promise<BigNumber>}
      */
     async balanceOf(account) {
         const balance = await this.methods.balanceOf(account).call()
@@ -237,11 +297,13 @@ class KIP17 extends Contract {
     }
 
     /**
-     * ownerOf returns the owner of the specified token id.
+     * Returns the address of the owner of the specified token id.
      *
-     * @method ownerOf
-     * @param {BigNumber|String|Number} tokenId The id of the token.
-     * @return {BigNumber}
+     * @example
+     * const owner = await kip17.ownerOf(8)
+     *
+     * @param {BigNumber|string|number} tokenId The id of the token.
+     * @return {Promise<string>}
      */
     async ownerOf(tokenId) {
         const owner = await this.methods.ownerOf(formatParamForUint256(tokenId)).call()
@@ -249,11 +311,14 @@ class KIP17 extends Contract {
     }
 
     /**
-     * getApproved returns the approved address for a token id, or zero if no address set.
+     * Returns the address who was permitted to transfer this token, or 'zero' address, if no address was approved.
+     * It reverts if the given token id does not exist.
      *
-     * @method getApproved
-     * @param {BigNumber|String|Number} tokenId The id of the token.
-     * @return {Boolean}
+     * @example
+     * const approvedAddress = await kip17.getApproved(10)
+     *
+     * @param {BigNumber|string|number} tokenId The id of the token.
+     * @return {Promise<string>}
      */
     async getApproved(tokenId) {
         const isApproved = await this.methods.getApproved(formatParamForUint256(tokenId)).call()
@@ -261,12 +326,14 @@ class KIP17 extends Contract {
     }
 
     /**
-     * isApprovedForAll returns true if an operator is approved by a given owner.
+     * Returns `true` if an `operator` is approved to transfer all tokens that belong to the `owner`.
      *
-     * @method isApprovedForAll
-     * @param {String} owner The id of the token.
-     * @param {String} operator The id of the token.
-     * @return {Boolean}
+     * @example
+     * const isApprovedForAll = await kip17.isApprovedForAll('0x{address in hex}', '0x{address in hex}')
+     *
+     * @param {string} owner The id of the token.
+     * @param {string} operator The id of the token.
+     * @return {Promise<boolean>}
      */
     async isApprovedForAll(owner, operator) {
         const isApprovedForAll = await this.methods.isApprovedForAll(owner, operator).call()
@@ -274,11 +341,13 @@ class KIP17 extends Contract {
     }
 
     /**
-     * isMinter returns whether the account is minter or not.
+     * Returns true if the given account is a minter who can issue new tokens in the current contract conforming to KIP-17.
      *
-     * @method isMinter
-     * @param {String} account The address of the account you want to check minter or not.
-     * @return {Boolean}
+     * @example
+     * const isMinter = await kip17.isMinter('0x{address in hex}')
+     *
+     * @param {string} account The address of the account to be checked for having the minting right.
+     * @return {Promise<boolean>}
      */
     async isMinter(account) {
         const isMinter = await this.methods.isMinter(account).call()
@@ -286,10 +355,12 @@ class KIP17 extends Contract {
     }
 
     /**
-     * paused returns whether or not the token contract's transaction is paused.
+     * Returns true if the contract is paused, and false otherwise.
      *
-     * @method paused
-     * @return {Boolean}
+     * @example
+     * const isPaused = await kip17.paused()
+     *
+     * @return {Promise<boolean>}
      */
     async paused() {
         const isPaused = await this.methods.paused().call()
@@ -297,11 +368,13 @@ class KIP17 extends Contract {
     }
 
     /**
-     * isPauser returns whether the account is pauser or not.
+     * Returns `true` if the given account is a pauser who can suspend transferring tokens.
      *
-     * @method isPauser
-     * @param {String} account The address of the account you want to check pauser or not.
-     * @return {Boolean}
+     * @example
+     * const isPauser = await kip17.isPauser('0x{address in hex}')
+     *
+     * @param {string} account The address of the account you want to check pauser or not.
+     * @return {Promise<boolean>}
      */
     async isPauser(account) {
         const isPauser = await this.methods.isPauser(account).call()
@@ -309,13 +382,18 @@ class KIP17 extends Contract {
     }
 
     /**
-     * approve sets approval with another address to transfer the given token id.
+     * Approves another address to transfer a token of the given token id.
+     * The zero address indicates there is no approved address.
+     * There can only be one approved address per token.
+     * This method is allowed to call only by the token owner or an approved operator.
      *
-     * @method approve
-     * @param {String} to The address of the account to use on behalf of owner for the tokenId.
-     * @param {BigNumber|String|Number} tokenId The id of token the spender allows to use on behalf of the owner.
-     * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     * @example
+     * const receipt = await kip17.approve('0x{address in hex}', 10, { from: '0x{address in hex}' })
+     *
+     * @param {string} to The address of the account who spends tokens in place of the owner.
+     * @param {BigNumber|string|number} tokenId The id of the token the spender is allowed to use.
+     * @param {Contract.SendOptions} [sendParam] An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async approve(to, tokenId, sendParam = {}) {
@@ -326,14 +404,15 @@ class KIP17 extends Contract {
     }
 
     /**
-     * setApprovalForAll sets or unsets the approval of a given operator.
-     * An operator is allowed to transfer all tokens of the sender on their behalf.
+     * Approves the given operator `to`, or disallow the given operator, to transfer all tokens of the `owner`.
      *
-     * @method setApprovalForAll
-     * @param {String} to The address of an account to allow/forbid for transfer of all tokens owned by the owner on behalf of the owner.
-     * @param {Boolean} approved Whether to allow sending tokens on behalf of the owner.
-     * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     * @example
+     * const receipt = await kip17.setApprovalForAll('0x{address in hex}', false, { from: '0x{address in hex}' })
+     *
+     * @param {string} to The address of an account to be approved/prohibited to transfer the owner's all tokens.
+     * @param {boolean} approved This operator will be approved if `true`. The operator will be disallowed if `false`.
+     * @param {Contract.SendOptions} [sendParam] An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async setApprovalForAll(to, approved, sendParam = {}) {
@@ -344,14 +423,22 @@ class KIP17 extends Contract {
     }
 
     /**
-     * transferFrom transfers the ownership of a given token id to another address.
+     * Transfers the token of the given token id `tokenId` from the token `owner`'s balance to another address.
      *
-     * @method transferFrom
-     * @param {String} from The address of the owner or approved of the given token.
-     * @param {String} to The address of the account to receive the token.
-     * @param {BigNumber|String|Number} tokenId The id of token you want to transfer.
-     * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     * The address who was approved to send the token owner's token (the `operator`) or the token `owner` itself is expected to execute this token transferring transaction.
+     * Thus, the approved one or the token owner should be the sender of this transaction whose address must be given at `sendParam.from` or `kip17Instance.options.from`.
+     * Without `sendParam.from` nor `kip17Instance.options.from` being provided, an error would occur.
+     *
+     * It is recommended to use {@link safeTransferFrom} whenever possible instead of this method.
+     *
+     * @example
+     * const receipt = await kip17.transferFrom('0x{address in hex}', '0x{address in hex}', 2, { from: '0x{address in hex}' })
+     *
+     * @param {string} from The address of the owner or approved of the given token.
+     * @param {string} to The address of the account to receive the token.
+     * @param {BigNumber|string|number} tokenId The id of token you want to transfer.
+     * @param {Contract.SendOptions} [sendParam] An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async transferFrom(from, to, tokenId, sendParam = {}) {
@@ -362,15 +449,21 @@ class KIP17 extends Contract {
     }
 
     /**
-     * safeTransferFrom safely transfers the ownership of a given token id to another address.
+     * Safely transfers the token of the given token id `tokenId` from the token `owner`'s balance to another address.
      *
-     * @method safeTransferFrom
-     * @param {String} from The address of the owner or approved of the given token.
-     * @param {String} to The address of the account to receive the token.
-     * @param {BigNumber|String|Number} tokenId The id of token you want to transfer.
-     * @param {Buffer|String|Number} data The optional data to send along with the call.
-     * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     * The address who was approved to send the token owner's token (the `operator`) or the token `owner` itself is expected to execute this token transferring transaction.
+     * Thus, the approved one or the token owner should be the sender of this transaction whose address must be given at `sendParam.from` or `kip17Instance.options.from`.
+     * Without `sendParam.from` nor `kip17Instance.options.from` being provided, an error would occur.
+     *
+     * @example
+     * const receipt = await kip17.safeTransferFrom('0x{address in hex}', '0x{address in hex}', 9, { from: '0x{address in hex}' })
+     *
+     * @param {string} from The address of the owner or approved of the given token.
+     * @param {string} to The address of the account to receive the token.
+     * @param {BigNumber|string|number} tokenId The id of token you want to transfer.
+     * @param {Buffer|string|number} data The optional data to send along with the call.
+     * @param {Contract.SendOptions} [sendParam] An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async safeTransferFrom(from, to, tokenId, data, sendParam = {}) {
@@ -397,13 +490,15 @@ class KIP17 extends Contract {
     }
 
     /**
-     * addMinter adds an account as a minter that has the permission of MinterRole and can mint.
-     * The account sending transaction to execute the addMinter must be a Minter with a MinterRole.
+     * Adds an account as a minter, who are permitted to mint tokens.
+     * If `sendParam.from` or `kip17.options.from` were given, it should be a minter with MinterRole.
      *
-     * @method addMinter
-     * @param {String} account The address of account to add as minter.
-     * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     * @example
+     * const receipt = await kip17.addMinter('0x{address in hex}', { from: '0x{address in hex}' })
+     *
+     * @param {string} account The address of account to add as minter.
+     * @param {Contract.SendOptions} [sendParam] An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async addMinter(account, sendParam = {}) {
@@ -414,12 +509,14 @@ class KIP17 extends Contract {
     }
 
     /**
-     * renounceMinter renounces privilege of MinterRole.
-     * The account sending transaction to execute the renounceMinter must be a Minter with a MinterRole.
+     * Renounces the right to mint tokens. Only a minter address can renounce the minting right.
+     * If `sendParam.from` or `kip17.options.from` were given, it should be a minter with MinterRole.
      *
-     * @method renounceMinter
-     * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     * @example
+     * const receipt = await kip17.renounceMinter({ from: '0x{address in hex}' })
+     *
+     * @param {Contract.SendOptions} [sendParam] An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async renounceMinter(sendParam = {}) {
@@ -430,13 +527,16 @@ class KIP17 extends Contract {
     }
 
     /**
-     * mint creates token and assigns them to account, increasing the total supply.
+     * Creates token and assigns them to account, increasing the total supply.
+     * If `sendParam.from` or `kip17.options.from` were given, it should be a minter with MinterRole.
      *
-     * @method mint
-     * @param {String} to The address of the account to which the minted token will be allocated.
-     * @param {BigNumber|String|Number} tokenId The id of token to mint.
-     * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     * @example
+     * const receipt = await kip17.mint('0x{address in hex}', 20, { from: '0x{address in hex}' })
+     *
+     * @param {string} to The address of the account to which the minted token will be allocated.
+     * @param {BigNumber|string|number} tokenId The id of token to mint.
+     * @param {Contract.SendOptions} [sendParam] An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async mint(to, tokenId, sendParam = {}) {
@@ -447,14 +547,18 @@ class KIP17 extends Contract {
     }
 
     /**
-     * mintWithTokenURI creates token with uri and assigns them to account, increasing the total supply.
+     * Creates a token with the given uri and assigns them to the given account.
+     * This method increases the total supply of this token.
+     * If `sendParam.from` or `kip17.options.from` were given, it should be a minter with MinterRole.
      *
-     * @method mintWithTokenURI
-     * @param {String} to The address of the account to which the minted token will be allocated.
-     * @param {BigNumber|String|Number} tokenId The id of token to mint.
-     * @param {String} tokenURI The uri of token to mint.
-     * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     * @example
+     * const receipt = await kip17.mintWithTokenURI('0x{address in hex}', 18, tokenURI, { from: '0x{address in hex}' })
+     *
+     * @param {string} to The address of the account to which the minted token will be allocated.
+     * @param {BigNumber|string|number} tokenId The id of token to mint.
+     * @param {string} tokenURI The uri of token to mint.
+     * @param {Contract.SendOptions} [sendParam] An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async mintWithTokenURI(to, tokenId, tokenURI, sendParam = {}) {
@@ -465,12 +569,15 @@ class KIP17 extends Contract {
     }
 
     /**
-     * burn destroys a specific KIP-17 token.
+     * Destroys the token of the given token id.
+     * Without `sendParam.from` nor `kip17.options.from` being provided, an error would occur.
      *
-     * @method burn
-     * @param {BigNumber|String|Number} tokenId The id of token to destroy.
-     * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     * @example
+     * const receipt = await kip17.burn(14, { from: '0x{address in hex}' })
+     *
+     * @param {BigNumber|string|number} tokenId The id of token to destroy.
+     * @param {Contract.SendOptions} [sendParam] An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async burn(tokenId, sendParam = {}) {
@@ -481,12 +588,14 @@ class KIP17 extends Contract {
     }
 
     /**
-     * pause triggers stopped state that stops sending tokens in emergency situation.
-     * The account sending transaction to execute the pause must be a Pauser with a PauserRole.
+     * Suspends functions related to sending tokens.
+     * If `sendParam.from` or `kip17.options.from` were given, it should be a pauser with PauserRole.
      *
-     * @method pause
-     * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     * @example
+     * const receipt = await kip17.pause({ from: '0x{address in hex}' })
+     *
+     * @param {Contract.SendOptions} [sendParam] An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async pause(sendParam = {}) {
@@ -497,14 +606,16 @@ class KIP17 extends Contract {
     }
 
     /**
-     * unpause sets amount as the allowance of spender over the caller’s tokens.
-     * The account sending transaction to execute the unpause must be a Pauser with a PauserRole.
+     * Resumes the paused contract.
+     * If `sendParam.from` or `kip17.options.from` were given, it should be a pauser with PauserRole.
      *
-     * @method unpause
-     * @param {String} spender The address of the account to use on behalf of owner for the amount to be set in allowance.
-     * @param {BigNumber|String|Number} amount The amount of tokens the spender allows to use on behalf of the owner.
-     * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     * @example
+     * const receipt = await kip17.unpause({ from: '0x{address in hex}' })
+     *
+     * @param {string} spender The address of the account to use on behalf of owner for the amount to be set in allowance.
+     * @param {BigNumber|string|number} amount The amount of tokens the spender allows to use on behalf of the owner.
+     * @param {Contract.SendOptions} [sendParam] An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async unpause(sendParam = {}) {
@@ -515,13 +626,15 @@ class KIP17 extends Contract {
     }
 
     /**
-     * addPauser adds an account as a pauser that has the permission of PauserRole and can pause.
-     * The account sending transaction to execute the addPauser must be a Pauser with a PauserRole.
+     * Adds an account as a pauser that has the right to suspend the contract.
+     * If `sendParam.from` or `kip17.options.from` were given, it should be a pauser with PauserRole.
      *
-     * @method addPauser
-     * @param {String} account The address of account to add as pauser.
-     * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     * @example
+     * const receipt = await kip17.addPauser('0x{address in hex}', { from: '0x{address in hex}' })
+     *
+     * @param {string} account The address of account to add as pauser.
+     * @param {Contract.SendOptions} [sendParam] An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async addPauser(account, sendParam = {}) {
@@ -532,12 +645,14 @@ class KIP17 extends Contract {
     }
 
     /**
-     * renouncePauser renounces privilege of PauserRole.
-     * The account sending transaction to execute the renouncePauser must be a Pauser with a PauserRole.
+     * Renounces the right to pause the contract. Only a pauser address can renounce its own pausing right.
+     * If `sendParam.from` or `kip17.options.from` were given, it should be a pauser with PauserRole.
      *
-     * @method renouncePauser
-     * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     * @example
+     * const receipt = await kip17.renouncePauser({ from: '0x{address in hex}' })
+     *
+     * @param {Contract.SendOptions} [sendParam] An object holding parameters that are required for sending a transaction.
+     * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async renouncePauser(sendParam = {}) {
@@ -548,5 +663,14 @@ class KIP17 extends Contract {
     }
 }
 
+/**
+ * The byte code of the KIP-17 token contract.
+ *
+ * @example
+ * caver.kct.kip17.byteCode
+ *
+ * @static
+ * @type {string}
+ */
 KIP17.byteCode = kip17ByteCode
 module.exports = KIP17

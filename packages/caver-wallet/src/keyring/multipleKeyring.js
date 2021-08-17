@@ -28,8 +28,13 @@ const { fillWeightedMultiSigOptionsForMultiSig } = require('../../../caver-accou
 const { validateForSigning, validateIndexWithKeys, encryptKey, formatEncrypted } = require('./keyringHelper')
 
 /**
- * representing a Keyring which includes `address` and `private keys`.
+ * `MultipleKeyring` is a class that stores the address of the account and the multiple private keys.
+ *
+ * To create a `MultipleKeyring` instance with private key strings, please refer to {@link KeyringFactory.create|caver.wallet.keyring.create}.
+ * MultipleKeyring uses private keys with which no roles assigned.
+ *
  * @class
+ * @hideconstructor
  */
 class MultipleKeyring {
     /**
@@ -71,10 +76,13 @@ class MultipleKeyring {
     }
 
     /**
-     * returns public key strings.
+     * Returns public key strings.
+     *
+     * @example
+     * const publicKeys = keyring.getPublicKey()
      *
      * @param {boolean} [compressed] Whether in compressed format or not.
-     * @return {Array.<string>}
+     * @return {Array.<string>} The public keys of the keyring.
      */
     getPublicKey(compressed = false) {
         const publicKeys = []
@@ -85,22 +93,37 @@ class MultipleKeyring {
     }
 
     /**
-     * returns a copied multipleKeyring instance
+     * Returns a copied MultipleKeyring instance.
      *
-     * @return {MultipleKeyring}
+     * @example
+     * const copied = keyring.copy()
+     *
+     * @return {MultipleKeyring} A copied MultipleKeyring instance.
      */
     copy() {
         return new MultipleKeyring(this.address, this.keys)
     }
 
     /**
-     * signs with transactionHash with key and returns signature(s).
+     * Signs with transactionHash with the private keys and returns signatures.
+     *
+     * If you want to define an `index` when using MultipleKeyring, the `index` must be less than the length of the key.
+     * And `MultipleKeyring` doesn't have the private key(s) defined by {@link KeyringFactory.role|caver.wallet.keyring.role}, so they all use the same private keys.
+     *
+     * If the user has not defined an `index` parameter, `keyring.sign` signs transaction using all the private keys used by the role.
+     * If `index` is defined, the `keyring.sign` signs transaction using only one private key at the index.
+     * The role used in caver-js can be checked through {@link KeyringFactory.role|caver.wallet.keyring.role}.
+     *
+     * @example
+     * const signed = keyring.sign('0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550', '0x2810', caver.wallet.keyring.role.roleTransactionKey)
+     * const signed = keyring.sign('0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550', '0x2810', caver.wallet.keyring.role.roleAccountUpdateKey, 1)
+     * const signed = keyring.sign('0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550', '0x2810', caver.wallet.keyring.role.roleFeePayerKey)
      *
      * @param {string} transactionHash The hash of transaction.
      * @param {string|number} chainId The chainId specific to the network.
      * @param {number} role A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
      * @param {number} [index] The index of the key to be used. If index is undefined, all private keys in keyring will be used.
-     * @return {Array.<string>|Array.<Array.<string>>}
+     * @return {SignatureData|Array.<SignatureData>} A {@link SignatureData} when `index` is deinfed, otherwise an array of {@link SignatureData}.
      */
     sign(transactionHash, chainId, role, index) {
         validateForSigning(transactionHash, chainId)
@@ -120,12 +143,25 @@ class MultipleKeyring {
     }
 
     /**
-     * signs with hashed message and returns result object that includes `signatures`, `message` and `messageHash`
+     * Signs message with Klaytn-specific prefix.
+     *
+     * This calculates a Klaytn-specific signature with:
+     * `sign(keccak256("\x19Klaytn Signed Message:\n" + len(message) + message)))`.
+     *
+     * If you want to define an `index` when using MultipleKeyring, the `index` must be less than the length of the key.
+     * And `MultipleKeyring` doesn't have the private key(s) defined by {@link KeyringFactory.role|caver.wallet.keyring.role}, so they all use the same private keys.
+     *
+     * If the user has not provided the `index` parameter, `caver.wallet.signMessage` signs message using all the private keys used by the role.
+     * If the `index` parameter is given, `caver.wallet.signMessage` signs message using only one private key at the given index.
+     * The role used in caver-js can be found from {@link KeyringFactory.role|caver.wallet.keyring.role}.
+     *
+     * @example
+     * const signed = keyring.signMessage('message to sign', caver.wallet.keyring.role.roleTransactionKey)
      *
      * @param {string} message The message string to sign.
-     * @param {number} role A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
-     * @param {number} [index] The index of the key to be used.
-     * @return {object}
+     * @param {number} role A number indicating the role of the key. You can use {@link KeyringFactory.role|caver.wallet.keyring.role}.
+     * @param {number} [index] The index of the private key you want to use. The index must be less than the length of the array of the private keys defined for each role. If an index is not defined, this method will use all the private keys.
+     * @return {KeyringContainer.SignedMessage} An object that includes the result of signing.
      */
     signMessage(message, role, index) {
         if (role === undefined) throw new Error(`role should be defined for signMessage. Please use 'caver.wallet.keyring.role'.`)
@@ -150,10 +186,13 @@ class MultipleKeyring {
     }
 
     /**
-     * returns keys by role. If the key of the role passed as parameter is empty, the default key is returned.
+     * Returns the private key(s) used by the role entered as a parameter.
      *
-     * @param {number} role A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
-     * @return {Array.<PrivateKey>}
+     * @example
+     * const key = keyring.getKeyByRole(caver.wallet.keyring.role.roleTransactionKey)
+     *
+     * @param {number} role A number indicating the role of the key. You can use {@link KeyringFactory.role|caver.wallet.keyring.role}.
+     * @return {Array.<PrivateKey>} An instance of PrivateKey.
      */
     getKeyByRole(role) {
         if (role === undefined) throw new Error(`role should be defined.`)
@@ -162,10 +201,17 @@ class MultipleKeyring {
     }
 
     /**
-     * returns an instance of Account.
+     * Returns the {@link Account} instance for updating the {@link Account.AccountKey|AccountKey} of the Klaytn accounts.
+     * The {@link Account} instance has an {@link Account.AccountKey|AccountKey} instance that can contain public key(s) inside, which will be sent to Klaytn Network and used for validating transactions.
+     * Please note that if you update the AccountKey of the Account stored in the Klaytn, the old private key(s) cannot be used anymore.
      *
-     * @param {WeightedMultiSigOptions} [options] The options that includes 'threshold' and 'weight'. This is only necessary when keyring use multiple private keys.
-     * @return {Account}
+     * `MultipleKeyring` returns an {@link Account} instance that includes the address in the keyring and an instance of {@link AccountKeyWeightedMultiSig}.
+     *
+     * @example
+     * const account = keyring.toAccount()
+     *
+     * @param {WeightedMultiSigOptions} [options] `WeightedMultiSigOptions` instance containing information that should be defined when updating your existing account to the one with a number of private keys. If `options` parameter is not defined, the default `WeightedMultiSigOptions` with the `{ threshold: 1, weights: [1, 1...}}` will be used.
+     * @return {Account} An Account instance to be used when a user updates AccountKey for their account in the Klaytn. Note that if you want to replace the existing keyring (or the existing private key) with a new keyring (or a new private key) for your account, you must update your AccountKey by sending an Account Update transaction to Klaytn beforehand.
      */
     toAccount(options) {
         if (_.isArray(options))
@@ -178,14 +224,10 @@ class MultipleKeyring {
     }
 
     /**
-     * encrypts a keyring and returns a keystore v4 object.
+     * Encrypts a keyring and returns a keystore v4 standard.
+     * For more information, please refer to {@link https://kips.klaytn.com/KIPs/kip-3|KIP-3}.
      *
-     * @param {string} password The password to be used for encryption. The encrypted key store can be decrypted with this password.
-     * @param {object} options The options to use when encrypt a keyring. Also address can be defined specifically in options object.
-     * @return {object}
-     */
-    /**
-     * options can include below
+     * `options` can include below:
      * {
      *   salt: ...,
      *   iv: ...,
@@ -199,6 +241,13 @@ class MultipleKeyring {
      *   uuid: ...,
      *   cipher: ...,
      * }
+     *
+     * @example
+     * const encrypted = keyring.encrypt('password')
+     *
+     * @param {string} password The password to be used for encryption. The encrypted key store can be decrypted with this password.
+     * @param {object} [options] The options parameter allows you to specify the values to use when using encrypt.
+     * @return {KeyringFactory.Keystore} The encrypted keystore v4.
      */
     encrypt(password, options = {}) {
         let keyring = []
@@ -207,8 +256,13 @@ class MultipleKeyring {
     }
 
     /**
-     * returns KlaytnWalletKey format. If keyring uses more than one private key, this function will throw error.
+     * Returns the {@link https://docs.klaytn.com/klaytn/design/accounts#klaytn-wallet-key-format|KlaytnWalletKey} string for the keyring.
+     * This function will throw error because `MultipleKeyring` uses more than one private key.
      *
+     * @example
+     * const klaytnWalletKey = keyring.getKlaytnWalletKey()
+     *
+     * @ignore
      * @return {string}
      */
     getKlaytnWalletKey() {
@@ -216,10 +270,17 @@ class MultipleKeyring {
     }
 
     /**
-     * encrypts a keyring and returns a keystore v3 object.
+     * Encrypts a keyring and returns a keystore v3 object.
      *
+     * Note that {@link MultipleKeyring} and {@link RoleBasedKeyring} cannot use encryptV3.
+     * In this case, please use {@link MultipleKeyring#encrypt|keyring.encrypt} with a keystore V4 standard.
+     *
+     * @example
+     * const encrypted = keyring.encryptV3('password')
+     *
+     * @ignore
      * @param {string} password The password to be used for keyring encryption. The encrypted key store can be decrypted with this password.
-     * @param {object} options The options to use when encrypt a keyring. See `keyring.encrypt` for more detail about options.
+     * @param {object} [options] The options to use when encrypt a keyring. See `keyring.encrypt` for more detail about options.
      * @return {object}
      */
     encryptV3(password, options) {
@@ -227,9 +288,12 @@ class MultipleKeyring {
     }
 
     /**
-     * returns true if keyring has decoupled key.
+     * Returns `true` if keyring has decoupled key.
      *
-     * @return {boolean}
+     * @example
+     * const isDecupled = keyring.isDecoupled()
+     *
+     * @return {boolean} `true` if keyring has decoupled key.
      */
     isDecoupled() {
         return true

@@ -39,8 +39,10 @@ function _decode(rlpEncoded) {
 }
 /**
  * Represents a legacy transaction.
- * Please refer to https://docs.klaytn.com/klaytn/design/transactions/basic#txtypelegacytransaction to see more detail.
+ * Please refer to {@link https://docs.klaytn.com/klaytn/design/transactions/basic#txtypelegacytransaction|LegacyTransaction} to see more detail.
  * @class
+ * @hideconstructor
+ * @augments AbstractTransaction
  */
 class LegacyTransaction extends AbstractTransaction {
     /**
@@ -135,10 +137,14 @@ class LegacyTransaction extends AbstractTransaction {
 
     /**
      * Appends signatures array to transaction.
-     * Legacy transaction cannot have more than one signature, so an error occurs if the transaction already has a signature.
+     * Legacy transaction cannot have more than one signature, so an error will be occured if the transaction already has a signature or the `sig` parameter has more than one signatures.
+     *
+     * @example
+     * tx.appendSignatures([ '0x0fea', '0xade94...', '0x38160...' ])
      *
      * @override
-     * @param {Array.<string>|Array.<Array.<string>>} sig - An array of signatures to append.
+     * @param {SignatureData|Array.<SignatureData>|Array.<string>|Array.<Array.<string>>} signatures - The `signatures` to be appended to the transaction. {@link SignatureData|SignatureData} instance or an array containing {@link SignatureData|SignatureData} instances.
+     *                                                                                                 An array in which each 'v', 'r', and 's' are sequentially defined as string formats or a 2D array containing those arrays can also be taken as parameters.
      */
     appendSignatures(sig) {
         if (!utils.isEmptySig(this.signatures))
@@ -156,7 +162,11 @@ class LegacyTransaction extends AbstractTransaction {
 
     /**
      * Returns the RLP-encoded string of this transaction (i.e., rawTransaction).
-     * @return {string}
+     *
+     * @example
+     * const result = tx.getRLPEncoding()
+     *
+     * @return {string} An RLP-encoded transaction string.
      */
     getRLPEncoding() {
         this.validateOptionalValues()
@@ -209,13 +219,12 @@ class LegacyTransaction extends AbstractTransaction {
 
     /**
      * Recovers the public key strings from `signatures` field in transaction object.
-     * If you want to derive an address from public key, please use `caver.utils.publicKeyToAddress`.
+     * If you want to derive an address from public key, please use {@link module:utils~publicKeyToAddress|caver.utils.publicKeyToAddress}.
      *
      * @example
      * const publicKey = tx.recoverPublicKeys()
      *
-     * @method recoverPublicKeys
-     * @return {Array.<string>}
+     * @return {Array.<string>} An array containing public keys recovered from `signatures`.
      */
     recoverPublicKeys() {
         if (utils.isEmptySig(this.signatures)) throw new Error(`Failed to recover public key from signatures: signatures is empty.`)
