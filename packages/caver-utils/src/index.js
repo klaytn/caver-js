@@ -319,7 +319,7 @@ const unitKlayToEthMap = {
 }
 
 const getKlayUnitValue = function(u) {
-    unit = u || 'KLAY'
+    let unit = u || 'KLAY'
 
     if (_.isObject(u) && u.unit) unit = u.unit
 
