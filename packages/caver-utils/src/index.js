@@ -318,13 +318,21 @@ const unitKlayToEthMap = {
     TKLAY: 'tether',
 }
 
-const getKlayUnitValue = function(unit) {
-    unit = unit || 'KLAY'
+const getKlayUnitValue = function(u) {
+    unit = u || 'KLAY'
+
+    if (_.isObject(u) && u.unit) unit = u.unit
+
     if (!unitKlayMap[unit]) {
         throw new Error(
             `This unit "${unit}" doesn't exist, please use the one of the following units${JSON.stringify(unitKlayMap, null, 2)}`
         )
     }
+
+    if (u.pebFactor !== undefined && KlayUnit[u.unit].pebFactor !== u.pebFactor) {
+        throw new Error(`peb factor does not match with given unit`)
+    }
+
     return unit
 }
 
@@ -378,7 +386,6 @@ const toPeb = function(number, unit) {
  * @return {string} The string number.
  */
 const convertFromPeb = function(amount, unitString) {
-    if (_.isObject(unitString) && unitString.unit) unitString = unitString.unit
     const converted = fromPeb(amount, unitString)
     return utils.isBN(converted) ? converted.toString(10) : converted
 }
@@ -400,7 +407,6 @@ const convertFromPeb = function(amount, unitString) {
  * @return {string|BN}
  */
 const convertToPeb = function(number, unitString) {
-    if (_.isObject(unitString) && unitString.unit) unitString = unitString.unit
     const converted = toPeb(number, unitString)
     return utils.isBN(converted) ? converted.toString(10) : converted
 }
@@ -555,6 +561,9 @@ const stripHexPrefix = function(str) {
  * @return {SignatureData}
  */
 const decodeSignature = signature => {
+    if (Buffer.byteLength(stripHexPrefix(signature), 'hex') !== 65)
+        throw new Error(`Invalid signature: The length of raw signature must be 65 byte.`)
+
     const ret = Account.decodeSignature(signature).map(sig => utils.makeEven(utils.trimLeadingZero(sig)))
     return new SignatureData(ret)
 }

@@ -162,6 +162,20 @@ class SignatureData {
     toString() {
         return this.v + this.r + this.s
     }
+
+    /**
+     * Checks that the signature data is the same.
+     *
+     * @example
+     * const isEqual = signatureData.isEqual([ '0x1b', '0xc6901...', '0x642d8...' ])
+     *
+     * @param {Array.<string>|SignatureData} sig - The ECDSA signatureData to compare
+     * @return {boolean}
+     */
+    isEqual(sig) {
+        sig = new SignatureData(sig)
+        return this.toString() === sig.toString()
+    }
 }
 
 /**

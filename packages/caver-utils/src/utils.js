@@ -1453,13 +1453,16 @@ const recover = (message, signature, isHashed = false) => {
  * @inner
  *
  * @method publicKeyToAddress
- * @param {string} publicKey The public key string to get the address.
+ * @param {string} pubKey The public key string to get the address.
  * @return {string}
  */
-const publicKeyToAddress = publicKey => {
-    publicKey = publicKey.slice(0, 2) === '0x' ? publicKey : `0x${publicKey}`
+const publicKeyToAddress = pubKey => {
+    let publicKey = pubKey.slice(0, 2) === '0x' ? pubKey : `0x${pubKey}`
 
     if (isCompressedPublicKey(publicKey)) publicKey = decompressPublicKey(publicKey)
+
+    // With '0x' prefix, 65 bytes in uncompressed format.
+    if (Buffer.byteLength(publicKey, 'hex') !== 65) throw new Error(`Invalid public key: ${pubKey}`)
 
     const publicHash = Hash.keccak256(publicKey)
     const address = `0x${publicHash.slice(-40)}`
