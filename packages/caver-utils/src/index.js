@@ -329,7 +329,7 @@ const getKlayUnitValue = function(u) {
         )
     }
 
-    if (u.pebFactor !== undefined && KlayUnit[u.unit].pebFactor !== u.pebFactor) {
+    if (u && u.pebFactor !== undefined && KlayUnit[u.unit].pebFactor !== u.pebFactor) {
         throw new Error(`peb factor does not match with given unit`)
     }
 
