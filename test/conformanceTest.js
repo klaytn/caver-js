@@ -42,7 +42,8 @@ describe('Caver Common Architecture Conformance Tests', () => {
         if (layer.name.startsWith('.')) return
 
         describe(`${layer.name} Layer Testing`, () => {
-            const packageName = formatPackageNaming(layer.name) // To access each layer via `caver` instance (ex `caver.utils), format string.
+            // To access each layer via `caver` instance (ex `caver.utils), format string.
+            const packageName = formatPackageNaming(layer.name)
             const layerDirPath = path.join(comformanceTests, `${layer.name}`)
             const testDirectories = fs.readdirSync(layerDirPath, { withFileTypes: true })
 
@@ -117,7 +118,7 @@ function modifyInputFormatToArray(jsonString) {
         const expectedResultIndex = jsonString.slice(inputIndex).indexOf('"expectedResult"') + inputIndex
 
         // inputString contains the input of one TC defined in json in the form of string.
-        let inputString = jsonString.slice(inputIndex, expectedResultIndex)
+        const inputString = jsonString.slice(inputIndex, expectedResultIndex)
 
         // After parsing with `JSON.parse`, object keys will be sorted.
         // But we shouldn't change the order because inputs are defined in the order of the parameters of the function.
