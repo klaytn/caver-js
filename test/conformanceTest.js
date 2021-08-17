@@ -28,12 +28,6 @@ const Caver = require('../index.js')
 const comformanceTests = path.join(__dirname, '/../caver-conformance-tests')
 const SignatureData = require('../packages/caver-wallet/src/keyring/signatureData')
 
-let caver
-
-before(() => {
-    caver = new Caver()
-})
-
 describe('Caver Common Architecture Conformance Tests', () => {
     // caver-conformance-tests/LayerName/ClassName/functionName.json
     const layers = fs.readdirSync(comformanceTests, { withFileTypes: true })
@@ -76,6 +70,7 @@ describe('Caver Common Architecture Conformance Tests', () => {
                             }
 
                             it(`${tc.id}: ${tc.description}`, async () => {
+                                const caver = new Caver()
                                 const inputs = tc.inputArray
 
                                 // Function calls should work normally without any errors.
@@ -168,7 +163,7 @@ function compareResult(result, expectedResult) {
     } else if (_.isObject(result)) {
         if (result instanceof SignatureData) return result.isEqual(expectedResult)
 
-        for (const key of Object.keys(result)) {
+        for (let key of Object.keys(result)) {
             if (key.startsWith('_')) key = key.slice(1)
             compareResult(result[key], expectedResult[key])
         }
