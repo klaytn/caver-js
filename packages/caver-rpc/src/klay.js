@@ -1933,24 +1933,6 @@ class Klay {
                 call: 'klay_rewardbase',
                 params: 0,
             }),
-            /**
-             * Returns `true` if the node is using writeThroughCaching.
-             *
-             * @memberof Klay
-             * @method isWriteThroughCaching
-             * @instance
-             *
-             * @example
-             * const result = await caver.rpc.klay.isWriteThroughCaching()
-             *
-             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
-             * @return {Promise<boolean>} `true` means the node is using write-through caching.
-             */
-            new Method({
-                name: 'isWriteThroughCaching',
-                call: 'klay_writeThroughCaching',
-                params: 0,
-            }),
 
             // Filter
             /**
