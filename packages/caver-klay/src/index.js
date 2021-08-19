@@ -145,17 +145,7 @@ const Klay = function Klay(...args) {
     const self = this
     const Contract = function Contract() {
         BaseContract.apply(this, arguments)
-
-        // when Klay.setProvider is called, call packageInit
-        // on all contract instances instantiated via this Klay
-        // instances. This will update the currentProvider for
-        // the contract instances
-        const _this = this // eslint-disable-line no-shadow
-        const setProvider = self.setProvider // eslint-disable-line no-shadow
-        self.setProvider = function() {
-            setProvider.apply(self, arguments)
-            core.packageInit(_this, [self])
-        }
+        core.packageInit(this, [self])
     }
 
     Contract.setProvider = function() {
