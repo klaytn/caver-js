@@ -33,7 +33,19 @@ module.exports = {
         // make property of pkg._provider, which can properly set providers
         Object.defineProperty(pkg, 'currentProvider', {
             get: function() {
-                return pkg._provider
+                return pkg._requestManager.provider
+            },
+            set: function(value) {
+                return pkg.setProvider(value)
+            },
+            enumerable: true,
+            configurable: true,
+        })
+
+        // make property of pkg._provider, which can properly set providers
+        Object.defineProperty(pkg, '_provider', {
+            get: function() {
+                return pkg._requestManager.provider
             },
             set: function(value) {
                 return pkg.setProvider(value)
@@ -50,20 +62,17 @@ module.exports = {
         }
 
         pkg.providers = Manager.providers
-        pkg._provider = pkg._requestManager.provider
 
         // add SETPROVIDER function (don't overwrite if already existing)
         if (!pkg.setProvider) {
             pkg.setProvider = function(provider, net) {
                 pkg._requestManager.setProvider(provider, net)
-                pkg._provider = pkg._requestManager.provider
                 return true
             }
         }
 
         pkg.setRequestManager = function(manager) {
             pkg._requestManager = manager
-            pkg._provider = manager.provider
         }
 
         // attach batch request creation

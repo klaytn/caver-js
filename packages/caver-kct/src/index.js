@@ -147,13 +147,7 @@ class KCT {
              */
             constructor(tokenAddress, abi) {
                 super(tokenAddress, abi)
-                const self = this // eslint-disable-line no-shadow
-                const setRequestManager = _this.setRequestManager // eslint-disable-line no-shadow
-                _this.setRequestManager = function() {
-                    setRequestManager.apply(_this, arguments)
-                    core.packageInit(self, [_this])
-                }
-
+                core.packageInit(this, [_this])
                 this.setWallet(args[0].wallet)
             }
         }
@@ -230,13 +224,7 @@ class KCT {
              */
             constructor(tokenAddress, abi) {
                 super(tokenAddress, abi)
-                const self = this // eslint-disable-line no-shadow
-                const setRequestManager = _this.setRequestManager // eslint-disable-line no-shadow
-                _this.setRequestManager = function() {
-                    setRequestManager.apply(_this, arguments)
-                    core.packageInit(self, [_this])
-                }
-
+                core.packageInit(this, [_this])
                 this.setWallet(args[0].wallet)
             }
         }

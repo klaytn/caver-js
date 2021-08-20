@@ -135,14 +135,7 @@ function Caver(provider, net) {
     const Contract = function Contract() {
         BaseContract.apply(this, arguments)
 
-        // when caver.setProvider is called, call 'packageInit' all contract instances instantiated via this Caver instances.
-        // This will update the currentProvider for the contract instances
-        const _this = this // eslint-disable-line no-shadow
-        const setProvider = self.setProvider // eslint-disable-line no-shadow
-        self.setProvider = function() {
-            setProvider.apply(self, arguments)
-            core.packageInit(_this, [self])
-        }
+        core.packageInit(this, [self])
         this.setWallet(self.wallet)
     }
 
