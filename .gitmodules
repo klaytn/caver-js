@@ -1,0 +1,3 @@
+[submodule "caver-conformance-tests"]
+	path = caver-conformance-tests
+	url = https://github.com/ground-x/caver-conformance-tests.git
