@@ -41,11 +41,17 @@ export class Wallet extends KeyringContainer {
 }
 
 export class Contract extends BaseContract {
-    create(): Contract
+    static create(...args: ConstructorParameters<typeof BaseContract>): Contract
 }
 
+type RequestProvider =
+  | string
+  | WebsocketProvider
+  | HttpProvider
+  | IpcProvider
+
 export default class Caver {
-    constructor(provider: string, net?: string)
+    constructor(provider: RequestProvider, net?: string)
 
     version: string
     utils: typeof Utils
@@ -63,9 +69,10 @@ export default class Caver {
     middleware: Middleware
     ipfs: IPFS
     contract: typeof Contract
-    providers: {
-        WebsocketProvider: WebsocketProvider
-        HttpProvider: HttpProvider
-        IpcProvider: IpcProvider
+    static providers: {
+        WebsocketProvider: typeof WebsocketProvider
+        HttpProvider: typeof HttpProvider
+        IpcProvider: typeof IpcProvider
     }
+
 }
