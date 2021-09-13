@@ -34,6 +34,9 @@ const SignatureData = require('../../../caver-wallet/src/keyring/signatureData')
 /**
  * Abstract class that implements common logic for each fee delegated transaction type.
  * @class
+ * @hideconstructor
+ * @abstract
+ * @augments AbstractTransaction
  */
 class AbstractFeeDelegatedTransaction extends AbstractTransaction {
     /**
@@ -76,12 +79,23 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
     }
 
     /**
-     * Signs to the transaction with private key(s) in `key` as a fee payer.
-     * @async
-     * @param {Keyring|string} key - The instance of Keyring, private key string or KlaytnWalletKey string.
-     * @param {number} [index] - The index of private key to use. If index is undefined, all private keys in keyring will be used.
-     * @param {function} [hasher] - The function to get the transaction hash.
-     * @return {Transaction}
+     * Signs the transaction as a transaction fee payer with the private key(s) in the `keyring` and appends `feePayerSignatures` in the transaction object.
+     *
+     * This will use "roleFeePayerKey" in {@link RoleBasedKeyring}.
+     * If the user has not defined an `index`, `transaction.signAsFeePayer` signs the transaction using "all the private keys" used by the role.
+     * If `index` is defined, the `transaction.signAsFeePayer` signs the transaction using "only one private key" at the given index.
+     *
+     * @example
+     * const feePayer = caver.wallet.keyring.create('0x{address in hex}', '0x{private key}')
+     * const signedTx = await tx.signAsFeePayer(feePayer)
+     *
+     * const keyring = caver.wallet.keyring.create('0x{address in hex}', [['0x{private key}'], ['0x{private key}', '0x{private key}'], ['0x{private key}']]) // The third `roleFeePayerKey` will be used.
+     * const signedTx = await tx.signAsFeePayer(feePayer, 1) // sign the transaction with index. If omitted, sign with all private keys.
+     *
+     * @param {KeyringContainer.Keyring|string} key - A private key string ({@link https://docs.klaytn.com/klaytn/design/accounts#klaytn-wallet-key-format|KlaytnWalletKey} format is also allowed) or an instance of {@link KeyringContainer.Keyring|Keyring}. If a private key string or a KlaytnWalletKey is passed as a parameter, the keyring instance is created internally.
+     * @param {number} [index] - The index of the private key you want to use. The index must be less than the length of the array of the private keys defined for each role. If an index is not defined, this method will use all the private keys.
+     * @param {function} [hasher] - The hash function to get the hash of the transaction.
+     * @return {module:Transaction.FeeDelegatedTransaction} An instance of signed fee delegated Transaction. The `feePayerSignatures` is appended to the `transaction.feePayerSignatures`.
      */
     async signAsFeePayer(key, index, hasher = TransactionHasher.getHashForFeePayerSignature) {
         // User parameter input cases
@@ -115,11 +129,16 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
     }
 
     /**
-     * Appends feePayerSignatures to the transaction.
+     * Appends `feePayerSignatures` to the transaction.
      *
-     * @param {SignatureData|Array.<SignatureData>|Array.<string>|Array.<Array.<string>>} signatures - An array of feePayerSignatures to append to the transaction.
-     *                                                      One feePayerSignature can be defined in the form of a one-dimensional array or two-dimensional array,
-     *                                                      and more than one feePayerSignatures should be defined in the form of a two-dimensional array.
+     * @example
+     * tx.appendFeePayerSignatures([ '0x0fea', '0xade94...', '0x38160...' ])
+     *
+     * const sig = [[ '0x0fea', '0xade94...', '0x38160...' ], [ '0x0fea', '0xbde66...', '0x546eb...' ]]
+     * tx.appendFeePayerSignatures(sig)
+     *
+     * @param {SignatureData|Array.<SignatureData>|Array.<string>|Array.<Array.<string>>} signatures - The `feePayerSignatures` to be appended to the transaction. {@link SignatureData} instance or an array containing {@link SignatureData} instances.
+     *                                                                                                 An array in which each 'v', 'r', and 's' are sequentially defined as string formats or a 2D array containing those arrays can also be taken as parameters.
      */
     appendFeePayerSignatures(signatures) {
         let sig = signatures
@@ -134,12 +153,18 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
     }
 
     /**
-     * Combines RLP-encoded transactions (rawTransaction) to the transaction from RLP-encoded transaction strings and returns a single transaction with all signatures combined.
-     * When combining the signatures into a transaction instance,
-     * an error is thrown if the decoded transaction contains different value except signatures.
+     * Collects signs in each RLP-encoded transaction string in the given array, combines them with the transaction instance, and returns a RLP-encoded transaction string which includes all signs.
      *
-     * @param {Array.<string>} rlpEncodedTxs - An array of RLP-encoded transaction strings.
-     * @return {string}
+     * Note that the transaction instance doesn't necessarily be signed in advance.
+     * The `feePayerSignatures` is also merged and included in the output RLP-encoded transaction string.
+     *
+     * When combining the signatures into a transaction instance, an error is thrown if the decoded transaction contains different value except signatures.
+     *
+     * @example
+     * const combined = tx.combineSignedRawTransactions(['0x09f88...'])
+     *
+     * @param {Array.<string>} rlpEncodedTxs - An array of signed RLP-encoded transaction strings.
+     * @return {string} A RLP-encoded transaction string which includes all `signatures` and `feePayerSignatures`.
      */
     combineSignedRawTransactions(rlpEncodedTxs) {
         if (!_.isArray(rlpEncodedTxs)) throw new Error(`The parameter must be an array of RLP encoded transaction strings.`)
@@ -190,9 +215,13 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
     }
 
     /**
-     * Returns a senderTxHash of transaction
+     * Returns a {@link https://docs.klaytn.com/klaytn/design/transactions#sendertxhash|senderTxHash} of transaction.
+     * The {@link https://docs.klaytn.com/klaytn/design/transactions#sendertxhash|senderTxHash} is a hash of the transaction except for the fee payer's address and signature, so transactionHash and senderTxHash will be different for fee delegated transactions.
      *
-     * @return {string}
+     * @example
+     * const result = tx.getSenderTxHash()
+     *
+     * @return {string} A senderTxHash.
      */
     getSenderTxHash() {
         const rlpEncoded = this.getRLPEncoding()
@@ -205,9 +234,12 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
     }
 
     /**
-     * Returns an RLP-encoded transaction string for making signature as a fee payer
+     * Returns an RLP-encoded transaction string for making feePayerSignature.
      *
-     * @return {string}
+     * @example
+     * const result = tx.getRLPEncodingForFeePayerSignature()
+     *
+     * @return {string} An RLP-encoded transaction string without any signature and feePayerSignature attached.
      */
     getRLPEncodingForFeePayerSignature() {
         return RLP.encode([this.getCommonRLPEncodingForSignature(), this.feePayer, Bytes.fromNat(this.chainId), '0x', '0x'])
@@ -215,13 +247,12 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
 
     /**
      * Recovers the public key strings from `feePayerSignatures` field in transaction object.
-     * If you want to derive an address from public key, please use `caver.utils.publicKeyToAddress`.
+     * If you want to derive an address from public key, please use {@link module:utils~publicKeyToAddress|caver.utils.publicKeyToAddress}.
      *
      * @example
      * const publicKey = tx.recoverFeePayerPublicKeys()
      *
-     * @method recoverFeePayerPublicKeys
-     * @return {Array.<string>}
+     * @return {Array.<string>} An array containing public keys recovered from `feePayerSignatures`.
      */
     recoverFeePayerPublicKeys() {
         if (utils.isEmptySig(this.feePayerSignatures))

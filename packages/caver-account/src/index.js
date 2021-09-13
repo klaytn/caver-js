@@ -224,6 +224,11 @@ class Account {
     }
 
     /**
+     * The account key types which are used in the `caver.account` package.
+     *
+     * @typedef {AccountKeyLegacy|AccountKeyPublic|AccountKeyFail|AccountKeyWeightedMultiSig|AccountKeyRoleBased} Account.AccountKey
+     */
+    /**
      * Creates an account. It is recommended to use [caver.account.create]{@link Account#create} rather than using the constructor directly.
      *
      * @example
@@ -231,8 +236,9 @@ class Account {
      * const account = new caver.account('0x{address in hex}', accountKey)
      *
      * @constructor
+     * @hideconstructor
      * @param {string} address - The address of account.
-     * @param {AccountKeyLegacy|AccountKeyPublic|AccountKeyFail|AccountKeyWeightedMultiSig|AccountKeyRoleBased} accountKey - The accountKey of account.
+     * @param {Account.AccountKey} accountKey - The accountKey of account.
      */
     constructor(address, accountKey) {
         this.address = address
@@ -253,7 +259,7 @@ class Account {
     }
 
     /**
-     * @type {AccountKeyLegacy|AccountKeyPublic|AccountKeyFail|AccountKeyWeightedMultiSig|AccountKeyRoleBased}
+     * @type {Account.AccountKey}
      */
     get accountKey() {
         return this._accountKey
@@ -290,19 +296,16 @@ class Account {
 Account.weightedMultiSigOptions = WeightedMultiSigOptions
 
 /**
- * The option values for the contract instance.
- * Those values will be used for default value when make a transaction to deploy or execute the smart contract.
- * If the user passes the object defined in the fields below as a parameter when deploying or executing the contract,
- * the values defined for default in the contract are not used.
+ * A module that provides functions for accountKey.
  *
- * @typedef {Object} AccountKeyModule
- * @property {Function} decode - The address from which transactions should be made.
- * @property {typeof AccountKeyLegacy} accountKeyLegacy - The address from which transactions should be made.
- * @property {typeof AccountKeyPublic} accountKeyPublic - The address from which transactions should be made.
- * @property {typeof AccountKeyFail} accountKeyFail - The address from which transactions should be made.
- * @property {typeof AccountKeyWeightedMultiSig} accountKeyWeightedMultiSig - The address from which transactions should be made.
- * @property {typeof AccountKeyRoleBased} accountKeyRoleBased - The address from which transactions should be made.
- * @property {typeof WeightedPublicKey} weightedPublicKey - The address from which transactions should be made.
+ * @typedef {object} AccountKeyModule
+ * @property {function} decode - A function to decode the accountKey. Please refer to {@link AccountKeyDecoder.decode|caver.account.accountKey.decode}.
+ * @property {typeof AccountKeyLegacy} accountKeyLegacy - Class representing accountKeyLegacy.
+ * @property {typeof AccountKeyPublic} accountKeyPublic - Class representing AccountKeyPublic.
+ * @property {typeof AccountKeyFail} accountKeyFail - Class representing AccountKeyFail.
+ * @property {typeof AccountKeyWeightedMultiSig} accountKeyWeightedMultiSig - Class representing AccountKeyWeightedMultiSig.
+ * @property {typeof AccountKeyRoleBased} accountKeyRoleBased - Class representing AccountKeyRoleBased.
+ * @property {typeof WeightedPublicKey} weightedPublicKey - Class representing WeightedPublicKey.
  */
 /**
  * @example

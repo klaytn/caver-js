@@ -35,7 +35,6 @@ const { packageInit, providers } = require('./packages/caver-core')
 const Klay = require('./packages/caver-klay')
 const Account = require('./packages/caver-account')
 const KeyringContainer = require('./packages/caver-wallet')
-const Keyring = require('./packages/caver-wallet/src/keyring/keyringFactory')
 const Transaction = require('./packages/caver-transaction')
 const RPC = require('./packages/caver-rpc')
 const abi = require('./packages/caver-abi')
@@ -70,9 +69,8 @@ const { version } = require('./package.json')
  *
  * @class
  * @constructor
- * @param {string|HttpProvider|WebsocketProvider} [provider] - The url string of the Node to connect with. You can pass the provider instance directly.
+ * @param {string|HttpProvider|WebsocketProvider|IpcProvider} [provider] - The url string of the Node to connect with. You can pass the provider instance directly.
  */
-
 function Caver(provider, net) {
     const _this = this
 
@@ -94,8 +92,6 @@ function Caver(provider, net) {
     this.abi = abi
     /** @type {KeyringContainer} */
     this.wallet = new KeyringContainer()
-    /** @type {module:KeyringFactory~keyring} */
-    this.wallet.keyring = Keyring
 
     // ex) call `caver.klay.property` || `caver.klay.method(...)`
     /** @type {KCT} */
@@ -112,8 +108,18 @@ function Caver(provider, net) {
     // overwrite package setProvider
     const setProvider = this.setProvider
     /**
-     * Set the provider of the Caver.
+     * Changes the current provider of the Caver.
+     * You can access the provider's constructor via `const Caver = require('caver-js'); const provider = new Caver.providers.XXXProvider('...')`.
+     *
+     * @example
+     * const isSet = caver.setProvider('http://{your en url}:{port}')
+     * const isSet = caver.setProvider(new Caver.providers.HttpProvider('http://{your en url}:{port}'))
+     *
+     * const isSet = caver.setProvider('ws://{your en url}:{port}')
+     * const isSet = caver.setProvider(new Caver.providers.WebsocketProvider('http://{your en url}:{port}'))
+     *
      * @param {string|HttpProvider|WebsocketProvider|IpcProvider} p - The url string of the Node or the provider instance.
+     * @return {boolean} `true` means provider is set successfully.
      */
     this.setProvider = (p, n) => {
         setProvider.apply(this, [p, n])
@@ -129,14 +135,7 @@ function Caver(provider, net) {
     const Contract = function Contract() {
         BaseContract.apply(this, arguments)
 
-        // when caver.setProvider is called, call 'packageInit' all contract instances instantiated via this Caver instances.
-        // This will update the currentProvider for the contract instances
-        const _this = this // eslint-disable-line no-shadow
-        const setProvider = self.setProvider // eslint-disable-line no-shadow
-        self.setProvider = function() {
-            setProvider.apply(self, arguments)
-            core.packageInit(_this, [self])
-        }
+        core.packageInit(this, [self])
         this.setWallet(self.wallet)
     }
 
@@ -159,8 +158,36 @@ function Caver(provider, net) {
     this.contract.currentProvider = this._requestManager.provider
 }
 
+/**
+ * @type {module:utils}
+ *
+ * @example
+ * const utils = require('caver-js').utils
+ * */
 Caver.utils = utils
+
+/**
+ * @type {ABI}
+ *
+ * @example
+ * const abi = require('caver-js').abi
+ * */
 Caver.abi = abi
+
+/**
+ * The account key types which are used in the `caver.account` package.
+ *
+ * @typedef {object} Caver.Providers
+ * @property {typeof WebsocketProvider} WebsocketProvider - Class representing WebsocketProvider.
+ * @property {typeof HttpProvider} HttpProvider - Class representing HttpProvider.
+ * @property {typeof IpcProvider} IpcProvider - Class representing IpcProvider.
+ */
+/**
+ * @type {Caver.Providers}
+ *
+ * @example
+ * const providers = require('./index').providers
+ * */
 Caver.providers = providers
 
 module.exports = Caver

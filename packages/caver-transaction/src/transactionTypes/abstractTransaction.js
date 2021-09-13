@@ -34,6 +34,8 @@ const SignatureData = require('../../../caver-wallet/src/keyring/signatureData')
 /**
  * Abstract class that implements common logic for each transaction type.
  * @class
+ * @hideconstructor
+ * @abstract
  */
 class AbstractTransaction {
     /**
@@ -149,7 +151,10 @@ class AbstractTransaction {
      * Returns the RLP-encoded string of this transaction (i.e., rawTransaction).
      * This method has to be overrided in classes which extends AbstractTransaction.
      *
-     * @return {string}
+     * @example
+     * const result = tx.getRLPEncoding()
+     *
+     * @return {string} An RLP-encoded transaction string.
      */
     getRLPEncoding() {
         throw new Error(`Not implemented.`)
@@ -160,19 +165,33 @@ class AbstractTransaction {
      * This method has to be overrided in classes which extends AbstractTransaction.
      * getCommonRLPEncodingForSignature is used in getRLPEncodingForSignature.
      *
-     * @return {string}
+     * @example
+     * const result = tx.getCommonRLPEncodingForSignature()
+     *
+     * @return {string} An RLP-encoded transaction string without signature.
      */
     getCommonRLPEncodingForSignature() {
         throw new Error(`Not implemented.`)
     }
 
     /**
-     * Signs to the transaction with private key(s) in the `key`.
-     * @async
-     * @param {Keyring|string} key - The instance of Keyring, private key string or KlaytnWalletKey string.
-     * @param {number} [index] - The index of private key to use. If index is undefined, all private keys in keyring will be used.
-     * @param {function} [hasher] - The function to get hash of transaction. In order to use a custom hasher, the index must be defined.
-     * @return {Transaction}
+     * Signs the transaction as a transaction sender with the private key(s) in the `keyring` and appends `signatures` in the transaction object.
+     *
+     * For {@link AccountUpdate|Account Update} transaction, use "roleAccountUpdateKey", or otherwise, use "roleTransactionKey" in {@link RoleBasedKeyring}.
+     * If the user has not defined an `index`, `transaction.sign` signs the transaction using "all the private keys" used by the role.
+     * If `index` is defined, the `transaction.sign` signs the transaction using "only one private key" at the given index.
+     *
+     * @example
+     * const keyring = caver.wallet.keyring.create('0x{address in hex}', '0x{private key}')
+     * const signedTx = await tx.sign(keyring)
+     *
+     * const keyring = caver.wallet.keyring.create('0x{address in hex}', ['0x{private key}', '0x{private key}'])
+     * const signedTx = await tx.sign(keyring, 1) // sign the transaction with index. If omitted, sign with all private keys.
+     *
+     * @param {KeyringContainer.Keyring|string} key - A private key string ({@link https://docs.klaytn.com/klaytn/design/accounts#klaytn-wallet-key-format|KlaytnWalletKey} format is also allowed) or an instance of {@link KeyringContainer.Keyring|Keyring}. If a private key string or a KlaytnWalletKey is passed as a parameter, the keyring instance is created internally.
+     * @param {number} [index] - The index of the private key you want to use. The index must be less than the length of the array of the private keys defined for each role. If an index is not defined, this method will use all the private keys.
+     * @param {function} [hasher] - The hash function to get the hash of the transaction.
+     * @return {module:Transaction.Transaction} An instance of signed Transaction. The `signature` is appended to the `transaction.signatures`.
      */
     async sign(key, index, hasher = TransactionHasher.getHashForSignature) {
         // User parameter input cases
@@ -211,11 +230,16 @@ class AbstractTransaction {
     }
 
     /**
-     * Appends signatures to the transaction.
+     * Appends `signatures` to the transaction.
      *
-     * @param {SignatureData|Array.<SignatureData>|Array.<string>|Array.<Array.<string>>} signatures - An array of signatures to append to the transaction.
-     *                                                      One signature can be defined in the form of a one-dimensional array or two-dimensional array,
-     *                                                      and more than one signatures should be defined in the form of a two-dimensional array.
+     * @example
+     * tx.appendSignatures([ '0x0fea', '0xade94...', '0x38160...' ])
+     *
+     * const sig = [[ '0x0fea', '0xade94...', '0x38160...' ], [ '0x0fea', '0xbde66...', '0x546eb...' ]]
+     * tx.appendSignatures(sig)
+     *
+     * @param {SignatureData|Array.<SignatureData>|Array.<string>|Array.<Array.<string>>} signatures - The `signatures` to be appended to the transaction. {@link SignatureData} instance or an array containing {@link SignatureData} instances.
+     *                                                                                                 An array in which each 'v', 'r', and 's' are sequentially defined as string formats or a 2D array containing those arrays can also be taken as parameters.
      */
     appendSignatures(signatures) {
         let sig = signatures
@@ -230,12 +254,17 @@ class AbstractTransaction {
     }
 
     /**
-     * Combines RLP-encoded transactions (rawTransaction) to the transaction from RLP-encoded transaction strings and returns a single transaction with all signatures combined.
-     * When combining the signatures into a transaction instance,
-     * an error is thrown if the decoded transaction contains different value except signatures.
+     * Collects signs in each RLP-encoded transaction string in the given array, combines them with the transaction instance, and returns a RLP-encoded transaction string which includes all signs.
      *
-     * @param {Array.<string>} rlpEncodedTxs - An array of RLP-encoded transaction strings.
-     * @return {string}
+     * Note that the transaction instance doesn't necessarily be signed in advance.
+     *
+     * When combining the signatures into a transaction instance, an error is thrown if the decoded transaction contains different value except signatures.
+     *
+     * @example
+     * const combined = tx.combineSignedRawTransactions(['0x09f88...'])
+     *
+     * @param {Array.<string>} rlpEncodedTxs - An array of signed RLP-encoded transaction strings.
+     * @return {string} A RLP-encoded transaction string which includes all `signatures`.
      */
     combineSignedRawTransactions(rlpEncodedTxs) {
         if (!_.isArray(rlpEncodedTxs)) throw new Error(`The parameter must be an array of RLP-encoded transaction strings.`)
@@ -275,7 +304,11 @@ class AbstractTransaction {
     }
 
     /**
-     * Returns RawTransaction(RLP-encoded transaction string)
+     * Returns a `rawTransaction` string (a RLP-encoded transaction string).
+     * This function is same with {@link AbstractTransaction#getRLPEncoding|transaction.getRLPEncoding}.
+     *
+     * @example
+     * const result = tx.getRawTransaction()
      *
      * @return {string}
      */
@@ -284,7 +317,10 @@ class AbstractTransaction {
     }
 
     /**
-     * Returns a hash string of transaction
+     * Returns a hash string of transaction.
+     *
+     * @example
+     * const result = tx.getTransactionHash()
      *
      * @return {string}
      */
@@ -293,18 +329,25 @@ class AbstractTransaction {
     }
 
     /**
-     * Returns a senderTxHash of transaction
+     * Returns a {@link https://docs.klaytn.com/klaytn/design/transactions#sendertxhash|senderTxHash} of transaction.
+     * The {@link https://docs.klaytn.com/klaytn/design/transactions#sendertxhash|senderTxHash} is a hash of the transaction except for the fee payer's address and signature, so transactionHash and senderTxHash are the same for basic transactions.
      *
-     * @return {string}
+     * @example
+     * const result = tx.getSenderTxHash()
+     *
+     * @return {string} A senderTxHash.
      */
     getSenderTxHash() {
         return this.getTransactionHash()
     }
 
     /**
-     * Returns an RLP-encoded transaction string for making signature
+     * Returns an RLP-encoded transaction string for making signature.
      *
-     * @return {string}
+     * @example
+     * const result = tx.getRLPEncodingForSignature()
+     *
+     * @return {string} An RLP-encoded transaction string without any signature attached.
      */
     getRLPEncodingForSignature() {
         this.validateOptionalValues()
@@ -316,13 +359,12 @@ class AbstractTransaction {
 
     /**
      * Recovers the public key strings from `signatures` field in transaction object.
-     * If you want to derive an address from public key, please use `caver.utils.publicKeyToAddress`.
+     * If you want to derive an address from public key, please use {@link module:utils~publicKeyToAddress|caver.utils.publicKeyToAddress}.
      *
      * @example
      * const publicKey = tx.recoverPublicKeys()
      *
-     * @method recoverPublicKeys
-     * @return {Array.<string>}
+     * @return {Array.<string>} An array containing public keys recovered from `signatures`.
      */
     recoverPublicKeys() {
         if (utils.isEmptySig(this.signatures)) throw new Error(`Failed to recover public keys from signatures: signatures is empty.`)
@@ -348,7 +390,13 @@ class AbstractTransaction {
     }
 
     /**
-     * Fills empty optional transaction properties(gasPrice, nonce, chainId).
+     * Fills in the optional variables in transaction.
+     *
+     * If the `gasPrice`, `nonce`, or `chainId` of the transaction are not defined, this method asks the default values for these optional variables and preset them by sending JSON RPC call to the connected Klaytn Node.
+     * Use {@link Klay#getGasPrice|caver.rpc.klay.getGasPrice} to get gasPrice, {@link Klay#getTransactionCount|caver.rpc.klay.getTransactionCount} to get nonce and {@link Klay#getChainId|caver.rpc.klay.getChainId} call to get chainId.
+     *
+     * @example
+     * await tx.fillTransaction()
      */
     async fillTransaction() {
         const [chainId, gasPrice, nonce] = await Promise.all([
@@ -365,6 +413,8 @@ class AbstractTransaction {
     /**
      * Checks that member variables that can be defined by the user are defined.
      * If there is an undefined variable, an error occurs.
+     *
+     * @ignore
      */
     validateOptionalValues() {
         if (this.gasPrice === undefined)

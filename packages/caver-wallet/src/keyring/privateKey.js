@@ -29,6 +29,7 @@ const SignatureData = require('./signatureData')
 /**
  * Representing a PrivateKey class that includes private key string.
  * @class
+ * @hideconstructor
  */
 class PrivateKey {
     /**
@@ -52,11 +53,14 @@ class PrivateKey {
     }
 
     /**
-     * signs with transactionHash with key and returns signature.
+     * Signs with transactionHash with key and returns signature.
+     *
+     * @example
+     * const signature = privateKey.sign('0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550', '0x2810')
      *
      * @param {string} transactionHash The hash of transaction.
      * @param {string|number} chainId The chainId or the network.
-     * @return {SignatureData}
+     * @return {SignatureData} A {@link SignatureData}.
      */
     sign(transactionHash, chainId) {
         chainId = utils.toHex(chainId)
@@ -66,10 +70,13 @@ class PrivateKey {
     }
 
     /**
-     * signs with hashed data and returns `signature`
+     * Signs with hashed data and returns `signature`.
+     *
+     * @example
+     * const signature = privateKey.signMessage('0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550')
      *
      * @param {string} messageHash The hash of data to sign.
-     * @return {SignatureData}
+     * @return {SignatureData} A {@link SignatureData}.
      */
     signMessage(messageHash) {
         const signature = AccountLib.sign(messageHash, this.privateKey)
@@ -78,10 +85,13 @@ class PrivateKey {
     }
 
     /**
-     * returns public key string
+     * Returns public key string.
+     *
+     * @example
+     * const publicKey = privateKey.getPublicKey()
      *
      * @param {boolean} [compressed] Whether in compressed format or not.
-     * @return {string}
+     * @return {string} A public key string which is derived from private key string.
      */
     getPublicKey(compressed = false) {
         const strippedPrivateKey = utils.stripHexPrefix(this.privateKey)
@@ -93,9 +103,12 @@ class PrivateKey {
     }
 
     /**
-     * returns derived address from private key string
+     * Returns derived address from private key string.
      *
-     * @return {string}
+     * @example
+     * const address = privateKey.getDerivedAddress()
+     *
+     * @return {string} A address which is derived from private key string.
      */
     getDerivedAddress() {
         return AccountLib.fromPrivate(this.privateKey).address.toLowerCase()

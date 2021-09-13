@@ -49,6 +49,7 @@ function Result() {}
  * caver.abi
  *
  * @class
+ * @hideconstructor
  */
 const ABI = function() {}
 
