@@ -375,6 +375,15 @@ const hexToNumberString = function(value) {
  * @return {string} The HEX value of the given number.
  */
 const numberToHex = function(value) {
+    if (_.isNumber(value)) {
+        const bn = toBN(value)
+        try {
+            bn.toNumber()
+        } catch (e) {
+            throw new Error(`${e.message}: Number type cannot handle big number. Please use hex string or BigNumber/BN.`)
+        }
+    }
+
     if (_.isNull(value) || _.isUndefined(value)) {
         return value
     }
