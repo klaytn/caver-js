@@ -703,8 +703,9 @@ describe('caver.utils.numberToHex', () => {
 
     context('CAVERJS-UNIT-ETC-397: input: number that Number type cannot handle', () => {
         it('should throw an error', () => {
-            const expectedErrorMsg = 'Error: Number can only safely store up to 53 bits: Number type cannot handle big number. Please use hex string or BigNumber/BN.'
-            
+            const expectedErrorMsg =
+                'Error: Number can only safely store up to 53 bits: Number type cannot handle big number. Please use hex string or BigNumber/BN.'
+
             let invalid = 0x303f3b2c93f1a7ffff
             expect(() => caver.utils.numberToHex(invalid)).to.throw(expectedErrorMsg)
 

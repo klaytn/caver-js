@@ -379,7 +379,7 @@ const numberToHex = function(value) {
         const bn = toBN(value)
         try {
             bn.toNumber()
-        } catch(e) {
+        } catch (e) {
             throw new Error(`${e.message}: Number type cannot handle big number. Please use hex string or BigNumber/BN.`)
         }
     }
