@@ -34,6 +34,7 @@ describe('Caver Common Architecture Conformance Tests', () => {
     layers.forEach(function(layer) {
         if (layer.isDirectory() === false) return
         if (layer.name.startsWith('.')) return
+        if (layer.name === 'Account' || layer.name === 'Rpc') return // Skip Rpc
 
         describe(`${layer.name} Layer Testing`, () => {
             // To access each layer via `caver` instance (ex `caver.utils), format string.
@@ -57,15 +58,13 @@ describe('Caver Common Architecture Conformance Tests', () => {
                         const filename = path.join(classDirPath, file.name)
 
                         // Convert an input filed in object format to array format.
-                        const converted = modifyInputFormatToArray(fs.readFileSync(filename).toString())
-                        const json = JSON.parse(converted)
+                        const json = fs.readFileSync(filename)
+                        const tcs = JSON.parse(modifyInputFormatToArray(functionName, json.toString()))
 
                         // There are several TCs for each function.
-                        const tcs = json[functionName]
-
                         for (const tc of tcs) {
-                            if (json.skipJs) {
-                                console.log(`Skip ${json.id} / ${json.description}`)
+                            if (tc.skipJs) {
+                                console.log(`Skip ${tc.id} / ${tc.description}`)
                                 return
                             }
 
@@ -99,28 +98,32 @@ describe('Caver Common Architecture Conformance Tests', () => {
     })
 })
 
-function modifyInputFormatToArray(jsonString) {
+function modifyInputFormatToArray(functionName, jsonString) {
     const parsed = JSON.parse(jsonString)
 
     // Since there are multiple tc in one json file, `count` acts as an index for the tc.
     let count = 0
 
+    const tc = parsed[functionName]
+    const data = tc.testCases
+
+    let dataString = JSON.stringify(data)
     // When the input object is changed to an array format, the key name is changed from `"input"` to `"inputArray"`.
     // So try to convert until `"input"` is no longer found in jsonString.
-    while (jsonString.indexOf('"input"') !== -1) {
-        const inputIndex = jsonString.indexOf('"input"')
+    while (dataString.indexOf('"input"') !== -1) {
+        const inputIndex = dataString.indexOf('"input"')
         // Find the index of "expectedResult" after "input".
-        const expectedResultIndex = jsonString.slice(inputIndex).indexOf('"expectedResult"') + inputIndex
+        const expectedResultIndex = dataString.slice(inputIndex).indexOf('"expectedResult"') + inputIndex
 
         // inputString contains the input of one TC defined in json in the form of string.
-        const inputString = jsonString.slice(inputIndex, expectedResultIndex)
+        const inputString = dataString.slice(inputIndex, expectedResultIndex)
 
         // After parsing with `JSON.parse`, object keys will be sorted.
         // But we shouldn't change the order because inputs are defined in the order of the parameters of the function.
         // The idea here is to easily get the `key` and `value` of the input from the parsed object,
         // and to sort them in the order of the function parameters,
         // find the index by the key of the input in the jsonString and sort them in order.
-        const parsedInputObject = parsed[Object.keys(parsed)[0]][count].input
+        const parsedInputObject = data[count].input
         const inputKeyArray = Object.keys(parsedInputObject)
         let params = new Map()
 
@@ -142,14 +145,14 @@ function modifyInputFormatToArray(jsonString) {
         }
 
         // Add a `inputArray` field instead of `input` in array format.
-        const frontString = jsonString.slice(0, inputIndex)
-        const endString = jsonString.slice(expectedResultIndex)
+        const frontString = dataString.slice(0, inputIndex)
+        const endString = dataString.slice(expectedResultIndex)
 
-        jsonString = `${frontString}"inputArray": ${JSON.stringify(inputs)},\n${endString}`
+        dataString = `${frontString}"inputArray": ${JSON.stringify(inputs)},\n${endString}`
         count++
     }
 
-    return jsonString
+    return dataString
 }
 
 function formatPackageNaming(name) {
