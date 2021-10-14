@@ -182,6 +182,8 @@ class Account {
      * @return {Account}
      */
     static createWithAccountKeyWeightedMultiSig(address, publicKeyArray, options) {
+        if (!utils.isAddress(address)) throw new Error(`Invalid address: ${address}`)
+        if (!_.isArray(publicKeyArray)) throw new Error(`Invalid public key array: ${publicKeyArray}`)
         return new Account(address, AccountKeyWeightedMultiSig.fromPublicKeysAndOptions(publicKeyArray, options))
     }
 
