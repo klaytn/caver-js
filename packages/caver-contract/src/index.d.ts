@@ -75,26 +75,15 @@ export interface EventOptions {
     topics?: string[]
 }
 
-export interface EventData {
-    address?: string
-    blockNumber?: number
-    transactionHash?: string
-    transactionIndex?: number
-    blockHash?: string
-    logIndex?: number
-    id?: string
-    returnValues?: {
-        operator?: string
-        from?: string
-        to?: string
-        id?: string
-        ids?: string[]
-        value?: string
-        values?: string[]
-        account?: string
-        approved?: boolean
-        tokenId?: string
-    }
+export interface EventData<ReturnValues extends object = Record<string, string>> {
+  address?: string
+  blockNumber?: number
+  transactionHash?: string
+  transactionIndex?: number
+  blockHash?: string
+  logIndex?: number
+  id?: string
+  returnValues?: ReturnValues
     event?: string
     signature?: string
     raw?: {
