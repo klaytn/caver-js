@@ -1820,6 +1820,11 @@ class Klay {
                 call: 'klay_getDecodedAnchoringTransactionByHash',
                 params: 1,
             }),
+            new Method({
+                name: 'getDecodedAnchoringTransaction',
+                call: 'klay_getDecodedAnchoringTransactionByHash',
+                params: 1,
+            }),
 
             // Configuration
             /**
