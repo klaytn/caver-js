@@ -95,6 +95,7 @@ describe('Caver Common Architecture Conformance Tests', () => {
                                 continue
                             }
 
+                            // eslint-disable-next-line no-loop-func
                             it(`${tc.id}: ${tc.description}`, async () => {
                                 const inputs = getInputValues(tc.inputArray, preRequisites)
 
@@ -113,9 +114,9 @@ describe('Caver Common Architecture Conformance Tests', () => {
                                         })
 
                                         // When an RPC request sends a transaction to a node,
-                                        // a transactionReceipt query is requested by polling 
+                                        // a transactionReceipt query is requested by polling
                                         // using the transaction hash received as a result of the request.
-                                        sandbox.stub(method, '_confirmTransaction').callsFake((defer, result, payload) => {
+                                        sandbox.stub(method, '_confirmTransaction').callsFake(defer => {
                                             return defer.resolve({})
                                         })
 
@@ -391,7 +392,7 @@ function getInputValues(inputArray, preRequisites) {
         // the parameter is defined in the form of 'preRequisites[index]'.
         // In this case, instead of the 'preRequisites[index]' string,
         // the index-th instance of preRequisites should be transmitted as a parameter.
-        if(_.isString(inputArray[i]) && inputArray[i].includes('preRequisites')) {
+        if (_.isString(inputArray[i]) && inputArray[i].includes('preRequisites')) {
             const index = Number(inputArray[i].slice(inputArray[i].indexOf('[') + 1, inputArray[i].indexOf(']')))
             inputs.push(preRequisites[index])
             continue
