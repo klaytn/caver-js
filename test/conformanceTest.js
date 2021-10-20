@@ -43,7 +43,6 @@ describe('Caver Common Architecture Conformance Tests', () => {
     const layers = fs.readdirSync(comformanceTests, { withFileTypes: true })
     layers.forEach(function(layer) {
         if (layer.isDirectory() === false || layer.name.startsWith('.')) return
-        if (layer.name !== 'Rpc') return // TODO: Remove
 
         describe(`${layer.name} Layer Testing`, () => {
             // To access each layer via `caver` instance (ex `caver.utils), format string.
