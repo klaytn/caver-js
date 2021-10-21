@@ -112,7 +112,7 @@ describe('Caver Common Architecture Conformance Tests', () => {
                                             callback(undefined, {})
                                         })
 
-                                        // When an RPC request sends a transaction to a node,
+                                        // When a RPC request sends a transaction to a node,
                                         // a transactionReceipt query is requested by polling
                                         // using the transaction hash received as a result of the request.
                                         sandbox.stub(method, '_confirmTransaction').callsFake(defer => {
