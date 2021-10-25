@@ -3,6 +3,7 @@
   "version": "1.6.5",
   "description": "caver-js is a JavaScript API library that allows developers to interact with a Klaytn node",
   "main": "index.js",
+  "types": "types/index.d.ts",
   "scripts": {
     "test": "npm run build && npm run unitTest",
     "unitTest": " npm run txUnitTest && npm run utilUnitTest && npm run netUnitTest && npm run accountUnitTest && npm run serUnitTest && npm run walletUnitTest && npm run etcUnitTest && npm run validatorUnitTest",
@@ -137,6 +138,7 @@
     "sinon": "9.0.0",
     "sinon-chai": "3.5.0",
     "turndown": "^7.1.1",
+    "typescript": "^4.4.4",
     "vinyl-source-stream": "2.0.0"
   }
 }
