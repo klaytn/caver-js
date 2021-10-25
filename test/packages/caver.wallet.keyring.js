@@ -1644,6 +1644,22 @@ describe('keyring.toAccount', () => {
         })
     })
 
+    context('CAVERJS-UNIT-KEYRING-170: keyring type: roleBased / options: array of the object', () => {
+        it('return account instance which has AccountKeyRoleBased with weightedMultiSigOptions instances', () => {
+            const account = roleBased.toAccount([
+                { threshold: 3, weights: [2, 2] },
+                { threshold: 4, weights: [2, 2] },
+                { threshold: 5, weights: [1, 2, 3, 3] },
+            ])
+            const exepectedOptions = [
+                new caver.account.weightedMultiSigOptions(3, [2, 2]),
+                new caver.account.weightedMultiSigOptions(4, [2, 2]),
+                new caver.account.weightedMultiSigOptions(5, [1, 2, 3, 3]),
+            ]
+            validateAccount(account, { keyring: roleBased, expectedAccountKey: 'AccountKeyRoleBased', exepectedOptions })
+        })
+    })
+
     context('CAVERJS-UNIT-KEYRING-128: keyring type: roleBased / options: defined(not array format)', () => {
         it('should throw error when options is insufficient', () => {
             const options = new caver.account.weightedMultiSigOptions(5, [2, 3, 4])
