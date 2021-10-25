@@ -48,6 +48,49 @@ function isAccountKeyInstance(accountKey) {
  */
 class Account {
     /**
+     * @example
+     * caver.account.weightedMultiSigOptions
+     *
+     * @type {typeof WeightedMultiSigOptions}
+     * */
+    static weightedMultiSigOptions = WeightedMultiSigOptions
+
+    /**
+     * A module that provides functions for accountKey.
+     *
+     * @typedef {object} AccountKeyModule
+     * @property {function} decode - A function to decode the accountKey. Please refer to {@link AccountKeyDecoder.decode|caver.account.accountKey.decode}.
+     * @property {typeof AccountKeyLegacy} accountKeyLegacy - Class representing accountKeyLegacy.
+     * @property {typeof AccountKeyPublic} accountKeyPublic - Class representing AccountKeyPublic.
+     * @property {typeof AccountKeyFail} accountKeyFail - Class representing AccountKeyFail.
+     * @property {typeof AccountKeyWeightedMultiSig} accountKeyWeightedMultiSig - Class representing AccountKeyWeightedMultiSig.
+     * @property {typeof AccountKeyRoleBased} accountKeyRoleBased - Class representing AccountKeyRoleBased.
+     * @property {typeof WeightedPublicKey} weightedPublicKey - Class representing WeightedPublicKey.
+     */
+    /**
+     * @example
+     * caver.account.accountKey
+     * caver.account.accountKey.decode('0x{encoded account key}')
+     * caver.account.accountKey.accountKeyLegacy
+     * caver.account.accountKey.accountKeyPublic
+     * caver.account.accountKey.accountKeyFail
+     * caver.account.accountKey.accountKeyWeightedMultiSig
+     * caver.account.accountKey.accountKeyRoleBased
+     * caver.account.accountKey.weightedPublicKey
+     *
+     * @type {AccountKeyModule}
+     * */
+    static accountKey = {
+        decode: AccountKeyDecoder.decode,
+        accountKeyLegacy: AccountKeyLegacy,
+        accountKeyPublic: AccountKeyPublic,
+        accountKeyFail: AccountKeyFail,
+        accountKeyWeightedMultiSig: AccountKeyWeightedMultiSig,
+        accountKeyRoleBased: AccountKeyRoleBased,
+        weightedPublicKey: WeightedPublicKey,
+    }
+
+    /**
      * Creates an Account instance with an address and an accountKey.
      *
      * If `accountKey` is a public key string, an `Account` instance with `AccountKeyPublic` as accountKey is created.
@@ -228,7 +271,7 @@ class Account {
     /**
      * The account key types which are used in the `caver.account` package.
      *
-     * @typedef {AccountKeyLegacy|AccountKeyPublic|AccountKeyFail|AccountKeyWeightedMultiSig|AccountKeyRoleBased} Account.AccountKey
+     * @typedef {AccountKeyLegacy|AccountKeyPublic|AccountKeyFail|AccountKeyWeightedMultiSig|AccountKeyRoleBased} AccountKey
      */
     /**
      * Creates an account. It is recommended to use [caver.account.create]{@link Account#create} rather than using the constructor directly.
@@ -240,7 +283,7 @@ class Account {
      * @constructor
      * @hideconstructor
      * @param {string} address - The address of account.
-     * @param {Account.AccountKey} accountKey - The accountKey of account.
+     * @param {AccountKey} accountKey - The accountKey of account.
      */
     constructor(address, accountKey) {
         this.address = address
@@ -261,7 +304,7 @@ class Account {
     }
 
     /**
-     * @type {Account.AccountKey}
+     * @type {AccountKey}
      */
     get accountKey() {
         return this._accountKey
@@ -289,47 +332,5 @@ class Account {
     }
 }
 
-/**
- * @example
- * caver.account.weightedMultiSigOptions
- *
- * @type {typeof WeightedMultiSigOptions}
- * */
-Account.weightedMultiSigOptions = WeightedMultiSigOptions
-
-/**
- * A module that provides functions for accountKey.
- *
- * @typedef {object} AccountKeyModule
- * @property {function} decode - A function to decode the accountKey. Please refer to {@link AccountKeyDecoder.decode|caver.account.accountKey.decode}.
- * @property {typeof AccountKeyLegacy} accountKeyLegacy - Class representing accountKeyLegacy.
- * @property {typeof AccountKeyPublic} accountKeyPublic - Class representing AccountKeyPublic.
- * @property {typeof AccountKeyFail} accountKeyFail - Class representing AccountKeyFail.
- * @property {typeof AccountKeyWeightedMultiSig} accountKeyWeightedMultiSig - Class representing AccountKeyWeightedMultiSig.
- * @property {typeof AccountKeyRoleBased} accountKeyRoleBased - Class representing AccountKeyRoleBased.
- * @property {typeof WeightedPublicKey} weightedPublicKey - Class representing WeightedPublicKey.
- */
-/**
- * @example
- * caver.account.accountKey
- * caver.account.accountKey.decode('0x{encoded account key}')
- * caver.account.accountKey.accountKeyLegacy
- * caver.account.accountKey.accountKeyPublic
- * caver.account.accountKey.accountKeyFail
- * caver.account.accountKey.accountKeyWeightedMultiSig
- * caver.account.accountKey.accountKeyRoleBased
- * caver.account.accountKey.weightedPublicKey
- *
- * @type {AccountKeyModule}
- * */
-Account.accountKey = {
-    decode: AccountKeyDecoder.decode,
-    accountKeyLegacy: AccountKeyLegacy,
-    accountKeyPublic: AccountKeyPublic,
-    accountKeyFail: AccountKeyFail,
-    accountKeyWeightedMultiSig: AccountKeyWeightedMultiSig,
-    accountKeyRoleBased: AccountKeyRoleBased,
-    weightedPublicKey: WeightedPublicKey,
-}
 
 module.exports = Account
