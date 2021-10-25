@@ -66,7 +66,7 @@ const fillWeightedMultiSigOptionsForRoleBased = (lengthOfKeys, options = []) => 
 
     for (let i = 0; i < lengthOfKeys.length; i++) {
         if (options[i] && !(options[i] instanceof WeightedMultiSigOptions)) {
-            options[i] = WeightedMultiSigOptions.fromObject(options)
+            options[i] = WeightedMultiSigOptions.fromObject(options[i])
         }
         // If the WeightedMultiSigOptions instance is not empty,
         // it means that the user has defined the option parameters needed when updating to AccountKeyWeightedMultiSig.
