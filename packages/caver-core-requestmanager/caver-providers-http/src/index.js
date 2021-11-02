@@ -44,26 +44,51 @@ const HttpProvider = function HttpProvider(host, options) {
     this.timeout = options.timeout || 0
     this.headers = options.headers
     this.connected = false
+
+    // keepAlive is true unless explicitly set to false
+    const keepAlive = options.keepAlive !== false
+    this.host = host || 'http://localhost:8545'
+    if (!this.agent) {
+        if (this.host.substring(0, 5) === 'https') {
+            this.httpsAgent = new https.Agent({ keepAlive })
+        } else {
+            this.httpAgent = new http.Agent({ keepAlive })
+        }
+    }
 }
 
 /**
  * _prepareRequest create request instance
  */
 HttpProvider.prototype._prepareRequest = function() {
-    const request = new XHR2()
+    let request
+
+    // the current runtime is a browser
+    if (typeof XMLHttpRequest !== 'undefined') {
+        request = new XMLHttpRequest()
+    } else {
+        request = new XHR2()
+        var agents = { httpsAgent: this.httpsAgent, httpAgent: this.httpAgent, baseUrl: this.baseUrl }
+
+        if (this.agent) {
+            agents.httpsAgent = this.agent.https
+            agents.httpAgent = this.agent.http
+            agents.baseUrl = this.agent.baseUrl
+        }
+
+        request.nodejsSet(agents)
+    }
 
     request.open('POST', this.host, true)
     request.setRequestHeader('Content-Type', 'application/json')
-    request.timeout = this.timeout && this.timeout !== 1 ? this.timeout : 0
+    request.timeout = this.timeout
+    request.withCredentials = this.withCredentials
 
     if (this.headers) {
         this.headers.forEach(function(header) {
             request.setRequestHeader(header.name, header.value)
         })
     }
-
-    // Set https default port
-    if (request._url.port === null && this.host.slice(0, 5) === 'https') request._url.port = 443
 
     return request
 }
@@ -78,41 +103,16 @@ HttpProvider.prototype._prepareRequest = function() {
 HttpProvider.prototype.send = function(payload, callback) {
     const _this = this
     const request = this._prepareRequest()
-    const host = this.host
-    let timer
 
     request.onreadystatechange = function() {
-        /**
-         * readystate value
-         * 0: UNSENT - When client is created
-         * 1: OPENED - When request is opened
-         * 2: HEADERS_RECEIVED - When "send" is called and headers and status are available
-         * 3: LOADING - downloading
-         * 4: DONE - When receive response after operating request
-         */
-
-        if (request.readyState === 2) {
-            clearTimeout(timer)
-        }
-
         if (request.readyState === 4 && request.timeout !== 1) {
-            let result = request.responseText
+            const result = request.responseText
             let error = null
 
-            if (request.response === null) {
-                error = errors.InvalidResponse(request.response)
-                clearTimeout(timer)
-            } else {
-                try {
-                    result = JSON.parse(result)
-                } catch (e) {
-                    if (request.responseText === '') {
-                        error = errors.RequestFailed(request.statusText)
-                    } else {
-                        console.error(`Invalid JSON RPC response: ${JSON.stringify(request.responseText)}`)
-                        error = errors.InvalidResponse(request.responseText)
-                    }
-                }
+            try {
+                result = JSON.parse(result)
+            } catch (e) {
+                error = errors.InvalidResponse(request.responseText)
             }
 
             _this.connected = true
@@ -121,30 +121,20 @@ HttpProvider.prototype.send = function(payload, callback) {
     }
 
     request.ontimeout = function() {
-        console.error(`CONNECTION TIMEOUT: timeout of ${this.timeout}ms achived`)
         _this.connected = false
-        clearTimeout(timer)
         callback(errors.ConnectionTimeout(this.timeout))
     }
 
     try {
-        // Set timeout for connection
-        if (request.timeout !== 0) {
-            timer = setTimeout(function() {
-                if (request.status < 4) {
-                    console.error(`CONNECTION ERROR: Couldn't connect to node ${host}`)
-                    request.abort()
-                    callback(errors.InvalidConnection(host))
-                }
-            }, request.timeout)
-        }
         request.send(JSON.stringify(payload))
     } catch (error) {
-        console.error(`CONNECTION ERROR: Couldn't connect to node ${this.host}`)
         this.connected = false
-        clearTimeout(timer)
         callback(errors.InvalidConnection(this.host))
     }
+}
+
+HttpProvider.prototype.disconnect = function() {
+    //NO OP
 }
 
 HttpProvider.prototype.supportsSubscriptions = function() {

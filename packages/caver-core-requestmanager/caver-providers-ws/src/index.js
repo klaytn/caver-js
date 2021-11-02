@@ -24,10 +24,10 @@
  * @date 2017
  */
 
-const EventEmitter = require('eventemitter3')
-const Ws = require('websocket').w3cwebsocket
-const errors = require('../../../caver-core-helpers').errors
-const helpers = require('./helpers')
+var EventEmitter = require('eventemitter3')
+var Ws = require('websocket').w3cwebsocket
+var helpers = require('./helpers.js')
+var errors = require('../../../caver-core-helpers').errors
 
 /**
  * @param {string} url
@@ -72,13 +72,13 @@ const WebsocketProvider = function WebsocketProvider(url, options) {
     // pass through with any additional headers supplied in constructor
     const parsedURL = helpers.parseURL(url)
     if (parsedURL.username && parsedURL.password) {
-        this.headers.authorization = `Basic ${helpers.btoa(`${parsedURL.username}:${parsedURL.password}`)}`
+        this.headers.authorization = 'Basic ' + helpers.btoa(parsedURL.username + ':' + parsedURL.password)
     }
 
     // When all node core implementations that do not have the
     // WHATWG compatible URL parser go out of service this line can be removed.
     if (parsedURL.auth) {
-        this.headers.authorization = `Basic ${helpers.btoa(parsedURL.auth)}`
+        this.headers.authorization = 'Basic ' + helpers.btoa(parsedURL.auth)
     }
 
     // make property `connected` which will return the current connection status
@@ -246,16 +246,16 @@ WebsocketProvider.prototype._parseResponse = function(data) {
         .replace(/\}\][\n\r]?\{/g, '}]|--|{') // }]{
         .split('|--|')
 
-    dechunkedData.forEach(function(d) {
+    dechunkedData.forEach(function(data) {
         // prepend the last chunk
-        if (_this.lastChunk) d = _this.lastChunk + d
+        if (_this.lastChunk) data = _this.lastChunk + data
 
         let result = null
 
         try {
-            result = JSON.parse(d)
+            result = JSON.parse(data)
         } catch (e) {
-            _this.lastChunk = d
+            _this.lastChunk = data
 
             // start timeout to cancel all requests
             clearTimeout(_this.lastChunkTimeout)
