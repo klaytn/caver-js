@@ -240,7 +240,7 @@ class RoleBasedKeyring {
      * @example
      * const account = keyring.toAccount()
      *
-     * @param {WeightedMultiSigOptions} [options]  `WeightedMultiSigOptions` instance containing information that should be defined when updating your existing account to the one with a number of private keys. The `RoleBasedKeyring` uses different private keys for each role, a `WeightedMultiSigOptions` instance must be defined for each role in an array. If multiple keys are used and `options` are not defined for specific role, defualt WeightedMultiSigOptions (`{ threshold: 1, weights: [1, 1...}}`) is used.
+     * @param {Array.<WeightedMultiSigOptions>} [options] An array of the `WeightedMultiSigOptions` instances containing information that should be defined when updating your existing account to the one with a number of private keys. The `RoleBasedKeyring` uses different private keys for each role, a `WeightedMultiSigOptions` instance must be defined for each role in an array. If multiple keys are used and `options` are not defined for specific role, defualt WeightedMultiSigOptions (`{ threshold: 1, weights: [1, 1...}}`) is used.
      * @return {Account} An Account instance to be used when a user updates AccountKey for their account in the Klaytn. Note that if you want to replace the existing keyring (or the existing private key) with a new keyring (or a new private key) for your account, you must update your AccountKey by sending an Account Update transaction to Klaytn beforehand.
      */
     toAccount(options) {

@@ -42,8 +42,6 @@ const ethersAbiCoder = new EthersAbiCoder(function(type, value) {
 function Result() {}
 
 class ABI {
-    constructor() {}
-
     /**
      * Encodes the function signature to its ABI signature, which are the first 4 bytes of the sha3 hash of the function name including parameter types.
      *
@@ -62,7 +60,7 @@ class ABI {
         if (_.isObject(functionSignature)) {
             functionSignature = utils._jsonInterfaceMethodToString(functionSignature)
         }
-    
+
         return utils.sha3(functionSignature).slice(0, 10)
     }
 
@@ -136,14 +134,14 @@ class ABI {
      *      [true, '0x77656c636f6d6520746f20657468657265756d2e']
      *  ]
      *)
-    *
-    * @method encodeParameters
-    * @memberof ABI
-    * @instance
-    * @param {Array.<string|object>} types An array with types or a JSON interface of a function. See the {@link http://solidity.readthedocs.io/en/develop/types.html|solidity documentation} for a list of types.
-    * @param {Array.<*>} params The parameters to encode.
-    * @return {string} encoded list of params
-    */
+     *
+     * @method encodeParameters
+     * @memberof ABI
+     * @instance
+     * @param {Array.<string|object>} types An array with types or a JSON interface of a function. See the {@link http://solidity.readthedocs.io/en/develop/types.html|solidity documentation} for a list of types.
+     * @param {Array.<*>} params The parameters to encode.
+     * @return {string} encoded list of params
+     */
     encodeParameters(types, params) {
         const self = this
         types = self.mapTypes(types)
@@ -696,7 +694,6 @@ class ABI {
         return returnValue
     }
 }
-
 
 /** @instance */
 const abi = new ABI()

@@ -27,6 +27,8 @@
  */
 
 const XHR2 = require('xhr2-cookies').XMLHttpRequest
+const http = require('http')
+const https = require('https')
 
 const errors = require('../../../caver-core-helpers').errors
 
@@ -65,10 +67,11 @@ HttpProvider.prototype._prepareRequest = function() {
 
     // the current runtime is a browser
     if (typeof XMLHttpRequest !== 'undefined') {
+        // eslint-disable-next-line no-undef
         request = new XMLHttpRequest()
     } else {
         request = new XHR2()
-        var agents = { httpsAgent: this.httpsAgent, httpAgent: this.httpAgent, baseUrl: this.baseUrl }
+        const agents = { httpsAgent: this.httpsAgent, httpAgent: this.httpAgent, baseUrl: this.baseUrl }
 
         if (this.agent) {
             agents.httpsAgent = this.agent.https
@@ -106,7 +109,7 @@ HttpProvider.prototype.send = function(payload, callback) {
 
     request.onreadystatechange = function() {
         if (request.readyState === 4 && request.timeout !== 1) {
-            const result = request.responseText
+            let result = request.responseText
             let error = null
 
             try {
@@ -134,7 +137,7 @@ HttpProvider.prototype.send = function(payload, callback) {
 }
 
 HttpProvider.prototype.disconnect = function() {
-    //NO OP
+    // NO OP
 }
 
 HttpProvider.prototype.supportsSubscriptions = function() {

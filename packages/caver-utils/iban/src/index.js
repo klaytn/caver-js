@@ -132,7 +132,7 @@ class Iban {
      */
     static fromAddress(address) {
         if (!utils.isAddress(address)) {
-            throw new Error('Provided address is not a valid address: ' + address)
+            throw new Error(`Provided address is not a valid address: ${address}`)
         }
 
         address = address.replace('0x', '').replace('0X', '')
@@ -155,8 +155,8 @@ class Iban {
     static fromBban(bban) {
         const countryCode = 'XE'
 
-        const remainder = mod9710(iso13616Prepare(countryCode + '00' + bban))
-        const checkDigit = ('0' + (98 - remainder)).slice(-2)
+        const remainder = mod9710(iso13616Prepare(`${countryCode}00${bban}`))
+        const checkDigit = `0${98 - remainder}`.slice(-2)
 
         return new Iban(countryCode + checkDigit + bban)
     }
@@ -169,7 +169,7 @@ class Iban {
      * @return {Iban} the IBAN object
      */
     static createIndirect(options) {
-        return Iban.fromBban('ETH' + options.institution + options.identifier)
+        return Iban.fromBban(`ETH${options.institution}${options.identifier}`)
     }
 
     /**
