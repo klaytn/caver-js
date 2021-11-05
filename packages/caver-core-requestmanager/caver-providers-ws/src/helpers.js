@@ -1,10 +1,11 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-shadow */
 const isNode = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]'
+const isRN = typeof navigator !== 'undefined' && navigator.product === 'ReactNative'
 
 let _btoa = null
 let helpers = null
-if (isNode) {
+if (isNode || isRN) {
     _btoa = function(str) {
         return Buffer.from(str).toString('base64')
     }
