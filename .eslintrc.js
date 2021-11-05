@@ -5,6 +5,7 @@ module.exports = {
         node: true,
         mocha: true,
     },
+    parser: 'babel-eslint',
     plugins: ['prettier'],
     rules: {
         'prettier/prettier': ['error'],
