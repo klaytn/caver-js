@@ -25,7 +25,7 @@ export default class MultipleKeyring {
 
     getPublicKey(compressed?: boolean): string[]
     copy(): MultipleKeyring
-    sign(transactionHash: string, chainId: string | number, role: number, index?: number): SignatureData | SignatureData[]
+    sign(txSigHash: string, chainId: string | number, role: number, index?: number): SignatureData | SignatureData[]
     signMessage(message: string, role: number, index?: number): SignedMessage
     getKeyByRole(role: number): PrivateKey[]
     toAccount(options?: WeightedMultiSigOptions | WeightedMultiSigOptionsObject): Account
