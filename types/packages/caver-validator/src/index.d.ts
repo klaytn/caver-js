@@ -13,11 +13,14 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { KlaytnCall } from '../../caver-rpc/src/klay'
 import AbstractFeeDelegatedTransaction from '../../caver-transaction/src/transactionTypes/abstractFeeDelegatedTransaction'
 import AbstractTransaction from '../../caver-transaction/src/transactionTypes/abstractTransaction'
 import SignatureData from '../../caver-wallet/src/keyring/signatureData'
 
 export default class Validator {
+    static _klaytnCall: KlaytnCall
+
     validateSignedMessage(
         message: string,
         signatures: string[] | string[][] | SignatureData | SignatureData[],
