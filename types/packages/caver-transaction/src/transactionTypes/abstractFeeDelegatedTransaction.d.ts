@@ -23,7 +23,6 @@ export default class AbstractFeeDelegatedTransaction extends AbstractTransaction
     signAsFeePayer(key: string | Keyring, index?: number, hasher?: Function): Promise<AbstractFeeDelegatedTransaction>
     appendFeePayerSignatures(signatures: string[] | string[][] | SignatureData | SignatureData[]): void
     combineSignedRawTransactions(rlpEncodedTxs: string[]): string
-    getSenderTxHash(): string
     getRLPEncodingForFeePayerSignature(): string
     recoverFeePayerPublicKeys(): string[]
 
