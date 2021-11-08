@@ -20,10 +20,11 @@ import AccountKeyFail from '../../caver-account/src/accountKey/accountKeyFail'
 import AccountKeyWeightedMultiSig from '../../caver-account/src/accountKey/accountKeyWeightedMultiSig'
 import AccountKeyRoleBased from '../../caver-account/src/accountKey/accountKeyRoleBased'
 import { AccountKey } from '../../caver-account/src'
-import { AccountKeyForRPC, TransactionForRPC, TransactionReceipt } from '../../caver-rpc/src/klay'
+import { AccountKeyForRPC } from '../../caver-rpc/src/klay'
+import { TransactionForRPC, TransactionReceipt } from '../../caver-core/src'
 import Utils from '../../caver-utils/src'
 
-export default interface formatters {
+export default interface Formatters {
     inputDefaultBlockNumberFormatter(blockNumber: string): string
     inputBlockNumberFormatter(blockNumber: string): string
     inputCallFormatter(options: object): object

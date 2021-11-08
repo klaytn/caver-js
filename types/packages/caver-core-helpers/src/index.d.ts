@@ -52,7 +52,7 @@ export interface ReconnectOptions {
     onTimeout: boolean
 }
 
-export default interface IHelpers {
+export default interface CoreHelpers {
     errors: IErrors
     formatters: IFormatters
     payloadTransformer: IPayloadTransformer
