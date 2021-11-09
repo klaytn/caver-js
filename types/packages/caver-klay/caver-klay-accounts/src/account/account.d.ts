@@ -17,7 +17,7 @@ import AccountKeyMultiSig from '../accountKey/accountKeyMultiSig'
 import AccountKeyPublic from '../accountKey/accountKeyPublic'
 import AccountKeyRoleBased, { RoleBasedKeyObject } from '../accountKey/accountKeyRoleBased'
 
-type AccountKey = AccountKeyPublic | AccountKeyMultiSig | AccountKeyRoleBased
+export type AccountKey = AccountKeyPublic | AccountKeyMultiSig | AccountKeyRoleBased
 
 export default class Account {
     static fromObject(obj: { address: string; privateKey: string }): Account
@@ -27,15 +27,14 @@ export default class Account {
 
     toPublicKey(toPublicKeyFunc: Function): string | string[] | RoleBasedKeyObject
 
-    private _address(): string
-    public address(): string
-    private _accountKey(): AccountKey
-    public accountKey(): AccountKey
-    public privateKey(): string
-
-    public keys(): string
-    public accountKeyType(): string
-    public transactionKey(): string
-    public updateKey(): string
-    public feePayerKey(): string
+    address: string
+    accountKey: AccountKey
+    readonly privateKey: string
+    readonly keys: string
+    readonly accountKeyType: string
+    readonly transactionKey: string
+    readonly updateKey: string
+    readonly feePayerKey: string
+    private _address: string
+    private _accountKey: AccountKey
 }

@@ -13,4 +13,4 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-export function getNetworkType(callback: Function): Promise<string>
+export function getNetworkType(callback?: (error: Error, returnValue: string) => void): Promise<string>

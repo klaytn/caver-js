@@ -26,6 +26,6 @@ export default class FeeDelegatedAccountUpdateWithRatio extends AbstractFeeDeleg
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string
 
+    account: Account
     private _account: Account
-    public account: Account
 }

@@ -21,10 +21,10 @@ export default class AccountKeyMultiSig {
     toPublicKey(toPublicKeyFunc: Function): string[]
     update(keys: AccountKeyMultiSig): void
 
-    public defaultKey(): string
-    private _keys(): string[]
-    public keys(): string[]
-    public transactionKey(): string[]
-    public updateKey(): string[]
-    public feePayerKey(): string[]
+    keys: string[]
+    readonly defaultKey: string
+    readonly transactionKey: string[]
+    readonly updateKey: string[]
+    readonly feePayerKey: string[]
+    private _keys: string[]
 }

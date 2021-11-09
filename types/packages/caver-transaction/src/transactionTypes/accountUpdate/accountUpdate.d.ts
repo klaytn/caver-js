@@ -25,6 +25,6 @@ export default class AccountUpdate extends AbstractTransaction {
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string
 
+    account: Account
     private _account: Account
-    public account: Account
 }

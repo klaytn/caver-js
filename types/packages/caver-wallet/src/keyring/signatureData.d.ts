@@ -23,16 +23,16 @@ export default class SignatureData {
     toString(): string
     isEqual(sig: SignatureData | SignatureData[]): boolean
 
+    v: string
+    V: string
+    r: string
+    R: string
+    s: string
+    S: string
     private _v: string
-    public v: string
     private _V: string
-    public V: string
     private _r: string
-    public r: string
     private _R: string
-    public R: string
     private _s: string
-    public s: string
     private _S: string
-    public S: string
 }

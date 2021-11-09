@@ -25,16 +25,16 @@ export default class FeeDelegatedSmartContractDeployWithRatio extends AbstractFe
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string
 
+    to: string
+    value: string
+    input: string
+    data: string
+    humanReadable: boolean
+    codeFormat: string
     private _to: string
-    public to: string
     private _value: string
-    public value: string
     private _input: string
-    public input: string
     private _data: string
-    public data: string
     private _humanReadable: boolean
-    public humanReadable: boolean
     private _codeFormat: string
-    public codeFormat: string
 }

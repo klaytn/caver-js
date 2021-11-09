@@ -22,8 +22,7 @@ import AccountKeyLegacy from './accountKey/accountKeyLegacy'
 import AccountKeyPublic from './accountKey/accountKeyPublic'
 import AccountKeyRoleBased from './accountKey/accountKeyRoleBased'
 import AccountKeyWeightedMultiSig from './accountKey/accountKeyWeightedMultiSig'
-import WeightedMultiSigOptions from './accountKey/weightedMultiSigOptions'
-import { WeightedMultiSigOptionsObject } from './accountKey/weightedMultiSigOptions'
+import WeightedMultiSigOptions, { WeightedMultiSigOptionsObject } from './accountKey/weightedMultiSigOptions'
 import WeightedPublicKey from './accountKey/weightedPublicKey'
 
 export type AccountKey = AccountKeyLegacy | AccountKeyPublic | AccountKeyFail | AccountKeyWeightedMultiSig | AccountKeyRoleBased
@@ -35,7 +34,7 @@ export interface IAccountKey {
 export default class Account {
     static weightedMultiSigOptions: typeof WeightedMultiSigOptions
     static accountKey: {
-        decode: typeof AccountKeyDecoder['decode']
+        decode: AccountKeyDecoder['decode']
         accountKeyLegacy: typeof AccountKeyLegacy
         accountKeyPublic: typeof AccountKeyPublic
         accountKeyFail: typeof AccountKeyFail
@@ -66,10 +65,10 @@ export default class Account {
 
     constructor(address: string, accountKey: AccountKey)
 
+    address: string
+    accountKey: AccountKey
     private _address: string
-    public address: string
     private _accountKey: AccountKey
-    public accountKey: AccountKey
 
     getRLPEncodingAccountKey(): string
 }

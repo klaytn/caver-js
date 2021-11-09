@@ -13,17 +13,21 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-export type WeightedMultiSigOptionsObject = { threshold?: number; weigths?: number[]; weight?: number[] }
+export interface WeightedMultiSigOptionsObject {
+    threshold?: number
+    weigths?: number[]
+    weight?: number[]
+}
 
 export default class WeightedMultiSigOptions {
     static fromObject(options: WeightedMultiSigOptionsObject): WeightedMultiSigOptions
 
-    constructor(threshold: number, weights: Array<number>)
+    constructor(threshold: number, weights: number[])
 
+    threshold: number
+    weights: number[]
     private _threshold: number
-    public threshold: number
     private _weights: number[]
-    public weights: number[]
 
     isEmpty(): boolean
 }

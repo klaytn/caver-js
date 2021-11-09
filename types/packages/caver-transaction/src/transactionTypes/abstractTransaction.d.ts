@@ -43,7 +43,7 @@ export default class AbstractTransaction {
 
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string
-    sign(key: string | Keyring, index?: number, hasher?: Function): Promise<AbstractTransaction>
+    sign(key: string | Keyring, index?: number, hasher?: (transaction: AbstractTransaction) => string): Promise<AbstractTransaction>
     appendSignatures(signatures: string[] | string[][] | SignatureData | SignatureData[]): void
     combineSignedRawTransactions(rlpEncodedTxs: string[]): string
     getRawTransaction(): string
@@ -54,17 +54,17 @@ export default class AbstractTransaction {
     fillTransaction(): Promise<void>
     validateOptionalValues(): void
 
-    public type: string
+    readonly type: string
+    from: string
+    nonce: string
+    gas: string
+    gasPrice: string
+    chainId: string
+    signatures: string
     private _from: string
-    public from: string
     private _nonce: string
-    public nonce: string
     private _gas: string
-    public gas: string
     private _gasPrice: string
-    public gasPrice: string
     private _chainId: string
-    public chainId: string
     private _signatures: string
-    public signatures: string
 }

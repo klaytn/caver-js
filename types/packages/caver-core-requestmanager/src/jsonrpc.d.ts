@@ -22,5 +22,5 @@ import Method from '../../caver-core-method/src/index'
 export default interface Jsonrpc {
     toPayload(method: Method, params: any[]): JsonRpcPayload
     isValidResponse(response: JsonRpcResponse): boolean
-    toBatchPayload(messages: { method: Method; params: any[] }[]): JsonRpcPayload[]
+    toBatchPayload(messages: Array<{ method: Method; params: any[] }>): JsonRpcPayload[]
 }

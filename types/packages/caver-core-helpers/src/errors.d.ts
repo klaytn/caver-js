@@ -13,7 +13,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-interface txErrorTable {
+export interface txErrorTable {
     '0x2': string
     '0x3': string
     '0x4': string
@@ -45,7 +45,7 @@ interface txErrorTable {
     '0x1e': string
 }
 
-export default interface IErrors {
+export default interface Errors {
     txErrorTable: txErrorTable
 
     needNameCallPropertyToCreateMethod: Error

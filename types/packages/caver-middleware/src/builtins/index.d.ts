@@ -17,7 +17,7 @@ import { fileLogger } from './fileLogger'
 import { rpcFilter } from './rpcFilter'
 import { timeMeasure } from './timeMeasure'
 
-export default interface IBuiltins {
+export default interface Builtins {
     fileLogger: typeof fileLogger
     rpcFilter: typeof rpcFilter
     timeMeasure: typeof timeMeasure

@@ -33,8 +33,8 @@ export default class SingleKeyring {
     encryptV3(password: string, options?: EncryptionOptions): EncryptedKeystoreV3Json
     isDecoupled(): boolean
 
+    address: string
+    key: PrivateKey
     private _address: string
-    public address: string
     private _key: PrivateKey
-    public key: PrivateKey
 }

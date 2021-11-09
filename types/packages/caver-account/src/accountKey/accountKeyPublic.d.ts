@@ -22,8 +22,8 @@ export default class AccountKeyPublic implements IAccountKey {
 
     constructor(publicKey: string)
 
+    publicKey: string
     private _publicKey: string
-    public publicKey: string
 
     getRLPEncoding(): string
     getXYPoint(): string[]

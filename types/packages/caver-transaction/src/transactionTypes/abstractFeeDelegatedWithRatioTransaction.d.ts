@@ -19,6 +19,6 @@ import { CreateTransactionObject } from './abstractTransaction'
 export default class AbstractFeeDelegatedWithRatioTransaction extends AbstractFeeDelegatedTransaction {
     constructor(typeString: string, createTxObj: CreateTransactionObject)
 
+    feeRatio: string
     private _feeRatio: string
-    public feeRatio: string
 }
