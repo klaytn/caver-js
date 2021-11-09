@@ -20,14 +20,18 @@ import AbstractTransaction, { CreateTransactionObject } from './abstractTransact
 export default class AbstractFeeDelegatedTransaction extends AbstractTransaction {
     constructor(typeString: string, createTxObj: CreateTransactionObject)
 
-    signAsFeePayer(key: string | Keyring, index?: number, hasher?: Function): Promise<AbstractFeeDelegatedTransaction>
+    signAsFeePayer(
+        key: string | Keyring,
+        index?: number,
+        hasher?: (transaction: AbstractFeeDelegatedTransaction) => string
+    ): Promise<AbstractFeeDelegatedTransaction>
     appendFeePayerSignatures(signatures: string[] | string[][] | SignatureData | SignatureData[]): void
     combineSignedRawTransactions(rlpEncodedTxs: string[]): string
     getRLPEncodingForFeePayerSignature(): string
     recoverFeePayerPublicKeys(): string[]
 
+    feePayer: string
+    feePayerSignatures: SignatureData[]
     private _feePayer: string
-    public feePayer: string
     private _feePayerSignatures: SignatureData[]
-    public feePayerSignatures: SignatureData[]
 }

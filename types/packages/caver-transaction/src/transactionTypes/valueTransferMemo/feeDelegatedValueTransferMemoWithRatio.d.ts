@@ -18,19 +18,19 @@ import { CreateTransactionObject } from '../abstractTransaction'
 
 export default class FeeDelegatedValueTransferMemoWithRatio extends AbstractFeeDelegatedWithRatioTransaction {
     static create(createTxObj: string | CreateTransactionObject): FeeDelegatedValueTransferMemoWithRatio
-    static decode(rlpEncoded): FeeDelegatedValueTransferMemoWithRatio
+    static decode(rlpEncoded: string): FeeDelegatedValueTransferMemoWithRatio
 
     constructor(createTxObj: string | CreateTransactionObject)
 
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string
 
+    to: string
+    value: string
+    input: string
+    data: string
     private _to: string
-    public to: string
     private _value: string
-    public value: string
     private _input: string
-    public input: string
     private _data: string
-    public data: string
 }

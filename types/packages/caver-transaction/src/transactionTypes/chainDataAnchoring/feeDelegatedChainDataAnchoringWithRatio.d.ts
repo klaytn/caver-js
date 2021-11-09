@@ -25,6 +25,6 @@ export default class FeeDelegatedChainDataAnchoringWithRatio extends AbstractFee
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string
 
+    input: string
     private _input: string
-    public input: string
 }

@@ -13,7 +13,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { TransactionReceipt } from '../../caver-rpc/src/klay'
+import { TransactionReceipt } from '../../caver-core/src'
 import RequestManager from '../../caver-core-requestmanager/src/index'
 
 export interface MethodOptions {
@@ -27,7 +27,7 @@ export interface MethodOptions {
         contractDeployFormatter?: (receipt: TransactionReceipt) => any
     }
     hexCall?: string
-    inputFormatter?: (() => void | null)[]
+    inputFormatter?: Array<() => void | null>
     outputFormatter?: () => void
     outputFormatterDisable?: boolean
     params?: number
@@ -42,7 +42,7 @@ export default class Method {
     call: string
     hexCall: string
     params: number
-    inputFormatter: (() => void | null)[]
+    inputFormatter: Array<() => void | null>
     outputFormatter: () => void
     transformPayload: () => void
     extraFormatters: {

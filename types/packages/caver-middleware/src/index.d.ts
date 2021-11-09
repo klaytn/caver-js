@@ -13,7 +13,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import IBuiltins from './builtins'
+import Builtins from './builtins'
 
 export interface JsonRPCPayloadObject {
     jsonrpc: string
@@ -25,7 +25,7 @@ export interface JsonRPCPayloadObject {
 export default class Middleware {
     constructor()
 
-    builtin: IBuiltins
+    builtin: Builtins
 
     getMiddlewares(): Function[]
     registerMiddleware(middleware: Function): void

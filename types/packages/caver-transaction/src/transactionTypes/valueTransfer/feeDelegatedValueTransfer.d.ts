@@ -24,8 +24,8 @@ export default class FeeDelegatedValueTransfer extends AbstractFeeDelegatedTrans
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string
 
+    to: string
+    value: string
     private _to: string
-    public to: string
     private _value: string
-    public value: string
 }

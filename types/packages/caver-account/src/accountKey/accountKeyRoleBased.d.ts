@@ -20,19 +20,19 @@ import AccountKeyPublic from './accountKeyPublic'
 import AccountKeyWeightedMultiSig from './accountKeyWeightedMultiSig'
 import WeightedMultiSigOptions, { WeightedMultiSigOptionsObject } from './weightedMultiSigOptions'
 
-type AccountKeyRoleBasedRoleKeyType = AccountKeyLegacy | AccountKeyPublic | AccountKeyFail | AccountKeyWeightedMultiSig
+export type AccountKeyRoleBasedRoleKeyType = AccountKeyLegacy | AccountKeyPublic | AccountKeyFail | AccountKeyWeightedMultiSig
 
 export default class AccountKeyRoleBased implements IAccountKey {
     static decode(rlpEncodedKey: string): AccountKeyRoleBased
     static fromRoleBasedPublicKeysAndOptions(
-        roleBasedPubArray: (AccountKeyLegacy | AccountKeyFail | string[])[],
-        options: (WeightedMultiSigOptions | WeightedMultiSigOptionsObject)[]
+        roleBasedPubArray: Array<AccountKeyLegacy | AccountKeyFail | string[]>,
+        options: Array<WeightedMultiSigOptions | WeightedMultiSigOptionsObject>
     ): AccountKeyRoleBased
 
     constructor(accountKeyArray: AccountKeyRoleBasedRoleKeyType[])
 
+    accountKeys: AccountKeyRoleBasedRoleKeyType[]
     private _accountKeys: AccountKeyRoleBasedRoleKeyType[]
-    public accountKeys: AccountKeyRoleBasedRoleKeyType[]
 
     getRLPEncoding(): string
 }

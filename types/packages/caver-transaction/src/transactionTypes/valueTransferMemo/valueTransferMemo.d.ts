@@ -24,12 +24,12 @@ export default class ValueTransferMemo extends AbstractTransaction {
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string
 
+    to: string
+    value: string
+    input: string
+    data: string
     private _to: string
-    public to: string
     private _value: string
-    public value: string
     private _input: string
-    public input: string
     private _data: string
-    public data: string
 }

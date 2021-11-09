@@ -26,10 +26,6 @@ import Personal from '../caver-klay-personal/src'
 import { getNetworkType } from './getNetworkType'
 import { BlockNumber } from '../../caver-core/src'
 
-export class KlayNet extends Net {
-    getNetworkType(callback: Function): Promise<string>
-}
-
 export interface DecodedFromRawTransactionObject extends KeyForUpdateObject {
     type: string
     nonce: string
@@ -56,7 +52,7 @@ export interface DecodedFromRawTransactionObject extends KeyForUpdateObject {
 export default class Klay {
     decodeTransaction(rawTransaction: string, type?: string): DecodedFromRawTransactionObject
 
-    net: KlayNet
+    net: Net
     accounts: Accounts
     personal: Personal
     Contract: typeof Contract

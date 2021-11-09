@@ -79,7 +79,7 @@ export type FeeDelegatedTransaction =
     | FeeDelegatedChainDataAnchoringWithRatio
 
 export default interface TransactionModule {
-    decode: typeof TransactionDecoder['decode']
+    decode: TransactionDecoder['decode']
     getTransactionByHash(transactionHash: string): AbstractTransaction
     recoverPublicKeys(rawTx: string): string[]
     recoverFeePayerPublicKeys(rawTx: string): string[]

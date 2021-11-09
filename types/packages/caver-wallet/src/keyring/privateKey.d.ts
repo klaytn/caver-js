@@ -23,6 +23,6 @@ export default class PrivateKey {
     getPublicKey(compressed?: boolean): string
     getDerivedAddress(): string
 
+    privateKey: string
     private _privateKey: string
-    public privateKey: string
 }

@@ -29,10 +29,10 @@ export default class RequestManager {
     provider: provider
     subscriptions: object
 
-    setProvider(p: provider, net: net.Server)
+    setProvider(p: provider, net: net.Server): void
     send(data: object, callback: (error: Error | null, result?: JsonRpcResponse) => void): void
     sendBatch(data: object[], callback: (error: Error | null, result?: JsonRpcResponse) => void): void
-    addSubscription(id: string, name: string, type: string, callback: Function): void
+    addSubscription(id: string, name: string, type: string, callback: (error: Error | null, result?: JsonRpcResponse) => void): void
     removeSubscription(id: string, callback: (error: Error | null, result?: JsonRpcResponse) => void): void
     clearSubscriptions(keepIsSyncing?: boolean): void
 }

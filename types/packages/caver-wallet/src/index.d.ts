@@ -38,7 +38,7 @@ export default class KeyringContainer implements IWallet {
     constructor(keyrings?: Keyring[])
 
     length: number
-    keyring: typeof KeyringFactory
+    keyring: KeyringFactory
 
     generate(numberOfKeyrings: number, entropy?: string): string[]
     newKeyring(address: string, key: string): SingleKeyring
@@ -50,11 +50,11 @@ export default class KeyringContainer implements IWallet {
     add(keyring: Keyring): Keyring
     remove(address: string): boolean
     signMessage(address: string, data: string, role?: number, index?: number): SignedMessage
-    sign(address: string, transaction: Transaction, index?: number, hasher?: Function): Promise<Transaction>
+    sign(address: string, transaction: Transaction, index?: number, hasher?: (transaction: Transaction) => string): Promise<Transaction>
     signAsFeePayer(
         address: string,
         transaction: FeeDelegatedTransaction,
         index?: number,
-        hasher?: Function
+        hasher?: (transaction: FeeDelegatedTransaction) => string
     ): Promise<FeeDelegatedTransaction>
 }

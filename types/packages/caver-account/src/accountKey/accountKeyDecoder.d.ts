@@ -15,6 +15,6 @@
 
 import { AccountKey } from '..'
 
-export default class AccountKeyDecoder {
-    static decode(rlpEncodedKey: string): AccountKey
+export default interface AccountKeyDecoder {
+    decode(rlpEncodedKey: string): AccountKey
 }

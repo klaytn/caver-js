@@ -14,10 +14,9 @@
 */
 
 import BigNumber from 'bignumber.js'
-import BN from 'bn.js'
-import _ from 'lodash'
+import BN = require('bn.js')
+import _ = require('lodash')
 import SignatureData from '../../caver-wallet/src/keyring/signatureData'
-import Iban from '../iban/src'
 import { TransactionForRPC } from '../../caver-core/src'
 
 export type EncodeScalarInput = Buffer | string | number
@@ -108,10 +107,23 @@ export interface PromiEvent {
     eventEmitter: Promise<any> | object
 }
 
+export class Iban {
+    toAddress(ib?: string): string
+    toIban(address: string): string
+    fromAddress(address: string): Iban
+    fromBban(bban: string): Iban
+    createIndirect(options?: object): Iban
+    isValid(): boolean
+    isValid(iban: string): boolean
+    isDirect(): boolean
+    isIndirect(): boolean
+    checksum(): string
+    institution(): string
+    client(): string
+    toString(): string
+}
+
 export default interface Utils {
-    _fireError(error: object, emitter: object, reject: Function, callback: Function): object
-    _jsonInterfaceMethodToString(abiItem: AbiItem): string
-    _flattenTypes(includeTuple: boolean, puts: object): string[]
     randomHex(bytesSize: number): string
     soliditySha3(...val: Mixed[]): string | null
     toChecksumAddress(address: string): string

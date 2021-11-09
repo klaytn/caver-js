@@ -26,10 +26,10 @@ export default class AccountKeyWeightedMultiSig implements IAccountKey {
 
     constructor(threshold: number, weightedPublicKeys: WeightedPublicKey[])
 
+    threshold: number
+    weightedPublicKeys: WeightedPublicKey[]
     private _threshold: number
-    public threshold: number
     private _weightedPublicKeys: WeightedPublicKey[]
-    public weightedPublicKeys: WeightedPublicKey[]
 
     getRLPEncoding(): string
 }

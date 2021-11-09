@@ -13,15 +13,14 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import BN from 'bn.js'
-import { IWallet } from '../../caver-wallet/src'
+import BN = require('bn.js')
+import KeyringContainer, { IWallet } from '../../caver-wallet/src'
 import { Result } from '../../caver-abi/src'
 import { KIP37 } from '../../caver-kct/src'
 import KIP7 from '../../caver-kct/src/kip7'
 import { TransactionReceipt, CallObject, BlockNumber, PromiEvent, LogsOptions } from '../../caver-core/src'
 import { Transaction, FeeDelegatedTransaction } from '../../caver-transaction/src'
 import { AbiItem } from '../../caver-utils/src'
-import KeyringContainer from '../../caver-wallet/src'
 
 export interface SendOptions {
     from?: string

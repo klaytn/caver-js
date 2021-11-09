@@ -257,7 +257,7 @@ export interface EncryptedKeystoreV4Json {
     keyring: EncryptedKey[] | EncryptedKey[][]
 }
 
-interface EncryptedKey {
+export interface EncryptedKey {
     ciphertext: string
     cipherparams: { iv: string }
     cipher: string

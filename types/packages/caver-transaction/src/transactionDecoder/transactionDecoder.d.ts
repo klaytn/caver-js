@@ -15,6 +15,6 @@
 
 import { Transaction } from '..'
 
-export default class TransactionDecoder {
-    static decode(rlpEncoded: string): Transaction
+export default interface TransactionDecoder {
+    decode(rlpEncoded: string): Transaction
 }

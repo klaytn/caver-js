@@ -27,10 +27,10 @@ import {
     Log,
     LogsOptions,
     LogObject,
+    CallObject,
 } from '../../caver-core/src'
 import { Transaction } from '../../caver-transaction/src'
 import { Syncing, AccountKeyForRPC, AccountForRPC } from '../../caver-rpc/src/klay'
-import { CallObject } from '../../caver-core/src'
 import { PeerCountByType } from '../../caver-rpc/src/net'
 
 export interface TracingOptions {

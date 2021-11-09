@@ -13,11 +13,11 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import IConstants from './constants'
-import IErrors from './errors'
-import IFormatters from './formatters'
-import IPayloadTransformer from './payloadTransformer'
-import IValidateFunction from './validateFunction'
+import Constants from './constants'
+import Errors from './errors'
+import Formatters from './formatters'
+import PayloadTransformer from './payloadTransformer'
+import ValidateFunction from './validateFunction'
 
 export interface JsonRpcPayload {
     jsonrpc: string
@@ -53,9 +53,9 @@ export interface ReconnectOptions {
 }
 
 export default interface CoreHelpers {
-    errors: IErrors
-    formatters: IFormatters
-    payloadTransformer: IPayloadTransformer
-    constants: IConstants
-    validateFunction: IValidateFunction
+    errors: Errors
+    formatters: Formatters
+    payloadTransformer: PayloadTransformer
+    constants: Constants
+    validateFunction: ValidateFunction
 }

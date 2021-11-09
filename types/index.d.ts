@@ -13,6 +13,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+import * as net from 'net'
 import ABI from './packages/caver-abi/src'
 import Account from './packages/caver-account/src'
 import BaseContract from './packages/caver-contract/src'
@@ -30,26 +31,27 @@ import RPC from './packages/caver-rpc/src'
 import Validator from './packages/caver-validator/src'
 import Transaction from './packages/caver-transaction/src'
 import Utils from './packages/caver-utils/src'
-import KeyringContainer from './packages/caver-wallet/src'
+import KeyringContainer, { IWallet } from './packages/caver-wallet/src'
 import KeyringFactory from './packages/caver-wallet/src/keyring/keyringFactory'
-import { IWallet } from './packages/caver-wallet/src'
 
 export class Contract extends BaseContract {
     static create(...args: ConstructorParameters<typeof BaseContract>): Contract
 }
 
-type RequestProvider = string | WebsocketProvider | HttpProvider | IpcProvider
+export type RequestProvider = string | WebsocketProvider | HttpProvider | IpcProvider
+
+export interface Providers {
+    WebsocketProvider: typeof WebsocketProvider
+    HttpProvider: typeof HttpProvider
+    IpcProvider: typeof IpcProvider
+}
 
 export default class Caver {
-    static providers: {
-        WebsocketProvider: typeof WebsocketProvider
-        HttpProvider: typeof HttpProvider
-        IpcProvider: typeof IpcProvider
-    }
+    static providers: Providers
     static utils: Utils
     static abi: ABI
 
-    constructor(provider: RequestProvider, net?: string)
+    constructor(provider?: RequestProvider, net?: net.Socket)
 
     version: string
     utils: Utils

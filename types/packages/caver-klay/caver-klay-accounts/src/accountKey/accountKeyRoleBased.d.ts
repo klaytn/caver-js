@@ -27,12 +27,12 @@ export default class AccountKeyRoleBased {
     toPublicKey(toPublicKeyFunc: Function): RoleBasedKeyObject
     update(keys: AccountKeyRoleBased): void
 
-    public defaultKey(): string
-    public keys(): RoleBasedKeyObject
-    private _transactionKey(): string[]
-    public transactionKey(): string[]
-    private _updateKey(): string[]
-    public updateKey(): string[]
-    private _feePayerKey(): string[]
-    public feePayerKey(): string[]
+    transactionKey: string[]
+    updateKey: string[]
+    feePayerKey: string[]
+    readonly keys: RoleBasedKeyObject
+    readonly defaultKey: string
+    private _transactionKey: string[]
+    private _updateKey: string[]
+    private _feePayerKey: string[]
 }

@@ -16,10 +16,10 @@
 export default class WeightedPublicKey {
     constructor(weight: number, publicKey: string)
 
+    weight: number
+    publicKey: string
     private _weight: number
-    public weight: number
     private _publicKey: string
-    public publicKey: string
 
     encodeToBytes(): string
 }

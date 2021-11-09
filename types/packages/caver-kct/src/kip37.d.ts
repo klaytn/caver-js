@@ -49,7 +49,7 @@ export default class KIP37 extends Contract {
     uri(id: string | number | BigNumber): Promise<string>
     totalSupply(id: string | number | BigNumber): Promise<BigNumber>
     balanceOf(account: string, id: string | number | BigNumber): Promise<BigNumber>
-    balanceOfBatch(accounts: string[], ids: (string | number | BigNumber)[]): Promise<BigNumber[]>
+    balanceOfBatch(accounts: string[], ids: Array<string | number | BigNumber>): Promise<BigNumber[]>
     isApprovedForAll(owner: string, operator: string): Promise<boolean>
     paused(id?: string | number | BigNumber): Promise<boolean>
     isPauser(account: string): Promise<boolean>
@@ -73,21 +73,21 @@ export default class KIP37 extends Contract {
     safeBatchTransferFrom(
         from: string,
         to: string,
-        ids: (string | number | BigNumber)[],
-        amounts: (string | number | BigNumber)[],
+        ids: Array<string | number | BigNumber>,
+        amounts: Array<string | number | BigNumber>,
         data?: Data,
         sendParam?: SendOptions
     ): Promise<TransactionReceipt>
     mint(
         toList: string | string[],
         id: string | number | BigNumber,
-        values: string | number | BigNumber | (string | number | BigNumber)[],
+        values: string | number | BigNumber | Array<string | number | BigNumber>,
         sendParam?: SendOptions
     ): Promise<TransactionReceipt>
     mintBatch(
         to: string,
-        ids: (string | number | BigNumber)[],
-        values: (string | number | BigNumber)[],
+        ids: Array<string | number | BigNumber>,
+        values: Array<string | number | BigNumber>,
         sendParam?: SendOptions
     ): Promise<TransactionReceipt>
     addMinter(account: string, sendParam?: SendOptions): Promise<TransactionReceipt>
@@ -100,8 +100,8 @@ export default class KIP37 extends Contract {
     ): Promise<TransactionReceipt>
     burnBatch(
         account: string,
-        ids: (string | number | BigNumber)[],
-        values: (string | number | BigNumber)[],
+        ids: Array<string | number | BigNumber>,
+        values: Array<string | number | BigNumber>,
         sendParam?: SendOptions
     ): Promise<TransactionReceipt>
     pause(id?: string | number | BigNumber, sendParam?: SendOptions): Promise<TransactionReceipt>

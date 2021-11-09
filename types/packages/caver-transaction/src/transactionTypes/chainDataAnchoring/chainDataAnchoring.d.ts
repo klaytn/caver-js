@@ -24,6 +24,6 @@ export default class ChainDataAnchoring extends AbstractTransaction {
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string
 
+    input: string
     private _input: string
-    public input: string
 }
