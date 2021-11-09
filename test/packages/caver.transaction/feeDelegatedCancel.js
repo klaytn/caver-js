@@ -181,7 +181,6 @@ describe('TxTypeFeeDelegatedCancel', () => {
                 transactionObj[unnecessaries[i].name] = unnecessaries[i].value
 
                 const expectedError = `"${unnecessaries[i].name}" cannot be used with ${caver.transaction.type.TxTypeFeeDelegatedCancel} transaction`
-                // eslint-disable-next-line no-loop-func
                 expect(() => new caver.transaction.feeDelegatedCancel(transactionObj)).to.throw(expectedError)
             }
         })

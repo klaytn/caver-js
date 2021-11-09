@@ -1,4 +1,3 @@
-/* eslint-disable no-loop-func */
 /*
 	Copyright 2020 The caver-js Authors
 	This file is part of the caver-js library.

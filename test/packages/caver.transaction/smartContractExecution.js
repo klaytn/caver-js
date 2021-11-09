@@ -182,7 +182,6 @@ describe('TxTypeSmartContractExecution', () => {
                 transactionObj[unnecessaries[i].name] = unnecessaries[i].value
 
                 const expectedError = `"${unnecessaries[i].name}" cannot be used with ${caver.transaction.type.TxTypeSmartContractExecution} transaction`
-                // eslint-disable-next-line no-loop-func
                 expect(() => new caver.transaction.smartContractExecution(transactionObj)).to.throw(expectedError)
             }
         })

@@ -179,7 +179,6 @@ describe('TxTypeValueTransfer', () => {
                 transactionObj[unnecessaries[i].name] = unnecessaries[i].value
 
                 const expectedError = `"${unnecessaries[i].name}" cannot be used with ${caver.transaction.type.TxTypeValueTransfer} transaction`
-                // eslint-disable-next-line no-loop-func
                 expect(() => new caver.transaction.valueTransfer(transactionObj)).to.throw(expectedError)
             }
         })

@@ -239,7 +239,6 @@ describe('TxTypeFeeDelegatedSmartContractDeployWithRatio', () => {
                 transactionObj[unnecessaries[i].name] = unnecessaries[i].value
 
                 const expectedError = `"${unnecessaries[i].name}" cannot be used with ${caver.transaction.type.TxTypeFeeDelegatedSmartContractDeployWithRatio} transaction`
-                // eslint-disable-next-line no-loop-func
                 expect(() => new caver.transaction.feeDelegatedSmartContractDeployWithRatio(transactionObj)).to.throw(expectedError)
             }
         })

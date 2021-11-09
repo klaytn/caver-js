@@ -141,7 +141,6 @@ describe('TxTypeLegacyTransaction', () => {
                 transactionObj[unnecessaries[i].name] = unnecessaries[i].value
 
                 const expectedError = `"${unnecessaries[i].name}" cannot be used with ${caver.transaction.type.TxTypeLegacyTransaction} transaction`
-                // eslint-disable-next-line no-loop-func
                 expect(() => new caver.transaction.legacyTransaction(transactionObj)).to.throw(expectedError)
             }
         })
