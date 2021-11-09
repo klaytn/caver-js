@@ -64,7 +64,7 @@
   },
   "homepage": "https://github.com/klaytn/caver-js",
   "author": "Klaytn Team",
-  "license": "LGPL",
+  "license": "LGPL-3.0",
   "dependencies": {
     "@babel/runtime": "7.3.1",
     "@ethersproject/abi": "5.0.7",
@@ -102,7 +102,7 @@
     "xhr2-cookies": "1.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.2.0",
+    "@babel/core": "^7.11.0",
     "@babel/eslint-parser": "^7.16.0",
     "@babel/plugin-external-helpers": "7.0.0",
     "@babel/plugin-transform-runtime": "7.1.0",
@@ -121,7 +121,7 @@
     "eslint-config-airbnb": "17.0.0",
     "eslint-config-google": "0.14.0",
     "eslint-config-prettier": "6.4.0",
-    "eslint-plugin-import": "2.13.0",
+    "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-jsx-a11y": "6.1.1",
     "eslint-plugin-prettier": "3.1.1",
     "eslint-plugin-react": "7.10.0",
