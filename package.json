@@ -6,7 +6,7 @@
   "types": "types/index.d.ts",
   "scripts": {
     "dtslint": "dtslint types --localTs ./node_modules/typescript/lib",
-    "test": "npm run build && npm run dtslint && npm run unitTest",
+    "test": "npm run build && npm run unitTest",
     "unitTest": " npm run txUnitTest && npm run utilUnitTest && npm run netUnitTest && npm run accountUnitTest && npm run serUnitTest && npm run walletUnitTest && npm run etcUnitTest && npm run validatorUnitTest",
     "fullTest": " npm run unitTest && npm run rpcTest && npm run txTest && npm run etcTest && npm run accountKeyTest && npm run kctTest && npm run intTest",
     "build-all": "gulp all",
