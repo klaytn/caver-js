@@ -13,17 +13,17 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import MultipleKeyring from './multipleKeyring'
-import PrivateKey from './privateKey'
-import RoleBasedKeyring from './roleBasedKeyring'
-import SignatureData from './signatureData'
-import SingleKeyring from './singleKeyring'
+import { MultipleKeyring } from './multipleKeyring'
+import { PrivateKey } from './privateKey'
+import { RoleBasedKeyring } from './roleBasedKeyring'
+import { SignatureData } from './signatureData'
+import { SingleKeyring } from './singleKeyring'
 import { KEY_ROLE } from './keyringHelper'
 import { Keystore } from '../../../caver-core/src'
 
 export type Keyring = SingleKeyring | MultipleKeyring | RoleBasedKeyring
 
-export default interface KeyringFactory {
+export interface KeyringFactory {
     privateKey: PrivateKey
     singleKeyring: SingleKeyring
     multipleKeyring: MultipleKeyring

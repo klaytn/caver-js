@@ -13,11 +13,10 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Keyring } from '../../../caver-wallet/src/keyring/keyringFactory'
-import SignatureData from '../../../caver-wallet/src/keyring/signatureData'
-import AbstractTransaction, { CreateTransactionObject } from './abstractTransaction'
+import { Keyring, SignatureData } from '../../../caver-wallet/src'
+import { AbstractTransaction, CreateTransactionObject } from './abstractTransaction'
 
-export default class AbstractFeeDelegatedTransaction extends AbstractTransaction {
+export class AbstractFeeDelegatedTransaction extends AbstractTransaction {
     constructor(typeString: string, createTxObj: CreateTransactionObject)
 
     signAsFeePayer(

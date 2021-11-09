@@ -13,7 +13,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-export default interface Constants {
+export interface Constants {
     VALID_GAS_PRICE: number
     ACCOUNT_UPDATE_TYPE_TAG: string
     FEE_DELEGATED_ACCOUNT_UPDATE_TYPE_TAG: string

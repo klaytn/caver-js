@@ -107,7 +107,7 @@ export interface StakingInformation {
     UseGini: boolean
 }
 
-export default class Governance {
+export class Governance {
     constructor(...args: any[])
 
     vote(key: string, value: string | number | boolean, callback?: (error: Error, result: string) => void): Promise<string>

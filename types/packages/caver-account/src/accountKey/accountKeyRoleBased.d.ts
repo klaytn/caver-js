@@ -14,15 +14,15 @@
 */
 
 import { IAccountKey } from '..'
-import AccountKeyFail from './accountKeyFail'
-import AccountKeyLegacy from './accountKeyLegacy'
-import AccountKeyPublic from './accountKeyPublic'
-import AccountKeyWeightedMultiSig from './accountKeyWeightedMultiSig'
-import WeightedMultiSigOptions, { WeightedMultiSigOptionsObject } from './weightedMultiSigOptions'
+import { AccountKeyFail } from './accountKeyFail'
+import { AccountKeyLegacy } from './accountKeyLegacy'
+import { AccountKeyPublic } from './accountKeyPublic'
+import { AccountKeyWeightedMultiSig } from './accountKeyWeightedMultiSig'
+import { WeightedMultiSigOptions, WeightedMultiSigOptionsObject } from './weightedMultiSigOptions'
 
 export type AccountKeyRoleBasedRoleKeyType = AccountKeyLegacy | AccountKeyPublic | AccountKeyFail | AccountKeyWeightedMultiSig
 
-export default class AccountKeyRoleBased implements IAccountKey {
+export class AccountKeyRoleBased implements IAccountKey {
     static decode(rlpEncodedKey: string): AccountKeyRoleBased
     static fromRoleBasedPublicKeysAndOptions(
         roleBasedPubArray: Array<AccountKeyLegacy | AccountKeyFail | string[]>,

@@ -15,7 +15,7 @@
 
 import BigNumber from 'bignumber.js'
 import { IWallet } from '../../caver-wallet/src'
-import Contract, { SendOptions, SendOptionsWithFormatter } from '../../caver-contract/src'
+import { Contract, SendOptions, SendOptionsWithFormatter } from '../../caver-contract/src'
 import { TransactionReceipt } from '../../caver-core/src'
 import { AbiItem } from '../../caver-utils/src'
 import { Data } from './kip7'
@@ -32,7 +32,7 @@ export interface KIP37DetectedObject {
     IKIP37Pausable: boolean
 }
 
-export default class KIP37 extends Contract {
+export class KIP37 extends Contract {
     static byteCode: string
 
     static create(tokenAddress?: string, abi?: AbiItem[]): KIP37

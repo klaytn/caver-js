@@ -13,10 +13,9 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Account from '../../../caver-account/src'
+import { Account } from '../../../caver-account/src'
 import { KlaytnCall } from '../../../caver-rpc/src/klay'
-import { Keyring } from '../../../caver-wallet/src/keyring/keyringFactory'
-import SignatureData from '../../../caver-wallet/src/keyring/signatureData'
+import { SignatureData, Keyring } from '../../../caver-wallet/src/'
 
 export interface CreateTransactionObject {
     account?: Account
@@ -36,7 +35,7 @@ export interface CreateTransactionObject {
     codeFormat?: string | number
 }
 
-export default class AbstractTransaction {
+export class AbstractTransaction {
     constructor(typeString: string, createTxObj: CreateTransactionObject)
 
     static _klaytnCall: KlaytnCall

@@ -22,7 +22,7 @@ export interface JsonRPCPayloadObject {
     params: any[]
 }
 
-export default class Middleware {
+export class Middleware {
     constructor()
 
     builtin: Builtins

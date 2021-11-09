@@ -17,7 +17,7 @@ import BigNumber from 'bignumber.js'
 import { Transaction } from '../../caver-transaction/src'
 import { DeprecatedTransactionObject } from '../../caver-klay/caver-klay-accounts/src'
 
-export default interface ValidateFunction {
+export interface ValidateFunction {
     validateParams(tx: DeprecatedTransactionObject | Transaction): Error
     validateTxType(txType: string): boolean
     validateCodeFormat(cf: string): boolean

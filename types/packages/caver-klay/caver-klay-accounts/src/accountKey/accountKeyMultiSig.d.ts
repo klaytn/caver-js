@@ -13,13 +13,13 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-export default class AccountKeyMultiSig {
-    constructor(keys: string[] | AccountKeyMultiSig)
+export class DeprecatedAccountKeyMultiSig {
+    constructor(keys: string[] | DeprecatedAccountKeyMultiSig)
 
     type: string
 
     toPublicKey(toPublicKeyFunc: Function): string[]
-    update(keys: AccountKeyMultiSig): void
+    update(keys: DeprecatedAccountKeyMultiSig): void
 
     keys: string[]
     readonly defaultKey: string

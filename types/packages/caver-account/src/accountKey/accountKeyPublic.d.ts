@@ -15,7 +15,7 @@
 
 import { IAccountKey } from '..'
 
-export default class AccountKeyPublic implements IAccountKey {
+export class AccountKeyPublic implements IAccountKey {
     static decode(rlpEncodedKey: string): AccountKeyPublic
     static fromXYPoint(x: string, y: string): AccountKeyPublic
     static fromPublicKey(pubKey: string): AccountKeyPublic

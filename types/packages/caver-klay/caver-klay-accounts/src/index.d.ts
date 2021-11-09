@@ -17,11 +17,18 @@ import BigNumber from 'bignumber.js'
 import RpcCallToMethod from '../../../caver-rtm/src'
 import { SignatureObject } from '../../../caver-utils/src'
 import { EncryptionOptions, Keystore, EncryptedKeystoreV3Json, EncryptedKeystoreV4Json } from '../../../caver-core/src'
-import Account, { AccountKey } from './account/account'
-import AccountForUpdate, { KeyForUpdateObject } from './account/accountKeyForUpdate'
-import AccountKeyMultiSig from './accountKey/accountKeyMultiSig'
-import AccountKeyPublic from './accountKey/accountKeyPublic'
-import AccountKeyRoleBased, { RoleBasedKeyObject } from './accountKey/accountKeyRoleBased'
+import { DeprecatedAccount, DeprecatedAccountKey } from './account/account'
+import { AccountForUpdate, KeyForUpdateObject } from './account/accountKeyForUpdate'
+import { DeprecatedAccountKeyMultiSig } from './accountKey/accountKeyMultiSig'
+import { DeprecatedAccountKeyPublic } from './accountKey/accountKeyPublic'
+import { DeprecatedAccountKeyRoleBased, DeprecatedRoleBasedKeyObject } from './accountKey/accountKeyRoleBased'
+
+export * from './account/account'
+export * from './account/accountKeyForUpdate'
+export * from './accountKey/accountKeyMultiSig'
+export * from './accountKey/accountKeyPublic'
+export * from './accountKey/accountKeyRoleBased'
+export * from './accountKey/accountKeyEnum'
 
 export interface DeprecatedTransactionObject extends KeyForUpdateObject {
     type: string
@@ -48,7 +55,7 @@ export interface UpdateOptionsObject {
     feePayerKey?: UpdateOptionsObject
 }
 
-export class AccountWithFunctions extends Account {
+export class AccountWithFunctions extends DeprecatedAccount {
     signTransaction(tx: string | object, callback?: Function): Promise<DeprecatedTransactionObject>
     feePayerSignTransaction(tx: string | object, callback?: Function): Promise<DeprecatedTransactionObject>
     sign(data: string): DeprecatedTransactionObject
@@ -56,7 +63,7 @@ export class AccountWithFunctions extends Account {
     getKlaytnWalletKey(addressOrIndex?: string | number): string
 }
 
-export class AccountInWallet extends Account {
+export class DeprecatedAccountInWallet extends DeprecatedAccount {
     index: number
 }
 
@@ -67,9 +74,12 @@ export class Wallet {
     defaultKeyName: 'caverjs_wallet'
 
     create(numberOfAccounts: number, entropy?: string): Wallet
-    add(account: string | Account | AccountKey | object, userInputAddrees?: string): AccountInWallet
-    updatePrivateKey(privateKey: string, address: string): AccountInWallet
-    updateAccountKey(address: string, accountKey: string | string[] | RoleBasedKeyObject | AccountKey): AccountInWallet
+    add(account: string | DeprecatedAccount | DeprecatedAccountKey | object, userInputAddrees?: string): DeprecatedAccountInWallet
+    updatePrivateKey(privateKey: string, address: string): DeprecatedAccountInWallet
+    updateAccountKey(
+        address: string,
+        accountKey: string | string[] | DeprecatedRoleBasedKeyObject | DeprecatedAccountKey
+    ): DeprecatedAccountInWallet
     remove(addressOrIndex: string | number): boolean
     clear(): Wallet
     encrypt(password: string, options?: EncryptionOptions): EncryptedKeystoreV4Json[]
@@ -77,10 +87,10 @@ export class Wallet {
     save(password: string, keyName: string): boolean
     load(password: string, keyName: string): Wallet
     getKlaytnWalletKey(addressOrIndex: string | number): string
-    getAccount(input: string | number): AccountInWallet
+    getAccount(input: string | number): DeprecatedAccountInWallet
 }
 
-export default class Accounts {
+export class Accounts {
     constructor(...args: any[])
 
     wallet: Wallet
@@ -92,16 +102,16 @@ export default class Accounts {
     }
     _getRoleKey(tx: object, account: object): string | string[]
     create(entropy?: string): AccountWithFunctions
-    createAccountKey(accountKey: string | string[] | object): AccountKey
-    createAccountKeyPublic(privateKey: string | AccountKeyPublic): AccountKeyPublic
-    createAccountKeyMultiSig(privateKeys: string[] | AccountKeyMultiSig): AccountKeyMultiSig
-    createAccountKeyRoleBased(keyObject: RoleBasedKeyObject): AccountKeyRoleBased
-    accountKeyToPublicKey(accountKey: RoleBasedKeyObject | AccountKeyRoleBased): RoleBasedKeyObject
-    accountKeyToPublicKey(accountKey: string | AccountKeyPublic): string
-    accountKeyToPublicKey(accountKey: string[] | AccountKeyMultiSig): string[]
+    createAccountKey(accountKey: string | string[] | object): DeprecatedAccountKey
+    createAccountKeyPublic(privateKey: string | DeprecatedAccountKeyPublic): DeprecatedAccountKeyPublic
+    createAccountKeyMultiSig(privateKeys: string[] | DeprecatedAccountKeyMultiSig): DeprecatedAccountKeyMultiSig
+    createAccountKeyRoleBased(keyObject: DeprecatedRoleBasedKeyObject): DeprecatedAccountKeyRoleBased
+    accountKeyToPublicKey(accountKey: DeprecatedRoleBasedKeyObject | DeprecatedAccountKeyRoleBased): DeprecatedRoleBasedKeyObject
+    accountKeyToPublicKey(accountKey: string | DeprecatedAccountKeyPublic): string
+    accountKeyToPublicKey(accountKey: string[] | DeprecatedAccountKeyMultiSig): string[]
     createWithAccountKey(address: string, accountKey: string | string[] | object): AccountWithFunctions
     createWithAccountKeyPublic(address: string, key: string | object): AccountWithFunctions
-    createWithAccountKeyMultiSig(address: string, keys: string | string[] | AccountKey): AccountWithFunctions
+    createWithAccountKeyMultiSig(address: string, keys: string | string[] | DeprecatedAccountKey): AccountWithFunctions
     createWithAccountKeyRoleBased(address: string, keyObject: string | object): AccountWithFunctions
     privateKeyToAccount(key: string, userInputAddress?: string): AccountWithFunctions
     createAccountForUpdate(address: string, accountKey: string | string[] | object, options?: UpdateOptionsObject): AccountForUpdate
@@ -151,9 +161,9 @@ export default class Accounts {
     recover(message: object, preFixed?: boolean): string
     recover(message: string, v: string, r: string, s: string, preFixed?: boolean): string
     recover(message: string | object, signature?: string, preFixed?: boolean): string
-    decrypt(keystore: Keystore, password: string, nonStrict?: boolean): Account
+    decrypt(keystore: Keystore, password: string, nonStrict?: boolean): DeprecatedAccount
     encrypt(key: string | string[] | object, password: string, options?: object): EncryptedKeystoreV4Json
-    encryptV3(key: string | AccountKey, password: string, options?: object): EncryptedKeystoreV3Json
+    encryptV3(key: string | DeprecatedAccountKey, password: string, options?: object): EncryptedKeystoreV3Json
     privateKeyToPublicKey(privateKey: string, compressed?: boolean): string
     encodeRLPByTxType(transaction: object): string
     setAccounts(accounts: Accounts): Accounts

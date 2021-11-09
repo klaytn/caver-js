@@ -13,13 +13,13 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-export default class AccountKeyPublic {
-    constructor(key: string | AccountKeyPublic)
+export class DeprecatedAccountKeyPublic {
+    constructor(key: string | DeprecatedAccountKeyPublic)
 
     type: string
 
     toPublicKey(toPublicKeyFunc: Function): string
-    update(keys: AccountKeyPublic): void
+    update(keys: DeprecatedAccountKeyPublic): void
 
     keys: string
     readonly defaultKey: string

@@ -13,11 +13,15 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Governance from './governance'
-import Klay from './klay'
-import Net from './net'
+import { Governance } from './governance'
+import { Klay } from './klay'
+import { Net } from './net'
 
-export default class RPC {
+export * from './governance'
+export * from './klay'
+export * from './net'
+
+export class RPC {
     constructor(...args: any[])
 
     setRequestManager(manager: any): boolean

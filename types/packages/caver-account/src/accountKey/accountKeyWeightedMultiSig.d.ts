@@ -14,10 +14,10 @@
 */
 
 import { IAccountKey } from '..'
-import WeightedPublicKey from './weightedPublicKey'
-import WeightedMultiSigOptions, { WeightedMultiSigOptionsObject } from './weightedMultiSigOptions'
+import { WeightedPublicKey } from './weightedPublicKey'
+import { WeightedMultiSigOptions, WeightedMultiSigOptionsObject } from './weightedMultiSigOptions'
 
-export default class AccountKeyWeightedMultiSig implements IAccountKey {
+export class AccountKeyWeightedMultiSig implements IAccountKey {
     static decode(rlpEncodedKey: string): AccountKeyWeightedMultiSig
     static fromPublicKeysAndOptions(
         publicKeyArray: string[],

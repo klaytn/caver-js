@@ -13,11 +13,11 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Account from '../../../../caver-account/src'
-import AbstractFeeDelegatedTransaction from '../abstractFeeDelegatedTransaction'
+import { Account } from '../../../../caver-account/src'
+import { AbstractFeeDelegatedTransaction } from '../abstractFeeDelegatedTransaction'
 import { CreateTransactionObject } from '../abstractTransaction'
 
-export default class FeeDelegatedAccountUpdate extends AbstractFeeDelegatedTransaction {
+export class FeeDelegatedAccountUpdate extends AbstractFeeDelegatedTransaction {
     static create(createTxObj: string | CreateTransactionObject): FeeDelegatedAccountUpdate
     static decode(rlpEncoded: string): FeeDelegatedAccountUpdate
 

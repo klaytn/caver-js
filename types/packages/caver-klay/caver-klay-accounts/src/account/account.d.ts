@@ -13,22 +13,22 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import AccountKeyMultiSig from '../accountKey/accountKeyMultiSig'
-import AccountKeyPublic from '../accountKey/accountKeyPublic'
-import AccountKeyRoleBased, { RoleBasedKeyObject } from '../accountKey/accountKeyRoleBased'
+import { DeprecatedAccountKeyMultiSig } from '../accountKey/accountKeyMultiSig'
+import { DeprecatedAccountKeyPublic } from '../accountKey/accountKeyPublic'
+import { DeprecatedAccountKeyRoleBased, DeprecatedRoleBasedKeyObject } from '../accountKey/accountKeyRoleBased'
 
-export type AccountKey = AccountKeyPublic | AccountKeyMultiSig | AccountKeyRoleBased
+export type DeprecatedAccountKey = DeprecatedAccountKeyPublic | DeprecatedAccountKeyMultiSig | DeprecatedAccountKeyRoleBased
 
-export default class Account {
-    static fromObject(obj: { address: string; privateKey: string }): Account
+export class DeprecatedAccount {
+    static fromObject(obj: { address: string; privateKey: string }): DeprecatedAccount
     static isAccountKey(accountKey: any): boolean
 
-    constructor(address: string, accountKey: string | string[] | RoleBasedKeyObject)
+    constructor(address: string, accountKey: string | string[] | DeprecatedRoleBasedKeyObject)
 
-    toPublicKey(toPublicKeyFunc: Function): string | string[] | RoleBasedKeyObject
+    toPublicKey(toPublicKeyFunc: Function): string | string[] | DeprecatedRoleBasedKeyObject
 
     address: string
-    accountKey: AccountKey
+    accountKey: DeprecatedAccountKey
     readonly privateKey: string
     readonly keys: string
     readonly accountKeyType: string
@@ -36,5 +36,5 @@ export default class Account {
     readonly updateKey: string
     readonly feePayerKey: string
     private _address: string
-    private _accountKey: AccountKey
+    private _accountKey: DeprecatedAccountKey
 }

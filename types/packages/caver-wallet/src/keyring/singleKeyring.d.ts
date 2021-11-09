@@ -14,12 +14,12 @@
 */
 
 import { SignedMessage } from '..'
-import Account from '../../../caver-account/src'
+import { Account } from '../../../caver-account/src'
 import { EncryptionOptions, EncryptedKeystoreV3Json, EncryptedKeystoreV4Json } from '../../../caver-core/src'
-import PrivateKey from './privateKey'
-import SignatureData from './signatureData'
+import { PrivateKey } from './privateKey'
+import { SignatureData } from './signatureData'
 
-export default class SingleKeyring {
+export class SingleKeyring {
     constructor(address: string, key: string | PrivateKey)
 
     getPublicKey(compressed?: boolean): string

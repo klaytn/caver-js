@@ -14,11 +14,10 @@
 */
 
 import BN = require('bn.js')
-import KeyringContainer, { IWallet } from '../../caver-wallet/src'
+import { KeyringContainer, IWallet } from '../../caver-wallet/src'
 import { Result } from '../../caver-abi/src'
-import { KIP37 } from '../../caver-kct/src'
-import KIP7 from '../../caver-kct/src/kip7'
-import { TransactionReceipt, CallObject, BlockNumber, PromiEvent, LogsOptions } from '../../caver-core/src'
+import { KIP7, KIP37 } from '../../caver-kct/src'
+import { TransactionReceipt, CallObject, BlockNumber, PromiEvent, LogsOptions, EventOptions, EventData } from '../../caver-core/src'
 import { Transaction, FeeDelegatedTransaction } from '../../caver-transaction/src'
 import { AbiItem } from '../../caver-utils/src'
 
@@ -29,7 +28,7 @@ export interface SendOptions {
     data?: string
     feeDelegation?: boolean
     feePayer?: string
-    feeRatio?: number
+    feeRatio?: number | string
 }
 
 export interface SendOptionsWithFormatter extends SendOptions {
@@ -61,33 +60,7 @@ export interface ContractMethod {
     encodeABI(): string
 }
 
-export interface EventOptions {
-    filter?: object
-    fromBlock?: number
-    toBlock?: number
-    topics?: string[]
-}
-
-export interface EventData {
-    returnValues?: {
-        [key: string]: any
-    }
-    raw: {
-        data?: string
-        topics?: string[]
-    }
-    event?: string
-    signature?: string
-    logIndex?: number
-    transactionIndex?: number
-    transactionHash?: string
-    blockHash?: string
-    blockNumber?: number
-    address?: string
-    id?: string
-}
-
-export default class Contract {
+export class Contract {
     constructor(jsonInterface: AbiItem[], address?: string, options?: SendOptions)
 
     _address: string

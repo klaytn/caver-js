@@ -13,7 +13,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-export default class IPFS {
+export class IPFS {
     constructor(host: string, port: number, ssl: boolean)
 
     setIPFSNode(host: string, port: number, ssl: boolean): void

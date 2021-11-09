@@ -13,7 +13,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-export default class SignatureData {
+export class SignatureData {
     constructor(signature: string[] | SignatureData)
 
     emptySig: SignatureData

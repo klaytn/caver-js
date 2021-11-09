@@ -13,10 +13,10 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Account from '../../../../caver-account/src'
-import AbstractTransaction, { CreateTransactionObject } from '../abstractTransaction'
+import { Account } from '../../../../caver-account/src'
+import { AbstractTransaction, CreateTransactionObject } from '../abstractTransaction'
 
-export default class AccountUpdate extends AbstractTransaction {
+export class AccountUpdate extends AbstractTransaction {
     static create(createTxObj: string | CreateTransactionObject): AccountUpdate
     static decode(rlpEncoded: string): AccountUpdate
 

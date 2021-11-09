@@ -14,11 +14,17 @@
 */
 
 import { Transaction, FeeDelegatedTransaction } from '../../caver-transaction/src'
-import KeyringFactory, { Keyring } from './keyring/keyringFactory'
-import SingleKeyring from './keyring/singleKeyring'
-import MultipleKeyring from './keyring/multipleKeyring'
-import RoleBasedKeyring from './keyring/roleBasedKeyring'
-import SignatureData from './keyring/signatureData'
+import { KeyringFactory, Keyring } from './keyring/keyringFactory'
+import { SingleKeyring } from './keyring/singleKeyring'
+import { MultipleKeyring } from './keyring/multipleKeyring'
+import { RoleBasedKeyring } from './keyring/roleBasedKeyring'
+import { SignatureData } from './keyring/signatureData'
+
+export * from './keyring/keyringFactory'
+export * from './keyring/singleKeyring'
+export * from './keyring/multipleKeyring'
+export * from './keyring/roleBasedKeyring'
+export * from './keyring/signatureData'
 
 export interface SignedMessage {
     message: string
@@ -34,7 +40,7 @@ export class IWallet {
     remove(address: string): boolean
 }
 
-export default class KeyringContainer implements IWallet {
+export class KeyringContainer implements IWallet {
     constructor(keyrings?: Keyring[])
 
     length: number

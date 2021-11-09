@@ -16,8 +16,8 @@
 import BigNumber from 'bignumber.js'
 import BN = require('bn.js')
 import _ = require('lodash')
-import SignatureData from '../../caver-wallet/src/keyring/signatureData'
-import { TransactionForRPC } from '../../caver-core/src'
+import { SignatureData } from '../../caver-wallet/src'
+import { TransactionForRPC, PromiEvent } from '../../caver-core/src'
 
 export type EncodeScalarInput = Buffer | string | number
 export type EncodeInput = EncodeScalarInput | EncodeScalarInput[]
@@ -101,12 +101,6 @@ export interface AbiOutput {
     internalType?: string
 }
 
-export interface PromiEvent {
-    resolve: (value: unknown) => void
-    reject: (reason?: any) => void
-    eventEmitter: Promise<any> | object
-}
-
 export class Iban {
     toAddress(ib?: string): string
     toIban(address: string): string
@@ -123,7 +117,7 @@ export class Iban {
     toString(): string
 }
 
-export default interface Utils {
+export interface Utils {
     randomHex(bytesSize: number): string
     soliditySha3(...val: Mixed[]): string | null
     toChecksumAddress(address: string): string
@@ -212,7 +206,6 @@ export default interface Utils {
     recover(message: string, signature: SignatureData | string[] | object, isHashed?: boolean): string
     recoverPublicKey(message: string, signature: SignatureData | string[] | object, isHashed?: boolean): string
     publicKeyToAddress(publicKey: string): string
-    promiEvent(promiseOnly: boolean): PromiEvent
     Iban: Iban
     isHexParameter(a: unknown): boolean
     isHexPrefixed(str: string | object): boolean

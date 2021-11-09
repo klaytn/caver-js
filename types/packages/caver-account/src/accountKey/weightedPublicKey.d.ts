@@ -13,7 +13,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-export default class WeightedPublicKey {
+export class WeightedPublicKey {
     constructor(weight: number, publicKey: string)
 
     weight: number

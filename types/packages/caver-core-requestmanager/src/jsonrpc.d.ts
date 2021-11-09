@@ -16,10 +16,10 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { JsonRpcPayload, JsonRpcResponse } from '../../caver-core-helpers/src/index'
-import Method from '../../caver-core-method/src/index'
+import { JsonRpcPayload, JsonRpcResponse } from '../../caver-core-helpers/src'
+import { Method } from '../../caver-core-method/src'
 
-export default interface Jsonrpc {
+export interface Jsonrpc {
     toPayload(method: Method, params: any[]): JsonRpcPayload
     isValidResponse(response: JsonRpcResponse): boolean
     toBatchPayload(messages: Array<{ method: Method; params: any[] }>): JsonRpcPayload[]

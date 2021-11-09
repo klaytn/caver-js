@@ -67,7 +67,7 @@ export interface KlaytnCall {
     getTransactionCount: Klay['getTransactionCount']
 }
 
-export default class Klay {
+export class Klay {
     constructor(...args: any[])
 
     accountCreated(address: string, blockNumber?: BlockNumber, callback?: (error: Error, result: boolean) => void): Promise<boolean>
