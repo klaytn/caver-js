@@ -20,7 +20,7 @@ const { expect } = require('./extendedChai')
 
 const testRPCURL = require('./testrpc')
 
-const Caver = require('../index.js')
+const Caver = require('../index')
 
 describe('getNodeInfo from Node', () => {
     it('CAVERJS-UNIT-ETC-042: should return valid value', () => {

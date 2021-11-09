@@ -17,7 +17,7 @@
 */
 
 const { expect } = require('chai')
-const Caver = require('../index.js')
+const Caver = require('../index')
 const testRPCURL = require('./testrpc')
 
 describe('CAVERJS-UNIT-ETC-017 : unit map', () => {

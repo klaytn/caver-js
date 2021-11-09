@@ -28,9 +28,9 @@ const _ = require('lodash')
 const errors = require('../../caver-core-helpers').errors
 const middleware = require('../../caver-middleware')
 
-const Jsonrpc = require('./jsonrpc.js')
+const Jsonrpc = require('./jsonrpc')
 
-const BatchManager = require('./batch.js')
+const BatchManager = require('./batch')
 
 const RequestManager = function RequestManager(provider, net) {
     this.provider = null

@@ -27,7 +27,7 @@ chai.use(sinonChai)
 const expect = chai.expect
 
 const testRPCURL = require('../../testrpc')
-const Caver = require('../../../index.js')
+const Caver = require('../../../index')
 
 const AbstractTransaction = require('../../../packages/caver-transaction/src/transactionTypes/abstractTransaction')
 const txSamples = require('./transactionSamples')

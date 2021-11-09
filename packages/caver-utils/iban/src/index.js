@@ -28,7 +28,7 @@
  */
 
 const BigNumber = require('bn.js')
-const utils = require('../../src/index.js')
+const utils = require('../../src/index')
 
 const leftPad = function(string, bytes) {
     let result = string

@@ -23,7 +23,7 @@ const testRPCURL = require('../testrpc')
 const { expect } = require('../extendedChai')
 
 const utils = require('./utils')
-const Caver = require('../../index.js')
+const Caver = require('../../index')
 const SignatureData = require('../../packages/caver-wallet/src/keyring/signatureData')
 
 let caver

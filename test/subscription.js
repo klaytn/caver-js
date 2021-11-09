@@ -19,7 +19,7 @@
 const { expect } = require('chai')
 const websocketURL = require('./testWebsocket')
 
-const Caver = require('../index.js')
+const Caver = require('../index')
 
 const caver = new Caver(websocketURL)
 

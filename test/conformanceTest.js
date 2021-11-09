@@ -32,7 +32,7 @@ const expect = chai.expect
 
 const sandbox = sinon.createSandbox()
 
-const Caver = require('../index.js')
+const Caver = require('../index')
 const utils = require('../packages/caver-utils')
 
 const comformanceTests = path.join(__dirname, '/../caver-conformance-tests')

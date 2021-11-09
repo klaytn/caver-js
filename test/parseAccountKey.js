@@ -22,7 +22,7 @@ const testRPCURL = require('./testrpc')
 
 const { parseAccountKey } = require('../packages/caver-klay/caver-klay-accounts/src/transactionType/account')
 
-const Caver = require('../index.js')
+const Caver = require('../index')
 
 const caver = new Caver(testRPCURL)
 

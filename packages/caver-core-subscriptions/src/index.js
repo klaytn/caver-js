@@ -24,7 +24,7 @@
  * @date 2017
  */
 
-const Subscription = require('./subscription.js')
+const Subscription = require('./subscription')
 
 function Subscriptions(options) {
     this.name = options.name

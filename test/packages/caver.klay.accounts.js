@@ -23,7 +23,7 @@ const testRPCURL = require('../testrpc')
 const { expect, assert } = require('../extendedChai')
 
 const setting = require('./setting')
-const Caver = require('../../index.js')
+const Caver = require('../../index')
 
 const MessagePrefix = '\x19Klaytn Signed Message:\n'
 

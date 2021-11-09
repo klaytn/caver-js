@@ -21,7 +21,7 @@ const { expect } = require('./extendedChai')
 const testRPCURL = require('./testrpc')
 const websocketURL = require('./testWebsocket')
 
-const Caver = require('../index.js')
+const Caver = require('../index')
 
 describe('supportsSubscriptions from Providers', () => {
     it('CAVERJS-UNIT-ETC-095: HttpProvider should return false', () => {
