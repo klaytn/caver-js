@@ -18,7 +18,7 @@
 
 const { expect } = require('chai')
 const BN = require('bn.js')
-const Caver = require('../index.js')
+const Caver = require('../index')
 const testRPCURL = require('./testrpc')
 
 describe('sha3', () => {

@@ -21,7 +21,7 @@ const chaiAsPromised = require('chai-as-promised')
 
 chai.use(chaiAsPromised)
 
-const Caver = require('../index.js')
+const Caver = require('../index')
 const testRPCURL = require('./testrpc')
 
 const caver = new Caver(testRPCURL)

@@ -16,7 +16,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const Caver = require('../index.js')
+const Caver = require('../index')
 const testRPCURL = require('./testrpc')
 
 describe('getPastLogs', () => {

@@ -20,7 +20,7 @@
 */
 
 const chai = require('chai')
-const Iban = require('../packages/caver-utils/iban/src/index.js')
+const Iban = require('../packages/caver-utils/iban/src/index')
 
 const assert = chai.assert
 

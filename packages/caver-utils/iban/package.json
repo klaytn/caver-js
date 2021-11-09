@@ -9,5 +9,5 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Klaytn Team",
-  "license": "LGPL"
+  "license": "LGPL-3.0"
 }

@@ -17,7 +17,7 @@
 */
 
 function randomHex(size, callback) {
-    const crypto = require('./crypto.js')
+    const crypto = require('./crypto')
     const isCallback = typeof callback === 'function'
 
     if (size < 0 || size > 65536) {

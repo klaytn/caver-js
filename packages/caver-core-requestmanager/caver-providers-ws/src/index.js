@@ -26,7 +26,7 @@
 
 const EventEmitter = require('eventemitter3')
 const Ws = require('websocket').w3cwebsocket
-const helpers = require('./helpers.js')
+const helpers = require('./helpers')
 const errors = require('../../../caver-core-helpers').errors
 
 /**

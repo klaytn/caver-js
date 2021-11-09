@@ -27,7 +27,7 @@ const expect = chai.expect
 
 const testRPCURL = require('../testrpc')
 
-const Caver = require('../../index.js')
+const Caver = require('../../index')
 const SingleKeyring = require('../../packages/caver-wallet/src/keyring/singleKeyring')
 const MultipleKeyring = require('../../packages/caver-wallet/src/keyring/multipleKeyring')
 const RoleBasedKeyring = require('../../packages/caver-wallet/src/keyring/roleBasedKeyring')

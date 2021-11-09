@@ -28,7 +28,7 @@ const expect = chai.expect
 
 const websocketURL = require('./testWebsocket')
 
-const Caver = require('../index.js')
+const Caver = require('../index')
 
 const sandbox = sinon.createSandbox()
 

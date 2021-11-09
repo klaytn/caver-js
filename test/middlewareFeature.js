@@ -17,7 +17,7 @@
 */
 
 const fetch = require('node-fetch')
-const Caver = require('../index.js')
+const Caver = require('../index')
 
 describe('caver middleware', () => {
     it('when sendTransaction, does it logs?', async () => {

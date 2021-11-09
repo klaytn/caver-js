@@ -41,6 +41,14 @@ export class Contract extends BaseContract {
 type RequestProvider = string | WebsocketProvider | HttpProvider | IpcProvider
 
 export default class Caver {
+    static providers: {
+        WebsocketProvider: typeof WebsocketProvider
+        HttpProvider: typeof HttpProvider
+        IpcProvider: typeof IpcProvider
+    }
+    static utils: Utils
+    static abi: ABI
+
     constructor(provider: RequestProvider, net?: string)
 
     version: string
@@ -59,9 +67,4 @@ export default class Caver {
     middleware: Middleware
     ipfs: IPFS
     contract: typeof Contract
-    static providers: {
-        WebsocketProvider: typeof WebsocketProvider
-        HttpProvider: typeof HttpProvider
-        IpcProvider: typeof IpcProvider
-    }
 }

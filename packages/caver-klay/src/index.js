@@ -40,7 +40,7 @@ const KIP7 = require('../../caver-kct/src/kip7')
 const KIP17 = require('../../caver-kct/src/kip17')
 const Accounts = require('../caver-klay-accounts')
 const abi = require('../../caver-abi')
-const getNetworkType = require('./getNetworkType.js')
+const getNetworkType = require('./getNetworkType')
 
 const rpcCalls = require('../../caver-rtm')
 

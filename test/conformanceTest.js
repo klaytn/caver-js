@@ -32,7 +32,7 @@ const expect = chai.expect
 
 const sandbox = sinon.createSandbox()
 
-const Caver = require('../index.js')
+const Caver = require('../index')
 const utils = require('../packages/caver-utils')
 
 const comformanceTests = path.join(__dirname, '/../caver-conformance-tests')
@@ -93,8 +93,6 @@ describe('Caver Common Architecture Conformance Tests', () => {
                                 console.log(`Skip ${tc.id} / ${tc.description}`)
                                 continue
                             }
-
-                            // eslint-disable-next-line no-loop-func
                             it(`${tc.id}: ${tc.description}`, async () => {
                                 const inputs = getInputValues(tc.inputArray, preRequisites)
 

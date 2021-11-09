@@ -18,7 +18,7 @@
 
 const { expect } = require('chai')
 
-const Caver = require('../index.js')
+const Caver = require('../index')
 const testRPCURL = require('./testrpc')
 
 const caver = new Caver(testRPCURL)

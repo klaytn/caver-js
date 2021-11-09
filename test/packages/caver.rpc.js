@@ -28,7 +28,7 @@ chai.use(sinonChai)
 
 const expect = chai.expect
 
-const Caver = require('../../index.js')
+const Caver = require('../../index')
 
 let caver
 let testKeyring

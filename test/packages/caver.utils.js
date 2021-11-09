@@ -16,7 +16,6 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-require('it-each')({ testPerIteration: true })
 const BN = require('bn.js')
 const BigNumber = require('bignumber.js')
 const _ = require('lodash')
@@ -24,7 +23,7 @@ const testRPCURL = require('../testrpc')
 const { expect } = require('../extendedChai')
 
 const utils = require('./utils')
-const Caver = require('../../index.js')
+const Caver = require('../../index')
 const SignatureData = require('../../packages/caver-wallet/src/keyring/signatureData')
 
 let caver
@@ -35,10 +34,12 @@ beforeEach(() => {
 describe('caver.utils.randomHex', () => {
     context('CAVERJS-UNIT-ETC-097: input: valid value', () => {
         const tests = [0, 1, 2, 4, 32, 64]
-        it.each(tests, 'should match with regex', size => {
-            const data = caver.utils.randomHex(size)
-            const regExp = new RegExp(`^0x[0-9a-f]{${size * 2}}$`)
-            expect(data).to.match(regExp)
+        it('should match with regex', () => {
+            for (const size of tests) {
+                const data = caver.utils.randomHex(size)
+                const regExp = new RegExp(`^0x[0-9a-f]{${size * 2}}$`)
+                expect(data).to.match(regExp)
+            }
         })
     })
 
@@ -61,8 +62,10 @@ describe('caver.utils.isBN', () => {
             { value: new BN('11111111', 2), expected: true },
             { value: new BN(0), expected: true },
         ]
-        it.each(tests, 'should return true', test => {
-            expect(caver.utils.isBN(test.value)).to.be.equal(test.expected)
+        it('should return true', () => {
+            for (const test of tests) {
+                expect(caver.utils.isBN(test.value)).to.be.equal(test.expected)
+            }
         })
     })
 
@@ -77,8 +80,10 @@ describe('caver.utils.isBN', () => {
             { value: {}, expected: false },
             { value: 'hello', expected: false },
         ]
-        it.each(tests, 'should return false', test => {
-            expect(caver.utils.isBN(test.value)).to.be.equal(test.expected)
+        it('should return false', () => {
+            for (const test of tests) {
+                expect(caver.utils.isBN(test.value)).to.be.equal(test.expected)
+            }
         })
     })
 
@@ -100,8 +105,10 @@ describe('caver.utils.isBigNumber', () => {
             { value: new BigNumber(99999999999999999999), expected: true },
             { value: new BigNumber(2e308), expected: true },
         ]
-        it.each(tests, 'should return true', test => {
-            expect(caver.utils.isBigNumber(test.value)).to.be.equal(test.expected)
+        it('should return true', () => {
+            for (const test of tests) {
+                expect(caver.utils.isBigNumber(test.value)).to.be.equal(test.expected)
+            }
         })
     })
 
@@ -112,8 +119,10 @@ describe('caver.utils.isBigNumber', () => {
             { value: 99999999999999999999, expected: false },
             { value: 2e308, expected: false },
         ]
-        it.each(tests, 'should return false', test => {
-            expect(caver.utils.isBigNumber(test.value)).to.be.equal(test.expected)
+        it('should return false', () => {
+            for (const test of tests) {
+                expect(caver.utils.isBigNumber(test.value)).to.be.equal(test.expected)
+            }
         })
     })
 
@@ -130,15 +139,19 @@ describe('caver.utils.isBigNumber', () => {
 describe('caver.utils.sha3', () => {
     context('CAVERJS-UNIT-ETC-103: input: BN type', () => {
         const tests = [{ value: new BN('234'), expected: '0xc1912fee45d61c87cc5ea59dae311904cd86b84fee17cc96966216f811ce6a79' }]
-        it.each(tests, 'should return 32 bytes hexstring', test => {
-            expect(caver.utils.sha3(test.value)).to.be.equal(test.expected)
+        it('should return 32 bytes hexstring', () => {
+            for (const test of tests) {
+                expect(caver.utils.sha3(test.value)).to.be.equal(test.expected)
+            }
         })
     })
 
     context('CAVERJS-UNIT-ETC-104: input: number type', () => {
         const tests = [{ value: 234, expected: null }, { value: 0xea, expected: null }]
-        it.each(tests, 'should return null', test => {
-            expect(caver.utils.sha3(test.value)).to.be.equal(test.expected)
+        it('should return null', () => {
+            for (const test of tests) {
+                expect(caver.utils.sha3(test.value)).to.be.equal(test.expected)
+            }
         })
     })
 
@@ -147,8 +160,10 @@ describe('caver.utils.sha3', () => {
             { value: '234', expected: '0xc1912fee45d61c87cc5ea59dae311904cd86b84fee17cc96966216f811ce6a79' },
             { value: '0xea', expected: '0x2f20677459120677484f7104c76deb6846a2c071f9b3152c103bb12cd54d1a4a' },
         ]
-        it.each(tests, 'should return 32 bytes hexstring', test => {
-            expect(caver.utils.sha3(test.value)).to.be.equal(test.expected)
+        it('should return 32 bytes hexstring', () => {
+            for (const test of tests) {
+                expect(caver.utils.sha3(test.value)).to.be.equal(test.expected)
+            }
         })
     })
 })
@@ -187,8 +202,10 @@ describe('CAVERJS-UNIT-ETC-106: caver.utils.soliditySha3', () => {
             expected: '0xa13b31627c1ed7aaded5aecec71baf02fe123797fffd45e662eac8e06fbe4955',
         },
     ]
-    it.each(tests, 'should return 32 bytes hexstring', test => {
-        expect(caver.utils.soliditySha3(...test.values)).to.be.equal(test.expected)
+    it('should return 32 bytes hexstring', () => {
+        for (const test of tests) {
+            expect(caver.utils.soliditySha3(...test.values)).to.be.equal(test.expected)
+        }
     })
 })
 
@@ -200,15 +217,19 @@ describe('caver.utils.isHex', () => {
             { value: 'c1912', expected: true },
             { value: 345, expected: true },
         ]
-        it.each(tests, 'should return true', test => {
-            expect(caver.utils.isHex(test.value)).to.be.equal(test.expected)
+        it('should return true', () => {
+            for (const test of tests) {
+                expect(caver.utils.isHex(test.value)).to.be.equal(test.expected)
+            }
         })
     })
 
     context('CAVERJS-UNIT-ETC-108: input: invalid hexString', () => {
         const tests = [{ value: '0xZ1912', expected: false }, { value: 'Hello', expected: false }]
-        it.each(tests, 'should return false', test => {
-            expect(caver.utils.isHex(test.value)).to.be.equal(test.expected)
+        it('should return false', () => {
+            for (const test of tests) {
+                expect(caver.utils.isHex(test.value)).to.be.equal(test.expected)
+            }
         })
     })
 })
@@ -216,8 +237,10 @@ describe('caver.utils.isHex', () => {
 describe('caver.utils.isHexStrict', () => {
     context('CAVERJS-UNIT-ETC-109: input: strict hexString', () => {
         const tests = [{ value: '0xc1912', expected: true }]
-        it.each(tests, 'should return true', test => {
-            expect(caver.utils.isHexStrict(test.value)).to.be.equal(test.expected)
+        it('should return true', () => {
+            for (const test of tests) {
+                expect(caver.utils.isHexStrict(test.value)).to.be.equal(test.expected)
+            }
         })
     })
 
@@ -229,8 +252,10 @@ describe('caver.utils.isHexStrict', () => {
             { value: '0xZ1912', expected: false },
             { value: 'Hello', expected: false },
         ]
-        it.each(tests, 'should return false', test => {
-            expect(caver.utils.isHexStrict(test.value)).to.be.equal(test.expected)
+        it('should return false', () => {
+            for (const test of tests) {
+                expect(caver.utils.isHexStrict(test.value)).to.be.equal(test.expected)
+            }
         })
     })
 })
@@ -243,15 +268,19 @@ describe('caver.utils.isAddress', () => {
             { address: '0xc1912fee45d61c87cc5ea59dae31190fffff232d', expected: true },
             { address: '0XC1912FEE45D61C87CC5EA59DAE31190FFFFF232D', expected: true },
         ]
-        it.each(tests, 'should return true', test => {
-            expect(caver.utils.isAddress(test.address)).to.be.equal(test.expected)
+        it('should return true', () => {
+            for (const test of tests) {
+                expect(caver.utils.isAddress(test.address)).to.be.equal(test.expected)
+            }
         })
     })
 
     context('CAVERJS-UNIT-ETC-112: input: invalid address', () => {
         const tests = [{ address: '0xC1912fEE45d61C87Cc5EA59DaE31190FFFFf232d', expected: false }]
-        it.each(tests, 'should return false', test => {
-            expect(caver.utils.isAddress(test.address)).to.be.equal(test.expected)
+        it('should return false', () => {
+            for (const test of tests) {
+                expect(caver.utils.isAddress(test.address)).to.be.equal(test.expected)
+            }
         })
     })
 })
@@ -263,8 +292,10 @@ describe('caver.utils.toChecksumAddress', () => {
             { address: '0XC1912FEE45D61C87CC5EA59DAE31190FFFFF232D', expected: '0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d' },
             { address: '0xC1912fEE45d61C87Cc5EA59DaE31190FFFFf232d', expected: '0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d' },
         ]
-        it.each(tests, 'should return checksum address', test => {
-            expect(caver.utils.toChecksumAddress(test.address)).to.be.equal(test.expected)
+        it('should return checksum address', () => {
+            for (const test of tests) {
+                expect(caver.utils.toChecksumAddress(test.address)).to.be.equal(test.expected)
+            }
         })
     })
 
@@ -280,8 +311,10 @@ describe('caver.utils.toChecksumAddress', () => {
 describe('caver.utils.checkAddressChecksum', () => {
     context('CAVERJS-UNIT-ETC-115: input: valid checksum address', () => {
         const tests = [{ address: '0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d', expected: true }]
-        it.each(tests, 'should return true', test => {
-            expect(caver.utils.checkAddressChecksum(test.address)).to.be.equal(test.expected)
+        it('should return true', () => {
+            for (const test of tests) {
+                expect(caver.utils.checkAddressChecksum(test.address)).to.be.equal(test.expected)
+            }
         })
     })
 
@@ -292,8 +325,10 @@ describe('caver.utils.checkAddressChecksum', () => {
             { address: '0XC1912FEE45D61C87CC5EA59DAE31190FFFFF232D', expected: false },
             { address: '0xC1912fEE45d61C87Cc5EA59DaE31190FFFFf232d', expected: false },
         ]
-        it.each(tests, 'should return false', test => {
-            expect(caver.utils.checkAddressChecksum(test.address)).to.be.equal(test.expected)
+        it('should return false', () => {
+            for (const test of tests) {
+                expect(caver.utils.checkAddressChecksum(test.address)).to.be.equal(test.expected)
+            }
         })
     })
 })
@@ -369,8 +404,10 @@ describe('CAVERJS-UNIT-ETC-117: caver.utils.toHex', () => {
         },
     ]
 
-    it.each(tests, 'should return hexstring', test => {
-        expect(caver.utils.toHex(test.value)).to.be.equal(test.expected)
+    it('should return hexstring', () => {
+        for (const test of tests) {
+            expect(caver.utils.toHex(test.value)).to.be.equal(test.expected)
+        }
     })
 })
 
@@ -382,8 +419,10 @@ describe('caver.utils.isTxHashStrict', () => {
             { hash: transactionHash.toUpperCase(), expected: true }, // all upper
             { hash: transactionHash.slice(0, 10) + transactionHash.slice(10).toUpperCase(), expected: true }, // mixed
         ]
-        it.each(tests, 'should return true', test => {
-            expect(caver.utils.isTxHashStrict(test.hash)).to.be.equal(test.expected)
+        it('should return true', () => {
+            for (const test of tests) {
+                expect(caver.utils.isTxHashStrict(test.hash)).to.be.equal(test.expected)
+            }
         })
     })
 
@@ -394,8 +433,10 @@ describe('caver.utils.isTxHashStrict', () => {
             { hash: `${transactionHash.slice(0, 64)}ZZ`, expected: false }, // not hex
             { hash: transactionHash.slice(0, 10), expected: false }, // length is not enough
         ]
-        it.each(tests, 'should return false', test => {
-            expect(caver.utils.isTxHashStrict(test.hash)).to.be.equal(test.expected)
+        it('should return false', () => {
+            for (const test of tests) {
+                expect(caver.utils.isTxHashStrict(test.hash)).to.be.equal(test.expected)
+            }
         })
     })
 })
@@ -415,8 +456,10 @@ describe('caver.utils.isValidHashStrict', () => {
             { hash: hash[1].toUpperCase(), expected: true }, // all upper
             { hash: hash[1].slice(0, 10) + hash[1].slice(10).toUpperCase(), expected: true }, // mixed
         ]
-        it.each(tests, 'should return true', test => {
-            expect(caver.utils.isValidHashStrict(test.hash)).to.be.equal(test.expected)
+        it('should return true', () => {
+            for (const test of tests) {
+                expect(caver.utils.isValidHashStrict(test.hash)).to.be.equal(test.expected)
+            }
         })
     })
 
@@ -431,8 +474,10 @@ describe('caver.utils.isValidHashStrict', () => {
             { hash: `${hash[1].slice(0, 64)}ZZ`, expected: false }, // not hex
             { hash: hash[1].slice(0, 10), expected: false }, // length is not enough
         ]
-        it.each(tests, 'should return false', test => {
-            expect(caver.utils.isValidHashStrict(test.hash)).to.be.equal(test.expected)
+        it('should return false', () => {
+            for (const test of tests) {
+                expect(caver.utils.isValidHashStrict(test.hash)).to.be.equal(test.expected)
+            }
         })
     })
 })
@@ -448,8 +493,10 @@ describe('caver.utils.isTxHash', () => {
             { hash: transactionHash.slice(0, 10) + transactionHash.slice(10).toUpperCase(), expected: true }, // mixed long
             { hash: transactionHash.slice(2, 10) + transactionHash.slice(10).toUpperCase(), expected: true }, // mixed short
         ]
-        it.each(tests, 'should return true', test => {
-            expect(caver.utils.isTxHash(test.hash)).to.be.equal(test.expected)
+        it('should return true', () => {
+            for (const test of tests) {
+                expect(caver.utils.isTxHash(test.hash)).to.be.equal(test.expected)
+            }
         })
     })
 
@@ -460,8 +507,10 @@ describe('caver.utils.isTxHash', () => {
             { hash: `${transactionHash.slice(2)}00`, expected: false }, // length is too long (66 without 0x)
             { hash: `${transactionHash}00`, expected: false }, // length is too long (68)
         ]
-        it.each(tests, 'should return false', test => {
-            expect(caver.utils.isTxHash(test.tx)).to.be.equal(test.expected)
+        it('should return false', () => {
+            for (const test of tests) {
+                expect(caver.utils.isTxHash(test.tx)).to.be.equal(test.expected)
+            }
         })
     })
 })
@@ -487,8 +536,10 @@ describe('caver.utils.isValidHash', () => {
             { hash: hash[1].slice(0, 10) + hash[1].slice(10).toUpperCase(), expected: true }, // mixed long
             { hash: hash[1].slice(2, 10) + hash[1].slice(10).toUpperCase(), expected: true }, // mixed short
         ]
-        it.each(tests, 'should return true', test => {
-            expect(caver.utils.isValidHash(test.hash)).to.be.equal(test.expected)
+        it('should return true', () => {
+            for (const test of tests) {
+                expect(caver.utils.isValidHash(test.hash)).to.be.equal(test.expected)
+            }
         })
     })
 
@@ -504,8 +555,10 @@ describe('caver.utils.isValidHash', () => {
             { hash: `${hash[1]}00`, expected: false }, // length is too long (68)
         ]
 
-        it.each(tests, 'should return false', test => {
-            expect(caver.utils.isValidHash(test.hash)).to.be.equal(test.expected)
+        it('should return false', () => {
+            for (const test of tests) {
+                expect(caver.utils.isValidHash(test.hash)).to.be.equal(test.expected)
+            }
         })
     })
 })
@@ -554,10 +607,12 @@ describe('caver.utils.toBN', () => {
             { value: '-0x0', expected: '0' },
             { value: new BN(0), expected: '0' },
         ]
-        it.each(tests, 'should return BigNumber type', test => {
-            const bn = caver.utils.toBN(test.value)
-            expect(caver.utils.isBN(bn)).to.be.true
-            expect(bn.toString()).to.be.equal(test.expected)
+        it('should return BigNumber type', () => {
+            for (const test of tests) {
+                const bn = caver.utils.toBN(test.value)
+                expect(caver.utils.isBN(bn)).to.be.true
+                expect(bn.toString()).to.be.equal(test.expected)
+            }
         })
     })
 
@@ -578,15 +633,19 @@ describe('caver.utils.hexToNumberString', () => {
             { value: 0xea, expected: (0xea).toString() },
             { value: 100000, expected: '100000' },
         ]
-        it.each(tests, 'should return numberString', test => {
-            expect(caver.utils.hexToNumberString(test.value)).to.be.equal(test.expected)
+        it('should return numberString', () => {
+            for (const test of tests) {
+                expect(caver.utils.hexToNumberString(test.value)).to.be.equal(test.expected)
+            }
         })
     })
 
     context('CAVERJS-UNIT-ETC-121: input: numberString', () => {
         const tests = [{ value: '1234', expected: (1234).toString() }]
-        it.each(tests, 'should return numberString', test => {
-            expect(caver.utils.hexToNumberString(test.value)).to.be.equal(test.expected)
+        it('should return numberString', () => {
+            for (const test of tests) {
+                expect(caver.utils.hexToNumberString(test.value)).to.be.equal(test.expected)
+            }
         })
     })
 
@@ -596,8 +655,10 @@ describe('caver.utils.hexToNumberString', () => {
             { value: '0x3e8', expected: '1000' },
             { value: '0x1f0fe294a36', expected: '2134567897654' },
         ]
-        it.each(tests, 'should return numberString', test => {
-            expect(caver.utils.hexToNumberString(test.value)).to.be.equal(test.expected)
+        it('should return numberString', () => {
+            for (const test of tests) {
+                expect(caver.utils.hexToNumberString(test.value)).to.be.equal(test.expected)
+            }
         })
     })
 
@@ -620,8 +681,10 @@ describe('caver.utils.hexToNumber', () => {
             { value: 0xea, expected: 234 },
             { value: '0xea', expected: 234 },
         ]
-        it.each(tests, 'should return number', test => {
-            expect(caver.utils.hexToNumber(test.value)).to.be.equal(test.expected)
+        it('should return number', () => {
+            for (const test of tests) {
+                expect(caver.utils.hexToNumber(test.value)).to.be.equal(test.expected)
+            }
         })
     })
 
@@ -687,8 +750,10 @@ describe('caver.utils.numberToHex', () => {
             { value: '-0', expected: '0x0' },
             { value: '-0x0', expected: '0x0' },
         ]
-        it.each(tests, 'should return hexString', test => {
-            expect(caver.utils.numberToHex(test.value)).to.equal(test.expected)
+        it('should return hexString', () => {
+            for (const test of tests) {
+                expect(caver.utils.numberToHex(test.value)).to.equal(test.expected)
+            }
         })
     })
 
@@ -729,8 +794,10 @@ describe('caver.utils.hexToUtf8', () => {
             { value: '0x65787065637465642076616c7565000000000000000000000000000000000000', expected: 'expected value' },
             { value: '0x000000000000000000000000000000000000657870656374000065642076616c7565', expected: 'expect\u0000\u0000ed value' },
         ]
-        it.each(tests, 'should return utf8 string', test => {
-            expect(caver.utils.hexToUtf8(test.value)).to.be.equal(test.expected)
+        it('should return utf8 string', () => {
+            for (const test of tests) {
+                expect(caver.utils.hexToUtf8(test.value)).to.be.equal(test.expected)
+            }
         })
     })
 
@@ -758,8 +825,10 @@ describe('caver.utils.hexToAscii', () => {
                     '\u0003\u0000\u0000\u00005èÆÕL]\u0012|Î¾\u001a7«\u00052\u0011(ÐY\n<\u0010\u0000\u0000\u0000\u0000\u0000\u0000e!ßd/ñõì\f:z¦Î¦±ç·÷Í¢Ëß\u00076*\bñùC1ÉUÀé2\u001aÓB',
             },
         ]
-        it.each(tests, 'should return Ascii string', test => {
-            expect(caver.utils.hexToAscii(test.value)).to.be.equal(test.expected)
+        it('should return Ascii string', () => {
+            for (const test of tests) {
+                expect(caver.utils.hexToAscii(test.value)).to.be.equal(test.expected)
+            }
         })
     })
 
@@ -783,8 +852,10 @@ describe('CAVERJS-UNIT-ETC-132: caver.utils.utf8ToHex', () => {
         { value: 'expected value\u0000\u0000\u0000', expected: '0x65787065637465642076616c7565' },
         { value: 'expect\u0000\u0000ed value\u0000\u0000\u0000', expected: '0x657870656374000065642076616c7565' },
     ]
-    it.each(tests, 'should return hexString', test => {
-        expect(caver.utils.utf8ToHex(test.value)).to.be.equal(test.expected)
+    it('should return hexString', () => {
+        for (const test of tests) {
+            expect(caver.utils.utf8ToHex(test.value)).to.be.equal(test.expected)
+        }
     })
 })
 
@@ -801,8 +872,10 @@ describe('CAVERJS-UNIT-ETC-133: caver.utils.asciiToHex', () => {
                 '0x0300000035e8c6d54c5d127c9dcebe9e1a37ab9b05321128d097590a3c100000000000006521df642ff1f5ec0c3a7aa6cea6b1e7b7f7cda2cbdf07362a85088e97f19ef94331c955c0e9321ad386428c',
         },
     ]
-    it.each(tests, 'should return hex String', test => {
-        expect(caver.utils.asciiToHex(test.value)).to.be.equal(test.expected)
+    it('should return hex String', () => {
+        for (const test of tests) {
+            expect(caver.utils.asciiToHex(test.value)).to.be.equal(test.expected)
+        }
     })
 })
 
@@ -832,8 +905,10 @@ describe('caver.utils.hexToBytes', () => {
 
 describe('CAVERJS-UNIT-ETC-136: caver.utils.bytesToHex', () => {
     const tests = [{ value: [0, 0, 0, 234], expected: '0x000000ea' }, { value: [234], expected: '0xea' }]
-    it.each(tests, 'should return byteArray', test => {
-        expect(caver.utils.bytesToHex(test.value)).deep.equal(test.expected)
+    it('should return byteArray', () => {
+        for (const test of tests) {
+            expect(caver.utils.bytesToHex(test.value)).deep.equal(test.expected)
+        }
     })
 })
 
@@ -851,8 +926,10 @@ describe('caver.utils.toPeb', () => {
             { value: new BN(123456789), expected: new BigNumber(unitMap.KLAY * 123456789).toFixed(0) },
             { value: new BN('123456789'), expected: new BigNumber(unitMap.KLAY * 123456789).toFixed(0) },
         ]
-        it.each(tests, 'should return string', test => {
-            expect(caver.utils.toPeb(test.value).toString()).to.be.equal(test.expected.toString())
+        it('should return string', () => {
+            for (const test of tests) {
+                expect(caver.utils.toPeb(test.value).toString()).to.be.equal(test.expected.toString())
+            }
         })
     })
 
@@ -868,8 +945,10 @@ describe('caver.utils.toPeb', () => {
             { value: 1, unit: 'kKLAY', expected: unitMap.kKLAY },
             { value: 1, unit: 'MKLAY', expected: unitMap.MKLAY },
         ]
-        it.each(tests, 'should return string', test => {
-            expect(caver.utils.toPeb(test.value, test.unit)).to.be.equal(test.expected)
+        it('should return string', () => {
+            for (const test of tests) {
+                expect(caver.utils.toPeb(test.value, test.unit)).to.be.equal(test.expected)
+            }
         })
     })
 })
@@ -888,11 +967,13 @@ describe('caver.utils.fromPeb', () => {
             { value: new BN(123456789), peb: unitMap.KLAY },
             { value: new BN('123456789'), peb: unitMap.KLAY },
         ]
-        it.each(tests, 'should return string based on unitMap', test => {
-            const bn = new BigNumber(test.peb)
-            const expected = (0.1 ** bn.e * test.value).toFixed(bn.e)
+        it('should return string based on unitMap', () => {
+            for (const test of tests) {
+                const bn = new BigNumber(test.peb)
+                const expected = (0.1 ** bn.e * test.value).toFixed(bn.e)
 
-            expect(caver.utils.fromPeb(test.value)).to.be.equal(expected)
+                expect(caver.utils.fromPeb(test.value)).to.be.equal(expected)
+            }
         })
     })
 
@@ -908,11 +989,13 @@ describe('caver.utils.fromPeb', () => {
             { value: 1, unit: 'kKLAY', peb: unitMap.kKLAY },
             { value: 1, unit: 'MKLAY', peb: unitMap.MKLAY },
         ]
-        it.each(tests, 'should return string based on unitMap', test => {
-            const bn = new BigNumber(test.peb)
-            const expected = (0.1 ** bn.e * test.value).toFixed(bn.e)
+        it('should return string based on unitMap', () => {
+            for (const test of tests) {
+                const bn = new BigNumber(test.peb)
+                const expected = (0.1 ** bn.e * test.value).toFixed(bn.e)
 
-            expect(caver.utils.fromPeb(test.value, test.unit)).to.be.equal(expected)
+                expect(caver.utils.fromPeb(test.value, test.unit)).to.be.equal(expected)
+            }
         })
     })
 })
@@ -962,15 +1045,19 @@ describe('caver.utils.padLeft', () => {
             { value: '0x3456ff', length: 20, expected: '0x000000000000003456ff' },
             { value: 0x3456ff, length: 20, expected: '0x000000000000003456ff' },
         ]
-        it.each(tests, 'should be left-padded with 0', test => {
-            expect(caver.utils.padLeft(test.value, test.length)).to.equal(test.expected)
+        it('should be left-padded with 0', () => {
+            for (const test of tests) {
+                expect(caver.utils.padLeft(test.value, test.length)).to.equal(test.expected)
+            }
         })
     })
 
     context('CAVERJS-UNIT-ETC-143: input: string', () => {
         const tests = [{ value: 'Hello', length: 20, sign: 'x', expected: 'xxxxxxxxxxxxxxxHello' }]
-        it.each(tests, 'should be left padded with x', test => {
-            expect(caver.utils.padLeft(test.value, test.length, test.sign)).to.equal(test.expected)
+        it('should be left padded with x', () => {
+            for (const test of tests) {
+                expect(caver.utils.padLeft(test.value, test.length, test.sign)).to.equal(test.expected)
+            }
         })
     })
 })
@@ -981,15 +1068,19 @@ describe('caver.utils.padRight', () => {
             { value: '0x3456ff', length: 20, expected: '0x3456ff00000000000000' },
             { value: 0x3456ff, length: 20, expected: '0x3456ff00000000000000' },
         ]
-        it.each(tests, 'should be right padded with 0', test => {
-            expect(caver.utils.padRight(test.value, test.length)).to.equal(test.expected)
+        it('should be right padded with 0', () => {
+            for (const test of tests) {
+                expect(caver.utils.padRight(test.value, test.length)).to.equal(test.expected)
+            }
         })
     })
 
     context('input: string', () => {
         const tests = [{ value: 'Hello', length: 20, sign: 'x', expected: 'Helloxxxxxxxxxxxxxxx' }]
-        it.each(tests, 'should be right padded with x', test => {
-            expect(caver.utils.padRight(test.value, test.length, test.sign)).to.equal(test.expected)
+        it('should be right padded with x', () => {
+            for (const test of tests) {
+                expect(caver.utils.padRight(test.value, test.length, test.sign)).to.equal(test.expected)
+            }
         })
     })
 })
@@ -1010,8 +1101,10 @@ describe('CAVERJS-UNIT-ETC-144: caver.utils.toTwosComplement', () => {
         { value: '0x0f', expected: '0x000000000000000000000000000000000000000000000000000000000000000f' },
         { value: new BN(0), expected: '0x0000000000000000000000000000000000000000000000000000000000000000' },
     ]
-    it.each(tests, 'should return TwosComplement', test => {
-        expect(caver.utils.toTwosComplement(test.value)).to.equal(test.expected)
+    it('should return TwosComplement', () => {
+        for (const test of tests) {
+            expect(caver.utils.toTwosComplement(test.value)).to.equal(test.expected)
+        }
     })
 })
 

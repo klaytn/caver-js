@@ -16,8 +16,6 @@
 	along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-require('it-each')({ testPerIteration: true })
-
 const BN = require('bn.js')
 const Hash = require('eth-lib/lib/hash')
 
@@ -25,7 +23,7 @@ const testRPCURL = require('../testrpc')
 const { expect, assert } = require('../extendedChai')
 
 const setting = require('./setting')
-const Caver = require('../../index.js')
+const Caver = require('../../index')
 
 const MessagePrefix = '\x19Klaytn Signed Message:\n'
 
@@ -3209,8 +3207,11 @@ describe('caver.klay.accounts.encryptV3', () => {
 
         const errorMessage =
             'Invalid parameter: encryptV3 only supports a single private key (also supports KlantnWalletKey format), or an instance of Account or AccountKeyPublic as a parameter. If you want to encrypt multiple keys, use caver.klay.accounts.encrypt which encrypts to keystore v4.'
-        it.each(invalidParameters, 'should throw error', param => {
-            expect(() => caver.klay.accounts.encryptV3(param, password)).to.throw(errorMessage)
+
+        it('should throw error', () => {
+            for (const param of invalidParameters) {
+                expect(() => caver.klay.accounts.encryptV3(param, password)).to.throw(errorMessage)
+            }
         })
     })
 })

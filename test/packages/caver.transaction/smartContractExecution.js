@@ -29,7 +29,7 @@ const expect = chai.expect
 const { propertiesForUnnecessary } = require('../utils')
 
 const testRPCURL = require('../../testrpc')
-const Caver = require('../../../index.js')
+const Caver = require('../../../index')
 const Keyring = require('../../../packages/caver-wallet/src/keyring/keyringFactory')
 const SingleKeyring = require('../../../packages/caver-wallet/src/keyring/singleKeyring')
 
@@ -182,7 +182,6 @@ describe('TxTypeSmartContractExecution', () => {
                 transactionObj[unnecessaries[i].name] = unnecessaries[i].value
 
                 const expectedError = `"${unnecessaries[i].name}" cannot be used with ${caver.transaction.type.TxTypeSmartContractExecution} transaction`
-                // eslint-disable-next-line no-loop-func
                 expect(() => new caver.transaction.smartContractExecution(transactionObj)).to.throw(expectedError)
             }
         })

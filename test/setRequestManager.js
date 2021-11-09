@@ -24,7 +24,7 @@ chai.use(sinonChai)
 
 const expect = chai.expect
 
-const Caver = require('../index.js')
+const Caver = require('../index')
 const testRPCURL = require('./testrpc')
 const { Manager } = require('../packages/caver-core-requestmanager/src/index')
 const { kip7JsonInterface } = require('../packages/caver-kct/src/kctHelper')
