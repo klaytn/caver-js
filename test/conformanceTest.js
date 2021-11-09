@@ -93,7 +93,6 @@ describe('Caver Common Architecture Conformance Tests', () => {
                                 console.log(`Skip ${tc.id} / ${tc.description}`)
                                 continue
                             }
-                            no - loop - func
                             it(`${tc.id}: ${tc.description}`, async () => {
                                 const inputs = getInputValues(tc.inputArray, preRequisites)
 
