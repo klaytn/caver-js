@@ -16,6 +16,8 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+import BN = require('bn.js')
+import BigNumber from 'bignumber.js'
 import { AccountKey } from '../../caver-account/src'
 import {
     Block,
@@ -32,7 +34,7 @@ import {
     LogObject,
     CallObject,
 } from '../../caver-core/src'
-import { Transaction } from '../../caver-transaction/src'
+import { Transaction, FeeDelegatedTransaction } from '../../caver-transaction/src'
 import RpcCallToMethod from '../../caver-rtm/src'
 
 export interface AccountForRPC {
@@ -45,10 +47,25 @@ export interface AccountForRPC {
     }
 }
 
+export interface PublicKeyForRPC {
+    x: string
+    y: string
+}
+
+export interface WeightedPublicKeyForRPC {
+    weight: number
+    key: PublicKeyForRPC
+}
+
+export interface WeightedMultiSigKeyForRPC {
+    threshold: number
+    keys: WeightedPublicKeyForRPC[]
+}
+
 export interface AccountKeyForRPC {
-    keyType: number
+    keyType?: number
     nonce?: number
-    key?: AccountKeyForRPC | AccountKeyForRPC[]
+    key?: PublicKeyForRPC | WeightedMultiSigKeyForRPC | AccountKeyForRPC | AccountKeyForRPC[]
 }
 
 export interface Syncing {
@@ -70,65 +87,90 @@ export interface KlaytnCall {
 export class Klay {
     constructor(...args: any[])
 
-    accountCreated(address: string, blockNumber?: BlockNumber, callback?: (error: Error, result: boolean) => void): Promise<boolean>
+    accountCreated(address: string, callback?: (error: Error, result: boolean) => void): Promise<boolean>
+    accountCreated(address: string, blockNumber: BlockNumber, callback?: (error: Error, result: boolean) => void): Promise<boolean>
     getAccounts(callback?: (error: Error, result: string[]) => void): Promise<string[]>
     encodeAccountKey(accountKey: AccountKeyForRPC | AccountKey, callback?: (error: Error, result: string) => void): Promise<string>
     decodeAccountKey(encodedAccountKey: string, callback?: (error: Error, result: AccountKeyForRPC) => void): Promise<AccountKeyForRPC>
-    getAccount(address: string, blockNumber?: BlockNumber, callback?: (error: Error, result: AccountForRPC) => void): Promise<AccountForRPC>
+    getAccount(address: string, callback?: (error: Error, result: AccountForRPC) => void): Promise<AccountForRPC>
+    getAccount(address: string, blockNumber: BlockNumber, callback?: (error: Error, result: AccountForRPC) => void): Promise<AccountForRPC>
+    getAccountKey(address: string, callback?: (error: Error, result: AccountKeyForRPC) => void): Promise<AccountKeyForRPC>
     getAccountKey(
         address: string,
-        blockNumber?: BlockNumber,
+        blockNumber: BlockNumber,
         callback?: (error: Error, result: AccountKeyForRPC) => void
     ): Promise<AccountKeyForRPC>
-    getBalance(address: string, blockNumber?: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
-    getCode(address: string, blockNumber?: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
-    getTransactionCount(address: string, blockNumber?: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
-    isContractAccount(address: string, blockNumber?: BlockNumber, callback?: (error: Error, result: boolean) => void): Promise<boolean>
-    sign(address: string, message: string, blockNumber?: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
+    getBalance(address: string, callback?: (error: Error, result: string) => void): Promise<string>
+    getBalance(address: string, blockNumber: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
+    getCode(address: string, callback?: (error: Error, result: string) => void): Promise<string>
+    getCode(address: string, blockNumber: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
+    getTransactionCount(address: string, callback?: (error: Error, result: string) => void): Promise<string>
+    getTransactionCount(address: string, blockNumber: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
+    isContractAccount(address: string, callback?: (error: Error, result: boolean) => void): Promise<boolean>
+    isContractAccount(address: string, blockNumber: BlockNumber, callback?: (error: Error, result: boolean) => void): Promise<boolean>
+    sign(address: string, message: string, callback?: (error: Error, result: string) => void): Promise<string>
+    sign(address: string, message: string, blockNumber: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
 
     getBlockNumber(callback?: (error: Error, result: string) => void): Promise<string>
-    getBlock(blockNumber: BlockNumber, returnTransactionObjects?: boolean, callback?: (error: Error, result: Block) => void): Promise<Block>
+    getBlock(blockNumber: BlockNumber, callback?: (error: Error, result: Block) => void): Promise<Block>
+    getBlock(blockNumber: BlockNumber, returnTransactionObjects: boolean, callback?: (error: Error, result: Block) => void): Promise<Block>
     getBlockByNumber(
-        blockNumber: number,
-        returnTransactionObjects?: boolean,
+        blockNumber: 'genesis' | 'latest' | number | BN | BigNumber,
         callback?: (error: Error, result: Block) => void
     ): Promise<Block>
-    getBlockByHash(blockHash: string, returnTransactionObjects?: boolean, callback?: (error: Error, result: Block) => void): Promise<Block>
+    getBlockByNumber(
+        blockNumber: 'genesis' | 'latest' | number | BN | BigNumber,
+        returnTransactionObjects: boolean,
+        callback?: (error: Error, result: Block) => void
+    ): Promise<Block>
+    getBlockByHash(blockHash: string, callback?: (error: Error, result: Block) => void): Promise<Block>
+    getBlockByHash(blockHash: string, returnTransactionObjects: boolean, callback?: (error: Error, result: Block) => void): Promise<Block>
     getBlockReceipts(blockHash: string, callback?: (error: Error, result: TransactionReceipt[]) => void): Promise<TransactionReceipt[]>
     getBlockTransactionCount(blockNumber: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
-    getBlockTransactionCountByNumber(blockNumber: number, callback?: (error: Error, result: string) => void): Promise<string>
+    getBlockTransactionCountByNumber(
+        blockNumber: 'genesis' | 'latest' | number | BN | BigNumber,
+        callback?: (error: Error, result: string) => void
+    ): Promise<string>
     getBlockTransactionCountByHash(blockHash: string, callback?: (error: Error, result: string) => void): Promise<string>
     getBlockWithConsensusInfo(
         blockNumber: BlockNumber,
         callback?: (error: Error, result: BlockWithConsensusInfo) => void
     ): Promise<BlockWithConsensusInfo>
     getBlockWithConsensusInfoByNumber(
-        blockNumber: number,
+        blockNumber: 'genesis' | 'latest' | number | BN | BigNumber,
         callback?: (error: Error, result: BlockWithConsensusInfo) => void
     ): Promise<BlockWithConsensusInfo>
     getBlockWithConsensusInfoByHash(
         blockHash: string,
         callback?: (error: Error, result: BlockWithConsensusInfo) => void
     ): Promise<BlockWithConsensusInfo>
+    getCommittee(callback?: (error: Error, result: string[]) => void): Promise<string[]>
     getCommittee(blockNumber: BlockNumber, callback?: (error: Error, result: string[]) => void): Promise<string[]>
+    getCommitteeSize(callback?: (error: Error, result: number) => void): Promise<number>
     getCommitteeSize(blockNumber: BlockNumber, callback?: (error: Error, result: number) => void): Promise<number>
+    getCouncil(callback?: (error: Error, result: string[]) => void): Promise<string[]>
     getCouncil(blockNumber: BlockNumber, callback?: (error: Error, result: string[]) => void): Promise<string[]>
+    getCouncilSize(callback?: (error: Error, result: number) => void): Promise<number>
     getCouncilSize(blockNumber: BlockNumber, callback?: (error: Error, result: number) => void): Promise<number>
 
+    getStorageAt(address: string, position: number, callback?: (error: Error, result: string) => void): Promise<string>
     getStorageAt(
         address: string,
         position: number,
-        blockNumber?: BlockNumber,
+        blockNumber: BlockNumber,
         callback?: (error: Error, result: string) => void
     ): Promise<string>
     isMining(callback?: (error: Error, result: boolean) => void): Promise<boolean>
     isSyncing(callback?: (error: Error, result: Syncing | boolean) => void): Promise<Syncing | boolean>
 
-    call(callObject: CallObject, blockNumber?: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
-    estimateGas(callObject: CallObject, blockNumber?: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
+    call(callObject: CallObject, callback?: (error: Error, result: string) => void): Promise<string>
+    call(callObject: CallObject, blockNumber: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
+    estimateGas(callObject: CallObject, callback?: (error: Error, result: string) => void): Promise<string>
+    estimateGas(callObject: CallObject, blockNumber: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
+    estimateComputationCost(callObject: CallObject, callback?: (error: Error, result: string) => void): Promise<string>
     estimateComputationCost(
         callObject: CallObject,
-        blockNumber?: BlockNumber,
+        blockNumber: BlockNumber,
         callback?: (error: Error, result: string) => void
     ): Promise<string>
 
@@ -138,7 +180,7 @@ export class Klay {
         callback?: (error: Error, result: TransactionForRPC) => void
     ): Promise<TransactionForRPC>
     getTransactionByBlockNumberAndIndex(
-        blockNumber: number,
+        blockNumber: 'genesis' | 'latest' | number | BN | BigNumber,
         index: number,
         callback?: (error: Error, result: TransactionForRPC) => void
     ): Promise<TransactionForRPC>
@@ -170,26 +212,26 @@ export class Klay {
 
     submitTransaction(
         signedTransaction: string | Transaction,
-        callback?: (error: Error, result: TransactionReceipt) => void
+        callback?: (error: Error, hash: string) => void
     ): PromiEvent<TransactionReceipt>
     sendRawTransaction(
         signedTransaction: string | Transaction,
-        callback?: (error: Error, result: TransactionReceipt) => void
+        callback?: (error: Error, hash: string) => void
     ): PromiEvent<TransactionReceipt>
     sendTransaction(
         transaction: TransactionForSendRPC | Transaction,
-        callback?: (error: Error, result: TransactionReceipt) => void
+        callback?: (error: Error, hash: string) => void
     ): PromiEvent<TransactionReceipt>
     sendTransactionAsFeePayer(
         transaction: TransactionForSendRPC | Transaction,
-        callback?: (error: Error, result: TransactionReceipt) => void
+        callback?: (error: Error, hash: string) => void
     ): PromiEvent<TransactionReceipt>
     signTransaction(
         transaction: TransactionForSendRPC | Transaction,
         callback?: (error: Error, result: RLPEncodedTransaction) => void
     ): Promise<RLPEncodedTransaction>
     signTransactionAsFeePayer(
-        transaction: TransactionForSendRPC | Transaction,
+        transaction: TransactionForSendRPC | FeeDelegatedTransaction,
         callback?: (error: Error, result: RLPEncodedTransaction) => void
     ): Promise<RLPEncodedTransaction>
     getDecodedAnchoringTransactionByHash(
@@ -200,7 +242,8 @@ export class Klay {
     getChainId(callback?: (error: Error, result: string) => void): Promise<string>
     getClientVersion(callback?: (error: Error, result: string) => void): Promise<string>
     getGasPrice(callback?: (error: Error, result: string) => void): Promise<string>
-    getGasPriceAt(blockNumber?: number, callback?: (error: Error, result: string) => void): Promise<string>
+    getGasPriceAt(callback?: (error: Error, result: string) => void): Promise<string>
+    getGasPriceAt(blockNumber: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
     isParallelDBWrite(callback?: (error: Error, result: boolean) => void): Promise<boolean>
     isSenderTxHashIndexingEnabled(callback?: (error: Error, result: boolean) => void): Promise<boolean>
     getProtocolVersion(callback?: (error: Error, result: string) => void): Promise<string>
