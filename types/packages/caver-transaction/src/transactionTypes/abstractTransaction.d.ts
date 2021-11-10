@@ -42,7 +42,8 @@ export class AbstractTransaction {
 
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string
-    sign(key: string | Keyring, index?: number, hasher?: (transaction: AbstractTransaction) => string): Promise<AbstractTransaction>
+    sign(key: string | Keyring, hasher?: (transaction: AbstractTransaction) => string): Promise<AbstractTransaction>
+    sign(key: string | Keyring, index: number, hasher?: (transaction: AbstractTransaction) => string): Promise<AbstractTransaction>
     appendSignatures(signatures: string[] | string[][] | SignatureData | SignatureData[]): void
     combineSignedRawTransactions(rlpEncodedTxs: string[]): string
     getRawTransaction(): string
@@ -59,7 +60,7 @@ export class AbstractTransaction {
     gas: string
     gasPrice: string
     chainId: string
-    signatures: string
+    signatures: SignatureData[]
     private _from: string
     private _nonce: string
     private _gas: string

@@ -13,7 +13,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Transaction, FeeDelegatedTransaction } from '../../caver-transaction/src'
+import { Transaction, FeeDelegatedTransaction, AbstractTransaction, AbstractFeeDelegatedTransaction } from '../../caver-transaction/src'
 import { KeyringFactory, Keyring } from './keyring/keyringFactory'
 import { SingleKeyring } from './keyring/singleKeyring'
 import { MultipleKeyring } from './keyring/multipleKeyring'
@@ -56,11 +56,16 @@ export class KeyringContainer implements IWallet {
     add(keyring: Keyring): Keyring
     remove(address: string): boolean
     signMessage(address: string, data: string, role?: number, index?: number): SignedMessage
-    sign(address: string, transaction: Transaction, index?: number, hasher?: (transaction: Transaction) => string): Promise<Transaction>
+    sign(
+        address: string,
+        transaction: AbstractTransaction,
+        index?: number,
+        hasher?: (transaction: AbstractTransaction) => string
+    ): Promise<AbstractTransaction>
     signAsFeePayer(
         address: string,
-        transaction: FeeDelegatedTransaction,
+        transaction: AbstractFeeDelegatedTransaction,
         index?: number,
-        hasher?: (transaction: FeeDelegatedTransaction) => string
-    ): Promise<FeeDelegatedTransaction>
+        hasher?: (transaction: AbstractFeeDelegatedTransaction) => string
+    ): Promise<AbstractFeeDelegatedTransaction>
 }

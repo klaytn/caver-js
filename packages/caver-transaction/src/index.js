@@ -61,7 +61,7 @@ const AbstractFeeDelegatedTransaction = require('./transactionTypes/abstractFeeD
  *
  * @method getTransactionByHash
  * @param  {string} transactionHash The transaction hash string to query from Klaytn.
- * @return {AbstractTransaction}
+ * @return {Promise<AbstractTransaction>}
  */
 async function getTransactionByHash(transactionHash) {
     let txObject = await AbstractTransaction._klaytnCall.getTransactionByHash(transactionHash)
