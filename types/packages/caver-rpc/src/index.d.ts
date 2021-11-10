@@ -13,9 +13,11 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+import * as net from 'net'
 import { Governance } from './governance'
 import { Klay } from './klay'
 import { Net } from './net'
+import { RequestManager, provider } from '../../caver-core-requestmanager/src'
 
 export * from './governance'
 export * from './klay'
@@ -24,8 +26,8 @@ export * from './net'
 export class RPC {
     constructor(...args: any[])
 
-    setRequestManager(manager: any): boolean
-    setProvider(): void
+    setRequestManager(manager: RequestManager): boolean
+    setProvider(p: provider, net?: net.Socket): void
 
     klay: Klay
     net: Net

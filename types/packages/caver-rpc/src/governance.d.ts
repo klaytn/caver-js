@@ -16,6 +16,8 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+import BN = require('bn.js')
+import BigNumber from 'bignumber.js'
 import { BlockNumber } from '../../caver-core/src'
 
 export interface Tally {
@@ -114,7 +116,7 @@ export class Governance {
     showTally(callback?: (error: Error, result: Tally[]) => void): Promise<Tally[]>
     getTotalVotingPower(callback?: (error: Error, result: number) => void): Promise<number>
     getMyVotingPower(callback?: (error: Error, result: number) => void): Promise<number>
-    getMyVotes(callback?: (error: Error, result: MyVote) => void): Promise<MyVote>
+    getMyVotes(callback?: (error: Error, result: MyVote[]) => void): Promise<MyVote[]>
     getChainConfig(callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
     getNodeAddress(callback?: (error: Error, result: string) => void): Promise<string>
     getItemsAt(blockNumber: BlockNumber, callback?: (error: Error, result: GovernanceItems) => void): Promise<GovernanceItems>
@@ -122,6 +124,10 @@ export class Governance {
     getVotes(callback?: (error: Error, result: Vote[]) => void): Promise<Vote[]>
     getIdxCache(callback?: (error: Error, result: number[]) => void): Promise<number[]>
     getIdxCacheFromDb(callback?: (error: Error, result: number[]) => void): Promise<number[]>
-    getItemCacheFromDb(blockNumber: BlockNumber, callback?: (error: Error, result: GovernanceItems) => void): Promise<GovernanceItems>
+    getItemCacheFromDb(
+        blockNumber: number | BN | BigNumber | string,
+        callback?: (error: Error, result: GovernanceItems) => void
+    ): Promise<GovernanceItems>
+    getStakingInfo(callback?: (error: Error, result: StakingInformation) => void): Promise<StakingInformation>
     getStakingInfo(blockNumber: BlockNumber, callback?: (error: Error, result: StakingInformation) => void): Promise<StakingInformation>
 }

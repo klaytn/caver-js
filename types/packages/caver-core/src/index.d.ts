@@ -56,6 +56,7 @@ export interface BlockWithConsensusInfo extends Block {
 }
 
 export interface TransactionForSendRPC {
+    type?: string
     from?: string | number
     signatures?: SignatureForRPC[]
     to?: string
