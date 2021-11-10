@@ -139,8 +139,6 @@ abiCoder.decodeParameter('uint256', '0x00000000000000000000000000000000000000000
 // $ExpectType string
 abiCoder.decodeParameter('uint256', '0x0000000000000000000000000000000000000000000000000000000000000010')
 // $ExpectType string
-abiCoder.decodeParameter('uint256', '0x0000000000000000000000000000000000000000000000000000000000000010')
-// $ExpectType string
 abiCoder.decodeParameter(
     {
         ParentStruct: {
