@@ -147,8 +147,8 @@ export interface LogObject {
 
 export interface EventOptions {
     filter?: object
-    fromBlock?: number
-    toBlock?: number
+    fromBlock?: BlockNumber
+    toBlock?: BlockNumber
     topics?: string[]
 }
 

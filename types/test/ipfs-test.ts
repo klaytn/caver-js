@@ -13,13 +13,38 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-export class IPFS {
-    constructor()
-    constructor(host: string, port: number, ssl: boolean)
+import Caver, { IPFS } from 'caver-js'
 
-    setIPFSNode(host: string, port: number, ssl: boolean): void
-    add(data: string | Buffer | ArrayBuffer): Promise<string>
-    get(hash: string): Promise<Buffer>
-    toHex(hash: string): string
-    fromHex(contentHash: string): string
-}
+const caver = new Caver()
+
+// $ExpectType IPFS
+caver.ipfs
+
+// $ExpectType typeof IPFS
+IPFS
+
+// $ExpectType IPFS
+let ipfs = new IPFS()
+// $ExpectType IPFS
+ipfs = new IPFS('ipfs.infura.io', 5001, true)
+
+// $ExpectType void
+ipfs.setIPFSNode('ipfs.infura.io', 5001, true)
+
+const testFileName = './ipfsTestFile.txt'
+
+// $ExpectType Promise<string>
+ipfs.add(testFileName)
+// $ExpectType Promise<string>
+ipfs.add(Buffer.from([]))
+// $ExpectType Promise<string>
+ipfs.add(new ArrayBuffer(1))
+
+// $ExpectType Promise<Buffer>
+ipfs.get('hash')
+
+// $ExpectType string
+ipfs.toHex('hash')
+
+// $ExpectType string
+ipfs.fromHex('hash')
