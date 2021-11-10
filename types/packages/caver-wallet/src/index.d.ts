@@ -55,17 +55,27 @@ export class KeyringContainer implements IWallet {
     isExisted(address: string): boolean
     add(keyring: Keyring): Keyring
     remove(address: string): boolean
-    signMessage(address: string, data: string, role?: number, index?: number): SignedMessage
+    signMessage(address: string, data: string, role: number, index?: number): SignedMessage
     sign(
         address: string,
         transaction: AbstractTransaction,
-        index?: number,
+        hasher?: (transaction: AbstractTransaction) => string
+    ): Promise<AbstractTransaction>
+    sign(
+        address: string,
+        transaction: AbstractTransaction,
+        index: number,
         hasher?: (transaction: AbstractTransaction) => string
     ): Promise<AbstractTransaction>
     signAsFeePayer(
         address: string,
         transaction: AbstractFeeDelegatedTransaction,
-        index?: number,
+        hasher?: (transaction: AbstractFeeDelegatedTransaction) => string
+    ): Promise<AbstractFeeDelegatedTransaction>
+    signAsFeePayer(
+        address: string,
+        transaction: AbstractFeeDelegatedTransaction,
+        index: number,
         hasher?: (transaction: AbstractFeeDelegatedTransaction) => string
     ): Promise<AbstractFeeDelegatedTransaction>
 }

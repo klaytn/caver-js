@@ -24,12 +24,12 @@ import { Keystore } from '../../../caver-core/src'
 export type Keyring = SingleKeyring | MultipleKeyring | RoleBasedKeyring
 
 export interface KeyringFactory {
-    privateKey: PrivateKey
-    singleKeyring: SingleKeyring
-    multipleKeyring: MultipleKeyring
-    roleBasedKeyring: RoleBasedKeyring
+    privateKey: typeof PrivateKey
+    singleKeyring: typeof SingleKeyring
+    multipleKeyring: typeof MultipleKeyring
+    roleBasedKeyring: typeof RoleBasedKeyring
     role: typeof KEY_ROLE
-    signatureData: SignatureData
+    signatureData: typeof SignatureData
 
     generate(entropy?: string): SingleKeyring
     generateSingleKey(entropy?: string): string
