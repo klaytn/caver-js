@@ -21,22 +21,26 @@ import { KIP37 as BaseKIP37 } from './kip37'
 import { KIP7 as BaseKIP7, KIP7DeployParams } from './kip7'
 import { Contract, SendOptions, SendOptionsWithFormatter } from '../../caver-contract/src'
 
-export class KIP7 extends BaseKIP7 {
-    static create(tokenAddress?: string, abi?: AbiItem[]): KIP7
+export * from './kip13'
 
-    static deploy(tokenInfo: KIP7DeployParams, sendOptions: string | SendOptions): Promise<KIP7>
+export class KIP7 extends BaseKIP7 {
+    static create(abi?: AbiItem[]): KIP7
+    static create(tokenAddress: string, abi?: AbiItem[]): KIP7
+
     static deploy(tokenInfo: KIP7DeployParams, sendOptions: SendOptionsWithFormatter): Promise<any>
-    static deploy(tokenInfo: KIP7DeployParams, sendOptions: string | SendOptions, wallet: IWallet): Promise<KIP7>
+    static deploy(tokenInfo: KIP7DeployParams, sendOptions: string | SendOptions): Promise<KIP7>
     static deploy(tokenInfo: KIP7DeployParams, sendOptions: SendOptionsWithFormatter, wallet: IWallet): Promise<any>
+    static deploy(tokenInfo: KIP7DeployParams, sendOptions: string | SendOptions, wallet: IWallet): Promise<KIP7>
 }
 
 export class KIP17 extends BaseKIP17 {
-    static create(tokenAddress?: string, abi?: AbiItem[]): KIP17
+    static create(abi?: AbiItem[]): KIP17
+    static create(tokenAddress: string, abi?: AbiItem[]): KIP17
 
-    static deploy(tokenInfo: KIP17DeployParams, sendOptions?: string | SendOptions): Promise<KIP17>
     static deploy(tokenInfo: KIP17DeployParams, sendOptions?: SendOptionsWithFormatter): Promise<any>
-    static deploy(tokenInfo: KIP17DeployParams, sendOptions: string | SendOptions, wallet: IWallet): Promise<KIP17>
+    static deploy(tokenInfo: KIP17DeployParams, sendOptions?: string | SendOptions): Promise<KIP17>
     static deploy(tokenInfo: KIP17DeployParams, sendOptions: SendOptionsWithFormatter, wallet: IWallet): Promise<any>
+    static deploy(tokenInfo: KIP17DeployParams, sendOptions: string | SendOptions, wallet: IWallet): Promise<KIP17>
 }
 
 export class KIP37 extends BaseKIP37 {
