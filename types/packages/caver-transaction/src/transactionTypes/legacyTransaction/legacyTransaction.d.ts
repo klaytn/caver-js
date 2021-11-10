@@ -14,6 +14,7 @@
 */
 
 import { AbstractTransaction, CreateTransactionObject } from '../abstractTransaction'
+import { SignatureData } from '../../../../caver-wallet/src/'
 
 export class LegacyTransaction extends AbstractTransaction {
     static create(createTxObj: CreateTransactionObject): LegacyTransaction
@@ -21,7 +22,7 @@ export class LegacyTransaction extends AbstractTransaction {
 
     constructor(createTxObj: CreateTransactionObject)
 
-    appendSignatures(sig: string[] | string[][]): void
+    appendSignatures(sig: string[] | string[][] | SignatureData | SignatureData[]): void
     getRLPEncoding(): string
     getRLPEncodingForSignature(): string
     getCommonRLPEncodingForSignature(): string

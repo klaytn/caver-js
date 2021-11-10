@@ -110,7 +110,7 @@ export type FeeDelegatedTransaction =
 
 export interface TransactionModule {
     decode: TransactionDecoder['decode']
-    getTransactionByHash(transactionHash: string): AbstractTransaction
+    getTransactionByHash(transactionHash: string): Promise<AbstractTransaction>
     recoverPublicKeys(rawTx: string): string[]
     recoverFeePayerPublicKeys(rawTx: string): string[]
     legacyTransaction: typeof LegacyTransaction

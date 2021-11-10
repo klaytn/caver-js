@@ -21,11 +21,14 @@ export class AbstractFeeDelegatedTransaction extends AbstractTransaction {
 
     signAsFeePayer(
         key: string | Keyring,
-        index?: number,
+        hasher?: (transaction: AbstractFeeDelegatedTransaction) => string
+    ): Promise<AbstractFeeDelegatedTransaction>
+    signAsFeePayer(
+        key: string | Keyring,
+        index: number,
         hasher?: (transaction: AbstractFeeDelegatedTransaction) => string
     ): Promise<AbstractFeeDelegatedTransaction>
     appendFeePayerSignatures(signatures: string[] | string[][] | SignatureData | SignatureData[]): void
-    combineSignedRawTransactions(rlpEncodedTxs: string[]): string
     getRLPEncodingForFeePayerSignature(): string
     recoverFeePayerPublicKeys(): string[]
 
