@@ -759,4 +759,16 @@ class KIP37 extends Contract {
  * @type {string}
  */
 KIP37.byteCode = kip37ByteCode
+
+/**
+ * The abi of the KIP-37 token contract.
+ *
+ * @example
+ * caver.kct.kip37.abi
+ *
+ * @static
+ * @type {Array.<object>}
+ */
+KIP37.abi = kip37JsonInterface
+
 module.exports = KIP37
