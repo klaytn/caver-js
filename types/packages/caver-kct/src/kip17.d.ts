@@ -36,12 +36,14 @@ export interface KIP17DetectedObject {
 
 export class KIP17 extends Contract {
     static byteCode: string
+    static abi: AbiItem[]
 
     static deploy(tokenInfo: KIP17DeployParams, sendOptions?: string | SendOptions): Promise<TransactionReceipt>
     static deploy(tokenInfo: KIP17DeployParams, sendOptions?: SendOptionsWithFormatter): Promise<any>
     static detectInterface(contractAddress: string): Promise<KIP17DetectedObject>
 
-    constructor(tokenAddress?: string, abi?: AbiItem[])
+    constructor(abi?: AbiItem[])
+    constructor(tokenAddress: string, abi?: AbiItem[])
 
     clone(tokenAddress?: string): KIP17
     detectInterface(): Promise<KIP17DetectedObject>
@@ -64,11 +66,12 @@ export class KIP17 extends Contract {
     approve(to: string, tokenId: string | number | BigNumber, sendParam?: SendOptions): Promise<TransactionReceipt>
     setApprovalForAll(to: string, approved: boolean, sendParam?: SendOptions): Promise<TransactionReceipt>
     transferFrom(from: string, to: string, tokenId: string | number | BigNumber, sendParam?: SendOptions): Promise<TransactionReceipt>
+    safeTransferFrom(from: string, to: string, tokenId: string | number | BigNumber, sendParam?: SendOptions): Promise<TransactionReceipt>
     safeTransferFrom(
         from: string,
         to: string,
         tokenId: string | number | BigNumber,
-        data?: Data,
+        data: Data,
         sendParam?: SendOptions
     ): Promise<TransactionReceipt>
     addMinter(account: string, sendParam?: SendOptions): Promise<TransactionReceipt>

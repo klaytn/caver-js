@@ -32,7 +32,7 @@ export interface SendOptions {
 }
 
 export interface SendOptionsWithFormatter extends SendOptions {
-    contractDeployFormatter?: Function
+    contractDeployFormatter: Function
 }
 
 export interface ContractOptions extends SendOptions {
@@ -52,11 +52,13 @@ export interface EstimateGasOptions {
 }
 
 export interface ContractMethod {
-    call(options?: CallObject, callback?: (err: Error, result: any) => void): Promise<any>
+    call(callback?: (err: Error, result: any) => void): Promise<any>
+    call(options: CallObject, callback?: (err: Error, result: any) => void): Promise<any>
     send(options: SendOptions, callback?: (err: Error, transactionHash: string) => void): PromiEvent<Contract>
     sign(options: SendOptions): Promise<Transaction>
     signAsFeePayer(options: SendOptions): Promise<Transaction>
-    estimateGas(options?: EstimateGasOptions, callback?: (err: Error, gas: number) => void): Promise<number>
+    estimateGas(callback?: (err: Error, gas: number) => void): Promise<number>
+    estimateGas(options: EstimateGasOptions, callback?: (err: Error, gas: number) => void): Promise<number>
     encodeABI(): string
 }
 
@@ -94,5 +96,6 @@ export class Contract {
 
     once(event: string, callback: (error: Error, event: EventData) => void): void
     once(event: string, options: EventOptions, callback: (error: Error, event: EventData) => void): void
+    getPastEvents(event: string, callback?: (error: Error, event: EventData) => void): Promise<EventData[]>
     getPastEvents(event: string, options?: EventOptions, callback?: (error: Error, event: EventData) => void): Promise<EventData[]>
 }

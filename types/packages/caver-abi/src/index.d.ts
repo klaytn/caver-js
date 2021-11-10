@@ -23,12 +23,12 @@ export interface Result {
 export class ABI {
     decodeFunctionCall(abi: AbiItem, functionCall: string): Result
     decodeLog(inputs: AbiInput[], data: string, topics: string[]): Result
-    decodeParameter(type: string, bytes: string): string
-    decodeParameters(outputs: string[], bytes: string): Result
+    decodeParameter(type: string | object, bytes: string): string
+    decodeParameters(outputs: Array<string | object>, bytes: string): Result
     encodeContractDeploy(jsonInterface: AbiItem[], bytecode: string, args: any[]): string
     encodeEventSignature(functionName: AbiItem | string): string
-    encodeFunctionCall(jsonInterface: AbiItem, params: any[]): string
+    encodeFunctionCall(jsonInterface: AbiItem, params: any): string
     encodeFunctionSignature(functionName: AbiItem | string): string
-    encodeParameter(type: string, param: any): string
-    encodeParameters(types: string[], params: any[]): string
+    encodeParameter(type: string | object, param: any): string
+    encodeParameters(types: Array<string | object>, params: any[]): string
 }

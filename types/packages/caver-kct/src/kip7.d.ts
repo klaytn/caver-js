@@ -38,12 +38,14 @@ export type Data = string | number | number[] | Buffer
 
 export class KIP7 extends Contract {
     static byteCode: string
+    static abi: AbiItem[]
 
     static deploy(tokenInfo: KIP7DeployParams, sendOptions: string | SendOptions): Promise<KIP7>
     static deploy(tokenInfo: KIP7DeployParams, sendOptions: SendOptionsWithFormatter): Promise<any>
     static detectInterface(contractAddress: string): Promise<KIP7DetectedObject>
 
-    constructor(tokenAddress?: string, abi?: AbiItem[])
+    constructor(abi?: AbiItem[])
+    constructor(tokenAddress: string, abi?: AbiItem[])
 
     clone(tokenAddress?: string): KIP7
     detectInterface(): Promise<KIP7DetectedObject>
@@ -67,12 +69,19 @@ export class KIP7 extends Contract {
         amount: string | number | BigNumber,
         sendParam?: SendOptions
     ): Promise<TransactionReceipt>
-    safeTransfer(recipient: string, amount: string | number | BigNumber, data?: Data, sendParam?: SendOptions): Promise<TransactionReceipt>
+    safeTransfer(recipient: string, amount: string | number | BigNumber, sendParam?: SendOptions): Promise<TransactionReceipt>
+    safeTransfer(recipient: string, amount: string | number | BigNumber, data: Data, sendParam?: SendOptions): Promise<TransactionReceipt>
     safeTransferFrom(
         sender: string,
         recipient: string,
         amount: string | number | BigNumber,
-        data?: Data,
+        sendParam?: SendOptions
+    ): Promise<TransactionReceipt>
+    safeTransferFrom(
+        sender: string,
+        recipient: string,
+        amount: string | number | BigNumber,
+        data: Data,
         sendParam?: SendOptions
     ): Promise<TransactionReceipt>
     mint(account: string, amount: string | number | BigNumber, sendParam?: SendOptions): Promise<TransactionReceipt>
@@ -80,8 +89,8 @@ export class KIP7 extends Contract {
     renounceMinter(sendParam?: SendOptions): Promise<TransactionReceipt>
     burn(amount: string | number | BigNumber, sendParam?: SendOptions): Promise<TransactionReceipt>
     burnFrom(account: string, amount: string | number | BigNumber, sendParam?: SendOptions): Promise<TransactionReceipt>
-    addPauser(account: string, sendParam?: SendOptions): Promise<TransactionReceipt>
     pause(sendParam?: SendOptions): Promise<TransactionReceipt>
     unpause(sendParam?: SendOptions): Promise<TransactionReceipt>
+    addPauser(account: string, sendParam?: SendOptions): Promise<TransactionReceipt>
     renouncePauser(sendParam?: SendOptions): Promise<TransactionReceipt>
 }

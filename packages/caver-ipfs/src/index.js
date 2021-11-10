@@ -30,9 +30,9 @@ const multihash = require('multihashes')
 class IPFS {
     /**
      * Create an IPFS instance.
-     * @param {string} host The IPFS Node url to connect with.
-     * @param {number} port The port number to use.
-     * @param {boolean} ssl With or without SSL. If true, the https protocol is used. Otherwise, the http protocol is used.
+     * @param {string} [host] The IPFS Node url to connect with.
+     * @param {number} [port] The port number to use.
+     * @param {boolean} [ssl] With or without SSL. If true, the https protocol is used. Otherwise, the http protocol is used.
      */
     constructor(host, port, ssl) {
         if (host !== undefined && port !== undefined && ssl !== undefined) {
@@ -99,7 +99,7 @@ class IPFS {
      * const cid = await caver.ipfs.add(Buffer.from('test data'))
      *
      * @param {string|Buffer|ArrayBuffer} data The file path string or file contents.
-     * @return {string}
+     * @return {Promise<string>}
      */
     async add(data) {
         if (!this.ipfs) throw new Error(`Please set IPFS Node through 'caver.ipfs.setIPFSNode'.`)
@@ -123,7 +123,7 @@ class IPFS {
      * const fileContents = await caver.ipfs.get('Qmd9thymMS6mejhEDZfwXPowSDunzgma9ex4ezpCSRZGwC')
      *
      * @param {string} hash An {@link https://docs.ipfs.io/concepts/content-addressing/#content-addressing-and-cids|CID(Content Identifier)} of the file to download.
-     * @return {Buffer}
+     * @return {Promise<Buffer>}
      */
     async get(hash) {
         if (!this.ipfs) throw new Error(`Please set IPFS Node through 'caver.ipfs.setIPFSNode'.`)

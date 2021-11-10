@@ -33,14 +33,18 @@ export interface KIP37DetectedObject {
 }
 
 export class KIP37 extends Contract {
+    static wallet: IWallet
     static byteCode: string
+    static abi: AbiItem[]
 
-    static create(tokenAddress?: string, abi?: AbiItem[]): KIP37
-    static deploy(tokenInfo: KIP37DeployParams, sendOptions: string | SendOptions, wallet?: IWallet): Promise<TransactionReceipt>
+    static create(abi?: AbiItem[]): KIP37
+    static create(tokenAddress: string, abi?: AbiItem[]): KIP37
     static deploy(tokenInfo: KIP37DeployParams, sendOptions: SendOptionsWithFormatter, wallet?: IWallet): Promise<any>
+    static deploy(tokenInfo: KIP37DeployParams, sendOptions: string | SendOptions, wallet?: IWallet): Promise<KIP37>
     static detectInterface(contractAddress: string): Promise<KIP37DetectedObject>
 
-    constructor(tokenAddress?: string, abi?: AbiItem[])
+    constructor(abi?: AbiItem[])
+    constructor(tokenAddress: string, abi?: AbiItem[])
 
     clone(tokenAddress?: string): KIP37
     detectInterface(): Promise<KIP37DetectedObject>
@@ -58,7 +62,12 @@ export class KIP37 extends Contract {
     create(
         id: string | number | BigNumber,
         initialSupply: string | number | BigNumber,
-        uri?: string,
+        sendParam?: SendOptions
+    ): Promise<TransactionReceipt>
+    create(
+        id: string | number | BigNumber,
+        initialSupply: string | number | BigNumber,
+        uri: string,
         sendParam?: SendOptions
     ): Promise<TransactionReceipt>
     setApprovalForAll(operator: string, approved: boolean, sendParam?: SendOptions): Promise<TransactionReceipt>
@@ -67,7 +76,14 @@ export class KIP37 extends Contract {
         to: string,
         id: string | number | BigNumber,
         amount: string | number | BigNumber,
-        data?: Data,
+        sendParam?: SendOptions
+    ): Promise<TransactionReceipt>
+    safeTransferFrom(
+        from: string,
+        to: string,
+        id: string | number | BigNumber,
+        amount: string | number | BigNumber,
+        data: Data,
         sendParam?: SendOptions
     ): Promise<TransactionReceipt>
     safeBatchTransferFrom(
@@ -75,7 +91,14 @@ export class KIP37 extends Contract {
         to: string,
         ids: Array<string | number | BigNumber>,
         amounts: Array<string | number | BigNumber>,
-        data?: Data,
+        sendParam?: SendOptions
+    ): Promise<TransactionReceipt>
+    safeBatchTransferFrom(
+        from: string,
+        to: string,
+        ids: Array<string | number | BigNumber>,
+        amounts: Array<string | number | BigNumber>,
+        data: Data,
         sendParam?: SendOptions
     ): Promise<TransactionReceipt>
     mint(
@@ -104,8 +127,10 @@ export class KIP37 extends Contract {
         values: Array<string | number | BigNumber>,
         sendParam?: SendOptions
     ): Promise<TransactionReceipt>
-    pause(id?: string | number | BigNumber, sendParam?: SendOptions): Promise<TransactionReceipt>
-    unpause(id?: string | number | BigNumber, sendParam?: SendOptions): Promise<TransactionReceipt>
+    pause(sendParam?: SendOptions): Promise<TransactionReceipt>
+    pause(id: string | number | BigNumber, sendParam?: SendOptions): Promise<TransactionReceipt>
+    unpause(sendParam?: SendOptions): Promise<TransactionReceipt>
+    unpause(id: string | number | BigNumber, sendParam?: SendOptions): Promise<TransactionReceipt>
     addPauser(account: string, sendParam?: SendOptions): Promise<TransactionReceipt>
     renouncePauser(sendParam?: SendOptions): Promise<TransactionReceipt>
 }
