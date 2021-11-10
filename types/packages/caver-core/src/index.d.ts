@@ -276,14 +276,14 @@ export interface EncryptedKey {
     mac: string
 }
 export interface EncryptionOptions {
-    salt: any
-    iv: any
-    kdf: any
-    dklen: any
-    c: any
-    n: any
-    r: any
-    p: any
-    cipher: any
-    uuid: any
+    salt?: any
+    iv?: any
+    kdf?: any
+    dklen?: any
+    c?: any
+    n?: any
+    r?: any
+    p?: any
+    cipher?: any
+    uuid?: any
 }
