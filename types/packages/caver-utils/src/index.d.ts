@@ -33,11 +33,13 @@ export interface SignatureObject {
 
 export type Unit = 'peb' | 'kpeb' | 'Mpeb' | 'Gpeb' | 'Ston' | 'ston' | 'uKLAY' | 'mKLAY' | 'KLAY' | 'kKLAY' | 'MKLAY' | 'GKLAY' | 'TKLAY'
 
+export interface UnitInfo {
+    unit: string
+    pebFactor: number
+}
+
 export interface KlayUnit {
-    [key: string]: {
-        unit: string
-        pebFactor: number
-    }
+    [key: string]: UnitInfo
 }
 
 export interface UnitMap {
@@ -135,8 +137,8 @@ export interface Utils {
     toPeb(number: BN, unit?: Unit): BN
     toPeb(number: number | string, unit?: Unit): string
     fromPeb(number: number | string, unit?: Unit): string
-    convertFromPeb(number: number | string | BN | BigNumber, unitString: string | KlayUnit): string
-    convertToPeb(number: number | string | BN | BigNumber, unitString: string | KlayUnit): string | BN
+    convertFromPeb(number: number | string | BN | BigNumber, unitString: string | UnitInfo): string
+    convertToPeb(number: number | string | BN | BigNumber, unitString: string | UnitInfo): string | BN
     isBN(object: object): boolean
     isBN(object: object): boolean
     isBigNumber(num: object): boolean
