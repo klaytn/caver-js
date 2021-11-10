@@ -14,11 +14,10 @@
 */
 
 import { KlaytnCall } from '../../caver-rpc/src/klay'
-import AbstractFeeDelegatedTransaction from '../../caver-transaction/src/transactionTypes/abstractFeeDelegatedTransaction'
-import AbstractTransaction from '../../caver-transaction/src/transactionTypes/abstractTransaction'
-import SignatureData from '../../caver-wallet/src/keyring/signatureData'
+import { AbstractTransaction, AbstractFeeDelegatedTransaction } from '../../caver-transaction/src'
+import { SignatureData } from '../../caver-wallet/src'
 
-export default class Validator {
+export class Validator {
     static _klaytnCall: KlaytnCall
 
     validateSignedMessage(

@@ -13,9 +13,9 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import AbstractTransaction, { CreateTransactionObject } from '../abstractTransaction'
+import { AbstractTransaction, CreateTransactionObject } from '../abstractTransaction'
 
-export default class ChainDataAnchoring extends AbstractTransaction {
+export class ChainDataAnchoring extends AbstractTransaction {
     static create(createTxObj: string | CreateTransactionObject): ChainDataAnchoring
     static decode(rlpEncoded: string): ChainDataAnchoring
 

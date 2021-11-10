@@ -45,7 +45,7 @@ export interface txErrorTable {
     '0x1e': string
 }
 
-export default interface Errors {
+export interface Errors {
     txErrorTable: txErrorTable
 
     needNameCallPropertyToCreateMethod: Error

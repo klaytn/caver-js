@@ -20,7 +20,7 @@ export interface Result {
     __length__: number
 }
 
-export default class ABI {
+export class ABI {
     decodeFunctionCall(abi: AbiItem, functionCall: string): Result
     decodeLog(inputs: AbiInput[], data: string, topics: string[]): Result
     decodeParameter(type: string, bytes: string): string

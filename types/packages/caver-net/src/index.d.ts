@@ -16,7 +16,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-export default class Net {
+export class DeprecatedNetRPC {
     getNetworkType(callback?: (error: Error, returnValue: string) => void): Promise<string>
     getId(callback?: (error: Error, id: number) => void): Promise<number>
     isListening(callback?: (error: Error, listening: boolean) => void): Promise<boolean>

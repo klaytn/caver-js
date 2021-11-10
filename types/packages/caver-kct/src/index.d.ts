@@ -15,11 +15,11 @@
 
 import { IWallet } from '../../caver-wallet/src'
 import { AbiItem } from '../../caver-utils/src'
-import KIP13 from './kip13'
-import BaseKIP17, { KIP17DeployParams } from './kip17'
-import BaseKIP37 from './kip37'
-import BaseKIP7, { KIP7DeployParams } from './kip7'
-import Contract, { SendOptions, SendOptionsWithFormatter } from '../../caver-contract/src'
+import { KIP13 } from './kip13'
+import { KIP17 as BaseKIP17, KIP17DeployParams } from './kip17'
+import { KIP37 as BaseKIP37 } from './kip37'
+import { KIP7 as BaseKIP7, KIP7DeployParams } from './kip7'
+import { Contract, SendOptions, SendOptionsWithFormatter } from '../../caver-contract/src'
 
 export class KIP7 extends BaseKIP7 {
     static create(tokenAddress?: string, abi?: AbiItem[]): KIP7
@@ -43,7 +43,7 @@ export class KIP37 extends BaseKIP37 {
     static wallet: IWallet
 }
 
-export default class KCT {
+export class KCT {
     constructor(...args: any[])
 
     kip7: typeof KIP7

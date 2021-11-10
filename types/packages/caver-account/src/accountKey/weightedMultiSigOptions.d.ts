@@ -19,7 +19,7 @@ export interface WeightedMultiSigOptionsObject {
     weight?: number[]
 }
 
-export default class WeightedMultiSigOptions {
+export class WeightedMultiSigOptions {
     static fromObject(options: WeightedMultiSigOptionsObject): WeightedMultiSigOptions
 
     constructor(threshold: number, weights: number[])

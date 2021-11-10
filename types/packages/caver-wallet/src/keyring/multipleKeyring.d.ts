@@ -14,13 +14,12 @@
 */
 
 import { SignedMessage } from '..'
-import Account from '../../../caver-account/src'
-import WeightedMultiSigOptions, { WeightedMultiSigOptionsObject } from '../../../caver-account/src/accountKey/weightedMultiSigOptions'
+import { Account, WeightedMultiSigOptions, WeightedMultiSigOptionsObject } from '../../../caver-account/src'
 import { EncryptedKeystoreV4Json, EncryptionOptions } from '../../../caver-core/src'
-import PrivateKey from './privateKey'
-import SignatureData from './signatureData'
+import { PrivateKey } from './privateKey'
+import { SignatureData } from './signatureData'
 
-export default class MultipleKeyring {
+export class MultipleKeyring {
     constructor(address: string, keys: string[] | PrivateKey[])
 
     getPublicKey(compressed?: boolean): string[]

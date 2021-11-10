@@ -13,24 +13,24 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-export interface RoleBasedKeyObject {
+export interface DeprecatedRoleBasedKeyObject {
     transactionKey?: string | string[]
     updateKey?: string | string[]
     feePayerKey?: string | string[]
 }
 
-export default class AccountKeyRoleBased {
-    constructor(keyObj: RoleBasedKeyObject | AccountKeyRoleBased)
+export class DeprecatedAccountKeyRoleBased {
+    constructor(keyObj: DeprecatedRoleBasedKeyObject | DeprecatedAccountKeyRoleBased)
 
     type: string
 
-    toPublicKey(toPublicKeyFunc: Function): RoleBasedKeyObject
-    update(keys: AccountKeyRoleBased): void
+    toPublicKey(toPublicKeyFunc: Function): DeprecatedRoleBasedKeyObject
+    update(keys: DeprecatedAccountKeyRoleBased): void
 
     transactionKey: string[]
     updateKey: string[]
     feePayerKey: string[]
-    readonly keys: RoleBasedKeyObject
+    readonly keys: DeprecatedRoleBasedKeyObject
     readonly defaultKey: string
     private _transactionKey: string[]
     private _updateKey: string[]

@@ -13,19 +13,21 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import ABI from '../../caver-abi/src'
-import Contract from '../../caver-contract/src'
-import KIP17 from '../../caver-kct/src/kip17'
-import KIP7 from '../../caver-kct/src/kip7'
-import Net from '../../caver-net/src'
-import Utils from '../../caver-utils/src'
-import Accounts from '../caver-klay-accounts/src'
+import { ABI } from '../../caver-abi/src'
+import { Contract } from '../../caver-contract/src'
+import { KIP7, KIP17 } from '../../caver-kct/src'
+import { DeprecatedNetRPC } from '../../caver-net/src'
+import { Utils } from '../../caver-utils/src'
+import { Accounts } from '../caver-klay-accounts/src'
 import RpcCallToMethod from '../../caver-rtm/src'
 import { KeyForUpdateObject } from '../caver-klay-accounts/src/account/accountKeyForUpdate'
-import Personal from '../caver-klay-personal/src'
-import { getNetworkType } from './getNetworkType'
+import { Personal } from '../caver-klay-personal/src'
 import { BlockNumber } from '../../caver-core/src'
 
+export * from '../caver-klay-accounts/src'
+export * from '../caver-klay-personal/src'
+
+export function getNetworkType(callback?: (error: Error, returnValue: string) => void): Promise<string>
 export interface DecodedFromRawTransactionObject extends KeyForUpdateObject {
     type: string
     nonce: string
@@ -49,10 +51,10 @@ export interface DecodedFromRawTransactionObject extends KeyForUpdateObject {
     feePayerSignatures?: string[][]
 }
 
-export default class Klay {
+export class DeprecatedKlayRPC {
     decodeTransaction(rawTransaction: string, type?: string): DecodedFromRawTransactionObject
 
-    net: Net
+    net: DeprecatedNetRPC
     accounts: Accounts
     personal: Personal
     Contract: typeof Contract

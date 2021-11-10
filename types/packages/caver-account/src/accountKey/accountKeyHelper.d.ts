@@ -13,7 +13,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import WeightedMultiSigOptions, { WeightedMultiSigOptionsObject } from './weightedMultiSigOptions'
+import { WeightedMultiSigOptions, WeightedMultiSigOptionsObject } from './weightedMultiSigOptions'
 
 export namespace ACCOUNT_KEY_TAG {
     const ACCOUNT_KEY_NIL_TAG: string

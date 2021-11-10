@@ -13,9 +13,9 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import AbstractTransaction, { CreateTransactionObject } from '../abstractTransaction'
+import { AbstractTransaction, CreateTransactionObject } from '../abstractTransaction'
 
-export default class Cancel extends AbstractTransaction {
+export class Cancel extends AbstractTransaction {
     static create(createTxObj: string | CreateTransactionObject): Cancel
     static decode(rlpEncoded: string): Cancel
 

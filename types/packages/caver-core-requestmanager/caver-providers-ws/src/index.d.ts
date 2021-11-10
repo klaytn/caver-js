@@ -21,7 +21,7 @@ export interface RequestItem {
     callback: (error: any, result: any) => void
 }
 
-export default class WebsocketProvider {
+export class WebsocketProvider {
     constructor(url: string, options?: WebsocketProviderOptions)
 
     url: string

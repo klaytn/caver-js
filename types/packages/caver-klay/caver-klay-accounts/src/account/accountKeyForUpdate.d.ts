@@ -37,7 +37,7 @@ export interface KeyForUpdateObject extends KeyForUpdateBaseObject {
     roleFeePayerKey?: KeyForUpdateBaseObject
 }
 
-export default class AccountForUpdate {
+export class AccountForUpdate {
     constructor(address: string, keyForUpdate: string | string[] | object, options: WeightedMultiSigOptionsObject)
 
     address: string

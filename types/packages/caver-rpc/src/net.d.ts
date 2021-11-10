@@ -22,7 +22,7 @@ export interface PeerCountByType {
     total: number
 }
 
-export default class Net {
+export class Net {
     constructor(...args: any[])
 
     getNetworkId(callback?: (error: Error, result: string) => void): Promise<string>

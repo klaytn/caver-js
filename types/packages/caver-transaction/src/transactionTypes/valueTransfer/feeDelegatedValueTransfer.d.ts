@@ -13,10 +13,10 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import AbstractFeeDelegatedTransaction from '../abstractFeeDelegatedTransaction'
+import { AbstractFeeDelegatedTransaction } from '../abstractFeeDelegatedTransaction'
 import { CreateTransactionObject } from '../abstractTransaction'
 
-export default class FeeDelegatedValueTransfer extends AbstractFeeDelegatedTransaction {
+export class FeeDelegatedValueTransfer extends AbstractFeeDelegatedTransaction {
     constructor(createTxObj: string | CreateTransactionObject)
 
     static create(createTxObj: string | CreateTransactionObject): FeeDelegatedValueTransfer

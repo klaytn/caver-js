@@ -14,14 +14,18 @@
 */
 
 import * as net from 'net'
-import WebsocketProvider from '../caver-providers-ws/src/index'
-import HttpProvider from '../caver-providers-http/src/index'
-import IpcProvider from '../caver-providers-ipc/src/index'
-import { JsonRpcResponse } from '../../caver-core-helpers/src/index'
+import { WebsocketProvider } from '../caver-providers-ws/src'
+import { HttpProvider } from '../caver-providers-http/src'
+import { IpcProvider } from '../caver-providers-ipc/src'
+import { JsonRpcResponse } from '../../caver-core-helpers/src'
+
+export * from '../caver-providers-ws/src'
+export * from '../caver-providers-http/src'
+export * from '../caver-providers-ipc/src'
 
 export type provider = WebsocketProvider | HttpProvider | IpcProvider
 
-export default class RequestManager {
+export class RequestManager {
     static providers: { WebsocketProvider: typeof WebsocketProvider; HttpProvider: typeof HttpProvider; IpcProvider: typeof IpcProvider }
 
     constructor(provider: provider, net?: net.Server)
@@ -35,4 +39,14 @@ export default class RequestManager {
     addSubscription(id: string, name: string, type: string, callback: (error: Error | null, result?: JsonRpcResponse) => void): void
     removeSubscription(id: string, callback: (error: Error | null, result?: JsonRpcResponse) => void): void
     clearSubscriptions(keepIsSyncing?: boolean): void
+}
+
+export class Batch {
+    constructor(requestManager: RequestManager)
+
+    requestManager: RequestManager
+    requests: object[]
+
+    add(request: object): void
+    execute(): void
 }

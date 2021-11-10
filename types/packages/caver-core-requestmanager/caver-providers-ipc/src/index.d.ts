@@ -16,7 +16,7 @@
 import * as net from 'net'
 import { JsonRpcPayload, JsonRpcResponse } from '../../../caver-core-helpers/src/index'
 
-export default class IpcProvider {
+export class IpcProvider {
     constructor(path: string, net: net.Server)
 
     responseCallbacks: object

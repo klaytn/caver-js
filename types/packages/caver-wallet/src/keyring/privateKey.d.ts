@@ -13,9 +13,9 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import SignatureData from './signatureData'
+import { SignatureData } from './signatureData'
 
-export default class PrivateKey {
+export class PrivateKey {
     constructor(key: string)
 
     sign(txSigHash: string, chainId: string | number): SignatureData

@@ -17,7 +17,7 @@
 */
 
 import { AbiItem } from '../../caver-utils/src'
-import Account from '../../caver-account/src'
+import { Account } from '../../caver-account/src'
 import BN = require('bn.js')
 import BigNumber from 'bignumber.js'
 
@@ -100,7 +100,27 @@ export interface TransactionForRPC {
     value?: string
 }
 
-export interface TransactionReceipt extends TransactionForRPC {
+export interface TransactionReceipt {
+    blockHash: string
+    blockNumber: string
+    codeFormat?: string
+    feePayer?: string
+    feePayerSignatures?: SignatureForRPC[]
+    feeRatio?: string
+    from: string
+    gas: string | number
+    gasPrice: string | number
+    humanReadable?: boolean
+    key?: string
+    input?: string
+    nonce: string
+    senderTxHash: string
+    signatures: SignatureForRPC[]
+    to: string | null
+    transactionIndex: string | null
+    type: string
+    typeInt: number
+    value?: string
     contractAddress: string
     gasUsed: string
     logs?: LogObject[]
@@ -111,7 +131,6 @@ export interface TransactionReceipt extends TransactionForRPC {
     events?: {
         [eventName: string]: EventData | EventData[]
     }
-    options?: ContractOptions
 }
 
 export interface LogObject {
@@ -124,18 +143,6 @@ export interface LogObject {
     blockHash?: string
     logIndex?: string
     removed?: boolean
-}
-
-export interface ContractOptions {
-    address: string
-    jsonInterface: AbiItem[]
-    from: string
-    feePayer: string
-    feeDelegation: boolean
-    feeRatio: number | string
-    gasPrice: number | string
-    gas: number | string
-    data: string
 }
 
 export interface EventOptions {
@@ -220,10 +227,6 @@ export interface CallObject {
 }
 
 export interface PromiEvent<T> extends Promise<T> {
-    once(type: 'sending', handler: (payload: object) => void): PromiEvent<T>
-
-    once(type: 'sent', handler: (payload: object) => void): PromiEvent<T>
-
     once(type: 'transactionHash', handler: (transactionHash: string) => void): PromiEvent<T>
 
     once(type: 'receipt', handler: (receipt: TransactionReceipt) => void): PromiEvent<T>

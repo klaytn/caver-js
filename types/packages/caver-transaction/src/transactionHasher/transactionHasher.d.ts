@@ -15,7 +15,7 @@
 
 import { Transaction } from '..'
 
-export default interface TransactionHasher {
+export interface TransactionHasher {
     getHashForSignature(transaction: Transaction): string
     getHashForFeePayerSignature(transaction: Transaction): string
 }

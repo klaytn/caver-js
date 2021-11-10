@@ -14,7 +14,7 @@
 */
 
 import BigNumber from 'bignumber.js'
-import Contract, { SendOptions, SendOptionsWithFormatter } from '../../caver-contract/src'
+import { Contract, SendOptions, SendOptionsWithFormatter } from '../../caver-contract/src'
 import { TransactionReceipt } from '../../caver-core/src'
 import { AbiItem } from '../../caver-utils/src'
 import { Data } from './kip7'
@@ -34,7 +34,7 @@ export interface KIP17DetectedObject {
     IKIP17Pausable: boolean
 }
 
-export default class KIP17 extends Contract {
+export class KIP17 extends Contract {
     static byteCode: string
 
     static deploy(tokenInfo: KIP17DeployParams, sendOptions?: string | SendOptions): Promise<TransactionReceipt>

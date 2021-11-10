@@ -40,7 +40,7 @@ export interface HttpProviderOptions {
     keepAlive?: boolean
 }
 
-export default class HttpProvider {
+export class HttpProvider {
     constructor(host: string, options?: HttpProviderOptions)
 
     host: string

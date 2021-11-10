@@ -13,13 +13,14 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Net from '../../../caver-net/src'
+import { DeprecatedNetRPC } from '../../../caver-net/src'
 import RpcCallToMethod from '../../../caver-rtm/src'
+import { BlockNumber } from '../../../caver-core/src'
 
-export default class Personal {
+export class Personal {
     constructor(...args: any[])
 
-    net: Net
+    net: DeprecatedNetRPC
 
     getAccounts: RpcCallToMethod['personal_listAccounts']
     newAccount: RpcCallToMethod['personal_newAccount']
@@ -34,8 +35,8 @@ export default class Personal {
     sendValueTransfer: RpcCallToMethod['personal_sendValueTransfer']
     sendAccountUpdate: RpcCallToMethod['personal_sendAccountUpdate']
 
-    get defaultAccount(): string
-    set defaultAccount(val)
-    get defaultBlock(): string | number
-    set defaultBlock(val)
+    defaultAccount: string
+    defaultBlock: BlockNumber
+    private _defaultAccount: string
+    private _defaultBlock: BlockNumber
 }

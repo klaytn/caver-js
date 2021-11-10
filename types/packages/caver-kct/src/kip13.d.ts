@@ -13,10 +13,10 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Contract from '../../caver-contract/src'
+import { Contract } from '../../caver-contract/src'
 import { AbiItem } from '../../caver-utils/src'
 
-export default class KIP13 extends Contract {
+export class KIP13 extends Contract {
     static isImplementedKIP13Interface(contractAddress: string): Promise<boolean>
 
     constructor(contractAddress: string, abi: AbiItem[])

@@ -13,6 +13,6 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-export default interface PayloadTransformer {
+export interface PayloadTransformer {
     reversePayload(payload: any): any
 }

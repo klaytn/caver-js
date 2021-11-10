@@ -14,25 +14,39 @@
 */
 
 import * as net from 'net'
-import ABI from './packages/caver-abi/src'
-import Account from './packages/caver-account/src'
-import BaseContract from './packages/caver-contract/src'
-import CoreHelpers from './packages/caver-core-helpers/src'
-import Formatters from './packages/caver-core-helpers/src/formatters'
-import Method from './packages/caver-core-method/src'
-import HttpProvider from './packages/caver-core-requestmanager/caver-providers-http/src'
-import IpcProvider from './packages/caver-core-requestmanager/caver-providers-ipc/src'
-import WebsocketProvider from './packages/caver-core-requestmanager/caver-providers-ws/src'
-import IPFS from './packages/caver-ipfs/src'
-import KCT from './packages/caver-kct/src'
-import Klay from './packages/caver-klay/src'
-import Middleware from './packages/caver-middleware/src'
-import RPC from './packages/caver-rpc/src'
-import Validator from './packages/caver-validator/src'
-import Transaction from './packages/caver-transaction/src'
-import Utils from './packages/caver-utils/src'
-import KeyringContainer, { IWallet } from './packages/caver-wallet/src'
-import KeyringFactory from './packages/caver-wallet/src/keyring/keyringFactory'
+import { ABI } from './packages/caver-abi/src'
+import { Account } from './packages/caver-account/src'
+import { Contract as BaseContract } from './packages/caver-contract/src'
+import { CoreHelpers, Formatters } from './packages/caver-core-helpers/src'
+import { Method } from './packages/caver-core-method/src'
+import { HttpProvider, IpcProvider, WebsocketProvider } from './packages/caver-core-requestmanager/src'
+import { IPFS } from './packages/caver-ipfs/src'
+import { KCT } from './packages/caver-kct/src'
+import { DeprecatedKlayRPC } from './packages/caver-klay/src'
+import { Middleware } from './packages/caver-middleware/src'
+import { RPC } from './packages/caver-rpc/src'
+import { Validator } from './packages/caver-validator/src'
+import { TransactionModule as Transaction } from './packages/caver-transaction/src'
+import { Utils } from './packages/caver-utils/src'
+import { KeyringContainer, IWallet, KeyringFactory } from './packages/caver-wallet/src'
+
+export * from './packages/caver-abi/src'
+export * from './packages/caver-account/src'
+export * from './packages/caver-contract/src'
+export * from './packages/caver-core/src'
+export * from './packages/caver-core-helpers/src'
+export * from './packages/caver-core-method/src'
+export * from './packages/caver-core-requestmanager/src'
+export * from './packages/caver-ipfs/src'
+export * from './packages/caver-core-subscriptions/src'
+export * from './packages/caver-kct/src'
+export * from './packages/caver-klay/src'
+export * from './packages/caver-net/src'
+export * from './packages/caver-rpc/src'
+export * from './packages/caver-transaction/src'
+export * from './packages/caver-utils/src'
+export * from './packages/caver-validator/src'
+export * from './packages/caver-wallet/src'
 
 export class Contract extends BaseContract {
     static create(...args: ConstructorParameters<typeof BaseContract>): Contract
@@ -63,7 +77,7 @@ export default class Caver {
     wallet: IWallet
     transaction: Transaction
     kct: KCT
-    klay: Klay
+    klay: DeprecatedKlayRPC
     rpc: RPC
     validator: Validator
     middleware: Middleware

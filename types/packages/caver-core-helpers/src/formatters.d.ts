@@ -14,17 +14,19 @@
 */
 
 import BigNumber from 'bignumber.js'
-import AccountKeyLegacy from '../../caver-account/src/accountKey/accountKeyLegacy'
-import AccountKeyPublic from '../../caver-account/src/accountKey/accountKeyPublic'
-import AccountKeyFail from '../../caver-account/src/accountKey/accountKeyFail'
-import AccountKeyWeightedMultiSig from '../../caver-account/src/accountKey/accountKeyWeightedMultiSig'
-import AccountKeyRoleBased from '../../caver-account/src/accountKey/accountKeyRoleBased'
-import { AccountKey } from '../../caver-account/src'
+import {
+    AccountKey,
+    AccountKeyLegacy,
+    AccountKeyPublic,
+    AccountKeyFail,
+    AccountKeyWeightedMultiSig,
+    AccountKeyRoleBased,
+} from '../../caver-account/src'
 import { AccountKeyForRPC } from '../../caver-rpc/src/klay'
 import { TransactionForRPC, TransactionReceipt } from '../../caver-core/src'
-import Utils from '../../caver-utils/src'
+import { Utils } from '../../caver-utils/src'
 
-export default interface Formatters {
+export interface Formatters {
     inputDefaultBlockNumberFormatter(blockNumber: string): string
     inputBlockNumberFormatter(blockNumber: string): string
     inputCallFormatter(options: object): object

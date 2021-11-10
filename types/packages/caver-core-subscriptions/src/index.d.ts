@@ -48,3 +48,30 @@ export interface SubscriptionModel {
     inputFormatter: Array<() => void>
     subscriptionHandler: () => void
 }
+
+export interface SubscriptionOptions {
+    subscription: string
+    type: string
+    requestManager: any
+}
+export class Subscription<T> {
+    constructor(options: SubscriptionOptions)
+
+    id: string
+    options: SubscriptionOptions
+    callback: () => void
+    arguments: any
+    _reconnectIntervalId: string
+
+    subscribe(callback?: (error: Error, result: T) => void): Subscription<T>
+
+    unsubscribe(callback?: (error: Error, result: boolean) => void): Promise<undefined | boolean>
+
+    on(type: 'data', handler: (data: T) => void): Subscription<T>
+
+    on(type: 'changed', handler: (data: T) => void): Subscription<T>
+
+    on(type: 'connected', handler: (subscriptionId: string) => void): Subscription<T>
+
+    on(type: 'error', handler: (data: Error) => void): Subscription<T>
+}

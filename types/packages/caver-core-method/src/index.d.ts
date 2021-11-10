@@ -14,7 +14,7 @@
 */
 
 import { TransactionReceipt } from '../../caver-core/src'
-import RequestManager from '../../caver-core-requestmanager/src/index'
+import { RequestManager } from '../../caver-core-requestmanager/src'
 
 export interface MethodOptions {
     name: string
@@ -35,7 +35,7 @@ export interface MethodOptions {
     transformPayload?: () => void
 }
 
-export default class Method {
+export class Method {
     constructor(options: MethodOptions)
 
     name: string

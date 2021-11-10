@@ -16,14 +16,23 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import AccountKeyDecoder from './accountKey/accountKeyDecoder'
-import AccountKeyFail from './accountKey/accountKeyFail'
-import AccountKeyLegacy from './accountKey/accountKeyLegacy'
-import AccountKeyPublic from './accountKey/accountKeyPublic'
-import AccountKeyRoleBased from './accountKey/accountKeyRoleBased'
-import AccountKeyWeightedMultiSig from './accountKey/accountKeyWeightedMultiSig'
-import WeightedMultiSigOptions, { WeightedMultiSigOptionsObject } from './accountKey/weightedMultiSigOptions'
-import WeightedPublicKey from './accountKey/weightedPublicKey'
+import { AccountKeyDecoder } from './accountKey/accountKeyDecoder'
+import { AccountKeyFail } from './accountKey/accountKeyFail'
+import { AccountKeyLegacy } from './accountKey/accountKeyLegacy'
+import { AccountKeyPublic } from './accountKey/accountKeyPublic'
+import { AccountKeyRoleBased } from './accountKey/accountKeyRoleBased'
+import { AccountKeyWeightedMultiSig } from './accountKey/accountKeyWeightedMultiSig'
+import { WeightedMultiSigOptions, WeightedMultiSigOptionsObject } from './accountKey/weightedMultiSigOptions'
+import { WeightedPublicKey } from './accountKey/weightedPublicKey'
+
+export * from './accountKey/accountKeyDecoder'
+export * from './accountKey/accountKeyFail'
+export * from './accountKey/accountKeyLegacy'
+export * from './accountKey/accountKeyPublic'
+export * from './accountKey/accountKeyRoleBased'
+export * from './accountKey/accountKeyWeightedMultiSig'
+export * from './accountKey/weightedMultiSigOptions'
+export * from './accountKey/weightedPublicKey'
 
 export type AccountKey = AccountKeyLegacy | AccountKeyPublic | AccountKeyFail | AccountKeyWeightedMultiSig | AccountKeyRoleBased
 
@@ -31,7 +40,7 @@ export interface IAccountKey {
     getRLPEncoding(): string
 }
 
-export default class Account {
+export class Account {
     static weightedMultiSigOptions: typeof WeightedMultiSigOptions
     static accountKey: {
         decode: AccountKeyDecoder['decode']
