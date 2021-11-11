@@ -20,7 +20,7 @@ const { expect } = require('./extendedChai')
 
 const testRPCURL = require('./testrpc')
 
-const Caver = require('../index.js')
+const Caver = require('../index')
 const { kip7JsonInterface, kip17JsonInterface, kip37JsonInterface } = require('../packages/caver-kct/src/kctHelper')
 
 let caver

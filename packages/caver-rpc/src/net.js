@@ -48,6 +48,11 @@ const Net = function Net(...args) {
             call: 'net_networkID',
             params: 0,
         }),
+        new Method({
+            name: 'getNetworkID',
+            call: 'net_networkID',
+            params: 0,
+        }),
         /**
          * Returns `true` if the Klaytn Node is actively listening for network connections.
          *

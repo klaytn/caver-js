@@ -27,7 +27,7 @@ const expect = chai.expect
 
 const testRPCURL = require('../testrpc')
 
-const Caver = require('../../index.js')
+const Caver = require('../../index')
 const SingleKeyring = require('../../packages/caver-wallet/src/keyring/singleKeyring')
 const MultipleKeyring = require('../../packages/caver-wallet/src/keyring/multipleKeyring')
 const RoleBasedKeyring = require('../../packages/caver-wallet/src/keyring/roleBasedKeyring')
@@ -1639,6 +1639,22 @@ describe('keyring.toAccount', () => {
                 new caver.account.weightedMultiSigOptions(1, [1, 1]),
                 new caver.account.weightedMultiSigOptions(1, [1, 1]),
                 new caver.account.weightedMultiSigOptions(1, [1, 1, 1, 1]),
+            ]
+            validateAccount(account, { keyring: roleBased, expectedAccountKey: 'AccountKeyRoleBased', exepectedOptions })
+        })
+    })
+
+    context('CAVERJS-UNIT-KEYRING-170: keyring type: roleBased / options: array of the object', () => {
+        it('return account instance which has AccountKeyRoleBased with weightedMultiSigOptions instances', () => {
+            const account = roleBased.toAccount([
+                { threshold: 3, weights: [2, 2] },
+                { threshold: 4, weights: [2, 2] },
+                { threshold: 5, weights: [1, 2, 3, 3] },
+            ])
+            const exepectedOptions = [
+                new caver.account.weightedMultiSigOptions(3, [2, 2]),
+                new caver.account.weightedMultiSigOptions(4, [2, 2]),
+                new caver.account.weightedMultiSigOptions(5, [1, 2, 3, 3]),
             ]
             validateAccount(account, { keyring: roleBased, expectedAccountKey: 'AccountKeyRoleBased', exepectedOptions })
         })

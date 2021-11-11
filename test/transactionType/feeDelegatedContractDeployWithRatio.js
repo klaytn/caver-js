@@ -19,7 +19,7 @@
 const { expect, assert } = require('../extendedChai')
 
 const testRPCURL = require('../testrpc')
-const Caver = require('../../index.js')
+const Caver = require('../../index')
 
 let caver
 let senderPrvKey

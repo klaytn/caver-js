@@ -18,9 +18,12 @@
 
 const RLP = require('eth-lib/lib/rlp')
 const Bytes = require('eth-lib/lib/bytes')
+const _ = require('lodash')
 const WeightedPublicKey = require('./weightedPublicKey')
 const utils = require('../../../caver-utils')
 const { ACCOUNT_KEY_TAG, fillWeightedMultiSigOptionsForMultiSig } = require('./accountKeyHelper')
+
+const MAXIMUM_WEIGTHED_KEYS_LENGTH = 10
 
 /**
  * Representing an AccountKeyWeightedMultiSig.
@@ -115,6 +118,9 @@ class AccountKeyWeightedMultiSig {
     }
 
     set weightedPublicKeys(wps) {
+        if (!_.isArray(wps)) throw new Error(`Invalid weighted public keys type. Please use an array for weightedPublicKeys.`)
+        if (wps.length > MAXIMUM_WEIGTHED_KEYS_LENGTH)
+            throw new Error(`Invalid weighted public keys: The number of keys exceeds the limit (${MAXIMUM_WEIGTHED_KEYS_LENGTH}).`)
         for (const wp of wps) {
             if (!(wp instanceof WeightedPublicKey)) throw new Error(`Invalid type of weighted public keys.`)
         }

@@ -1,0 +1,12 @@
+{
+    "extends": "dtslint/dtslint.json",
+    "rules": {
+      "semicolon": false,
+      "no-redundant-jsdoc": false,
+      "unified-signatures": false,
+      "interface-name": false,
+      "ban-types": [false, [], ["Function"]],
+      "adjacent-overload-signatures": false,
+      "max-line-length": false
+    }
+}

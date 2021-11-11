@@ -22,7 +22,7 @@ const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 const { expect } = require('chai')
 const nock = require('nock')
-const Caver = require('../index.js')
+const Caver = require('../index')
 const testRPCURL = require('./testrpc')
 
 const authorizationValue = 'WLRyv95rHM3urcccdS7v42tFElH7G7zG9sTeshf5'

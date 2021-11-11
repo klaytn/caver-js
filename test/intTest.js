@@ -36,7 +36,7 @@ const fs = require('fs')
 
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
-const Caver = require('../index.js')
+const Caver = require('../index')
 const testEnv = require('./klaytn-integration-tests/env.json')
 const conf = require('./klaytn-integration-tests/conf.json')
 const { expect, assert } = require('./extendedChai')

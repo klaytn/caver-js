@@ -263,7 +263,8 @@ const inputAccountKeyFormatter = function(accountKey) {
         return { keyType: 5, key }
     }
 
-    if (accountKey.keyType === undefined || accountKey.key === undefined) {
+    const keyTypesWithoutKeyDefinition = [1, 3] // AccountKeyLegacy, AccountKeyFail
+    if (accountKey.keyType === undefined || (accountKey.key === undefined && !keyTypesWithoutKeyDefinition.includes(accountKey.keyType))) {
         throw new Error(`AccountKey obejct should define 'keyType' and 'key'`)
     }
 

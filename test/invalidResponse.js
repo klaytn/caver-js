@@ -40,7 +40,7 @@ describe('Invalid response test', () => {
             await caver.klay.getNodeInfo()
             assert(false)
         } catch (err) {
-            expect(err.message).to.equals('Invalid response: null')
+            expect(err.message).to.equals('Invalid JSON RPC response: ""')
         }
     })
 
@@ -50,7 +50,7 @@ describe('Invalid response test', () => {
             await caver.klay.getNodeInfo()
             assert(false)
         } catch (err) {
-            expect(err.message).to.equals('Invalid response: null')
+            expect(err.message).to.equals('Invalid JSON RPC response: ""')
         }
     })
 })

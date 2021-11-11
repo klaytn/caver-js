@@ -20,7 +20,7 @@ const sinon = require('sinon')
 const AccountLib = require('eth-lib/lib/account')
 const { expect } = require('../extendedChai')
 
-const Caver = require('../../index.js')
+const Caver = require('../../index')
 
 let caver
 beforeEach(() => {

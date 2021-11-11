@@ -1,4 +1,3 @@
-/* eslint-disable no-loop-func */
 /*
 	Copyright 2020 The caver-js Authors
 	This file is part of the caver-js library.
@@ -24,7 +23,7 @@ const testRPCURL = require('../testrpc')
 const { expect } = require('../extendedChai')
 const { TX_TYPE_STRING } = require('../../packages/caver-transaction/src/transactionHelper/transactionHelper')
 
-const Caver = require('../../index.js')
+const Caver = require('../../index')
 
 let caver
 let sender

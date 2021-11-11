@@ -17,7 +17,7 @@
 */
 
 const { expect } = require('chai')
-const Caver = require('../index.js')
+const Caver = require('../index')
 
 describe('get storage at', () => {
     it('should not throw an error with string type parameter', async () => {

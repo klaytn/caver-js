@@ -28,7 +28,7 @@ const expect = chai.expect
 
 const testRPCURL = require('../testrpc')
 
-const Caver = require('../../index.js')
+const Caver = require('../../index')
 const utils = require('../../packages/caver-utils')
 
 const AccountKeyLegacy = require('../../packages/caver-account/src/accountKey/accountKeyLegacy')

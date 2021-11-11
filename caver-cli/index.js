@@ -23,7 +23,7 @@ const chalk = require('chalk')
 const figlet = require('figlet')
 const inquirer = require('inquirer')
 
-const formatters = ['null', ...Object.keys(require('../index.js').formatters)]
+const formatters = ['null', ...Object.keys(require('../index').formatters)]
 let rpcList = require('../rpc.json')
 
 let rpcListName = rpcList.map(({ name }) => name)

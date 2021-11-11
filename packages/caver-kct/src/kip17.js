@@ -461,7 +461,7 @@ class KIP17 extends Contract {
      * @param {string} from The address of the owner or approved of the given token.
      * @param {string} to The address of the account to receive the token.
      * @param {BigNumber|string|number} tokenId The id of token you want to transfer.
-     * @param {Buffer|string|number} data The optional data to send along with the call.
+     * @param {Buffer|string|number} [data] The optional data to send along with the call.
      * @param {Contract.SendOptions} [sendParam] An object holding parameters that are required for sending a transaction.
      * @return {Promise<object>} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
      *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
@@ -673,4 +673,16 @@ class KIP17 extends Contract {
  * @type {string}
  */
 KIP17.byteCode = kip17ByteCode
+
+/**
+ * The abi of the KIP-17 token contract.
+ *
+ * @example
+ * caver.kct.kip17.abi
+ *
+ * @static
+ * @type {Array.<object>}
+ */
+KIP17.abi = kip17JsonInterface
+
 module.exports = KIP17

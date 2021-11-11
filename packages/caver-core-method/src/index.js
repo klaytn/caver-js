@@ -124,8 +124,10 @@ function attachToObject(obj) {
     if (optionalName) {
         obj[callName] = obj[callName] || {}
         obj[callName][optionalName] = func
+        obj[callName][optionalName].getMethod = () => this
     } else {
         obj[callName] = func
+        obj[callName].getMethod = () => this
     }
 }
 
@@ -188,7 +190,11 @@ function formatInput(args) {
     // If inputFormatter is defined, map original args by calling formatter.
     return this.inputFormatter.map((formatter, index) => {
         // bind this for defaultBlock, and defaultAccount
-        return (formatter && formatter.call(_this, args[index])) || args[index]
+        let formattedInput = args[index]
+        if (formatter) {
+            formattedInput = formatter.call(_this, args[index])
+        }
+        return formattedInput
     })
 }
 

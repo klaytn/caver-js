@@ -19,7 +19,7 @@
 const testRPCURL = require('../testrpc')
 const { expect } = require('../extendedChai')
 
-const Caver = require('../../index.js')
+const Caver = require('../../index')
 
 let caver
 beforeEach(() => {

@@ -644,4 +644,16 @@ class KIP7 extends Contract {
  * @type {string}
  */
 KIP7.byteCode = kip7ByteCode
+
+/**
+ * The abi of the KIP-7 token contract.
+ *
+ * @example
+ * caver.kct.kip7.abi
+ *
+ * @static
+ * @type {Array.<object>}
+ */
+KIP7.abi = kip7JsonInterface
+
 module.exports = KIP7

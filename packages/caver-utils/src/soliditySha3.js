@@ -26,7 +26,7 @@
 
 const _ = require('lodash')
 const BN = require('bn.js')
-const utils = require('./utils.js')
+const utils = require('./utils')
 
 const _elementaryName = function(name) {
     if (name.startsWith('int[')) {
