@@ -43,6 +43,8 @@ If you are already using a different version of the node(for example, node v15),
 
 ## Installation
 
+### Node
+
 To try it out, install caver-js with npm like following command:
 
 ```
@@ -56,6 +58,24 @@ To install a specific version of caver-js, try the following command:
 ```
 $ npm install caver-js@X.X.X
 ```
+
+### In the Browser
+
+Build using the caver-js repository:
+
+```
+$ npm run build
+```
+
+Then include `dist/caver.min.js` in your html file. This will expose Caver on the window object.
+
+Or via CDN:
+
+```
+<script src="https://cdnjs.cloudflare.com/ajax/libs/caver-js/x.x.x/caver.min.js"></script>
+```
+
+The caver-js provided by cdnjs can be found at [this link](https://cdnjs.com/libraries/caver-js).
 
 ## Getting Started
 
