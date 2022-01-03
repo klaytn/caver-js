@@ -641,11 +641,10 @@ describe('caver.utils.hexToNumberString', () => {
     })
 
     context('CAVERJS-UNIT-ETC-121: input: numberString', () => {
-        const tests = [{ value: '1234', expected: (1234).toString() }]
-        it('should return numberString', () => {
-            for (const test of tests) {
-                expect(caver.utils.hexToNumberString(test.value)).to.be.equal(test.expected)
-            }
+        it('should throw an error', () => {
+            const invalid = '1234'
+            const errorMessage = `Given value "${invalid}" is not a valid hex string.`
+            expect(() => caver.utils.hexToNumberString(invalid)).to.throw(errorMessage)
         })
     })
 
@@ -665,7 +664,7 @@ describe('caver.utils.hexToNumberString', () => {
     context('CAVERJS-UNIT-ETC-123: input: invalid hexString', () => {
         it('should throw an error', () => {
             const invalid = 'zzzz'
-            const errorMessage = `Error: [number-to-bn] while converting number "${invalid}" to BN.js instance, error: invalid number value. Value must be an integer, hex string, BN or BigNumber instance. Note, decimals are not supported. Given value: "${invalid}"`
+            const errorMessage = `Given value "${invalid}" is not a valid hex string.`
             expect(() => caver.utils.hexToNumberString(invalid)).to.throw(errorMessage)
         })
     })
@@ -676,7 +675,6 @@ describe('caver.utils.hexToNumber', () => {
     context('CAVERJS-UNIT-ETC-124: input: valid value', () => {
         const tests = [
             { value: 1234, expected: 1234 },
-            { value: '1234', expected: 1234 },
             { value: 0x1234, expected: 4660 },
             { value: 0xea, expected: 234 },
             { value: '0xea', expected: 234 },
@@ -690,9 +688,13 @@ describe('caver.utils.hexToNumber', () => {
 
     context('CAVERJS-UNIT-ETC-125: input: invalid value', () => {
         it('should throw an error', () => {
-            const invalid = 'zzzz'
-            const errorMessage = `Error: [number-to-bn] while converting number "${invalid}" to BN.js instance, error: invalid number value. Value must be an integer, hex string, BN or BigNumber instance. Note, decimals are not supported. Given value: "${invalid}"`
-            expect(() => caver.utils.hexToNumber(invalid)).to.throw(errorMessage)
+            let invalid = '1234'
+            let errorMessage = `Given value "${invalid}" is not a valid hex string.`
+            expect(() => caver.utils.hexToBytes(invalid)).to.throw(errorMessage)
+
+            invalid = 'zzzz'
+            errorMessage = `Given value "${invalid}" is not a valid hex string.`
+            expect(() => caver.utils.hexToBytes(invalid)).to.throw(errorMessage)
         })
     })
 })

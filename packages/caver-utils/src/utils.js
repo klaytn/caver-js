@@ -338,6 +338,11 @@ const hexToUtf8 = function(hex) {
  */
 const hexToNumber = function(value) {
     if (!value) return value
+
+    if (typeof value === 'string' && !isHexStrict(value)) {
+        throw new Error(`Given value "${value}" is not a valid hex string.`)
+    }
+
     return toBN(value).toNumber()
 }
 
@@ -355,6 +360,10 @@ const hexToNumber = function(value) {
  */
 const hexToNumberString = function(value) {
     if (!value) return value
+
+    if (_.isString(value) && !isHexStrict(value)) {
+        throw new Error(`Given value "${value}" is not a valid hex string.`)
+    }
 
     return toBN(value).toString(10)
 }
