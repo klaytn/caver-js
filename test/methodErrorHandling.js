@@ -43,7 +43,7 @@ describe('Error handling in Method package', () => {
             type: 'SMART_CONTRACT_DEPLOY',
             from: sender.address,
             data: deployedData,
-            gas: 140000,
+            gas: 130000,
             value: 0,
         }
         const expectedError = `contract creation code storage out of gas`
