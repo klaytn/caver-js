@@ -17,12 +17,16 @@
 */
 
 // Instruction
-// $ git clone git@github.com:klaytn/klaytn-integration-tests.git test/klaytn-integration-tests
+// $ git submodule init && git submodule update
 // $ cp test/klaytn-integration-tests/env.template.json test/klaytn-integration-tests/env.json
+//
 // $ mocha test/intTest.js
+// or you can use script in the package.json like below
+// $ npm run intTest
 //
 // To execute a specific test,
 // $ mocha --grep INT-LEGACY/012 test/intTest.js
+// In `caver-js/package.json`, the test scripts are defined. (ex: `npm run intTxTest`, ...)
 const _ = require('lodash')
 const RLP = require('eth-lib/lib/rlp')
 const Bytes = require('eth-lib/lib/bytes')
