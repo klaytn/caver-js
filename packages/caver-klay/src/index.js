@@ -93,8 +93,6 @@ const Klay = function Klay(...args) {
             methods.forEach(function(method) {
                 method.defaultAccount = defaultAccount
             })
-
-            return val
         },
         enumerable: true,
     })
@@ -115,8 +113,6 @@ const Klay = function Klay(...args) {
             methods.forEach(function(method) {
                 method.defaultBlock = defaultBlock
             })
-
-            return val
         },
         enumerable: true,
     })

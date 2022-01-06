@@ -235,7 +235,7 @@ describe('caver.klay.accounts.signTransaction', () => {
 
     context('CAVERJS-UNIT-WALLET-026 : input: tx, privateKey, without nonce', () => {
         it('should return signature and rawTransaction', async () => {
-            const tx = Object.assign({}, txObj)
+            const tx = { ...txObj }
             delete tx.nonce
 
             const result = await caver.klay.accounts.signTransaction(tx, account.privateKey)
@@ -249,7 +249,7 @@ describe('caver.klay.accounts.signTransaction', () => {
 
     context('CAVERJS-UNIT-WALLET-027 : input: tx, privateKey, without gasPrice', () => {
         it('should return signature and rawTransaction', async () => {
-            const tx = Object.assign({}, txObj)
+            const tx = { ...txObj }
             delete tx.gasPrice
 
             const result = await caver.klay.accounts.signTransaction(tx, account.privateKey)
@@ -263,7 +263,7 @@ describe('caver.klay.accounts.signTransaction', () => {
 
     context('CAVERJS-UNIT-WALLET-028 : input: tx, privateKey, without chainId', () => {
         it('should return signature and rawTransaction', async () => {
-            const tx = Object.assign({}, txObj)
+            const tx = { ...txObj }
             delete tx.chainId
 
             const result = await caver.klay.accounts.signTransaction(tx, account.privateKey)
@@ -277,7 +277,7 @@ describe('caver.klay.accounts.signTransaction', () => {
 
     context('CAVERJS-UNIT-WALLET-024 : input: tx:invalid address, privateKey', () => {
         it('should throw an error', async () => {
-            const invalid = Object.assign({}, txObj)
+            const invalid = { ...txObj }
             delete invalid.to
             delete invalid.data
 
@@ -289,7 +289,7 @@ describe('caver.klay.accounts.signTransaction', () => {
 
     context('CAVERJS-UNIT-WALLET-024 : input: tx:invalid value, privateKey', async () => {
         it('should throw an error', async () => {
-            const invalid = Object.assign({}, txObj)
+            const invalid = { ...txObj }
             invalid.value = '0xzzzz'
 
             const errorMessage = `Given input "${invalid.value}" is not a number.`
@@ -1111,7 +1111,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
     context('CAVERJS-UNIT-WALLET-280: input: tx object(without nonce) and feePayer', () => {
         it('should return signature and rawTransaction', async () => {
-            const tx = Object.assign({}, txObj)
+            const tx = { ...txObj }
             delete tx.nonce
 
             const result = await caver.klay.accounts.feePayerSignTransaction(tx, feePayer.address)
@@ -1128,7 +1128,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
     context('CAVERJS-UNIT-WALLET-281: input: tx object(without nonce), feePayer and privateKey', () => {
         it('should return signature and rawTransaction', async () => {
-            const tx = Object.assign({}, txObj)
+            const tx = { ...txObj }
             delete tx.nonce
 
             const result = await caver.klay.accounts.feePayerSignTransaction(tx, feePayer.address, feePayer.feePayerKey[0])
@@ -1145,7 +1145,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
     context('CAVERJS-UNIT-WALLET-282: input: tx object(without gasPrice) and feePayer', () => {
         it('should return signature and rawTransaction', async () => {
-            const tx = Object.assign({}, txObj)
+            const tx = { ...txObj }
             delete tx.gasPrice
 
             const result = await caver.klay.accounts.feePayerSignTransaction(tx, feePayer.address)
@@ -1162,7 +1162,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
     context('CAVERJS-UNIT-WALLET-283: input: tx object(without gasPrice), feePayer and privateKey', () => {
         it('should return signature and rawTransaction', async () => {
-            const tx = Object.assign({}, txObj)
+            const tx = { ...txObj }
             delete tx.gasPrice
 
             const result = await caver.klay.accounts.feePayerSignTransaction(tx, feePayer.address, feePayer.feePayerKey[0])
@@ -1179,7 +1179,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
     context('CAVERJS-UNIT-WALLET-284: input: tx object(without chainId) and feePayer', () => {
         it('should return signature and rawTransaction', async () => {
-            const tx = Object.assign({}, txObj)
+            const tx = { ...txObj }
             delete tx.chainId
 
             const result = await caver.klay.accounts.feePayerSignTransaction(tx, feePayer.address)
@@ -1196,7 +1196,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
     context('CAVERJS-UNIT-WALLET-285: input: tx object(without chainId), feePayer and privateKey', () => {
         it('should return signature and rawTransaction', async () => {
-            const tx = Object.assign({}, txObj)
+            const tx = { ...txObj }
             delete tx.chainId
 
             const result = await caver.klay.accounts.feePayerSignTransaction(tx, feePayer.address, feePayer.feePayerKey[0])
@@ -1231,7 +1231,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
     context('CAVERJS-UNIT-WALLET-288: input: tx object(without from) and feePayer', () => {
         it('should throw error when invalid transaction', async () => {
-            const invalid = Object.assign({}, txObj)
+            const invalid = { ...txObj }
             delete invalid.from
 
             const errorMessage = '"from" is missing'
@@ -1241,7 +1241,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
     context('CAVERJS-UNIT-WALLET-289: input: tx object(without from), feePayer and privateKey', () => {
         it('should throw error when invalid transaction', async () => {
-            const invalid = Object.assign({}, txObj)
+            const invalid = { ...txObj }
             delete invalid.from
 
             const errorMessage = '"from" is missing'
@@ -1577,7 +1577,7 @@ describe('caver.klay.accounts.feePayerSignTransaction', () => {
 
     context('CAVERJS-UNIT-WALLET-417: input: tx object(different chainId), feePayer', () => {
         it('should return different signature result when chainId is different', async () => {
-            const tx = Object.assign({}, txObj)
+            const tx = { ...txObj }
 
             tx.chainId = 10000
             const result1 = await caver.klay.accounts.feePayerSignTransaction(tx, feePayer.address, feePayer.feePayerKey[0])
@@ -1674,7 +1674,7 @@ describe('caver.klay.accounts.getRawTransactionWithSignatures', () => {
 
     context('CAVERJS-UNIT-WALLET-309: input: fee delegated value transfer tx object with feePayerSignatures', () => {
         it('should return valid rawTransaction', async () => {
-            const tx = Object.assign({}, feeDelegatedTx)
+            const tx = { ...feeDelegatedTx }
 
             const feePayerSignResult = await caver.klay.accounts.feePayerSignTransaction(feeDelegatedTx, feePayer.address)
 
@@ -1695,7 +1695,7 @@ describe('caver.klay.accounts.getRawTransactionWithSignatures', () => {
 
     context('CAVERJS-UNIT-WALLET-310: input: fee delegated value transfer tx object with signatures and feePayerSignatures', () => {
         it('should return valid rawTransaction', async () => {
-            const tx = Object.assign({}, feeDelegatedTx)
+            const tx = { ...feeDelegatedTx }
 
             const signResult = await caver.klay.accounts.signTransaction(feeDelegatedTx)
 
@@ -1825,7 +1825,7 @@ describe('caver.klay.accounts.getRawTransactionWithSignatures', () => {
 
     context('CAVERJS-UNIT-WALLET-315: input: fee delegated value transfer tx object without feePayerSignatures only(no feePayer)', () => {
         it('should throw error when tx defines feePayerSignatures only without feePayer', async () => {
-            const tx = Object.assign({}, feeDelegatedTx)
+            const tx = { ...feeDelegatedTx }
             const feePayerSignResult = await caver.klay.accounts.feePayerSignTransaction(feeDelegatedTx, feePayer.address)
             tx.feePayerSignatures = feePayerSignResult.feePayerSignatures
 
@@ -2931,11 +2931,7 @@ describe('caver.klay.accounts.encrypt', () => {
                 uuid: Buffer.from('e7c4605ad8200e0d93cd67f9d82fb997', 'hex'),
             }
 
-            const result = caver.klay.accounts.encrypt(
-                testAccount.keys,
-                password,
-                Object.assign({ address: testAccount.address }, encryptOption)
-            )
+            const result = caver.klay.accounts.encrypt(testAccount.keys, password, { address: testAccount.address, ...encryptOption })
 
             isKeystore(result, testAccount)
 
@@ -5323,7 +5319,7 @@ describe('caver.klay.accounts.signTransactionWithHash', () => {
             expect(sig[0].R).not.to.be.undefined
             expect(sig[0].S).not.to.be.undefined
 
-            const tx = Object.assign({}, legacyTx)
+            const tx = { ...legacyTx }
             delete tx.chainId
             let sigFromSignTransaction = await caver.klay.accounts.signTransaction(tx, account.keys)
             sigFromSignTransaction = caver.utils.transformSignaturesToObject(sigFromSignTransaction.signatures)
@@ -5349,7 +5345,7 @@ describe('caver.klay.accounts.signTransactionWithHash', () => {
             expect(sig[1].R).not.to.be.undefined
             expect(sig[1].S).not.to.be.undefined
 
-            const tx = Object.assign({}, vtTx)
+            const tx = { ...vtTx }
             delete tx.chainId
             let sigFromSignTransaction = await caver.klay.accounts.signTransaction(tx, privateKeys)
             sigFromSignTransaction = caver.utils.transformSignaturesToObject(sigFromSignTransaction.signatures)

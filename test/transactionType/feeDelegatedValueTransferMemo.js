@@ -65,7 +65,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
     })
 
     it('If transaction object has all essential value, sendTransaction should not return error', async () => {
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
 
         let result
         await caver.klay.accounts
@@ -86,7 +86,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
 
     // Error from missing
     it('CAVERJS-UNIT-TX-079 : If transaction object missing from, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
         delete tx.from
 
         let result
@@ -99,7 +99,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-079 : If transaction object missing from, sendTransaction should throw error', () => {
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
         delete tx.from
 
         // Throw error from formatter validation
@@ -108,7 +108,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
 
     // Error to missing
     it('CAVERJS-UNIT-TX-080 : If transaction object missing to, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
         delete tx.to
 
         let result
@@ -121,7 +121,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-080 : If transaction object missing to, sendTransaction should throw error', () => {
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
         delete tx.to
 
         // Throw error from formatter validation
@@ -130,7 +130,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
 
     // Error value missing
     it('CAVERJS-UNIT-TX-081 : If transaction object missing value, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
         delete tx.value
 
         let result
@@ -143,7 +143,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-081 : If transaction object missing value, sendTransaction should throw error', () => {
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
         delete tx.value
 
         // Throw error from formatter validation
@@ -152,7 +152,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
 
     // Error gas and gasLimit missing
     it('CAVERJS-UNIT-TX-082 : If transaction object missing gas and gasLimit, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
         delete tx.gas
 
         let result
@@ -165,7 +165,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-082 : If transaction object missing gas and gasLimit, sendTransaction should throw error', () => {
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
         delete tx.gas
 
         // Throw error from formatter validation
@@ -174,7 +174,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
 
     // Error data missing
     it('CAVERJS-UNIT-TX-083 : If transaction object missing data, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
         delete tx.data
 
         let result
@@ -187,7 +187,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-083 : If transaction object missing data, sendTransaction should throw error', () => {
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
         delete tx.data
 
         // Throw error from formatter validation
@@ -196,7 +196,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
 
     // Error feePayer missing (A check on the feePayer is performed when the feePayer attempts to sign the rawTransaction after sender signed.)
     it('CAVERJS-UNIT-TX-084 : If transaction object missing feePayer, signTransaction should throw error', () => {
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
 
         caver.klay.accounts.signTransaction(tx, senderPrvKey).then(ret => {
             expect(() => caver.klay.sendTransaction({ senderRawTransaction: ret.rawTransaction })).to.throws()
@@ -205,7 +205,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
 
     // Error senderRawTransaction missing (A check on the senderRawTransaction is performed when the feePayer attempts to sign the rawTransaction after sender signed.)
     it('CAVERJS-UNIT-TX-085 : If transaction object missing senderRawTransaction, signTransaction should throw error', () => {
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
 
         caver.klay.accounts.signTransaction(tx, senderPrvKey).then(() => {
             expect(() => caver.klay.sendTransaction({ feePayer: payerAddress })).to.throws()
@@ -214,7 +214,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
 
     // Error unnecessary feeRatio
     it('CAVERJS-UNIT-TX-086 : If transaction object has unnecessary feeRatio field, signTransaction should throw error', async () => {
-        const tx = Object.assign({ feeRatio: 20 }, feeDelegatedValueTransferMemoObject)
+        const tx = { feeRatio: 20, ...feeDelegatedValueTransferMemoObject }
 
         let result
         await caver.klay.accounts
@@ -226,7 +226,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-086 : If transaction object has unnecessary feeRatio field, sendTransaction should throw error', () => {
-        const tx = Object.assign({ feeRatio: 20 }, feeDelegatedValueTransferMemoObject)
+        const tx = { feeRatio: 20, ...feeDelegatedValueTransferMemoObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -234,13 +234,11 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
 
     // Error unnecessary publicKey
     it('CAVERJS-UNIT-TX-087 : If transaction object has unnecessary publicKey field, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            {
-                publicKey:
-                    '0x006dc19d50bbc8a8e4b0f26c0dd3e78978f5f691a6161c41e3b0e4d1aa2d60fad62f37912b59f484b2e05bd3c9c3b4d93b0ca570d6d4421eee544e7da99e9de4',
-            },
-            feeDelegatedValueTransferMemoObject
-        )
+        const tx = {
+            publicKey:
+                '0x006dc19d50bbc8a8e4b0f26c0dd3e78978f5f691a6161c41e3b0e4d1aa2d60fad62f37912b59f484b2e05bd3c9c3b4d93b0ca570d6d4421eee544e7da99e9de4',
+            ...feeDelegatedValueTransferMemoObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -252,13 +250,11 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-087 : If transaction object has unnecessary publicKey field, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            {
-                publicKey:
-                    '0x006dc19d50bbc8a8e4b0f26c0dd3e78978f5f691a6161c41e3b0e4d1aa2d60fad62f37912b59f484b2e05bd3c9c3b4d93b0ca570d6d4421eee544e7da99e9de4',
-            },
-            feeDelegatedValueTransferMemoObject
-        )
+        const tx = {
+            publicKey:
+                '0x006dc19d50bbc8a8e4b0f26c0dd3e78978f5f691a6161c41e3b0e4d1aa2d60fad62f37912b59f484b2e05bd3c9c3b4d93b0ca570d6d4421eee544e7da99e9de4',
+            ...feeDelegatedValueTransferMemoObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -291,7 +287,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
                 },
             ],
         }
-        const tx = Object.assign({ multisig }, feeDelegatedValueTransferMemoObject)
+        const tx = { multisig, ...feeDelegatedValueTransferMemoObject }
 
         let result
         await caver.klay.accounts
@@ -328,7 +324,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
                 },
             ],
         }
-        const tx = Object.assign({ multisig }, feeDelegatedValueTransferMemoObject)
+        const tx = { multisig, ...feeDelegatedValueTransferMemoObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -340,7 +336,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleTransactionKey }, feeDelegatedValueTransferMemoObject)
+        const tx = { roleTransactionKey, ...feeDelegatedValueTransferMemoObject }
 
         let result
         await caver.klay.accounts
@@ -356,7 +352,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleTransactionKey }, feeDelegatedValueTransferMemoObject)
+        const tx = { roleTransactionKey, ...feeDelegatedValueTransferMemoObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -368,7 +364,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleAccountUpdateKey }, feeDelegatedValueTransferMemoObject)
+        const tx = { roleAccountUpdateKey, ...feeDelegatedValueTransferMemoObject }
 
         let result
         await caver.klay.accounts
@@ -384,7 +380,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleAccountUpdateKey }, feeDelegatedValueTransferMemoObject)
+        const tx = { roleAccountUpdateKey, ...feeDelegatedValueTransferMemoObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -396,7 +392,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleFeePayerKey }, feeDelegatedValueTransferMemoObject)
+        const tx = { roleFeePayerKey, ...feeDelegatedValueTransferMemoObject }
 
         let result
         await caver.klay.accounts
@@ -412,7 +408,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleFeePayerKey }, feeDelegatedValueTransferMemoObject)
+        const tx = { roleFeePayerKey, ...feeDelegatedValueTransferMemoObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -420,7 +416,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
 
     // Error unnecessary failKey
     it('CAVERJS-UNIT-TX-092 : If transaction object has unnecessary failKey field, signTransaction should throw error', async () => {
-        const tx = Object.assign({ failKey: true }, feeDelegatedValueTransferMemoObject)
+        const tx = { failKey: true, ...feeDelegatedValueTransferMemoObject }
 
         let result
         await caver.klay.accounts
@@ -432,7 +428,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-092 : If transaction object has unnecessary failKey field, sendTransaction should throw error', () => {
-        const tx = Object.assign({ failKey: true }, feeDelegatedValueTransferMemoObject)
+        const tx = { failKey: true, ...feeDelegatedValueTransferMemoObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -440,7 +436,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
 
     // Error unnecessary codeFormat
     it('CAVERJS-UNIT-TX-093 : If transaction object has unnecessary codeFormat field, signTransaction should throw error', async () => {
-        const tx = Object.assign({ codeFormat: 'EVM' }, feeDelegatedValueTransferMemoObject)
+        const tx = { codeFormat: 'EVM', ...feeDelegatedValueTransferMemoObject }
 
         let result
         await caver.klay.accounts
@@ -452,7 +448,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-093 : If transaction object has unnecessary codeFormat field, sendTransaction should throw error', () => {
-        const tx = Object.assign({ codeFormat: 'EVM' }, feeDelegatedValueTransferMemoObject)
+        const tx = { codeFormat: 'EVM', ...feeDelegatedValueTransferMemoObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -460,7 +456,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
 
     // UnnecessaryLegacyKey
     it('CAVERJS-UNIT-TX-563 : If transaction object has unnecessary legacyKey field, signTransaction should throw error', async () => {
-        const tx = Object.assign({ legacyKey: true }, feeDelegatedValueTransferMemoObject)
+        const tx = { legacyKey: true, ...feeDelegatedValueTransferMemoObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -469,7 +465,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-563 : If transaction object has unnecessary legacyKey field, sendTransaction should throw error', () => {
-        const tx = Object.assign({ legacyKey: true }, feeDelegatedValueTransferMemoObject)
+        const tx = { legacyKey: true, ...feeDelegatedValueTransferMemoObject }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws(
             '"legacyKey" cannot be used with FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction'
@@ -478,7 +474,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
 
     // Invalid from address
     it('CAVERJS-UNIT-TX-651: If transaction object has invalid from, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
         tx.from = 'invalidAddress'
 
         const expectedError = `Invalid address of from: ${tx.from}`
@@ -487,7 +483,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-651: If transaction object has invalid from, sendTransaction should throw error', () => {
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
         tx.from = 'invalidAddress'
 
         const expectedError = `Provided address "${tx.from}" is invalid, the capitalization checksum test failed`
@@ -505,7 +501,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
                 '0x46647d1ce8755cd664f5fb4eba3082dd1a13817488029f3869662986b7b1a5ae',
             ],
         ]
-        const tx = Object.assign({ feePayerSignatures }, feeDelegatedValueTransferMemoObject)
+        const tx = { feePayerSignatures, ...feeDelegatedValueTransferMemoObject }
 
         const expectedError = '"feePayer" is missing: feePayer must be defined with feePayerSignatures.'
 
@@ -520,7 +516,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
                 '0x46647d1ce8755cd664f5fb4eba3082dd1a13817488029f3869662986b7b1a5ae',
             ],
         ]
-        const tx = Object.assign({ feePayerSignatures }, feeDelegatedValueTransferMemoObject)
+        const tx = { feePayerSignatures, ...feeDelegatedValueTransferMemoObject }
 
         const expectedError = '"feePayer" is missing: feePayer must be defined with feePayerSignatures.'
 
@@ -538,7 +534,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
             ],
         ]
         const invalidFeePayer = 'feePayer'
-        const tx = Object.assign({ feePayer: invalidFeePayer, feePayerSignatures }, feeDelegatedValueTransferMemoObject)
+        const tx = { feePayer: invalidFeePayer, feePayerSignatures, ...feeDelegatedValueTransferMemoObject }
 
         const expectedError = `Invalid address of fee payer: ${invalidFeePayer}`
 
@@ -554,7 +550,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
             ],
         ]
         const invalidFeePayer = 'feePayer'
-        const tx = Object.assign({ feePayer: invalidFeePayer, feePayerSignatures }, feeDelegatedValueTransferMemoObject)
+        const tx = { feePayer: invalidFeePayer, feePayerSignatures, ...feeDelegatedValueTransferMemoObject }
 
         const expectedError = `Invalid address of fee payer: ${invalidFeePayer}`
 
@@ -564,7 +560,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
     // InvalidTo
     it('CAVERJS-UNIT-TX-654: If transaction object has invalid to address, signTransaction should throw error', async () => {
         const invalidTo = 'invalid'
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
         tx.to = invalidTo
 
         const expectedError = `Invalid address of to: ${tx.to}`
@@ -574,7 +570,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
 
     it('CAVERJS-UNIT-TX-654: If transaction object has unnecessary feePayerSignatures, sendTransaction should throw error', () => {
         const invalidTo = 'invalid'
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
         tx.to = invalidTo
 
         const expectedError = `Provided address "${tx.to}" is invalid, the capitalization checksum test failed.`
@@ -585,7 +581,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
 
     // Error when feePayer is not defined with fee payer transaction format
     it('CAVERJS-UNIT-TX-655: If transaction object missing feePayer, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
         const { rawTransaction } = await caver.klay.accounts.signTransaction(tx, testAccount.privateKey)
 
         const feePayerTx = {
@@ -599,7 +595,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-655: If transaction object missing feePayer, sendTransaction should throw error', async () => {
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
         const { rawTransaction } = await caver.klay.accounts.signTransaction(tx, testAccount.privateKey)
 
         const feePayerTx = {
@@ -615,7 +611,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
 
     // Error when feePayer is invalid with fee payer transaction format
     it('CAVERJS-UNIT-TX-656: If transaction object has invalid feePayer, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
         const { rawTransaction } = await caver.klay.accounts.signTransaction(tx, testAccount.privateKey)
 
         const feePayerTx = {
@@ -629,7 +625,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-656: If transaction object has invalid feePayer, sendTransaction should throw error', async () => {
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
         const { rawTransaction } = await caver.klay.accounts.signTransaction(tx, testAccount.privateKey)
 
         const feePayerTx = {
@@ -646,7 +642,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO transaction', () => {
     it('CAVERJS-UNIT-TX-724: sendTransaction should throw error when try to use an account in Node with not LEGACY transaction', async () => {
         const acctInNode = caver.klay.accounts.create()
 
-        const tx = Object.assign({}, feeDelegatedValueTransferMemoObject)
+        const tx = { ...feeDelegatedValueTransferMemoObject }
         tx.from = acctInNode.address
 
         const expectedError = `No private key found in the caver-js wallet. Trying to use the Klaytn node's wallet, but it only supports legacy transactions. Please add private key of ${acctInNode.address.toLowerCase()} to the caver-js wallet.`

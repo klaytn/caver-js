@@ -5,7 +5,11 @@ module.exports = {
         node: true,
         mocha: true,
     },
-    parser: 'babel-eslint',
+    parser: '@babel/eslint-parser',
+    parserOptions: {
+        ecmaVersion: 8,
+        requireConfigFile: false,
+    },
     plugins: ['prettier'],
     rules: {
         'prettier/prettier': ['error'],
@@ -42,6 +46,7 @@ module.exports = {
         'import/no-dynamic-require': 0,
         'import/no-extraneous-dependencies': 0,
         'no-loop-func': 0,
+        'react/destructuring-assignment': 0,
         'no-proto': 1,
         'prefer-const': 1,
         'no-multi-assign': 1,

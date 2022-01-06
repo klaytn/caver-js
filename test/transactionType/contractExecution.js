@@ -67,7 +67,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
 
     // MissingFrom
     it('CAVERJS-UNIT-TX-467 : If transaction object missing from, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, executionObject)
+        const tx = { ...executionObject }
         delete tx.from
 
         await caver.klay.accounts
@@ -77,7 +77,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-467 : If transaction object missing from, sendTransaction should throw error', () => {
-        const tx = Object.assign({}, executionObject)
+        const tx = { ...executionObject }
         delete tx.from
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('The send transactions "from" field must be defined!')
@@ -85,7 +85,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
 
     // MissingTo
     it('CAVERJS-UNIT-TX-468 : If transaction object missing to, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, executionObject)
+        const tx = { ...executionObject }
         delete tx.to
 
         await caver.klay.accounts
@@ -95,7 +95,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-468 : If transaction object missing to, sendTransaction should throw error', () => {
-        const tx = Object.assign({}, executionObject)
+        const tx = { ...executionObject }
         delete tx.to
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"to" is missing')
@@ -103,7 +103,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
 
     // Missing gas and gasLimit
     it('CAVERJS-UNIT-TX-469 : If transaction object missing gas and gasLimit, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, executionObject)
+        const tx = { ...executionObject }
         delete tx.gas
 
         await caver.klay.accounts
@@ -113,7 +113,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-469 : If transaction object missing gas and gasLimit, sendTransaction should throw error', () => {
-        const tx = Object.assign({}, executionObject)
+        const tx = { ...executionObject }
         delete tx.gas
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"gas" is missing')
@@ -121,7 +121,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
 
     // MissingData
     it('CAVERJS-UNIT-TX-470 : If transaction object missing data, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, executionObject)
+        const tx = { ...executionObject }
         delete tx.data
 
         await caver.klay.accounts
@@ -131,7 +131,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-470 : If transaction object missing data, sendTransaction should throw error', () => {
-        const tx = Object.assign({}, executionObject)
+        const tx = { ...executionObject }
         delete tx.data
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"data" is missing')
@@ -139,7 +139,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
 
     // UnnecessaryFeePayer
     it('CAVERJS-UNIT-TX-471 : If transaction object has unnecessary feePayer field, signTransaction should throw error', async () => {
-        const tx = Object.assign({ feePayer: testAccount.address }, executionObject)
+        const tx = { feePayer: testAccount.address, ...executionObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -148,7 +148,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-471 : If transaction object has unnecessary feePayer field, sendTransaction should throw error', () => {
-        const tx = Object.assign({ feePayer: testAccount.address }, executionObject)
+        const tx = { feePayer: testAccount.address, ...executionObject }
 
         // This error return from formatter. Because in formatter discriminate fee delegation through feePayer and senderRawTransaction
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"feePayer" cannot be used with SMART_CONTRACT_EXECUTION transaction')
@@ -156,7 +156,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
 
     // UnnecessaryFeeRatio
     it('CAVERJS-UNIT-TX-472 : If transaction object has unnecessary feeRatio field, signTransaction should throw error', async () => {
-        const tx = Object.assign({ feeRatio: 10 }, executionObject)
+        const tx = { feeRatio: 10, ...executionObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -165,20 +165,18 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-472 : If transaction object has unnecessary feeRatio field, sendTransaction should throw error', () => {
-        const tx = Object.assign({ feeRatio: 10 }, executionObject)
+        const tx = { feeRatio: 10, ...executionObject }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"feeRatio" cannot be used with SMART_CONTRACT_EXECUTION transaction')
     }).timeout(200000)
 
     // UnnecessaryPublicKey
     it('CAVERJS-UNIT-TX-473 : If transaction object has unnecessary publicKey field, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            {
-                publicKey:
-                    '0x006dc19d50bbc8a8e4b0f26c0dd3e78978f5f691a6161c41e3b0e4d1aa2d60fad62f37912b59f484b2e05bd3c9c3b4d93b0ca570d6d4421eee544e7da99e9de4',
-            },
-            executionObject
-        )
+        const tx = {
+            publicKey:
+                '0x006dc19d50bbc8a8e4b0f26c0dd3e78978f5f691a6161c41e3b0e4d1aa2d60fad62f37912b59f484b2e05bd3c9c3b4d93b0ca570d6d4421eee544e7da99e9de4',
+            ...executionObject,
+        }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -187,13 +185,11 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-473 : If transaction object has unnecessary publicKey field, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            {
-                publicKey:
-                    '0x006dc19d50bbc8a8e4b0f26c0dd3e78978f5f691a6161c41e3b0e4d1aa2d60fad62f37912b59f484b2e05bd3c9c3b4d93b0ca570d6d4421eee544e7da99e9de4',
-            },
-            executionObject
-        )
+        const tx = {
+            publicKey:
+                '0x006dc19d50bbc8a8e4b0f26c0dd3e78978f5f691a6161c41e3b0e4d1aa2d60fad62f37912b59f484b2e05bd3c9c3b4d93b0ca570d6d4421eee544e7da99e9de4',
+            ...executionObject,
+        }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"publicKey" cannot be used with SMART_CONTRACT_EXECUTION transaction')
     }).timeout(200000)
@@ -225,7 +221,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
                 },
             ],
         }
-        const tx = Object.assign({ multisig }, executionObject)
+        const tx = { multisig, ...executionObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -259,7 +255,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
                 },
             ],
         }
-        const tx = Object.assign({ multisig }, executionObject)
+        const tx = { multisig, ...executionObject }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"multisig" cannot be used with SMART_CONTRACT_EXECUTION transaction')
     }).timeout(200000)
@@ -270,7 +266,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleTransactionKey }, executionObject)
+        const tx = { roleTransactionKey, ...executionObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -283,7 +279,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleTransactionKey }, executionObject)
+        const tx = { roleTransactionKey, ...executionObject }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws(
             '"roleTransactionKey" cannot be used with SMART_CONTRACT_EXECUTION transaction'
@@ -296,7 +292,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleAccountUpdateKey }, executionObject)
+        const tx = { roleAccountUpdateKey, ...executionObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -309,7 +305,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleAccountUpdateKey }, executionObject)
+        const tx = { roleAccountUpdateKey, ...executionObject }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws(
             '"roleAccountUpdateKey" cannot be used with SMART_CONTRACT_EXECUTION transaction'
@@ -322,7 +318,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleFeePayerKey }, executionObject)
+        const tx = { roleFeePayerKey, ...executionObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -335,14 +331,14 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleFeePayerKey }, executionObject)
+        const tx = { roleFeePayerKey, ...executionObject }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"roleFeePayerKey" cannot be used with SMART_CONTRACT_EXECUTION transaction')
     }).timeout(200000)
 
     // UnnecessaryFailKey
     it('CAVERJS-UNIT-TX-478 : If transaction object has unnecessary failKey field, signTransaction should throw error', async () => {
-        const tx = Object.assign({ failKey: true }, executionObject)
+        const tx = { failKey: true, ...executionObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -351,14 +347,14 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-478 : If transaction object has unnecessary failKey field, sendTransaction should throw error', () => {
-        const tx = Object.assign({ failKey: true }, executionObject)
+        const tx = { failKey: true, ...executionObject }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"failKey" cannot be used with SMART_CONTRACT_EXECUTION transaction')
     }).timeout(200000)
 
     // UnnecessaryCodeFormat
     it('CAVERJS-UNIT-TX-479 : If transaction object has unnecessary codeFormat field, signTransaction should throw error', async () => {
-        const tx = Object.assign({ codeFormat: 'EVM' }, executionObject)
+        const tx = { codeFormat: 'EVM', ...executionObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -367,14 +363,14 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-479 : If transaction object has unnecessary codeFormat field, sendTransaction should throw error', () => {
-        const tx = Object.assign({ codeFormat: 'EVM' }, executionObject)
+        const tx = { codeFormat: 'EVM', ...executionObject }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"codeFormat" cannot be used with SMART_CONTRACT_EXECUTION transaction')
     }).timeout(200000)
 
     // UnnecessaryLegacyKey
     it('CAVERJS-UNIT-TX-480 : If transaction object has unnecessary legacyKey field, signTransaction should throw error', async () => {
-        const tx = Object.assign({ legacyKey: true }, executionObject)
+        const tx = { legacyKey: true, ...executionObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -383,14 +379,14 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-480 : If transaction object has unnecessary legacyKey field, sendTransaction should throw error', () => {
-        const tx = Object.assign({ legacyKey: true }, executionObject)
+        const tx = { legacyKey: true, ...executionObject }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"legacyKey" cannot be used with SMART_CONTRACT_EXECUTION transaction')
     }).timeout(200000)
 
     // Invalid from address
     it('CAVERJS-UNIT-TX-594: If transaction object has invalid from, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, executionObject)
+        const tx = { ...executionObject }
         tx.from = 'invalidAddress'
 
         const expectedError = `Invalid address of from: ${tx.from}`
@@ -399,7 +395,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-594: If transaction object has invalid from, sendTransaction should throw error', () => {
-        const tx = Object.assign({}, executionObject)
+        const tx = { ...executionObject }
         tx.from = 'invalidAddress'
 
         const expectedError = `Provided address "${tx.from}" is invalid, the capitalization checksum test failed`
@@ -410,7 +406,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
 
     // UnnecessaryFeePayerSignatures
     it('CAVERJS-UNIT-TX-595: If transaction object has unnecessary feePayerSignatures, signTransaction should throw error', async () => {
-        const tx = Object.assign({ feePayerSignatures: [['0x01', '0x', '0x']] }, executionObject)
+        const tx = { feePayerSignatures: [['0x01', '0x', '0x']], ...executionObject }
 
         const expectedError = `"feePayerSignatures" cannot be used with ${tx.type} transaction`
 
@@ -418,7 +414,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-595: If transaction object has unnecessary feePayerSignatures, sendTransaction should throw error', () => {
-        const tx = Object.assign({ feePayerSignatures: [['0x01', '0x', '0x']] }, executionObject)
+        const tx = { feePayerSignatures: [['0x01', '0x', '0x']], ...executionObject }
 
         const expectedError = `"feePayerSignatures" cannot be used with ${tx.type} transaction`
 
@@ -429,7 +425,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
     // InvalidTo
     it('CAVERJS-UNIT-TX-596: If transaction object has invalid to address, signTransaction should throw error', async () => {
         const invalidTo = 'invalid'
-        const tx = Object.assign({}, executionObject)
+        const tx = { ...executionObject }
         tx.to = invalidTo
 
         const expectedError = `Invalid address of to: ${tx.to}`
@@ -439,7 +435,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
 
     it('CAVERJS-UNIT-TX-596: If transaction object has unnecessary feePayerSignatures, sendTransaction should throw error', () => {
         const invalidTo = 'invalid'
-        const tx = Object.assign({}, executionObject)
+        const tx = { ...executionObject }
         tx.to = invalidTo
 
         const expectedError = `Provided address "${tx.to}" is invalid, the capitalization checksum test failed.`
@@ -451,7 +447,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
     it('CAVERJS-UNIT-TX-714: sendTransaction should throw error when try to use an account in Node with not LEGACY transaction', async () => {
         const acctInNode = caver.klay.accounts.create()
 
-        const tx = Object.assign({}, executionObject)
+        const tx = { ...executionObject }
         tx.from = acctInNode.address
 
         const expectedError = `No private key found in the caver-js wallet. Trying to use the Klaytn node's wallet, but it only supports legacy transactions. Please add private key of ${acctInNode.address.toLowerCase()} to the caver-js wallet.`

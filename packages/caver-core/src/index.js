@@ -36,7 +36,7 @@ module.exports = {
                 return pkg._requestManager.provider
             },
             set: function(value) {
-                return pkg.setProvider(value)
+                pkg.setProvider(value)
             },
             enumerable: true,
             configurable: true,
@@ -48,7 +48,7 @@ module.exports = {
                 return pkg._requestManager.provider
             },
             set: function(value) {
-                return pkg.setProvider(value)
+                pkg.setProvider(value)
             },
             enumerable: true,
             configurable: true,
