@@ -19,7 +19,7 @@
 // Instruction
 // $ git submodule init && git submodule update
 // $ cp test/klaytn-integration-tests/env.template.json test/klaytn-integration-tests/env.json
-// 
+//
 // $ mocha test/intTest.js
 // or you can use script in the package.json like below
 // $ npm run intTest
