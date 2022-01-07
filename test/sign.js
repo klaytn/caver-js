@@ -25,6 +25,7 @@ const caver = new Caver(testRPCURL)
 
 let senderPrvKey
 let senderAddress
+let password
 
 before(() => {
     senderPrvKey =
@@ -33,17 +34,19 @@ before(() => {
             : process.env.privateKey
 
     senderAddress = caver.klay.accounts.wallet.add(senderPrvKey).address
+
+    password = process.env.password? process.env.password : 'password'
 })
 
 describe('caver.klay.sign', () => {
     it('Compare the result of caver.klay.sign and caver.klay.accounts.sign', async () => {
         try {
             // If account is already existed in node, return error.
-            const address = await caver.klay.personal.importRawKey(senderPrvKey, 'passphrase')
+            const address = await caver.klay.personal.importRawKey(senderPrvKey, password)
             expect(address.toLowerCase()).to.equals(senderAddress.toLowerCase())
         } catch (e) {}
 
-        const isUnlock = await caver.klay.personal.unlockAccount(senderAddress, 'passphrase')
+        const isUnlock = await caver.klay.personal.unlockAccount(senderAddress, password)
         expect(isUnlock).to.be.true
 
         const ret = await caver.klay.sign('Message to sign', senderAddress)
