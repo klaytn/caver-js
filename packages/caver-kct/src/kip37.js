@@ -29,7 +29,7 @@ const {
     interfaceIds,
 } = require('./kctHelper')
 const { isAddress, toBuffer, isHexStrict, toHex, stripHexPrefix, leftPad } = require('../../caver-utils')
-const KIP13 = require('../src/kip13')
+const KIP13 = require('./kip13')
 
 /**
  * The KIP37 class that helps you easily handle a smart contract that implements KIP-37 as a JavaScript object on the Klaytn blockchain platform (Klaytn).

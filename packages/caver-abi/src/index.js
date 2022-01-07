@@ -264,7 +264,7 @@ class ABI {
             // recognize former type. Solidity docs say `Function` is a bytes24
             // encoding the contract address followed by the function selector hash.
             if (typeof type === 'object' && type.type === 'function') {
-                type = Object.assign({}, type, { type: 'bytes24' })
+                type = { ...type, type: 'bytes24' }
             }
             if (self.isSimplifiedStructFormat(type)) {
                 const structName = Object.keys(type)[0]
@@ -361,10 +361,10 @@ class ABI {
      * @return {string|Array.<string>} - The formatted param
      */
     formatParam(type, param) {
-        const paramTypeBytes = new RegExp(/^bytes([0-9]*)$/)
-        const paramTypeBytesArray = new RegExp(/^bytes([0-9]*)\[\]$/)
-        const paramTypeNumber = new RegExp(/^(u?int)([0-9]*)$/)
-        const paramTypeNumberArray = new RegExp(/^(u?int)([0-9]*)\[\]$/)
+        const paramTypeBytes = /^bytes([0-9]*)$/
+        const paramTypeBytesArray = /^bytes([0-9]*)\[\]$/
+        const paramTypeNumber = /^(u?int)([0-9]*)$/
+        const paramTypeNumberArray = /^(u?int)([0-9]*)\[\]$/
 
         // Format BN to string
         if (utils.isBN(param) || utils.isBigNumber(param)) {

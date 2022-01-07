@@ -325,20 +325,18 @@ before(() => {
         feeRatio: 30,
     }
 
-    txObjWithLegacy = Object.assign({ account: makeAccount(sender.address, accountKeyTestCases.LEGACY) }, commonObj)
-    txObjWithPublic = Object.assign({ account: makeAccount(sender.address, accountKeyTestCases.PUBLIC) }, commonObj)
-    txObjWithFail = Object.assign({ account: makeAccount(sender.address, accountKeyTestCases.FAIL) }, commonObj)
-    txObjWithMultiSig = Object.assign({ account: makeAccount(sender.address, accountKeyTestCases.MULTISIG) }, commonObj)
-    txObjWithRoleBased = Object.assign(
-        {
-            account: makeAccount(sender.address, accountKeyTestCases.ROLEBAED, [
-                { threshold: 2, weights: [1, 1, 1] },
-                {},
-                { threshold: 1, weights: [1, 1] },
-            ]),
-        },
-        commonObj
-    )
+    txObjWithLegacy = { account: makeAccount(sender.address, accountKeyTestCases.LEGACY), ...commonObj }
+    txObjWithPublic = { account: makeAccount(sender.address, accountKeyTestCases.PUBLIC), ...commonObj }
+    txObjWithFail = { account: makeAccount(sender.address, accountKeyTestCases.FAIL), ...commonObj }
+    txObjWithMultiSig = { account: makeAccount(sender.address, accountKeyTestCases.MULTISIG), ...commonObj }
+    txObjWithRoleBased = {
+        account: makeAccount(sender.address, accountKeyTestCases.ROLEBAED, [
+            { threshold: 2, weights: [1, 1, 1] },
+            {},
+            { threshold: 1, weights: [1, 1] },
+        ]),
+        ...commonObj,
+    }
 
     makeAccountUpdateObjectWithExpectedValues()
 })
@@ -370,7 +368,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
 
     context('create feeDelegatedAccountUpdateWithRatio instance', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-152: If feeDelegatedAccountUpdateWithRatio not define from, return error', () => {
-            const testUpdateObj = Object.assign({}, txObjWithPublic)
+            const testUpdateObj = { ...txObjWithPublic }
             delete testUpdateObj.from
 
             const expectedError = '"from" is missing'
@@ -378,7 +376,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-153: If feeDelegatedAccountUpdateWithRatio not define gas, return error', () => {
-            const testUpdateObj = Object.assign({}, txObjWithPublic)
+            const testUpdateObj = { ...txObjWithPublic }
             delete testUpdateObj.gas
 
             const expectedError = '"gas" is missing'
@@ -386,7 +384,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-154: If accountUpdate not define gas, return error', () => {
-            const testUpdateObj = Object.assign({}, txObjWithPublic)
+            const testUpdateObj = { ...txObjWithPublic }
             delete testUpdateObj.account
 
             const expectedError = 'Missing account information with TxTypeFeeDelegatedAccountUpdateWithRatio transaction'
@@ -394,7 +392,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-155: If feeDelegatedAccountUpdateWithRatio not define feeRatio, return error', () => {
-            const testUpdateObj = Object.assign({}, txObjWithPublic)
+            const testUpdateObj = { ...txObjWithPublic }
             delete testUpdateObj.feeRatio
 
             const expectedError = '"feeRatio" is missing'
@@ -402,7 +400,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-156: If feeDelegatedAccountUpdateWithRatio define from property with invalid address, return error', () => {
-            const testUpdateObj = Object.assign({}, txObjWithPublic)
+            const testUpdateObj = { ...txObjWithPublic }
             testUpdateObj.from = 'invalid'
 
             const expectedError = `Invalid address of from: ${testUpdateObj.from}`
@@ -410,7 +408,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-157: If feeDelegatedAccountUpdateWithRatio define feePayer property with invalid address, return error', () => {
-            const testUpdateObj = Object.assign({}, txObjWithPublic)
+            const testUpdateObj = { ...txObjWithPublic }
             testUpdateObj.feePayer = 'invalid'
 
             const expectedError = `Invalid address of fee payer: ${testUpdateObj.feePayer}`
@@ -418,7 +416,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-521: If feeDelegatedAccountUpdateWithRatio define feeRatio property with invalid value, return error', () => {
-            const testUpdateObj = Object.assign({}, txObjWithPublic)
+            const testUpdateObj = { ...txObjWithPublic }
 
             testUpdateObj.feeRatio = 'nonHexString'
             let expectedError = `Invalid type fo feeRatio: feeRatio should be number type or hex number string.`
@@ -445,7 +443,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-158: If feeDelegatedAccountUpdateWithRatio define feePayerSignatures property without feePayer, return error', () => {
-            const testUpdateObj = Object.assign({}, txObjWithPublic)
+            const testUpdateObj = { ...txObjWithPublic }
             testUpdateObj.feePayer = '0x'
             testUpdateObj.feePayerSignatures = [
                 [
@@ -460,7 +458,7 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-159: If feeDelegatedAccountUpdateWithRatio define unnecessary property, return error', () => {
-            const testUpdateObj = Object.assign({}, txObjWithPublic)
+            const testUpdateObj = { ...txObjWithPublic }
 
             const unnecessaries = [
                 propertiesForUnnecessary.data,
@@ -1742,9 +1740,10 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
         }
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-539: should return public key string recovered from signatures in FeeDelegatedAccountUpdateWithRatio', async () => {
-            const tx = caver.transaction.feeDelegatedAccountUpdateWithRatio.create(
-                Object.assign({ account: caver.account.createWithAccountKeyLegacy(txObj.from) }, txObj)
-            )
+            const tx = caver.transaction.feeDelegatedAccountUpdateWithRatio.create({
+                account: caver.account.createWithAccountKeyLegacy(txObj.from),
+                ...txObj,
+            })
             const publicKeys = tx.recoverPublicKeys()
 
             expect(publicKeys.length).to.equal(expectedPublicKeyArray.length)
@@ -1754,9 +1753,10 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-540: should return fee payer public key string recovered from feePayerSignatures in FeeDelegatedAccountUpdateWithRatio', async () => {
-            const tx = caver.transaction.feeDelegatedAccountUpdateWithRatio.create(
-                Object.assign({ account: caver.account.createWithAccountKeyLegacy(txObj.from) }, txObj)
-            )
+            const tx = caver.transaction.feeDelegatedAccountUpdateWithRatio.create({
+                account: caver.account.createWithAccountKeyLegacy(txObj.from),
+                ...txObj,
+            })
             const publicKeys = tx.recoverFeePayerPublicKeys()
 
             expect(publicKeys.length).to.equal(expectedFeePayerPublicKeyArray.length)

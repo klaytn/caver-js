@@ -41,7 +41,8 @@ jobs:
           command: |
             cd ./test/test-web
             ./prepareWebTest.sh
-            ./runWebEnvTest.sh
+            npm run cypress:run
+            ./terminateTest.sh
 
   tag_verify:
     <<: *defaults

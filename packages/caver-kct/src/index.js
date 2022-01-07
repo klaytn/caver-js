@@ -16,6 +16,8 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+/* eslint-disable max-classes-per-file */
+
 const _ = require('lodash')
 const BaseKIP7 = require('./kip7')
 const BaseKIP17 = require('./kip17')

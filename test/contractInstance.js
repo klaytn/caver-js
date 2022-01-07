@@ -26,6 +26,7 @@ let caver
 
 let senderPrvKey
 let senderAddress
+let password
 
 const byteCode =
     '0x60806040526000805534801561001457600080fd5b506101ea806100246000396000f30060806040526004361061006d576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806306661abd1461007257806342cbb15c1461009d578063767800de146100c8578063b22636271461011f578063d14e62b814610150575b600080fd5b34801561007e57600080fd5b5061008761017d565b6040518082815260200191505060405180910390f35b3480156100a957600080fd5b506100b2610183565b6040518082815260200191505060405180910390f35b3480156100d457600080fd5b506100dd61018b565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b34801561012b57600080fd5b5061014e60048036038101908080356000191690602001909291905050506101b1565b005b34801561015c57600080fd5b5061017b600480360381019080803590602001909291905050506101b4565b005b60005481565b600043905090565b600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b50565b80600081905550505600a165627a7a7230582053c65686a3571c517e2cf4f741d842e5ee6aa665c96ce70f46f9a594794f11eb0029'
@@ -107,6 +108,8 @@ before(() => {
         process.env.privateKey && String(process.env.privateKey).indexOf('0x') === -1
             ? `0x${process.env.privateKey}`
             : process.env.privateKey
+
+    password = process.env.password ? process.env.password : 'password'
 })
 
 beforeEach(() => {
@@ -146,9 +149,9 @@ describe('caver.klay.contract with using account exists in Node', () => {
         senderAddress = caver.klay.accounts.privateKeyToAccount(senderPrvKey).address
 
         try {
-            await caver.klay.personal.importRawKey(senderPrvKey, 'passphrase')
+            await caver.klay.personal.importRawKey(senderPrvKey, password)
         } catch (e) {}
-        const isUnlock = await caver.klay.personal.unlockAccount(senderAddress, 'passphrase')
+        const isUnlock = await caver.klay.personal.unlockAccount(senderAddress, password)
         expect(isUnlock).to.be.true
 
         const contractInst = new caver.klay.Contract(abi)
@@ -211,9 +214,9 @@ describe('caver.klay.contract with using account exists in Node', () => {
         senderAddress = caver.klay.accounts.privateKeyToAccount(senderPrvKey).address
 
         try {
-            await caver.klay.personal.importRawKey(senderPrvKey, 'passphrase')
+            await caver.klay.personal.importRawKey(senderPrvKey, password)
         } catch (e) {}
-        const isUnlock = await caver.klay.personal.unlockAccount(senderAddress, 'passphrase')
+        const isUnlock = await caver.klay.personal.unlockAccount(senderAddress, password)
         expect(isUnlock).to.be.true
 
         const contractInst = new caver.klay.Contract(abi)

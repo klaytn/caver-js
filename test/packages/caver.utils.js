@@ -100,10 +100,10 @@ describe('caver.utils.isBN', () => {
 describe('caver.utils.isBigNumber', () => {
     context('CAVERJS-UNIT-ETC-101: input: BigNumber type', () => {
         const tests = [
-            { value: new BigNumber(1.0000000000000001), expected: true },
-            { value: new BigNumber(88259496234518.57), expected: true },
-            { value: new BigNumber(99999999999999999999), expected: true },
-            { value: new BigNumber(2e308), expected: true },
+            { value: new BigNumber('1.0000000000000001'), expected: true },
+            { value: new BigNumber('88259496234518.57'), expected: true },
+            { value: new BigNumber('99999999999999999999'), expected: true },
+            { value: new BigNumber('2e308'), expected: true },
         ]
         it('should return true', () => {
             for (const test of tests) {
@@ -114,10 +114,10 @@ describe('caver.utils.isBigNumber', () => {
 
     context('CAVERJS-UNIT-ETC-102: input: not a BigNumber type', () => {
         const tests = [
-            { value: 1.0000000000000001, expected: false },
-            { value: 88259496234518.57, expected: false },
-            { value: 99999999999999999999, expected: false },
-            { value: 2e308, expected: false },
+            { value: '1.0000000000000001', expected: false },
+            { value: '88259496234518.57', expected: false },
+            { value: '99999999999999999999', expected: false },
+            { value: '2e308', expected: false },
         ]
         it('should return false', () => {
             for (const test of tests) {
@@ -773,9 +773,11 @@ describe('caver.utils.numberToHex', () => {
             const expectedErrorMsg =
                 'Number can only safely store up to 53 bits: Number type cannot handle big number. Please use hex string or BigNumber/BN.'
 
+            // eslint-disable-next-line no-loss-of-precision
             let invalid = 0x303f3b2c93f1a7ffff
             expect(() => caver.utils.numberToHex(invalid)).to.throw(expectedErrorMsg)
 
+            // eslint-disable-next-line no-loss-of-precision
             invalid = 889999999999999999999
             expect(() => caver.utils.numberToHex(invalid)).to.throw(expectedErrorMsg)
         })

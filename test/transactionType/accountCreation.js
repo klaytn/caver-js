@@ -71,7 +71,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // Error from missing
     it('CAVERJS-UNIT-TX-109 : If transaction object missing from, signTransaction should throw error', async () => {
-        const tx = Object.assign({ publicKey: pubKey1 }, accountCreationObject)
+        const tx = { publicKey: pubKey1, ...accountCreationObject }
         delete tx.from
 
         let result
@@ -84,7 +84,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-109 : If transaction object missing from, sendTransaction should throw error', () => {
-        const tx = Object.assign({ publicKey: pubKey1 }, accountCreationObject)
+        const tx = { publicKey: pubKey1, ...accountCreationObject }
         delete tx.from
 
         // Throw error from formatter validation
@@ -93,7 +93,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // Error to missing
     it('CAVERJS-UNIT-TX-110 : If transaction object missing to, signTransaction should throw error', async () => {
-        const tx = Object.assign({ publicKey: pubKey1 }, accountCreationObject)
+        const tx = { publicKey: pubKey1, ...accountCreationObject }
         delete tx.to
 
         let result
@@ -106,7 +106,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-110 : If transaction object missing to, sendTransaction should throw error', () => {
-        const tx = Object.assign({ publicKey: pubKey1 }, accountCreationObject)
+        const tx = { publicKey: pubKey1, ...accountCreationObject }
         delete tx.to
 
         // Throw error from formatter validation
@@ -115,7 +115,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // Error value missing
     it('CAVERJS-UNIT-TX-111 : If transaction object missing value, signTransaction should throw error', async () => {
-        const tx = Object.assign({ publicKey: pubKey1 }, accountCreationObject)
+        const tx = { publicKey: pubKey1, ...accountCreationObject }
         delete tx.value
 
         let result
@@ -128,7 +128,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-111 : If transaction object missing value, sendTransaction should throw error', () => {
-        const tx = Object.assign({ publicKey: pubKey1 }, accountCreationObject)
+        const tx = { publicKey: pubKey1, ...accountCreationObject }
         delete tx.value
 
         // Throw error from formatter validation
@@ -137,7 +137,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // Error gas and gasLimit missing
     it('CAVERJS-UNIT-TX-112 : If transaction object missing gas and gasLimit, signTransaction should throw error', async () => {
-        const tx = Object.assign({ publicKey: pubKey1 }, accountCreationObject)
+        const tx = { publicKey: pubKey1, ...accountCreationObject }
         delete tx.gas
 
         let result
@@ -150,7 +150,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-112 : If transaction object missing gas and gasLimit, sendTransaction should throw error', () => {
-        const tx = Object.assign({ publicKey: pubKey1 }, accountCreationObject)
+        const tx = { publicKey: pubKey1, ...accountCreationObject }
         delete tx.gas
 
         // Throw error from formatter validation
@@ -159,7 +159,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // MissingKey
     it('CAVERJS-UNIT-TX-113 : If transaction object missing key information, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, accountCreationObject)
+        const tx = { ...accountCreationObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -170,7 +170,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-113 : If transaction object missing key information, sendTransaction should throw error', () => {
-        const tx = Object.assign({}, accountCreationObject)
+        const tx = { ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws('Missing key information with ACCOUNT_CREATION transaction')
@@ -178,7 +178,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // Creation with publicKey.
     it('CAVERJS-UNIT-TX-114 : If transaction object has publicKey, create account with publicKey', async () => {
-        const tx = Object.assign({ publicKey: pubKey1 }, accountCreationObject)
+        const tx = { publicKey: pubKey1, ...accountCreationObject }
 
         let result
         await caver.klay
@@ -199,7 +199,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // PublicKeyLength64
     it('CAVERJS-UNIT-TX-116 : If compressed publicKey length is not 64, signTransaction should return error', async () => {
-        const tx = Object.assign({ publicKey: caver.utils.randomHex(32) }, accountCreationObject)
+        const tx = { publicKey: caver.utils.randomHex(32), ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -211,7 +211,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-116 : If compressed publicKey length is not 64, sendTransaction should return error', async () => {
-        const tx = Object.assign({ publicKey: caver.utils.randomHex(32) }, accountCreationObject)
+        const tx = { publicKey: caver.utils.randomHex(32), ...accountCreationObject }
 
         let result
         await caver.klay
@@ -224,7 +224,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // PublicKeyLength126
     it('CAVERJS-UNIT-TX-117 : If uncompressed publicKey length is 126, signTransaction should return error', async () => {
-        const tx = Object.assign({ publicKey: caver.utils.randomHex(63) }, accountCreationObject)
+        const tx = { publicKey: caver.utils.randomHex(63), ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -236,7 +236,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-117 : If uncompressed publicKey length is 126, sendTransaction should return error', async () => {
-        const tx = Object.assign({ publicKey: caver.utils.randomHex(63) }, accountCreationObject)
+        const tx = { publicKey: caver.utils.randomHex(63), ...accountCreationObject }
 
         let result
         await caver.klay
@@ -249,7 +249,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // Creation with multisig.
     it('CAVERJS-UNIT-TX-118 : If transaction object has multisig, create account with multisig', async () => {
-        const tx = Object.assign({ multisig }, accountCreationObject)
+        const tx = { multisig, ...accountCreationObject }
 
         let result
         await caver.klay
@@ -270,7 +270,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // Creation with multisig and publicKey.
     it('CAVERJS-UNIT-TX-119 : If transaction object has multisig and publicKey, signTransaction should throw error', async () => {
-        const tx = Object.assign({ publicKey: pubKey1, multisig }, accountCreationObject)
+        const tx = { publicKey: pubKey1, multisig, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -282,7 +282,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-119 : If transaction object has multisig and publicKey, sendTransaction should throw error', () => {
-        const tx = Object.assign({ publicKey: pubKey1, multisig }, accountCreationObject)
+        const tx = { publicKey: pubKey1, multisig, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -290,7 +290,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // Creation with roleTransactionKey.
     it('CAVERJS-UNIT-TX-120 : If transaction object has roleTransactionKey, create account with roleTransactionKey', async () => {
-        const tx = Object.assign({ roleTransactionKey: { publicKey: pubKey1 } }, accountCreationObject)
+        const tx = { roleTransactionKey: { publicKey: pubKey1 }, ...accountCreationObject }
 
         let result
         await caver.klay
@@ -316,7 +316,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // Creation with roleTransactionKey and publicKey.
     it('CAVERJS-UNIT-TX-121 : If transaction object has roleTransactionKey and publicKey, signTransaction should throw error', async () => {
-        const tx = Object.assign({ roleTransactionKey: { publicKey: pubKey1 }, publicKey: pubKey1 }, accountCreationObject)
+        const tx = { roleTransactionKey: { publicKey: pubKey1 }, publicKey: pubKey1, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -328,7 +328,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-121 : If transaction object has roleTransactionKey and publicKey, sendTransaction should throw error', () => {
-        const tx = Object.assign({ roleTransactionKey: { publicKey: pubKey1 }, publicKey: pubKey1 }, accountCreationObject)
+        const tx = { roleTransactionKey: { publicKey: pubKey1 }, publicKey: pubKey1, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -336,7 +336,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // Creation with roleTransactionKey and multisig.
     it('CAVERJS-UNIT-TX-122 : If transaction object has roleTransactionKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign({ roleTransactionKey: { publicKey: pubKey1 }, multisig }, accountCreationObject)
+        const tx = { roleTransactionKey: { publicKey: pubKey1 }, multisig, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -348,7 +348,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-122 : If transaction object has roleTransactionKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign({ roleTransactionKey: { publicKey: pubKey1 }, multisig }, accountCreationObject)
+        const tx = { roleTransactionKey: { publicKey: pubKey1 }, multisig, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -356,7 +356,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // Creation with roleTransactionKey and multisig and publicKey.
     it('CAVERJS-UNIT-TX-123 : If transaction object has roleTransactionKey and multisig and publicKey, signTransaction should throw error', async () => {
-        const tx = Object.assign({ roleTransactionKey: { publicKey: pubKey1 }, multisig, publicKey: pubKey1 }, accountCreationObject)
+        const tx = { roleTransactionKey: { publicKey: pubKey1 }, multisig, publicKey: pubKey1, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -368,7 +368,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-123 : If transaction object has roleTransactionKey and multisig and publicKey, sendTransaction should throw error', () => {
-        const tx = Object.assign({ roleTransactionKey: { publicKey: pubKey1 }, multisig, publicKey: pubKey1 }, accountCreationObject)
+        const tx = { roleTransactionKey: { publicKey: pubKey1 }, multisig, publicKey: pubKey1, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -376,7 +376,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleAccountUpdateKey without roleTransactionKey
     it('CAVERJS-UNIT-TX-124 : If transaction object has only roleAccountUpdateKey, signTransaction should throw error', async () => {
-        const tx = Object.assign({ roleAccountUpdateKey: { publicKey: pubKey1 } }, accountCreationObject)
+        const tx = { roleAccountUpdateKey: { publicKey: pubKey1 }, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -388,7 +388,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-124 : If transaction object has only roleAccountUpdateKey, sendTransaction should throw error', () => {
-        const tx = Object.assign({ roleAccountUpdateKey: { publicKey: pubKey1 } }, accountCreationObject)
+        const tx = { roleAccountUpdateKey: { publicKey: pubKey1 }, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -396,10 +396,11 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleAccountUpdateKey with roleTransactionKey
     it('CAVERJS-UNIT-TX-125 : If transaction object has roleAccountUpdateKey and roleTransactionKey, create account with roleTransactionKey and roleAccountUpdateKey', async () => {
-        const tx = Object.assign(
-            { roleTransactionKey: { publicKey: pubKey1 }, roleAccountUpdateKey: { publicKey: pubKey2 } },
-            accountCreationObject
-        )
+        const tx = {
+            roleTransactionKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay
@@ -430,7 +431,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleAccountUpdateKey with publicKey
     it('CAVERJS-UNIT-TX-126 : If transaction object has roleAccountUpdateKey and publicKey, signTransaction should throw error', async () => {
-        const tx = Object.assign({ roleAccountUpdateKey: { publicKey: pubKey1 }, publicKey: pubKey1 }, accountCreationObject)
+        const tx = { roleAccountUpdateKey: { publicKey: pubKey1 }, publicKey: pubKey1, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -442,7 +443,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-126 : If transaction object has roleAccountUpdateKey and publicKey, sendTransaction should throw error', () => {
-        const tx = Object.assign({ roleAccountUpdateKey: { publicKey: pubKey1 }, publicKey: pubKey1 }, accountCreationObject)
+        const tx = { roleAccountUpdateKey: { publicKey: pubKey1 }, publicKey: pubKey1, ...accountCreationObject }
         // Throw error from formatter validation
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -450,7 +451,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleAccountUpdateKey with multisig
     it('CAVERJS-UNIT-TX-127 : If transaction object has roleAccountUpdateKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign({ roleAccountUpdateKey: { publicKey: pubKey1 }, multisig }, accountCreationObject)
+        const tx = { roleAccountUpdateKey: { publicKey: pubKey1 }, multisig, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -462,7 +463,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-127 : If transaction object has roleAccountUpdateKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign({ roleAccountUpdateKey: { publicKey: pubKey1 }, multisig }, accountCreationObject)
+        const tx = { roleAccountUpdateKey: { publicKey: pubKey1 }, multisig, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -470,7 +471,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleAccountUpdateKey with multisig and publicKey
     it('CAVERJS-UNIT-TX-128 : If transaction object has roleAccountUpdateKey, multisig and publicKey, signTransaction should throw error', async () => {
-        const tx = Object.assign({ roleAccountUpdateKey: { publicKey: pubKey1 }, multisig, publicKey: pubKey1 }, accountCreationObject)
+        const tx = { roleAccountUpdateKey: { publicKey: pubKey1 }, multisig, publicKey: pubKey1, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -482,7 +483,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-128 : If transaction object has roleAccountUpdateKey, multisig and publicKey, sendTransaction should throw error', () => {
-        const tx = Object.assign({ roleAccountUpdateKey: { publicKey: pubKey1 }, multisig, publicKey: pubKey1 }, accountCreationObject)
+        const tx = { roleAccountUpdateKey: { publicKey: pubKey1 }, multisig, publicKey: pubKey1, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -490,10 +491,12 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleAccountUpdateKey with roleTransactionKey and publicKey
     it('CAVERJS-UNIT-TX-129 : If transaction object has roleAccountUpdateKey, roleTransactionKey and publicKey, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            { roleAccountUpdateKey: { publicKey: pubKey1 }, roleTransactionKey: { publicKey: pubKey2 }, publicKey: pubKey1 },
-            accountCreationObject
-        )
+        const tx = {
+            roleAccountUpdateKey: { publicKey: pubKey1 },
+            roleTransactionKey: { publicKey: pubKey2 },
+            publicKey: pubKey1,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -505,10 +508,12 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-129 : If transaction object has roleAccountUpdateKey, roleTransactionKey and publicKey, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            { roleAccountUpdateKey: { publicKey: pubKey1 }, roleTransactionKey: { publicKey: pubKey2 }, publicKey: pubKey1 },
-            accountCreationObject
-        )
+        const tx = {
+            roleAccountUpdateKey: { publicKey: pubKey1 },
+            roleTransactionKey: { publicKey: pubKey2 },
+            publicKey: pubKey1,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -516,10 +521,12 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleAccountUpdateKey with roleTransactionKey and multisig
     it('CAVERJS-UNIT-TX-130 : If transaction object has roleAccountUpdateKey, roleTransactionKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            { roleAccountUpdateKey: { publicKey: pubKey1 }, roleTransactionKey: { publicKey: pubKey2 }, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            roleAccountUpdateKey: { publicKey: pubKey1 },
+            roleTransactionKey: { publicKey: pubKey2 },
+            multisig,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -531,10 +538,12 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-130 : If transaction object has roleAccountUpdateKey, roleTransactionKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            { roleAccountUpdateKey: { publicKey: pubKey1 }, roleTransactionKey: { publicKey: pubKey2 }, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            roleAccountUpdateKey: { publicKey: pubKey1 },
+            roleTransactionKey: { publicKey: pubKey2 },
+            multisig,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -542,10 +551,13 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleAccountUpdateKey with roleTransactionKey, multisig and publicKey
     it('CAVERJS-UNIT-TX-131 : If transaction object has roleAccountUpdateKey, roleTransactionKey, multisig and publicKey, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            { roleAccountUpdateKey: { publicKey: pubKey1 }, roleTransactionKey: { publicKey: pubKey2 }, multisig, publicKey: pubKey1 },
-            accountCreationObject
-        )
+        const tx = {
+            roleAccountUpdateKey: { publicKey: pubKey1 },
+            roleTransactionKey: { publicKey: pubKey2 },
+            multisig,
+            publicKey: pubKey1,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -557,10 +569,13 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-131 : If transaction object has roleAccountUpdateKey, roleTransactionKey, multisig and publicKey, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            { roleAccountUpdateKey: { publicKey: pubKey1 }, roleTransactionKey: { publicKey: pubKey2 }, multisig, publicKey: pubKey1 },
-            accountCreationObject
-        )
+        const tx = {
+            roleAccountUpdateKey: { publicKey: pubKey1 },
+            roleTransactionKey: { publicKey: pubKey2 },
+            multisig,
+            publicKey: pubKey1,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -568,7 +583,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleFeePayerKey without roleTransactionKey and roleAccountUpdateKey
     it('CAVERJS-UNIT-TX-132 : If transaction object has only roleFeePayerKey, signTransaction should throw error', async () => {
-        const tx = Object.assign({ roleFeePayerKey: { publicKey: pubKey1 } }, accountCreationObject)
+        const tx = { roleFeePayerKey: { publicKey: pubKey1 }, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -580,7 +595,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-132 : If transaction object has only roleFeePayerKey, sendTransaction should throw error', () => {
-        const tx = Object.assign({ roleFeePayerKey: { publicKey: pubKey1 } }, accountCreationObject)
+        const tx = { roleFeePayerKey: { publicKey: pubKey1 }, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -588,10 +603,11 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleFeePayerKey with roleTransactionKey
     it('CAVERJS-UNIT-TX-133 : If transaction object has roleFeePayerKey and roleTransactionKey, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            { roleFeePayerKey: { publicKey: pubKey1 }, roleTransactionKey: { publicKey: pubKey2 } },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleTransactionKey: { publicKey: pubKey2 },
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -603,10 +619,11 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-133 : If transaction object has roleFeePayerKey and roleTransactionKey, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            { roleFeePayerKey: { publicKey: pubKey1 }, roleTransactionKey: { publicKey: pubKey2 } },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleTransactionKey: { publicKey: pubKey2 },
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -614,10 +631,11 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleFeePayerKey with roleAccountUpdateKey
     it('CAVERJS-UNIT-TX-134 : If transaction object has roleFeePayerKey and roleAccountUpdateKey, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            { roleFeePayerKey: { publicKey: pubKey1 }, roleAccountUpdateKey: { publicKey: pubKey2 } },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -629,10 +647,11 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-134 : If transaction object has roleFeePayerKey and roleAccountUpdateKey, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            { roleFeePayerKey: { publicKey: pubKey1 }, roleAccountUpdateKey: { publicKey: pubKey2 } },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -640,14 +659,12 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleFeePayerKey with roleAccountUpdateKey and roleTransactionKey
     it('CAVERJS-UNIT-TX-135 : If transaction object has roleFeePayerKey, roleTransactionKey and roleAccountUpdateKey, create account with roleTransactionKey, roleAccountUpdateKey and roleFeePayerKey', async () => {
-        const tx = Object.assign(
-            {
-                roleTransactionKey: { publicKey: pubKey1 },
-                roleAccountUpdateKey: { publicKey: pubKey2 },
-                roleFeePayerKey: { publicKey: pubKey3 },
-            },
-            accountCreationObject
-        )
+        const tx = {
+            roleTransactionKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            roleFeePayerKey: { publicKey: pubKey3 },
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay
@@ -682,7 +699,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleFeePayerKey with publicKey
     it('CAVERJS-UNIT-TX-136 : If transaction object has roleFeePayerKey and publicKey, signTransaction should throw error', async () => {
-        const tx = Object.assign({ roleFeePayerKey: { publicKey: pubKey1 }, publicKey: pubKey2 }, accountCreationObject)
+        const tx = { roleFeePayerKey: { publicKey: pubKey1 }, publicKey: pubKey2, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -694,7 +711,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-136 : If transaction object has roleFeePayerKey and publicKey, sendTransaction should throw error', () => {
-        const tx = Object.assign({ roleFeePayerKey: { publicKey: pubKey1 }, publicKey: pubKey2 }, accountCreationObject)
+        const tx = { roleFeePayerKey: { publicKey: pubKey1 }, publicKey: pubKey2, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -702,7 +719,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleFeePayerKey with multisig
     it('CAVERJS-UNIT-TX-137 : If transaction object has roleFeePayerKey and publicKey, signTransaction should throw error', async () => {
-        const tx = Object.assign({ roleFeePayerKey: { publicKey: pubKey1 }, multisig }, accountCreationObject)
+        const tx = { roleFeePayerKey: { publicKey: pubKey1 }, multisig, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -714,7 +731,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-137 : If transaction object has roleFeePayerKey and publicKey, sendTransaction should throw error', () => {
-        const tx = Object.assign({ roleFeePayerKey: { publicKey: pubKey1 }, multisig }, accountCreationObject)
+        const tx = { roleFeePayerKey: { publicKey: pubKey1 }, multisig, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -722,7 +739,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleFeePayerKey with publicKey and multisig
     it('CAVERJS-UNIT-TX-138 : If transaction object has roleFeePayerKey, publicKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign({ roleFeePayerKey: { publicKey: pubKey1 }, multisig, publicKey: pubKey2 }, accountCreationObject)
+        const tx = { roleFeePayerKey: { publicKey: pubKey1 }, multisig, publicKey: pubKey2, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -734,7 +751,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-138 : If transaction object has roleFeePayerKey, publicKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign({ roleFeePayerKey: { publicKey: pubKey1 }, multisig, publicKey: pubKey2 }, accountCreationObject)
+        const tx = { roleFeePayerKey: { publicKey: pubKey1 }, multisig, publicKey: pubKey2, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -742,10 +759,12 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleFeePayerKey with roleTransactionKey and publicKey
     it('CAVERJS-UNIT-TX-139 : If transaction object has roleFeePayerKey, roleTransactionKey and publicKey, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            { roleFeePayerKey: { publicKey: pubKey1 }, roleTransactionKey: { publicKey: pubKey2 }, publicKey: pubKey3 },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleTransactionKey: { publicKey: pubKey2 },
+            publicKey: pubKey3,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -757,10 +776,12 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-139 : If transaction object has roleFeePayerKey, roleTransactionKey and publicKey, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            { roleFeePayerKey: { publicKey: pubKey1 }, roleTransactionKey: { publicKey: pubKey2 }, publicKey: pubKey3 },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleTransactionKey: { publicKey: pubKey2 },
+            publicKey: pubKey3,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -768,10 +789,12 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleFeePayerKey with roleTransactionKey and multisig
     it('CAVERJS-UNIT-TX-140 : If transaction object has roleFeePayerKey, roleTransactionKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            { roleFeePayerKey: { publicKey: pubKey1 }, roleTransactionKey: { publicKey: pubKey2 }, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleTransactionKey: { publicKey: pubKey2 },
+            multisig,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -783,10 +806,12 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-140 : If transaction object has roleFeePayerKey, roleTransactionKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            { roleFeePayerKey: { publicKey: pubKey1 }, roleTransactionKey: { publicKey: pubKey2 }, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleTransactionKey: { publicKey: pubKey2 },
+            multisig,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -794,10 +819,13 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleFeePayerKey with roleTransactionKey, publicKey and multisig
     it('CAVERJS-UNIT-TX-141 : If transaction object has roleFeePayerKey, roleTransactionKey, publicKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            { roleFeePayerKey: { publicKey: pubKey1 }, roleTransactionKey: { publicKey: pubKey2 }, publicKey: pubKey3, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleTransactionKey: { publicKey: pubKey2 },
+            publicKey: pubKey3,
+            multisig,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -809,10 +837,13 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-141 : If transaction object has roleFeePayerKey, roleTransactionKey, publicKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            { roleFeePayerKey: { publicKey: pubKey1 }, roleTransactionKey: { publicKey: pubKey2 }, publicKey: pubKey3, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleTransactionKey: { publicKey: pubKey2 },
+            publicKey: pubKey3,
+            multisig,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -820,10 +851,12 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleFeePayerKey with roleAccountUpdateKey and publicKey
     it('CAVERJS-UNIT-TX-142 : If transaction object has roleFeePayerKey, roleAccountUpdateKey and publicKey, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            { roleFeePayerKey: { publicKey: pubKey1 }, roleAccountUpdateKey: { publicKey: pubKey2 }, publicKey: pubKey3 },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            publicKey: pubKey3,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -835,10 +868,12 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-142 : If transaction object has roleFeePayerKey, roleAccountUpdateKey and publicKey, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            { roleFeePayerKey: { publicKey: pubKey1 }, roleAccountUpdateKey: { publicKey: pubKey2 }, publicKey: pubKey3 },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            publicKey: pubKey3,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -846,10 +881,12 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleFeePayerKey with roleAccountUpdateKey and multisig
     it('CAVERJS-UNIT-TX-143 : If transaction object has roleFeePayerKey, roleAccountUpdateKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            { roleFeePayerKey: { publicKey: pubKey1 }, roleAccountUpdateKey: { publicKey: pubKey2 }, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            multisig,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -861,10 +898,12 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-143 : If transaction object has roleFeePayerKey, roleAccountUpdateKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            { roleFeePayerKey: { publicKey: pubKey1 }, roleAccountUpdateKey: { publicKey: pubKey2 }, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            multisig,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -872,10 +911,13 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleFeePayerKey with roleAccountUpdateKey, publicKey and multisig
     it('CAVERJS-UNIT-TX-144 : If transaction object has roleFeePayerKey, roleAccountUpdateKey, publicKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            { roleFeePayerKey: { publicKey: pubKey1 }, roleAccountUpdateKey: { publicKey: pubKey2 }, publicKey: pubKey3, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            publicKey: pubKey3,
+            multisig,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -887,10 +929,13 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-144 : If transaction object has roleFeePayerKey, roleAccountUpdateKey, publicKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            { roleFeePayerKey: { publicKey: pubKey1 }, roleAccountUpdateKey: { publicKey: pubKey2 }, publicKey: pubKey3, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            publicKey: pubKey3,
+            multisig,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -898,15 +943,13 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleFeePayerKey with roleTransactionKey, roleAccountUpdateKey and publicKey
     it('CAVERJS-UNIT-TX-145 : If transaction object has roleFeePayerKey, roleTransactionKey, roleAccountUpdateKey and publicKey, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            {
-                roleFeePayerKey: { publicKey: pubKey1 },
-                roleTransactionKey: { publicKey: pubKey2 },
-                roleAccountUpdateKey: { publicKey: pubKey3 },
-                publicKey: pubKey4,
-            },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleTransactionKey: { publicKey: pubKey2 },
+            roleAccountUpdateKey: { publicKey: pubKey3 },
+            publicKey: pubKey4,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -918,15 +961,13 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-145 : If transaction object has roleFeePayerKey, roleTransactionKey, roleAccountUpdateKey and publicKey, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            {
-                roleFeePayerKey: { publicKey: pubKey1 },
-                roleTransactionKey: { publicKey: pubKey2 },
-                roleAccountUpdateKey: { publicKey: pubKey3 },
-                publicKey: pubKey4,
-            },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleTransactionKey: { publicKey: pubKey2 },
+            roleAccountUpdateKey: { publicKey: pubKey3 },
+            publicKey: pubKey4,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -934,15 +975,13 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleFeePayerKey with roleTransactionKey, roleAccountUpdateKey and multisig
     it('CAVERJS-UNIT-TX-146 : If transaction object has roleFeePayerKey, roleTransactionKey, roleAccountUpdateKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            {
-                roleFeePayerKey: { publicKey: pubKey1 },
-                roleTransactionKey: { publicKey: pubKey2 },
-                roleAccountUpdateKey: { publicKey: pubKey3 },
-                multisig,
-            },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleTransactionKey: { publicKey: pubKey2 },
+            roleAccountUpdateKey: { publicKey: pubKey3 },
+            multisig,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -954,15 +993,13 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-146 : If transaction object has roleFeePayerKey, roleTransactionKey, roleAccountUpdateKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            {
-                roleFeePayerKey: { publicKey: pubKey1 },
-                roleTransactionKey: { publicKey: pubKey2 },
-                roleAccountUpdateKey: { publicKey: pubKey3 },
-                multisig,
-            },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleTransactionKey: { publicKey: pubKey2 },
+            roleAccountUpdateKey: { publicKey: pubKey3 },
+            multisig,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -970,16 +1007,14 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // RoleFeePayerKey with roleTransactionKey, roleAccountUpdateKey, publicKey and multisig
     it('CAVERJS-UNIT-TX-147 : If transaction object has roleFeePayerKey, roleTransactionKey, roleAccountUpdateKey, publicKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            {
-                roleFeePayerKey: { publicKey: pubKey1 },
-                roleTransactionKey: { publicKey: pubKey2 },
-                roleAccountUpdateKey: { publicKey: pubKey3 },
-                publicKey: pubKey4,
-                multisig,
-            },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleTransactionKey: { publicKey: pubKey2 },
+            roleAccountUpdateKey: { publicKey: pubKey3 },
+            publicKey: pubKey4,
+            multisig,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -991,16 +1026,14 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-147 : If transaction object has roleFeePayerKey, roleTransactionKey, roleAccountUpdateKey, publicKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            {
-                roleFeePayerKey: { publicKey: pubKey1 },
-                roleTransactionKey: { publicKey: pubKey2 },
-                roleAccountUpdateKey: { publicKey: pubKey3 },
-                publicKey: pubKey4,
-                multisig,
-            },
-            accountCreationObject
-        )
+        const tx = {
+            roleFeePayerKey: { publicKey: pubKey1 },
+            roleTransactionKey: { publicKey: pubKey2 },
+            roleAccountUpdateKey: { publicKey: pubKey3 },
+            publicKey: pubKey4,
+            multisig,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1008,7 +1041,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // Create account with failKey
     it('CAVERJS-UNIT-TX-148 : If transaction object has only failKey, create account with failKey', async () => {
-        const tx = Object.assign({ failKey: true }, accountCreationObject)
+        const tx = { failKey: true, ...accountCreationObject }
 
         let result
         await caver.klay
@@ -1030,7 +1063,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with publicKey
     it('CAVERJS-UNIT-TX-149 : If transaction object has failKey and publicKey, signTransaction should throw error', async () => {
-        const tx = Object.assign({ failKey: true, publicKey: pubKey1 }, accountCreationObject)
+        const tx = { failKey: true, publicKey: pubKey1, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -1042,7 +1075,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-149 : If transaction object has failKey and publicKey, sendTransaction should throw error', () => {
-        const tx = Object.assign({ failKey: true, publicKey: pubKey1 }, accountCreationObject)
+        const tx = { failKey: true, publicKey: pubKey1, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1050,7 +1083,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with multisig
     it('CAVERJS-UNIT-TX-150 : If transaction object has failKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign({ failKey: true, multisig }, accountCreationObject)
+        const tx = { failKey: true, multisig, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -1062,7 +1095,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-150 : If transaction object has failKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign({ failKey: true, multisig }, accountCreationObject)
+        const tx = { failKey: true, multisig, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1070,7 +1103,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with publicKey and multisig
     it('CAVERJS-UNIT-TX-151 : If transaction object has failKey, publicKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign({ failKey: true, publicKey: pubKey1, multisig }, accountCreationObject)
+        const tx = { failKey: true, publicKey: pubKey1, multisig, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -1082,7 +1115,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-151 : If transaction object has failKey, publicKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign({ failKey: true, publicKey: pubKey1, multisig }, accountCreationObject)
+        const tx = { failKey: true, publicKey: pubKey1, multisig, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1090,7 +1123,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleTransactionKey
     it('CAVERJS-UNIT-TX-152 : If transaction object has failKey and roleTransactionKey, signTransaction should throw error', async () => {
-        const tx = Object.assign({ failKey: true, roleTransactionKey: { publicKey: pubKey1 } }, accountCreationObject)
+        const tx = { failKey: true, roleTransactionKey: { publicKey: pubKey1 }, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -1102,7 +1135,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-152 : If transaction object has failKey and roleTransactionKey, sendTransaction should throw error', () => {
-        const tx = Object.assign({ failKey: true, roleTransactionKey: { publicKey: pubKey1 } }, accountCreationObject)
+        const tx = { failKey: true, roleTransactionKey: { publicKey: pubKey1 }, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1110,7 +1143,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleTransactionKey and publicKey
     it('CAVERJS-UNIT-TX-153 : If transaction object has failKey, roleTransactionKey and publicKey, signTransaction should throw error', async () => {
-        const tx = Object.assign({ failKey: true, roleTransactionKey: { publicKey: pubKey1 }, publicKey: pubKey1 }, accountCreationObject)
+        const tx = { failKey: true, roleTransactionKey: { publicKey: pubKey1 }, publicKey: pubKey1, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -1122,7 +1155,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-153 : If transaction object has failKey, roleTransactionKey and publicKey, sendTransaction should throw error', () => {
-        const tx = Object.assign({ failKey: true, roleTransactionKey: { publicKey: pubKey1 }, publicKey: pubKey1 }, accountCreationObject)
+        const tx = { failKey: true, roleTransactionKey: { publicKey: pubKey1 }, publicKey: pubKey1, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1130,7 +1163,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleTransactionKey and multisig
     it('CAVERJS-UNIT-TX-154 : If transaction object has failKey, roleTransactionKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign({ failKey: true, roleTransactionKey: { publicKey: pubKey1 }, multisig }, accountCreationObject)
+        const tx = { failKey: true, roleTransactionKey: { publicKey: pubKey1 }, multisig, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -1142,7 +1175,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-154 : If transaction object has failKey, roleTransactionKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign({ failKey: true, roleTransactionKey: { publicKey: pubKey1 }, multisig }, accountCreationObject)
+        const tx = { failKey: true, roleTransactionKey: { publicKey: pubKey1 }, multisig, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1150,10 +1183,13 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleTransactionKey, publicKey and multisig
     it('CAVERJS-UNIT-TX-155 : If transaction object has failKey, roleTransactionKey, publicKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            { failKey: true, roleTransactionKey: { publicKey: pubKey1 }, publicKey: pubKey1, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleTransactionKey: { publicKey: pubKey1 },
+            publicKey: pubKey1,
+            multisig,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -1165,10 +1201,13 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-155 : If transaction object has failKey, roleTransactionKey, publicKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            { failKey: true, roleTransactionKey: { publicKey: pubKey1 }, publicKey: pubKey1, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleTransactionKey: { publicKey: pubKey1 },
+            publicKey: pubKey1,
+            multisig,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1176,7 +1215,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleAccountUpdateKey
     it('CAVERJS-UNIT-TX-156 : If transaction object has failKey and roleAccountUpdateKey, signTransaction should throw error', async () => {
-        const tx = Object.assign({ failKey: true, roleAccountUpdateKey: { publicKey: pubKey1 } }, accountCreationObject)
+        const tx = { failKey: true, roleAccountUpdateKey: { publicKey: pubKey1 }, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -1188,7 +1227,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-156 : If transaction object has failKey and roleAccountUpdateKey, sendTransaction should throw error', () => {
-        const tx = Object.assign({ failKey: true, roleAccountUpdateKey: { publicKey: pubKey1 } }, accountCreationObject)
+        const tx = { failKey: true, roleAccountUpdateKey: { publicKey: pubKey1 }, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1196,7 +1235,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleAccountUpdateKey and publicKey
     it('CAVERJS-UNIT-TX-157 : If transaction object has failKey, roleAccountUpdateKey and publicKey, signTransaction should throw error', async () => {
-        const tx = Object.assign({ failKey: true, roleAccountUpdateKey: { publicKey: pubKey1 }, publicKey: pubKey1 }, accountCreationObject)
+        const tx = { failKey: true, roleAccountUpdateKey: { publicKey: pubKey1 }, publicKey: pubKey1, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -1208,7 +1247,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-157 : If transaction object has failKey, roleAccountUpdateKey and publicKey, sendTransaction should throw error', () => {
-        const tx = Object.assign({ failKey: true, roleAccountUpdateKey: { publicKey: pubKey1 }, publicKey: pubKey1 }, accountCreationObject)
+        const tx = { failKey: true, roleAccountUpdateKey: { publicKey: pubKey1 }, publicKey: pubKey1, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1216,7 +1255,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleAccountUpdateKey and multisig
     it('CAVERJS-UNIT-TX-158 : If transaction object has failKey, roleAccountUpdateKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign({ failKey: true, roleAccountUpdateKey: { publicKey: pubKey1 }, multisig }, accountCreationObject)
+        const tx = { failKey: true, roleAccountUpdateKey: { publicKey: pubKey1 }, multisig, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -1228,7 +1267,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-158 : If transaction object has failKey, roleAccountUpdateKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign({ failKey: true, roleAccountUpdateKey: { publicKey: pubKey1 }, multisig }, accountCreationObject)
+        const tx = { failKey: true, roleAccountUpdateKey: { publicKey: pubKey1 }, multisig, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1236,10 +1275,13 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleAccountUpdateKey, publicKey and multisig
     it('CAVERJS-UNIT-TX-159 : If transaction object has failKey, roleAccountUpdateKey, publicKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            { failKey: true, roleAccountUpdateKey: { publicKey: pubKey1 }, publicKey: pubKey1, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleAccountUpdateKey: { publicKey: pubKey1 },
+            publicKey: pubKey1,
+            multisig,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -1251,10 +1293,13 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-159 : If transaction object has failKey, roleAccountUpdateKey, publicKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            { failKey: true, roleAccountUpdateKey: { publicKey: pubKey1 }, publicKey: pubKey1, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleAccountUpdateKey: { publicKey: pubKey1 },
+            publicKey: pubKey1,
+            multisig,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1262,7 +1307,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleFeePayerKey
     it('CAVERJS-UNIT-TX-160 : If transaction object has failKey and roleFeePayerKey, signTransaction should throw error', async () => {
-        const tx = Object.assign({ failKey: true, roleFeePayerKey: { publicKey: pubKey1 } }, accountCreationObject)
+        const tx = { failKey: true, roleFeePayerKey: { publicKey: pubKey1 }, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -1274,7 +1319,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-160 : If transaction object has failKey and roleFeePayerKey, sendTransaction should throw error', () => {
-        const tx = Object.assign({ failKey: true, roleFeePayerKey: { publicKey: pubKey1 } }, accountCreationObject)
+        const tx = { failKey: true, roleFeePayerKey: { publicKey: pubKey1 }, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1282,7 +1327,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleFeePayerKey and publicKey
     it('CAVERJS-UNIT-TX-161 : If transaction object has failKey, roleFeePayerKey and publicKey, signTransaction should throw error', async () => {
-        const tx = Object.assign({ failKey: true, roleFeePayerKey: { publicKey: pubKey1 }, publicKey: pubKey1 }, accountCreationObject)
+        const tx = { failKey: true, roleFeePayerKey: { publicKey: pubKey1 }, publicKey: pubKey1, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -1294,7 +1339,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-161 : If transaction object has failKey, roleFeePayerKey and publicKey, sendTransaction should throw error', () => {
-        const tx = Object.assign({ failKey: true, roleFeePayerKey: { publicKey: pubKey1 }, publicKey: pubKey1 }, accountCreationObject)
+        const tx = { failKey: true, roleFeePayerKey: { publicKey: pubKey1 }, publicKey: pubKey1, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1302,7 +1347,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleFeePayerKey and multisig
     it('CAVERJS-UNIT-TX-162 : If transaction object has failKey, roleFeePayerKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign({ failKey: true, roleFeePayerKey: { publicKey: pubKey1 }, multisig }, accountCreationObject)
+        const tx = { failKey: true, roleFeePayerKey: { publicKey: pubKey1 }, multisig, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -1314,7 +1359,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-162 : If transaction object has failKey, roleFeePayerKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign({ failKey: true, roleFeePayerKey: { publicKey: pubKey1 }, multisig }, accountCreationObject)
+        const tx = { failKey: true, roleFeePayerKey: { publicKey: pubKey1 }, multisig, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1322,10 +1367,13 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleFeePayerKey, publicKey and multisig
     it('CAVERJS-UNIT-TX-163 : If transaction object has failKey, roleFeePayerKey, publicKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            { failKey: true, roleFeePayerKey: { publicKey: pubKey1 }, publicKey: pubKey1, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleFeePayerKey: { publicKey: pubKey1 },
+            publicKey: pubKey1,
+            multisig,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -1337,10 +1385,13 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-163 : If transaction object has failKey, roleFeePayerKey, publicKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            { failKey: true, roleFeePayerKey: { publicKey: pubKey1 }, publicKey: pubKey1, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleFeePayerKey: { publicKey: pubKey1 },
+            publicKey: pubKey1,
+            multisig,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1348,10 +1399,13 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleTransactionKey, roleAccountUpdateKey and publicKey
     it('CAVERJS-UNIT-TX-164 : If transaction object has failKey, roleTransactionKey, roleAccountUpdateKey and publicKey, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            { failKey: true, roleTransactionKey: { publicKey: pubKey1 }, roleAccountUpdateKey: { publicKey: pubKey2 }, publicKey: pubKey1 },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleTransactionKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            publicKey: pubKey1,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -1363,10 +1417,13 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-164 : If transaction object has failKey, roleTransactionKey, roleAccountUpdateKey and publicKey, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            { failKey: true, roleTransactionKey: { publicKey: pubKey1 }, roleAccountUpdateKey: { publicKey: pubKey2 }, publicKey: pubKey1 },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleTransactionKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            publicKey: pubKey1,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1374,10 +1431,13 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleTransactionKey, roleAccountUpdateKey and multisig
     it('CAVERJS-UNIT-TX-165 : If transaction object has failKey, roleTransactionKey, roleAccountUpdateKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            { failKey: true, roleTransactionKey: { publicKey: pubKey1 }, roleAccountUpdateKey: { publicKey: pubKey2 }, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleTransactionKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            multisig,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -1389,10 +1449,13 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-165 : If transaction object has failKey, roleTransactionKey, roleAccountUpdateKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            { failKey: true, roleTransactionKey: { publicKey: pubKey1 }, roleAccountUpdateKey: { publicKey: pubKey2 }, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleTransactionKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            multisig,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1400,16 +1463,14 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleTransactionKey, roleAccountUpdateKey, publicKey and multisig
     it('CAVERJS-UNIT-TX-166 : If transaction object has failKey, roleTransactionKey, roleAccountUpdateKey, publicKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            {
-                failKey: true,
-                roleTransactionKey: { publicKey: pubKey1 },
-                roleAccountUpdateKey: { publicKey: pubKey2 },
-                publicKey: pubKey1,
-                multisig,
-            },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleTransactionKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            publicKey: pubKey1,
+            multisig,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -1421,16 +1482,14 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-166 : If transaction object has failKey, roleTransactionKey, roleAccountUpdateKey, publicKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            {
-                failKey: true,
-                roleTransactionKey: { publicKey: pubKey1 },
-                roleAccountUpdateKey: { publicKey: pubKey2 },
-                publicKey: pubKey1,
-                multisig,
-            },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleTransactionKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            publicKey: pubKey1,
+            multisig,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1438,10 +1497,13 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleTransactionKey, roleFeePayerKey and publicKey
     it('CAVERJS-UNIT-TX-167 : If transaction object has failKey, roleTransactionKey, roleFeePayerKey and publicKey, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            { failKey: true, roleTransactionKey: { publicKey: pubKey1 }, roleFeePayerKey: { publicKey: pubKey2 }, publicKey: pubKey1 },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleTransactionKey: { publicKey: pubKey1 },
+            roleFeePayerKey: { publicKey: pubKey2 },
+            publicKey: pubKey1,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -1453,10 +1515,13 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-167 : If transaction object has failKey, roleTransactionKey, roleFeePayerKey and publicKey, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            { failKey: true, roleTransactionKey: { publicKey: pubKey1 }, roleFeePayerKey: { publicKey: pubKey2 }, publicKey: pubKey1 },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleTransactionKey: { publicKey: pubKey1 },
+            roleFeePayerKey: { publicKey: pubKey2 },
+            publicKey: pubKey1,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1464,10 +1529,13 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleTransactionKey, roleFeePayerKey and multisig
     it('CAVERJS-UNIT-TX-168 : If transaction object has failKey, roleTransactionKey, roleFeePayerKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            { failKey: true, roleTransactionKey: { publicKey: pubKey1 }, roleFeePayerKey: { publicKey: pubKey2 }, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleTransactionKey: { publicKey: pubKey1 },
+            roleFeePayerKey: { publicKey: pubKey2 },
+            multisig,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -1479,10 +1547,13 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-168 : If transaction object has failKey, roleTransactionKey, roleFeePayerKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            { failKey: true, roleTransactionKey: { publicKey: pubKey1 }, roleFeePayerKey: { publicKey: pubKey2 }, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleTransactionKey: { publicKey: pubKey1 },
+            roleFeePayerKey: { publicKey: pubKey2 },
+            multisig,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1490,16 +1561,14 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleTransactionKey, roleFeePayerKey, publicKey and multisig
     it('CAVERJS-UNIT-TX-169 : If transaction object has failKey, roleTransactionKey, roleFeePayerKey, publicKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            {
-                failKey: true,
-                roleTransactionKey: { publicKey: pubKey1 },
-                roleFeePayerKey: { publicKey: pubKey2 },
-                publicKey: pubKey1,
-                multisig,
-            },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleTransactionKey: { publicKey: pubKey1 },
+            roleFeePayerKey: { publicKey: pubKey2 },
+            publicKey: pubKey1,
+            multisig,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -1511,16 +1580,14 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-169 : If transaction object has failKey, roleTransactionKey, roleFeePayerKey, publicKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            {
-                failKey: true,
-                roleTransactionKey: { publicKey: pubKey1 },
-                roleFeePayerKey: { publicKey: pubKey2 },
-                publicKey: pubKey1,
-                multisig,
-            },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleTransactionKey: { publicKey: pubKey1 },
+            roleFeePayerKey: { publicKey: pubKey2 },
+            publicKey: pubKey1,
+            multisig,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1528,10 +1595,13 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with  roleAccountUpdateKey, roleFeePayerKey and publicKey
     it('CAVERJS-UNIT-TX-170 : If transaction object has failKey, roleAccountUpdateKey, roleFeePayerKey and publicKey, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            { failKey: true, roleAccountUpdateKey: { publicKey: pubKey2 }, roleFeePayerKey: { publicKey: pubKey3 }, publicKey: pubKey1 },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            roleFeePayerKey: { publicKey: pubKey3 },
+            publicKey: pubKey1,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -1543,10 +1613,13 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-170 : If transaction object has failKey, roleAccountUpdateKey, roleFeePayerKey and publicKey, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            { failKey: true, roleAccountUpdateKey: { publicKey: pubKey2 }, roleFeePayerKey: { publicKey: pubKey3 }, publicKey: pubKey1 },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            roleFeePayerKey: { publicKey: pubKey3 },
+            publicKey: pubKey1,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1554,10 +1627,13 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleAccountUpdateKey, roleFeePayerKey and multisig
     it('CAVERJS-UNIT-TX-171 : If transaction object has failKey, roleAccountUpdateKey, roleFeePayerKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            { failKey: true, roleAccountUpdateKey: { publicKey: pubKey2 }, roleFeePayerKey: { publicKey: pubKey3 }, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            roleFeePayerKey: { publicKey: pubKey3 },
+            multisig,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -1569,10 +1645,13 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-171 : If transaction object has failKey, roleAccountUpdateKey, roleFeePayerKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            { failKey: true, roleAccountUpdateKey: { publicKey: pubKey2 }, roleFeePayerKey: { publicKey: pubKey3 }, multisig },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            roleFeePayerKey: { publicKey: pubKey3 },
+            multisig,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1580,16 +1659,14 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleAccountUpdateKey, roleFeePayerKey, publicKey and multisig
     it('CAVERJS-UNIT-TX-172 : If transaction object has failKey, roleAccountUpdateKey, roleFeePayerKey, publicKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            {
-                failKey: true,
-                roleAccountUpdateKey: { publicKey: pubKey2 },
-                roleFeePayerKey: { publicKey: pubKey3 },
-                publicKey: pubKey1,
-                multisig,
-            },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            roleFeePayerKey: { publicKey: pubKey3 },
+            publicKey: pubKey1,
+            multisig,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -1601,16 +1678,14 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-172 : If transaction object has failKey, roleAccountUpdateKey, roleFeePayerKey, publicKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            {
-                failKey: true,
-                roleAccountUpdateKey: { publicKey: pubKey2 },
-                roleFeePayerKey: { publicKey: pubKey3 },
-                publicKey: pubKey1,
-                multisig,
-            },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            roleFeePayerKey: { publicKey: pubKey3 },
+            publicKey: pubKey1,
+            multisig,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1618,16 +1693,14 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleTransactionKey, roleAccountUpdateKey, roleFeePayerKey and publicKey
     it('CAVERJS-UNIT-TX-173 : If transaction object has failKey, roleTransactionKey, roleAccountUpdateKey, roleFeePayerKey and publicKey, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            {
-                failKey: true,
-                roleTransactionKey: { publicKey: pubKey1 },
-                roleAccountUpdateKey: { publicKey: pubKey2 },
-                roleFeePayerKey: { publicKey: pubKey3 },
-                publicKey: pubKey1,
-            },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleTransactionKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            roleFeePayerKey: { publicKey: pubKey3 },
+            publicKey: pubKey1,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -1639,16 +1712,14 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-173 : If transaction object has failKey, roleTransactionKey, roleAccountUpdateKey, roleFeePayerKey and publicKey, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            {
-                failKey: true,
-                roleTransactionKey: { publicKey: pubKey1 },
-                roleAccountUpdateKey: { publicKey: pubKey2 },
-                roleFeePayerKey: { publicKey: pubKey3 },
-                publicKey: pubKey1,
-            },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleTransactionKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            roleFeePayerKey: { publicKey: pubKey3 },
+            publicKey: pubKey1,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1656,16 +1727,14 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleTransactionKey, roleAccountUpdateKey, roleFeePayerKey and multisig
     it('CAVERJS-UNIT-TX-174 : If transaction object has failKey, roleTransactionKey, roleAccountUpdateKey, roleFeePayerKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            {
-                failKey: true,
-                roleTransactionKey: { publicKey: pubKey1 },
-                roleAccountUpdateKey: { publicKey: pubKey2 },
-                roleFeePayerKey: { publicKey: pubKey3 },
-                multisig,
-            },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleTransactionKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            roleFeePayerKey: { publicKey: pubKey3 },
+            multisig,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -1677,16 +1746,14 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-174 : If transaction object has failKey, roleTransactionKey, roleAccountUpdateKey, roleFeePayerKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            {
-                failKey: true,
-                roleTransactionKey: { publicKey: pubKey1 },
-                roleAccountUpdateKey: { publicKey: pubKey2 },
-                roleFeePayerKey: { publicKey: pubKey3 },
-                multisig,
-            },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleTransactionKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            roleFeePayerKey: { publicKey: pubKey3 },
+            multisig,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1694,17 +1761,15 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // FailKey with roleTransactionKey, roleAccountUpdateKey, roleFeePayerKey, publicKey and multisig
     it('CAVERJS-UNIT-TX-175 : If transaction object has failKey, roleTransactionKey, roleAccountUpdateKey, roleFeePayerKey, publicKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            {
-                failKey: true,
-                roleTransactionKey: { publicKey: pubKey1 },
-                roleAccountUpdateKey: { publicKey: pubKey2 },
-                roleFeePayerKey: { publicKey: pubKey3 },
-                publicKey: pubKey1,
-                multisig,
-            },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleTransactionKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            roleFeePayerKey: { publicKey: pubKey3 },
+            publicKey: pubKey1,
+            multisig,
+            ...accountCreationObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -1716,17 +1781,15 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-175 : If transaction object has failKey, roleTransactionKey, roleAccountUpdateKey, roleFeePayerKey, publicKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            {
-                failKey: true,
-                roleTransactionKey: { publicKey: pubKey1 },
-                roleAccountUpdateKey: { publicKey: pubKey2 },
-                roleFeePayerKey: { publicKey: pubKey3 },
-                publicKey: pubKey1,
-                multisig,
-            },
-            accountCreationObject
-        )
+        const tx = {
+            failKey: true,
+            roleTransactionKey: { publicKey: pubKey1 },
+            roleAccountUpdateKey: { publicKey: pubKey2 },
+            roleFeePayerKey: { publicKey: pubKey3 },
+            publicKey: pubKey1,
+            multisig,
+            ...accountCreationObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1734,7 +1797,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // UnnecessaryData
     it('CAVERJS-UNIT-TX-176 : If transaction object has data, signTransaction should throw error', async () => {
-        const tx = Object.assign({ publicKey: pubKey1, data: '0x68656c6c6f' }, accountCreationObject)
+        const tx = { publicKey: pubKey1, data: '0x68656c6c6f', ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -1746,7 +1809,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-176 : If transaction object has data, sendTransaction should throw error', () => {
-        const tx = Object.assign({ publicKey: pubKey1, data: '0x68656c6c6f' }, accountCreationObject)
+        const tx = { publicKey: pubKey1, data: '0x68656c6c6f', ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1755,7 +1818,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     // UnnecessaryFeePayer
     it('CAVERJS-UNIT-TX-177 : If transaction object has feePayer, signTransaction should throw error', async () => {
         const payer = caver.klay.accounts.create()
-        const tx = Object.assign({ publicKey: pubKey1, feePayer: payer.address }, accountCreationObject)
+        const tx = { publicKey: pubKey1, feePayer: payer.address, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -1768,7 +1831,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     it('CAVERJS-UNIT-TX-177 : If transaction object has data, sendTransaction should throw error', () => {
         const payer = caver.klay.accounts.create()
-        const tx = Object.assign({ publicKey: pubKey1, feePayer: payer.address }, accountCreationObject)
+        const tx = { publicKey: pubKey1, feePayer: payer.address, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1776,7 +1839,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // UnnecessaryFeeRatio
     it('CAVERJS-UNIT-TX-178 : If transaction object has feeRatio, signTransaction should throw error', async () => {
-        const tx = Object.assign({ publicKey: pubKey1, feeRatio: 20 }, accountCreationObject)
+        const tx = { publicKey: pubKey1, feeRatio: 20, ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -1788,7 +1851,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-178 : If transaction object has feeRatio, sendTransaction should throw error', () => {
-        const tx = Object.assign({ publicKey: pubKey1, feeRatio: 20 }, accountCreationObject)
+        const tx = { publicKey: pubKey1, feeRatio: 20, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1796,7 +1859,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // UnnecessaryCodeFormat
     it('CAVERJS-UNIT-TX-179 : If transaction object has codeFormat, signTransaction should throw error', async () => {
-        const tx = Object.assign({ publicKey: pubKey1, codeFormat: 'EVM' }, accountCreationObject)
+        const tx = { publicKey: pubKey1, codeFormat: 'EVM', ...accountCreationObject }
 
         let result
         await caver.klay.accounts
@@ -1808,7 +1871,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-179 : If transaction object has codeFormat, sendTransaction should throw error', () => {
-        const tx = Object.assign({ publicKey: pubKey1, codeFormat: 'EVM' }, accountCreationObject)
+        const tx = { publicKey: pubKey1, codeFormat: 'EVM', ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -1816,7 +1879,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // Create account with legacyKey
     it('CAVERJS-UNIT-TX-180 : If transaction object has only legacyKey, create account with legacyKey', async () => {
-        const tx = Object.assign({ legacyKey: true }, accountCreationObject)
+        const tx = { legacyKey: true, ...accountCreationObject }
 
         const receipt = await caver.klay.sendTransaction(tx)
         expect(receipt.to).to.equals(tx.to)
@@ -1827,7 +1890,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // LegacyKey with publicKey
     it('CAVERJS-UNIT-TX-181 : If transaction object has legacyKey and publicKey, signTransaction should throw error', async () => {
-        const tx = Object.assign({ legacyKey: true, publicKey: pubKey1 }, accountCreationObject)
+        const tx = { legacyKey: true, publicKey: pubKey1, ...accountCreationObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -1838,7 +1901,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-181 : If transaction object has legacyKey and publicKey, sendTransaction should throw error', () => {
-        const tx = Object.assign({ legacyKey: true, publicKey: pubKey1 }, accountCreationObject)
+        const tx = { legacyKey: true, publicKey: pubKey1, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws('The key parameter to be used for ACCOUNT_CREATION is duplicated.')
@@ -1846,7 +1909,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // LegacyKey with multisig
     it('CAVERJS-UNIT-TX-182 : If transaction object has legacyKey and multisig, signTransaction should throw error', async () => {
-        const tx = Object.assign({ legacyKey: true, multisig }, accountCreationObject)
+        const tx = { legacyKey: true, multisig, ...accountCreationObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -1857,7 +1920,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-182 : If transaction object has legacyKey and multisig, sendTransaction should throw error', () => {
-        const tx = Object.assign({ legacyKey: true, multisig }, accountCreationObject)
+        const tx = { legacyKey: true, multisig, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws('The key parameter to be used for ACCOUNT_CREATION is duplicated.')
@@ -1865,7 +1928,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // LegacyKey with failKey
     it('CAVERJS-UNIT-TX-183 : If transaction object has legacyKey and failKey, signTransaction should throw error', async () => {
-        const tx = Object.assign({ legacyKey: true, failKey: true }, accountCreationObject)
+        const tx = { legacyKey: true, failKey: true, ...accountCreationObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -1876,7 +1939,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-183 : If transaction object has legacyKey and failKey, sendTransaction should throw error', () => {
-        const tx = Object.assign({ legacyKey: true, failKey: true }, accountCreationObject)
+        const tx = { legacyKey: true, failKey: true, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws('The key parameter to be used for ACCOUNT_CREATION is duplicated.')
@@ -1884,7 +1947,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // LegacyKey with roleTransactionKey
     it('CAVERJS-UNIT-TX-184 : If transaction object has legacyKey and roleTransactionKey, signTransaction should throw error', async () => {
-        const tx = Object.assign({ legacyKey: true, roleTransactionKey: { publicKey: pubKey1 } }, accountCreationObject)
+        const tx = { legacyKey: true, roleTransactionKey: { publicKey: pubKey1 }, ...accountCreationObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -1895,7 +1958,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-184 : If transaction object has legacyKey and roleTransactionKey, sendTransaction should throw error', () => {
-        const tx = Object.assign({ legacyKey: true, roleTransactionKey: { publicKey: pubKey1 } }, accountCreationObject)
+        const tx = { legacyKey: true, roleTransactionKey: { publicKey: pubKey1 }, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws('The key parameter to be used for ACCOUNT_CREATION is duplicated.')
@@ -1903,7 +1966,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // LegacyKey with roleAccountUpdateKey
     it('CAVERJS-UNIT-TX-185 : If transaction object has legacyKey and roleAccountUpdateKey, signTransaction should throw error', async () => {
-        const tx = Object.assign({ legacyKey: true, roleAccountUpdateKey: { publicKey: pubKey1 } }, accountCreationObject)
+        const tx = { legacyKey: true, roleAccountUpdateKey: { publicKey: pubKey1 }, ...accountCreationObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -1914,7 +1977,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-185 : If transaction object has legacyKey and roleAccountUpdateKey, sendTransaction should throw error', () => {
-        const tx = Object.assign({ legacyKey: true, roleAccountUpdateKey: { publicKey: pubKey1 } }, accountCreationObject)
+        const tx = { legacyKey: true, roleAccountUpdateKey: { publicKey: pubKey1 }, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws('The key parameter to be used for ACCOUNT_CREATION is duplicated.')
@@ -1922,7 +1985,7 @@ describe('ACCOUNT_CREATION transaction', () => {
 
     // LegacyKey with roleFeePayerKey
     it('CAVERJS-UNIT-TX-186 : If transaction object has legacyKey and roleFeePayerKey, signTransaction should throw error', async () => {
-        const tx = Object.assign({ legacyKey: true, roleFeePayerKey: { publicKey: pubKey1 } }, accountCreationObject)
+        const tx = { legacyKey: true, roleFeePayerKey: { publicKey: pubKey1 }, ...accountCreationObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -1933,7 +1996,7 @@ describe('ACCOUNT_CREATION transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-186 : If transaction object has legacyKey and roleFeePayerKey, sendTransaction should throw error', () => {
-        const tx = Object.assign({ legacyKey: true, roleFeePayerKey: { publicKey: pubKey1 } }, accountCreationObject)
+        const tx = { legacyKey: true, roleFeePayerKey: { publicKey: pubKey1 }, ...accountCreationObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws('The key parameter to be used for ACCOUNT_CREATION is duplicated.')
