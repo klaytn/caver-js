@@ -48,7 +48,7 @@ before(() => {
     caver.wallet.add(sender)
     caver.wallet.add(feePayer)
 
-    password = process.env.password? process.env.password : 'password'
+    password = process.env.password ? process.env.password : 'password'
 })
 
 describe('caver.contract makes it easy to interact with smart contracts on the Klaytn blockchain platform', () => {

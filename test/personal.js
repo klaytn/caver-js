@@ -36,7 +36,7 @@ before(() => {
     const sender = caver.klay.accounts.privateKeyToAccount(senderPrvKey)
     senderAddress = sender.address
 
-    password = process.env.password? process.env.password : 'password'
+    password = process.env.password ? process.env.password : 'password'
 })
 
 describe('Personal RPC test', () => {

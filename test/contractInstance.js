@@ -109,7 +109,7 @@ before(() => {
             ? `0x${process.env.privateKey}`
             : process.env.privateKey
 
-    password = process.env.password? process.env.password : 'password'
+    password = process.env.password ? process.env.password : 'password'
 })
 
 beforeEach(() => {

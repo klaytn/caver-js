@@ -35,7 +35,7 @@ before(() => {
 
     senderAddress = caver.klay.accounts.wallet.add(senderPrvKey).address
 
-    password = process.env.password? process.env.password : 'password'
+    password = process.env.password ? process.env.password : 'password'
 })
 
 describe('caver.klay.sign', () => {
