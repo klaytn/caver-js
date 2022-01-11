@@ -24,6 +24,7 @@
  * @date 2017
  */
 
+/* eslint-disable max-classes-per-file */
 const _ = require('lodash')
 
 const core = require('../../caver-core')

@@ -2,3 +2,6 @@
 	path = caver-conformance-tests
 	url = https://github.com/ground-x/caver-conformance-tests.git
 	branch = dev
+[submodule "test/klaytn-integration-tests"]
+	path = test/klaytn-integration-tests
+	url = https://github.com/klaytn/klaytn-integration-tests

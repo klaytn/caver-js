@@ -55,7 +55,7 @@ describe('VALUE_TRANSFER transaction', () => {
     })
 
     it('If transaction object has all essential value, sendTransaction should not return error', async () => {
-        const tx = Object.assign({}, valueTransferObject)
+        const tx = { ...valueTransferObject }
 
         let result
         await caver.klay
@@ -68,7 +68,7 @@ describe('VALUE_TRANSFER transaction', () => {
 
     // Error from missing
     it('CAVERJS-UNIT-TX-021 : If transaction object missing from, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, valueTransferObject)
+        const tx = { ...valueTransferObject }
         delete tx.from
 
         let result
@@ -80,7 +80,7 @@ describe('VALUE_TRANSFER transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-021 : If transaction object missing from, sendTransaction should throw error', () => {
-        const tx = Object.assign({}, valueTransferObject)
+        const tx = { ...valueTransferObject }
         delete tx.from
 
         // Throw error from formatter validation
@@ -89,7 +89,7 @@ describe('VALUE_TRANSFER transaction', () => {
 
     // Error to missing
     it('CAVERJS-UNIT-TX-022 : If transaction object missing to, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, valueTransferObject)
+        const tx = { ...valueTransferObject }
         delete tx.to
 
         let result
@@ -101,7 +101,7 @@ describe('VALUE_TRANSFER transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-022 : If transaction object missing to, sendTransaction should throw error', () => {
-        const tx = Object.assign({}, valueTransferObject)
+        const tx = { ...valueTransferObject }
         delete tx.to
 
         // Throw error from formatter validation
@@ -110,7 +110,7 @@ describe('VALUE_TRANSFER transaction', () => {
 
     // Error value missing
     it('CAVERJS-UNIT-TX-023 : If transaction object missing value, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, valueTransferObject)
+        const tx = { ...valueTransferObject }
         delete tx.value
 
         let result
@@ -122,7 +122,7 @@ describe('VALUE_TRANSFER transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-023 : If transaction object missing value, sendTransaction should throw error', () => {
-        const tx = Object.assign({}, valueTransferObject)
+        const tx = { ...valueTransferObject }
         delete tx.value
 
         // Throw error from formatter validation
@@ -131,7 +131,7 @@ describe('VALUE_TRANSFER transaction', () => {
 
     // Error gas and gasLimit missing
     it('CAVERJS-UNIT-TX-024 : If transaction object missing gas and gasLimit, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, valueTransferObject)
+        const tx = { ...valueTransferObject }
         delete tx.gas
 
         let result
@@ -143,7 +143,7 @@ describe('VALUE_TRANSFER transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-024 : If transaction object missing gas and gasLimit, sendTransaction should throw error', () => {
-        const tx = Object.assign({}, valueTransferObject)
+        const tx = { ...valueTransferObject }
         delete tx.gas
 
         // Throw error from formatter validation
@@ -152,7 +152,7 @@ describe('VALUE_TRANSFER transaction', () => {
 
     // Error unnecessary feePayer
     it('CAVERJS-UNIT-TX-025 : If transaction object has unnecessary feePayer field, signTransaction should throw error', async () => {
-        const tx = Object.assign({ feePayer: testAccount.address }, valueTransferObject)
+        const tx = { feePayer: testAccount.address, ...valueTransferObject }
 
         let result
         await caver.klay.accounts
@@ -163,7 +163,7 @@ describe('VALUE_TRANSFER transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-025 : If transaction object has unnecessary feePayer field, sendTransaction should throw error', () => {
-        const tx = Object.assign({ feePayer: testAccount.address }, valueTransferObject)
+        const tx = { feePayer: testAccount.address, ...valueTransferObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -171,7 +171,7 @@ describe('VALUE_TRANSFER transaction', () => {
 
     // Error unnecessary feeRatio
     it('CAVERJS-UNIT-TX-026 : If transaction object has unnecessary feeRatio field, signTransaction should throw error', async () => {
-        const tx = Object.assign({ feeRatio: 20 }, valueTransferObject)
+        const tx = { feeRatio: 20, ...valueTransferObject }
 
         let result
         await caver.klay.accounts
@@ -182,7 +182,7 @@ describe('VALUE_TRANSFER transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-026 : If transaction object has unnecessary feeRatio field, sendTransaction should throw error', () => {
-        const tx = Object.assign({ feeRatio: 20 }, valueTransferObject)
+        const tx = { feeRatio: 20, ...valueTransferObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -190,13 +190,11 @@ describe('VALUE_TRANSFER transaction', () => {
 
     // Error unnecessary publicKey
     it('CAVERJS-UNIT-TX-027 : If transaction object has unnecessary publicKey field, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            {
-                publicKey:
-                    '0x006dc19d50bbc8a8e4b0f26c0dd3e78978f5f691a6161c41e3b0e4d1aa2d60fad62f37912b59f484b2e05bd3c9c3b4d93b0ca570d6d4421eee544e7da99e9de4',
-            },
-            valueTransferObject
-        )
+        const tx = {
+            publicKey:
+                '0x006dc19d50bbc8a8e4b0f26c0dd3e78978f5f691a6161c41e3b0e4d1aa2d60fad62f37912b59f484b2e05bd3c9c3b4d93b0ca570d6d4421eee544e7da99e9de4',
+            ...valueTransferObject,
+        }
 
         let result
         await caver.klay.accounts
@@ -207,13 +205,11 @@ describe('VALUE_TRANSFER transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-027 : If transaction object has unnecessary publicKey field, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            {
-                publicKey:
-                    '0x006dc19d50bbc8a8e4b0f26c0dd3e78978f5f691a6161c41e3b0e4d1aa2d60fad62f37912b59f484b2e05bd3c9c3b4d93b0ca570d6d4421eee544e7da99e9de4',
-            },
-            valueTransferObject
-        )
+        const tx = {
+            publicKey:
+                '0x006dc19d50bbc8a8e4b0f26c0dd3e78978f5f691a6161c41e3b0e4d1aa2d60fad62f37912b59f484b2e05bd3c9c3b4d93b0ca570d6d4421eee544e7da99e9de4',
+            ...valueTransferObject,
+        }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -246,7 +242,7 @@ describe('VALUE_TRANSFER transaction', () => {
                 },
             ],
         }
-        const tx = Object.assign({ multisig }, valueTransferObject)
+        const tx = { multisig, ...valueTransferObject }
 
         let result
         await caver.klay.accounts
@@ -282,7 +278,7 @@ describe('VALUE_TRANSFER transaction', () => {
                 },
             ],
         }
-        const tx = Object.assign({ multisig }, valueTransferObject)
+        const tx = { multisig, ...valueTransferObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -294,7 +290,7 @@ describe('VALUE_TRANSFER transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleTransactionKey }, valueTransferObject)
+        const tx = { roleTransactionKey, ...valueTransferObject }
 
         let result
         await caver.klay.accounts
@@ -309,7 +305,7 @@ describe('VALUE_TRANSFER transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleTransactionKey }, valueTransferObject)
+        const tx = { roleTransactionKey, ...valueTransferObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -321,7 +317,7 @@ describe('VALUE_TRANSFER transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleAccountUpdateKey }, valueTransferObject)
+        const tx = { roleAccountUpdateKey, ...valueTransferObject }
 
         let result
         await caver.klay.accounts
@@ -336,7 +332,7 @@ describe('VALUE_TRANSFER transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleAccountUpdateKey }, valueTransferObject)
+        const tx = { roleAccountUpdateKey, ...valueTransferObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -348,7 +344,7 @@ describe('VALUE_TRANSFER transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleFeePayerKey }, valueTransferObject)
+        const tx = { roleFeePayerKey, ...valueTransferObject }
 
         let result
         await caver.klay.accounts
@@ -363,7 +359,7 @@ describe('VALUE_TRANSFER transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleFeePayerKey }, valueTransferObject)
+        const tx = { roleFeePayerKey, ...valueTransferObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -371,7 +367,7 @@ describe('VALUE_TRANSFER transaction', () => {
 
     // Error unnecessary failKey
     it('CAVERJS-UNIT-TX-032 : If transaction object has unnecessary failKey field, signTransaction should throw error', async () => {
-        const tx = Object.assign({ failKey: true }, valueTransferObject)
+        const tx = { failKey: true, ...valueTransferObject }
 
         let result
         await caver.klay.accounts
@@ -382,7 +378,7 @@ describe('VALUE_TRANSFER transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-032 : If transaction object has unnecessary failKey field, sendTransaction should throw error', () => {
-        const tx = Object.assign({ failKey: true }, valueTransferObject)
+        const tx = { failKey: true, ...valueTransferObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -390,7 +386,7 @@ describe('VALUE_TRANSFER transaction', () => {
 
     // Error unnecessary codeFormat
     it('CAVERJS-UNIT-TX-033 : If transaction object has unnecessary codeFormat field, signTransaction should throw error', async () => {
-        const tx = Object.assign({ codeFormat: 'EVM' }, valueTransferObject)
+        const tx = { codeFormat: 'EVM', ...valueTransferObject }
 
         let result
         await caver.klay.accounts
@@ -401,7 +397,7 @@ describe('VALUE_TRANSFER transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-033 : If transaction object has unnecessary codeFormat field, sendTransaction should throw error', () => {
-        const tx = Object.assign({ codeFormat: 'EVM' }, valueTransferObject)
+        const tx = { codeFormat: 'EVM', ...valueTransferObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -411,7 +407,7 @@ describe('VALUE_TRANSFER transaction', () => {
     it('CAVERJS-UNIT-TX-034 : If transaction object has unnecessary data field, signTransaction should throw error', async () => {
         const data =
             '0x6080604052348015600f57600080fd5b5060e98061001e6000396000f300608060405260043610603f576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff168063954ab4b2146044575b600080fd5b348015604f57600080fd5b5060566058565b005b7f90a042becc42ba1b13a5d545701bf5ceff20b24d9e5cc63b67f96ef814d80f0933604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a15600a165627a7a723058200ebb53e9d575350ceb2d92263b7d4920888706b5221f024e7bbc10e3dbb8e18d0029'
-        const tx = Object.assign({ data }, valueTransferObject)
+        const tx = { data, ...valueTransferObject }
 
         let result
         await caver.klay.accounts
@@ -424,7 +420,7 @@ describe('VALUE_TRANSFER transaction', () => {
     it('CAVERJS-UNIT-TX-034 : If transaction object has unnecessary data field, sendTransaction should throw error', () => {
         const data =
             '0x6080604052348015600f57600080fd5b5060e98061001e6000396000f300608060405260043610603f576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff168063954ab4b2146044575b600080fd5b348015604f57600080fd5b5060566058565b005b7f90a042becc42ba1b13a5d545701bf5ceff20b24d9e5cc63b67f96ef814d80f0933604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a15600a165627a7a723058200ebb53e9d575350ceb2d92263b7d4920888706b5221f024e7bbc10e3dbb8e18d0029'
-        const tx = Object.assign({ data }, valueTransferObject)
+        const tx = { data, ...valueTransferObject }
 
         // Throw error from formatter validation
         expect(() => caver.klay.sendTransaction(tx)).to.throws()
@@ -432,7 +428,7 @@ describe('VALUE_TRANSFER transaction', () => {
 
     // UnnecessaryLegacyKey
     it('CAVERJS-UNIT-TX-559 : If transaction object has unnecessary legacyKey field, signTransaction should throw error', async () => {
-        const tx = Object.assign({ legacyKey: true }, valueTransferObject)
+        const tx = { legacyKey: true, ...valueTransferObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -441,14 +437,14 @@ describe('VALUE_TRANSFER transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-559 : If transaction object has unnecessary legacyKey field, sendTransaction should throw error', () => {
-        const tx = Object.assign({ legacyKey: true }, valueTransferObject)
+        const tx = { legacyKey: true, ...valueTransferObject }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"legacyKey" cannot be used with VALUE_TRANSFER transaction')
     }).timeout(200000)
 
     // Invalid from address
     it('CAVERJS-UNIT-TX-666: If transaction object has invalid from, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, valueTransferObject)
+        const tx = { ...valueTransferObject }
         tx.from = 'invalidAddress'
 
         const expectedError = `Invalid address of from: ${tx.from}`
@@ -457,7 +453,7 @@ describe('VALUE_TRANSFER transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-666: If transaction object has invalid from, sendTransaction should throw error', () => {
-        const tx = Object.assign({}, valueTransferObject)
+        const tx = { ...valueTransferObject }
         tx.from = 'invalidAddress'
 
         const expectedError = `Provided address "${tx.from}" is invalid, the capitalization checksum test failed`
@@ -468,7 +464,7 @@ describe('VALUE_TRANSFER transaction', () => {
 
     // UnnecessaryFeePayerSignatures
     it('CAVERJS-UNIT-TX-667: If transaction object has unnecessary feePayerSignatures, signTransaction should throw error', async () => {
-        const tx = Object.assign({ feePayerSignatures: [['0x01', '0x', '0x']] }, valueTransferObject)
+        const tx = { feePayerSignatures: [['0x01', '0x', '0x']], ...valueTransferObject }
 
         const expectedError = `"feePayerSignatures" cannot be used with ${tx.type} transaction`
 
@@ -476,7 +472,7 @@ describe('VALUE_TRANSFER transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-667: If transaction object has unnecessary feePayerSignatures, sendTransaction should throw error', () => {
-        const tx = Object.assign({ feePayerSignatures: [['0x01', '0x', '0x']] }, valueTransferObject)
+        const tx = { feePayerSignatures: [['0x01', '0x', '0x']], ...valueTransferObject }
 
         const expectedError = `"feePayerSignatures" cannot be used with ${tx.type} transaction`
 
@@ -487,7 +483,7 @@ describe('VALUE_TRANSFER transaction', () => {
     // InvalidTo
     it('CAVERJS-UNIT-TX-668: If transaction object has invalid to address, signTransaction should throw error', async () => {
         const invalidTo = 'invalid'
-        const tx = Object.assign({}, valueTransferObject)
+        const tx = { ...valueTransferObject }
         tx.to = invalidTo
 
         const expectedError = `Invalid address of to: ${tx.to}`
@@ -497,7 +493,7 @@ describe('VALUE_TRANSFER transaction', () => {
 
     it('CAVERJS-UNIT-TX-668: If transaction object has unnecessary feePayerSignatures, sendTransaction should throw error', () => {
         const invalidTo = 'invalid'
-        const tx = Object.assign({}, valueTransferObject)
+        const tx = { ...valueTransferObject }
         tx.to = invalidTo
 
         const expectedError = `Provided address "${tx.to}" is invalid, the capitalization checksum test failed.`
@@ -509,7 +505,7 @@ describe('VALUE_TRANSFER transaction', () => {
     it('CAVERJS-UNIT-TX-727: sendTransaction should throw error when try to use an account in Node with not LEGACY transaction', async () => {
         const acctInNode = caver.klay.accounts.create()
 
-        const tx = Object.assign({}, valueTransferObject)
+        const tx = { ...valueTransferObject }
         tx.from = acctInNode.address
 
         const expectedError = `No private key found in the caver-js wallet. Trying to use the Klaytn node's wallet, but it only supports legacy transactions. Please add private key of ${acctInNode.address.toLowerCase()} to the caver-js wallet.`

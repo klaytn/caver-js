@@ -255,20 +255,18 @@ before(() => {
         gas: '0x3b9ac9ff',
     }
 
-    txObjWithLegacy = Object.assign({ account: makeAccount(sender.address, accountKeyTestCases.LEGACY) }, commonObj)
-    txObjWithPublic = Object.assign({ account: makeAccount(sender.address, accountKeyTestCases.PUBLIC) }, commonObj)
-    txObjWithFail = Object.assign({ account: makeAccount(sender.address, accountKeyTestCases.FAIL) }, commonObj)
-    txObjWithMultiSig = Object.assign({ account: makeAccount(sender.address, accountKeyTestCases.MULTISIG) }, commonObj)
-    txObjWithRoleBased = Object.assign(
-        {
-            account: makeAccount(sender.address, accountKeyTestCases.ROLEBAED, [
-                { threshold: 2, weights: [1, 1, 1] },
-                {},
-                { threshold: 1, weights: [1, 1] },
-            ]),
-        },
-        commonObj
-    )
+    txObjWithLegacy = { account: makeAccount(sender.address, accountKeyTestCases.LEGACY), ...commonObj }
+    txObjWithPublic = { account: makeAccount(sender.address, accountKeyTestCases.PUBLIC), ...commonObj }
+    txObjWithFail = { account: makeAccount(sender.address, accountKeyTestCases.FAIL), ...commonObj }
+    txObjWithMultiSig = { account: makeAccount(sender.address, accountKeyTestCases.MULTISIG), ...commonObj }
+    txObjWithRoleBased = {
+        account: makeAccount(sender.address, accountKeyTestCases.ROLEBAED, [
+            { threshold: 2, weights: [1, 1, 1] },
+            {},
+            { threshold: 1, weights: [1, 1] },
+        ]),
+        ...commonObj,
+    }
 
     makeAccountUpdateObjectWithExpectedValues()
 })
@@ -300,7 +298,7 @@ describe('TxTypeAccountUpdate', () => {
 
     context('create accountUpdate instance', () => {
         it('CAVERJS-UNIT-TRANSACTION-152: If accountUpdate not define from, return error', () => {
-            const testUpdateObj = Object.assign({}, txObjWithPublic)
+            const testUpdateObj = { ...txObjWithPublic }
             delete testUpdateObj.from
 
             const expectedError = '"from" is missing'
@@ -308,7 +306,7 @@ describe('TxTypeAccountUpdate', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-153: If accountUpdate not define gas, return error', () => {
-            const testUpdateObj = Object.assign({}, txObjWithPublic)
+            const testUpdateObj = { ...txObjWithPublic }
             delete testUpdateObj.gas
 
             const expectedError = '"gas" is missing'
@@ -316,7 +314,7 @@ describe('TxTypeAccountUpdate', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-389: If accountUpdate not define gas, return error', () => {
-            const testUpdateObj = Object.assign({}, txObjWithPublic)
+            const testUpdateObj = { ...txObjWithPublic }
             delete testUpdateObj.account
 
             const expectedError = 'Missing account information with TxTypeAccountUpdate transaction'
@@ -324,7 +322,7 @@ describe('TxTypeAccountUpdate', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-154: If accountUpdate define from property with invalid address, return error', () => {
-            const testUpdateObj = Object.assign({}, txObjWithPublic)
+            const testUpdateObj = { ...txObjWithPublic }
             testUpdateObj.from = 'invalid'
 
             const expectedError = `Invalid address of from: ${testUpdateObj.from}`
@@ -332,7 +330,7 @@ describe('TxTypeAccountUpdate', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-155: If accountUpdate define unnecessary property, return error', () => {
-            const testUpdateObj = Object.assign({}, txObjWithPublic)
+            const testUpdateObj = { ...txObjWithPublic }
 
             const unnecessaries = [
                 propertiesForUnnecessary.data,

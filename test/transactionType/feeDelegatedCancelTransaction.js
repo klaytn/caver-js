@@ -58,7 +58,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
 
     // Error from missing
     it('CAVERJS-UNIT-TX-526 : If transaction object missing from, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, cancelObject)
+        const tx = { ...cancelObject }
         delete tx.from
 
         await caver.klay.accounts
@@ -68,7 +68,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-526 : If transaction object missing from, sendTransaction should throw error', () => {
-        const tx = Object.assign({}, cancelObject)
+        const tx = { ...cancelObject }
         delete tx.from
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('The send transactions "from" field must be defined!')
@@ -76,7 +76,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
 
     // UnnecessaryTo
     it('CAVERJS-UNIT-TX-527 : If transaction object has unnecessary to field, signTransaction should throw error', async () => {
-        const tx = Object.assign({ to: testAccount.address }, cancelObject)
+        const tx = { to: testAccount.address, ...cancelObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -85,14 +85,14 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-527 : If transaction object has unnecessary to field, sendTransaction should throw error', () => {
-        const tx = Object.assign({ to: testAccount.address }, cancelObject)
+        const tx = { to: testAccount.address, ...cancelObject }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"to" cannot be used with FEE_DELEGATED_CANCEL transaction')
     }).timeout(200000)
 
     // UnnecessaryValue
     it('CAVERJS-UNIT-TX-528 : If transaction object has unnecessary value field, signTransaction should throw error', async () => {
-        const tx = Object.assign({ value: 1 }, cancelObject)
+        const tx = { value: 1, ...cancelObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -101,14 +101,14 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-528 : If transaction object has unnecessary value field, sendTransaction should throw error', () => {
-        const tx = Object.assign({ value: 1 }, cancelObject)
+        const tx = { value: 1, ...cancelObject }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"value" cannot be used with FEE_DELEGATED_CANCEL transaction')
     }).timeout(200000)
 
     // MissingGas
     it('CAVERJS-UNIT-TX-529 : If transaction object missing gas and gasLimit, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, cancelObject)
+        const tx = { ...cancelObject }
         delete tx.gas
 
         await caver.klay.accounts
@@ -118,7 +118,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-529 : If transaction object missing gas and gasLimit, sendTransaction should throw error', () => {
-        const tx = Object.assign({}, cancelObject)
+        const tx = { ...cancelObject }
         delete tx.gas
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"gas" is missing')
@@ -126,7 +126,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
 
     // UnnecessaryData
     it('CAVERJS-UNIT-TX-530 : If transaction object has unnecessary data field, signTransaction should throw error', async () => {
-        const tx = Object.assign({ data: '0x68656c6c6f' }, cancelObject)
+        const tx = { data: '0x68656c6c6f', ...cancelObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -135,14 +135,14 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-530 : If transaction object has unnecessary data field, sendTransaction should throw error', () => {
-        const tx = Object.assign({ data: '0x68656c6c6f' }, cancelObject)
+        const tx = { data: '0x68656c6c6f', ...cancelObject }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"data" cannot be used with FEE_DELEGATED_CANCEL transaction')
     }).timeout(200000)
 
     // MissingFeePayer
     it('CAVERJS-UNIT-TX-531 : If transaction object missing feePayer, should throw error', async () => {
-        const tx = Object.assign({}, cancelObject)
+        const tx = { ...cancelObject }
 
         const ret = await caver.klay.accounts.signTransaction(tx, senderPrvKey)
         expect(() =>
@@ -154,7 +154,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
 
     // UnnecessaryFeeRatio
     it('CAVERJS-UNIT-TX-533 : If transaction object has unnecessary feeRatio field, signTransaction should throw error', async () => {
-        const tx = Object.assign({ feeRatio: 10 }, cancelObject)
+        const tx = { feeRatio: 10, ...cancelObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -163,20 +163,18 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-533 : If transaction object has unnecessary feeRatio field, sendTransaction should throw error', () => {
-        const tx = Object.assign({ feeRatio: 10 }, cancelObject)
+        const tx = { feeRatio: 10, ...cancelObject }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"feeRatio" cannot be used with FEE_DELEGATED_CANCEL transaction')
     }).timeout(200000)
 
     // UnnecessaryPublicKey
     it('CAVERJS-UNIT-TX-534 : If transaction object has unnecessary publicKey field, signTransaction should throw error', async () => {
-        const tx = Object.assign(
-            {
-                publicKey:
-                    '0x006dc19d50bbc8a8e4b0f26c0dd3e78978f5f691a6161c41e3b0e4d1aa2d60fad62f37912b59f484b2e05bd3c9c3b4d93b0ca570d6d4421eee544e7da99e9de4',
-            },
-            cancelObject
-        )
+        const tx = {
+            publicKey:
+                '0x006dc19d50bbc8a8e4b0f26c0dd3e78978f5f691a6161c41e3b0e4d1aa2d60fad62f37912b59f484b2e05bd3c9c3b4d93b0ca570d6d4421eee544e7da99e9de4',
+            ...cancelObject,
+        }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -185,13 +183,11 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-534 : If transaction object has unnecessary publicKey field, sendTransaction should throw error', () => {
-        const tx = Object.assign(
-            {
-                publicKey:
-                    '0x006dc19d50bbc8a8e4b0f26c0dd3e78978f5f691a6161c41e3b0e4d1aa2d60fad62f37912b59f484b2e05bd3c9c3b4d93b0ca570d6d4421eee544e7da99e9de4',
-            },
-            cancelObject
-        )
+        const tx = {
+            publicKey:
+                '0x006dc19d50bbc8a8e4b0f26c0dd3e78978f5f691a6161c41e3b0e4d1aa2d60fad62f37912b59f484b2e05bd3c9c3b4d93b0ca570d6d4421eee544e7da99e9de4',
+            ...cancelObject,
+        }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"publicKey" cannot be used with FEE_DELEGATED_CANCEL transaction')
     }).timeout(200000)
@@ -223,7 +219,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
                 },
             ],
         }
-        const tx = Object.assign({ multisig }, cancelObject)
+        const tx = { multisig, ...cancelObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -257,7 +253,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
                 },
             ],
         }
-        const tx = Object.assign({ multisig }, cancelObject)
+        const tx = { multisig, ...cancelObject }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"multisig" cannot be used with FEE_DELEGATED_CANCEL transaction')
     }).timeout(200000)
@@ -268,7 +264,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleTransactionKey }, cancelObject)
+        const tx = { roleTransactionKey, ...cancelObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -281,7 +277,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleTransactionKey }, cancelObject)
+        const tx = { roleTransactionKey, ...cancelObject }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"roleTransactionKey" cannot be used with FEE_DELEGATED_CANCEL transaction')
     }).timeout(200000)
@@ -292,7 +288,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleAccountUpdateKey }, cancelObject)
+        const tx = { roleAccountUpdateKey, ...cancelObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -305,7 +301,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleAccountUpdateKey }, cancelObject)
+        const tx = { roleAccountUpdateKey, ...cancelObject }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws(
             '"roleAccountUpdateKey" cannot be used with FEE_DELEGATED_CANCEL transaction'
@@ -318,7 +314,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleFeePayerKey }, cancelObject)
+        const tx = { roleFeePayerKey, ...cancelObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -331,14 +327,14 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
-        const tx = Object.assign({ roleFeePayerKey }, cancelObject)
+        const tx = { roleFeePayerKey, ...cancelObject }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"roleFeePayerKey" cannot be used with FEE_DELEGATED_CANCEL transaction')
     }).timeout(200000)
 
     // UnnecessaryFailKey
     it('CAVERJS-UNIT-TX-539 : If transaction object has unnecessary failKey field, signTransaction should throw error', async () => {
-        const tx = Object.assign({ failKey: true }, cancelObject)
+        const tx = { failKey: true, ...cancelObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -347,14 +343,14 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-539 : If transaction object has unnecessary failKey field, sendTransaction should throw error', () => {
-        const tx = Object.assign({ failKey: true }, cancelObject)
+        const tx = { failKey: true, ...cancelObject }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"failKey" cannot be used with FEE_DELEGATED_CANCEL transaction')
     }).timeout(200000)
 
     // UnnecessaryCodeFormat
     it('CAVERJS-UNIT-TX-540 : If transaction object has unnecessary codeFormat field, signTransaction should throw error', async () => {
-        const tx = Object.assign({ codeFormat: 'EVM' }, cancelObject)
+        const tx = { codeFormat: 'EVM', ...cancelObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -363,14 +359,14 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-540 : If transaction object has unnecessary codeFormat field, sendTransaction should throw error', () => {
-        const tx = Object.assign({ codeFormat: 'EVM' }, cancelObject)
+        const tx = { codeFormat: 'EVM', ...cancelObject }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"codeFormat" cannot be used with FEE_DELEGATED_CANCEL transaction')
     }).timeout(200000)
 
     // UnnecessaryLegacyKey
     it('CAVERJS-UNIT-TX-541 : If transaction object has unnecessary legacyKey field, signTransaction should throw error', async () => {
-        const tx = Object.assign({ legacyKey: true }, cancelObject)
+        const tx = { legacyKey: true, ...cancelObject }
 
         await caver.klay.accounts
             .signTransaction(tx, senderPrvKey)
@@ -379,14 +375,14 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-541 : If transaction object has unnecessary legacyKey field, sendTransaction should throw error', () => {
-        const tx = Object.assign({ legacyKey: true }, cancelObject)
+        const tx = { legacyKey: true, ...cancelObject }
 
         expect(() => caver.klay.sendTransaction(tx)).to.throws('"legacyKey" cannot be used with FEE_DELEGATED_CANCEL transaction')
     }).timeout(200000)
 
     // Invalid from address
     it('CAVERJS-UNIT-TX-607: If transaction object has invalid from, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, cancelObject)
+        const tx = { ...cancelObject }
         tx.from = 'invalidAddress'
 
         const expectedError = `Invalid address of from: ${tx.from}`
@@ -395,7 +391,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-607: If transaction object has invalid from, sendTransaction should throw error', () => {
-        const tx = Object.assign({}, cancelObject)
+        const tx = { ...cancelObject }
         tx.from = 'invalidAddress'
 
         const expectedError = `Provided address "${tx.from}" is invalid, the capitalization checksum test failed`
@@ -413,7 +409,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
                 '0x46647d1ce8755cd664f5fb4eba3082dd1a13817488029f3869662986b7b1a5ae',
             ],
         ]
-        const tx = Object.assign({ feePayerSignatures }, cancelObject)
+        const tx = { feePayerSignatures, ...cancelObject }
 
         const expectedError = '"feePayer" is missing: feePayer must be defined with feePayerSignatures.'
 
@@ -428,7 +424,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
                 '0x46647d1ce8755cd664f5fb4eba3082dd1a13817488029f3869662986b7b1a5ae',
             ],
         ]
-        const tx = Object.assign({ feePayerSignatures }, cancelObject)
+        const tx = { feePayerSignatures, ...cancelObject }
 
         const expectedError = '"feePayer" is missing: feePayer must be defined with feePayerSignatures.'
 
@@ -446,7 +442,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
             ],
         ]
         const invalidFeePayer = 'feePayer'
-        const tx = Object.assign({ feePayer: invalidFeePayer, feePayerSignatures }, cancelObject)
+        const tx = { feePayer: invalidFeePayer, feePayerSignatures, ...cancelObject }
 
         const expectedError = `Invalid address of fee payer: ${invalidFeePayer}`
 
@@ -462,7 +458,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
             ],
         ]
         const invalidFeePayer = 'feePayer'
-        const tx = Object.assign({ feePayer: invalidFeePayer, feePayerSignatures }, cancelObject)
+        const tx = { feePayer: invalidFeePayer, feePayerSignatures, ...cancelObject }
 
         const expectedError = `Invalid address of fee payer: ${invalidFeePayer}`
 
@@ -472,7 +468,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
 
     // Error when feePayer is not defined with fee payer transaction format
     it('CAVERJS-UNIT-TX-610: If transaction object missing feePayer, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, cancelObject)
+        const tx = { ...cancelObject }
         const { rawTransaction } = await caver.klay.accounts.signTransaction(tx, testAccount.privateKey)
 
         const feePayerTx = {
@@ -486,7 +482,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-610: If transaction object missing feePayer, sendTransaction should throw error', async () => {
-        const tx = Object.assign({}, cancelObject)
+        const tx = { ...cancelObject }
         const { rawTransaction } = await caver.klay.accounts.signTransaction(tx, testAccount.privateKey)
 
         const feePayerTx = {
@@ -502,7 +498,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
 
     // Error when feePayer is invalid with fee payer transaction format
     it('CAVERJS-UNIT-TX-611: If transaction object has invalid feePayer, signTransaction should throw error', async () => {
-        const tx = Object.assign({}, cancelObject)
+        const tx = { ...cancelObject }
         const { rawTransaction } = await caver.klay.accounts.signTransaction(tx, testAccount.privateKey)
 
         const feePayerTx = {
@@ -516,7 +512,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-611: If transaction object has invalid feePayer, sendTransaction should throw error', async () => {
-        const tx = Object.assign({}, cancelObject)
+        const tx = { ...cancelObject }
         const { rawTransaction } = await caver.klay.accounts.signTransaction(tx, testAccount.privateKey)
 
         const feePayerTx = {
@@ -533,7 +529,7 @@ describe('FEE_DELEGATED_CANCEL transaction', () => {
     it('CAVERJS-UNIT-TX-717: sendTransaction should throw error when try to use an account in Node with not LEGACY transaction', async () => {
         const acctInNode = caver.klay.accounts.create()
 
-        const tx = Object.assign({}, cancelObject)
+        const tx = { ...cancelObject }
         tx.from = acctInNode.address
 
         const expectedError = `No private key found in the caver-js wallet. Trying to use the Klaytn node's wallet, but it only supports legacy transactions. Please add private key of ${acctInNode.address.toLowerCase()} to the caver-js wallet.`

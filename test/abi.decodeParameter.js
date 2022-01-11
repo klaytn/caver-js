@@ -1059,7 +1059,7 @@ describe('/lib/solidity/coder', function() {
                 name: 'f',
                 internalType: 'function () external',
             }
-            const copyOfT = Object.assign({}, t)
+            const copyOfT = { ...t }
             coder.decodeParameter(t, '063e4f349a9e91c6575aedab0e70087fab642ecac04062260000000000000000') // must not alter t!
             assert.deepEqual(t, copyOfT)
         })

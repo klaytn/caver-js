@@ -319,20 +319,18 @@ before(() => {
         feePayer: feePayer.address,
     }
 
-    txObjWithLegacy = Object.assign({ account: makeAccount(sender.address, accountKeyTestCases.LEGACY) }, commonObj)
-    txObjWithPublic = Object.assign({ account: makeAccount(sender.address, accountKeyTestCases.PUBLIC) }, commonObj)
-    txObjWithFail = Object.assign({ account: makeAccount(sender.address, accountKeyTestCases.FAIL) }, commonObj)
-    txObjWithMultiSig = Object.assign({ account: makeAccount(sender.address, accountKeyTestCases.MULTISIG) }, commonObj)
-    txObjWithRoleBased = Object.assign(
-        {
-            account: makeAccount(sender.address, accountKeyTestCases.ROLEBAED, [
-                { threshold: 2, weights: [1, 1, 1] },
-                {},
-                { threshold: 1, weights: [1, 1] },
-            ]),
-        },
-        commonObj
-    )
+    txObjWithLegacy = { account: makeAccount(sender.address, accountKeyTestCases.LEGACY), ...commonObj }
+    txObjWithPublic = { account: makeAccount(sender.address, accountKeyTestCases.PUBLIC), ...commonObj }
+    txObjWithFail = { account: makeAccount(sender.address, accountKeyTestCases.FAIL), ...commonObj }
+    txObjWithMultiSig = { account: makeAccount(sender.address, accountKeyTestCases.MULTISIG), ...commonObj }
+    txObjWithRoleBased = {
+        account: makeAccount(sender.address, accountKeyTestCases.ROLEBAED, [
+            { threshold: 2, weights: [1, 1, 1] },
+            {},
+            { threshold: 1, weights: [1, 1] },
+        ]),
+        ...commonObj,
+    }
 
     makeAccountUpdateObjectWithExpectedValues()
 })
@@ -364,7 +362,7 @@ describe('TxTypeFeeDelegatedAccountUpdate', () => {
 
     context('create feeDelegatedAccountUpdate instance', () => {
         it('CAVERJS-UNIT-TRANSACTIONFD-150: If feeDelegatedAccountUpdate not define from, return error', () => {
-            const testUpdateObj = Object.assign({}, txObjWithPublic)
+            const testUpdateObj = { ...txObjWithPublic }
             delete testUpdateObj.from
 
             const expectedError = '"from" is missing'
@@ -372,7 +370,7 @@ describe('TxTypeFeeDelegatedAccountUpdate', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFD-151: If feeDelegatedAccountUpdate not define gas, return error', () => {
-            const testUpdateObj = Object.assign({}, txObjWithPublic)
+            const testUpdateObj = { ...txObjWithPublic }
             delete testUpdateObj.gas
 
             const expectedError = '"gas" is missing'
@@ -380,7 +378,7 @@ describe('TxTypeFeeDelegatedAccountUpdate', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFD-152: If accountUpdate not define gas, return error', () => {
-            const testUpdateObj = Object.assign({}, txObjWithPublic)
+            const testUpdateObj = { ...txObjWithPublic }
             delete testUpdateObj.account
 
             const expectedError = 'Missing account information with TxTypeFeeDelegatedAccountUpdate transaction'
@@ -388,7 +386,7 @@ describe('TxTypeFeeDelegatedAccountUpdate', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFD-153: If feeDelegatedAccountUpdate define from property with invalid address, return error', () => {
-            const testUpdateObj = Object.assign({}, txObjWithPublic)
+            const testUpdateObj = { ...txObjWithPublic }
             testUpdateObj.from = 'invalid'
 
             const expectedError = `Invalid address of from: ${testUpdateObj.from}`
@@ -396,7 +394,7 @@ describe('TxTypeFeeDelegatedAccountUpdate', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFD-154: If feeDelegatedAccountUpdate define feePayer property with invalid address, return error', () => {
-            const testUpdateObj = Object.assign({}, txObjWithPublic)
+            const testUpdateObj = { ...txObjWithPublic }
             testUpdateObj.feePayer = 'invalid'
 
             const expectedError = `Invalid address of fee payer: ${testUpdateObj.feePayer}`
@@ -404,7 +402,7 @@ describe('TxTypeFeeDelegatedAccountUpdate', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFD-155: If feeDelegatedAccountUpdate define feePayerSignatures property without feePayer, return error', () => {
-            const testUpdateObj = Object.assign({}, txObjWithPublic)
+            const testUpdateObj = { ...txObjWithPublic }
             testUpdateObj.feePayer = '0x'
             testUpdateObj.feePayerSignatures = [
                 [
@@ -422,7 +420,7 @@ describe('TxTypeFeeDelegatedAccountUpdate', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFD-156: If feeDelegatedAccountUpdate define unnecessary property, return error', () => {
-            const testUpdateObj = Object.assign({}, txObjWithPublic)
+            const testUpdateObj = { ...txObjWithPublic }
 
             const unnecessaries = [
                 propertiesForUnnecessary.data,
@@ -1703,9 +1701,10 @@ describe('TxTypeFeeDelegatedAccountUpdate', () => {
         }
 
         it('CAVERJS-UNIT-TRANSACTIONFD-525: should return public key string recovered from signatures in FeeDelegatedAccountUpdate', async () => {
-            const tx = caver.transaction.feeDelegatedAccountUpdate.create(
-                Object.assign({ account: caver.account.createWithAccountKeyLegacy(txObj.from) }, txObj)
-            )
+            const tx = caver.transaction.feeDelegatedAccountUpdate.create({
+                account: caver.account.createWithAccountKeyLegacy(txObj.from),
+                ...txObj,
+            })
             const publicKeys = tx.recoverPublicKeys()
 
             expect(publicKeys.length).to.equal(expectedPublicKeyArray.length)
@@ -1715,9 +1714,10 @@ describe('TxTypeFeeDelegatedAccountUpdate', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFD-526: should return fee payer public key string recovered from feePayerSignatures in FeeDelegatedAccountUpdate', async () => {
-            const tx = caver.transaction.feeDelegatedAccountUpdate.create(
-                Object.assign({ account: caver.account.createWithAccountKeyLegacy(txObj.from) }, txObj)
-            )
+            const tx = caver.transaction.feeDelegatedAccountUpdate.create({
+                account: caver.account.createWithAccountKeyLegacy(txObj.from),
+                ...txObj,
+            })
             const publicKeys = tx.recoverFeePayerPublicKeys()
 
             expect(publicKeys.length).to.equal(expectedFeePayerPublicKeyArray.length)

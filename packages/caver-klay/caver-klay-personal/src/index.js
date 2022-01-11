@@ -56,8 +56,6 @@ const Personal = function Personal(...args) {
             methods.forEach(function(method) {
                 method.defaultAccount = defaultAccount
             })
-
-            return val
         },
         enumerable: true,
     })
@@ -75,8 +73,6 @@ const Personal = function Personal(...args) {
             methods.forEach(function(method) {
                 method.defaultBlock = defaultBlock
             })
-
-            return val
         },
         enumerable: true,
     })

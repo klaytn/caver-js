@@ -28,6 +28,7 @@ let feePayer
 let contractAddress
 let keyString
 let valueString
+let password
 
 before(() => {
     caver = new Caver(testRPCURL)
@@ -46,6 +47,8 @@ before(() => {
     feePayer = caver.wallet.keyring.createFromPrivateKey(feePayerPrvKey)
     caver.wallet.add(sender)
     caver.wallet.add(feePayer)
+
+    password = process.env.password ? process.env.password : 'password'
 })
 
 describe('caver.contract makes it easy to interact with smart contracts on the Klaytn blockchain platform', () => {
@@ -2887,9 +2890,9 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
 
         it(`CAVERJS-UNIT-ETC-393: should send to the Klaytn if in-memory wallet does not have a from account`, async () => {
             try {
-                await caver.klay.personal.importRawKey(sender.key.privateKey, 'passphrase')
+                await caver.klay.personal.importRawKey(sender.key.privateKey, password)
             } catch (e) {}
-            await caver.klay.personal.unlockAccount(sender.address, 'passphrase')
+            await caver.klay.personal.unlockAccount(sender.address, password)
 
             const contract = new caver.contract(abiWithoutConstructor, contractAddress)
 
@@ -2925,9 +2928,9 @@ describe('caver.contract makes it easy to interact with smart contracts on the K
 
             // FD/FDR Transaction - `from` is not existed in the `caver.wallet` / `feePayer` is not existed in the `caver.wallet`
             try {
-                await caver.klay.personal.importRawKey(feePayer.key.privateKey, 'passphrase')
+                await caver.klay.personal.importRawKey(feePayer.key.privateKey, password)
             } catch (e) {}
-            await caver.klay.personal.unlockAccount(feePayer.address, 'passphrase')
+            await caver.klay.personal.unlockAccount(feePayer.address, password)
 
             caver.wallet.remove(feePayer.address)
             const sendOptionsForFDWithNodeAccount = {

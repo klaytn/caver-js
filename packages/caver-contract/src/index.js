@@ -220,8 +220,6 @@ const Contract = function Contract(jsonInterface, address, options) {
 
             // add allEvents
             _this.events.allEvents = _this._on.bind(_this, 'allevents')
-
-            return _this._jsonInterface
         },
         get() {
             return _this._jsonInterface
@@ -241,8 +239,6 @@ const Contract = function Contract(jsonInterface, address, options) {
             if (val) {
                 defaultAccount = utils.toChecksumAddress(formatters.inputAddressFormatter(val))
             }
-
-            return val
         },
         enumerable: true,
     })
@@ -255,8 +251,6 @@ const Contract = function Contract(jsonInterface, address, options) {
                 throw new Error('Invalid default block number.')
             }
             defaultBlock = val
-
-            return val
         },
         enumerable: true,
     })
@@ -1732,7 +1726,7 @@ Contract.prototype._executeMethod = async function _executeMethod() {
 
 function createTransactionFromArgs(args, method, deployData, defer) {
     // Not to affect original data, copy args.options
-    const options = Object.assign({}, args.options)
+    const options = { ...args.options }
 
     options.value = options.value || 0
 

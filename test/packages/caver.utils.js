@@ -100,10 +100,10 @@ describe('caver.utils.isBN', () => {
 describe('caver.utils.isBigNumber', () => {
     context('CAVERJS-UNIT-ETC-101: input: BigNumber type', () => {
         const tests = [
-            { value: new BigNumber(1.0000000000000001), expected: true },
-            { value: new BigNumber(88259496234518.57), expected: true },
-            { value: new BigNumber(99999999999999999999), expected: true },
-            { value: new BigNumber(2e308), expected: true },
+            { value: new BigNumber('1.0000000000000001'), expected: true },
+            { value: new BigNumber('88259496234518.57'), expected: true },
+            { value: new BigNumber('99999999999999999999'), expected: true },
+            { value: new BigNumber('2e308'), expected: true },
         ]
         it('should return true', () => {
             for (const test of tests) {
@@ -114,10 +114,10 @@ describe('caver.utils.isBigNumber', () => {
 
     context('CAVERJS-UNIT-ETC-102: input: not a BigNumber type', () => {
         const tests = [
-            { value: 1.0000000000000001, expected: false },
-            { value: 88259496234518.57, expected: false },
-            { value: 99999999999999999999, expected: false },
-            { value: 2e308, expected: false },
+            { value: '1.0000000000000001', expected: false },
+            { value: '88259496234518.57', expected: false },
+            { value: '99999999999999999999', expected: false },
+            { value: '2e308', expected: false },
         ]
         it('should return false', () => {
             for (const test of tests) {
@@ -641,11 +641,10 @@ describe('caver.utils.hexToNumberString', () => {
     })
 
     context('CAVERJS-UNIT-ETC-121: input: numberString', () => {
-        const tests = [{ value: '1234', expected: (1234).toString() }]
-        it('should return numberString', () => {
-            for (const test of tests) {
-                expect(caver.utils.hexToNumberString(test.value)).to.be.equal(test.expected)
-            }
+        it('should throw an error', () => {
+            const invalid = '1234'
+            const errorMessage = `Given value "${invalid}" is not a valid hex string.`
+            expect(() => caver.utils.hexToNumberString(invalid)).to.throw(errorMessage)
         })
     })
 
@@ -665,7 +664,7 @@ describe('caver.utils.hexToNumberString', () => {
     context('CAVERJS-UNIT-ETC-123: input: invalid hexString', () => {
         it('should throw an error', () => {
             const invalid = 'zzzz'
-            const errorMessage = `Error: [number-to-bn] while converting number "${invalid}" to BN.js instance, error: invalid number value. Value must be an integer, hex string, BN or BigNumber instance. Note, decimals are not supported. Given value: "${invalid}"`
+            const errorMessage = `Given value "${invalid}" is not a valid hex string.`
             expect(() => caver.utils.hexToNumberString(invalid)).to.throw(errorMessage)
         })
     })
@@ -676,7 +675,6 @@ describe('caver.utils.hexToNumber', () => {
     context('CAVERJS-UNIT-ETC-124: input: valid value', () => {
         const tests = [
             { value: 1234, expected: 1234 },
-            { value: '1234', expected: 1234 },
             { value: 0x1234, expected: 4660 },
             { value: 0xea, expected: 234 },
             { value: '0xea', expected: 234 },
@@ -690,9 +688,13 @@ describe('caver.utils.hexToNumber', () => {
 
     context('CAVERJS-UNIT-ETC-125: input: invalid value', () => {
         it('should throw an error', () => {
-            const invalid = 'zzzz'
-            const errorMessage = `Error: [number-to-bn] while converting number "${invalid}" to BN.js instance, error: invalid number value. Value must be an integer, hex string, BN or BigNumber instance. Note, decimals are not supported. Given value: "${invalid}"`
-            expect(() => caver.utils.hexToNumber(invalid)).to.throw(errorMessage)
+            let invalid = '1234'
+            let errorMessage = `Given value "${invalid}" is not a valid hex string.`
+            expect(() => caver.utils.hexToBytes(invalid)).to.throw(errorMessage)
+
+            invalid = 'zzzz'
+            errorMessage = `Given value "${invalid}" is not a valid hex string.`
+            expect(() => caver.utils.hexToBytes(invalid)).to.throw(errorMessage)
         })
     })
 })
@@ -771,9 +773,11 @@ describe('caver.utils.numberToHex', () => {
             const expectedErrorMsg =
                 'Number can only safely store up to 53 bits: Number type cannot handle big number. Please use hex string or BigNumber/BN.'
 
+            // eslint-disable-next-line no-loss-of-precision
             let invalid = 0x303f3b2c93f1a7ffff
             expect(() => caver.utils.numberToHex(invalid)).to.throw(expectedErrorMsg)
 
+            // eslint-disable-next-line no-loss-of-precision
             invalid = 889999999999999999999
             expect(() => caver.utils.numberToHex(invalid)).to.throw(expectedErrorMsg)
         })

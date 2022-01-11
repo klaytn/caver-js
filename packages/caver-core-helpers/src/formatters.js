@@ -27,7 +27,7 @@
 
 const _ = require('lodash')
 const utils = require('../../caver-utils')
-const validateParams = require('../../caver-core-helpers/src/validateFunction').validateParams
+const validateParams = require('./validateFunction').validateParams
 const { getTypeInt } = require('../../caver-transaction/src/transactionHelper/transactionHelper')
 const AccountKeyLegacy = require('../../caver-account/src/accountKey/accountKeyLegacy')
 const AccountKeyPublic = require('../../caver-account/src/accountKey/accountKeyPublic')

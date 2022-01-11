@@ -105,7 +105,7 @@ describe(`KIP7 token contract class test`, () => {
                 expect(account.account.key.keyType).to.equals(3)
 
                 // Check deploy with string initial supply
-                const newTokenInfo = Object.assign({}, tokenInfo)
+                const newTokenInfo = { ...tokenInfo }
                 newTokenInfo.initialSupply = String(newTokenInfo.initialSupply)
 
                 const deployed2 = await kip7.deploy(newTokenInfo, sender.address)
