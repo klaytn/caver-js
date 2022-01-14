@@ -26,6 +26,8 @@ const caver = new Caver(websocketURL)
 let senderPrvKey
 let senderAddress
 let receiver
+let contractAddress
+let contractAbi
 
 // If you are using websocket provider, subscribe the 'newBlockHeaders' event through the subscriptions object after sending the transaction.
 // When receiving the 'newBlockHeaders' event, it queries the transaction receipt.
@@ -42,19 +44,38 @@ let receiver
 // -> [request] klay_getTransactionReceipt
 // -> [response] receipt
 
-before(() => {
-    senderPrvKey =
-        process.env.privateKey && String(process.env.privateKey).indexOf('0x') === -1
-            ? `0x${process.env.privateKey}`
-            : process.env.privateKey
+async function prepareContractTesting() {
+    const kip7 = await caver.kct.kip7.deploy({
+        name: 'Jamie',
+        symbol: 'JME',
+        decimals: 18,
+        initialSupply: '1000000000000'
+    }, senderAddress)
+    contractAddress = kip7.options.address
+    contractAbi = kip7.options.jsonInterface
 
-    senderAddress = caver.klay.accounts.wallet.add(senderPrvKey).address
+    return kip7.transfer(receiver.address, 1000, { from: senderAddress })
+}
 
-    receiver = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
-})
+describe('subscription should work well with websocket connection', () => {
+    before(function(done) {
+        this.timeout(200000)
 
-describe('get transaction', () => {
-    it('CAVERJS-UNIT-ETC-094: getTransaction should return information of transaction.', async () => {
+        senderPrvKey =
+            process.env.privateKey && String(process.env.privateKey).indexOf('0x') === -1
+                ? `0x${process.env.privateKey}`
+                : process.env.privateKey
+
+        senderAddress = caver.klay.accounts.wallet.add(senderPrvKey).address
+        caver.wallet.add(caver.wallet.keyring.createFromPrivateKey(senderPrvKey))
+
+        receiver = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
+        caver.wallet.add(caver.wallet.keyring.createFromPrivateKey(receiver.privateKey))
+
+        prepareContractTesting().then(() => done())
+    })
+
+    it('CAVERJS-UNIT-ETC-094: sendTransaction should return a transaction receipt.', async () => {
         const txObj = {
             from: senderAddress,
             to: receiver.address,
@@ -83,16 +104,40 @@ describe('get transaction', () => {
         expect(receipt.typeInt).not.to.undefined
         expect(receipt.value).not.to.undefined
     }).timeout(10000)
-})
 
-describe('Subscribe test throught contract event', () => {
     it('CAVERJS-UNIT-ETC-262: should emit subscription id when subscription is created', done => {
-        caver.wallet.add(caver.wallet.keyring.createFromPrivateKey(senderPrvKey)).address
         caver.kct.kip17.deploy({ name: 'Jasmine', symbol: 'JAS' }, senderAddress).then(deployed => {
             deployed.events.MinterAdded({}).on('connected', subscriptionId => {
                 expect(subscriptionId).not.to.be.undefined
-                caver.currentProvider.connection.close()
                 done()
+            })
+        })
+    }).timeout(30000)
+
+    // Regression test for a race-condition where a fresh caver instance
+    // subscribing to past events would have its call parameters deleted while it
+    // made initial Websocket handshake and return an incorrect response.
+    it('CAVERJS-UNIT-ETC-: should immediately listen for events in the past', async () => {
+        const freshCaver = new Caver(websocketURL)
+        const contract = freshCaver.contract.create(contractAbi, contractAddress)
+
+        let counter = 0;
+        const latestBlock = await caver.rpc.klay.getBlockNumber()
+        caver.currentProvider.connection.close()
+
+        await new Promise(async resolve => {
+            contract.events.allEvents({
+                fromBlock: 0
+            })
+            .on('data', function(event) {
+                counter++;
+                expect(event.blockNumber < latestBlock).to.be.true
+
+                if (counter === 2){
+                    this.removeAllListeners()
+                    freshCaver.currentProvider.connection.close()
+                    resolve()
+                }
             })
         })
     }).timeout(30000)
