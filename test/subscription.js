@@ -117,7 +117,7 @@ describe('subscription should work well with websocket connection', () => {
     // Regression test for a race-condition where a fresh caver instance
     // subscribing to past events would have its call parameters deleted while it
     // made initial Websocket handshake and return an incorrect response.
-    it('CAVERJS-UNIT-ETC-: should immediately listen for events in the past', async () => {
+    it('CAVERJS-UNIT-ETC-398: should immediately listen for events in the past', async () => {
         const freshCaver = new Caver(websocketURL)
         const contract = freshCaver.contract.create(contractAbi, contractAddress)
 
