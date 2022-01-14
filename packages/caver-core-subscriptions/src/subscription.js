@@ -235,10 +235,14 @@ Subscription.prototype.subscribe = function() {
         isFinite(payload.params[1].fromBlock)
     ) {
         // send the subscription request
+
+        // copy the params to avoid race-condition with deletion below this block
+        const blockParams = { ...payload.params[1] }
+
         this.options.requestManager.send(
             {
                 method: 'klay_getLogs',
-                params: [payload.params[1]],
+                params: [blockParams],
             },
             function(err, logs) {
                 if (!err) {
