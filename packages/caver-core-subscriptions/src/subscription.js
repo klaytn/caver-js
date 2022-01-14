@@ -237,7 +237,7 @@ Subscription.prototype.subscribe = function() {
         // send the subscription request
 
         // copy the params to avoid race-condition with deletion below this block
-        const blockParams = Object.assign({}, payload.params[1]);
+        const blockParams = { ...payload.params[1] }
 
         this.options.requestManager.send(
             {

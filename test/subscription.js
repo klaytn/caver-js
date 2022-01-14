@@ -45,12 +45,15 @@ let contractAbi
 // -> [response] receipt
 
 async function prepareContractTesting() {
-    const kip7 = await caver.kct.kip7.deploy({
-        name: 'Jamie',
-        symbol: 'JME',
-        decimals: 18,
-        initialSupply: '1000000000000'
-    }, senderAddress)
+    const kip7 = await caver.kct.kip7.deploy(
+        {
+            name: 'Jamie',
+            symbol: 'JME',
+            decimals: 18,
+            initialSupply: '1000000000000',
+        },
+        senderAddress
+    )
     contractAddress = kip7.options.address
     contractAbi = kip7.options.jsonInterface
 
@@ -121,24 +124,25 @@ describe('subscription should work well with websocket connection', () => {
         const freshCaver = new Caver(websocketURL)
         const contract = freshCaver.contract.create(contractAbi, contractAddress)
 
-        let counter = 0;
+        let counter = 0
         const latestBlock = await caver.rpc.klay.getBlockNumber()
         caver.currentProvider.connection.close()
 
-        await new Promise(async resolve => {
-            contract.events.allEvents({
-                fromBlock: 0
-            })
-            .on('data', function(event) {
-                counter++;
-                expect(event.blockNumber < latestBlock).to.be.true
+        await new Promise(resolve => {
+            contract.events
+                .allEvents({
+                    fromBlock: 0,
+                })
+                .on('data', function(event) {
+                    counter++
+                    expect(event.blockNumber < latestBlock).to.be.true
 
-                if (counter === 2){
-                    this.removeAllListeners()
-                    freshCaver.currentProvider.connection.close()
-                    resolve()
-                }
-            })
+                    if (counter === 2) {
+                        this.removeAllListeners()
+                        freshCaver.currentProvider.connection.close()
+                        resolve()
+                    }
+                })
         })
     }).timeout(30000)
 })
