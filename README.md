@@ -5,7 +5,10 @@
 # caver-js
 
 caver-js is a JavaScript API library that allows developers to interact with a
-Klaytn node using a HTTP or Websocket connection. 
+Klaytn node using a HTTP or Websocket connection.
+
+**NOTE** It is recommended to use [caver-js v1.4.1](https://www.npmjs.com/package/caver-js/v/1.4.1) version when working with Kaikas Web Extension Wallet.
+See [Trouble shooting and known issues](#connect-with-kaikas-web-extension) for more details.
 
 ## Table of contents
 
@@ -22,6 +25,7 @@ Klaytn node using a HTTP or Websocket connection.
    * [Error Code Improvement](#error-code-improvement)
    * [Sample Projects](#sample-projects)
    * [Github Repository](#github-repository)
+   * [Trouble shooting and known issues](#trouble-shooting-and-known-issues)
    * [Related Projects](#related-projects)
 
 ## Requirements
@@ -295,6 +299,54 @@ The BApp (Blockchain Application) Development sample projects using caver-js are
 
 * [Count BApp](https://docs.klaytn.com/bapp/tutorials/count-bapp)
 * [Klaystagram](https://docs.klaytn.com/bapp/tutorials/klaystagram)
+
+## Trouble shooting and known issues
+
+### Connect with Kaikas Web Extension
+
+Kaikas Web Extension Wallet works well only up to [caver-js v1.4.1](https://www.npmjs.com/package/caver-js/v/1.4.1).
+Features provided in later versions (caver-js v1.5.0~) may not work with Kaikas Web Extension Wallet.
+If the error below occurs when connecting to Kaikas, use caver-js v1.4.1.
+
+```
+Kaikas only processes one transaction at a time. Open Kaikas and refresh the pending transaction. If the service doesn’t process your transaction for a while, cancel the pending transaction.
+```
+
+```
+Kaikas는 한 번에 하나의 트랜잭션만 처리합니다. Kaikas를 열어 대기 중인 트랜잭션을 새로고침 해주세요. 만약 대기 상태가 계속된다면 이용 중인 서비스가 트랜잭션을 처리하지 않는 것이니 트랜잭션을 취소바랍니다.
+```
+
+Although the above error is mostly the case, other errors may occur besides the above error, so if you are using Kaikas Web Extension Wallet, please use caver-js v1.4.1.
+
+For documents up to caver-js v1.4.1, refer to [here](https://docs.klaytn.com/dapp/sdk/caver-js/v1.4.1).
+
+### Using webpack >= 5
+
+Node.js module polyfills are not provided by default in webpack v5 and later.
+Therefore, you need to install the missing modules and add them to the `resolve.fallback` property of the webpack.config.js file in the form below.
+
+```
+module.exports = {
+    ...
+    resolve: {
+        fallback: {
+            fs: false,
+            net: false,
+            stream: require.resolve('stream-browserify'),
+            crypto: require.resolve('crypto-browserify'),
+            http: require.resolve('stream-http'),
+            https: require.resolve('https-browserify'),
+            os: require.resolve('os-browserify/browser'),
+            ...
+        },
+    },
+}
+```
+
+More information on migrating to webpack v5 can be found [here](https://webpack.js.org/migrate/5/#clean-up-configuration).
+
+If you are implementing an app using [create-react-app](https://create-react-app.dev/), you can use [react-app-rewired](https://www.npmjs.com/package/react-app-rewired) to add the above polyfills to the webpack.config.js file used by [CRA](https://create-react-app.dev/).
+More information on using react-app-rewired with create-react-app can be found [here](https://www.npmjs.com/package/react-app-rewired).
 
 ## Github Repository
 
