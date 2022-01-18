@@ -8,6 +8,7 @@ caver-js is a JavaScript API library that allows developers to interact with a
 Klaytn node using a HTTP or Websocket connection.
 
 **NOTE** It is recommended to use [caver-js v1.4.1](https://www.npmjs.com/package/caver-js/v/1.4.1) version when working with Kaikas Web Extension Wallet.
+For documents up to caver-js v1.4.1, refer to [caver-js ~v1.4.1 Documentation](https://docs.klaytn.com/dapp/sdk/caver-js/v1.4.1).
 See [Trouble shooting and known issues](#connect-with-kaikas-web-extension) for more details.
 
 ## Table of contents
@@ -318,7 +319,7 @@ Kaikas는 한 번에 하나의 트랜잭션만 처리합니다. Kaikas를 열어
 
 Although the above error is mostly the case, other errors may occur besides the above error, so if you are using Kaikas Web Extension Wallet, please use caver-js v1.4.1.
 
-For documents up to caver-js v1.4.1, refer to [here](https://docs.klaytn.com/dapp/sdk/caver-js/v1.4.1).
+For documents up to caver-js v1.4.1, refer to [caver-js ~v1.4.1 Documentation](https://docs.klaytn.com/dapp/sdk/caver-js/v1.4.1).
 
 ### Using webpack >= 5
 
