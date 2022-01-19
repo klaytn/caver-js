@@ -25,7 +25,6 @@
  */
 
 const _ = require('lodash')
-const util = require('util')
 
 const core = require('../../caver-core')
 const { formatters } = require('../../caver-core-helpers')
