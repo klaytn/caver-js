@@ -7,9 +7,10 @@
 caver-js is a JavaScript API library that allows developers to interact with a
 Klaytn node using a HTTP or Websocket connection.
 
-**NOTE** It is recommended to use [caver-js v1.4.1](https://www.npmjs.com/package/caver-js/v/1.4.1) version when working with Kaikas Web Extension Wallet.
-For documents up to caver-js v1.4.1, refer to [caver-js ~v1.4.1 Documentation](https://docs.klaytn.com/dapp/sdk/caver-js/v1.4.1).
-See [Trouble shooting and known issues](#connect-with-kaikas-web-extension) for more details.
+**NOTE**
+Kaikas Web Extension Wallet is recommended to be used with [features prior to common architecture](https://docs.klaytn.com/dapp/sdk/caver-js/v1.4.1). New features provided in caver-js v1.5.0 (introduced common architecrue) or later are currently not compatible with Kaikas.
+Kaikas web extension wallet works fine with functions prior to common architecture, so please use [functions prior to common architecture](https://docs.klaytn.com/dapp/sdk/caver-js/v1.4.1).
+Even in the latest version of caver-js, [functions prior to common architecture](https://docs.klaytn.com/dapp/sdk/caver-js/v1.4.1) are provided for backward compatibility. See [Trouble shooting and known issues](#connect-with-kaikas-web-extension) for more details.
 
 ## Table of contents
 
@@ -305,9 +306,11 @@ The BApp (Blockchain Application) Development sample projects using caver-js are
 
 ### Connect with Kaikas Web Extension
 
-Kaikas Web Extension Wallet works well only up to [caver-js v1.4.1](https://www.npmjs.com/package/caver-js/v/1.4.1).
+Kaikas Web Extension Wallet works normally with [functions prior to common architecture](https://docs.klaytn.com/dapp/sdk/caver-js/v1.4.1).
 Features provided in later versions (caver-js v1.5.0~) may not work with Kaikas Web Extension Wallet.
-If the error below occurs when connecting to Kaikas, use caver-js v1.4.1.
+
+If the following error occurs when using with Kaikas, it must be modified to use the [functions supported by caver-js v1.4.1](https://docs.klaytn.com/dapp/sdk/caver-js/v1.4.1).
+For compatibility with the latest version, the same [functions provided by caver-js v1.4.0](https://docs.klaytn.com/dapp/sdk/caver-js/v1.4.1) are provided.
 
 ```
 Kaikas only processes one transaction at a time. Open Kaikas and refresh the pending transaction. If the service doesn’t process your transaction for a while, cancel the pending transaction.
@@ -317,9 +320,10 @@ Kaikas only processes one transaction at a time. Open Kaikas and refresh the pen
 Kaikas는 한 번에 하나의 트랜잭션만 처리합니다. Kaikas를 열어 대기 중인 트랜잭션을 새로고침 해주세요. 만약 대기 상태가 계속된다면 이용 중인 서비스가 트랜잭션을 처리하지 않는 것이니 트랜잭션을 취소바랍니다.
 ```
 
-Although the above error is mostly the case, other errors may occur besides the above error, so if you are using Kaikas Web Extension Wallet, please use caver-js v1.4.1.
+Although the above error is mostly the case, other errors may occur besides the above error, so if you are using Kaikas Web Extension Wallet, please use the [functions supported by caver-js v1.4.1](https://docs.klaytn.com/dapp/sdk/caver-js/v1.4.1).
+Keep in mind that you **cannot mix features** before and after common architecture.
 
-For documents up to caver-js v1.4.1, refer to [caver-js ~v1.4.1 Documentation](https://docs.klaytn.com/dapp/sdk/caver-js/v1.4.1).
+For documents for the functions supported by caver-js v1.4.1, refer to [caver-js ~v1.4.1 Documentation](https://docs.klaytn.com/dapp/sdk/caver-js/v1.4.1).
 
 ### Using webpack >= 5
 
