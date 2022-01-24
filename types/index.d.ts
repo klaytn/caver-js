@@ -74,7 +74,7 @@ export default class Caver {
     helpers: CoreHelpers
     Method: typeof Method
     account: typeof Account
-    wallet: IWallet
+    wallet: KeyringContainer
     transaction: Transaction
     kct: KCT
     klay: DeprecatedKlayRPC
