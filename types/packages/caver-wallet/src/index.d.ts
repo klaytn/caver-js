@@ -46,6 +46,7 @@ export class KeyringContainer implements IWallet {
     length: number
     keyring: KeyringFactory
 
+    generate(num: number): string[]
     generate(numberOfKeyrings: number, entropy?: string): string[]
     newKeyring(address: string, key: string): SingleKeyring
     newKeyring(address: string, key: string[]): MultipleKeyring
@@ -56,6 +57,7 @@ export class KeyringContainer implements IWallet {
     add(keyring: Keyring): Keyring
     remove(address: string): boolean
     signMessage(address: string, data: string, role: number, index?: number): SignedMessage
+    sign(address: string, transaction: Transaction): Promise<AbstractTransaction>
     sign(
         address: string,
         transaction: AbstractTransaction,
@@ -67,6 +69,7 @@ export class KeyringContainer implements IWallet {
         index: number,
         hasher?: (transaction: AbstractTransaction) => string
     ): Promise<AbstractTransaction>
+    signAsFeePayer(address: string, transaction: FeeDelegatedTransaction): Promise<AbstractFeeDelegatedTransaction>
     signAsFeePayer(
         address: string,
         transaction: AbstractFeeDelegatedTransaction,
@@ -78,4 +81,6 @@ export class KeyringContainer implements IWallet {
         index: number,
         hasher?: (transaction: AbstractFeeDelegatedTransaction) => string
     ): Promise<AbstractFeeDelegatedTransaction>
+    isExisted(address: string): boolean
+    remove(address: string): boolean
 }

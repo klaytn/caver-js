@@ -46,7 +46,7 @@ caver.formatters
 // $ExpectType CoreHelpers
 caver.helpers
 
-// $ExpectType IWallet
+// $ExpectType KeyringContainer
 caver.wallet
 
 // $ExpectType TransactionModule
