@@ -60,7 +60,7 @@ export interface Providers {
     IpcProvider: typeof IpcProvider
 }
 
-export default class Caver {
+export class AbstractCaver {
     static providers: Providers
     static utils: Utils
     static abi: ABI
@@ -83,4 +83,8 @@ export default class Caver {
     middleware: Middleware
     ipfs: IPFS
     contract: typeof Contract
+}
+
+export default class Caver extends AbstractCaver {
+    wallet: KeyringContainer
 }

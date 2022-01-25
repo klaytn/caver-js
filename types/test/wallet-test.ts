@@ -49,7 +49,7 @@ import { PrivateKey } from 'packages/caver-wallet/src/keyring/privateKey'
 
 const caver = new Caver()
 
-// $ExpectType IWallet
+// $ExpectType KeyringContainer
 caver.wallet
 
 // $ExpectType KeyringContainer
