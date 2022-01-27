@@ -51,14 +51,14 @@ class Klay {
 
         // overwrite package setRequestManager
         const setRequestManager = this.setRequestManager
-        this.setRequestManager = function(manager) {
+        this.setRequestManager = function (manager) {
             setRequestManager(manager)
             return true
         }
 
         // overwrite setProvider
         const setProvider = this.setProvider
-        this.setProvider = function(...arg) {
+        this.setProvider = function (...arg) {
             setProvider.apply(_this, arg)
             _this.setRequestManager(_this._requestManager)
         }
@@ -323,7 +323,7 @@ class Klay {
         ]
         AbstractTransaction._klaytnCall = {}
         Validator._klaytnCall = {}
-        _.each(_klaytnCall, function(method) {
+        _.each(_klaytnCall, function (method) {
             method = new Method(method)
             method.attachToObject(AbstractTransaction._klaytnCall)
             method.attachToObject(Validator._klaytnCall)
@@ -620,10 +620,10 @@ class Klay {
             }),
             /**
              * Generates signed data specific to the Klaytn.
-             * Refer to {@link https://docs.klaytn.com/bapp/json-rpc/api-references/klay/account#klay_sign|Klaytn Platform API - klay_sign} to know how the signature is generated
+             * Refer to {@link https://docs.klaytn.com/dapp/json-rpc/api-references/klay/account#klay_sign|Klaytn Platform API - klay_sign} to know how the signature is generated
              *
-             * This API provides the function to sign a message using an {@link https://docs.klaytn.com/bapp/json-rpc/api-references/personal#personal_importrawkey|imported account} in your Klaytn node.
-             * The imported account in your node must be {@link https://docs.klaytn.com/bapp/json-rpc/api-references/personal#personal_unlockaccount|unlocked} to sign the message.
+             * This API provides the function to sign a message using an {@link https://docs.klaytn.com/dapp/json-rpc/api-references/personal#personal_importrawkey|imported account} in your Klaytn node.
+             * The imported account in your node must be {@link https://docs.klaytn.com/dapp/json-rpc/api-references/personal#personal_unlockaccount|unlocked} to sign the message.
              * To sign a transaction with imported account in your Klaytn node, use {@link signTransaction|caver.rpc.klay.signTransaction}.
              *
              * @memberof Klay
@@ -1242,7 +1242,7 @@ class Klay {
              * const result = await caver.rpc.klay.getStorageAt('0x407d73d8a49eeb85d32cf465507dd71d507100c1')
              *
              * @param {string} address The address to get the storage from.
-             * @param {number} position The index position of the storage. For more information on calculating the position, refer to {@link https://docs.klaytn.com/bapp/json-rpc/api-references/klay/block#klay_getstorageat|klay_getStorageAt}.
+             * @param {number} position The index position of the storage. For more information on calculating the position, refer to {@link https://docs.klaytn.com/dapp/json-rpc/api-references/klay/block#klay_getstorageat|klay_getStorageAt}.
              * @param {string|number} [blockNumber] A block number, or the string `latest` or `earliest`. If omitted, `latest` will be used.
              * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
              * @return {Promise<string>} The value at this storage position.
@@ -1625,8 +1625,8 @@ class Klay {
             /**
              * Signs a transaction as a transaction `sender` with an "imported account's private key" in your Klaytn Node and propagates the transaction to the Klaytn.
              *
-             * This API provides the function to sign a transaction using an {@link https://docs.klaytn.com/bapp/json-rpc/api-references/personal#personal_importrawkey|imported account} in your Klaytn node.
-             * The imported account in your node must be {@link https://docs.klaytn.com/bapp/json-rpc/api-references/personal#personal_unlockaccount|unlocked} to sign a transaction.
+             * This API provides the function to sign a transaction using an {@link https://docs.klaytn.com/dapp/json-rpc/api-references/personal#personal_importrawkey|imported account} in your Klaytn node.
+             * The imported account in your node must be {@link https://docs.klaytn.com/dapp/json-rpc/api-references/personal#personal_unlockaccount|unlocked} to sign a transaction.
              *
              * @memberof Klay
              * @method sendTransaction
@@ -1656,8 +1656,8 @@ class Klay {
              *
              * Before using sendTransaction as a fee payer, the transaction sender must have signed with valid signature(s) and the `nonce` must have been defined.
              *
-             * This API provides the function to sign a transaction using an {@link https://docs.klaytn.com/bapp/json-rpc/api-references/personal#personal_importrawkey|imported account} in your Klaytn node.
-             * The imported account in your node must be {@link https://docs.klaytn.com/bapp/json-rpc/api-references/personal#personal_unlockaccount|unlocked} to sign a transaction.
+             * This API provides the function to sign a transaction using an {@link https://docs.klaytn.com/dapp/json-rpc/api-references/personal#personal_importrawkey|imported account} in your Klaytn node.
+             * The imported account in your node must be {@link https://docs.klaytn.com/dapp/json-rpc/api-references/personal#personal_unlockaccount|unlocked} to sign a transaction.
              *
              * @memberof Klay
              * @method sendTransactionAsFeePayer
@@ -1724,8 +1724,8 @@ class Klay {
             /**
              * Signs a transaction as a transaction sender with an "imported account's private key" in your Klaytn Node.
              *
-             * This API provides the function to sign a transaction using an {@link https://docs.klaytn.com/bapp/json-rpc/api-references/personal#personal_importrawkey|imported account} in your Klaytn node.
-             * The imported account in your node must be {@link https://docs.klaytn.com/bapp/json-rpc/api-references/personal#personal_unlockaccount|unlocked} to sign a transaction.
+             * This API provides the function to sign a transaction using an {@link https://docs.klaytn.com/dapp/json-rpc/api-references/personal#personal_importrawkey|imported account} in your Klaytn node.
+             * The imported account in your node must be {@link https://docs.klaytn.com/dapp/json-rpc/api-references/personal#personal_unlockaccount|unlocked} to sign a transaction.
              *
              * @memberof Klay
              * @method signTransaction
@@ -1753,8 +1753,8 @@ class Klay {
             /**
              * Signs a transaction as a transaction fee payer with an "imported account's private key" in your Klaytn Node.
              *
-             * This API provides the function to sign a transaction using an {@link https://docs.klaytn.com/bapp/json-rpc/api-references/personal#personal_importrawkey|imported account} in your Klaytn node.
-             * The imported account in your node must be {@link https://docs.klaytn.com/bapp/json-rpc/api-references/personal#personal_unlockaccount|unlocked} to sign a transaction.
+             * This API provides the function to sign a transaction using an {@link https://docs.klaytn.com/dapp/json-rpc/api-references/personal#personal_importrawkey|imported account} in your Klaytn node.
+             * The imported account in your node must be {@link https://docs.klaytn.com/dapp/json-rpc/api-references/personal#personal_unlockaccount|unlocked} to sign a transaction.
              *
              * @memberof Klay
              * @method signTransactionAsFeePayer
@@ -2042,7 +2042,7 @@ class Klay {
              * To check if the state has changed, call {@link Klay#getFilterChanges|caver.rpc.klay.getFilterChanges}.
              * To obtain all logs matching the filter created by `newFilter`, call {@link Klay#getFilterLogs|caver.rpc.klay.getFilterLogs}.
              *
-             * For detailed information about the topics in the filter object, please see {@link https://docs.klaytn.com/bapp/json-rpc/api-references/klay/filter#klay_newfilter|Klaytn Platform API - klay_newFilter}.
+             * For detailed information about the topics in the filter object, please see {@link https://docs.klaytn.com/dapp/json-rpc/api-references/klay/filter#klay_newfilter|Klaytn Platform API - klay_newFilter}.
              *
              * @memberof Klay
              * @method newFilter
@@ -2147,7 +2147,7 @@ class Klay {
                     logs: {
                         params: 1,
                         inputFormatter: [formatters.inputLogFormatter],
-                        subscriptionHandler: function(output) {
+                        subscriptionHandler: function (output) {
                             this.emit('data', output)
 
                             if (_.isFunction(this.callback)) {
@@ -2157,7 +2157,7 @@ class Klay {
                     },
                     syncing: {
                         params: 0,
-                        subscriptionHandler: function(output) {
+                        subscriptionHandler: function (output) {
                             const _this = this /* eslint-disable-line no-shadow */
 
                             // fire TRUE at start
@@ -2169,7 +2169,7 @@ class Klay {
                                     this.callback(null, _this._isSyncing, this)
                                 }
 
-                                setTimeout(function() {
+                                setTimeout(function () {
                                     _this.emit('data', output)
 
                                     if (_.isFunction(_this.callback)) {
@@ -2186,7 +2186,7 @@ class Klay {
 
                                 // wait for some time before fireing the FALSE
                                 clearTimeout(this._isSyncingTimeout)
-                                this._isSyncingTimeout = setTimeout(function() {
+                                this._isSyncingTimeout = setTimeout(function () {
                                     if (output.currentBlock > output.highestBlock - 200) {
                                         _this._isSyncing = false
                                         _this.emit('changed', _this._isSyncing)
@@ -2203,7 +2203,7 @@ class Klay {
             }),
         ]
 
-        methods.forEach(function(method) {
+        methods.forEach(function (method) {
             method.attachToObject(_this)
             method.setRequestManager(_this._requestManager)
         })
