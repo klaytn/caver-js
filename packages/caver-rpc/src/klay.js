@@ -51,14 +51,14 @@ class Klay {
 
         // overwrite package setRequestManager
         const setRequestManager = this.setRequestManager
-        this.setRequestManager = function (manager) {
+        this.setRequestManager = function(manager) {
             setRequestManager(manager)
             return true
         }
 
         // overwrite setProvider
         const setProvider = this.setProvider
-        this.setProvider = function (...arg) {
+        this.setProvider = function(...arg) {
             setProvider.apply(_this, arg)
             _this.setRequestManager(_this._requestManager)
         }
@@ -323,7 +323,7 @@ class Klay {
         ]
         AbstractTransaction._klaytnCall = {}
         Validator._klaytnCall = {}
-        _.each(_klaytnCall, function (method) {
+        _.each(_klaytnCall, function(method) {
             method = new Method(method)
             method.attachToObject(AbstractTransaction._klaytnCall)
             method.attachToObject(Validator._klaytnCall)
@@ -2147,7 +2147,7 @@ class Klay {
                     logs: {
                         params: 1,
                         inputFormatter: [formatters.inputLogFormatter],
-                        subscriptionHandler: function (output) {
+                        subscriptionHandler: function(output) {
                             this.emit('data', output)
 
                             if (_.isFunction(this.callback)) {
@@ -2157,7 +2157,7 @@ class Klay {
                     },
                     syncing: {
                         params: 0,
-                        subscriptionHandler: function (output) {
+                        subscriptionHandler: function(output) {
                             const _this = this /* eslint-disable-line no-shadow */
 
                             // fire TRUE at start
@@ -2169,7 +2169,7 @@ class Klay {
                                     this.callback(null, _this._isSyncing, this)
                                 }
 
-                                setTimeout(function () {
+                                setTimeout(function() {
                                     _this.emit('data', output)
 
                                     if (_.isFunction(_this.callback)) {
@@ -2186,7 +2186,7 @@ class Klay {
 
                                 // wait for some time before fireing the FALSE
                                 clearTimeout(this._isSyncingTimeout)
-                                this._isSyncingTimeout = setTimeout(function () {
+                                this._isSyncingTimeout = setTimeout(function() {
                                     if (output.currentBlock > output.highestBlock - 200) {
                                         _this._isSyncing = false
                                         _this.emit('changed', _this._isSyncing)
@@ -2203,7 +2203,7 @@ class Klay {
             }),
         ]
 
-        methods.forEach(function (method) {
+        methods.forEach(function(method) {
             method.attachToObject(_this)
             method.setRequestManager(_this._requestManager)
         })
