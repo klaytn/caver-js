@@ -1826,6 +1826,103 @@ class Klay {
                 call: 'klay_getDecodedAnchoringTransactionByHash',
                 params: 1,
             }),
+            /**
+             * An object defines fee history.
+             *
+             * @typedef {object} Klay.FeeHistoryResult
+             * @property {string} oldestBlock - Lowest number block of returned range.
+             * @property {string[]} baseFeePerGas - An array of block base fees per gas. This includes the next block after the newest of the returned range, because this value can be derived from the newest block. Zeroes are returned for pre-EIP-1559 blocks.
+             * @property {string[][]} reward - A two-dimensional array of effective priority fees per gas at the requested block percentiles.
+             * @property {number[]} gasUsedRatio - An array of gasUsed/gasLimit in the block.
+             */
+            /**
+             * Returns fee history for the returned block range. This can be a subsection of the requested range if not all blocks are available.
+             *
+             * @memberof Klay
+             * @method getFeeHistory
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getFeeHistory(16, 'latest', [0.1, 0.2, 0.3])
+             *
+             * @param {number|BigNumber|BN|string} blockCount Number of blocks in the requested range. Between 1 and 1024 blocks can be requested in a single query. Less than requested may be returned if not all blocks are available.
+             * @param {number|BigNumber|BN|string} lastBlock Highest number block (or block tag string) of the requested range.
+             * @param {number[]} rewardPercentiles A monotonically increasing list of percentile values to sample from each block’s effective priority fees per gas in ascending order, weighted by gas used. (Example: `['0', '25', '50', '75', '100']` or `['0', '0.5', '1', '1.5', '3', '80']`)
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<Klay.FeeHistoryResult>} Fee history for the returned block range. This can be a subsection of the requested range if not all blocks are available.
+             */
+            new Method({
+                name: 'getFeeHistory',
+                call: 'klay_feeHistory',
+                params: 3,
+                inputFormatter: [utils.numberToHex, formatters.inputBlockNumberFormatter, null]
+            }),
+            /**
+             * Returns a suggestion for a gas tip cap for dynamic fee transactions in peb.
+             * Since Klaytn has a fixed gas price, this `caver.rpc.klay.getMaxPriorityFeePerGas` returns the gas price set by Klaytn.
+             *
+             * @memberof Klay
+             * @method getMaxPriorityFeePerGas
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getMaxPriorityFeePerGas()
+             *
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<string>} As a suggested value for the gas tip cap, the current Klaytn uses a fixed gas price, so the gasPrice value is returned.
+             */
+            new Method({
+                name: 'getMaxPriorityFeePerGas',
+                call: 'klay_maxPriorityFeePerGas',
+                params: 0
+            }),
+            /**
+             * An object defines an access list result that includes accessList and gasUsed.
+             *
+             * @typedef {object} Klay.AccessListResult
+             * @property {Klay.AccessList} accessList - The list of addresses and storage keys that will be used by that transaction. The list could change when the transaction is actually mined.
+             * @property {string} gasUsed - The estimated amount of gas used.
+             */
+            /**
+             * Klay.AccessList is a list of access tuple.
+             *
+             * @typedef {Klay.AccessTuple[]} Klay.AccessList
+             */
+            /**
+             * The element type of an access list.
+             *
+             * @typedef {object} Klay.AccessTuple
+             * @property {string} address - An address that the transaction plans to access.
+             * @property {string[]} storageKeys - The storage slots that the transaction plans to access.
+             */
+            /**
+             * Returns a list of addresses and storage keys used by the transaction, plus the gas consumed when the access list is added.
+             *
+             * @memberof Klay
+             * @method createAccessList
+             * @instance
+             *
+             * @example
+             * const txArgs = {
+             *     from: '0x3bc5885c2941c5cda454bdb4a8c88aa7f248e312',
+             *     data: '0x20965255',
+             *     gasPrice: '0x3b9aca00',
+             *     gas: '0x3d0900',
+             *     to: '0x00f5f5f3a25f142fafd0af24a754fafa340f32c7'
+             * }
+             * const result = await caver.rpc.klay.createAccessList(txArgs, 'latest')
+             *
+             * @param {Klay.CallObject} callObject A transaction call object.
+             * @param {number|BigNumber|BN|string} [blockParameter] A block number, or the block tag string `latest` or `earliest`. If omitted, `latest` will be used.
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<Klay.AccessListResult>} An accessListResult for the given transaction
+             */
+            new Method({
+                name: 'createAccessList',
+                call: 'klay_createAccessList',
+                params: 2,
+                inputFormatter: [formatters.inputTransactionFormatter, formatters.inputDefaultBlockNumberFormatter],
+            }),
 
             // Configuration
             /**

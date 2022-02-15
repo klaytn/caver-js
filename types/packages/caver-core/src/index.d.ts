@@ -287,3 +287,22 @@ export interface EncryptionOptions {
     cipher?: any
     uuid?: any
 }
+
+export interface FeeHistoryResult {
+    oldestBlock: number
+    baseFeePerGas: string[]
+    reward: string[][]
+    gasUsedRatio: number[]
+}
+
+export interface AccessListResult {
+    accessList: AccessList
+    gasUsed: string
+}
+
+export type AccessList = AccessTuple[]
+
+export interface AccessTuple {
+    address: string
+    storageKeys: string[]
+}

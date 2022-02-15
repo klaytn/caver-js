@@ -33,9 +33,10 @@ import {
     LogsOptions,
     LogObject,
     CallObject,
+    FeeHistoryResult,
+    AccessListResult,
 } from '../../caver-core/src'
 import { Transaction, FeeDelegatedTransaction } from '../../caver-transaction/src'
-import RpcCallToMethod from '../../caver-rtm/src'
 
 export interface AccountForRPC {
     accType: number
@@ -238,6 +239,20 @@ export class Klay {
         transactionHash: string,
         callback?: (error: Error, result: DecodedAnchoringTransaction) => void
     ): Promise<DecodedAnchoringTransaction>
+    getFeeHistory(
+        blockCount: string | number | BN | BigNumber,
+        latestBlock: BlockNumber,
+        rewardPercentiles: number[],
+        callback?: (error: Error, result: FeeHistoryResult) => void
+    ): Promise<FeeHistoryResult>
+    getMaxPriorityFeePerGas(
+        callback?: (error: Error, result: string) => void
+    ): Promise<string>
+    createAccessList(
+        callObject: CallObject,
+        blockNumber: BlockNumber, 
+        callback?: (error: Error, result: AccessListResult) => void
+    ): Promise<AccessListResult>
 
     getChainId(callback?: (error: Error, result: string) => void): Promise<string>
     getClientVersion(callback?: (error: Error, result: string) => void): Promise<string>

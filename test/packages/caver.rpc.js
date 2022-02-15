@@ -27,6 +27,7 @@ chai.use(chaiAsPromised)
 chai.use(sinonChai)
 
 const expect = chai.expect
+const sandbox = sinon.createSandbox()
 
 const Caver = require('../../index')
 
@@ -44,6 +45,10 @@ beforeEach(() => {
             : process.env.privateKey
 
     sender = caver.wallet.add(caver.wallet.keyring.createFromPrivateKey(senderPrvKey))
+})
+
+afterEach(() => {
+    sandbox.restore()
 })
 
 describe('caver.rpc.klay', () => {
@@ -459,9 +464,165 @@ describe('caver.rpc.klay', () => {
             )
         }).timeout(100000)
     })
+
+    context('caver.rpc.klay.getFeeHistory', () => {
+        function checkFeeHistoryResult(blockCount, blockNumberOrTag, rewardPercentiles, ret) {
+            const bc = caver.utils.hexToNumber(blockCount)
+            let bn = blockNumberOrTag
+            try {
+                bn = caver.utils.hexToNumber(bn)
+                expect(ret.oldestBlock).to.equal(caver.utils.toHex(bn - bc + 1))
+            } catch (e) {
+                // blockNumberOrTag is tag
+            }
+
+            expect(ret.oldestBlock).not.to.be.undefined
+            expect(ret.reward.length).to.equal(bc)
+            expect(ret.reward[0].length).to.equal(rewardPercentiles.length)
+            expect(ret.baseFeePerGas.length).to.equal(bc + 1) // include next base fee
+            expect(ret.baseFeePerGas.every((bf) => caver.utils.isHexStrict(bf))).to.be.true
+            expect(ret.gasUsedRatio.length).to.equal(bc)
+            expect(ret.gasUsedRatio.every((gur) => _.isNumber(gur))).to.be.true
+        }
+
+        it('CAVERJS-UNIT-RPC-023: should call klay_feeHistory', async () => {
+            let blockCount = 5
+            let blockNumber = 'latest'
+            let rewardPercentiles = [0.1, 0.3, 0.8]
+
+            sandbox.stub(caver.rpc.klay._requestManager, 'send').callsFake((data, callback) => {
+                expect(data.method).to.equal('klay_feeHistory')
+                callback(undefined, {})
+            })
+
+            await caver.rpc.klay.getFeeHistory(blockCount, blockNumber, rewardPercentiles)
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-RPC-024: should return fee history with various parameter types', async () => {
+            let nonce = caver.utils.hexToNumber(await caver.rpc.klay.getTransactionCount(sender.address))
+            const txsCount = 30
+            let receipt
+            for (let i = 0; i < txsCount; i++) {
+                const tx = caver.transaction.valueTransfer.create({
+                    from: sender.address,
+                    to: caver.wallet.keyring.generate().address,
+                    value: 1,
+                    gas: 50000,
+                    nonce
+                })
+                await caver.wallet.sign(sender.address, tx)
+                nonce++
+
+                // To track last transaction's receipt
+                if (i !== txsCount - 1) {
+                    caver.rpc.klay.sendRawTransaction(tx)
+                    continue
+                }
+                receipt = await caver.rpc.klay.sendRawTransaction(tx)
+            }
+
+            // Test with hex string
+            let blockCount = caver.utils.numberToHex(5)
+            let blockNumber = receipt.blockNumber
+            let rewardPercentiles = [0.1, 0.3, 0.8]
+            let ret = await caver.rpc.klay.getFeeHistory(blockCount, blockNumber, rewardPercentiles)
+            checkFeeHistoryResult(blockCount, blockNumber, rewardPercentiles, ret)
+
+            // Test with hex string
+            blockCount = 5
+            blockNumber = caver.utils.hexToNumber(receipt.blockNumber)
+            rewardPercentiles = [0.1, 0.3, 0.8]
+            ret = await caver.rpc.klay.getFeeHistory(blockCount, blockNumber, rewardPercentiles)
+            checkFeeHistoryResult(blockCount, blockNumber, rewardPercentiles, ret)
+
+            // Test with BN
+            blockCount = caver.utils.toBN(5)
+            blockNumber = caver.utils.toBN(receipt.blockNumber)
+            rewardPercentiles = [0.1, 0.3, 0.8]
+            ret = await caver.rpc.klay.getFeeHistory(blockCount, blockNumber, rewardPercentiles)
+            checkFeeHistoryResult(blockCount, blockNumber, rewardPercentiles, ret)
+
+            // Test with BigNumber
+            blockCount = new caver.utils.BigNumber(5)
+            blockNumber = new caver.utils.BigNumber(receipt.blockNumber)
+            rewardPercentiles = [0.1, 0.3, 0.8]
+            ret = await caver.rpc.klay.getFeeHistory(blockCount, blockNumber, rewardPercentiles)
+            checkFeeHistoryResult(blockCount, blockNumber, rewardPercentiles, ret)
+
+            // Test with block tag string
+            blockCount = 5
+            blockNumber = 'latest'
+            rewardPercentiles = [0.1, 0.3, 0.8]
+            ret = await caver.rpc.klay.getFeeHistory(blockCount, blockNumber, rewardPercentiles)
+            checkFeeHistoryResult(blockCount, blockNumber, rewardPercentiles, ret)
+        }).timeout(100000)
+    })
+
+    context('caver.rpc.klay.getMaxPriorityFeePerGas', () => {
+        it('CAVERJS-UNIT-RPC-025: should call klay_maxPriorityFeePerGas', async () => {
+            sandbox.stub(caver.rpc.klay._requestManager, 'send').callsFake((data, callback) => {
+                expect(data.method).to.equal('klay_maxPriorityFeePerGas')
+                callback(undefined, {})
+            })
+
+            await caver.rpc.klay.getMaxPriorityFeePerGas()
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-RPC-026: should return suggested max priority fee per gas', async () => {
+            const ret = await caver.rpc.klay.getMaxPriorityFeePerGas()
+            const gasPrice = await caver.rpc.klay.getGasPrice()
+            expect(_.isString(ret)).to.be.true
+            expect(ret).to.equal(gasPrice)
+        }).timeout(100000)
+    })
+
+    context('caver.rpc.klay.createAccessList', () => {
+        const txArgs = {
+            from: '0x3bc5885c2941c5cda454bdb4a8c88aa7f248e312',
+            data: '0x20965255',
+            gasPrice: '0x3b9aca00',
+            gas: '0x3d0900',
+            to: '0x00f5f5f3a25f142fafd0af24a754fafa340f32c7'
+        }
+        function checkAccessListResult(blockNumberOrTag, ret) {
+            expect(_.isArray(ret.accessList)).to.be.true
+            expect(ret.accessList.length).to.equal(0) // For now Klaytn will return empty access list
+            expect(ret.gasUsed).to.equal('0x0') // For now Klaytn will return empty access list
+        }
+
+        it('CAVERJS-UNIT-RPC-027: should call klay_createAccessList', async () => {
+            sandbox.stub(caver.rpc.klay._requestManager, 'send').callsFake((data, callback) => {
+                expect(data.method).to.equal('klay_createAccessList')
+                callback(undefined, {})
+            })
+            await caver.rpc.klay.createAccessList(txArgs, 'latest')
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-RPC-028: should return access list used by transaction', async () => {
+            const blocTag = 'latest'
+            let ret = await caver.rpc.klay.createAccessList(txArgs, blocTag)
+            checkAccessListResult(blocTag, ret)
+
+            const hexBlockNumber = await caver.rpc.klay.getBlockNumber()
+            ret = await caver.rpc.klay.createAccessList(txArgs, hexBlockNumber)
+            checkAccessListResult(hexBlockNumber, ret)
+
+            const blockNumber = caver.utils.hexToNumber(hexBlockNumber)
+            ret = await caver.rpc.klay.createAccessList(txArgs, blockNumber)
+            checkAccessListResult(blockNumber, ret)
+
+            const blockBN = caver.utils.toBN(blockNumber)
+            ret = await caver.rpc.klay.createAccessList(txArgs, blockBN)
+            checkAccessListResult(blockBN, ret)
+
+            const blockBigNumber = new caver.utils.BigNumber(blockNumber)
+            ret = await caver.rpc.klay.createAccessList(txArgs, blockBigNumber)
+            checkAccessListResult(blockBigNumber, ret)
+        }).timeout(100000)
+    })
 })
 
-describe('caver.rpc.gov', () => {
+describe('caver.rpc.governance', () => {
     const sandbox = sinon.createSandbox()
 
     afterEach(() => {
