@@ -10,7 +10,7 @@ These Terms shall be applied to users installing and utilizing the Software incl
 
 ## 3. Services provided by the Software
 
-The Software provides users with services which enable them to interact with Klaytn blockchain and users may refer to details of such services at Klaytn docs (https://docs.klaytn.com/bapp/sdk/caver-js).
+The Software provides users with services which enable them to interact with Klaytn blockchain and users may refer to details of such services at Klaytn docs (https://docs.klaytn.com/dapp/sdk/caver-js).
 
 ## 4. Software use and installation
 
