@@ -826,6 +826,7 @@ class Klay {
              * @property {string} extraData - The "extra data" field of this block.
              * @property {string} governanceData - RLP encoded governance configuration.
              * @property {string} hash - Hash of the current block.
+             * @property {string} [baseFeePerGas] - Base fee per gas.
              * @property {string} [voteData] - RLP encoded governance vote of the proposer.
              */
             /**

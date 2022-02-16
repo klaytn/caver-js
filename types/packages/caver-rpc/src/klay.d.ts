@@ -21,6 +21,7 @@ import BigNumber from 'bignumber.js'
 import { AccountKey } from '../../caver-account/src'
 import {
     Block,
+    Header,
     BlockNumber,
     TransactionReceipt,
     BlockWithConsensusInfo,
@@ -126,6 +127,9 @@ export class Klay {
     ): Promise<Block>
     getBlockByHash(blockHash: string, callback?: (error: Error, result: Block) => void): Promise<Block>
     getBlockByHash(blockHash: string, returnTransactionObjects: boolean, callback?: (error: Error, result: Block) => void): Promise<Block>
+    getHeader(blockNumber: BlockNumber, callback?: (error: Error, result: Header) => void): Promise<Header>
+    getHeaderByNumber(blockNumber: BlockNumber, callback?: (error: Error, result: Header) => void): Promise<Header>
+    getHeaderByHash(blockHash: string, callback?: (error: Error, result: Header) => void): Promise<Header>
     getBlockReceipts(blockHash: string, callback?: (error: Error, result: TransactionReceipt[]) => void): Promise<TransactionReceipt[]>
     getBlockTransactionCount(blockNumber: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
     getBlockTransactionCountByNumber(

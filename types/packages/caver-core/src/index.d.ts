@@ -27,6 +27,25 @@ export interface SignatureForRPC {
     S: string
 }
 
+export interface Header {
+    parentHash: string
+    reward: string
+    stateRoot: string
+    transactionsRoot: string
+    receiptsRoot: string
+    logsBloom: string
+    blockScore: string
+    number: string
+    gasUsed: string
+    timestamp: string
+    timestampFoS: string
+    extraData: string
+    governanceData: string
+    hash: string
+    voteData: string
+    baseFeePerGas: string
+}
+
 export interface Block {
     blockscore: string
     extraData: string
