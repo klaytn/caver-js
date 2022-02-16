@@ -480,15 +480,15 @@ describe('caver.rpc.klay', () => {
             expect(ret.reward.length).to.equal(bc)
             expect(ret.reward[0].length).to.equal(rewardPercentiles.length)
             expect(ret.baseFeePerGas.length).to.equal(bc + 1) // include next base fee
-            expect(ret.baseFeePerGas.every((bf) => caver.utils.isHexStrict(bf))).to.be.true
+            expect(ret.baseFeePerGas.every(bf => caver.utils.isHexStrict(bf))).to.be.true
             expect(ret.gasUsedRatio.length).to.equal(bc)
-            expect(ret.gasUsedRatio.every((gur) => _.isNumber(gur))).to.be.true
+            expect(ret.gasUsedRatio.every(gur => _.isNumber(gur))).to.be.true
         }
 
         it('CAVERJS-UNIT-RPC-023: should call klay_feeHistory', async () => {
-            let blockCount = 5
-            let blockNumber = 'latest'
-            let rewardPercentiles = [0.1, 0.3, 0.8]
+            const blockCount = 5
+            const blockNumber = 'latest'
+            const rewardPercentiles = [0.1, 0.3, 0.8]
 
             sandbox.stub(caver.rpc.klay._requestManager, 'send').callsFake((data, callback) => {
                 expect(data.method).to.equal('klay_feeHistory')
@@ -508,7 +508,7 @@ describe('caver.rpc.klay', () => {
                     to: caver.wallet.keyring.generate().address,
                     value: 1,
                     gas: 50000,
-                    nonce
+                    nonce,
                 })
                 await caver.wallet.sign(sender.address, tx)
                 nonce++
@@ -582,7 +582,7 @@ describe('caver.rpc.klay', () => {
             data: '0x20965255',
             gasPrice: '0x3b9aca00',
             gas: '0x3d0900',
-            to: '0x00f5f5f3a25f142fafd0af24a754fafa340f32c7'
+            to: '0x00f5f5f3a25f142fafd0af24a754fafa340f32c7',
         }
         function checkAccessListResult(blockNumberOrTag, ret) {
             expect(_.isArray(ret.accessList)).to.be.true
@@ -620,15 +620,27 @@ describe('caver.rpc.klay', () => {
             checkAccessListResult(blockBigNumber, ret)
         }).timeout(100000)
     })
+
+    context('caver.rpc.klay.getHeader', () => {
+        it('CAVERJS-UNIT-RPC-029: caver.rpc.klay.getHeader should call correct RPC call depends on param type', async () => {
+            // Have to call klay_getHeaderByHash with hex string param
+            sandbox.stub(caver.rpc.klay._requestManager, 'send').callsFake((data, callback) => {
+                expect(data.params.length).to.equal(1)
+                if (caver.utils.isValidHash(data.params[0])) {
+                    expect(data.method).to.equal('klay_getHeaderByHash')
+                } else {
+                    expect(data.method).to.equal('klay_getHeaderByNumber')
+                }
+                callback(undefined, {})
+            })
+            await caver.rpc.klay.getHeader('latest')
+            await caver.rpc.klay.getHeader(0)
+            await caver.rpc.klay.getHeader('0x489ef4696baa7f5c9548cb4affa1b969a5b18de221b0cc0ed2483a1b2f84ac69')
+        }).timeout(100000)
+    })
 })
 
 describe('caver.rpc.governance', () => {
-    const sandbox = sinon.createSandbox()
-
-    afterEach(() => {
-        sandbox.restore()
-    })
-
     context('caver.rpc.governance.vote', () => {
         it('CAVERJS-UNIT-RPC-006: should submit voting to the Klaytn', async () => {
             let key = 'governance.governancemode'

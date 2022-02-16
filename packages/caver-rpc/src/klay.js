@@ -807,6 +807,94 @@ class Klay {
                 inputFormatter: [formatters.inputBlockNumberFormatter, formatters.toBoolean],
             }),
             /**
+             * An object for block header from Klaytn.
+             *
+             * @example
+             *
+             * @typedef {object} Klay.Header
+             * @property {string} parentHash - Hash of the parent block.
+             * @property {string} reward - The address of the beneficiary to whom the block rewards were given.
+             * @property {string} stateRoot - The root of the final state trie of the block.
+             * @property {string} transactionsRoot - The root of the transaction trie of the block.
+             * @property {string} receiptsRoot - The root of the receipts trie of the block.
+             * @property {string} logsBloom - The bloom filter for the logs of the block. `null` when it is pending block.
+             * @property {string} blockScore - Former difficulty. Always 1 in the BFT consensus engine.
+             * @property {string} number - The block number. `null` when it is pending block.
+             * @property {string} gasUsed - The total used gas by all transactions in this block.
+             * @property {string} timestamp - The Unix timestamp for when the block was collated.
+             * @property {string} timestampFoS - The fraction of a second of the timestamp for when the block was collated.
+             * @property {string} extraData - The "extra data" field of this block.
+             * @property {string} governanceData - RLP encoded governance configuration.
+             * @property {string} hash - Hash of the current block.
+             * @property {string} [voteData] - RLP encoded governance vote of the proposer.
+             */
+            /**
+             * Returns a block header.
+             * If parameter is hex string, this will use {@link Klay#getHeaderByHash|caver.rpc.klay.getHeaderByHash}, if paramter is number type, this will use {@link Klay#getHeaderByNumber|caver.rpc.klay.getHeaderByNumber}.
+             *
+             * @memberof Klay
+             * @method getHeader
+             * @instance
+             *
+             * @example
+             * // Use `caver.rpc.klay.getHeaderByNumber`
+             * const result = await caver.rpc.klay.getHeader(0)
+             * // Use `caver.rpc.klay.getHeaderByHash`
+             * const result = await caver.rpc.klay.getHeader('0x58482921af951cf42a069436ac9338de50fd963bdbea40e396f416f9ac96a08b')
+             *
+             * @param {string|number|BN|BigNumber} blockHashOrNumber The block hash or block number to query block header.
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<Klay.Header>} An object includes block header.
+             */
+            new Method({
+                name: 'getHeader',
+                call: 'klay_getHeaderByNumber',
+                hexCall: 'klay_getHeaderByHash',
+                params: 1,
+                inputFormatter: [formatters.inputBlockNumberFormatter],
+            }),
+            /**
+             * Returns a block header by block number.
+             *
+             * @memberof Klay
+             * @method getHeaderByNumber
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getHeaderByNumber(0)
+             * const result = await caver.rpc.klay.getHeaderByNumber('latest')
+             *
+             * @param {string|number|BN|BigNumber} blockNumberOrTag The block number or block tag string to query block header.
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<Klay.Header>} An object includes block header.
+             */
+            new Method({
+                name: 'getHeaderByNumber',
+                call: 'klay_getHeaderByNumber',
+                params: 1,
+                inputFormatter: [formatters.inputBlockNumberFormatter],
+            }),
+            /**
+             * Returns a block header by block hash.
+             *
+             * @memberof Klay
+             * @method getHeaderByHash
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getHeaderByHash('0x58482921af951cf42a069436ac9338de50fd963bdbea40e396f416f9ac96a08b')
+             *
+             * @param {string} blockHash The block hash to query block header.
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<Klay.Header>} An object includes block header.
+             */
+            new Method({
+                name: 'getHeaderByHash',
+                call: 'klay_getHeaderByHash',
+                params: 1,
+                inputFormatter: [formatters.inputBlockNumberFormatter],
+            }),
+            /**
              * An object for transaction receipt from Klaytn.
              *
              * @example
@@ -1855,7 +1943,7 @@ class Klay {
                 name: 'getFeeHistory',
                 call: 'klay_feeHistory',
                 params: 3,
-                inputFormatter: [utils.numberToHex, formatters.inputBlockNumberFormatter, null]
+                inputFormatter: [utils.numberToHex, formatters.inputBlockNumberFormatter, null],
             }),
             /**
              * Returns a suggestion for a gas tip cap for dynamic fee transactions in peb.
@@ -1874,7 +1962,7 @@ class Klay {
             new Method({
                 name: 'getMaxPriorityFeePerGas',
                 call: 'klay_maxPriorityFeePerGas',
-                params: 0
+                params: 0,
             }),
             /**
              * An object defines an access list result that includes accessList and gasUsed.
