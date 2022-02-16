@@ -42,8 +42,8 @@ export interface Header {
     extraData: string
     governanceData: string
     hash: string
-    voteData: string
-    baseFeePerGas: string
+    voteData?: string
+    baseFeePerGas?: string
 }
 
 export interface Block {
