@@ -65,6 +65,7 @@ export interface Block {
     transactions: TransactionForRPC[]
     transactionsRoot: string
     voteData: string
+    baseFeePerGas?: string
 }
 
 export interface BlockWithConsensusInfo extends Block {

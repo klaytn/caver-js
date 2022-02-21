@@ -737,6 +737,7 @@ class Klay {
              * @property {Array.<Klay.Transaction>} transactions - Array of transaction objects, or 32-byte transaction hashes depending on the `returnTransactionObjects` parameter.
              * @property {string} transactionsRoot - The root of the transaction trie of the block.
              * @property {string} voteData - RLP encoded governance vote of the proposer.
+             * @property {string} [baseFeePerGas] - Base fee per gas.
              */
             /**
              * Returns information about a block.
@@ -1174,6 +1175,7 @@ class Klay {
              * @property {Array.<Klay.TransactionReceipt>} transactions - Array of transaction receipt objects.
              * @property {string} transactionsRoot - The root of the transaction trie of the block.
              * @property {string} voteData - RLP encoded governance vote of the proposer.
+             * @property {string} [baseFeePerGas] - Base fee per gas.
              */
             /**
              * Returns a block with consensus information matched by the given hash.
