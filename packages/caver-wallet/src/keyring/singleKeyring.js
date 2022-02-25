@@ -126,6 +126,34 @@ class SingleKeyring {
     }
 
     /**
+     * Signs with hashed data with the private key and returns signature which V is 0 or 1 (parity of the y-value of a secp256k1 signature).
+     *
+     * If you want to define an `index` when using SingleKeyring, the `index` must be `0`.
+     * And `SingleKeyring` doesn't have a key defined by {@link KeyringFactory.role|caver.wallet.keyring.role}, so they all use the same private key.
+     *
+     * @example
+     * const signed = keyring.ecsign('0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550', caver.wallet.keyring.role.roleTransactionKey)
+     * const signed = keyring.ecsign('0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550', caver.wallet.keyring.role.roleAccountUpdateKey, 0)
+     *
+     * @param {string} hash The hashed data to sign.
+     * @param {number} role A number indicating the role of the key. You can use {@link KeyringFactory.role|caver.wallet.keyring.role}.
+     * @param {number} [index] The index of the private key you want to use. The index must be less than the length of the array of the private keys defined for each role. If an index is not defined, this method will use all the private keys.
+     * @return {SignatureData|Array.<SignatureData>} A {@link SignatureData} when `index` is deinfed, otherwise an array of {@link SignatureData}.
+     */
+    ecsign(hash, role, index) {
+        if (!utils.isValidHashStrict(hash)) throw new Error(`Invalid hash: ${hash}`)
+
+        const key = this.getKeyByRole(role)
+
+        if (index !== undefined) {
+            validateIndexWithKeys(index, 1)
+            return key.ecsign(hash)
+        }
+
+        return [key.ecsign(hash)]
+    }
+
+    /**
      * Signs message with Klaytn-specific prefix.
      *
      * This calculates a Klaytn-specific signature with:

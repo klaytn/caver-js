@@ -18,7 +18,8 @@ import { SignatureData } from './signatureData'
 export class PrivateKey {
     constructor(key: string)
 
-    sign(txSigHash: string, chainId: string | number): SignatureData
+    sign(txSigHash: string, chainId?: string | number): SignatureData
+    ecsign(hash: string): SignatureData
     signMessage(messageHash: string): SignatureData
     getPublicKey(compressed?: boolean): string
     getDerivedAddress(): string

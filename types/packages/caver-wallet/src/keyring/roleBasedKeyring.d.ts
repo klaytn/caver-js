@@ -26,6 +26,7 @@ export class RoleBasedKeyring {
     getPublicKey(compressed?: boolean): string[][]
     copy(): RoleBasedKeyring
     sign(txSigHash: string, chainId: string | number, role: number, index?: number): SignatureData | SignatureData[]
+    ecsign(hash: string, role: number, index?: number): SignatureData | SignatureData[]
     signMessage(message: string, role: number, index?: number): SignedMessage
     getKeyByRole(role: number): PrivateKey[]
     toAccount(options?: WeightedMultiSigOptions[] | WeightedMultiSigOptionsObject[]): Account
