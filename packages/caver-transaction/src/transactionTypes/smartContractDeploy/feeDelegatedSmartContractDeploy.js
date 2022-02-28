@@ -256,7 +256,7 @@ class FeeDelegatedSmartContractDeploy extends AbstractFeeDelegatedTransaction {
      * await tx.fillTransaction()
      */
     async fillTransaction() {
-        const [chainId, gasPrice, nonce] = await Promise.all([
+        const [ chainId, gasPrice, nonce ] = await Promise.all([
             isNot(this.chainId) ? AbstractTransaction.getChainId() : this.chainId,
             isNot(this.gasPrice) ? AbstractTransaction.getGasPrice() : this.gasPrice,
             isNot(this.nonce) ? AbstractTransaction.getNonce(this.from) : this.nonce,
