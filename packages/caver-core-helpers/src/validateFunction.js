@@ -25,7 +25,7 @@
  */
 
 const utils = require('../../caver-utils')
-const { TX_TYPE_STRING } = require('../../caver-transaction/src/transactionHelper/transactionHelper')
+const { TX_TYPE_STRING, isEthereumTxType } = require('../../caver-transaction/src/transactionHelper/transactionHelper')
 
 function validateParams(tx) {
     let error
@@ -50,11 +50,11 @@ function validateParams(tx) {
         return error
     }
 
-    if (tx.type !== TX_TYPE_STRING.TxTypeLegacyTransaction && !tx.from) {
+    if (!isEthereumTxType(tx.type) && !tx.from) {
         error = new Error('"from" is missing')
     } else if (tx.from) {
         if (tx.from === '0x' || tx.from === '0x0000000000000000000000000000000000000000') {
-            if (tx.type !== TX_TYPE_STRING.TxTypeLegacyTransaction) {
+            if (!isEthereumTxType(tx.type)) {
                 error = new Error(`Invalid address of from: ${tx.from}`)
             }
         } else if (!utils.isAddress(tx.from)) {
@@ -135,6 +135,8 @@ function validateTxType(txType) {
         case TX_TYPE_STRING.TxTypeFeeDelegatedChainDataAnchoring:
         case TX_TYPE_STRING.TxTypeFeeDelegatedChainDataAnchoringWithRatio:
         case TX_TYPE_STRING.TxTypeLegacyTransaction:
+        case TX_TYPE_STRING.TxTypeEthereumAccessList:
+        case TX_TYPE_STRING.TxTypeEthereumDynamicFee:
             return true
     }
     return false
@@ -231,6 +233,8 @@ function validateTxObjectWithType(tx) {
             return validateFeeDelegatedChainDataAnchoring(tx)
         case TX_TYPE_STRING.TxTypeFeeDelegatedChainDataAnchoringWithRatio:
             return validateFeeDelegatedChainDataAnchoringWithRatio(tx)
+        case TX_TYPE_STRING.TxTypeEthereumAccessList:
+            return validateEthereumAccessList(tx)
     }
     return undefined
 }
@@ -255,6 +259,10 @@ function validateLegacy(transaction) {
 
     if (transaction.humanReadable !== undefined) {
         return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
+    }
+
+    if (transaction.accessList !== undefined) {
+        return new Error(`"accessList" cannot be used with ${transaction.type} transaction`)
     }
 
     const error = validateNonFeeDelegated(transaction)
@@ -339,6 +347,9 @@ function checkValueTransferEssential(transaction) {
     if (transaction.humanReadable !== undefined) {
         return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
     }
+    if (transaction.accessList !== undefined) {
+        return new Error(`"accessList" cannot be used with ${transaction.type} transaction`)
+    }
 }
 
 function validateValueTransfer(transaction) {
@@ -390,6 +401,9 @@ function checkValueTransferMemoEssential(transaction) {
     if (transaction.humanReadable !== undefined) {
         return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
     }
+    if (transaction.accessList !== undefined) {
+        return new Error(`"accessList" cannot be used with ${transaction.type} transaction`)
+    }
 }
 
 function validateValueTransferMemo(transaction) {
@@ -428,6 +442,9 @@ function validateAccountTransaction(transaction) {
     }
     if (transaction.humanReadable !== undefined) {
         return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.accessList !== undefined) {
+        return new Error(`"accessList" cannot be used with ${transaction.type} transaction`)
     }
 
     // TxTypeAccountUpdate, TxTypeFeeDelegatedAccountUpdate and TxTypeFeeDelegatedAccountUpdateWithRatio transaction use 'account' only
@@ -582,6 +599,9 @@ function checkDeployEssential(transaction) {
     if (transaction.humanReadable !== undefined && transaction.humanReadable === true) {
         return new Error('HumanReadableAddress is not supported yet.')
     }
+    if (transaction.accessList !== undefined) {
+        return new Error(`"accessList" cannot be used with ${transaction.type} transaction`)
+    }
 }
 
 function validateSmartContractDeploy(transaction) {
@@ -630,6 +650,9 @@ function checkExecutionEssential(transaction) {
     if (transaction.humanReadable !== undefined) {
         return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
     }
+    if (transaction.accessList !== undefined) {
+        return new Error(`"accessList" cannot be used with ${transaction.type} transaction`)
+    }
 }
 
 function validateSmartContractExecution(transaction) {
@@ -674,6 +697,9 @@ function checkCacncelEssential(transaction) {
     }
     if (transaction.humanReadable !== undefined) {
         return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.accessList !== undefined) {
+        return new Error(`"accessList" cannot be used with ${transaction.type} transaction`)
     }
 }
 
@@ -727,6 +753,9 @@ function checkChainDataAnchoringEssential(transaction) {
     if (transaction.humanReadable !== undefined) {
         return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
     }
+    if (transaction.accessList !== undefined) {
+        return new Error(`"accessList" cannot be used with ${transaction.type} transaction`)
+    }
 }
 
 function validateChainDataAnchoring(transaction) {
@@ -751,6 +780,34 @@ function validateFeeDelegatedChainDataAnchoring(transaction) {
 
 function validateFeeDelegatedChainDataAnchoringWithRatio(transaction) {
     return validateFeeDelegatedChainDataAnchoring(transaction)
+}
+
+function validateEthereumAccessList(transaction) {
+    if (transaction.to === undefined && transaction.data === undefined && transaction.input === undefined) {
+        return new Error('contract creation without any data provided')
+    }
+
+    if (
+        transaction.to &&
+        transaction.to !== '0x' &&
+        transaction.to !== '0x0000000000000000000000000000000000000000' &&
+        !utils.isAddress(transaction.to)
+    ) {
+        return new Error(`Invalid address of to: ${transaction.to}`)
+    }
+
+    if (transaction.codeFormat !== undefined) {
+        return new Error(`"codeFormat" cannot be used with ${transaction.type} transaction`)
+    }
+
+    if (transaction.humanReadable !== undefined) {
+        return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
+    }
+
+    const error = validateNonFeeDelegated(transaction)
+    if (error) return error
+
+    return validateNotAccountTransaction(transaction)
 }
 
 module.exports = {
