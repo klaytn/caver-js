@@ -43,11 +43,14 @@ const AbstractTransaction = require('./transactionTypes/abstractTransaction')
 const { TX_TYPE_STRING, TX_TYPE_TAG } = require('./transactionHelper/transactionHelper')
 const Account = require('../../caver-account')
 const AbstractFeeDelegatedTransaction = require('./transactionTypes/abstractFeeDelegatedTransaction')
+const EthereumAccessList = require('./transactionTypes/ethereumTypedTransaction/ethereumAccessList')
+const AccessList = require('./transactionUtils/accessList')
+const AccessTuple = require('./transactionUtils/accessTuple')
 
 /** @module Transaction */
 
 /**
- * @typedef {LegacyTransaction|ValueTransfer|FeeDelegatedValueTransfer|FeeDelegatedValueTransferWithRatio|ValueTransferMemo|FeeDelegatedValueTransferMemo|FeeDelegatedValueTransferMemoWithRatio|AccountUpdate|FeeDelegatedAccountUpdate|FeeDelegatedAccountUpdateWithRatio|SmartContractDeploy|FeeDelegatedSmartContractDeploy|FeeDelegatedSmartContractDeployWithRatio|SmartContractExecution|FeeDelegatedSmartContractExecution|FeeDelegatedSmartContractExecution|FeeDelegatedSmartContractExecutionWithRatio|Cancel|FeeDelegatedCancel|FeeDelegatedCancelWithRatio|ChainDataAnchoring|FeeDelegatedChainDataAnchoring|FeeDelegatedChainDataAnchoringWithRatio} module:Transaction.Transaction
+ * @typedef {LegacyTransaction|ValueTransfer|FeeDelegatedValueTransfer|FeeDelegatedValueTransferWithRatio|ValueTransferMemo|FeeDelegatedValueTransferMemo|FeeDelegatedValueTransferMemoWithRatio|AccountUpdate|FeeDelegatedAccountUpdate|FeeDelegatedAccountUpdateWithRatio|SmartContractDeploy|FeeDelegatedSmartContractDeploy|FeeDelegatedSmartContractDeployWithRatio|SmartContractExecution|FeeDelegatedSmartContractExecution|FeeDelegatedSmartContractExecution|FeeDelegatedSmartContractExecutionWithRatio|Cancel|FeeDelegatedCancel|FeeDelegatedCancelWithRatio|ChainDataAnchoring|FeeDelegatedChainDataAnchoring|FeeDelegatedChainDataAnchoringWithRatio|EthereumAccessList} module:Transaction.Transaction
  */
 /**
  * @typedef {FeeDelegatedValueTransfer|FeeDelegatedValueTransferWithRatio|FeeDelegatedValueTransferMemo|FeeDelegatedValueTransferMemoWithRatio|FeeDelegatedAccountUpdate|FeeDelegatedAccountUpdateWithRatio|FeeDelegatedSmartContractDeploy|FeeDelegatedSmartContractDeployWithRatio|FeeDelegatedSmartContractExecution|FeeDelegatedSmartContractExecution|FeeDelegatedSmartContractExecutionWithRatio|FeeDelegatedCancel|FeeDelegatedCancelWithRatio|FeeDelegatedChainDataAnchoring|FeeDelegatedChainDataAnchoringWithRatio} module:Transaction.FeeDelegatedTransaction
@@ -141,6 +144,9 @@ async function getTransactionByHash(transactionHash) {
             break
         case 'TxTypeFeeDelegatedChainDataAnchoringWithRatio':
             txObject = new FeeDelegatedChainDataAnchoringWithRatio(txObject)
+            break
+        case 'TxTypeEthereumAccessList':
+            txObject = new EthereumAccessList(txObject)
             break
     }
     return txObject
@@ -393,7 +399,35 @@ module.exports = {
      * @type {typeof FeeDelegatedChainDataAnchoringWithRatio}
      * */
     feeDelegatedChainDataAnchoringWithRatio: FeeDelegatedChainDataAnchoringWithRatio,
+    /**
+     * The EthereumAccessList class.
+     *
+     * @example
+     * caver.transaction.ethereumAccessList
+     *
+     * @type {typeof EthereumAccessList}
+     * */
+    ethereumAccessList: EthereumAccessList,
 
     type: TX_TYPE_STRING,
     tag: TX_TYPE_TAG,
+
+    /**
+     * A utils module that provides some classes needed for transaction.
+     *
+     * @typedef {object} TransactionUtils
+     * @property {typeof AccessList} accessList - Class representing AccessList.
+     * @property {typeof AccessTuple} accessTuple - Class representing AccessTuple.
+     */
+    /**
+     * @example
+     * caver.transaction.utils.accessList
+     * caver.transaction.utils.accessTuple
+     *
+     * @type {TransactionUtils}
+     * */
+    utils: {
+        accessList: AccessList,
+        accessTuple: AccessTuple,
+    },
 }

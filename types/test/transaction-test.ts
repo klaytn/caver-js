@@ -44,6 +44,7 @@ import Caver, {
     AbstractFeeDelegatedTransaction,
     AbstractFeeDelegatedWithRatioTransaction,
 } from 'caver-js'
+import { EthereumAccessList } from 'packages/caver-transaction/src/transactionTypes/ethereumTypedTransaction/ethereumAccessList'
 
 const caver = new Caver()
 
@@ -61,6 +62,27 @@ caver.transaction.recoverPublicKeys('rawTx')
 
 // $ExpectType string[]
 caver.transaction.recoverFeePayerPublicKeys('rawTx')
+
+// $ExpectType typeof AccessList
+caver.transaction.utils.accessList
+
+// $ExpectType AccessList
+caver.transaction.utils.accessList.create([])
+
+// $ExpectType AccessList
+caver.transaction.utils.accessList.decode('string')
+
+// $ExpectType EncodedAccessTuple[]
+caver.transaction.utils.accessList.create([]).encodeToBytes()
+
+// $ExpectType typeof AccessTuple
+caver.transaction.utils.accessTuple
+
+// $ExpectType AccessTuple
+caver.transaction.utils.accessTuple.create('address', ['storageKey1', 'storageKey2'])
+
+// $ExpectType EncodedAccessTuple
+caver.transaction.utils.accessTuple.create('address', ['storageKey1', 'storageKey2']).encodeToByte()
 
 // $ExpectType typeof LegacyTransaction
 caver.transaction.legacyTransaction
@@ -106,6 +128,8 @@ caver.transaction.feeDelegatedSmartContractExecutionWithRatio
 caver.transaction.feeDelegatedCancelWithRatio
 // $ExpectType typeof FeeDelegatedChainDataAnchoringWithRatio
 caver.transaction.feeDelegatedChainDataAnchoringWithRatio
+// $ExpectType typeof EthereumAccessList
+caver.transaction.ethereumAccessList
 
 // $ExpectType string
 caver.transaction.type.valueTransfer
@@ -313,6 +337,15 @@ FeeDelegatedChainDataAnchoringWithRatio.create('string')
 // $ExpectType FeeDelegatedChainDataAnchoringWithRatio
 FeeDelegatedChainDataAnchoringWithRatio.decode('string')
 
+// $ExpectType EthereumAccessList
+new EthereumAccessList({})
+// $ExpectType EthereumAccessList
+EthereumAccessList.create({})
+// $ExpectType EthereumAccessList
+EthereumAccessList.create('string')
+// $ExpectType EthereumAccessList
+EthereumAccessList.decode('string')
+
 const address = '0xde39030c0b51c01a83fc819fb79d47c90d6a3a60'
 const prvKeys = [
     '0x99305a113c6182985e1ee6ec636ee5e8d0b93fcf3af7f72f8177938afca688f1',
@@ -411,7 +444,7 @@ legacyTransaction.gas
 legacyTransaction.gasPrice
 // $ExpectType string
 legacyTransaction.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 legacyTransaction.signatures
 // $ExpectType string
 legacyTransaction.to
@@ -508,7 +541,7 @@ valueTransfer.gas
 valueTransfer.gasPrice
 // $ExpectType string
 valueTransfer.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 valueTransfer.signatures
 // $ExpectType string
 valueTransfer.to
@@ -601,7 +634,7 @@ valueTransferMemo.gas
 valueTransferMemo.gasPrice
 // $ExpectType string
 valueTransferMemo.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 valueTransferMemo.signatures
 // $ExpectType string
 valueTransferMemo.to
@@ -698,7 +731,7 @@ accountUpdate.gas
 accountUpdate.gasPrice
 // $ExpectType string
 accountUpdate.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 accountUpdate.signatures
 // $ExpectType Account
 accountUpdate.account
@@ -789,7 +822,7 @@ smartContractDeploy.gas
 smartContractDeploy.gasPrice
 // $ExpectType string
 smartContractDeploy.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 smartContractDeploy.signatures
 // $ExpectType string
 smartContractDeploy.to
@@ -890,7 +923,7 @@ smartContractExecution.gas
 smartContractExecution.gasPrice
 // $ExpectType string
 smartContractExecution.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 smartContractExecution.signatures
 // $ExpectType string
 smartContractExecution.to
@@ -987,7 +1020,7 @@ cancel.gas
 cancel.gasPrice
 // $ExpectType string
 cancel.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 cancel.signatures
 
 const chainDataAnchoring = new ChainDataAnchoring({})
@@ -1076,7 +1109,7 @@ chainDataAnchoring.gas
 chainDataAnchoring.gasPrice
 // $ExpectType string
 chainDataAnchoring.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 chainDataAnchoring.signatures
 // $ExpectType string
 chainDataAnchoring.input
@@ -1215,7 +1248,7 @@ feeDelegatedValueTransfer.gas
 feeDelegatedValueTransfer.gasPrice
 // $ExpectType string
 feeDelegatedValueTransfer.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 feeDelegatedValueTransfer.signatures
 // $ExpectType string
 feeDelegatedValueTransfer.to
@@ -1360,7 +1393,7 @@ feeDelegatedValueTransferMemo.gas
 feeDelegatedValueTransferMemo.gasPrice
 // $ExpectType string
 feeDelegatedValueTransferMemo.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 feeDelegatedValueTransferMemo.signatures
 // $ExpectType string
 feeDelegatedValueTransferMemo.to
@@ -1509,7 +1542,7 @@ feeDelegatedAccountUpdate.gas
 feeDelegatedAccountUpdate.gasPrice
 // $ExpectType string
 feeDelegatedAccountUpdate.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 feeDelegatedAccountUpdate.signatures
 // $ExpectType Account
 feeDelegatedAccountUpdate.account
@@ -1652,7 +1685,7 @@ feeDelegatedSmartContractDeploy.gas
 feeDelegatedSmartContractDeploy.gasPrice
 // $ExpectType string
 feeDelegatedSmartContractDeploy.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 feeDelegatedSmartContractDeploy.signatures
 // $ExpectType string
 feeDelegatedSmartContractDeploy.to
@@ -1805,7 +1838,7 @@ feeDelegatedSmartContractExecution.gas
 feeDelegatedSmartContractExecution.gasPrice
 // $ExpectType string
 feeDelegatedSmartContractExecution.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 feeDelegatedSmartContractExecution.signatures
 // $ExpectType string
 feeDelegatedSmartContractExecution.to
@@ -1954,7 +1987,7 @@ feeDelegatedCancel.gas
 feeDelegatedCancel.gasPrice
 // $ExpectType string
 feeDelegatedCancel.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 feeDelegatedCancel.signatures
 // $ExpectType string
 feeDelegatedCancel.feePayer
@@ -2095,7 +2128,7 @@ feeDelegatedChainDataAnchoring.gas
 feeDelegatedChainDataAnchoring.gasPrice
 // $ExpectType string
 feeDelegatedChainDataAnchoring.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 feeDelegatedChainDataAnchoring.signatures
 // $ExpectType string
 feeDelegatedChainDataAnchoring.input
@@ -2238,7 +2271,7 @@ feeDelegatedValueTransferWithRatio.gas
 feeDelegatedValueTransferWithRatio.gasPrice
 // $ExpectType string
 feeDelegatedValueTransferWithRatio.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 feeDelegatedValueTransferWithRatio.signatures
 // $ExpectType string
 feeDelegatedValueTransferWithRatio.to
@@ -2385,7 +2418,7 @@ feeDelegatedValueTransferMemoWithRatio.gas
 feeDelegatedValueTransferMemoWithRatio.gasPrice
 // $ExpectType string
 feeDelegatedValueTransferMemoWithRatio.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 feeDelegatedValueTransferMemoWithRatio.signatures
 // $ExpectType string
 feeDelegatedValueTransferMemoWithRatio.to
@@ -2536,7 +2569,7 @@ feeDelegatedAccountUpdateWithRatio.gas
 feeDelegatedAccountUpdateWithRatio.gasPrice
 // $ExpectType string
 feeDelegatedAccountUpdateWithRatio.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 feeDelegatedAccountUpdateWithRatio.signatures
 // $ExpectType Account
 feeDelegatedAccountUpdateWithRatio.account
@@ -2681,7 +2714,7 @@ feeDelegatedSmartContractDeployWithRatio.gas
 feeDelegatedSmartContractDeployWithRatio.gasPrice
 // $ExpectType string
 feeDelegatedSmartContractDeployWithRatio.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 feeDelegatedSmartContractDeployWithRatio.signatures
 // $ExpectType string
 feeDelegatedSmartContractDeployWithRatio.to
@@ -2836,7 +2869,7 @@ feeDelegatedSmartContractExecutionWithRatio.gas
 feeDelegatedSmartContractExecutionWithRatio.gasPrice
 // $ExpectType string
 feeDelegatedSmartContractExecutionWithRatio.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 feeDelegatedSmartContractExecutionWithRatio.signatures
 // $ExpectType string
 feeDelegatedSmartContractExecutionWithRatio.to
@@ -2987,7 +3020,7 @@ feeDelegatedCancelWithRatio.gas
 feeDelegatedCancelWithRatio.gasPrice
 // $ExpectType string
 feeDelegatedCancelWithRatio.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 feeDelegatedCancelWithRatio.signatures
 // $ExpectType string
 feeDelegatedCancelWithRatio.feePayer
@@ -3130,7 +3163,7 @@ feeDelegatedChainDataAnchoringWithRatio.gas
 feeDelegatedChainDataAnchoringWithRatio.gasPrice
 // $ExpectType string
 feeDelegatedChainDataAnchoringWithRatio.chainId
-// $ExpectType SignatureData[]
+// $ExpectType SignatureData | SignatureData[]
 feeDelegatedChainDataAnchoringWithRatio.signatures
 // $ExpectType string
 feeDelegatedChainDataAnchoringWithRatio.input
@@ -3140,3 +3173,102 @@ feeDelegatedChainDataAnchoringWithRatio.feePayer
 feeDelegatedChainDataAnchoringWithRatio.feePayerSignatures
 // $ExpectType string
 feeDelegatedChainDataAnchoringWithRatio.feeRatio
+
+const ethereumAccessList = new EthereumAccessList({})
+
+// $ExpectType string
+ethereumAccessList.getRLPEncoding()
+
+// $ExpectType string
+ethereumAccessList.getCommonRLPEncodingForSignature()
+
+// $ExpectType Promise<AbstractTransaction>
+ethereumAccessList.sign('string')
+// $ExpectType Promise<AbstractTransaction>
+ethereumAccessList.sign(keyrings.single)
+// $ExpectType Promise<AbstractTransaction>
+ethereumAccessList.sign(keyrings.multiple)
+// $ExpectType Promise<AbstractTransaction>
+ethereumAccessList.sign(keyrings.roleBased)
+// $ExpectType Promise<AbstractTransaction>
+ethereumAccessList.sign('string', 0)
+// $ExpectType Promise<AbstractTransaction>
+ethereumAccessList.sign(keyrings.single, 0)
+// $ExpectType Promise<AbstractTransaction>
+ethereumAccessList.sign(keyrings.multiple, 0)
+// $ExpectType Promise<AbstractTransaction>
+ethereumAccessList.sign(keyrings.roleBased, 0)
+// $ExpectType Promise<AbstractTransaction>
+ethereumAccessList.sign('string', (tx: AbstractTransaction) => '')
+// $ExpectType Promise<AbstractTransaction>
+ethereumAccessList.sign(keyrings.single, (tx: AbstractTransaction) => '')
+// $ExpectType Promise<AbstractTransaction>
+ethereumAccessList.sign(keyrings.multiple, (tx: AbstractTransaction) => '')
+// $ExpectType Promise<AbstractTransaction>
+ethereumAccessList.sign(keyrings.roleBased, (tx: AbstractTransaction) => '')
+// $ExpectType Promise<AbstractTransaction>
+ethereumAccessList.sign('string', 0, (tx: AbstractTransaction) => '')
+// $ExpectType Promise<AbstractTransaction>
+ethereumAccessList.sign(keyrings.single, 0, (tx: AbstractTransaction) => '')
+// $ExpectType Promise<AbstractTransaction>
+ethereumAccessList.sign(keyrings.multiple, 0, (tx: AbstractTransaction) => '')
+// $ExpectType Promise<AbstractTransaction>
+ethereumAccessList.sign(keyrings.roleBased, 0, (tx: AbstractTransaction) => '')
+
+// $ExpectType void
+ethereumAccessList.appendSignatures(sig)
+// $ExpectType void
+ethereumAccessList.appendSignatures([sig, sig])
+// $ExpectType void
+ethereumAccessList.appendSignatures(['0x01', '0x', '0x'])
+// $ExpectType void
+ethereumAccessList.appendSignatures([['0x01', '0x', '0x'], ['0x01', '0x', '0x']])
+
+// $ExpectType string
+ethereumAccessList.combineSignedRawTransactions(['rlpEncoded1', 'rlpEncoded2'])
+
+// $ExpectType string
+ethereumAccessList.getRawTransaction()
+
+// $ExpectType string
+ethereumAccessList.getTransactionHash()
+
+// $ExpectType string
+ethereumAccessList.getSenderTxHash()
+
+// $ExpectType string
+ethereumAccessList.getRLPEncodingForSignature()
+
+// $ExpectType string[]
+ethereumAccessList.recoverPublicKeys()
+
+// $ExpectType Promise<void>
+ethereumAccessList.fillTransaction()
+
+// $ExpectType void
+ethereumAccessList.validateOptionalValues()
+
+// $ExpectType string
+ethereumAccessList.type
+// $ExpectType string
+ethereumAccessList.from
+// $ExpectType string
+ethereumAccessList.nonce
+// $ExpectType string
+ethereumAccessList.gas
+// $ExpectType string
+ethereumAccessList.gasPrice
+// $ExpectType string
+ethereumAccessList.chainId
+// $ExpectType SignatureData | SignatureData[]
+ethereumAccessList.signatures
+// $ExpectType string
+ethereumAccessList.to
+// $ExpectType string
+ethereumAccessList.value
+// $ExpectType string
+ethereumAccessList.input
+// $ExpectType string
+ethereumAccessList.data
+// $ExpectType AccessList
+ethereumAccessList.accessList

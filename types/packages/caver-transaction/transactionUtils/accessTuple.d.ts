@@ -1,5 +1,5 @@
 /*
-    Copyright 2021 The caver-js Authors
+    Copyright 2022 The caver-js Authors
     This file is part of the caver-js library.
     The caver-js library is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
@@ -13,13 +13,23 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-export class WeightedPublicKey {
-    constructor(weight: number, publicKey: string)
+export interface AccessTupleObject {
+    address: string
+    storageKeys: string[]
+}
 
-    weight: number
-    publicKey: string
-    private _weight: number
-    private _publicKey: string
+export type EncodedAccessTuple = Array<string | string[]>
 
-    encodeToBytes(): string[]
+export class AccessTuple {
+    static create(address: string, storageKeys: string[]): AccessTuple
+
+    constructor(address: string, storageKeys: string[])
+
+    address: string
+    storageKeys: string[]
+    private _address: string
+    private _storageKeys: string[]
+
+    encodeToByte(): EncodedAccessTuple
+    isEqual(at: AccessTuple): boolean
 }

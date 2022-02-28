@@ -1053,6 +1053,14 @@ const makeEven = function(hex) {
     if (hex.length % 2 === 1) {
         hex = hex.replace('0x', '0x0')
     }
+    // To return '0x' instead of '0x00'
+    if (
+        hex
+            .replace('0x', '')
+            .split('')
+            .every(n => n == 0)
+    )
+        return '0x'
     return hex
 }
 

@@ -26,7 +26,12 @@ const Keyring = require('../../../caver-wallet/src/keyring/keyringFactory')
 const SingleKeyring = require('../../../caver-wallet/src/keyring/singleKeyring')
 const MultipleKeyring = require('../../../caver-wallet/src/keyring/multipleKeyring')
 const RoleBasedKeyring = require('../../../caver-wallet/src/keyring/roleBasedKeyring')
-const { TX_TYPE_STRING, refineSignatures, typeDetectionFromRLPEncoding } = require('../transactionHelper/transactionHelper')
+const {
+    TX_TYPE_STRING,
+    refineSignatures,
+    typeDetectionFromRLPEncoding,
+    isEthereumTxType,
+} = require('../transactionHelper/transactionHelper')
 const { KEY_ROLE } = require('../../../caver-wallet/src/keyring/keyringHelper')
 const { validateParams } = require('../../../caver-core-helpers/src/validateFunction')
 const SignatureData = require('../../../caver-wallet/src/keyring/signatureData')
@@ -144,7 +149,7 @@ class AbstractTransaction {
     }
 
     set signatures(sigs) {
-        this._signatures = refineSignatures(sigs, this.type === TX_TYPE_STRING.TxTypeLegacyTransaction)
+        this._signatures = refineSignatures(sigs, this.type)
     }
 
     /**
@@ -201,26 +206,7 @@ class AbstractTransaction {
             index = undefined
         }
 
-        let keyring = key
-        if (_.isString(key)) {
-            keyring = Keyring.createFromPrivateKey(key)
-        }
-        if (!(keyring instanceof SingleKeyring) && !(keyring instanceof MultipleKeyring) && !(keyring instanceof RoleBasedKeyring))
-            throw new Error(
-                `Unsupported key type. The key must be a single private key string, KlaytnWalletKey string, or Keyring instance.`
-            )
-
-        // When user attempt to sign with a updated keyring into a TxTypeLegacyTransaction error should be thrown.
-        if (this.type === TX_TYPE_STRING.TxTypeLegacyTransaction && keyring.isDecoupled())
-            throw new Error(`A legacy transaction cannot be signed with a decoupled keyring.`)
-
-        if (!this.from || this.from === '0x' || this.from === '0x0000000000000000000000000000000000000000') this.from = keyring.address
-        if (this.from.toLowerCase() !== keyring.address.toLowerCase())
-            throw new Error(`The from address of the transaction is different with the address of the keyring to use.`)
-
-        await this.fillTransaction()
-        const hash = hasher(this)
-        const role = this.type.includes('AccountUpdate') ? KEY_ROLE.roleAccountUpdateKey : KEY_ROLE.roleTransactionKey
+        const { keyring, hash, role } = await this._sign(key, hasher)
 
         const sig = keyring.sign(hash, this.chainId, role, index)
 
@@ -291,6 +277,11 @@ class AbstractTransaction {
                 // Compare with the RLP-encoded accountKey string, because 'account' is an object.
                 if (k === '_account') {
                     if (this[k].getRLPEncodingAccountKey() !== decoded[k].getRLPEncodingAccountKey()) throw new Error(differentTxError)
+                    continue
+                }
+
+                if (k === '_accessList') {
+                    if (!this[k].isEqual(decoded[k])) throw new Error(differentTxError)
                     continue
                 }
 
@@ -421,6 +412,30 @@ class AbstractTransaction {
             throw new Error(`gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`)
         if (this.nonce === undefined)
             throw new Error(`nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`)
+    }
+
+    async _sign(key, hasher) {
+        let keyring = key
+        if (_.isString(key)) {
+            keyring = Keyring.createFromPrivateKey(key)
+        }
+        if (!(keyring instanceof SingleKeyring) && !(keyring instanceof MultipleKeyring) && !(keyring instanceof RoleBasedKeyring))
+            throw new Error(
+                `Unsupported key type. The key must be a single private key string, KlaytnWalletKey string, or Keyring instance.`
+            )
+
+        // When user attempt to sign with a updated keyring into an ethereum tx type error should be thrown.
+        if (isEthereumTxType(this.type) && keyring.isDecoupled()) throw new Error(`${this.type} cannot be signed with a decoupled keyring.`)
+
+        if (!this.from || this.from === '0x' || this.from === '0x0000000000000000000000000000000000000000') this.from = keyring.address
+        if (this.from.toLowerCase() !== keyring.address.toLowerCase())
+            throw new Error(`The from address of the transaction is different with the address of the keyring to use.`)
+
+        await this.fillTransaction()
+        const hash = hasher(this)
+        const role = this.type.includes('AccountUpdate') ? KEY_ROLE.roleAccountUpdateKey : KEY_ROLE.roleTransactionKey
+
+        return { keyring, hash, role }
     }
 }
 
