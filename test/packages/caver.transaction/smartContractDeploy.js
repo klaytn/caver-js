@@ -172,6 +172,7 @@ describe('TxTypeSmartContractDeploy', () => {
                 propertiesForUnnecessary.roleTransactionKey,
                 propertiesForUnnecessary.roleAccountUpdateKey,
                 propertiesForUnnecessary.roleFeePayerKey,
+                propertiesForUnnecessary.accessList,
             ]
 
             for (let i = 0; i < unnecessaries.length; i++) {

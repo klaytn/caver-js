@@ -218,6 +218,7 @@ describe('TxTypeFeeDelegatedChainDataAnchoringWithRatio', () => {
                 propertiesForUnnecessary.roleAccountUpdateKey,
                 propertiesForUnnecessary.roleFeePayerKey,
                 propertiesForUnnecessary.humanReadable,
+                propertiesForUnnecessary.accessList,
             ]
 
             for (let i = 0; i < unnecessaries.length; i++) {
