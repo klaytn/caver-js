@@ -40,7 +40,6 @@ const SignatureData = require('../../packages/caver-wallet/src/keyring/signature
 
 const { generateDecoupledKeyring, generateMultiSigKeyring, generateRoleBasedKeyring } = require('./utils')
 const utils = require('../../packages/caver-utils')
-const { sign } = require('../../packages/caver-utils/randomhex/crypto')
 
 let caver
 
