@@ -78,7 +78,7 @@ const propertiesForUnnecessary = {
                 '0x0000000000000000000000000000000000000000000000000000000000000003',
                 '0x0000000000000000000000000000000000000000000000000000000000000007',
             ],
-        }
+        },
     },
     codeFormat: { name: 'codeFormat', value: 'EVM' },
     to: { name: 'to', value: testAddress },
