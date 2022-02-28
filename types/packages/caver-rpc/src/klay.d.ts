@@ -254,7 +254,7 @@ export class Klay {
     ): Promise<string>
     createAccessList(
         callObject: CallObject,
-        blockNumber: BlockNumber, 
+        blockNumber: BlockNumber,
         callback?: (error: Error, result: AccessListResult) => void
     ): Promise<AccessListResult>
 
