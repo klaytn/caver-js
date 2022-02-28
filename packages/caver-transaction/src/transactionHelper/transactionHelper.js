@@ -80,6 +80,9 @@ const TX_TYPE_STRING = {
     TxTypeChainDataAnchoring: 'TxTypeChainDataAnchoring',
     TxTypeFeeDelegatedChainDataAnchoring: 'TxTypeFeeDelegatedChainDataAnchoring',
     TxTypeFeeDelegatedChainDataAnchoringWithRatio: 'TxTypeFeeDelegatedChainDataAnchoringWithRatio',
+
+    TxTypeEthereumAccessList: 'TxTypeEthereumAccessList',
+    TxTypeEthereumDynamicFee: 'TxTypeEthereumDynamicFee',
 }
 
 /**
@@ -165,6 +168,11 @@ const TX_TYPE_TAG = {
     '0x49': TX_TYPE_STRING.TxTypeFeeDelegatedChainDataAnchoring,
     TxTypeFeeDelegatedChainDataAnchoringWithRatio: '0x4a',
     '0x4a': TX_TYPE_STRING.TxTypeFeeDelegatedChainDataAnchoringWithRatio,
+
+    TxTypeEthereumAccessList: '0x7801',
+    '0x7801': TX_TYPE_STRING.TxTypeEthereumAccessList,
+    TxTypeEthereumDynamicFee: '0x7802',
+    '0x7802': TX_TYPE_STRING.TxTypeEthereumDynamicFee,
 }
 
 const CODE_FORMAT = {
@@ -182,18 +190,77 @@ const getTypeInt = type => {
 }
 
 /**
+ * Returns an EthereumTxTypeEnvelopeTag string.
+ * This will be used to RLP encode ethereum typed transactions as a type prefix.
+ *
+ * @return {string}
+ */
+const getEthereumTxTypeEnvelopeTag = () => {
+    return '0x78'
+}
+
+/**
+ * Returns an ethereum type tag without EthereumTxTypeEnvelopeTag('0x78').
+ * This will be used to get RLP encoding to sign the ethereum typed transactions.
+ *
+ * @param {string} type - A transaction type string or tag.
+ * @return {string}
+ */
+const getTypeTagWithoutEthereumTxTypeEnvelopeTag = type => {
+    if (!isEthereumTypedTxType(type)) throw new Error(`Not EthereumTxTypeEnvelope tx type: ${type}`)
+    let tag = type
+    if (type.startsWith('TxType')) tag = TX_TYPE_TAG[type]
+    return `0x${tag.replace(getEthereumTxTypeEnvelopeTag(), '')}`
+}
+
+/**
+ * Returns whether the transaction type is ethereum tx or not.
+ *
+ * @param {string} type - A transaction type string or tag.
+ * @return {boolean}
+ */
+const isEthereumTxType = txType => {
+    return isLegacyTxType(txType) || isEthereumTypedTxType(txType)
+}
+
+/**
+ * Returns whether the transaction type is legacy tx or not.
+ *
+ * @param {string} type - A transaction type string or tag.
+ * @return {boolean}
+ */
+const isLegacyTxType = txType => {
+    return txType === undefined || txType === TX_TYPE_STRING.TxTypeLegacyTransaction || txType === TX_TYPE_TAG.TxTypeLegacyTransaction
+}
+
+/**
+ * Returns the transaction type is ethereum typed tx or not.
+ *
+ * @param {string} type - A transaction type string or tag.
+ * @return {boolean}
+ */
+const isEthereumTypedTxType = txType => {
+    return (
+        txType.startsWith(getEthereumTxTypeEnvelopeTag()) ||
+        txType === TX_TYPE_STRING.TxTypeEthereumAccessList ||
+        txType === TX_TYPE_STRING.TxTypeEthereumDynamicFee
+    )
+}
+
+/**
  * Refines the array containing signatures.
  * - Removes duplicate signatures.
  * - Removes the default empty signature(['0x01', '0x', '0x']) included with other signatures.
  * - For an empty signature array, return an array containing the default empty signature(['0x01', '0x', '0x']).
  *
  * @param {Array.<string>|Array.<Array.<string>>|SignatureData|Array.<SignatureData>} sigArray - A signature or an array of signatures.
- * @param {boolean} [isLegacy] - Whether 'LegacyTransaction' or not.
+ * @param {string} [txType] - The transaction type string. This can be null if signature is not for transaction(for example message signed).
  * @return {SignatureData|Array.<SignatureData>}
  */
-const refineSignatures = (sigArray, isLegacy = false) => {
+const refineSignatures = (sigArray, txType) => {
     const set = new Set()
     let result = []
+    const isSingleSignature = txType !== undefined ? isEthereumTxType(txType) : false
 
     let arrayOfSignatures = sigArray
     if (!_.isArray(sigArray) && sigArray instanceof SignatureData) {
@@ -213,9 +280,9 @@ const refineSignatures = (sigArray, isLegacy = false) => {
     }
     if (result.length === 0) result = [SignatureData.emtpySig]
 
-    if (isLegacy && result.length > 1) throw new Error(`${TX_TYPE_STRING.TxTypeLegacyTransaction} cannot have multiple sigantures.`)
+    if (isSingleSignature && txType != undefined && result.length > 1) throw new Error(`${txType}} cannot have multiple sigantures.`)
 
-    return !isLegacy ? result : result[0]
+    return !isSingleSignature ? result : result[0]
 }
 
 /**
@@ -225,7 +292,13 @@ const refineSignatures = (sigArray, isLegacy = false) => {
  * @return {string}
  */
 const typeDetectionFromRLPEncoding = rlpEncoded => {
-    const typeTag = utils.addHexPrefix(rlpEncoded).slice(0, 4)
+    rlpEncoded = utils.addHexPrefix(rlpEncoded)
+    let typeTag
+    if (rlpEncoded.startsWith(getEthereumTxTypeEnvelopeTag())) {
+        typeTag = rlpEncoded.slice(0, 6)
+    } else {
+        typeTag = rlpEncoded.slice(0, 4)
+    }
     return TX_TYPE_TAG[typeTag] ? TX_TYPE_TAG[typeTag] : TX_TYPE_STRING.TxTypeLegacyTransaction
 }
 
@@ -255,4 +328,8 @@ module.exports = {
     typeDetectionFromRLPEncoding,
     getCodeFormatTag,
     getTypeInt,
+    isEthereumTxType,
+    isEthereumTypedTxType,
+    getEthereumTxTypeEnvelopeTag,
+    getTypeTagWithoutEthereumTxTypeEnvelopeTag,
 }
