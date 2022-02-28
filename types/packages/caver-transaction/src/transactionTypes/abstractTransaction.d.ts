@@ -13,6 +13,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { AccessList } from 'ethers/lib/utils'
 import { Account } from '../../../caver-account/src'
 import { KlaytnCall } from '../../../caver-rpc/src/klay'
 import { SignatureData, Keyring } from '../../../caver-wallet/src/'
@@ -33,6 +34,7 @@ export interface CreateTransactionObject {
     feeRatio?: string | number
     humanReadable?: boolean
     codeFormat?: string | number
+    accessList?: AccessList
 }
 
 export class AbstractTransaction {
@@ -60,11 +62,11 @@ export class AbstractTransaction {
     gas: string
     gasPrice: string
     chainId: string
-    signatures: SignatureData[]
+    signatures: SignatureData | SignatureData[]
     private _from: string
     private _nonce: string
     private _gas: string
     private _gasPrice: string
     private _chainId: string
-    private _signatures: string
+    private _signatures: SignatureData | SignatureData[]
 }
