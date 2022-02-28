@@ -27,13 +27,17 @@ export class LegacyTransaction extends AbstractTransaction {
     getRLPEncodingForSignature(): string
     getCommonRLPEncodingForSignature(): string
     recoverPublicKeys(): string[]
+    fillTransaction(): Promise<void>
+    validateOptionalValues(): void
 
     to: string
     value: string
     input: string
     data: string
+    gasPrice: string
     private _to: string
     private _value: string
     private _input: string
     private _data: string
+    private _gasPrice: string
 }

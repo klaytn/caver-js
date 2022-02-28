@@ -24,4 +24,9 @@ export class FeeDelegatedCancel extends AbstractFeeDelegatedTransaction {
 
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string
+    fillTransaction(): Promise<void>
+    validateOptionalValues(): void
+
+    gasPrice: string
+    private _gasPrice: string
 }

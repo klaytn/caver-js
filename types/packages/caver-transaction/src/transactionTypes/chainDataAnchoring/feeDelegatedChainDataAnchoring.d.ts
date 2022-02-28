@@ -24,7 +24,11 @@ export class FeeDelegatedChainDataAnchoring extends AbstractFeeDelegatedTransact
 
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string
+    fillTransaction(): Promise<void>
+    validateOptionalValues(): void
 
     input: string
+    gasPrice: string
     private _input: string
+    private _gasPrice: string
 }

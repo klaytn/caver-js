@@ -320,10 +320,21 @@ const getCodeFormatTag = cf => {
     throw new Error(`Unsupported code format : ${cf}`)
 }
 
+/**
+ * Returns `true` value is undefined or null.
+ *
+ * @param {*} value - The value to check.
+ * @return {string}
+ */
+const isNot = function(value) {
+    return _.isUndefined(value) || _.isNull(value)
+}
+
 module.exports = {
     TX_TYPE_STRING,
     TX_TYPE_TAG,
     CODE_FORMAT,
+    isNot,
     refineSignatures,
     typeDetectionFromRLPEncoding,
     getCodeFormatTag,

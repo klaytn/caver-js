@@ -25,7 +25,11 @@ export class FeeDelegatedAccountUpdateWithRatio extends AbstractFeeDelegatedWith
 
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string
+    fillTransaction(): Promise<void>
+    validateOptionalValues(): void
 
     account: Account
+    gasPrice: string
     private _account: Account
+    private _gasPrice: string
 }
