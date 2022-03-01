@@ -587,7 +587,7 @@ describe('caver.rpc.klay', () => {
         function checkAccessListResult(blockNumberOrTag, ret) {
             expect(_.isArray(ret.accessList)).to.be.true
             expect(ret.accessList.length).to.equal(0) // For now Klaytn will return empty access list
-            expect(ret.gasUsed).to.equal('0x0') // For now Klaytn will return empty access list
+            expect(ret.gasUsed).to.equal('0x0') // For now Klaytn will return zero gasUsed
         }
 
         it('CAVERJS-UNIT-RPC-027: should call klay_createAccessList', async () => {
