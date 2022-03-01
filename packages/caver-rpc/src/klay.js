@@ -2004,7 +2004,7 @@ class Klay {
              * const result = await caver.rpc.klay.createAccessList(txArgs, 'latest')
              *
              * @param {Klay.CallObject} callObject A transaction call object.
-             * @param {number|BigNumber|BN|string} [blockParameter] A block number, or the block tag string `latest` or `earliest`. If omitted, `latest` will be used.
+             * @param {number|BigNumber|BN|string} [blockParameter] A block number, blockhash or the block tag string (`latest` or `earliest`). If omitted, `latest` will be used.
              * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
              * @return {Promise<Klay.AccessListResult>} An accessListResult for the given transaction
              */
