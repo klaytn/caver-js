@@ -43,6 +43,21 @@ const SignatureData = require('../../../caver-wallet/src/keyring/signatureData')
  * @abstract
  */
 class AbstractTransaction {
+    static async getChainId() {
+        const chainId = await AbstractTransaction._klaytnCall.getChainId()
+        return chainId
+    }
+
+    static async getGasPrice() {
+        const gasPrice = await AbstractTransaction._klaytnCall.getGasPrice()
+        return gasPrice
+    }
+
+    static async getNonce(from) {
+        const nonce = await AbstractTransaction._klaytnCall.getTransactionCount(from, 'pending')
+        return nonce
+    }
+
     /**
      * Abstract class that implements common logic for each transaction type.
      * In this constructor, type, tag, nonce, gasPrice, chainId, gas and signatures are set as transaction member variables.
@@ -65,7 +80,6 @@ class AbstractTransaction {
 
         // The variables below are values that the user does not need to pass to the parameter.
         if (createTxObj.nonce !== undefined) this.nonce = createTxObj.nonce
-        if (createTxObj.gasPrice !== undefined) this.gasPrice = createTxObj.gasPrice
         if (createTxObj.chainId !== undefined) this.chainId = createTxObj.chainId
 
         this.signatures = createTxObj.signatures || []
@@ -117,17 +131,6 @@ class AbstractTransaction {
 
     set gas(g) {
         this._gas = utils.numberToHex(g)
-    }
-
-    /**
-     * @type {string}
-     */
-    get gasPrice() {
-        return this._gasPrice
-    }
-
-    set gasPrice(g) {
-        this._gasPrice = utils.numberToHex(g)
     }
 
     /**
@@ -390,15 +393,7 @@ class AbstractTransaction {
      * await tx.fillTransaction()
      */
     async fillTransaction() {
-        const [chainId, gasPrice, nonce] = await Promise.all([
-            isNot(this.chainId) ? AbstractTransaction._klaytnCall.getChainId() : this.chainId,
-            isNot(this.gasPrice) ? AbstractTransaction._klaytnCall.getGasPrice() : this.gasPrice,
-            isNot(this.nonce) ? AbstractTransaction._klaytnCall.getTransactionCount(this.from, 'pending') : this.nonce,
-        ])
-
-        this.chainId = chainId
-        this.gasPrice = gasPrice
-        this.nonce = nonce
+        throw new Error(`Not implemented.`)
     }
 
     /**
@@ -408,8 +403,6 @@ class AbstractTransaction {
      * @ignore
      */
     validateOptionalValues() {
-        if (this.gasPrice === undefined)
-            throw new Error(`gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`)
         if (this.nonce === undefined)
             throw new Error(`nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`)
     }
@@ -437,10 +430,6 @@ class AbstractTransaction {
 
         return { keyring, hash, role }
     }
-}
-
-const isNot = function(value) {
-    return _.isUndefined(value) || _.isNull(value)
 }
 
 module.exports = AbstractTransaction

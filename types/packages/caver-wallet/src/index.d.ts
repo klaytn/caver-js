@@ -34,8 +34,8 @@ export interface SignedMessage {
 
 export class IWallet {
     generate(num: number): string[]
-    sign(address: string, transaction: Transaction): Promise<Transaction>
-    signAsFeePayer(address: string, transaction: FeeDelegatedTransaction): Promise<FeeDelegatedTransaction>
+    sign(address: string, transaction: AbstractTransaction): Promise<AbstractTransaction>
+    signAsFeePayer(address: string, transaction: AbstractFeeDelegatedTransaction): Promise<AbstractFeeDelegatedTransaction>
     isExisted(address: string): boolean
     remove(address: string): boolean
 }
@@ -57,7 +57,7 @@ export class KeyringContainer implements IWallet {
     add(keyring: Keyring): Keyring
     remove(address: string): boolean
     signMessage(address: string, data: string, role: number, index?: number): SignedMessage
-    sign(address: string, transaction: Transaction): Promise<AbstractTransaction>
+    sign(address: string, transaction: AbstractTransaction): Promise<AbstractTransaction>
     sign(
         address: string,
         transaction: AbstractTransaction,

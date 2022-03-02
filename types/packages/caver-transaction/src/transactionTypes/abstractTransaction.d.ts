@@ -35,6 +35,8 @@ export interface CreateTransactionObject {
     humanReadable?: boolean
     codeFormat?: string | number
     accessList?: AccessList
+    maxPriorityFeePerGas?: string | number
+    maxFeePerGas?: string | number
 }
 
 export class AbstractTransaction {
@@ -60,13 +62,11 @@ export class AbstractTransaction {
     from: string
     nonce: string
     gas: string
-    gasPrice: string
     chainId: string
     signatures: SignatureData | SignatureData[]
     private _from: string
     private _nonce: string
     private _gas: string
-    private _gasPrice: string
     private _chainId: string
     private _signatures: SignatureData | SignatureData[]
 }
