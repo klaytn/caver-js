@@ -27,6 +27,25 @@ export interface SignatureForRPC {
     S: string
 }
 
+export interface Header {
+    parentHash: string
+    reward: string
+    stateRoot: string
+    transactionsRoot: string
+    receiptsRoot: string
+    logsBloom: string
+    blockScore: string
+    number: string
+    gasUsed: string
+    timestamp: string
+    timestampFoS: string
+    extraData: string
+    governanceData: string
+    hash: string
+    voteData?: string
+    baseFeePerGas?: string
+}
+
 export interface Block {
     blockscore: string
     extraData: string
@@ -46,6 +65,7 @@ export interface Block {
     transactions: TransactionForRPC[]
     transactionsRoot: string
     voteData: string
+    baseFeePerGas?: string
 }
 
 export interface BlockWithConsensusInfo extends Block {
@@ -286,4 +306,24 @@ export interface EncryptionOptions {
     p?: any
     cipher?: any
     uuid?: any
+}
+
+export interface FeeHistoryResult {
+    oldestBlock: number
+    baseFeePerGas: string[]
+    reward: string[][]
+    gasUsedRatio: number[]
+}
+
+export interface AccessListResult {
+    accessList: AccessList
+    gasUsed: string
+    error: string
+}
+
+export type AccessList = AccessTuple[]
+
+export interface AccessTuple {
+    address: string
+    storageKeys: string[]
 }
