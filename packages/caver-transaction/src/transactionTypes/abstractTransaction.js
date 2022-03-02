@@ -47,14 +47,17 @@ class AbstractTransaction {
         const chainId = await AbstractTransaction._klaytnCall.getChainId()
         return chainId
     }
+
     static async getGasPrice() {
         const gasPrice = await AbstractTransaction._klaytnCall.getGasPrice()
         return gasPrice
     }
+
     static async getNonce(from) {
         const nonce = await AbstractTransaction._klaytnCall.getTransactionCount(from, 'pending')
         return nonce
     }
+
     /**
      * Abstract class that implements common logic for each transaction type.
      * In this constructor, type, tag, nonce, gasPrice, chainId, gas and signatures are set as transaction member variables.
