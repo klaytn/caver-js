@@ -318,6 +318,7 @@ export interface FeeHistoryResult {
 export interface AccessListResult {
     accessList: AccessList
     gasUsed: string
+    error: string
 }
 
 export type AccessList = AccessTuple[]
