@@ -20,7 +20,7 @@ const _ = require('lodash')
 const utils = require('../../../caver-utils/src')
 
 /**
- * An object defines the acess tuple.
+ * An object defines the access tuple.
  *
  * @typedef {object} module:Transaction.AccessTupleObject
  * @property {string} address - The address string.
@@ -33,7 +33,7 @@ const utils = require('../../../caver-utils/src')
  */
 class AccessTuple {
     /**
-     * Returns an access list.
+     * Returns an access tuple.
      *
      * @example
      * const result = caver.transaction.utils.AccessTuple.create('0x{address in hex}', [ '0x{storage key}' ])

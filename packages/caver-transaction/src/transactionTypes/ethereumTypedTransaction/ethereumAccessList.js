@@ -228,7 +228,7 @@ class EthereumAccessList extends AbstractTransaction {
 
         // TxTypeEthereumEnvelope(0x78) || 0x01 || rlp([chainId, nonce, gasPrice, gasLimit, to, value, data, accessList, signatureYParity, signatureR, signatureS])
 
-        const [ v, r, s ] = this.signatures.encode()
+        const [v, r, s] = this.signatures.encode()
         return (
             TX_TYPE_TAG[this.type] +
             RLP.encode([
