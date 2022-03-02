@@ -227,6 +227,8 @@ class EthereumAccessList extends AbstractTransaction {
         this.validateOptionalValues()
 
         // TxTypeEthereumEnvelope(0x78) || 0x01 || rlp([chainId, nonce, gasPrice, gasLimit, to, value, data, accessList, signatureYParity, signatureR, signatureS])
+
+        const [ v, r, s ] = this.signatures.encode()
         return (
             TX_TYPE_TAG[this.type] +
             RLP.encode([
@@ -238,9 +240,9 @@ class EthereumAccessList extends AbstractTransaction {
                 Bytes.fromNat(this.value),
                 this.input,
                 this.accessList.encodeToBytes(),
-                this.signatures.v,
-                this.signatures.r,
-                this.signatures.s,
+                v,
+                r,
+                s,
             ]).slice(2)
         )
     }
