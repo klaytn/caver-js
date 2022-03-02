@@ -66,7 +66,7 @@ class SignatureData {
 
     set v(v) {
         v = v.slice(0, 2) === '0x' ? v : `0x${v}`
-        this._v = utils.makeEven(v)
+        this._v = v
     }
 
     /**
@@ -148,7 +148,7 @@ class SignatureData {
      * @return {Array.<string>} An array format of signature.
      */
     encode() {
-        return [this.v, this.r, this.s]
+        return [utils.makeEven(utils.trimLeadingZero(this.v)), this.r, this.s]
     }
 
     /**

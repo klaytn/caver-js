@@ -25,6 +25,7 @@ export class SingleKeyring {
     getPublicKey(compressed?: boolean): string
     copy(): SingleKeyring
     sign(txSigHash: string, chainId: string | number, role: number, index?: number): SignatureData | SignatureData[]
+    ecsign(hash: string, role: number, index?: number): SignatureData | SignatureData[]
     signMessage(message: string, role: number, index?: number): SignedMessage
     getKeyByRole(role: number): PrivateKey[]
     getKlaytnWalletKey(): string
