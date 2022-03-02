@@ -131,6 +131,27 @@ class Klay {
                 inputFormatter: [formatters.inputAddressFormatter, formatters.inputDefaultBlockNumberFormatter],
             }),
             /**
+             * Returns a block header by block number.
+             *
+             * @memberof Klay
+             * @method getHeaderByNumber
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getHeaderByNumber(0)
+             * const result = await caver.rpc.klay.getHeaderByNumber('latest')
+             *
+             * @param {string|number|BN|BigNumber} blockNumberOrTag The block number or block tag string to query block header.
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<Klay.Header>} An object includes block header.
+             */
+            new Method({
+                name: 'getHeaderByNumber',
+                call: 'klay_getHeaderByNumber',
+                params: 1,
+                inputFormatter: [formatters.inputBlockNumberFormatter],
+            }),
+            /**
              * An object defines the AccountKeyLegacy.
              *
              * @example

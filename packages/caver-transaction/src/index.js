@@ -46,6 +46,7 @@ const AbstractFeeDelegatedTransaction = require('./transactionTypes/abstractFeeD
 const EthereumAccessList = require('./transactionTypes/ethereumTypedTransaction/ethereumAccessList')
 const AccessList = require('./utils/accessList')
 const AccessTuple = require('./utils/accessTuple')
+const EthereumDynamicFee = require('./transactionTypes/ethereumTypedTransaction/ethereumDynamicFee')
 
 /** @module Transaction */
 
@@ -408,6 +409,15 @@ module.exports = {
      * @type {typeof EthereumAccessList}
      * */
     ethereumAccessList: EthereumAccessList,
+    /**
+     * The EthereumDynamicFee class.
+     *
+     * @example
+     * caver.transaction.ethereumDynamicFee
+     *
+     * @type {typeof EthereumDynamicFee}
+     * */
+    ethereumDynamicFee: EthereumDynamicFee,
 
     type: TX_TYPE_STRING,
     tag: TX_TYPE_TAG,

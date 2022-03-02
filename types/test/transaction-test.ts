@@ -42,9 +42,9 @@ import Caver, {
     SignatureData,
     AbstractTransaction,
     AbstractFeeDelegatedTransaction,
-    AbstractFeeDelegatedWithRatioTransaction,
+    EthereumAccessList,
+    EthereumDynamicFee,
 } from 'caver-js'
-import { EthereumAccessList } from 'packages/caver-transaction/src/transactionTypes/ethereumTypedTransaction/ethereumAccessList'
 
 const caver = new Caver()
 
@@ -130,6 +130,8 @@ caver.transaction.feeDelegatedCancelWithRatio
 caver.transaction.feeDelegatedChainDataAnchoringWithRatio
 // $ExpectType typeof EthereumAccessList
 caver.transaction.ethereumAccessList
+// $ExpectType typeof EthereumDynamicFee
+caver.transaction.ethereumDynamicFee
 
 // $ExpectType string
 caver.transaction.type.valueTransfer
@@ -345,6 +347,15 @@ EthereumAccessList.create({})
 EthereumAccessList.create('string')
 // $ExpectType EthereumAccessList
 EthereumAccessList.decode('string')
+
+// $ExpectType EthereumDynamicFee
+new EthereumDynamicFee({})
+// $ExpectType EthereumDynamicFee
+EthereumDynamicFee.create({})
+// $ExpectType EthereumDynamicFee
+EthereumDynamicFee.create('string')
+// $ExpectType EthereumDynamicFee
+EthereumDynamicFee.decode('string')
 
 const address = '0xde39030c0b51c01a83fc819fb79d47c90d6a3a60'
 const prvKeys = [
@@ -3272,3 +3283,104 @@ ethereumAccessList.input
 ethereumAccessList.data
 // $ExpectType AccessList
 ethereumAccessList.accessList
+
+const ethereumDynamicFee = new EthereumDynamicFee({})
+
+// $ExpectType string
+ethereumDynamicFee.getRLPEncoding()
+
+// $ExpectType string
+ethereumDynamicFee.getCommonRLPEncodingForSignature()
+
+// $ExpectType Promise<AbstractTransaction>
+ethereumDynamicFee.sign('string')
+// $ExpectType Promise<AbstractTransaction>
+ethereumDynamicFee.sign(keyrings.single)
+// $ExpectType Promise<AbstractTransaction>
+ethereumDynamicFee.sign(keyrings.multiple)
+// $ExpectType Promise<AbstractTransaction>
+ethereumDynamicFee.sign(keyrings.roleBased)
+// $ExpectType Promise<AbstractTransaction>
+ethereumDynamicFee.sign('string', 0)
+// $ExpectType Promise<AbstractTransaction>
+ethereumDynamicFee.sign(keyrings.single, 0)
+// $ExpectType Promise<AbstractTransaction>
+ethereumDynamicFee.sign(keyrings.multiple, 0)
+// $ExpectType Promise<AbstractTransaction>
+ethereumDynamicFee.sign(keyrings.roleBased, 0)
+// $ExpectType Promise<AbstractTransaction>
+ethereumDynamicFee.sign('string', (tx: AbstractTransaction) => '')
+// $ExpectType Promise<AbstractTransaction>
+ethereumDynamicFee.sign(keyrings.single, (tx: AbstractTransaction) => '')
+// $ExpectType Promise<AbstractTransaction>
+ethereumDynamicFee.sign(keyrings.multiple, (tx: AbstractTransaction) => '')
+// $ExpectType Promise<AbstractTransaction>
+ethereumDynamicFee.sign(keyrings.roleBased, (tx: AbstractTransaction) => '')
+// $ExpectType Promise<AbstractTransaction>
+ethereumDynamicFee.sign('string', 0, (tx: AbstractTransaction) => '')
+// $ExpectType Promise<AbstractTransaction>
+ethereumDynamicFee.sign(keyrings.single, 0, (tx: AbstractTransaction) => '')
+// $ExpectType Promise<AbstractTransaction>
+ethereumDynamicFee.sign(keyrings.multiple, 0, (tx: AbstractTransaction) => '')
+// $ExpectType Promise<AbstractTransaction>
+ethereumDynamicFee.sign(keyrings.roleBased, 0, (tx: AbstractTransaction) => '')
+
+// $ExpectType void
+ethereumDynamicFee.appendSignatures(sig)
+// $ExpectType void
+ethereumDynamicFee.appendSignatures([sig, sig])
+// $ExpectType void
+ethereumDynamicFee.appendSignatures(['0x01', '0x', '0x'])
+// $ExpectType void
+ethereumDynamicFee.appendSignatures([['0x01', '0x', '0x'], ['0x01', '0x', '0x']])
+
+// $ExpectType string
+ethereumDynamicFee.combineSignedRawTransactions(['rlpEncoded1', 'rlpEncoded2'])
+
+// $ExpectType string
+ethereumDynamicFee.getRawTransaction()
+
+// $ExpectType string
+ethereumDynamicFee.getTransactionHash()
+
+// $ExpectType string
+ethereumDynamicFee.getSenderTxHash()
+
+// $ExpectType string
+ethereumDynamicFee.getRLPEncodingForSignature()
+
+// $ExpectType string[]
+ethereumDynamicFee.recoverPublicKeys()
+
+// $ExpectType Promise<void>
+ethereumDynamicFee.fillTransaction()
+
+// $ExpectType void
+ethereumDynamicFee.validateOptionalValues()
+
+// $ExpectType string
+ethereumDynamicFee.type
+// $ExpectType string
+ethereumDynamicFee.from
+// $ExpectType string
+ethereumDynamicFee.nonce
+// $ExpectType string
+ethereumDynamicFee.gas
+// $ExpectType string
+ethereumDynamicFee.chainId
+// $ExpectType SignatureData | SignatureData[]
+ethereumDynamicFee.signatures
+// $ExpectType string
+ethereumDynamicFee.to
+// $ExpectType string
+ethereumDynamicFee.value
+// $ExpectType string
+ethereumDynamicFee.input
+// $ExpectType string
+ethereumDynamicFee.data
+// $ExpectType AccessList
+ethereumDynamicFee.accessList
+// $ExpectType string
+ethereumDynamicFee.maxFeePerGas
+// $ExpectType string
+ethereumDynamicFee.maxPriorityFeePerGas

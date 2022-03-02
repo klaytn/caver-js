@@ -143,6 +143,18 @@ const propertiesForUnnecessary = {
         name: 'humanReadable',
         value: true,
     },
+    gasPrice: {
+        name: 'gasPrice',
+        value: '0x5d21dba00',
+    },
+    maxPriorityFeePerGas: {
+        name: 'maxPriorityFeePerGas',
+        value: '0x5d21dba00',
+    },
+    maxFeePerGas: {
+        name: 'maxFeePerGas',
+        value: '0x5d21dba00',
+    },
 }
 
 const checkSignature = (tx, expected = {}) => {

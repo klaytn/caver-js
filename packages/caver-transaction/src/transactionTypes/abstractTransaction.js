@@ -58,6 +58,11 @@ class AbstractTransaction {
         return nonce
     }
 
+    static async getBaseFee() {
+        const header = await AbstractTransaction._klaytnCall.getHeaderByNumber('latest')
+        return header.baseFeePerGas
+    }
+
     /**
      * Abstract class that implements common logic for each transaction type.
      * In this constructor, type, tag, nonce, gasPrice, chainId, gas and signatures are set as transaction member variables.

@@ -82,6 +82,7 @@ export interface KlaytnCall {
     getAccountKey: Klay['getAccountKey']
     getChainId: Klay['getChainId']
     getGasPrice: Klay['getGasPrice']
+    getHeaderByNumber: Klay['getHeaderByNumber']
     getTransactionByHash: Klay['getTransactionByHash']
     getTransactionCount: Klay['getTransactionCount']
 }

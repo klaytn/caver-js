@@ -40,6 +40,7 @@ const ChainDataAnchoring = require('../transactionTypes/chainDataAnchoring/chain
 const FeeDelegatedChainDataAnchoring = require('../transactionTypes/chainDataAnchoring/feeDelegatedChainDataAnchoring')
 const FeeDelegatedChainDataAnchoringWithRatio = require('../transactionTypes/chainDataAnchoring/feeDelegatedChainDataAnchoringWithRatio')
 const EthereumAccessList = require('../transactionTypes/ethereumTypedTransaction/ethereumAccessList')
+const EthereumDynamicFee = require('../transactionTypes/ethereumTypedTransaction/ethereumDynamicFee')
 
 /**
  * Representing a transaction decoder.
@@ -108,6 +109,8 @@ class TransactionDecoder {
                 return FeeDelegatedChainDataAnchoringWithRatio.decode(rlpEncoded)
             case TX_TYPE_STRING.TxTypeEthereumAccessList:
                 return EthereumAccessList.decode(rlpEncoded)
+            case TX_TYPE_STRING.TxTypeEthereumDynamicFee:
+                return EthereumDynamicFee.decode(rlpEncoded)
         }
     }
 }
