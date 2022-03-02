@@ -29,17 +29,17 @@ class AccessList extends Array {
      *
      * @example
      * const items = [
-     *      caver.transaction.utils.AccessTuple.create('0x{address in hex}', [ '0x{storage key}' ]),
-     *      caver.transaction.utils.AccessTuple.create('0x{address in hex}', [ '0x{storage key}' ]),
+     *      caver.transaction.accessListModule.AccessTuple.create('0x{address in hex}', [ '0x{storage key}' ]),
+     *      caver.transaction.accessListModule.AccessTuple.create('0x{address in hex}', [ '0x{storage key}' ]),
      * ]
-     * const result = caver.transaction.utils.AccessList.create(items)
+     * const result = caver.transaction.accessListModule.AccessList.create(items)
      *
      *
      * const items = [
      *      { address: '0x{address in hex}', storageKeys: [ '0x{storage key}' ] },
      *      { address: '0x{address in hex}', storageKeys: [ '0x{storage key}' ] },
      * ]
-     * const result = caver.transaction.utils.AccessList.create(items)
+     * const result = caver.transaction.accessListModule.AccessList.create(items)
      *
      * @param {Array.<AccessTuple> | Array.<module:Transaction.AccessTupleObject>} items - An array of the access list items.
      * @return {AccessList} An access list.
@@ -64,7 +64,7 @@ class AccessList extends Array {
      *          ]
      *      ]
      * ]
-     * const result = caver.transaction.utils.AccessList.decode(encoded)
+     * const result = caver.transaction.accessListModule.AccessList.decode(encoded)
      *
      * @param {Array.<Array.<string|Array.<string>>> items - An encoded access list.
      * @return {AccessList} An access list.
@@ -81,7 +81,7 @@ class AccessList extends Array {
      * Returns an access list.
      *
      * @example
-     * accessList.push(caver.transaction.utils.AccessTuple.create('0x{address in hex}', [ '0x{storage key}' ]))
+     * accessList.push(caver.transaction.accessListModule.AccessTuple.create('0x{address in hex}', [ '0x{storage key}' ]))
      * accessList.push({ address: '0x{address in hex}', storageKeys: [ '0x{storage key}' ] })
      *
      * @param {AccessTuple | module:Transaction.AccessTupleObject} item - An object of the access list item.
