@@ -59,13 +59,13 @@ class PrivateKey {
      * const signature = privateKey.sign('0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550', '0x2810')
      *
      * @param {string} transactionHash The hash of transaction.
-     * @param {string|number} [chainId] The chainId or the network.
+     * @param {string|number} chainId The chainId or the network.
      * @return {SignatureData} A {@link SignatureData}.
      */
     sign(transactionHash, chainId) {
         let addToV
         if (chainId === undefined) {
-            addToV = 27
+            throw new Error(`Insufficient parameters: chainId is undefined.`)
         } else {
             chainId = utils.toHex(chainId)
             addToV = Nat.toNumber(chainId) * 2 + 35
