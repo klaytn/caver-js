@@ -220,6 +220,9 @@ const getTypeTagWithoutEthereumTxTypeEnvelopeTag = type => {
  * @return {boolean}
  */
 const isEthereumTxType = txType => {
+    // The transaction types in `caver.transaction` should have tx type string as a member variable.
+    // So here we don't assume, user can define undefined for tx type.
+    if (txType === undefined) return false
     return isLegacyTxType(txType) || isEthereumTypedTxType(txType)
 }
 
@@ -230,7 +233,10 @@ const isEthereumTxType = txType => {
  * @return {boolean}
  */
 const isLegacyTxType = txType => {
-    return txType === undefined || txType === TX_TYPE_STRING.TxTypeLegacyTransaction || txType === TX_TYPE_TAG.TxTypeLegacyTransaction
+    // The transaction types in `caver.transaction` should have tx type string as a member variable.
+    // So here we don't assume, user can define undefined for tx type.
+    if (txType === undefined) return false
+    return txType === TX_TYPE_STRING.TxTypeLegacyTransaction || txType === TX_TYPE_TAG.TxTypeLegacyTransaction
 }
 
 /**
@@ -240,6 +246,9 @@ const isLegacyTxType = txType => {
  * @return {boolean}
  */
 const isEthereumTypedTxType = txType => {
+    // The transaction types in `caver.transaction` should have tx type string as a member variable.
+    // So here we don't assume, user can define undefined for tx type.
+    if (txType === undefined) return false
     return (
         txType.startsWith(getEthereumTxTypeEnvelopeTag()) ||
         txType === TX_TYPE_STRING.TxTypeEthereumAccessList ||
