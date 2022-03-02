@@ -13,8 +13,8 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { AccessList } from '../transactionUtils/accessList'
-import { AccessTuple } from '../transactionUtils/accessTuple'
+import { AccessList } from './accessList/accessList'
+import { AccessTuple } from './accessList/accessTuple'
 import { TransactionDecoder } from './transactionDecoder/transactionDecoder'
 import { AbstractTransaction } from './transactionTypes/abstractTransaction'
 import { AccountUpdate } from './transactionTypes/accountUpdate/accountUpdate'
@@ -143,7 +143,7 @@ export interface TransactionModule {
     type: { [key: string]: string }
     tag: { [key: string]: string }
 
-    utils: {
+    accessListModule: {
         accessList: typeof AccessList
         accessTuple: typeof AccessTuple
     }
