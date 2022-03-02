@@ -64,7 +64,7 @@ function validateParams(tx) {
 
     if (tx.gas === undefined && tx.gasLimit === undefined) {
         error = new Error('"gas" is missing')
-    } else if (tx.nonce < 0 || tx.gas < 0 || tx.gasPrice < 0 || tx.chainId < 0) {
+    } else if (tx.nonce < 0 || tx.gas < 0 || tx.gasLimit < 0 || tx.gasPrice < 0 || tx.chainId < 0) {
         error = new Error('gas, gasPrice, nonce or chainId is lower than 0')
     }
 
