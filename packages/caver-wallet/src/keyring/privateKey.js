@@ -76,7 +76,7 @@ class PrivateKey {
     }
 
     /**
-     * Signs with hased data and returns signature data.
+     * Signs with hashed data and returns signature data.
      * ecsign returns a signature which has v as a parity (0 for even, 1 for odd) of the y-value of a secp256k1 signature.
      *
      * @example
