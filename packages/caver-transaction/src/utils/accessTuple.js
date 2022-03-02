@@ -36,7 +36,7 @@ class AccessTuple {
      * Creates an access tuple.
      *
      * @example
-     * const result = caver.transaction.accessListModule.AccessTuple.create('0x{address in hex}', [ '0x{storage key}' ])
+     * const result = caver.transaction.utils.accessTuple.create('0x{address in hex}', [ '0x{storage key}' ])
      *
      * @param {string} address - The address string.
      * @param {Array.<string>} storageKeys - An array of the storage keys.

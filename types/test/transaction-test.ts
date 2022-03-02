@@ -64,25 +64,25 @@ caver.transaction.recoverPublicKeys('rawTx')
 caver.transaction.recoverFeePayerPublicKeys('rawTx')
 
 // $ExpectType typeof AccessList
-caver.transaction.accessListModule.accessList
+caver.transaction.utils.accessList
 
 // $ExpectType AccessList
-caver.transaction.accessListModule.accessList.create([])
+caver.transaction.utils.accessList.create([])
 
 // $ExpectType AccessList
-caver.transaction.accessListModule.accessList.decode('string')
+caver.transaction.utils.accessList.decode('string')
 
 // $ExpectType EncodedAccessTuple[]
-caver.transaction.accessListModule.accessList.create([]).encodeToBytes()
+caver.transaction.utils.accessList.create([]).encodeToBytes()
 
 // $ExpectType typeof AccessTuple
-caver.transaction.accessListModule.accessTuple
+caver.transaction.utils.accessTuple
 
 // $ExpectType AccessTuple
-caver.transaction.accessListModule.accessTuple.create('address', ['storageKey1', 'storageKey2'])
+caver.transaction.utils.accessTuple.create('address', ['storageKey1', 'storageKey2'])
 
 // $ExpectType EncodedAccessTuple
-caver.transaction.accessListModule.accessTuple.create('address', ['storageKey1', 'storageKey2']).encodeToByte()
+caver.transaction.utils.accessTuple.create('address', ['storageKey1', 'storageKey2']).encodeToByte()
 
 // $ExpectType typeof LegacyTransaction
 caver.transaction.legacyTransaction

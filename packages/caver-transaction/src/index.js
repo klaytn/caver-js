@@ -44,8 +44,8 @@ const { TX_TYPE_STRING, TX_TYPE_TAG } = require('./transactionHelper/transaction
 const Account = require('../../caver-account')
 const AbstractFeeDelegatedTransaction = require('./transactionTypes/abstractFeeDelegatedTransaction')
 const EthereumAccessList = require('./transactionTypes/ethereumTypedTransaction/ethereumAccessList')
-const AccessList = require('./accessList/accessList')
-const AccessTuple = require('./accessList/accessTuple')
+const AccessList = require('./utils/accessList')
+const AccessTuple = require('./utils/accessTuple')
 
 /** @module Transaction */
 
@@ -415,18 +415,18 @@ module.exports = {
     /**
      * A access list module that provides some classes needed for AccessList.
      *
-     * @typedef {object} AccessListModule
+     * @typedef {object} TransactionUtils
      * @property {typeof AccessList} accessList - Class representing AccessList.
      * @property {typeof AccessTuple} accessTuple - Class representing AccessTuple.
      */
     /**
      * @example
-     * caver.transaction.accessListModule.accessList
-     * caver.transaction.accessListModule.accessTuple
+     * caver.transaction.utils.accessList
+     * caver.transaction.utils.accessTuple
      *
-     * @type {AccessListModule}
+     * @type {TransactionUtils}
      * */
-    accessListModule: {
+    utils: {
         accessList: AccessList,
         accessTuple: AccessTuple,
     },

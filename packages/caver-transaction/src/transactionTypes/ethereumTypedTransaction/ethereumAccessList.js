@@ -28,7 +28,7 @@ const {
     getTypeTagWithoutEthereumTxTypeEnvelopeTag,
 } = require('../../transactionHelper/transactionHelper')
 const utils = require('../../../../caver-utils/src')
-const AccessList = require('../../accessList/accessList')
+const AccessList = require('../../utils/accessList')
 const TransactionHasher = require('../../transactionHasher/transactionHasher')
 
 function _decode(rlpEncoded) {
