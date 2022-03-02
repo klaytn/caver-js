@@ -33,7 +33,7 @@ const utils = require('../../../caver-utils/src')
  */
 class AccessTuple {
     /**
-     * Returns an access tuple.
+     * Creates an access tuple.
      *
      * @example
      * const result = caver.transaction.accessListModule.AccessTuple.create('0x{address in hex}', [ '0x{storage key}' ])

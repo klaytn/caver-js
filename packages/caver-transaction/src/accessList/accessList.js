@@ -25,7 +25,7 @@ const AccessTuple = require('./accessTuple')
  */
 class AccessList extends Array {
     /**
-     * Returns an access list.
+     * Creates an access list.
      *
      * @example
      * const items = [
@@ -78,7 +78,7 @@ class AccessList extends Array {
     }
 
     /**
-     * Returns an access list.
+     * Added access tuple in access list.
      *
      * @example
      * accessList.push(caver.transaction.accessListModule.AccessTuple.create('0x{address in hex}', [ '0x{storage key}' ]))
