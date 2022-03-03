@@ -82,8 +82,9 @@ class AccessTuple {
         if (!_.isArray(keys)) keys = [keys]
         for (let k of keys) {
             if (!_.isString(k)) throw new Error(`Invalid storageKey type: Storage key should be string type ${typeof k}`)
-            if (!utils.isHex(k)) throw new Error(`Invalid storageKey: Storage key should be a hex string ${k}`)
+            if (!utils.isHex(k)) throw new Error(`Invalid storageKey: The storage key must be a hexadecimal string ${k}`)
             k = utils.addHexPrefix(k)
+            if (k.length !== 66) throw new Error(`Invalid storageKey length: The storage key must be a 32-byte`)
         }
         keys.sort()
         this._storageKeys = keys

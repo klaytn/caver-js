@@ -181,7 +181,25 @@ describe('TxTypeEthereumAccessList', () => {
                     storageKeys: ['invalid storageKey'],
                 },
             ]
-            expectedError = `Invalid storageKey: Storage key should be a hex string ${transactionObj.accessList[0].storageKeys[0]}`
+            expectedError = `Invalid storageKey: The storage key must be a hexadecimal string ${transactionObj.accessList[0].storageKeys[0]}`
+            expect(() => caver.transaction.ethereumAccessList.create(transactionObj)).to.throw(expectedError)
+
+            transactionObj.accessList = [
+                {
+                    address: caver.wallet.keyring.generate().address,
+                    storageKeys: ['0x00000000000000000000000000000000000000000000000000000000000003'],
+                },
+            ]
+            expectedError = `Invalid storageKey length: The storage key must be a 32-byte`
+            expect(() => caver.transaction.ethereumAccessList.create(transactionObj)).to.throw(expectedError)
+
+            transactionObj.accessList = [
+                {
+                    address: caver.wallet.keyring.generate().address,
+                    storageKeys: ['00000000000000000000000000000000000000000000000000000000000003'],
+                },
+            ]
+            expectedError = `Invalid storageKey length: The storage key must be a 32-byte`
             expect(() => caver.transaction.ethereumAccessList.create(transactionObj)).to.throw(expectedError)
         })
 
