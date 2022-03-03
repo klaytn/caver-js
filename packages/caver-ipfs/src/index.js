@@ -127,7 +127,7 @@ class IPFS {
      */
     async get(hash) {
         if (!this.ipfs) throw new Error(`Please set IPFS Node through 'caver.ipfs.setIPFSNode'.`)
-        
+
         const ret = await this.ipfs.cat(hash)
 
         return (await ret.next(0)).value
