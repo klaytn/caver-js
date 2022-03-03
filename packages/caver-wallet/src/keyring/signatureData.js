@@ -66,7 +66,7 @@ class SignatureData {
 
     set v(v) {
         v = v.slice(0, 2) === '0x' ? v : `0x${v}`
-        this._v = v
+        this._v = utils.makeEven(v)
     }
 
     /**
@@ -77,7 +77,7 @@ class SignatureData {
     }
 
     set V(v) {
-        this.v = v
+        this.v = utils.makeEven(v)
     }
 
     /**
