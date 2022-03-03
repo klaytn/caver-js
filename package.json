@@ -82,7 +82,7 @@
     "eventemitter3": "4.0.0",
     "http": "0.0.1-security",
     "https": "^1.0.0",
-    "ipfs-api": "^26.1.2",
+    "ipfs-http-client": "^56.0.1",
     "jsdoc": "^3.6.7",
     "lodash": "4.17.21",
     "mocha": "8.3.2",
