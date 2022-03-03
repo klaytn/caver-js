@@ -5,3 +5,4 @@
 [submodule "test/klaytn-integration-tests"]
 	path = test/klaytn-integration-tests
 	url = https://github.com/klaytn/klaytn-integration-tests
+	branch = 0811

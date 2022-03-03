@@ -537,7 +537,7 @@ describe('Integration tests', () => {
                     it('make abi and bin', async () => {
                         for (const k in tc.deploy) {
                             const { stdout } = await exec(`solc --abi --bin --allow-paths . ${path.join(dir, tc.deploy[k].file)}`)
-                            const regex = `\n======= .*${tc.deploy[k].file}:${k} =======\nBinary: \n(.*)\nContract JSON ABI \n(.*)`
+                            const regex = `\n======= .*${tc.deploy[k].file}:${k} =======\nBinary:\n(.*)\nContract JSON ABI\n(.*)`
                             const found = stdout.match(regex)
                             expect(found).to.not.null
 
