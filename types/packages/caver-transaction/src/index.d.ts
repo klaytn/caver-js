@@ -13,6 +13,8 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { AccessList } from './utils/accessList'
+import { AccessTuple } from './utils/accessTuple'
 import { TransactionDecoder } from './transactionDecoder/transactionDecoder'
 import { AbstractTransaction } from './transactionTypes/abstractTransaction'
 import { AccountUpdate } from './transactionTypes/accountUpdate/accountUpdate'
@@ -24,6 +26,7 @@ import { FeeDelegatedCancelWithRatio } from './transactionTypes/cancel/feeDelega
 import { ChainDataAnchoring } from './transactionTypes/chainDataAnchoring/chainDataAnchoring'
 import { FeeDelegatedChainDataAnchoring } from './transactionTypes/chainDataAnchoring/feeDelegatedChainDataAnchoring'
 import { FeeDelegatedChainDataAnchoringWithRatio } from './transactionTypes/chainDataAnchoring/feeDelegatedChainDataAnchoringWithRatio'
+import { EthereumAccessList } from './transactionTypes/ethereumTypedTransaction/ethereumAccessList'
 import { LegacyTransaction } from './transactionTypes/legacyTransaction/legacyTransaction'
 import { FeeDelegatedSmartContractDeploy } from './transactionTypes/smartContractDeploy/feeDelegatedSmartContractDeploy'
 import { FeeDelegatedSmartContractDeployWithRatio } from './transactionTypes/smartContractDeploy/feeDelegatedSmartContractDeployWithRatio'
@@ -135,7 +138,13 @@ export interface TransactionModule {
     chainDataAnchoring: typeof ChainDataAnchoring
     feeDelegatedChainDataAnchoring: typeof FeeDelegatedChainDataAnchoring
     feeDelegatedChainDataAnchoringWithRatio: typeof FeeDelegatedChainDataAnchoringWithRatio
+    ethereumAccessList: typeof EthereumAccessList
 
     type: { [key: string]: string }
     tag: { [key: string]: string }
+
+    utils: {
+        accessList: typeof AccessList
+        accessTuple: typeof AccessTuple
+    }
 }

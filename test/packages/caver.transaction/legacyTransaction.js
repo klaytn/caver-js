@@ -134,6 +134,7 @@ describe('TxTypeLegacyTransaction', () => {
                 propertiesForUnnecessary.roleAccountUpdateKey,
                 propertiesForUnnecessary.roleFeePayerKey,
                 propertiesForUnnecessary.humanReadable,
+                propertiesForUnnecessary.accessList,
             ]
 
             for (let i = 0; i < unnecessaries.length; i++) {
@@ -256,7 +257,7 @@ describe('TxTypeLegacyTransaction', () => {
         it('CAVERJS-UNIT-TRANSACTION-010: input: decoupled KlaytnWalletKey. should throw error.', async () => {
             tx = new caver.transaction.legacyTransaction(transactionObj)
 
-            const expectedError = `A legacy transaction cannot be signed with a decoupled keyring.`
+            const expectedError = `TxTypeLegacyTransaction cannot be signed with a decoupled keyring.`
             await expect(tx.sign(generateDecoupledKeyring().getKlaytnWalletKey())).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
@@ -296,21 +297,21 @@ describe('TxTypeLegacyTransaction', () => {
         it('CAVERJS-UNIT-TRANSACTION-014: input: decoupled keyring. should throw error.', async () => {
             tx = new caver.transaction.legacyTransaction(transactionObj)
 
-            const expectedError = `A legacy transaction cannot be signed with a decoupled keyring.`
+            const expectedError = `TxTypeLegacyTransaction cannot be signed with a decoupled keyring.`
             await expect(tx.sign(generateDecoupledKeyring())).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-015: input: multisig keyring. should throw error.', async () => {
             tx = new caver.transaction.legacyTransaction(transactionObj)
 
-            const expectedError = `A legacy transaction cannot be signed with a decoupled keyring.`
+            const expectedError = `TxTypeLegacyTransaction cannot be signed with a decoupled keyring.`
             await expect(tx.sign(generateMultiSigKeyring())).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-016: input: roleBased keyring. should throw error.', async () => {
             tx = new caver.transaction.legacyTransaction(transactionObj)
 
-            const expectedError = `A legacy transaction cannot be signed with a decoupled keyring.`
+            const expectedError = `TxTypeLegacyTransaction cannot be signed with a decoupled keyring.`
             await expect(tx.sign(roleBasedKeyring)).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
@@ -390,7 +391,7 @@ describe('TxTypeLegacyTransaction', () => {
         it('CAVERJS-UNIT-TRANSACTION-021: input: decoupled KlaytnWalletKey. should throw error.', async () => {
             tx = new caver.transaction.legacyTransaction(transactionObj)
 
-            const expectedError = `A legacy transaction cannot be signed with a decoupled keyring.`
+            const expectedError = `TxTypeLegacyTransaction cannot be signed with a decoupled keyring.`
             await expect(tx.sign(generateDecoupledKeyring().getKlaytnWalletKey())).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
@@ -417,21 +418,21 @@ describe('TxTypeLegacyTransaction', () => {
         it('CAVERJS-UNIT-TRANSACTION-024: input: decoupled keyring. should throw error.', async () => {
             tx = new caver.transaction.legacyTransaction(transactionObj)
 
-            const expectedError = `A legacy transaction cannot be signed with a decoupled keyring.`
+            const expectedError = `TxTypeLegacyTransaction cannot be signed with a decoupled keyring.`
             await expect(tx.sign(generateDecoupledKeyring())).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-025: input: multisig keyring. should throw error.', async () => {
             tx = new caver.transaction.legacyTransaction(transactionObj)
 
-            const expectedError = `A legacy transaction cannot be signed with a decoupled keyring.`
+            const expectedError = `TxTypeLegacyTransaction cannot be signed with a decoupled keyring.`
             await expect(tx.sign(generateMultiSigKeyring())).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-026: input: roleBased keyring. should throw error.', async () => {
             tx = new caver.transaction.legacyTransaction(transactionObj)
 
-            const expectedError = `A legacy transaction cannot be signed with a decoupled keyring.`
+            const expectedError = `TxTypeLegacyTransaction cannot be signed with a decoupled keyring.`
             await expect(tx.sign(roleBasedKeyring)).to.be.rejectedWith(expectedError)
         }).timeout(200000)
     })
