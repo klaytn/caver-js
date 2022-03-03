@@ -192,7 +192,9 @@ describe('TxTypeEthereumDynamicFee', () => {
                     storageKeys: ['invalid storageKey'],
                 },
             ]
-            expectedError = `Invalid storageKey: The storage key must be a hexadecimal string ${transactionObj.accessList[0].storageKeys[0]}`
+            expectedError = `Invalid storageKey: The storage key must be a hexadecimal string ${
+                transactionObj.accessList[0].storageKeys[0]
+            }`
             expect(() => caver.transaction.ethereumDynamicFee.create(transactionObj)).to.throw(expectedError)
 
             transactionObj.accessList = [
