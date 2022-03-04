@@ -90,7 +90,9 @@ class PrivateKey {
         // `AccountLib.makeSigner` makes a sign function that adds addToV to `v`, so use 0.
         const addToV = 0
         const signature = AccountLib.makeSigner(addToV)(hash, this.privateKey)
-        const [v, r, s] = AccountLib.decodeSignature(signature).map(sig => utils.makeEven(utils.trimLeadingZero(sig)))
+        let [v, r, s] = AccountLib.decodeSignature(signature).map(sig => utils.makeEven(utils.trimLeadingZero(sig)))
+        // This is for converting '0x' to '0x0'
+        v = utils.toHex(utils.hexToNumber(v))
 
         return new SignatureData([v, r, s])
     }
