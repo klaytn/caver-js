@@ -73,6 +73,8 @@ export * from './transactionTypes/valueTransferMemo/feeDelegatedValueTransferMem
 export * from './transactionTypes/valueTransferMemo/feeDelegatedValueTransferMemoWithRatio'
 export * from './transactionTypes/ethereumTypedTransaction/ethereumAccessList'
 export * from './transactionTypes/ethereumTypedTransaction/ethereumDynamicFee'
+export * from './utils/accessList'
+export * from './utils/accessTuple'
 
 export type Transaction =
     | LegacyTransaction

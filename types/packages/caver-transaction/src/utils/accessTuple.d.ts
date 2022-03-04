@@ -13,6 +13,12 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+export interface AccessListResult {
+    accessList: AccessTupleObject[]
+    gasUsed: string
+    error: string
+}
+
 export interface AccessTupleObject {
     address: string
     storageKeys: string[]

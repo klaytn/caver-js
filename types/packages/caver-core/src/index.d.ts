@@ -314,16 +314,3 @@ export interface FeeHistoryResult {
     reward: string[][]
     gasUsedRatio: number[]
 }
-
-export interface AccessListResult {
-    accessList: AccessList
-    gasUsed: string
-    error: string
-}
-
-export type AccessList = AccessTuple[]
-
-export interface AccessTuple {
-    address: string
-    storageKeys: string[]
-}
