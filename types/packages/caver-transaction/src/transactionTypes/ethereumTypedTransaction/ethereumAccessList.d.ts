@@ -28,15 +28,19 @@ export class EthereumAccessList extends AbstractTransaction {
     getRLPEncodingForSignature(): string
     getCommonRLPEncodingForSignature(): string
     recoverPublicKeys(): string[]
+    fillTransaction(): Promise<void>
+    validateOptionalValues(): void
 
     to: string
     value: string
     input: string
     data: string
     accessList: AccessList
+    gasPrice: string
     private _to: string
     private _value: string
     private _input: string
     private _data: string
     private _accessList: AccessList
+    private _gasPrice: string
 }

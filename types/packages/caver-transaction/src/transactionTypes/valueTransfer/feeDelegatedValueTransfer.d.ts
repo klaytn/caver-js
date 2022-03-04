@@ -23,9 +23,13 @@ export class FeeDelegatedValueTransfer extends AbstractFeeDelegatedTransaction {
     static decode(rlpEncoded: string): FeeDelegatedValueTransfer
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string
+    fillTransaction(): Promise<void>
+    validateOptionalValues(): void
 
     to: string
     value: string
+    gasPrice: string
     private _to: string
     private _value: string
+    private _gasPrice: string
 }

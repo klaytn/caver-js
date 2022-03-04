@@ -1,5 +1,5 @@
 /*
-    Copyright 2021 The caver-js Authors
+    Copyright 2022 The caver-js Authors
     This file is part of the caver-js library.
     The caver-js library is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
@@ -13,17 +13,21 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { AbstractFeeDelegatedWithRatioTransaction } from '../abstractFeeDelegatedWithRatioTransaction'
-import { CreateTransactionObject } from '../abstractTransaction'
+import { AbstractTransaction, CreateTransactionObject } from '../abstractTransaction'
+import { SignatureData } from '../../../../caver-wallet/src'
+import { AccessList } from 'ethers/lib/utils'
 
-export class FeeDelegatedSmartContractExecutionWithRatio extends AbstractFeeDelegatedWithRatioTransaction {
-    static create(createTxObj: string | CreateTransactionObject): FeeDelegatedSmartContractExecutionWithRatio
-    static decode(rlpEncoded: string): FeeDelegatedSmartContractExecutionWithRatio
+export class EthereumDynamicFee extends AbstractTransaction {
+    static create(createTxObj: CreateTransactionObject | string): EthereumDynamicFee
+    static decode(rlpEncoded: string): EthereumDynamicFee
 
-    constructor(createTxObj: string | CreateTransactionObject)
+    constructor(createTxObj: CreateTransactionObject | string)
 
+    appendSignatures(sig: string[] | string[][] | SignatureData | SignatureData[]): void
     getRLPEncoding(): string
+    getRLPEncodingForSignature(): string
     getCommonRLPEncodingForSignature(): string
+    recoverPublicKeys(): string[]
     fillTransaction(): Promise<void>
     validateOptionalValues(): void
 
@@ -31,10 +35,14 @@ export class FeeDelegatedSmartContractExecutionWithRatio extends AbstractFeeDele
     value: string
     input: string
     data: string
-    gasPrice: string
+    maxPriorityFeePerGas: string
+    maxFeePerGas: string
+    accessList: AccessList
     private _to: string
     private _value: string
     private _input: string
     private _data: string
-    private _gasPrice: string
+    private _maxPriorityFeePerGas: string
+    private _maxFeePerGas: string
+    private _accessList: AccessList
 }

@@ -20,7 +20,7 @@ const _ = require('lodash')
 const RLP = require('eth-lib/lib/rlp')
 const Bytes = require('eth-lib/lib/bytes')
 const AbstractTransaction = require('../abstractTransaction')
-const { TX_TYPE_STRING, TX_TYPE_TAG } = require('../../transactionHelper/transactionHelper')
+const { TX_TYPE_STRING, TX_TYPE_TAG, isNot } = require('../../transactionHelper/transactionHelper')
 const Account = require('../../../../caver-account/src')
 const utils = require('../../../../caver-utils/src')
 
@@ -88,6 +88,18 @@ class AccountUpdate extends AbstractTransaction {
 
         super(TX_TYPE_STRING.TxTypeAccountUpdate, createTxObj)
         this.account = createTxObj.account
+        if (createTxObj.gasPrice !== undefined) this.gasPrice = createTxObj.gasPrice
+    }
+
+    /**
+     * @type {string}
+     */
+    get gasPrice() {
+        return this._gasPrice
+    }
+
+    set gasPrice(g) {
+        this._gasPrice = utils.numberToHex(g)
     }
 
     /**
@@ -151,6 +163,39 @@ class AccountUpdate extends AbstractTransaction {
             this.from.toLowerCase(),
             this.account.getRLPEncodingAccountKey(),
         ])
+    }
+
+    /**
+     * Fills in the optional variables in transaction.
+     *
+     * If the `gasPrice`, `nonce`, or `chainId` of the transaction are not defined, this method asks the default values for these optional variables and preset them by sending JSON RPC call to the connected Klaytn Node.
+     * Use {@link Klay#getGasPrice|caver.rpc.klay.getGasPrice} to get gasPrice, {@link Klay#getTransactionCount|caver.rpc.klay.getTransactionCount} to get nonce and {@link Klay#getChainId|caver.rpc.klay.getChainId} call to get chainId.
+     *
+     * @example
+     * await tx.fillTransaction()
+     */
+    async fillTransaction() {
+        const [chainId, gasPrice, nonce] = await Promise.all([
+            isNot(this.chainId) ? AbstractTransaction.getChainId() : this.chainId,
+            isNot(this.gasPrice) ? AbstractTransaction.getGasPrice() : this.gasPrice,
+            isNot(this.nonce) ? AbstractTransaction.getNonce(this.from) : this.nonce,
+        ])
+
+        this.chainId = chainId
+        this.gasPrice = gasPrice
+        this.nonce = nonce
+    }
+
+    /**
+     * Checks that member variables that can be defined by the user are defined.
+     * If there is an undefined variable, an error occurs.
+     *
+     * @ignore
+     */
+    validateOptionalValues() {
+        super.validateOptionalValues()
+        if (this.gasPrice === undefined)
+            throw new Error(`gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`)
     }
 }
 
