@@ -21,4 +21,5 @@ export class AccessList extends Array {
 
     encodeToBytes(): EncodedAccessTuple[]
     isEqual(acl: AccessList): boolean
+    toObject(): AccessTupleObject[]
 }

@@ -32,4 +32,5 @@ export class AccessTuple {
 
     encodeToByte(): EncodedAccessTuple
     isEqual(at: AccessTuple): boolean
+    toObject(): AccessTupleObject
 }

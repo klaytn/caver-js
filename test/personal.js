@@ -26,6 +26,9 @@ const caver = new Caver(testRPCURL)
 let senderPrvKey
 let senderAddress
 let password
+const byteCode =
+    '0x60806040526000805534801561001457600080fd5b5060405161016f38038061016f8339810180604052810190808051906020019092919080518201929190505050816000819055505050610116806100596000396000f3006080604052600436106053576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806306661abd14605857806342cbb15c146080578063d14e62b81460a8575b600080fd5b348015606357600080fd5b50606a60d2565b6040518082815260200191505060405180910390f35b348015608b57600080fd5b50609260d8565b6040518082815260200191505060405180910390f35b34801560b357600080fd5b5060d06004803603810190808035906020019092919050505060e0565b005b60005481565b600043905090565b80600081905550505600a165627a7a723058206d2bc553736581b6387f9a0410856ca490fcdc7045a8991ad63a1fd71b651c3a00290000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000013200000000000000000000000000000000000000000000000000000000000000'
+const executeInput = '0xd14e62b80000000000000000000000000000000000000000000000000000000000000005'
 
 before(() => {
     senderPrvKey =
@@ -252,5 +255,316 @@ describe('Personal RPC test', () => {
 
         const key = await caver.klay.getAccountKey(testAccount.address)
         expect(key.keyType).to.equals(4)
+    }).timeout(50000)
+
+    // sendTransaction ethereumAccessList transaction
+    it('CAVERJS-UNIT-ETC-399: sendTransaction should send an ethereumAccessList transaction using an account in the node.', async () => {
+        try {
+            // If account is already existed in node, return error.
+            const address = await caver.klay.personal.importRawKey(senderPrvKey, password)
+            expect(address.toLowerCase()).to.equals(senderAddress.toLowerCase())
+        } catch (e) {}
+
+        const chainId = await caver.rpc.klay.getChainId()
+        // Send KLAY Tx
+        let tx = caver.transaction.ethereumAccessList.create({
+            from: senderAddress,
+            to: caver.klay.accounts.create().address,
+            value: 1,
+            gas: 900000,
+            chainId,
+            accessList: [
+                {
+                    address: caver.klay.accounts.create().address,
+                    storageKeys: [
+                        '0x0000000000000000000000000000000000000000000000000000000000000003',
+                        '0x0000000000000000000000000000000000000000000000000000000000000007',
+                    ],
+                },
+            ],
+        })
+        let receipt = await caver.klay.personal.sendTransaction(tx, password)
+        expect(receipt).not.to.be.null
+        expect(receipt.type).to.equals('TxTypeEthereumAccessList')
+
+        // Deploy Smart Contract Tx
+        tx = caver.transaction.ethereumAccessList.create({
+            from: senderAddress,
+            value: 0,
+            gas: 1000000,
+            chainId,
+            accessList: [
+                {
+                    address: caver.klay.accounts.create().address,
+                    storageKeys: [
+                        '0x0000000000000000000000000000000000000000000000000000000000000003',
+                        '0x0000000000000000000000000000000000000000000000000000000000000007',
+                    ],
+                },
+            ],
+            input: byteCode,
+        })
+        receipt = await caver.klay.personal.sendTransaction(tx, password)
+        expect(receipt).not.to.be.null
+        expect(receipt.type).to.equals('TxTypeEthereumAccessList')
+        expect(receipt.contractAddress).not.to.be.null
+
+        // Execute Smart Contract Tx
+        tx = caver.transaction.ethereumAccessList.create({
+            from: senderAddress,
+            to: receipt.contractAddress,
+            value: 0,
+            gas: 900000,
+            chainId,
+            accessList: [
+                {
+                    address: caver.klay.accounts.create().address,
+                    storageKeys: [
+                        '0x0000000000000000000000000000000000000000000000000000000000000003',
+                        '0x0000000000000000000000000000000000000000000000000000000000000007',
+                    ],
+                },
+            ],
+            input: executeInput,
+        })
+        receipt = await caver.klay.personal.sendTransaction(tx, password)
+        expect(receipt).not.to.be.null
+        expect(receipt.type).to.equals('TxTypeEthereumAccessList')
+        expect(receipt.contractAddress).to.be.null
+    }).timeout(50000)
+
+    // signTransaction
+    it('CAVERJS-UNIT-ETC-400: signTransaction should send a signed transaction using an account in the node.', async () => {
+        const testKeyring = caver.wallet.add(caver.wallet.keyring.generate())
+        const address = await caver.klay.personal.importRawKey(testKeyring.key.privateKey, password)
+        expect(address.toLowerCase()).to.equals(testKeyring.address.toLowerCase())
+
+        const chainId = await caver.rpc.klay.getChainId()
+
+        // Send KLAY Tx
+        let tx = caver.transaction.ethereumAccessList.create({
+            from: testKeyring.address,
+            to: caver.klay.accounts.create().address,
+            value: 1,
+            gas: 900000,
+            chainId,
+            accessList: [
+                {
+                    address: caver.klay.accounts.create().address,
+                    storageKeys: [
+                        '0x0000000000000000000000000000000000000000000000000000000000000003',
+                        '0x0000000000000000000000000000000000000000000000000000000000000007',
+                    ],
+                },
+            ],
+        })
+        let signedTx = await caver.klay.personal.signTransaction(tx, password)
+        let signedTxFromCaver = await caver.wallet.sign(testKeyring.address, tx)
+        expect(signedTx.raw).to.equals(signedTxFromCaver.getRLPEncoding())
+
+        // Deploy Smart Contract Tx
+        tx = caver.transaction.ethereumAccessList.create({
+            from: testKeyring.address,
+            value: 0,
+            gas: 1000000,
+            chainId,
+            accessList: [
+                {
+                    address: caver.klay.accounts.create().address,
+                    storageKeys: [
+                        '0x0000000000000000000000000000000000000000000000000000000000000003',
+                        '0x0000000000000000000000000000000000000000000000000000000000000007',
+                    ],
+                },
+            ],
+            input: byteCode,
+        })
+        signedTx = await caver.klay.personal.signTransaction(tx, password)
+        signedTxFromCaver = await caver.wallet.sign(testKeyring.address, tx)
+        expect(signedTx.raw).to.equals(signedTxFromCaver.getRLPEncoding())
+
+        // Execute Smart Contract Tx
+        tx = caver.transaction.ethereumAccessList.create({
+            from: testKeyring.address,
+            to: caver.wallet.keyring.generate().address,
+            value: 0,
+            gas: 900000,
+            chainId,
+            accessList: [
+                {
+                    address: caver.klay.accounts.create().address,
+                    storageKeys: [
+                        '0x0000000000000000000000000000000000000000000000000000000000000003',
+                        '0x0000000000000000000000000000000000000000000000000000000000000007',
+                    ],
+                },
+            ],
+            input: executeInput,
+        })
+        signedTx = await caver.klay.personal.signTransaction(tx, password)
+        signedTxFromCaver = await caver.wallet.sign(testKeyring.address, tx)
+        expect(signedTx.raw).to.equals(signedTxFromCaver.getRLPEncoding())
+    }).timeout(50000)
+
+    // sendTransaction ethereumDynamicFee transaction
+    it('CAVERJS-UNIT-ETC-401: sendTransaction should send an ethereumDynamicFee transaction using an account in the node.', async () => {
+        try {
+            // If account is already existed in node, return error.
+            const address = await caver.klay.personal.importRawKey(senderPrvKey, password)
+            expect(address.toLowerCase()).to.equals(senderAddress.toLowerCase())
+        } catch (e) {}
+
+        const chainId = await caver.rpc.klay.getChainId()
+
+        // Send KLAY Tx
+        let tx = caver.transaction.ethereumDynamicFee.create({
+            from: senderAddress,
+            to: caver.klay.accounts.create().address,
+            value: 1,
+            gas: 900000,
+            chainId,
+            maxPriorityFeePerGas: '0x5d21dba00',
+            maxFeePerGas: '0x5d21dba00',
+            accessList: [
+                {
+                    address: caver.klay.accounts.create().address,
+                    storageKeys: [
+                        '0x0000000000000000000000000000000000000000000000000000000000000003',
+                        '0x0000000000000000000000000000000000000000000000000000000000000007',
+                    ],
+                },
+            ],
+        })
+        let receipt = await caver.klay.personal.sendTransaction(tx, password)
+        expect(receipt).not.to.be.null
+        expect(receipt.type).to.equals('TxTypeEthereumDynamicFee')
+
+        // Deploy Smart Contract Tx
+        tx = caver.transaction.ethereumDynamicFee.create({
+            from: senderAddress,
+            value: 0,
+            gas: 1000000,
+            chainId,
+            maxPriorityFeePerGas: '0x5d21dba00',
+            maxFeePerGas: '0x5d21dba00',
+            accessList: [
+                {
+                    address: caver.klay.accounts.create().address,
+                    storageKeys: [
+                        '0x0000000000000000000000000000000000000000000000000000000000000003',
+                        '0x0000000000000000000000000000000000000000000000000000000000000007',
+                    ],
+                },
+            ],
+            input: byteCode,
+        })
+        receipt = await caver.klay.personal.sendTransaction(tx, password)
+        expect(receipt).not.to.be.null
+        expect(receipt.type).to.equals('TxTypeEthereumDynamicFee')
+        expect(receipt.contractAddress).not.to.be.null
+
+        // Execute Smart Contract Tx
+        tx = caver.transaction.ethereumDynamicFee.create({
+            from: senderAddress,
+            to: receipt.contractAddress,
+            value: 0,
+            gas: 900000,
+            chainId,
+            maxPriorityFeePerGas: '0x5d21dba00',
+            maxFeePerGas: '0x5d21dba00',
+            accessList: [
+                {
+                    address: caver.klay.accounts.create().address,
+                    storageKeys: [
+                        '0x0000000000000000000000000000000000000000000000000000000000000003',
+                        '0x0000000000000000000000000000000000000000000000000000000000000007',
+                    ],
+                },
+            ],
+            input: executeInput,
+        })
+        receipt = await caver.klay.personal.sendTransaction(tx, password)
+        expect(receipt).not.to.be.null
+        expect(receipt.type).to.equals('TxTypeEthereumDynamicFee')
+        expect(receipt.contractAddress).to.be.null
+    }).timeout(50000)
+
+    // signTransaction with ethereumDynamicFee transaction
+    it('CAVERJS-UNIT-ETC-402: signTransaction should send a signed transaction using an account in the node.', async () => {
+        const testKeyring = caver.wallet.add(caver.wallet.keyring.generate())
+        const address = await caver.klay.personal.importRawKey(testKeyring.key.privateKey, password)
+        expect(address.toLowerCase()).to.equals(testKeyring.address.toLowerCase())
+
+        const chainId = await caver.rpc.klay.getChainId()
+
+        // Send KLAY Tx
+        let tx = caver.transaction.ethereumDynamicFee.create({
+            from: testKeyring.address,
+            to: caver.klay.accounts.create().address,
+            value: 1,
+            gas: 900000,
+            chainId,
+            maxPriorityFeePerGas: '0x5d21dba00',
+            maxFeePerGas: '0x5d21dba00',
+            accessList: [
+                {
+                    address: caver.klay.accounts.create().address,
+                    storageKeys: [
+                        '0x0000000000000000000000000000000000000000000000000000000000000003',
+                        '0x0000000000000000000000000000000000000000000000000000000000000007',
+                    ],
+                },
+            ],
+        })
+        let signedTx = await caver.klay.personal.signTransaction(tx, password)
+        let signedTxFromCaver = await caver.wallet.sign(testKeyring.address, tx)
+        expect(signedTx.raw).to.equals(signedTxFromCaver.getRLPEncoding())
+
+        // Deploy Smart Contract Tx
+        tx = caver.transaction.ethereumDynamicFee.create({
+            from: testKeyring.address,
+            value: 0,
+            gas: 1000000,
+            chainId,
+            maxPriorityFeePerGas: '0x5d21dba00',
+            maxFeePerGas: '0x5d21dba00',
+            accessList: [
+                {
+                    address: caver.klay.accounts.create().address,
+                    storageKeys: [
+                        '0x0000000000000000000000000000000000000000000000000000000000000003',
+                        '0x0000000000000000000000000000000000000000000000000000000000000007',
+                    ],
+                },
+            ],
+            input: byteCode,
+        })
+        signedTx = await caver.klay.personal.signTransaction(tx, password)
+        signedTxFromCaver = await caver.wallet.sign(testKeyring.address, tx)
+        expect(signedTx.raw).to.equals(signedTxFromCaver.getRLPEncoding())
+
+        // Execute Smart Contract Tx
+        tx = caver.transaction.ethereumDynamicFee.create({
+            from: testKeyring.address,
+            to: caver.wallet.keyring.generate().address,
+            value: 0,
+            gas: 900000,
+            chainId,
+            maxPriorityFeePerGas: '0x5d21dba00',
+            maxFeePerGas: '0x5d21dba00',
+            accessList: [
+                {
+                    address: caver.klay.accounts.create().address,
+                    storageKeys: [
+                        '0x0000000000000000000000000000000000000000000000000000000000000003',
+                        '0x0000000000000000000000000000000000000000000000000000000000000007',
+                    ],
+                },
+            ],
+            input: executeInput,
+        })
+        signedTx = await caver.klay.personal.signTransaction(tx, password)
+        signedTxFromCaver = await caver.wallet.sign(testKeyring.address, tx)
+        expect(signedTx.raw).to.equals(signedTxFromCaver.getRLPEncoding())
     }).timeout(50000)
 })

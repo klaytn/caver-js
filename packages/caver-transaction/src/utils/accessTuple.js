@@ -123,6 +123,22 @@ class AccessTuple {
         }
         return true
     }
+
+    /**
+     * Returns a JSON object without _ prefix variable name.
+     *
+     * @example
+     * const result = accessTuple.toObject()
+     *
+     * @return {module:Transaction.AccessTupleObject} An access tuple object.
+     */
+    toObject() {
+        const accessTupleObject = { address: this.address, storageKeys: [] }
+        for (const sk of this.storageKeys) {
+            accessTupleObject.storageKeys.push(sk)
+        }
+        return accessTupleObject
+    }
 }
 
 module.exports = AccessTuple
