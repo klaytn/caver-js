@@ -430,8 +430,8 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
             } else if (key === 'account') {
                 tx.key = payload.params[0][key].getRLPEncodingAccountKey()
             } else if (key === 'chainId') {
-                if (payload.params[0][key].type !== undefined && payload.params[0][key].type.includes('Ethereum')) {
-                    tx[key] = payload.params[0][key].toObject()
+                if (payload.params[0].type !== undefined && payload.params[0].type.includes('Ethereum')) {
+                    tx[key] = payload.params[0][key]
                 }
             } else if (key === 'accessList') {
                 tx[key] = payload.params[0][key].toObject()
