@@ -63,6 +63,11 @@ class AbstractTransaction {
         return header.baseFeePerGas
     }
 
+    static async getMaxPriorityFeePerGas() {
+        const maxPriorityFeePerGas = await AbstractTransaction._klaytnCall.getMaxPriorityFeePerGas()
+        return maxPriorityFeePerGas
+    }
+
     /**
      * Abstract class that implements common logic for each transaction type.
      * In this constructor, type, tag, nonce, gasPrice, chainId, gas and signatures are set as transaction member variables.

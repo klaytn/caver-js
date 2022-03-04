@@ -341,6 +341,25 @@ class Klay {
                 call: 'klay_getTransactionByHash',
                 params: 1,
             }),
+            /**
+             * Returns a suggestion for a gas tip cap for dynamic fee transactions in peb.
+             * Since Klaytn has a fixed gas price, this `caver.rpc.klay.getMaxPriorityFeePerGas` returns the gas price set by Klaytn.
+             *
+             * @memberof Klay
+             * @method getMaxPriorityFeePerGas
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getMaxPriorityFeePerGas()
+             *
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<string>} As a suggested value for the gas tip cap, the current Klaytn uses a fixed gas price, so the gasPrice value is returned.
+             */
+            new Method({
+                name: 'getMaxPriorityFeePerGas',
+                call: 'klay_maxPriorityFeePerGas',
+                params: 0,
+            }),
         ]
         AbstractTransaction._klaytnCall = {}
         Validator._klaytnCall = {}

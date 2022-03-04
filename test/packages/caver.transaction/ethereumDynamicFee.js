@@ -46,7 +46,7 @@ const utils = require('../../../packages/caver-utils/src')
 let caver
 let sender
 let roleBasedKeyring
-let gasPrice
+let maxPriorityFeePerGas
 let baseFee
 
 const sandbox = sinon.createSandbox()
@@ -65,10 +65,10 @@ function isValidV(sigs) {
 before(() => {
     caver = new Caver(testRPCURL)
     AbstractTransaction._klaytnCall = {
-        getGasPrice: () => {},
         getTransactionCount: () => {},
         getChainId: () => {},
         getHeaderByNumber: () => {},
+        getMaxPriorityFeePerGas: () => {},
     }
 
     sender = caver.wallet.add(caver.wallet.keyring.generate())
@@ -83,10 +83,10 @@ describe('TxTypeEthereumDynamicFee', () => {
     const expectedTxWithSigRLPEncoding =
         '0x7802f9010f822710258505d21dba008505d21dba00829c40941fc92c23f71a7de4cdb4394a37fc636986a0f48401b844a9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039f85bf8599467116062f1626f7b3019631f03d301b8f701f709f842a00000000000000000000000000000000000000000000000000000000000000003a0000000000000000000000000000000000000000000000000000000000000000780a04fc52da183020a27dc4b684a45404445630e946b0c1a37edeb538d4bdae63040a07d56dbcc61f42ffcbced105f838d20b8fe71e85a4d0344c7f60815fddfeae4cc'
 
-    let getGasPriceSpy
     let getNonceSpy
     let getChainIdSpy
     let getHeaderByNumberSpy
+    let getMaxPriorityFeePerGasSpy
 
     beforeEach(() => {
         const accessList = [
@@ -130,9 +130,6 @@ describe('TxTypeEthereumDynamicFee', () => {
                 '0xa9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039',
         }
 
-        gasPrice = '0x5d21dba00'
-        getGasPriceSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getGasPrice')
-        getGasPriceSpy.returns(gasPrice)
         getNonceSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionCount')
         getNonceSpy.returns('0x3a')
         getChainIdSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getChainId')
@@ -140,6 +137,9 @@ describe('TxTypeEthereumDynamicFee', () => {
         baseFee = '0x0'
         getHeaderByNumberSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getHeaderByNumber')
         getHeaderByNumberSpy.returns({ baseFeePerGas: baseFee })
+        maxPriorityFeePerGas = '0x5d21dba00'
+        getMaxPriorityFeePerGasSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getMaxPriorityFeePerGas')
+        getMaxPriorityFeePerGasSpy.returns(maxPriorityFeePerGas)
     })
 
     afterEach(() => {
@@ -906,20 +906,19 @@ describe('TxTypeEthereumDynamicFee', () => {
     })
 
     context('ethereumDynamicFee.fillTransaction', () => {
-        it('CAVERJS-UNIT-TRANSACTION-547: fillTransaction should call klay_getGasPrice and klay_getHeaderByNumber to fill maxPriorityFeePerGas when maxPriorityFeePerGas is undefined', async () => {
+        it('CAVERJS-UNIT-TRANSACTION-547: fillTransaction should call klay_getMaxPriorityFeePerGas to fill maxPriorityFeePerGas when maxPriorityFeePerGas is undefined', async () => {
             transactionObj.nonce = '0x3a'
             delete transactionObj.maxPriorityFeePerGas
             const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             await tx.fillTransaction()
-            expect(getGasPriceSpy).to.have.been.calledOnce
+            expect(getMaxPriorityFeePerGasSpy).to.have.been.calledOnce
             expect(getHeaderByNumberSpy).to.have.been.calledOnce
             expect(getNonceSpy).not.to.have.been.calledOnce
             expect(getChainIdSpy).not.to.have.been.calledOnce
-            expect(tx.maxPriorityFeePerGas).to.equal(gasPrice)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-548: fillTransaction should call klay_getGasPrice and klay_getHeaderByNumber  to fill maxFeePerGas when maxFeePerGas is undefined', async () => {
+        it('CAVERJS-UNIT-TRANSACTION-548: fillTransaction should call klay_getHeaderByNumber to fill maxFeePerGas when maxFeePerGas is undefined', async () => {
             transactionObj.nonce = '0x3a'
             delete transactionObj.maxFeePerGas
             const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
@@ -929,7 +928,7 @@ describe('TxTypeEthereumDynamicFee', () => {
 
             await tx.fillTransaction()
 
-            expect(getGasPriceSpy).to.have.been.calledOnce
+            expect(getMaxPriorityFeePerGasSpy).not.to.have.been.called
             expect(getHeaderByNumberSpy).to.have.been.calledOnce
             expect(getNonceSpy).not.to.have.been.calledOnce
             expect(getChainIdSpy).not.to.have.been.calledOnce
@@ -940,7 +939,7 @@ describe('TxTypeEthereumDynamicFee', () => {
             const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             await tx.fillTransaction()
-            expect(getGasPriceSpy).not.to.have.been.calledOnce
+            expect(getMaxPriorityFeePerGasSpy).not.to.have.been.calledOnce
             expect(getNonceSpy).to.have.been.calledOnce
             expect(getChainIdSpy).not.to.have.been.calledOnce
         }).timeout(200000)
@@ -950,7 +949,7 @@ describe('TxTypeEthereumDynamicFee', () => {
             const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             await tx.fillTransaction()
-            expect(getGasPriceSpy).not.to.have.been.calledOnce
+            expect(getMaxPriorityFeePerGasSpy).not.to.have.been.calledOnce
             expect(getNonceSpy).not.to.have.been.calledOnce
         }).timeout(200000)
     })
