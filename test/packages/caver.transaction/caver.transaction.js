@@ -48,6 +48,8 @@ describe('caver.transaction.getTransactionByHash', () => {
             getTransactionCount: () => {},
             getChainId: () => {},
             getTransactionByHash: () => {},
+            getHeaderByNumber: () => {},
+            getMaxPriorityFeePerGas: () => {},
         }
     })
 

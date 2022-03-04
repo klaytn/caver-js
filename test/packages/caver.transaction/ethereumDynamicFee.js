@@ -41,11 +41,13 @@ const SignatureData = require('../../../packages/caver-wallet/src/keyring/signat
 const { generateDecoupledKeyring, generateMultiSigKeyring, generateRoleBasedKeyring } = require('../utils')
 
 const AbstractTransaction = require('../../../packages/caver-transaction/src/transactionTypes/abstractTransaction')
-const utils = require('../../../packages/caver-utils')
+const utils = require('../../../packages/caver-utils/src')
 
 let caver
 let sender
 let roleBasedKeyring
+let maxPriorityFeePerGas
+let baseFee
 
 const sandbox = sinon.createSandbox()
 
@@ -63,31 +65,33 @@ function isValidV(sigs) {
 before(() => {
     caver = new Caver(testRPCURL)
     AbstractTransaction._klaytnCall = {
-        getGasPrice: () => {},
         getTransactionCount: () => {},
         getChainId: () => {},
+        getHeaderByNumber: () => {},
+        getMaxPriorityFeePerGas: () => {},
     }
 
     sender = caver.wallet.add(caver.wallet.keyring.generate())
     roleBasedKeyring = generateRoleBasedKeyring([3, 3, 3])
 })
 
-describe('TxTypeEthereumAccessList', () => {
+describe('TxTypeEthereumDynamicFee', () => {
     let transactionObj
     let transactionObjWithSignature
     const expectedTxWithSigRLPEncodingForSignature =
-        '0x01f8c6822710238505d21dba00829c4094c5fb1386b60160614a8151dcd4b0ae41325d1cb801b844a9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039f85bf859945430192ae264b3feff967fc08982b9c6f5694023f842a00000000000000000000000000000000000000000000000000000000000000003a00000000000000000000000000000000000000000000000000000000000000007'
+        '0x02f8cc822710258505d21dba008505d21dba00829c40941fc92c23f71a7de4cdb4394a37fc636986a0f48401b844a9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039f85bf8599467116062f1626f7b3019631f03d301b8f701f709f842a00000000000000000000000000000000000000000000000000000000000000003a00000000000000000000000000000000000000000000000000000000000000007'
     const expectedTxWithSigRLPEncoding =
-        '0x7801f90109822710238505d21dba00829c4094c5fb1386b60160614a8151dcd4b0ae41325d1cb801b844a9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039f85bf859945430192ae264b3feff967fc08982b9c6f5694023f842a00000000000000000000000000000000000000000000000000000000000000003a0000000000000000000000000000000000000000000000000000000000000000701a05ac25e47591243af2d6b8e7f54d608e9e0e0aeb5194d34c17852bd7e376f4857a0095a40394f33e95cce9695d5badf4270f4cc8aff0b5395cefc3a0fe213be1f30'
+        '0x7802f9010f822710258505d21dba008505d21dba00829c40941fc92c23f71a7de4cdb4394a37fc636986a0f48401b844a9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039f85bf8599467116062f1626f7b3019631f03d301b8f701f709f842a00000000000000000000000000000000000000000000000000000000000000003a0000000000000000000000000000000000000000000000000000000000000000780a04fc52da183020a27dc4b684a45404445630e946b0c1a37edeb538d4bdae63040a07d56dbcc61f42ffcbced105f838d20b8fe71e85a4d0344c7f60815fddfeae4cc'
 
-    let getGasPriceSpy
     let getNonceSpy
     let getChainIdSpy
+    let getHeaderByNumberSpy
+    let getMaxPriorityFeePerGasSpy
 
     beforeEach(() => {
         const accessList = [
             {
-                address: '0x5430192ae264b3feff967fc08982b9c6f5694023',
+                address: '0x67116062f1626f7b3019631f03d301b8f701f709',
                 storageKeys: [
                     '0x0000000000000000000000000000000000000000000000000000000000000003',
                     '0x0000000000000000000000000000000000000000000000000000000000000007',
@@ -97,75 +101,82 @@ describe('TxTypeEthereumAccessList', () => {
 
         transactionObj = {
             chainId: '0x2710',
-            to: '0xc5fb1386b60160614a8151dcd4b0ae41325d1cb8',
+            to: '0x1fc92c23f71a7de4cdb4394a37fc636986a0f484',
             value: '0x1',
             input:
                 '0xa9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039',
 
             gas: '0x9c40',
+            maxPriorityFeePerGas: '0x5d21dba00',
+            maxFeePerGas: '0x5d21dba00',
             accessList,
         }
 
         transactionObjWithSignature = {
             accessList,
-            to: '0xc5fb1386b60160614a8151dcd4b0ae41325d1cb8',
+            to: '0x1fc92c23f71a7de4cdb4394a37fc636986a0f484',
             value: '0x1',
             gas: '0x9c40',
-            nonce: '0x23',
-            gasPrice: '0x5d21dba00',
+            nonce: '0x25',
+            maxPriorityFeePerGas: '0x5d21dba00',
+            maxFeePerGas: '0x5d21dba00',
             signatures: [
-                '0x1',
-                '0x5ac25e47591243af2d6b8e7f54d608e9e0e0aeb5194d34c17852bd7e376f4857',
-                '0x095a40394f33e95cce9695d5badf4270f4cc8aff0b5395cefc3a0fe213be1f30',
+                '0x0',
+                '0x4fc52da183020a27dc4b684a45404445630e946b0c1a37edeb538d4bdae63040',
+                '0x7d56dbcc61f42ffcbced105f838d20b8fe71e85a4d0344c7f60815fddfeae4cc',
             ],
             chainId: '0x2710',
             input:
                 '0xa9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039',
         }
 
-        getGasPriceSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getGasPrice')
-        getGasPriceSpy.returns('0x5d21dba00')
         getNonceSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionCount')
         getNonceSpy.returns('0x3a')
         getChainIdSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getChainId')
         getChainIdSpy.returns('0x7e3')
+        baseFee = '0x0'
+        getHeaderByNumberSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getHeaderByNumber')
+        getHeaderByNumberSpy.returns({ baseFeePerGas: baseFee })
+        maxPriorityFeePerGas = '0x5d21dba00'
+        getMaxPriorityFeePerGasSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getMaxPriorityFeePerGas')
+        getMaxPriorityFeePerGasSpy.returns(maxPriorityFeePerGas)
     })
 
     afterEach(() => {
         sandbox.restore()
     })
 
-    context('create ethereumAccessList instance', () => {
-        it('CAVERJS-UNIT-TRANSACTION-437: If ethereumAccessList not define input and to, return error', () => {
+    context('create ethereumDynamicFee instance', () => {
+        it('CAVERJS-UNIT-TRANSACTION-492: If ethereumDynamicFee not define input and to, return error', () => {
             delete transactionObj.input
             delete transactionObj.to
 
             const expectedError = 'contract creation without any data provided'
-            expect(() => caver.transaction.ethereumAccessList.create(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.ethereumDynamicFee.create(transactionObj)).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-438: If ethereumAccessList not define gas, return error', () => {
+        it('CAVERJS-UNIT-TRANSACTION-493: If ethereumDynamicFee not define gas, return error', () => {
             delete transactionObj.gas
 
             const expectedError = '"gas" is missing'
-            expect(() => caver.transaction.ethereumAccessList.create(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.ethereumDynamicFee.create(transactionObj)).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-439: If ethereumAccessList define from property with invalid address, return error', () => {
+        it('CAVERJS-UNIT-TRANSACTION-494: If ethereumDynamicFee define from property with invalid address, return error', () => {
             transactionObj.from = 'invalid'
 
             const expectedError = `Invalid address of from: ${transactionObj.from}`
-            expect(() => caver.transaction.ethereumAccessList.create(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.ethereumDynamicFee.create(transactionObj)).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-440: If ethereumAccessList define to property with invalid address, return error', () => {
+        it('CAVERJS-UNIT-TRANSACTION-495: If ethereumDynamicFee define to property with invalid address, return error', () => {
             transactionObj.to = 'invalid address'
 
             const expectedError = `Invalid address of to: ${transactionObj.to}`
-            expect(() => caver.transaction.ethereumAccessList.create(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.ethereumDynamicFee.create(transactionObj)).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-441: If ethereumAccessList define accessList property with invalid value, return error', () => {
+        it('CAVERJS-UNIT-TRANSACTION-496: If ethereumDynamicFee define accessList property with invalid value, return error', () => {
             transactionObj.accessList = [
                 {
                     address: 'invalid address',
@@ -173,7 +184,7 @@ describe('TxTypeEthereumAccessList', () => {
             ]
 
             let expectedError = `Invalid address: ${transactionObj.accessList[0].address}`
-            expect(() => caver.transaction.ethereumAccessList.create(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.ethereumDynamicFee.create(transactionObj)).to.throw(expectedError)
 
             transactionObj.accessList = [
                 {
@@ -184,7 +195,7 @@ describe('TxTypeEthereumAccessList', () => {
             expectedError = `Invalid storageKey: The storage key must be a hexadecimal string ${
                 transactionObj.accessList[0].storageKeys[0]
             }`
-            expect(() => caver.transaction.ethereumAccessList.create(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.ethereumDynamicFee.create(transactionObj)).to.throw(expectedError)
 
             transactionObj.accessList = [
                 {
@@ -193,7 +204,7 @@ describe('TxTypeEthereumAccessList', () => {
                 },
             ]
             expectedError = `Invalid storageKey length: The storage key must be a 32-byte`
-            expect(() => caver.transaction.ethereumAccessList.create(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.ethereumDynamicFee.create(transactionObj)).to.throw(expectedError)
 
             transactionObj.accessList = [
                 {
@@ -202,10 +213,10 @@ describe('TxTypeEthereumAccessList', () => {
                 },
             ]
             expectedError = `Invalid storageKey length: The storage key must be a 32-byte`
-            expect(() => caver.transaction.ethereumAccessList.create(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.ethereumDynamicFee.create(transactionObj)).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-442: If ethereumAccessList define unnecessary property, return error', () => {
+        it('CAVERJS-UNIT-TRANSACTION-497: If ethereumDynamicFee define unnecessary property, return error', () => {
             const unnecessaries = [
                 propertiesForUnnecessary.codeFormat,
                 propertiesForUnnecessary.failKey,
@@ -222,91 +233,98 @@ describe('TxTypeEthereumAccessList', () => {
                 propertiesForUnnecessary.roleAccountUpdateKey,
                 propertiesForUnnecessary.roleFeePayerKey,
                 propertiesForUnnecessary.humanReadable,
-                propertiesForUnnecessary.maxPriorityFeePerGas,
-                propertiesForUnnecessary.maxFeePerGas,
+                propertiesForUnnecessary.gasPrice,
             ]
 
             for (let i = 0; i < unnecessaries.length; i++) {
                 if (i > 0) delete transactionObj[unnecessaries[i - 1].name]
                 transactionObj[unnecessaries[i].name] = unnecessaries[i].value
 
-                const expectedError = `"${unnecessaries[i].name}" cannot be used with ${caver.transaction.type.TxTypeEthereumAccessList} transaction`
-                expect(() => caver.transaction.ethereumAccessList.create(transactionObj)).to.throw(expectedError)
+                const expectedError = `"${unnecessaries[i].name}" cannot be used with ${caver.transaction.type.TxTypeEthereumDynamicFee} transaction`
+                expect(() => caver.transaction.ethereumDynamicFee.create(transactionObj)).to.throw(expectedError)
             }
         })
     })
 
-    context('ethereumAccessList.getRLPEncoding', () => {
-        it('CAVERJS-UNIT-TRANSACTION-443: returns RLP-encoded transaction string', () => {
+    context('ethereumDynamicFee.getRLPEncoding', () => {
+        it('CAVERJS-UNIT-TRANSACTION-498: returns RLP-encoded transaction string', () => {
             // 0 y-parity
+            const tx1 = caver.transaction.ethereumDynamicFee.create(transactionObjWithSignature)
+            expect(tx1.getRLPEncoding()).to.equal(expectedTxWithSigRLPEncoding)
+
+            // 1 y-parity
             transactionObj = {
                 accessList: [
                     {
-                        address: '0xac9ba2a7fb8572e971bcac01a5b58934b385a172',
+                        address: '0xd9d6bd9e2186233d9441bde052504b926f2e0bb2',
                         storageKeys: [
                             '0x0000000000000000000000000000000000000000000000000000000000000003',
                             '0x0000000000000000000000000000000000000000000000000000000000000007',
                         ],
                     },
                 ],
-                to: '0xc6779d72a88bec1a03bbb83cf028d95ff5f32f5b',
+                to: '0x7988508e9236a5b796ddbb6ac40864777a414f5f',
                 value: '0x1',
                 gas: '0x9c40',
-                nonce: '0x1a',
-                gasPrice: '0x5d21dba00',
+                nonce: '0x28',
+                maxFeePerGas: '0x5d21dba00',
+                maxPriorityFeePerGas: '0x5d21dba00',
                 signatures: [
-                    '0x0',
-                    '0x43ff73938e019e13dcc48c9ff1a46d9f1f081512351cf7b0eca49dbf74047848',
-                    '0x17a9816ca1446f51e0d6eb8c406a52758feb83b234128e4cfcaeaa8419f706af',
+                    '0x1',
+                    '0x54d6ea6f359a7d3546199ac93dca216918b45647a45b6f32be58f33735a696b7',
+                    '0x7179ffc15f5c6b4b08efc4f7306548c435529edc2e5b8243d1193f52085dbc65',
                 ],
                 chainId: '0x2710',
                 input:
                     '0xa9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039',
             }
-            const tx1 = caver.transaction.ethereumAccessList.create(transactionObj)
+            const tx2 = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
-            expect(tx1.getRLPEncoding()).to.equal(
-                '0x7801f901098227101a8505d21dba00829c4094c6779d72a88bec1a03bbb83cf028d95ff5f32f5b01b844a9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039f85bf85994ac9ba2a7fb8572e971bcac01a5b58934b385a172f842a00000000000000000000000000000000000000000000000000000000000000003a0000000000000000000000000000000000000000000000000000000000000000780a043ff73938e019e13dcc48c9ff1a46d9f1f081512351cf7b0eca49dbf74047848a017a9816ca1446f51e0d6eb8c406a52758feb83b234128e4cfcaeaa8419f706af'
+            expect(tx2.getRLPEncoding()).to.equal(
+                '0x7802f9010f822710288505d21dba008505d21dba00829c40947988508e9236a5b796ddbb6ac40864777a414f5f01b844a9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039f85bf85994d9d6bd9e2186233d9441bde052504b926f2e0bb2f842a00000000000000000000000000000000000000000000000000000000000000003a0000000000000000000000000000000000000000000000000000000000000000701a054d6ea6f359a7d3546199ac93dca216918b45647a45b6f32be58f33735a696b7a07179ffc15f5c6b4b08efc4f7306548c435529edc2e5b8243d1193f52085dbc65'
             )
-
-            // 1 y-parity
-            const tx2 = caver.transaction.ethereumAccessList.create(transactionObjWithSignature)
-            expect(tx2.getRLPEncoding()).to.equal(expectedTxWithSigRLPEncoding)
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-444: getRLPEncoding should throw error when chainId is undefined', () => {
-            transactionObj.gasPrice = '0x5d21dba00'
+        it('CAVERJS-UNIT-TRANSACTION-499: getRLPEncoding should throw error when chainId is undefined', () => {
             transactionObj.nonce = '0x3a'
             delete transactionObj.chainId
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getRLPEncoding()).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-445: getRLPEncoding should throw error when nonce is undefined', () => {
-            transactionObj.gasPrice = '0x5d21dba00'
-            transactionObj.chainId = 2019
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
+        it('CAVERJS-UNIT-TRANSACTION-500: getRLPEncoding should throw error when nonce is undefined', () => {
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getRLPEncoding()).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-446: getRLPEncoding should throw error when gasPrice is undefined', () => {
-            transactionObj.chainId = 2019
+        it('CAVERJS-UNIT-TRANSACTION-501: getRLPEncoding should throw error when maxPriorityFeePerGas is undefined', () => {
             transactionObj.nonce = '0x3a'
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
+            delete transactionObj.maxPriorityFeePerGas
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
-            const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
+            const expectedError = `maxPriorityFeePerGas is undefined. Define maxPriorityFeePerGas in transaction or use 'transaction.fillTransaction' to fill values.`
+
+            expect(() => tx.getRLPEncoding()).to.throw(expectedError)
+        })
+
+        it('CAVERJS-UNIT-TRANSACTION-502: getRLPEncoding should throw error when maxFeePerGas is undefined', () => {
+            transactionObj.nonce = '0x3a'
+            delete transactionObj.maxFeePerGas
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
+
+            const expectedError = `maxFeePerGas is undefined. Define maxFeePerGas in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getRLPEncoding()).to.throw(expectedError)
         })
     })
 
-    context('ethereumAccessList.sign', () => {
+    context('ethereumDynamicFee.sign', () => {
         const txHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
 
         let fillTransactionSpy
@@ -317,7 +335,7 @@ describe('TxTypeEthereumAccessList', () => {
         let tx
 
         beforeEach(() => {
-            tx = caver.transaction.ethereumAccessList.create(transactionObj)
+            tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             fillTransactionSpy = sandbox.spy(tx, 'fillTransaction')
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
@@ -340,7 +358,7 @@ describe('TxTypeEthereumAccessList', () => {
             expect(tx.signatures instanceof SignatureData).to.be.true
         }
 
-        it('CAVERJS-UNIT-TRANSACTION-447: input: keyring. should sign transaction.', async () => {
+        it('CAVERJS-UNIT-TRANSACTION-503: input: keyring. should sign transaction.', async () => {
             await tx.sign(sender)
 
             checkFunctionCall()
@@ -350,7 +368,7 @@ describe('TxTypeEthereumAccessList', () => {
             expect(isValidV(tx.signatures)).to.be.true
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-448: input: private key string. should sign the transaction with ecsign function.', async () => {
+        it('CAVERJS-UNIT-TRANSACTION-504: input: private key string. should sign the transaction with ecsign function.', async () => {
             const ecsignProtoSpy = sandbox.spy(SingleKeyring.prototype, 'ecsign')
             await tx.sign(sender.key.privateKey)
 
@@ -361,7 +379,7 @@ describe('TxTypeEthereumAccessList', () => {
             expect(isValidV(tx.signatures)).to.be.true
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-009: 449: KlaytnWalletKey. should sign the transaction with ecsign function.', async () => {
+        it('CAVERJS-UNIT-TRANSACTION-505: 449: KlaytnWalletKey. should sign the transaction with ecsign function.', async () => {
             const ecsignProtoSpy = sandbox.spy(SingleKeyring.prototype, 'ecsign')
             await tx.sign(sender.getKlaytnWalletKey())
 
@@ -372,14 +390,14 @@ describe('TxTypeEthereumAccessList', () => {
             expect(isValidV(tx.signatures)).to.be.true
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-450: input: decoupled KlaytnWalletKey. should throw error.', async () => {
-            tx = caver.transaction.ethereumAccessList.create(transactionObj)
+        it('CAVERJS-UNIT-TRANSACTION-506: input: decoupled KlaytnWalletKey. should throw error.', async () => {
+            tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
-            const expectedError = `TxTypeEthereumAccessList cannot be signed with a decoupled keyring.`
+            const expectedError = `TxTypeEthereumDynamicFee cannot be signed with a decoupled keyring.`
             await expect(tx.sign(generateDecoupledKeyring().getKlaytnWalletKey())).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-451: input: keyring, index. should sign transaction with specific index.', async () => {
+        it('CAVERJS-UNIT-TRANSACTION-507: input: keyring, index. should sign transaction with specific index.', async () => {
             await tx.sign(sender, 0)
 
             checkFunctionCall()
@@ -389,7 +407,7 @@ describe('TxTypeEthereumAccessList', () => {
             expect(isValidV(tx.signatures)).to.be.true
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-452: input: keyring, custom hasher. should use custom hasher.', async () => {
+        it('CAVERJS-UNIT-TRANSACTION-508: input: keyring, custom hasher. should use custom hasher.', async () => {
             const hashForCustomHasher = '0x9e4b4835f6ea5ce55bd1037fe92040dd070af6154aefc30d32c65364a1123cae'
             const customHasher = () => hashForCustomHasher
 
@@ -402,7 +420,7 @@ describe('TxTypeEthereumAccessList', () => {
             expect(isValidV(tx.signatures)).to.be.true
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-453: input: keyring, index, custom hasher. should use custom hasher when sign transaction.', async () => {
+        it('CAVERJS-UNIT-TRANSACTION-509: input: keyring, index, custom hasher. should use custom hasher when sign transaction.', async () => {
             const hashForCustomHasher = '0x9e4b4835f6ea5ce55bd1037fe92040dd070af6154aefc30d32c65364a1123cae'
             const customHasher = () => hashForCustomHasher
 
@@ -415,37 +433,37 @@ describe('TxTypeEthereumAccessList', () => {
             expect(isValidV(tx.signatures)).to.be.true
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-454: input: decoupled keyring. should throw error.', async () => {
-            tx = caver.transaction.ethereumAccessList.create(transactionObj)
+        it('CAVERJS-UNIT-TRANSACTION-510: input: decoupled keyring. should throw error.', async () => {
+            tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
-            const expectedError = `TxTypeEthereumAccessList cannot be signed with a decoupled keyring.`
+            const expectedError = `TxTypeEthereumDynamicFee cannot be signed with a decoupled keyring.`
             await expect(tx.sign(generateDecoupledKeyring())).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-455: input: multisig keyring. should throw error.', async () => {
-            tx = caver.transaction.ethereumAccessList.create(transactionObj)
+        it('CAVERJS-UNIT-TRANSACTION-511: input: multisig keyring. should throw error.', async () => {
+            tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
-            const expectedError = `TxTypeEthereumAccessList cannot be signed with a decoupled keyring.`
+            const expectedError = `TxTypeEthereumDynamicFee cannot be signed with a decoupled keyring.`
             await expect(tx.sign(generateMultiSigKeyring())).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-456: input: roleBased keyring. should throw error.', async () => {
-            tx = caver.transaction.ethereumAccessList.create(transactionObj)
+        it('CAVERJS-UNIT-TRANSACTION-512: input: roleBased keyring. should throw error.', async () => {
+            tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
-            const expectedError = `TxTypeEthereumAccessList cannot be signed with a decoupled keyring.`
+            const expectedError = `TxTypeEthereumDynamicFee cannot be signed with a decoupled keyring.`
             await expect(tx.sign(roleBasedKeyring)).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-457: input: keyring. should throw error when from is different.', async () => {
+        it('CAVERJS-UNIT-TRANSACTION-513: input: keyring. should throw error when from is different.', async () => {
             transactionObj.from = roleBasedKeyring.address
-            tx = caver.transaction.ethereumAccessList.create(transactionObj)
+            tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             const expectedError = `The from address of the transaction is different with the address of the keyring to use.`
             await expect(tx.sign(sender)).to.be.rejectedWith(expectedError)
         }).timeout(200000)
     })
 
-    context('ethereumAccessList.sign with multiple keys', () => {
+    context('ethereumDynamicFee.sign with multiple keys', () => {
         const txHash = '0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550'
 
         let fillTransactionSpy
@@ -456,7 +474,7 @@ describe('TxTypeEthereumAccessList', () => {
         let tx
 
         beforeEach(() => {
-            tx = caver.transaction.ethereumAccessList.create(transactionObj)
+            tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             fillTransactionSpy = sandbox.spy(tx, 'fillTransaction')
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
@@ -480,7 +498,7 @@ describe('TxTypeEthereumAccessList', () => {
             expect(tx.signatures instanceof SignatureData).to.be.true
         }
 
-        it('CAVERJS-UNIT-TRANSACTION-458: input: keyring. should sign transaction.', async () => {
+        it('CAVERJS-UNIT-TRANSACTION-514: input: keyring. should sign transaction.', async () => {
             await tx.sign(sender)
 
             checkFunctionCall()
@@ -490,7 +508,7 @@ describe('TxTypeEthereumAccessList', () => {
             expect(isValidV(tx.signatures)).to.be.true
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-459: input: private key string. should sign the transaction with ecsign function.', async () => {
+        it('CAVERJS-UNIT-TRANSACTION-515: input: private key string. should sign the transaction with ecsign function.', async () => {
             const ecsignProtoSpy = sandbox.spy(SingleKeyring.prototype, 'ecsign')
             await tx.sign(sender.key.privateKey)
 
@@ -501,7 +519,7 @@ describe('TxTypeEthereumAccessList', () => {
             expect(isValidV(tx.signatures)).to.be.true
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-460: input: KlaytnWalletKey. should sign the transaction with ecsign function.', async () => {
+        it('CAVERJS-UNIT-TRANSACTION-516: input: KlaytnWalletKey. should sign the transaction with ecsign function.', async () => {
             const ecsignProtoSpy = sandbox.spy(SingleKeyring.prototype, 'ecsign')
             await tx.sign(sender.getKlaytnWalletKey())
 
@@ -512,14 +530,14 @@ describe('TxTypeEthereumAccessList', () => {
             expect(isValidV(tx.signatures)).to.be.true
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-461: input: decoupled KlaytnWalletKey. should throw error.', async () => {
-            tx = caver.transaction.ethereumAccessList.create(transactionObj)
+        it('CAVERJS-UNIT-TRANSACTION-517: input: decoupled KlaytnWalletKey. should throw error.', async () => {
+            tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
-            const expectedError = `TxTypeEthereumAccessList cannot be signed with a decoupled keyring.`
+            const expectedError = `TxTypeEthereumDynamicFee cannot be signed with a decoupled keyring.`
             await expect(tx.sign(generateDecoupledKeyring().getKlaytnWalletKey())).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-462: input: keyring, custom hasher. should use custom hasher when sign transaction.', async () => {
+        it('CAVERJS-UNIT-TRANSACTION-518: input: keyring, custom hasher. should use custom hasher when sign transaction.', async () => {
             const hashForCustomHasher = '0x9e4b4835f6ea5ce55bd1037fe92040dd070af6154aefc30d32c65364a1123cae'
             const customHasher = () => hashForCustomHasher
 
@@ -532,43 +550,43 @@ describe('TxTypeEthereumAccessList', () => {
             expect(isValidV(tx.signatures)).to.be.true
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-463: input: keyring. should throw error when address is not equal.', async () => {
+        it('CAVERJS-UNIT-TRANSACTION-519: input: keyring. should throw error when address is not equal.', async () => {
             transactionObj.from = roleBasedKeyring.address
-            tx = caver.transaction.ethereumAccessList.create(transactionObj)
+            tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             const expectedError = `The from address of the transaction is different with the address of the keyring to use.`
             await expect(tx.sign(sender)).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-464: input: decoupled keyring. should throw error.', async () => {
-            tx = caver.transaction.ethereumAccessList.create(transactionObj)
+        it('CAVERJS-UNIT-TRANSACTION-520: input: decoupled keyring. should throw error.', async () => {
+            tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
-            const expectedError = `TxTypeEthereumAccessList cannot be signed with a decoupled keyring.`
+            const expectedError = `TxTypeEthereumDynamicFee cannot be signed with a decoupled keyring.`
             await expect(tx.sign(generateDecoupledKeyring())).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-465: input: multisig keyring. should throw error.', async () => {
-            tx = caver.transaction.ethereumAccessList.create(transactionObj)
+        it('CAVERJS-UNIT-TRANSACTION-521: input: multisig keyring. should throw error.', async () => {
+            tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
-            const expectedError = `TxTypeEthereumAccessList cannot be signed with a decoupled keyring.`
+            const expectedError = `TxTypeEthereumDynamicFee cannot be signed with a decoupled keyring.`
             await expect(tx.sign(generateMultiSigKeyring())).to.be.rejectedWith(expectedError)
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-466: input: roleBased keyring. should throw error.', async () => {
-            tx = caver.transaction.ethereumAccessList.create(transactionObj)
+        it('CAVERJS-UNIT-TRANSACTION-522: input: roleBased keyring. should throw error.', async () => {
+            tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
-            const expectedError = `TxTypeEthereumAccessList cannot be signed with a decoupled keyring.`
+            const expectedError = `TxTypeEthereumDynamicFee cannot be signed with a decoupled keyring.`
             await expect(tx.sign(roleBasedKeyring)).to.be.rejectedWith(expectedError)
         }).timeout(200000)
     })
 
-    context('ethereumAccessList.appendSignatures', () => {
+    context('ethereumDynamicFee.appendSignatures', () => {
         afterEach(() => {
             sandbox.restore()
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-467: If signatures is empty, appendSignatures append signatures in transaction', () => {
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
+        it('CAVERJS-UNIT-TRANSACTION-523: If signatures is empty, appendSignatures append signatures in transaction', () => {
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             const sig = [
                 '0x0',
@@ -583,8 +601,8 @@ describe('TxTypeEthereumAccessList', () => {
             expect(tx.signatures.s).to.equal(sig[2])
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-468: If signatures is empty, appendSignatures append signatures with two-dimensional signature array', () => {
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
+        it('CAVERJS-UNIT-TRANSACTION-524: If signatures is empty, appendSignatures append signatures with two-dimensional signature array', () => {
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             const sig = [
                 [
@@ -601,13 +619,13 @@ describe('TxTypeEthereumAccessList', () => {
             expect(tx.signatures.s).to.equal(sig[0][2])
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-469: If signatures is not empty, appendSignatures should throw error', () => {
+        it('CAVERJS-UNIT-TRANSACTION-525: If signatures is not empty, appendSignatures should throw error', () => {
             transactionObj.signatures = [
                 '0x0',
                 '0xd2502e40a01b7836e1f389ff71b8c64108a879d6316d4ff5367bc1b42910c928',
                 '0x32a19c030f1c95378f8d9c265f6911a022e2e78ddd28795d33d9697c7732fb9c',
             ]
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             const sig = [
                 '0x1',
@@ -620,8 +638,8 @@ describe('TxTypeEthereumAccessList', () => {
             expect(() => tx.appendSignatures(sig)).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-470: appendSignatures should throw error when sig array has more than one signatures', () => {
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
+        it('CAVERJS-UNIT-TRANSACTION-526: appendSignatures should throw error when sig array has more than one signatures', () => {
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             const sig = [
                 [
@@ -641,8 +659,8 @@ describe('TxTypeEthereumAccessList', () => {
             expect(() => tx.appendSignatures(sig)).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-471: appendSignatures should throw error when sig recovery id is neither 0 nor 1', () => {
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
+        it('CAVERJS-UNIT-TRANSACTION-527: appendSignatures should throw error when sig recovery id is neither 0 nor 1', () => {
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             const sig = [
                 '0x0fea',
@@ -656,14 +674,14 @@ describe('TxTypeEthereumAccessList', () => {
         })
     })
 
-    context('ethereumAccessList.combineSignedRawTransactions', () => {
+    context('ethereumDynamicFee.combineSignedRawTransactions', () => {
         afterEach(() => {
             sandbox.restore()
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-472: If signatures is empty, combineSignedRawTransactions set signatures in transaction', () => {
+        it('CAVERJS-UNIT-TRANSACTION-528: If signatures is empty, combineSignedRawTransactions set signatures in transaction', () => {
             const expectedSignatures = transactionObjWithSignature.signatures
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
             const appendSignaturesSpy = sandbox.spy(tx, 'appendSignatures')
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
@@ -679,13 +697,13 @@ describe('TxTypeEthereumAccessList', () => {
             expect(tx.signatures.s).to.equal(expectedSignatures[2])
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-473: If signatures is not empty, combineSignedRawTransactions should throw error', () => {
+        it('CAVERJS-UNIT-TRANSACTION-529: If signatures is not empty, combineSignedRawTransactions should throw error', () => {
             transactionObjWithSignature.signatures = [
                 '0x1',
                 '0xa65d60319310ce2eda59f2c75073d6214afc01d161fec24766d397ed66e22df6',
                 '0x72d8385554a637b847ce64d295f30267eff083fc6042cc06ea5e76791c40382e',
             ]
-            const tx = caver.transaction.ethereumAccessList.create(transactionObjWithSignature)
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObjWithSignature)
 
             const rlpEncoded = expectedTxWithSigRLPEncoding
             const expectedError = `signatures already defined. ${tx.type} cannot include more than one signature. Please use tx.signatures = sigArr to replace.`
@@ -693,25 +711,25 @@ describe('TxTypeEthereumAccessList', () => {
             expect(() => tx.combineSignedRawTransactions([rlpEncoded])).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-474: If decode transaction has different values, combineSignedRawTransactions should throw error', () => {
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
+        it('CAVERJS-UNIT-TRANSACTION-530: If decode transaction has different values, combineSignedRawTransactions should throw error', () => {
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             // Something different RLP-encoding string
             const rlpEncoded =
-                '0x7801f901098227101c8505d21dba00829c40947fad871313b22a2059b08aa8c3419a2c563d4f2001b844a9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039f85bf85994c40004d85fa54f22f24c4a1d817b6f65a6e205b7f842a00000000000000000000000000000000000000000000000000000000000000003a0000000000000000000000000000000000000000000000000000000000000000701a05f501e8b8ed3d800e684769e4cbb076eb97a64aae1d437f8b21beca6f998292aa00edee82b034c444dcb2a71bf222b1a089fd0a5411e4c396cc1ac44e36ecf4c7f'
+                '0x7802f9010f822710298505d21dba008505d21dba00829c4094ac5318f959569d2da0fad8660b6d9253d35fd90f01b844a9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039f85bf85994cdf91790c1227a4970d7d61b1e5c2d820fb1389cf842a00000000000000000000000000000000000000000000000000000000000000003a0000000000000000000000000000000000000000000000000000000000000000701a07103b928ce08afac0c56a14e0dc785c4ba2d154141828813839fc3f431bd3de7a0668b3da42dde439d4a950cb33fe27d007818b48ef314a94771ef52832a2e5e34'
             const expectedError = `Transactions containing different information cannot be combined.`
 
             expect(() => tx.combineSignedRawTransactions([rlpEncoded])).to.throw(expectedError)
         })
     })
 
-    context('ethereumAccessList.getRawTransaction', () => {
+    context('ethereumDynamicFee.getRawTransaction', () => {
         afterEach(() => {
             sandbox.restore()
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-475: getRawTransaction should call getRLPEncoding function', () => {
-            const tx = caver.transaction.ethereumAccessList.create(transactionObjWithSignature)
+        it('CAVERJS-UNIT-TRANSACTION-531: getRawTransaction should call getRLPEncoding function', () => {
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObjWithSignature)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
             const rawTransaction = tx.getRawTransaction()
@@ -721,13 +739,13 @@ describe('TxTypeEthereumAccessList', () => {
         })
     })
 
-    context('ethereumAccessList.getTransactionHash', () => {
+    context('ethereumDynamicFee.getTransactionHash', () => {
         afterEach(() => {
             sandbox.restore()
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-476: getTransactionHash should call getRLPEncoding function and return hash of RLPEncoding', () => {
-            const tx = caver.transaction.ethereumAccessList.create(transactionObjWithSignature)
+        it('CAVERJS-UNIT-TRANSACTION-532: getTransactionHash should call getRLPEncoding function and return hash of RLPEncoding', () => {
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObjWithSignature)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
             const hashRLP = expectedTxWithSigRLPEncoding.replace('0x78', '0x')
@@ -739,45 +757,52 @@ describe('TxTypeEthereumAccessList', () => {
             expect(caver.utils.isValidHashStrict(txHash)).to.be.true
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-477: getTransactionHash should throw error when chainId is undefined', () => {
-            transactionObj.gasPrice = '0x5d21dba00'
+        it('CAVERJS-UNIT-TRANSACTION-533: getTransactionHash should throw error when chainId is undefined', () => {
             transactionObj.nonce = '0x3a'
             delete transactionObj.chainId
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getTransactionHash()).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-478: getTransactionHash should throw error when nonce is undefined', () => {
-            transactionObj.gasPrice = '0x5d21dba00'
-            transactionObj.chainId = 2019
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
+        it('CAVERJS-UNIT-TRANSACTION-534: getTransactionHash should throw error when nonce is undefined', () => {
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getTransactionHash()).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-479: getTransactionHash should throw error when gasPrice is undefined', () => {
-            transactionObj.chainId = 2019
+        it('CAVERJS-UNIT-TRANSACTION-535: getTransactionHash should throw error when maxPriorityFeePerGas is undefined', () => {
             transactionObj.nonce = '0x3a'
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
+            delete transactionObj.maxPriorityFeePerGas
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
-            const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
+            const expectedError = `maxPriorityFeePerGas is undefined. Define maxPriorityFeePerGas in transaction or use 'transaction.fillTransaction' to fill values.`
+
+            expect(() => tx.getTransactionHash()).to.throw(expectedError)
+        })
+
+        it('CAVERJS-UNIT-TRANSACTION-536: getTransactionHash should throw error when maxFeePerGas is undefined', () => {
+            transactionObj.nonce = '0x3a'
+            delete transactionObj.maxFeePerGas
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
+
+            const expectedError = `maxFeePerGas is undefined. Define maxFeePerGas in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getTransactionHash()).to.throw(expectedError)
         })
     })
 
-    context('ethereumAccessList.getSenderTxHash', () => {
+    context('ethereumDynamicFee.getSenderTxHash', () => {
         afterEach(() => {
             sandbox.restore()
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-480: getSenderTxHash should call getRLPEncoding function and return hash of RLPEncoding', () => {
-            const tx = caver.transaction.ethereumAccessList.create(transactionObjWithSignature)
+        it('CAVERJS-UNIT-TRANSACTION-537: getSenderTxHash should call getRLPEncoding function and return hash of RLPEncoding', () => {
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObjWithSignature)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
             const hashRLP = expectedTxWithSigRLPEncoding.replace('0x78', '0x')
@@ -789,120 +814,149 @@ describe('TxTypeEthereumAccessList', () => {
             expect(caver.utils.isValidHashStrict(senderTxHash)).to.be.true
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-481: getSenderTxHash should throw error when chainId is undefined', () => {
-            transactionObj.gasPrice = '0x5d21dba00'
+        it('CAVERJS-UNIT-TRANSACTION-538: getSenderTxHash should throw error when chainId is undefined', () => {
             transactionObj.nonce = '0x3a'
             delete transactionObj.chainId
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getSenderTxHash()).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-482: getSenderTxHash should throw error when nonce is undefined', () => {
-            transactionObj.gasPrice = '0x5d21dba00'
-            transactionObj.chainId = 2019
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
+        it('CAVERJS-UNIT-TRANSACTION-539: getSenderTxHash should throw error when nonce is undefined', () => {
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getSenderTxHash()).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-483: getSenderTxHash should throw error when gasPrice is undefined', () => {
-            transactionObj.chainId = 2019
+        it('CAVERJS-UNIT-TRANSACTION-540: getSenderTxHash should throw error when maxPriorityFeePerGas is undefined', () => {
             transactionObj.nonce = '0x3a'
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
+            delete transactionObj.maxPriorityFeePerGas
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
-            const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
+            const expectedError = `maxPriorityFeePerGas is undefined. Define maxPriorityFeePerGas in transaction or use 'transaction.fillTransaction' to fill values.`
+
+            expect(() => tx.getSenderTxHash()).to.throw(expectedError)
+        })
+
+        it('CAVERJS-UNIT-TRANSACTION-541: getSenderTxHash should throw error when maxFeePerGas is undefined', () => {
+            transactionObj.nonce = '0x3a'
+            delete transactionObj.maxFeePerGas
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
+
+            const expectedError = `maxFeePerGas is undefined. Define maxFeePerGas in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getSenderTxHash()).to.throw(expectedError)
         })
     })
 
-    context('ethereumAccessList.getRLPEncodingForSignature', () => {
+    context('ethereumDynamicFee.getRLPEncodingForSignature', () => {
         afterEach(() => {
             sandbox.restore()
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-484: getRLPEncodingForSignature should return RLP-encoded transaction string for signing', () => {
-            const tx = caver.transaction.ethereumAccessList.create(transactionObjWithSignature)
+        it('CAVERJS-UNIT-TRANSACTION-542: getRLPEncodingForSignature should return RLP-encoded transaction string for signing', () => {
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObjWithSignature)
 
             const rlpEncodingForSign = tx.getRLPEncodingForSignature()
 
             expect(rlpEncodingForSign).to.equal(expectedTxWithSigRLPEncodingForSignature)
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-485: getRLPEncodingForSignature should throw error when nonce is undefined', () => {
-            transactionObj.gasPrice = '0x5d21dba00'
-            transactionObj.chainId = 2019
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
+        it('CAVERJS-UNIT-TRANSACTION-543: getRLPEncodingForSignature should throw error when nonce is undefined', () => {
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getRLPEncodingForSignature()).to.throw(expectedError)
         })
 
-        it('CAVERJS-UNIT-TRANSACTION-486: getRLPEncodingForSignature should throw error when gasPrice is undefined', () => {
-            transactionObj.chainId = 2019
-            transactionObj.nonce = '0x3a'
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
-
-            const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
-
-            expect(() => tx.getRLPEncodingForSignature()).to.throw(expectedError)
-        })
-
-        it('CAVERJS-UNIT-TRANSACTION-487: getRLPEncodingForSignature should throw error when chainId is undefined', () => {
-            transactionObj.gasPrice = '0x5d21dba00'
+        it('CAVERJS-UNIT-TRANSACTION-544: getRLPEncodingForSignature should throw error when chainId is undefined', () => {
             transactionObj.nonce = '0x3a'
             delete transactionObj.chainId
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
 
             expect(() => tx.getRLPEncodingForSignature()).to.throw(expectedError)
         })
+
+        it('CAVERJS-UNIT-TRANSACTION-545: getRLPEncodingForSignature should throw error when maxPriorityFeePerGas is undefined', () => {
+            transactionObj.nonce = '0x3a'
+            delete transactionObj.maxPriorityFeePerGas
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
+
+            const expectedError = `maxPriorityFeePerGas is undefined. Define maxPriorityFeePerGas in transaction or use 'transaction.fillTransaction' to fill values.`
+
+            expect(() => tx.getRLPEncodingForSignature()).to.throw(expectedError)
+        })
+
+        it('CAVERJS-UNIT-TRANSACTION-546: getRLPEncodingForSignature should throw error when maxFeePerGas is undefined', () => {
+            transactionObj.nonce = '0x3a'
+            delete transactionObj.maxFeePerGas
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
+
+            const expectedError = `maxFeePerGas is undefined. Define maxFeePerGas in transaction or use 'transaction.fillTransaction' to fill values.`
+
+            expect(() => tx.getRLPEncodingForSignature()).to.throw(expectedError)
+        })
     })
 
-    context('ethereumAccessList.fillTransaction', () => {
-        it('CAVERJS-UNIT-TRANSACTION-488: fillTransaction should call klay_getGasPrice to fill gasPrice when gasPrice is undefined', async () => {
+    context('ethereumDynamicFee.fillTransaction', () => {
+        it('CAVERJS-UNIT-TRANSACTION-547: fillTransaction should call klay_getMaxPriorityFeePerGas to fill maxPriorityFeePerGas when maxPriorityFeePerGas is undefined', async () => {
             transactionObj.nonce = '0x3a'
-            transactionObj.chainId = 2019
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
+            delete transactionObj.maxPriorityFeePerGas
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             await tx.fillTransaction()
-            expect(getGasPriceSpy).to.have.been.calledOnce
+            expect(getMaxPriorityFeePerGasSpy).to.have.been.calledOnce
+            expect(getHeaderByNumberSpy).to.have.been.calledOnce
             expect(getNonceSpy).not.to.have.been.calledOnce
             expect(getChainIdSpy).not.to.have.been.calledOnce
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-489: fillTransaction should call klay_getTransactionCount to fill nonce when nonce is undefined', async () => {
-            transactionObj.gasPrice = '0x5d21dba00'
-            transactionObj.chainId = 2019
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
+        it('CAVERJS-UNIT-TRANSACTION-548: fillTransaction should call klay_getHeaderByNumber to fill maxFeePerGas when maxFeePerGas is undefined', async () => {
+            transactionObj.nonce = '0x3a'
+            delete transactionObj.maxFeePerGas
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
+            const expectedMaxFeePerGas = utils.toHex(
+                utils.hexToNumber(baseFee) * 2 + utils.hexToNumber(transactionObj.maxPriorityFeePerGas)
+            )
 
             await tx.fillTransaction()
-            expect(getGasPriceSpy).not.to.have.been.calledOnce
+
+            expect(getMaxPriorityFeePerGasSpy).not.to.have.been.called
+            expect(getHeaderByNumberSpy).to.have.been.calledOnce
+            expect(getNonceSpy).not.to.have.been.calledOnce
+            expect(getChainIdSpy).not.to.have.been.calledOnce
+            expect(tx.maxFeePerGas).to.equal(expectedMaxFeePerGas)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-TRANSACTION-549: fillTransaction should call klay_getTransactionCount to fill nonce when nonce is undefined', async () => {
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
+
+            await tx.fillTransaction()
+            expect(getMaxPriorityFeePerGasSpy).not.to.have.been.calledOnce
             expect(getNonceSpy).to.have.been.calledOnce
             expect(getChainIdSpy).not.to.have.been.calledOnce
         }).timeout(200000)
 
-        it('CAVERJS-UNIT-TRANSACTION-490: fillTransaction should call klay_getChainid to fill chainId when chainId is undefined', async () => {
-            transactionObj.gasPrice = '0x5d21dba00'
+        it('CAVERJS-UNIT-TRANSACTION-550: fillTransaction should call klay_getChainid to fill chainId when chainId is undefined', async () => {
             transactionObj.nonce = '0x3a'
-            const tx = caver.transaction.ethereumAccessList.create(transactionObj)
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
             await tx.fillTransaction()
-            expect(getGasPriceSpy).not.to.have.been.calledOnce
+            expect(getMaxPriorityFeePerGasSpy).not.to.have.been.calledOnce
             expect(getNonceSpy).not.to.have.been.calledOnce
         }).timeout(200000)
     })
 
-    context('ethereumAccessList.recoverPublicKeys', () => {
-        it('CAVERJS-UNIT-TRANSACTION-491: should return public key string recovered from signatures in LegacyTransaction', async () => {
-            const tx = caver.transaction.ethereumAccessList.create(transactionObjWithSignature)
+    context('ethereumDynamicFee.recoverPublicKeys', () => {
+        it('CAVERJS-UNIT-TRANSACTION-551: should return public key string recovered from signatures in EthereumDynamicFee', async () => {
+            const tx = caver.transaction.ethereumDynamicFee.create(transactionObjWithSignature)
             const publicKeys = tx.recoverPublicKeys()
 
             expect(publicKeys[0].toLowerCase()).to.equal(

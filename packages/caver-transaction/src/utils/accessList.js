@@ -127,6 +127,22 @@ class AccessList extends Array {
         }
         return true
     }
+
+    /**
+     * Returns a JSON object without _ prefix variable name.
+     *
+     * @example
+     * const result = accessList.toObject()
+     *
+     * @return {Array.<module:Transaction.AccessTupleObject>} An access list object.
+     */
+    toObject() {
+        const accessListObject = []
+        for (let i = 0; i < this.length; i++) {
+            accessListObject.push(this[i].toObject())
+        }
+        return accessListObject
+    }
 }
 
 module.exports = AccessList

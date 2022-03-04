@@ -131,6 +131,27 @@ class Klay {
                 inputFormatter: [formatters.inputAddressFormatter, formatters.inputDefaultBlockNumberFormatter],
             }),
             /**
+             * Returns a block header by block number.
+             *
+             * @memberof Klay
+             * @method getHeaderByNumber
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getHeaderByNumber(0)
+             * const result = await caver.rpc.klay.getHeaderByNumber('latest')
+             *
+             * @param {string|number|BN|BigNumber} blockNumberOrTag The block number or block tag string to query block header.
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<Klay.Header>} An object includes block header.
+             */
+            new Method({
+                name: 'getHeaderByNumber',
+                call: 'klay_getHeaderByNumber',
+                params: 1,
+                inputFormatter: [formatters.inputBlockNumberFormatter],
+            }),
+            /**
              * An object defines the AccountKeyLegacy.
              *
              * @example
@@ -319,6 +340,25 @@ class Klay {
                 name: 'getTransactionByHash',
                 call: 'klay_getTransactionByHash',
                 params: 1,
+            }),
+            /**
+             * Returns a suggestion for a gas tip cap for dynamic fee transactions in peb.
+             * Since Klaytn has a fixed gas price, this `caver.rpc.klay.getMaxPriorityFeePerGas` returns the gas price set by Klaytn.
+             *
+             * @memberof Klay
+             * @method getMaxPriorityFeePerGas
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getMaxPriorityFeePerGas()
+             *
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<string>} As a suggested value for the gas tip cap, the current Klaytn uses a fixed gas price, so the gasPrice value is returned.
+             */
+            new Method({
+                name: 'getMaxPriorityFeePerGas',
+                call: 'klay_maxPriorityFeePerGas',
+                params: 0,
             }),
         ]
         AbstractTransaction._klaytnCall = {}

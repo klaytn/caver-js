@@ -35,9 +35,8 @@ import {
     LogObject,
     CallObject,
     FeeHistoryResult,
-    AccessListResult,
 } from '../../caver-core/src'
-import { Transaction, FeeDelegatedTransaction } from '../../caver-transaction/src'
+import { Transaction, FeeDelegatedTransaction, AccessListResult } from '../../caver-transaction/src'
 
 export interface AccountForRPC {
     accType: number
@@ -82,6 +81,7 @@ export interface KlaytnCall {
     getAccountKey: Klay['getAccountKey']
     getChainId: Klay['getChainId']
     getGasPrice: Klay['getGasPrice']
+    getHeaderByNumber: Klay['getHeaderByNumber']
     getTransactionByHash: Klay['getTransactionByHash']
     getTransactionCount: Klay['getTransactionCount']
 }

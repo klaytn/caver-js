@@ -27,6 +27,7 @@ import { ChainDataAnchoring } from './transactionTypes/chainDataAnchoring/chainD
 import { FeeDelegatedChainDataAnchoring } from './transactionTypes/chainDataAnchoring/feeDelegatedChainDataAnchoring'
 import { FeeDelegatedChainDataAnchoringWithRatio } from './transactionTypes/chainDataAnchoring/feeDelegatedChainDataAnchoringWithRatio'
 import { EthereumAccessList } from './transactionTypes/ethereumTypedTransaction/ethereumAccessList'
+import { EthereumDynamicFee } from './transactionTypes/ethereumTypedTransaction/ethereumDynamicFee'
 import { LegacyTransaction } from './transactionTypes/legacyTransaction/legacyTransaction'
 import { FeeDelegatedSmartContractDeploy } from './transactionTypes/smartContractDeploy/feeDelegatedSmartContractDeploy'
 import { FeeDelegatedSmartContractDeployWithRatio } from './transactionTypes/smartContractDeploy/feeDelegatedSmartContractDeployWithRatio'
@@ -70,6 +71,10 @@ export * from './transactionTypes/valueTransfer/feeDelegatedValueTransferWithRat
 export * from './transactionTypes/valueTransferMemo/valueTransferMemo'
 export * from './transactionTypes/valueTransferMemo/feeDelegatedValueTransferMemo'
 export * from './transactionTypes/valueTransferMemo/feeDelegatedValueTransferMemoWithRatio'
+export * from './transactionTypes/ethereumTypedTransaction/ethereumAccessList'
+export * from './transactionTypes/ethereumTypedTransaction/ethereumDynamicFee'
+export * from './utils/accessList'
+export * from './utils/accessTuple'
 
 export type Transaction =
     | LegacyTransaction
@@ -94,6 +99,8 @@ export type Transaction =
     | ChainDataAnchoring
     | FeeDelegatedChainDataAnchoring
     | FeeDelegatedChainDataAnchoringWithRatio
+    | EthereumAccessList
+    | EthereumDynamicFee
 
 export type FeeDelegatedTransaction =
     | FeeDelegatedValueTransfer
@@ -139,6 +146,7 @@ export interface TransactionModule {
     feeDelegatedChainDataAnchoring: typeof FeeDelegatedChainDataAnchoring
     feeDelegatedChainDataAnchoringWithRatio: typeof FeeDelegatedChainDataAnchoringWithRatio
     ethereumAccessList: typeof EthereumAccessList
+    ethereumDynamicFee: typeof EthereumDynamicFee
 
     type: { [key: string]: string }
     tag: { [key: string]: string }
