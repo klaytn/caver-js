@@ -13,6 +13,7 @@ module.exports = {
             http: require.resolve('stream-http'),
             https: require.resolve('https-browserify'),
             os: require.resolve('os-browserify/browser'),
+            constants: require.resolve('constants-browserify'),
         },
     },
 }
