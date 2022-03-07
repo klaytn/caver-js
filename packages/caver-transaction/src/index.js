@@ -149,6 +149,9 @@ async function getTransactionByHash(transactionHash) {
         case 'TxTypeEthereumAccessList':
             txObject = new EthereumAccessList(txObject)
             break
+        case 'TxTypeEthereumDynamicFee':
+            txObject = new EthereumDynamicFee(txObject)
+            break
     }
     return txObject
 }
