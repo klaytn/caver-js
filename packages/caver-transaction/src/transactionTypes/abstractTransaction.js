@@ -26,7 +26,12 @@ const Keyring = require('../../../caver-wallet/src/keyring/keyringFactory')
 const SingleKeyring = require('../../../caver-wallet/src/keyring/singleKeyring')
 const MultipleKeyring = require('../../../caver-wallet/src/keyring/multipleKeyring')
 const RoleBasedKeyring = require('../../../caver-wallet/src/keyring/roleBasedKeyring')
-const { TX_TYPE_STRING, refineSignatures, typeDetectionFromRLPEncoding } = require('../transactionHelper/transactionHelper')
+const {
+    TX_TYPE_STRING,
+    refineSignatures,
+    typeDetectionFromRLPEncoding,
+    isEthereumTxType,
+} = require('../transactionHelper/transactionHelper')
 const { KEY_ROLE } = require('../../../caver-wallet/src/keyring/keyringHelper')
 const { validateParams } = require('../../../caver-core-helpers/src/validateFunction')
 const SignatureData = require('../../../caver-wallet/src/keyring/signatureData')
@@ -38,6 +43,31 @@ const SignatureData = require('../../../caver-wallet/src/keyring/signatureData')
  * @abstract
  */
 class AbstractTransaction {
+    static async getChainId() {
+        const chainId = await AbstractTransaction._klaytnCall.getChainId()
+        return chainId
+    }
+
+    static async getGasPrice() {
+        const gasPrice = await AbstractTransaction._klaytnCall.getGasPrice()
+        return gasPrice
+    }
+
+    static async getNonce(from) {
+        const nonce = await AbstractTransaction._klaytnCall.getTransactionCount(from, 'pending')
+        return nonce
+    }
+
+    static async getBaseFee() {
+        const header = await AbstractTransaction._klaytnCall.getHeaderByNumber('latest')
+        return header.baseFeePerGas
+    }
+
+    static async getMaxPriorityFeePerGas() {
+        const maxPriorityFeePerGas = await AbstractTransaction._klaytnCall.getMaxPriorityFeePerGas()
+        return maxPriorityFeePerGas
+    }
+
     /**
      * Abstract class that implements common logic for each transaction type.
      * In this constructor, type, tag, nonce, gasPrice, chainId, gas and signatures are set as transaction member variables.
@@ -60,7 +90,6 @@ class AbstractTransaction {
 
         // The variables below are values that the user does not need to pass to the parameter.
         if (createTxObj.nonce !== undefined) this.nonce = createTxObj.nonce
-        if (createTxObj.gasPrice !== undefined) this.gasPrice = createTxObj.gasPrice
         if (createTxObj.chainId !== undefined) this.chainId = createTxObj.chainId
 
         this.signatures = createTxObj.signatures || []
@@ -117,17 +146,6 @@ class AbstractTransaction {
     /**
      * @type {string}
      */
-    get gasPrice() {
-        return this._gasPrice
-    }
-
-    set gasPrice(g) {
-        this._gasPrice = utils.numberToHex(g)
-    }
-
-    /**
-     * @type {string}
-     */
     get chainId() {
         return this._chainId
     }
@@ -144,7 +162,7 @@ class AbstractTransaction {
     }
 
     set signatures(sigs) {
-        this._signatures = refineSignatures(sigs, this.type === TX_TYPE_STRING.TxTypeLegacyTransaction)
+        this._signatures = refineSignatures(sigs, this.type)
     }
 
     /**
@@ -201,26 +219,7 @@ class AbstractTransaction {
             index = undefined
         }
 
-        let keyring = key
-        if (_.isString(key)) {
-            keyring = Keyring.createFromPrivateKey(key)
-        }
-        if (!(keyring instanceof SingleKeyring) && !(keyring instanceof MultipleKeyring) && !(keyring instanceof RoleBasedKeyring))
-            throw new Error(
-                `Unsupported key type. The key must be a single private key string, KlaytnWalletKey string, or Keyring instance.`
-            )
-
-        // When user attempt to sign with a updated keyring into a TxTypeLegacyTransaction error should be thrown.
-        if (this.type === TX_TYPE_STRING.TxTypeLegacyTransaction && keyring.isDecoupled())
-            throw new Error(`A legacy transaction cannot be signed with a decoupled keyring.`)
-
-        if (!this.from || this.from === '0x' || this.from === '0x0000000000000000000000000000000000000000') this.from = keyring.address
-        if (this.from.toLowerCase() !== keyring.address.toLowerCase())
-            throw new Error(`The from address of the transaction is different with the address of the keyring to use.`)
-
-        await this.fillTransaction()
-        const hash = hasher(this)
-        const role = this.type.includes('AccountUpdate') ? KEY_ROLE.roleAccountUpdateKey : KEY_ROLE.roleTransactionKey
+        const { keyring, hash, role } = await this._sign(key, hasher)
 
         const sig = keyring.sign(hash, this.chainId, role, index)
 
@@ -291,6 +290,11 @@ class AbstractTransaction {
                 // Compare with the RLP-encoded accountKey string, because 'account' is an object.
                 if (k === '_account') {
                     if (this[k].getRLPEncodingAccountKey() !== decoded[k].getRLPEncodingAccountKey()) throw new Error(differentTxError)
+                    continue
+                }
+
+                if (k === '_accessList') {
+                    if (!this[k].isEqual(decoded[k])) throw new Error(differentTxError)
                     continue
                 }
 
@@ -399,15 +403,7 @@ class AbstractTransaction {
      * await tx.fillTransaction()
      */
     async fillTransaction() {
-        const [chainId, gasPrice, nonce] = await Promise.all([
-            isNot(this.chainId) ? AbstractTransaction._klaytnCall.getChainId() : this.chainId,
-            isNot(this.gasPrice) ? AbstractTransaction._klaytnCall.getGasPrice() : this.gasPrice,
-            isNot(this.nonce) ? AbstractTransaction._klaytnCall.getTransactionCount(this.from, 'pending') : this.nonce,
-        ])
-
-        this.chainId = chainId
-        this.gasPrice = gasPrice
-        this.nonce = nonce
+        throw new Error(`Not implemented.`)
     }
 
     /**
@@ -417,15 +413,33 @@ class AbstractTransaction {
      * @ignore
      */
     validateOptionalValues() {
-        if (this.gasPrice === undefined)
-            throw new Error(`gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`)
         if (this.nonce === undefined)
             throw new Error(`nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`)
     }
-}
 
-const isNot = function(value) {
-    return _.isUndefined(value) || _.isNull(value)
+    async _sign(key, hasher) {
+        let keyring = key
+        if (_.isString(key)) {
+            keyring = Keyring.createFromPrivateKey(key)
+        }
+        if (!(keyring instanceof SingleKeyring) && !(keyring instanceof MultipleKeyring) && !(keyring instanceof RoleBasedKeyring))
+            throw new Error(
+                `Unsupported key type. The key must be a single private key string, KlaytnWalletKey string, or Keyring instance.`
+            )
+
+        // When user attempt to sign with a updated keyring into an ethereum tx type error should be thrown.
+        if (isEthereumTxType(this.type) && keyring.isDecoupled()) throw new Error(`${this.type} cannot be signed with a decoupled keyring.`)
+
+        if (!this.from || this.from === '0x' || this.from === '0x0000000000000000000000000000000000000000') this.from = keyring.address
+        if (this.from.toLowerCase() !== keyring.address.toLowerCase())
+            throw new Error(`The from address of the transaction is different with the address of the keyring to use.`)
+
+        await this.fillTransaction()
+        const hash = hasher(this)
+        const role = this.type.includes('AccountUpdate') ? KEY_ROLE.roleAccountUpdateKey : KEY_ROLE.roleTransactionKey
+
+        return { keyring, hash, role }
+    }
 }
 
 module.exports = AbstractTransaction

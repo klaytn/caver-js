@@ -43,6 +43,9 @@ export namespace TX_TYPE_STRING {
     const TxTypeChainDataAnchoring: string
     const TxTypeFeeDelegatedChainDataAnchoring: string
     const TxTypeFeeDelegatedChainDataAnchoringWithRatio: string
+
+    const TxTypeEthereumAccessList: string
+    const TxTypeEthereumDynamicFee: string
 }
 
 export const TX_TYPE_TAG: { [key: string]: string }

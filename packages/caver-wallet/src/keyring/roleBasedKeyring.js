@@ -163,6 +163,42 @@ class RoleBasedKeyring {
     }
 
     /**
+     * Signs with transactionHash with the private keys and returns signatures which V is 0 or 1 (parity of the y-value of a secp256k1 signature).
+     *
+     * If you want to define an `index` when using RoleBasedKeyring, the `index` must be less than the length of the specific role key.
+     * And `RoleBasedKeyring` has the private key(s) defined by {@link KeyringFactory.role|caver.wallet.keyring.role}, so signs using the key(s) defined in the role.
+     *
+     * If the user has not defined an `index` parameter, `keyring.sign` signs transaction using all the private keys used by the role.
+     * If `index` is defined, the `keyring.sign` signs transaction using only one private key at the index.
+     * The role used in caver-js can be checked through {@link KeyringFactory.role|caver.wallet.keyring.role}.
+     *
+     * @example
+     * const signed = keyring.ecsign('0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550', caver.wallet.keyring.role.roleTransactionKey)
+     * const signed = keyring.ecsign('0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550', caver.wallet.keyring.role.roleAccountUpdateKey, 1)
+     *
+     * @param {string} hash The hashed data to sign.
+     * @param {number} role A number indicating the role of the key. You can use `caver.wallet.keyring.role`.
+     * @param {number} [index] The index of the key to be used. If index is undefined, all private keys in keyring will be used.
+     * @return {SignatureData|Array.<SignatureData>} A {@link SignatureData} when `index` is deinfed, otherwise an array of {@link SignatureData}.
+     */
+    ecsign(hash, role, index) {
+        if (!utils.isValidHashStrict(hash)) throw new Error(`Invalid hash: ${hash}`)
+
+        const keys = this.getKeyByRole(role)
+
+        if (index !== undefined) {
+            validateIndexWithKeys(index, keys.length)
+            return keys[index].ecsign(hash)
+        }
+
+        const signatures = []
+        for (const k of keys) {
+            signatures.push(k.ecsign(hash))
+        }
+        return signatures
+    }
+
+    /**
      * Signs message with Klaytn-specific prefix.
      *
      * This calculates a Klaytn-specific signature with:

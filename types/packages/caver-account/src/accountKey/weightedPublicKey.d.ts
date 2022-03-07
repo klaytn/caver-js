@@ -21,5 +21,5 @@ export class WeightedPublicKey {
     private _weight: number
     private _publicKey: string
 
-    encodeToBytes(): string
+    encodeToBytes(): string[]
 }

@@ -645,6 +645,73 @@ const txSamples = {
         type: 'TxTypeFeeDelegatedChainDataAnchoringWithRatio',
         typeInt: 74,
     },
+    ethereumAccessList: {
+        blockHash: '0x7025add64d3619e12a90b1d11e21647b55cd672edc5bfd72f5ae0b5d196e7833',
+        blockNumber: '0x3aa3806',
+        gas: '0x9c40',
+        gasPrice: '0x5d21dba00',
+        hash: '0x4744f34dc127bfdb89549f15e60f144d8ac9ede573d6a1b6738b28b83d4de9dd',
+        input:
+            '0xa9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039',
+        nonce: '0x23',
+        senderTxHash: '0x4744f34dc127bfdb89549f15e60f144d8ac9ede573d6a1b6738b28b83d4de9dd',
+        signatures: [
+            {
+                V: '0x1',
+                R: '0x5ac25e47591243af2d6b8e7f54d608e9e0e0aeb5194d34c17852bd7e376f4857',
+                S: '0x095a40394f33e95cce9695d5badf4270f4cc8aff0b5395cefc3a0fe213be1f30',
+            },
+        ],
+        chainId: '0x2710',
+        to: '0xc5fb1386b60160614a8151dcd4b0ae41325d1cb8',
+        transactionIndex: '0x0',
+        type: 'TxTypeEthereumAccessList',
+        typeInt: 30721,
+        value: '0x1',
+        accessList: [
+            {
+                address: '0x5430192ae264b3feff967fc08982b9c6f5694023',
+                storageKeys: [
+                    '0x0000000000000000000000000000000000000000000000000000000000000003',
+                    '0x0000000000000000000000000000000000000000000000000000000000000007',
+                ],
+            },
+        ],
+    },
+    ethereumDynamicFee: {
+        blockHash: '0x7025add64d3619e12a90b1d11e21647b55cd672edc5bfd72f5ae0b5d196e7833',
+        blockNumber: '0x3aa3806',
+        gas: '0x9c40',
+        maxPriorityFeePerGas: '0x5d21dba00',
+        maxFeePerGas: '0x5d21dba00',
+        hash: '0x4744f34dc127bfdb89549f15e60f144d8ac9ede573d6a1b6738b28b83d4de9dd',
+        input:
+            '0xa9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039',
+        nonce: '0x25',
+        senderTxHash: '0x4744f34dc127bfdb89549f15e60f144d8ac9ede573d6a1b6738b28b83d4de9dd',
+        signatures: [
+            {
+                V: '0x0',
+                R: '0x4fc52da183020a27dc4b684a45404445630e946b0c1a37edeb538d4bdae63040',
+                S: '0x7d56dbcc61f42ffcbced105f838d20b8fe71e85a4d0344c7f60815fddfeae4cc',
+            },
+        ],
+        chainId: '0x2710',
+        to: '0x1fc92c23f71a7de4cdb4394a37fc636986a0f484',
+        transactionIndex: '0x0',
+        type: 'TxTypeEthereumDynamicFee',
+        typeInt: 30722,
+        value: '0x1',
+        accessList: [
+            {
+                address: '0x67116062f1626f7b3019631f03d301b8f701f709',
+                storageKeys: [
+                    '0x0000000000000000000000000000000000000000000000000000000000000003',
+                    '0x0000000000000000000000000000000000000000000000000000000000000007',
+                ],
+            },
+        ],
+    },
 }
 
 module.exports = txSamples

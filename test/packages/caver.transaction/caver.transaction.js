@@ -48,6 +48,8 @@ describe('caver.transaction.getTransactionByHash', () => {
             getTransactionCount: () => {},
             getChainId: () => {},
             getTransactionByHash: () => {},
+            getHeaderByNumber: () => {},
+            getMaxPriorityFeePerGas: () => {},
         }
     })
 
@@ -288,6 +290,30 @@ describe('caver.transaction.getTransactionByHash', () => {
 
             expect(getTransactionByHashSpy).to.have.been.called
             expect(txObj.type).to.equal('TxTypeFeeDelegatedChainDataAnchoringWithRatio')
+        })
+    })
+
+    context('ethereumAccessList', () => {
+        it('CAVERJS-UNIT-TRANSACTION-552: should return an ethereumAccessList instance', async () => {
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.ethereumAccessList)
+
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.ethereumAccessList.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeEthereumAccessList')
+        })
+    })
+
+    context('ethereumDynamicFee', () => {
+        it('CAVERJS-UNIT-TRANSACTION-553: should return an ethereumDynamicFee instance', async () => {
+            getTransactionByHashSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionByHash')
+            getTransactionByHashSpy.returns(txSamples.ethereumDynamicFee)
+
+            const txObj = await caver.transaction.getTransactionByHash(txSamples.ethereumDynamicFee.hash)
+
+            expect(getTransactionByHashSpy).to.have.been.called
+            expect(txObj.type).to.equal('TxTypeEthereumDynamicFee')
         })
     })
 })
@@ -695,6 +721,32 @@ describe('caver.transaction.recoverPublicKeys and caver.transaction.recoverFeePa
             for (let i = 0; i < feePayerPublicKeys.length; i++) {
                 expect(feePayerPublicKeys[i].toLowerCase()).to.equal(expectedFeePayerPublicKeyArray[i].toLowerCase())
             }
+        })
+    })
+
+    context('ethereumAccessList', () => {
+        it('CAVERJS-UNIT-TRANSACTION-554: recoverPublciKeys should recover public keys from signatures', async () => {
+            const expected =
+                '0xde8009313a986ec6d21dca780bd0bd12f0f8b177a29f50e833e5b3187391319cae9a5c8d179601417aeba6330b69b436f01f55d1c89ebb705adafd55d9636573'
+            const rawTx =
+                '0x7801f90109822710238505d21dba00829c4094c5fb1386b60160614a8151dcd4b0ae41325d1cb801b844a9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039f85bf859945430192ae264b3feff967fc08982b9c6f5694023f842a00000000000000000000000000000000000000000000000000000000000000003a0000000000000000000000000000000000000000000000000000000000000000701a05ac25e47591243af2d6b8e7f54d608e9e0e0aeb5194d34c17852bd7e376f4857a0095a40394f33e95cce9695d5badf4270f4cc8aff0b5395cefc3a0fe213be1f30'
+
+            const publicKeys = caver.transaction.recoverPublicKeys(rawTx)
+
+            expect(publicKeys[0].toLowerCase()).to.equal(expected)
+        })
+    })
+
+    context('ethereumDynamicFee', () => {
+        it('CAVERJS-UNIT-TRANSACTION-555: recoverPublciKeys should recover public keys from signatures', async () => {
+            const expected =
+                '0xde8009313a986ec6d21dca780bd0bd12f0f8b177a29f50e833e5b3187391319cae9a5c8d179601417aeba6330b69b436f01f55d1c89ebb705adafd55d9636573'
+            const rawTx =
+                '0x7802f9010f822710258505d21dba008505d21dba00829c40941fc92c23f71a7de4cdb4394a37fc636986a0f48401b844a9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039f85bf8599467116062f1626f7b3019631f03d301b8f701f709f842a00000000000000000000000000000000000000000000000000000000000000003a0000000000000000000000000000000000000000000000000000000000000000780a04fc52da183020a27dc4b684a45404445630e946b0c1a37edeb538d4bdae63040a07d56dbcc61f42ffcbced105f838d20b8fe71e85a4d0344c7f60815fddfeae4cc'
+
+            const publicKeys = caver.transaction.recoverPublicKeys(rawTx)
+
+            expect(publicKeys[0].toLowerCase()).to.equal(expected)
         })
     })
 })

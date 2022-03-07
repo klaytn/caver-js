@@ -17,3 +17,4 @@ node_modules
 dist/*
 .env
 out/*
+test.js

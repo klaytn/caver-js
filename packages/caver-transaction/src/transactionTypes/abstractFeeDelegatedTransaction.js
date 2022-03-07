@@ -75,7 +75,7 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
     }
 
     set feePayerSignatures(sigs) {
-        this._feePayerSignatures = refineSignatures(sigs)
+        this._feePayerSignatures = refineSignatures(sigs, this.type)
     }
 
     /**

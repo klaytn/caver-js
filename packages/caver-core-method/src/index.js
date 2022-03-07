@@ -37,6 +37,7 @@ const AVERAGE_BLOCK_TIME = 1 // 1s
 const POLLINGTIMEOUT = AVERAGE_BLOCK_TIME * TIMEOUTBLOCK // ~average block time (seconds) * TIMEOUTBLOCK
 
 const TransactionDecoder = require('../../caver-transaction/src/transactionDecoder/transactionDecoder')
+const { TX_TYPE_STRING } = require('../../caver-transaction/src/transactionHelper/transactionHelper')
 
 function Method(options) {
     // call, name should be existed to create a method.
@@ -404,12 +405,7 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
     // When sending a request to send or sign a transaction using a key stored in a Klaytn node,
     // the variable names inside the transaction must be properly formatted.
     // { _from: '0x..', _signatures: ['0x..', '0x..', '0x..'] } -> { from: '0x..', signatures: { V: '0x..', R: '0x..', S: '0x..'} }
-    if (
-        methodName === 'klay_sendTransaction' ||
-        methodName === 'klay_sendTransactionAsFeePayer' ||
-        methodName === 'klay_signTransaction' ||
-        methodName === 'klay_signTransactionAsFeePayer'
-    ) {
+    if (methodName.includes('sendTransaction') || methodName.includes('signTransaction')) {
         const tx = {}
         Object.keys(payload.params[0]).map(k => {
             let key = k
@@ -433,6 +429,12 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
                 tx[key] = utils.hexToNumber(payload.params[0][key])
             } else if (key === 'account') {
                 tx.key = payload.params[0][key].getRLPEncodingAccountKey()
+            } else if (key === 'chainId') {
+                if (payload.params[0].type !== undefined && payload.params[0].type.includes('Ethereum')) {
+                    tx[key] = payload.params[0][key]
+                }
+            } else if (key === 'accessList') {
+                tx[key] = payload.params[0][key].toObject()
             } else if (payload.params[0][key] !== '0x') {
                 tx[key] = payload.params[0][key]
             }
@@ -466,7 +468,11 @@ const buildSendFunc = (method, isSendTx) => (...args) => {
     }).createFunction(method.requestManager)
 
     getGasPrice((err, gasPrice) => {
-        payload.params[0].gasPrice = gasPrice || payload.params[0].gasPrice
+        // The TxTypeEthereumDynamicFee transaction does not use the gasPrice field,
+        // so the gas price default is not set for TxTypeEthereumDynamicFee.
+        if (payload.params[0].type !== TX_TYPE_STRING.TxTypeEthereumDynamicFee) {
+            payload.params[0].gasPrice = gasPrice || payload.params[0].gasPrice
+        }
         sendRequest(payload, method)
     })
 

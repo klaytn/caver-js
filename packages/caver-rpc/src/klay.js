@@ -131,6 +131,27 @@ class Klay {
                 inputFormatter: [formatters.inputAddressFormatter, formatters.inputDefaultBlockNumberFormatter],
             }),
             /**
+             * Returns a block header by block number.
+             *
+             * @memberof Klay
+             * @method getHeaderByNumber
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getHeaderByNumber(0)
+             * const result = await caver.rpc.klay.getHeaderByNumber('latest')
+             *
+             * @param {string|number|BN|BigNumber} blockNumberOrTag The block number or block tag string to query block header.
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<Klay.Header>} An object includes block header.
+             */
+            new Method({
+                name: 'getHeaderByNumber',
+                call: 'klay_getHeaderByNumber',
+                params: 1,
+                inputFormatter: [formatters.inputBlockNumberFormatter],
+            }),
+            /**
              * An object defines the AccountKeyLegacy.
              *
              * @example
@@ -319,6 +340,25 @@ class Klay {
                 name: 'getTransactionByHash',
                 call: 'klay_getTransactionByHash',
                 params: 1,
+            }),
+            /**
+             * Returns a suggestion for a gas tip cap for dynamic fee transactions in peb.
+             * Since Klaytn has a fixed gas price, this `caver.rpc.klay.getMaxPriorityFeePerGas` returns the gas price set by Klaytn.
+             *
+             * @memberof Klay
+             * @method getMaxPriorityFeePerGas
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getMaxPriorityFeePerGas()
+             *
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<string>} As a suggested value for the gas tip cap, the current Klaytn uses a fixed gas price, so the gasPrice value is returned.
+             */
+            new Method({
+                name: 'getMaxPriorityFeePerGas',
+                call: 'klay_maxPriorityFeePerGas',
+                params: 0,
             }),
         ]
         AbstractTransaction._klaytnCall = {}
@@ -737,6 +777,7 @@ class Klay {
              * @property {Array.<Klay.Transaction>} transactions - Array of transaction objects, or 32-byte transaction hashes depending on the `returnTransactionObjects` parameter.
              * @property {string} transactionsRoot - The root of the transaction trie of the block.
              * @property {string} voteData - RLP encoded governance vote of the proposer.
+             * @property {string} [baseFeePerGas] - Base fee per gas.
              */
             /**
              * Returns information about a block.
@@ -805,6 +846,95 @@ class Klay {
                 call: 'klay_getBlockByHash',
                 params: 2,
                 inputFormatter: [formatters.inputBlockNumberFormatter, formatters.toBoolean],
+            }),
+            /**
+             * An object for block header from Klaytn.
+             *
+             * @example
+             *
+             * @typedef {object} Klay.Header
+             * @property {string} parentHash - Hash of the parent block.
+             * @property {string} reward - The address of the beneficiary to whom the block rewards were given.
+             * @property {string} stateRoot - The root of the final state trie of the block.
+             * @property {string} transactionsRoot - The root of the transaction trie of the block.
+             * @property {string} receiptsRoot - The root of the receipts trie of the block.
+             * @property {string} logsBloom - The bloom filter for the logs of the block. `null` when it is pending block.
+             * @property {string} blockScore - Former difficulty. Always 1 in the BFT consensus engine.
+             * @property {string} number - The block number. `null` when it is pending block.
+             * @property {string} gasUsed - The total used gas by all transactions in this block.
+             * @property {string} timestamp - The Unix timestamp for when the block was collated.
+             * @property {string} timestampFoS - The fraction of a second of the timestamp for when the block was collated.
+             * @property {string} extraData - The "extra data" field of this block.
+             * @property {string} governanceData - RLP encoded governance configuration.
+             * @property {string} hash - Hash of the current block.
+             * @property {string} [baseFeePerGas] - Base fee per gas.
+             * @property {string} [voteData] - RLP encoded governance vote of the proposer.
+             */
+            /**
+             * Returns a block header.
+             * If parameter is hex string, this will use {@link Klay#getHeaderByHash|caver.rpc.klay.getHeaderByHash}, if paramter is number type, this will use {@link Klay#getHeaderByNumber|caver.rpc.klay.getHeaderByNumber}.
+             *
+             * @memberof Klay
+             * @method getHeader
+             * @instance
+             *
+             * @example
+             * // Use `caver.rpc.klay.getHeaderByNumber`
+             * const result = await caver.rpc.klay.getHeader(0)
+             * // Use `caver.rpc.klay.getHeaderByHash`
+             * const result = await caver.rpc.klay.getHeader('0x58482921af951cf42a069436ac9338de50fd963bdbea40e396f416f9ac96a08b')
+             *
+             * @param {string|number|BN|BigNumber} blockHashOrNumber The block hash or block number to query block header.
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<Klay.Header>} An object includes block header.
+             */
+            new Method({
+                name: 'getHeader',
+                call: 'klay_getHeaderByNumber',
+                hexCall: 'klay_getHeaderByHash',
+                params: 1,
+                inputFormatter: [formatters.inputBlockNumberFormatter],
+            }),
+            /**
+             * Returns a block header by block number.
+             *
+             * @memberof Klay
+             * @method getHeaderByNumber
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getHeaderByNumber(0)
+             * const result = await caver.rpc.klay.getHeaderByNumber('latest')
+             *
+             * @param {string|number|BN|BigNumber} blockNumberOrTag The block number or block tag string to query block header.
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<Klay.Header>} An object includes block header.
+             */
+            new Method({
+                name: 'getHeaderByNumber',
+                call: 'klay_getHeaderByNumber',
+                params: 1,
+                inputFormatter: [formatters.inputBlockNumberFormatter],
+            }),
+            /**
+             * Returns a block header by block hash.
+             *
+             * @memberof Klay
+             * @method getHeaderByHash
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getHeaderByHash('0x58482921af951cf42a069436ac9338de50fd963bdbea40e396f416f9ac96a08b')
+             *
+             * @param {string} blockHash The block hash to query block header.
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<Klay.Header>} An object includes block header.
+             */
+            new Method({
+                name: 'getHeaderByHash',
+                call: 'klay_getHeaderByHash',
+                params: 1,
+                inputFormatter: [formatters.inputBlockNumberFormatter],
             }),
             /**
              * An object for transaction receipt from Klaytn.
@@ -1085,6 +1215,7 @@ class Klay {
              * @property {Array.<Klay.TransactionReceipt>} transactions - Array of transaction receipt objects.
              * @property {string} transactionsRoot - The root of the transaction trie of the block.
              * @property {string} voteData - RLP encoded governance vote of the proposer.
+             * @property {string} [baseFeePerGas] - Base fee per gas.
              */
             /**
              * Returns a block with consensus information matched by the given hash.
@@ -1825,6 +1956,103 @@ class Klay {
                 name: 'getDecodedAnchoringTransaction',
                 call: 'klay_getDecodedAnchoringTransactionByHash',
                 params: 1,
+            }),
+            /**
+             * An object defines fee history.
+             *
+             * @typedef {object} Klay.FeeHistoryResult
+             * @property {string} oldestBlock - Lowest number block of returned range.
+             * @property {string[]} baseFeePerGas - An array of block base fees per gas. This includes the next block after the newest of the returned range, because this value can be derived from the newest block. Zeroes are returned for pre-EIP-1559 blocks.
+             * @property {string[][]} reward - A two-dimensional array of effective priority fees per gas at the requested block percentiles.
+             * @property {number[]} gasUsedRatio - An array of gasUsed/gasLimit in the block.
+             */
+            /**
+             * Returns fee history for the returned block range. This can be a subsection of the requested range if not all blocks are available.
+             *
+             * @memberof Klay
+             * @method getFeeHistory
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getFeeHistory(16, 'latest', [0.1, 0.2, 0.3])
+             *
+             * @param {number|BigNumber|BN|string} blockCount Number of blocks in the requested range. Between 1 and 1024 blocks can be requested in a single query. Less than requested may be returned if not all blocks are available.
+             * @param {number|BigNumber|BN|string} lastBlock Highest number block (or block tag string) of the requested range.
+             * @param {number[]} rewardPercentiles A monotonically increasing list of percentile values to sample from each block’s effective priority fees per gas in ascending order, weighted by gas used. (Example: `['0', '25', '50', '75', '100']` or `['0', '0.5', '1', '1.5', '3', '80']`)
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<Klay.FeeHistoryResult>} Fee history for the returned block range. This can be a subsection of the requested range if not all blocks are available.
+             */
+            new Method({
+                name: 'getFeeHistory',
+                call: 'klay_feeHistory',
+                params: 3,
+                inputFormatter: [utils.numberToHex, formatters.inputBlockNumberFormatter, null],
+            }),
+            /**
+             * Returns a suggestion for a gas tip cap for dynamic fee transactions in peb.
+             * Since Klaytn has a fixed gas price, this `caver.rpc.klay.getMaxPriorityFeePerGas` returns the gas price set by Klaytn.
+             *
+             * @memberof Klay
+             * @method getMaxPriorityFeePerGas
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getMaxPriorityFeePerGas()
+             *
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<string>} As a suggested value for the gas tip cap, the current Klaytn uses a fixed gas price, so the gasPrice value is returned.
+             */
+            new Method({
+                name: 'getMaxPriorityFeePerGas',
+                call: 'klay_maxPriorityFeePerGas',
+                params: 0,
+            }),
+            /**
+             * An object defines an access list result that includes accessList and gasUsed.
+             *
+             * @typedef {object} Klay.AccessListResult
+             * @property {Klay.AccessList} accessList - The list of addresses and storage keys that will be used by that transaction. The list could change when the transaction is actually mined.
+             * @property {string} gasUsed - The estimated amount of gas used.
+             */
+            /**
+             * Klay.AccessList is a list of access tuple.
+             *
+             * @typedef {Klay.AccessTuple[]} Klay.AccessList
+             */
+            /**
+             * The element type of an access list.
+             *
+             * @typedef {object} Klay.AccessTuple
+             * @property {string} address - An address that the transaction plans to access.
+             * @property {string[]} storageKeys - The storage slots that the transaction plans to access.
+             */
+            /**
+             * Returns a list of addresses and storage keys used by the transaction, plus the gas consumed when the access list is added.
+             *
+             * @memberof Klay
+             * @method createAccessList
+             * @instance
+             *
+             * @example
+             * const txArgs = {
+             *     from: '0x3bc5885c2941c5cda454bdb4a8c88aa7f248e312',
+             *     data: '0x20965255',
+             *     gasPrice: '0x3b9aca00',
+             *     gas: '0x3d0900',
+             *     to: '0x00f5f5f3a25f142fafd0af24a754fafa340f32c7'
+             * }
+             * const result = await caver.rpc.klay.createAccessList(txArgs, 'latest')
+             *
+             * @param {Klay.CallObject} callObject A transaction call object.
+             * @param {number|BigNumber|BN|string} [blockParameter] A block number, blockhash or the block tag string (`latest` or `earliest`). If omitted, `latest` will be used.
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<Klay.AccessListResult>} An accessListResult for the given transaction
+             */
+            new Method({
+                name: 'createAccessList',
+                call: 'klay_createAccessList',
+                params: 2,
+                inputFormatter: [formatters.inputTransactionFormatter, formatters.inputDefaultBlockNumberFormatter],
             }),
 
             // Configuration

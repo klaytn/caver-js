@@ -25,7 +25,7 @@
  */
 
 const utils = require('../../caver-utils')
-const { TX_TYPE_STRING } = require('../../caver-transaction/src/transactionHelper/transactionHelper')
+const { TX_TYPE_STRING, isEthereumTxType } = require('../../caver-transaction/src/transactionHelper/transactionHelper')
 
 function validateParams(tx) {
     let error
@@ -50,11 +50,11 @@ function validateParams(tx) {
         return error
     }
 
-    if (tx.type !== TX_TYPE_STRING.TxTypeLegacyTransaction && !tx.from) {
+    if (!isEthereumTxType(tx.type) && !tx.from) {
         error = new Error('"from" is missing')
     } else if (tx.from) {
         if (tx.from === '0x' || tx.from === '0x0000000000000000000000000000000000000000') {
-            if (tx.type !== TX_TYPE_STRING.TxTypeLegacyTransaction) {
+            if (!isEthereumTxType(tx.type)) {
                 error = new Error(`Invalid address of from: ${tx.from}`)
             }
         } else if (!utils.isAddress(tx.from)) {
@@ -64,8 +64,8 @@ function validateParams(tx) {
 
     if (tx.gas === undefined && tx.gasLimit === undefined) {
         error = new Error('"gas" is missing')
-    } else if (tx.nonce < 0 || tx.gas < 0 || tx.gasPrice < 0 || tx.chainId < 0) {
-        error = new Error('gas, gasPrice, nonce or chainId is lower than 0')
+    } else if (tx.nonce < 0 || tx.gas < 0 || tx.gasLimit < 0 || (tx.gasPrice !== undefined && tx.gasPrice < 0) || tx.chainId < 0) {
+        error = new Error('gas(or gasLimit), gasPrice, nonce or chainId is lower than 0')
     }
 
     // If feePayerSignatures is set in transaction object, feePayer also should be defined together.
@@ -135,6 +135,8 @@ function validateTxType(txType) {
         case TX_TYPE_STRING.TxTypeFeeDelegatedChainDataAnchoring:
         case TX_TYPE_STRING.TxTypeFeeDelegatedChainDataAnchoringWithRatio:
         case TX_TYPE_STRING.TxTypeLegacyTransaction:
+        case TX_TYPE_STRING.TxTypeEthereumAccessList:
+        case TX_TYPE_STRING.TxTypeEthereumDynamicFee:
             return true
     }
     return false
@@ -231,6 +233,10 @@ function validateTxObjectWithType(tx) {
             return validateFeeDelegatedChainDataAnchoring(tx)
         case TX_TYPE_STRING.TxTypeFeeDelegatedChainDataAnchoringWithRatio:
             return validateFeeDelegatedChainDataAnchoringWithRatio(tx)
+        case TX_TYPE_STRING.TxTypeEthereumAccessList:
+            return validateEthereumAccessList(tx)
+        case TX_TYPE_STRING.TxTypeEthereumDynamicFee:
+            return validateEthereumDynamicFee(tx)
     }
     return undefined
 }
@@ -255,6 +261,18 @@ function validateLegacy(transaction) {
 
     if (transaction.humanReadable !== undefined) {
         return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
+    }
+
+    if (transaction.accessList !== undefined) {
+        return new Error(`"accessList" cannot be used with ${transaction.type} transaction`)
+    }
+
+    if (transaction.maxPriorityFeePerGas !== undefined) {
+        return new Error(`"maxPriorityFeePerGas" cannot be used with ${transaction.type} transaction`)
+    }
+
+    if (transaction.maxFeePerGas !== undefined) {
+        return new Error(`"maxFeePerGas" cannot be used with ${transaction.type} transaction`)
     }
 
     const error = validateNonFeeDelegated(transaction)
@@ -339,6 +357,15 @@ function checkValueTransferEssential(transaction) {
     if (transaction.humanReadable !== undefined) {
         return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
     }
+    if (transaction.accessList !== undefined) {
+        return new Error(`"accessList" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.maxPriorityFeePerGas !== undefined) {
+        return new Error(`"maxPriorityFeePerGas" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.maxFeePerGas !== undefined) {
+        return new Error(`"maxFeePerGas" cannot be used with ${transaction.type} transaction`)
+    }
 }
 
 function validateValueTransfer(transaction) {
@@ -390,6 +417,15 @@ function checkValueTransferMemoEssential(transaction) {
     if (transaction.humanReadable !== undefined) {
         return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
     }
+    if (transaction.accessList !== undefined) {
+        return new Error(`"accessList" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.maxPriorityFeePerGas !== undefined) {
+        return new Error(`"maxPriorityFeePerGas" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.maxFeePerGas !== undefined) {
+        return new Error(`"maxFeePerGas" cannot be used with ${transaction.type} transaction`)
+    }
 }
 
 function validateValueTransferMemo(transaction) {
@@ -428,6 +464,15 @@ function validateAccountTransaction(transaction) {
     }
     if (transaction.humanReadable !== undefined) {
         return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.accessList !== undefined) {
+        return new Error(`"accessList" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.maxPriorityFeePerGas !== undefined) {
+        return new Error(`"maxPriorityFeePerGas" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.maxFeePerGas !== undefined) {
+        return new Error(`"maxFeePerGas" cannot be used with ${transaction.type} transaction`)
     }
 
     // TxTypeAccountUpdate, TxTypeFeeDelegatedAccountUpdate and TxTypeFeeDelegatedAccountUpdateWithRatio transaction use 'account' only
@@ -582,6 +627,15 @@ function checkDeployEssential(transaction) {
     if (transaction.humanReadable !== undefined && transaction.humanReadable === true) {
         return new Error('HumanReadableAddress is not supported yet.')
     }
+    if (transaction.accessList !== undefined) {
+        return new Error(`"accessList" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.maxPriorityFeePerGas !== undefined) {
+        return new Error(`"maxPriorityFeePerGas" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.maxFeePerGas !== undefined) {
+        return new Error(`"maxFeePerGas" cannot be used with ${transaction.type} transaction`)
+    }
 }
 
 function validateSmartContractDeploy(transaction) {
@@ -630,6 +684,15 @@ function checkExecutionEssential(transaction) {
     if (transaction.humanReadable !== undefined) {
         return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
     }
+    if (transaction.accessList !== undefined) {
+        return new Error(`"accessList" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.maxPriorityFeePerGas !== undefined) {
+        return new Error(`"maxPriorityFeePerGas" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.maxFeePerGas !== undefined) {
+        return new Error(`"maxFeePerGas" cannot be used with ${transaction.type} transaction`)
+    }
 }
 
 function validateSmartContractExecution(transaction) {
@@ -674,6 +737,15 @@ function checkCacncelEssential(transaction) {
     }
     if (transaction.humanReadable !== undefined) {
         return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.accessList !== undefined) {
+        return new Error(`"accessList" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.maxPriorityFeePerGas !== undefined) {
+        return new Error(`"maxPriorityFeePerGas" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.maxFeePerGas !== undefined) {
+        return new Error(`"maxFeePerGas" cannot be used with ${transaction.type} transaction`)
     }
 }
 
@@ -727,6 +799,15 @@ function checkChainDataAnchoringEssential(transaction) {
     if (transaction.humanReadable !== undefined) {
         return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
     }
+    if (transaction.accessList !== undefined) {
+        return new Error(`"accessList" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.maxPriorityFeePerGas !== undefined) {
+        return new Error(`"maxPriorityFeePerGas" cannot be used with ${transaction.type} transaction`)
+    }
+    if (transaction.maxFeePerGas !== undefined) {
+        return new Error(`"maxFeePerGas" cannot be used with ${transaction.type} transaction`)
+    }
 }
 
 function validateChainDataAnchoring(transaction) {
@@ -751,6 +832,76 @@ function validateFeeDelegatedChainDataAnchoring(transaction) {
 
 function validateFeeDelegatedChainDataAnchoringWithRatio(transaction) {
     return validateFeeDelegatedChainDataAnchoring(transaction)
+}
+
+function validateEthereumAccessList(transaction) {
+    if (transaction.to === undefined && transaction.data === undefined && transaction.input === undefined) {
+        return new Error('contract creation without any data provided')
+    }
+
+    if (
+        transaction.to &&
+        transaction.to !== '0x' &&
+        transaction.to !== '0x0000000000000000000000000000000000000000' &&
+        !utils.isAddress(transaction.to)
+    ) {
+        return new Error(`Invalid address of to: ${transaction.to}`)
+    }
+
+    if (transaction.codeFormat !== undefined) {
+        return new Error(`"codeFormat" cannot be used with ${transaction.type} transaction`)
+    }
+
+    if (transaction.humanReadable !== undefined) {
+        return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
+    }
+
+    if (transaction.maxPriorityFeePerGas !== undefined) {
+        return new Error(`"maxPriorityFeePerGas" cannot be used with ${transaction.type} transaction`)
+    }
+
+    if (transaction.maxFeePerGas !== undefined) {
+        return new Error(`"maxFeePerGas" cannot be used with ${transaction.type} transaction`)
+    }
+
+    const error = validateNonFeeDelegated(transaction)
+    if (error) return error
+
+    return validateNotAccountTransaction(transaction)
+}
+
+function validateEthereumDynamicFee(transaction) {
+    if (transaction.to === undefined && transaction.data === undefined && transaction.input === undefined) {
+        return new Error('contract creation without any data provided')
+    }
+
+    if (
+        transaction.to &&
+        transaction.to !== '0x' &&
+        transaction.to !== '0x0000000000000000000000000000000000000000' &&
+        !utils.isAddress(transaction.to)
+    ) {
+        return new Error(`Invalid address of to: ${transaction.to}`)
+    }
+
+    if (transaction.codeFormat !== undefined) {
+        return new Error(`"codeFormat" cannot be used with ${transaction.type} transaction`)
+    }
+
+    if (transaction.humanReadable !== undefined) {
+        return new Error(`"humanReadable" cannot be used with ${transaction.type} transaction`)
+    }
+
+    if (transaction.gasPrice !== undefined) {
+        return new Error(
+            `"gasPrice" cannot be used with ${transaction.type} transaction. Please use the maxPriorityFeePerGas and maxFeePerGas.`
+        )
+    }
+
+    const error = validateNonFeeDelegated(transaction)
+    if (error) return error
+
+    return validateNotAccountTransaction(transaction)
 }
 
 module.exports = {

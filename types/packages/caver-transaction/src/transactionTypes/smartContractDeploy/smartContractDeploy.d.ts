@@ -23,6 +23,8 @@ export class SmartContractDeploy extends AbstractTransaction {
 
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string
+    fillTransaction(): Promise<void>
+    validateOptionalValues(): void
 
     to: string
     value: string
@@ -30,10 +32,12 @@ export class SmartContractDeploy extends AbstractTransaction {
     data: string
     humanReadable: boolean
     codeFormat: string
+    gasPrice: string
     private _to: string
     private _value: string
     private _input: string
     private _data: string
     private _humanReadable: boolean
     private _codeFormat: string
+    private _gasPrice: string
 }

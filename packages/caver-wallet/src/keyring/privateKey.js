@@ -63,9 +63,37 @@ class PrivateKey {
      * @return {SignatureData} A {@link SignatureData}.
      */
     sign(transactionHash, chainId) {
-        chainId = utils.toHex(chainId)
-        const signature = AccountLib.makeSigner(Nat.toNumber(chainId) * 2 + 35)(transactionHash, this.privateKey)
+        let addToV
+        if (chainId === undefined) {
+            throw new Error(`Insufficient parameters: chainId is undefined.`)
+        } else {
+            chainId = utils.toHex(chainId)
+            addToV = Nat.toNumber(chainId) * 2 + 35
+        }
+        const signature = AccountLib.makeSigner(addToV)(transactionHash, this.privateKey)
         const [v, r, s] = AccountLib.decodeSignature(signature).map(sig => utils.makeEven(utils.trimLeadingZero(sig)))
+        return new SignatureData([v, r, s])
+    }
+
+    /**
+     * Signs with hashed data and returns signature data.
+     * ecsign returns a signature which has v as a parity (0 for even, 1 for odd) of the y-value of a secp256k1 signature.
+     *
+     * @example
+     * const signature = privateKey.ecsign('0xe9a11d9ef95fb437f75d07ce768d43e74f158dd54b106e7d3746ce29d545b550')
+     *
+     * @param {string} hash The hash to sign.
+     * @return {SignatureData} A {@link SignatureData}.
+     */
+    ecsign(hash) {
+        // ecsign returns recovery id `v` as y-parity (0 or 1).
+        // `AccountLib.makeSigner` makes a sign function that adds addToV to `v`, so use 0.
+        const addToV = 0
+        const signature = AccountLib.makeSigner(addToV)(hash, this.privateKey)
+        let [v, r, s] = AccountLib.decodeSignature(signature).map(sig => utils.makeEven(utils.trimLeadingZero(sig)))
+        // This is for converting '0x' to '0x0'
+        v = utils.toHex(utils.hexToNumber(v))
+
         return new SignatureData([v, r, s])
     }
 

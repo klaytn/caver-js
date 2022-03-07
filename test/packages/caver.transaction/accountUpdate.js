@@ -351,6 +351,9 @@ describe('TxTypeAccountUpdate', () => {
                 propertiesForUnnecessary.roleAccountUpdateKey,
                 propertiesForUnnecessary.roleFeePayerKey,
                 propertiesForUnnecessary.humanReadable,
+                propertiesForUnnecessary.accessList,
+                propertiesForUnnecessary.maxPriorityFeePerGas,
+                propertiesForUnnecessary.maxFeePerGas,
             ]
 
             for (let i = 0; i < unnecessaries.length; i++) {

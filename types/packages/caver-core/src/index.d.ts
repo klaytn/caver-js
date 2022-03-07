@@ -16,15 +16,34 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { AbiItem } from '../../caver-utils/src'
 import { Account } from '../../caver-account/src'
 import BN = require('bn.js')
 import BigNumber from 'bignumber.js'
+import { AccessListObject } from '../../caver-transaction/src'
 
 export interface SignatureForRPC {
     V: string
     R: string
     S: string
+}
+
+export interface Header {
+    parentHash: string
+    reward: string
+    stateRoot: string
+    transactionsRoot: string
+    receiptsRoot: string
+    logsBloom: string
+    blockScore: string
+    number: string
+    gasUsed: string
+    timestamp: string
+    timestampFoS: string
+    extraData: string
+    governanceData: string
+    hash: string
+    voteData?: string
+    baseFeePerGas?: string
 }
 
 export interface Block {
@@ -46,6 +65,7 @@ export interface Block {
     transactions: TransactionForRPC[]
     transactionsRoot: string
     voteData: string
+    baseFeePerGas?: string
 }
 
 export interface BlockWithConsensusInfo extends Block {
@@ -56,6 +76,7 @@ export interface BlockWithConsensusInfo extends Block {
 }
 
 export interface TransactionForSendRPC {
+    accessList?: AccessListObject
     type?: string
     from?: string | number
     signatures?: SignatureForRPC[]
@@ -63,6 +84,8 @@ export interface TransactionForSendRPC {
     value?: number | string
     gas?: number | string
     gasPrice?: number | string
+    maxPriorityFeePerGas?: string | number
+    maxFeePerGas?: string | number
     data?: string
     input?: string
     nonce?: number
@@ -78,15 +101,19 @@ export interface TransactionForSendRPC {
 }
 
 export interface TransactionForRPC {
+    accessList?: AccessListObject
     blockHash: string
     blockNumber: string
     codeFormat?: string
+    chainId?: string
     feePayer?: string
     feePayerSignatures?: SignatureForRPC[]
     feeRatio?: string
     from: string
     gas: string | number
-    gasPrice: string | number
+    gasPrice?: string
+    maxPriorityFeePerGas?: string
+    maxFeePerGas?: string
     hash: string
     humanReadable?: boolean
     key?: string
@@ -102,15 +129,19 @@ export interface TransactionForRPC {
 }
 
 export interface TransactionReceipt {
+    accessList?: AccessListObject
     blockHash: string
     blockNumber: string
     codeFormat?: string
+    chainId?: string
     feePayer?: string
     feePayerSignatures?: SignatureForRPC[]
     feeRatio?: string
     from: string
     gas: string | number
-    gasPrice: string | number
+    gasPrice?: string | number
+    maxPriorityFeePerGas?: string
+    maxFeePerGas?: string
     humanReadable?: boolean
     key?: string
     input?: string
@@ -286,4 +317,11 @@ export interface EncryptionOptions {
     p?: any
     cipher?: any
     uuid?: any
+}
+
+export interface FeeHistoryResult {
+    oldestBlock: number
+    baseFeePerGas: string[]
+    reward: string[][]
+    gasUsedRatio: number[]
 }
