@@ -16,10 +16,10 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { AbiItem } from '../../caver-utils/src'
 import { Account } from '../../caver-account/src'
 import BN = require('bn.js')
 import BigNumber from 'bignumber.js'
+import { AccessListObject } from '../../caver-transaction/src'
 
 export interface SignatureForRPC {
     V: string
@@ -76,6 +76,7 @@ export interface BlockWithConsensusInfo extends Block {
 }
 
 export interface TransactionForSendRPC {
+    accessList?: AccessListObject
     type?: string
     from?: string | number
     signatures?: SignatureForRPC[]
@@ -83,6 +84,8 @@ export interface TransactionForSendRPC {
     value?: number | string
     gas?: number | string
     gasPrice?: number | string
+    maxPriorityFeePerGas?: string | number
+    maxFeePerGas?: string | number
     data?: string
     input?: string
     nonce?: number
@@ -98,15 +101,19 @@ export interface TransactionForSendRPC {
 }
 
 export interface TransactionForRPC {
+    accessList?: AccessListObject
     blockHash: string
     blockNumber: string
     codeFormat?: string
+    chainId?: string
     feePayer?: string
     feePayerSignatures?: SignatureForRPC[]
     feeRatio?: string
     from: string
     gas: string | number
-    gasPrice: string | number
+    gasPrice?: string
+    maxPriorityFeePerGas?: string
+    maxFeePerGas?: string
     hash: string
     humanReadable?: boolean
     key?: string
@@ -122,15 +129,19 @@ export interface TransactionForRPC {
 }
 
 export interface TransactionReceipt {
+    accessList?: AccessListObject
     blockHash: string
     blockNumber: string
     codeFormat?: string
+    chainId?: string
     feePayer?: string
     feePayerSignatures?: SignatureForRPC[]
     feeRatio?: string
     from: string
     gas: string | number
-    gasPrice: string | number
+    gasPrice?: string | number
+    maxPriorityFeePerGas?: string
+    maxFeePerGas?: string
     humanReadable?: boolean
     key?: string
     input?: string

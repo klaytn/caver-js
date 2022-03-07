@@ -15,6 +15,14 @@
 
 import { AccessTuple, AccessTupleObject, EncodedAccessTuple } from './accessTuple'
 
+export type AccessListObject = AccessTupleObject[]
+
+export interface AccessListResult {
+    accessList: AccessListObject
+    gasUsed: string
+    error: string
+}
+
 export class AccessList extends Array {
     static create(items: AccessTuple[] | AccessTupleObject[]): AccessList
     static decode(encoded: string): AccessList
