@@ -67,7 +67,7 @@ class SignatureData {
     set v(v) {
         v = v.slice(0, 2) === '0x' ? v : `0x${v}`
         // If v of Signature is 0, '0x' is returned when RLP decoded.
-        // However, the Bytes.toNumber function used for recover public key cannot convert '0x' to 0, 
+        // However, the Bytes.toNumber function used for recover public key cannot convert '0x' to 0,
         // so to handle this case, v is converted to '0x0' in case of '0x' (makeEven converts '0x0' to '0x00').
         v = v === '0x' ? '0x0' : v
         this._v = utils.makeEven(v)
