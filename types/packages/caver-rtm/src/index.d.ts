@@ -79,7 +79,7 @@ export default class RpcCallToMethod {
         callback?: (error: Error, result: TransactionReceipt) => void
     ): PromiEvent<TransactionReceipt>
     klay_call(callObject: CallObject, blockNumber?: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
-    klay_estimateGas(callObject: CallObject, blockNumber?: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
+    klay_estimateGas(callObject: CallObject, blockNumber?: BlockNumber, callback?: (error: Error, result: string) => void): Promise<number>
     klay_getLogs(options: LogsOptions, callback?: (error: Error, result: Log[]) => void): Promise<Log[]>
     klay_sign(
         address: string,
