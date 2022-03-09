@@ -170,8 +170,8 @@ export class Klay {
 
     call(callObject: CallObject, callback?: (error: Error, result: string) => void): Promise<string>
     call(callObject: CallObject, blockNumber: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
-    estimateGas(callObject: CallObject, callback?: (error: Error, result: string) => void): Promise<number>
-    estimateGas(callObject: CallObject, blockNumber: BlockNumber, callback?: (error: Error, result: string) => void): Promise<number>
+    estimateGas(callObject: CallObject, callback?: (error: Error, result: string) => void): Promise<string>
+    estimateGas(callObject: CallObject, blockNumber: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
     estimateComputationCost(callObject: CallObject, callback?: (error: Error, result: string) => void): Promise<string>
     estimateComputationCost(
         callObject: CallObject,

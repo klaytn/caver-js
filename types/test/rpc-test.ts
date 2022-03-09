@@ -799,31 +799,31 @@ rpc.klay.call({ from: 'address' }, 'latest', (err: Error, ret: string) => {})
 // $ExpectType Promise<string>
 rpc.klay.call({ from: 'address' }, 'hash', (err: Error, ret: string) => {})
 
-// $ExpectType Promise<number>
+// $ExpectType Promise<string>
 rpc.klay.estimateGas({ from: 'address' })
-// $ExpectType Promise<number>
+// $ExpectType Promise<string>
 rpc.klay.estimateGas({ from: 'address' }, new BigNumber(0))
-// $ExpectType Promise<number>
+// $ExpectType Promise<string>
 rpc.klay.estimateGas({ from: 'address' }, new BN(0))
-// $ExpectType Promise<number>
+// $ExpectType Promise<string>
 rpc.klay.estimateGas({ from: 'address' }, 'genesis')
-// $ExpectType Promise<number>
+// $ExpectType Promise<string>
 rpc.klay.estimateGas({ from: 'address' }, 'latest')
-// $ExpectType Promise<number>
+// $ExpectType Promise<string>
 rpc.klay.estimateGas({ from: 'address' }, 'hash')
-// $ExpectType Promise<number>
+// $ExpectType Promise<string>
 rpc.klay.estimateGas({ from: 'address' }, (err: Error, ret: string) => {})
-// $ExpectType Promise<number>
+// $ExpectType Promise<string>
 rpc.klay.estimateGas({ from: 'address' }, 0, (err: Error, ret: string) => {})
-// $ExpectType Promise<number>
+// $ExpectType Promise<string>
 rpc.klay.estimateGas({ from: 'address' }, new BigNumber(0), (err: Error, ret: string) => {})
-// $ExpectType Promise<number>
+// $ExpectType Promise<string>
 rpc.klay.estimateGas({ from: 'address' }, new BN(0), (err: Error, ret: string) => {})
-// $ExpectType Promise<number>
+// $ExpectType Promise<string>
 rpc.klay.estimateGas({ from: 'address' }, 'genesis', (err: Error, ret: string) => {})
-// $ExpectType Promise<number>
+// $ExpectType Promise<string>
 rpc.klay.estimateGas({ from: 'address' }, 'latest', (err: Error, ret: string) => {})
-// $ExpectType Promise<number>
+// $ExpectType Promise<string>
 rpc.klay.estimateGas({ from: 'address' }, 'hash', (err: Error, ret: string) => {})
 
 // $ExpectType Promise<string>
