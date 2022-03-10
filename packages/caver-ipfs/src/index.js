@@ -19,7 +19,7 @@
 
 const lodash = require('lodash')
 const fs = require('fs')
-const { create } = require('ipfs-http-client')
+const ipfsClient = require('ipfs-http-client')
 const multihash = require('multihashes')
 
 /**
@@ -54,7 +54,7 @@ class IPFS {
      */
     setIPFSNode(host, port, ssl) {
         const protocol = ssl ? 'https' : 'http'
-        this.ipfs = create({ host, port, protocol })
+        this.ipfs = ipfsClient({ host, port, protocol })
     }
 
     /**
