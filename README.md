@@ -1,8 +1,10 @@
+# caver-js
+
+[![Gitter](https://badges.gitter.im/klaytn/Caver-js.svg)](https://gitter.im/klaytn/Caver-js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 <p align="center">
   <img src="assets/logo/caver-js.png" width="200" alt="caver-js" />
 </p>
-
-# caver-js
 
 caver-js is a JavaScript API library that allows developers to interact with a
 Klaytn node using a HTTP or Websocket connection.
