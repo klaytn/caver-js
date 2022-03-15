@@ -25,8 +25,6 @@
  * @date 2017
  */
 
-const constants = require('./constants')
-
 const hasErrorMessage = result => !!result && !!result.error && !!result.error.message
 
 const txErrorTable = {
