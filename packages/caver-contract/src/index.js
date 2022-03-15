@@ -328,7 +328,7 @@ const Contract = function Contract(jsonInterface, address, options) {
         set(value) {
             if (value) {
                 if (!utils.isValidNSHSN(value)) {
-                    throw errors.invalidGasPrice()
+                    throw new Error(`Invalid gas price: gasPrice should be number type, number string or hex string.`)
                 }
                 _this._gasPrice = value
             }

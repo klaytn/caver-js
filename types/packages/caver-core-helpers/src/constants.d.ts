@@ -14,7 +14,6 @@
 */
 
 export interface Constants {
-    VALID_GAS_PRICE: number
     ACCOUNT_UPDATE_TYPE_TAG: string
     FEE_DELEGATED_ACCOUNT_UPDATE_TYPE_TAG: string
     FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO_TYPE_TAG: string
