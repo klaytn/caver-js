@@ -51,11 +51,6 @@ const sandbox = sinon.createSandbox()
 
 before(() => {
     caver = new Caver(testRPCURL)
-    AbstractTransaction._klaytnCall = {
-        getGasPrice: () => {},
-        getTransactionCount: () => {},
-        getChainId: () => {},
-    }
 
     sender = caver.wallet.add(caver.wallet.keyring.generate())
     testKeyring = caver.wallet.add(caver.wallet.keyring.generate())
@@ -110,11 +105,11 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
             feeRatio: 30,
         }
 
-        getGasPriceSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getGasPrice')
+        getGasPriceSpy = sandbox.stub(caver.transaction.klaytnCall, 'getGasPrice')
         getGasPriceSpy.returns('0x5d21dba00')
-        getNonceSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionCount')
+        getNonceSpy = sandbox.stub(caver.transaction.klaytnCall, 'getTransactionCount')
         getNonceSpy.returns('0x3a')
-        getChainIdSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getChainId')
+        getChainIdSpy = sandbox.stub(caver.transaction.klaytnCall, 'getChainId')
         getChainIdSpy.returns('0x7e3')
     })
 
@@ -127,81 +122,81 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
             delete transactionObj.from
 
             const expectedError = '"from" is missing'
-            expect(() => new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-002: If feeDelegatedValueTransferWithRatio not define to, return error', () => {
             delete transactionObj.to
 
             const expectedError = '"to" is missing'
-            expect(() => new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-003: If feeDelegatedValueTransferWithRatio not define value, return error', () => {
             delete transactionObj.value
 
             const expectedError = '"value" is missing'
-            expect(() => new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-004: If feeDelegatedValueTransferWithRatio not define gas, return error', () => {
             delete transactionObj.gas
 
             const expectedError = '"gas" is missing'
-            expect(() => new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-005: If feeDelegatedValueTransferWithRatio not define feeRatio, return error', () => {
             delete transactionObj.feeRatio
 
             const expectedError = '"feeRatio" is missing'
-            expect(() => new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-006: If feeDelegatedValueTransferWithRatio define from property with invalid address, return error', () => {
             transactionObj.from = 'invalid'
 
             const expectedError = `Invalid address of from: ${transactionObj.from}`
-            expect(() => new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-007: If feeDelegatedValueTransferWithRatio define feePayer property with invalid address, return error', () => {
             transactionObj.feePayer = 'invalid'
 
             const expectedError = `Invalid address of fee payer: ${transactionObj.feePayer}`
-            expect(() => new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-008: If feeDelegatedValueTransferWithRatio define to property with invalid address, return error', () => {
             transactionObj.to = 'invalid address'
 
             const expectedError = `Invalid address of to: ${transactionObj.to}`
-            expect(() => new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-527: If feeDelegatedValueTransferWithRatio define feeRatio property with invalid value, return error', () => {
             transactionObj.feeRatio = 'nonHexString'
             let expectedError = `Invalid type fo feeRatio: feeRatio should be number type or hex number string.`
-            expect(() => new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)).to.throw(expectedError)
 
             transactionObj.feeRatio = {}
-            expect(() => new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)).to.throw(expectedError)
 
             transactionObj.feeRatio = []
-            expect(() => new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)).to.throw(expectedError)
 
             transactionObj.feeRatio = 0
             expectedError = `Invalid feeRatio: feeRatio is out of range. [1, 99]`
-            expect(() => new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)).to.throw(expectedError)
 
             transactionObj.feeRatio = 100
-            expect(() => new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)).to.throw(expectedError)
 
             transactionObj.feeRatio = -1
-            expect(() => new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)).to.throw(expectedError)
 
             transactionObj.feeRatio = 101
-            expect(() => new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-009: If feeDelegatedValueTransferWithRatio define feePayerSignatures property without feePayer, return error', () => {
@@ -214,7 +209,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
             ]
 
             const expectedError = '"feePayer" is missing: feePayer must be defined with feePayerSignatures.'
-            expect(() => new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-010: If feeDelegatedValueTransferWithRatio define unnecessary property, return error', () => {
@@ -243,14 +238,14 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
                 transactionObj[unnecessaries[i].name] = unnecessaries[i].value
 
                 const expectedError = `"${unnecessaries[i].name}" cannot be used with ${caver.transaction.type.TxTypeFeeDelegatedValueTransferWithRatio} transaction`
-                expect(() => new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)).to.throw(expectedError)
+                expect(() => caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)).to.throw(expectedError)
             }
         })
     })
 
     context('feeDelegatedValueTransferWithRatio.getRLPEncoding', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-011: Returns RLP-encoded string', () => {
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(txWithExpectedValues.tx)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(txWithExpectedValues.tx)
 
             expect(tx.getRLPEncoding()).to.equal(txWithExpectedValues.rlpEncoding)
         })
@@ -258,7 +253,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-012: getRLPEncoding should throw error when nonce is undefined', () => {
             transactionObj.chainId = 2019
             transactionObj.gasPrice = '0x5d21dba00'
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
 
@@ -268,7 +263,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-013: getRLPEncoding should throw error when gasPrice is undefined', () => {
             transactionObj.chainId = 2019
             transactionObj.nonce = '0x3a'
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
 
@@ -287,7 +282,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         let tx
 
         beforeEach(() => {
-            tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             fillTransactionSpy = sandbox.spy(tx, 'fillTransaction')
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
@@ -379,7 +374,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-021: input: keyring. should throw error when from is different.', async () => {
             transactionObj.from = roleBasedKeyring.address
-            tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const expectedError = `The from address of the transaction is different with the address of the keyring to use.`
             await expect(tx.sign(sender)).to.be.rejectedWith(expectedError)
@@ -387,7 +382,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-022: input: rolebased keyring, index out of range. should throw error.', async () => {
             transactionObj.from = roleBasedKeyring.address
-            tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const expectedError = `Invalid index(10): index must be less than the length of keys(${roleBasedKeyring.keys[0].length}).`
             await expect(tx.sign(roleBasedKeyring, 10)).to.be.rejectedWith(expectedError)
@@ -405,7 +400,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         let tx
 
         beforeEach(() => {
-            tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
             tx.feePayer = sender.address
 
             fillTransactionSpy = sandbox.spy(tx, 'fillTransaction')
@@ -519,7 +514,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-031: input: rolebased keyring, index out of range. should throw error.', async () => {
             transactionObj.from = roleBasedKeyring.address
-            tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const expectedError = `Invalid index(10): index must be less than the length of keys(${roleBasedKeyring.keys[0].length}).`
             await expect(tx.signAsFeePayer(roleBasedKeyring, 10)).to.be.rejectedWith(expectedError)
@@ -537,7 +532,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         let tx
 
         beforeEach(() => {
-            tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             fillTransactionSpy = sandbox.spy(tx, 'fillTransaction')
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
@@ -600,7 +595,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-036: input: keyring. should throw error when from is different.', async () => {
             transactionObj.from = roleBasedKeyring.address
-            tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const expectedError = `The from address of the transaction is different with the address of the keyring to use.`
             await expect(tx.sign(sender)).to.be.rejectedWith(expectedError)
@@ -631,7 +626,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         let tx
 
         beforeEach(() => {
-            tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             fillTransactionSpy = sandbox.spy(tx, 'fillTransaction')
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
@@ -729,7 +724,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-045: If signatures is empty, appendSignatures append signatures in transaction', () => {
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const sig = [
                 '0x0fea',
@@ -741,7 +736,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-046: If signatures is empty, appendSignatures append signatures with two-dimensional signature array', () => {
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const sig = [
                 [
@@ -760,7 +755,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
                 '0xade9480f584fe481bf070ab758ecc010afa15debc33e1bd75af637d834073a6e',
                 '0x38160105d78cef4529d765941ad6637d8dcf6bd99310e165fee1c39fff2aa27e',
             ]
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const sig = [
                 '0x0fea',
@@ -773,7 +768,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-048: appendSignatures should append multiple signatures', () => {
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const sig = [
                 [
@@ -802,7 +797,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-049: If feePayerSignatures is empty, appendFeePayerSignatures append feePayerSignatures in transaction', () => {
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const sig = [
                 '0x0fea',
@@ -814,7 +809,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-050: If feePayerSignatures is empty, appendFeePayerSignatures append feePayerSignatures with two-dimensional signature array', () => {
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const sig = [
                 [
@@ -833,7 +828,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
                 '0xade9480f584fe481bf070ab758ecc010afa15debc33e1bd75af637d834073a6e',
                 '0x38160105d78cef4529d765941ad6637d8dcf6bd99310e165fee1c39fff2aa27e',
             ]
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const sig = [
                 '0x0fea',
@@ -846,7 +841,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-052: appendFeePayerSignatures should append multiple feePayerSignatures', () => {
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const sig = [
                 [
@@ -884,7 +879,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-053: combineSignedRawTransactions combines single signature and sets signatures in transaction', () => {
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
             const appendSignaturesSpy = sandbox.spy(tx, 'appendSignatures')
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
@@ -914,7 +909,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
                     '0x44ded5739de93803b37790bb323f5020de50850b7b7cdc9a6a2e23a29a8cc145',
                 ],
             ]
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const rlpEncodedStrings = [
                 '0x0af886018505d21dba00830f4240947b65b75d204abed71587c9e519a89277766ee1d00a9431e7c5218f810af8ad1e50bf207de0cfb5bd45261ef847f845820feaa0df06077618ef021174af72c807ac968ab6b8549ca997432df73a1fe3612ed226a052684b175ec8fb45506e6f809ec0c879afa62e5cc1e64bd91e16a58a6aa0966780c4c3018080',
@@ -955,7 +950,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-055: combineSignedRawTransactions combines single feePayerSignature and sets feePayerSignatures in transaction', () => {
             transactionObj.feePayer = '0x12dbe69692cb021bc1f161dd5abc0507bd1493ce'
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
             const appendSignaturesSpy = sandbox.spy(tx, 'appendFeePayerSignatures')
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
@@ -986,7 +981,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
                     '0x29354a82fe53b4971b745acd837e0182b7df7e03c6e77821e508669b6a0a6390',
                 ],
             ]
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const rlpEncodedStrings = [
                 '0x0af89a018505d21dba00830f4240947b65b75d204abed71587c9e519a89277766ee1d00a9431e7c5218f810af8ad1e50bf207de0cfb5bd45261ec4c30180809412dbe69692cb021bc1f161dd5abc0507bd1493cef847f845820feaa015a95b922f43aad929329b13a42c3b00760eb0cabebd19cc0c7935db7d46da9ca02e4d9aa62bc12e40405d8209abbd40b65ba90eb6ff63b4e9260180c3a17525e0',
@@ -1026,7 +1021,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-057: combineSignedRawTransactions combines multiple signatures and feePayerSignatures', () => {
-            let tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            let tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             // RLP encoding with only signatures
             const rlpEncodedStrings = [
@@ -1080,7 +1075,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
             expect(appendFeePayerSignaturesSpy).to.have.been.callCount(rlpEncodedStringsWithFeePayerSignatures.length)
 
             // combine multiple signatures and feePayerSignatures
-            tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
             const combinedWithMultiple = tx.combineSignedRawTransactions([combined])
 
             expect(combined).to.equal(combinedWithMultiple)
@@ -1089,7 +1084,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-058: If decode transaction has different values, combineSignedRawTransactions should throw error', () => {
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
             tx.value = 10000
 
             const rlpEncoded =
@@ -1106,7 +1101,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-059: getRawTransaction should call getRLPEncoding function', () => {
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(txWithExpectedValues.tx)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(txWithExpectedValues.tx)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
             const rawTransaction = tx.getRawTransaction()
@@ -1122,7 +1117,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-060: getTransactionHash should call getRLPEncoding function and return hash of RLPEncoding', () => {
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(txWithExpectedValues.tx)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(txWithExpectedValues.tx)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
             const txHash = tx.getTransactionHash()
 
@@ -1134,7 +1129,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-061: getTransactionHash should throw error when nonce is undefined', () => {
             transactionObj.chainId = 2019
             transactionObj.gasPrice = '0x5d21dba00'
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
 
@@ -1144,7 +1139,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-062: getTransactionHash should throw error when gasPrice is undefined', () => {
             transactionObj.chainId = 2019
             transactionObj.nonce = '0x3a'
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
 
@@ -1158,7 +1153,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-064: getSenderTxHash should call getRLPEncoding function and return hash of RLPEncoding', () => {
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(txWithExpectedValues.tx)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(txWithExpectedValues.tx)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
             const senderTxHash = tx.getSenderTxHash()
@@ -1171,7 +1166,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-065: getSenderTxHash should throw error when nonce is undefined', () => {
             transactionObj.chainId = 2019
             transactionObj.gasPrice = '0x5d21dba00'
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
 
@@ -1181,7 +1176,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-066: getSenderTxHash should throw error when gasPrice is undefined', () => {
             transactionObj.chainId = 2019
             transactionObj.nonce = '0x3a'
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
 
@@ -1195,7 +1190,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-068: getRLPEncodingForSignature should return RLP-encoded transaction string for signing', () => {
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(txWithExpectedValues.tx)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(txWithExpectedValues.tx)
 
             const commonRLPForSigningSpy = sandbox.spy(tx, 'getCommonRLPEncodingForSignature')
 
@@ -1208,7 +1203,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-069: getRLPEncodingForSignature should throw error when nonce is undefined', () => {
             transactionObj.gasPrice = '0x5d21dba00'
             transactionObj.chainId = 2019
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
 
@@ -1218,7 +1213,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-070: getRLPEncodingForSignature should throw error when gasPrice is undefined', () => {
             transactionObj.chainId = 2019
             transactionObj.nonce = '0x3a'
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
 
@@ -1228,7 +1223,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-071: getRLPEncodingForSignature should throw error when chainId is undefined', () => {
             transactionObj.gasPrice = '0x5d21dba00'
             transactionObj.nonce = '0x3a'
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
 
@@ -1238,7 +1233,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
 
     context('feeDelegatedValueTransferWithRatio.getCommonRLPEncodingForSignature', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-072: getRLPEncodingForSignature should return RLP-encoded transaction string for signing', () => {
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(txWithExpectedValues.tx)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(txWithExpectedValues.tx)
 
             const commonRLPForSign = tx.getCommonRLPEncodingForSignature()
             const decoded = RLP.decode(txWithExpectedValues.rlpEncodingForSigning)
@@ -1251,7 +1246,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-073: fillTransaction should call klay_getGasPrice to fill gasPrice when gasPrice is undefined', async () => {
             transactionObj.nonce = '0x3a'
             transactionObj.chainId = 2019
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             await tx.fillTransaction()
             expect(getGasPriceSpy).to.have.been.calledOnce
@@ -1262,7 +1257,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-074: fillTransaction should call klay_getTransactionCount to fill nonce when nonce is undefined', async () => {
             transactionObj.gasPrice = '0x5d21dba00'
             transactionObj.chainId = 2019
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             await tx.fillTransaction()
             expect(getGasPriceSpy).not.to.have.been.calledOnce
@@ -1273,7 +1268,7 @@ describe('TxTypeFeeDelegatedValueTransferWithRatio', () => {
         it('CAVERJS-UNIT-TRANSACTIONFDR-075: fillTransaction should call klay_getChainid to fill chainId when chainId is undefined', async () => {
             transactionObj.gasPrice = '0x5d21dba00'
             transactionObj.nonce = '0x3a'
-            const tx = new caver.transaction.feeDelegatedValueTransferWithRatio(transactionObj)
+            const tx = caver.transaction.feeDelegatedValueTransferWithRatio.create(transactionObj)
 
             await tx.fillTransaction()
             expect(getGasPriceSpy).not.to.have.been.calledOnce

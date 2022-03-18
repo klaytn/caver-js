@@ -54,20 +54,22 @@ class ChainDataAnchoring extends AbstractTransaction {
      * @param {object|string} createTxObj - The parameters to create a ChainDataAnchoring transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                                      The object can define `from`, `nonce`, `gas`, `gasPrice`, `input`, `signatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {ChainDataAnchoring}
      */
-    static create(createTxObj) {
-        return new ChainDataAnchoring(createTxObj)
+    static create(createTxObj, klaytnCall) {
+        return new ChainDataAnchoring(createTxObj, klaytnCall)
     }
 
     /**
      * decodes the RLP-encoded string and returns a ChainDataAnchoring transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded chain data anchoring transaction.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {ChainDataAnchoring}
      */
-    static decode(rlpEncoded) {
-        return new ChainDataAnchoring(_decode(rlpEncoded))
+    static decode(rlpEncoded, klaytnCall) {
+        return new ChainDataAnchoring(_decode(rlpEncoded), klaytnCall)
     }
 
     /**
@@ -76,10 +78,11 @@ class ChainDataAnchoring extends AbstractTransaction {
      * @param {object|string} createTxObj - The parameters to create a ChainDataAnchoring transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                                      The object can define `from`, `nonce`, `gas`, `gasPrice`, `input`, `signatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      */
-    constructor(createTxObj) {
+    constructor(createTxObj, klaytnCall) {
         if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
-        super(TX_TYPE_STRING.TxTypeChainDataAnchoring, createTxObj)
+        super(TX_TYPE_STRING.TxTypeChainDataAnchoring, createTxObj, klaytnCall)
 
         if (createTxObj.input && createTxObj.data)
             throw new Error(`'input' and 'data' properties cannot be defined at the same time, please use either 'input' or 'data'.`)
@@ -170,9 +173,9 @@ class ChainDataAnchoring extends AbstractTransaction {
      */
     async fillTransaction() {
         const [chainId, gasPrice, nonce] = await Promise.all([
-            isNot(this.chainId) ? AbstractTransaction.getChainId() : this.chainId,
-            isNot(this.gasPrice) ? AbstractTransaction.getGasPrice() : this.gasPrice,
-            isNot(this.nonce) ? AbstractTransaction.getNonce(this.from) : this.nonce,
+            isNot(this.chainId) ? this.getChainId() : this.chainId,
+            isNot(this.gasPrice) ? this.getGasPrice() : this.gasPrice,
+            isNot(this.nonce) ? this.getNonce(this.from) : this.nonce,
         ])
 
         this.chainId = chainId

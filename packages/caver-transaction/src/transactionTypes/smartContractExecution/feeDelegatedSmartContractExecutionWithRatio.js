@@ -63,20 +63,22 @@ class FeeDelegatedSmartContractExecutionWithRatio extends AbstractFeeDelegatedWi
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                               The object can define `from`, `to`, `value`, `input`, `nonce`, `gas`,
      *                               `gasPrice`, `feeRatio`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {FeeDelegatedSmartContractExecutionWithRatio}
      */
-    static create(createTxObj) {
-        return new FeeDelegatedSmartContractExecutionWithRatio(createTxObj)
+    static create(createTxObj, klaytnCall) {
+        return new FeeDelegatedSmartContractExecutionWithRatio(createTxObj, klaytnCall)
     }
 
     /**
      * decodes the RLP-encoded string and returns a FeeDelegatedSmartContractExecutionWithRatio transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded fee delegated smart contract execution with ratio transaction.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {FeeDelegatedSmartContractExecutionWithRatio}
      */
-    static decode(rlpEncoded) {
-        return new FeeDelegatedSmartContractExecutionWithRatio(_decode(rlpEncoded))
+    static decode(rlpEncoded, klaytnCall) {
+        return new FeeDelegatedSmartContractExecutionWithRatio(_decode(rlpEncoded), klaytnCall)
     }
 
     /**
@@ -86,10 +88,11 @@ class FeeDelegatedSmartContractExecutionWithRatio extends AbstractFeeDelegatedWi
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                               The object can define `from`, `to`, `value`, `input`, `nonce`, `gas`,
      *                               `gasPrice`, `feeRatio`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      */
-    constructor(createTxObj) {
+    constructor(createTxObj, klaytnCall) {
         if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
-        super(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio, createTxObj)
+        super(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio, createTxObj, klaytnCall)
         this.to = createTxObj.to
         this.value = createTxObj.value || '0x0'
 
@@ -226,9 +229,9 @@ class FeeDelegatedSmartContractExecutionWithRatio extends AbstractFeeDelegatedWi
      */
     async fillTransaction() {
         const [chainId, gasPrice, nonce] = await Promise.all([
-            isNot(this.chainId) ? AbstractTransaction.getChainId() : this.chainId,
-            isNot(this.gasPrice) ? AbstractTransaction.getGasPrice() : this.gasPrice,
-            isNot(this.nonce) ? AbstractTransaction.getNonce(this.from) : this.nonce,
+            isNot(this.chainId) ? this.getChainId() : this.chainId,
+            isNot(this.gasPrice) ? this.getGasPrice() : this.gasPrice,
+            isNot(this.nonce) ? this.getNonce(this.from) : this.nonce,
         ])
 
         this.chainId = chainId

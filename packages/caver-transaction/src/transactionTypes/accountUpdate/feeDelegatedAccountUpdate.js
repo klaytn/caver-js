@@ -59,22 +59,24 @@ class FeeDelegatedAccountUpdate extends AbstractFeeDelegatedTransaction {
      * @param {object|string} createTxObj - The parameters to create a FeeDelegatedAccountUpdate transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                               The object can define `from`, `account`, `nonce`, `gas`, `gasPrice`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {FeeDelegatedAccountUpdate}
      */
-    static create(createTxObj) {
-        return new FeeDelegatedAccountUpdate(createTxObj)
+    static create(createTxObj, klaytnCall) {
+        return new FeeDelegatedAccountUpdate(createTxObj, klaytnCall)
     }
 
     /**
      * decodes the RLP-encoded string and returns a FeeDelegatedAccountUpdate transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded fee delegated account update transaction.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {FeeDelegatedAccountUpdate}
      */
-    static decode(rlpEncoded) {
+    static decode(rlpEncoded, klaytnCall) {
         const decoded = _decode(rlpEncoded)
         decoded.account = Account.createFromRLPEncoding(decoded.from, decoded.rlpEncodedKey)
-        return new FeeDelegatedAccountUpdate(decoded)
+        return new FeeDelegatedAccountUpdate(decoded, klaytnCall)
     }
 
     /**
@@ -83,14 +85,15 @@ class FeeDelegatedAccountUpdate extends AbstractFeeDelegatedTransaction {
      * @param {object|string} createTxObj - The parameters to create a FeeDelegatedAccountUpdate transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                               The object can define `from`, `account`, `nonce`, `gas`, `gasPrice`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      */
-    constructor(createTxObj) {
+    constructor(createTxObj, klaytnCall) {
         if (_.isString(createTxObj)) {
             createTxObj = _decode(createTxObj)
             createTxObj.account = Account.createFromRLPEncoding(createTxObj.from, createTxObj.rlpEncodedKey)
         }
 
-        super(TX_TYPE_STRING.TxTypeFeeDelegatedAccountUpdate, createTxObj)
+        super(TX_TYPE_STRING.TxTypeFeeDelegatedAccountUpdate, createTxObj, klaytnCall)
         this.account = createTxObj.account
         if (createTxObj.gasPrice !== undefined) this.gasPrice = createTxObj.gasPrice
     }
@@ -183,9 +186,9 @@ class FeeDelegatedAccountUpdate extends AbstractFeeDelegatedTransaction {
      */
     async fillTransaction() {
         const [chainId, gasPrice, nonce] = await Promise.all([
-            isNot(this.chainId) ? AbstractTransaction.getChainId() : this.chainId,
-            isNot(this.gasPrice) ? AbstractTransaction.getGasPrice() : this.gasPrice,
-            isNot(this.nonce) ? AbstractTransaction.getNonce(this.from) : this.nonce,
+            isNot(this.chainId) ? this.getChainId() : this.chainId,
+            isNot(this.gasPrice) ? this.getGasPrice() : this.gasPrice,
+            isNot(this.nonce) ? this.getNonce(this.from) : this.nonce,
         ])
 
         this.chainId = chainId

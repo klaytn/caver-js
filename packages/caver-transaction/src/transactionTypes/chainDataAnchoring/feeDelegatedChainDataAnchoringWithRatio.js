@@ -60,20 +60,22 @@ class FeeDelegatedChainDataAnchoringWithRatio extends AbstractFeeDelegatedWithRa
      * @param {object|string} createTxObj - The parameters to create a FeeDelegatedChainDataAnchoringWithRatio transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                               The object can define `from`, `nonce`, `gas`, `gasPrice`, `input`, `feeRatio`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {FeeDelegatedChainDataAnchoringWithRatio}
      */
-    static create(createTxObj) {
-        return new FeeDelegatedChainDataAnchoringWithRatio(createTxObj)
+    static create(createTxObj, klaytnCall) {
+        return new FeeDelegatedChainDataAnchoringWithRatio(createTxObj, klaytnCall)
     }
 
     /**
      * decodes the RLP-encoded string and returns a FeeDelegatedChainDataAnchoringWithRatio transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded fee delegated chain data anchoring with ratio transaction.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {FeeDelegatedChainDataAnchoringWithRatio}
      */
-    static decode(rlpEncoded) {
-        return new FeeDelegatedChainDataAnchoringWithRatio(_decode(rlpEncoded))
+    static decode(rlpEncoded, klaytnCall) {
+        return new FeeDelegatedChainDataAnchoringWithRatio(_decode(rlpEncoded), klaytnCall)
     }
 
     /**
@@ -82,10 +84,11 @@ class FeeDelegatedChainDataAnchoringWithRatio extends AbstractFeeDelegatedWithRa
      * @param {object|string} createTxObj - The parameters to create a FeeDelegatedChainDataAnchoringWithRatio transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                               The object can define `from`, `nonce`, `gas`, `gasPrice`, `input`, `feeRatio`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      */
-    constructor(createTxObj) {
+    constructor(createTxObj, klaytnCall) {
         if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
-        super(TX_TYPE_STRING.TxTypeFeeDelegatedChainDataAnchoringWithRatio, createTxObj)
+        super(TX_TYPE_STRING.TxTypeFeeDelegatedChainDataAnchoringWithRatio, createTxObj, klaytnCall)
 
         if (createTxObj.input && createTxObj.data)
             throw new Error(`'input' and 'data' properties cannot be defined at the same time, please use either 'input' or 'data'.`)
@@ -181,9 +184,9 @@ class FeeDelegatedChainDataAnchoringWithRatio extends AbstractFeeDelegatedWithRa
      */
     async fillTransaction() {
         const [chainId, gasPrice, nonce] = await Promise.all([
-            isNot(this.chainId) ? AbstractTransaction.getChainId() : this.chainId,
-            isNot(this.gasPrice) ? AbstractTransaction.getGasPrice() : this.gasPrice,
-            isNot(this.nonce) ? AbstractTransaction.getNonce(this.from) : this.nonce,
+            isNot(this.chainId) ? this.getChainId() : this.chainId,
+            isNot(this.gasPrice) ? this.getGasPrice() : this.gasPrice,
+            isNot(this.nonce) ? this.getNonce(this.from) : this.nonce,
         ])
 
         this.chainId = chainId

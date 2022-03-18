@@ -362,11 +362,11 @@ class Klay {
             }),
         ]
         AbstractTransaction._klaytnCall = {}
-        Validator._klaytnCall = {}
+        this.klaytnCall = {}
         _.each(_klaytnCall, function(method) {
             method = new Method(method)
             method.attachToObject(AbstractTransaction._klaytnCall)
-            method.attachToObject(Validator._klaytnCall)
+            method.attachToObject(_this.klaytnCall)
             method.setRequestManager(_this._requestManager)
         })
 

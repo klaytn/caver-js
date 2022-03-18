@@ -71,10 +71,11 @@ class EthereumDynamicFee extends AbstractTransaction {
      * @param {object|string} createTxObj - The parameters to create a EthereumDynamicFee transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                                      The object can define `from`, `to`, `value`, `input`, `nonce`, `gas`, `maxPriorityFeePerGas`, `maxFeePerGas`, `accessList` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {EthereumDynamicFee}
      */
-    static create(createTxObj) {
-        return new EthereumDynamicFee(createTxObj)
+    static create(createTxObj, klaytnCall) {
+        return new EthereumDynamicFee(createTxObj, klaytnCall)
     }
 
     /**
@@ -84,12 +85,13 @@ class EthereumDynamicFee extends AbstractTransaction {
      * const tx = caver.transaction.ethereumDynamicFee.decode('0x{rlp encoded data}')
      *
      * @param {string} rlpEncoded The RLP-encoded ethereum dynamic fee transaction.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {EthereumDynamicFee}
      */
-    static decode(rlpEncoded) {
+    static decode(rlpEncoded, klaytnCall) {
         const decoded = _decode(rlpEncoded)
         decoded.accessList = AccessList.decode(decoded.encodedAccessList)
-        return new EthereumDynamicFee(decoded)
+        return new EthereumDynamicFee(decoded, klaytnCall)
     }
 
     /**
@@ -98,13 +100,14 @@ class EthereumDynamicFee extends AbstractTransaction {
      * @param {object|string} createTxObj - The parameters to create a EthereumDynamicFee transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                                      The object can define `from`, `to`, `value`, `input`, `nonce`, `gas`, `maxPriorityFeePerGas`, `maxFeePerGas`, `accessList` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      */
-    constructor(createTxObj) {
+    constructor(createTxObj, klaytnCall) {
         if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
 
         createTxObj.from = createTxObj.from || '0x0000000000000000000000000000000000000000'
 
-        super(TX_TYPE_STRING.TxTypeEthereumDynamicFee, createTxObj)
+        super(TX_TYPE_STRING.TxTypeEthereumDynamicFee, createTxObj, klaytnCall)
         this.to = createTxObj.to || '0x'
 
         if (createTxObj.input && createTxObj.data)
@@ -388,10 +391,10 @@ class EthereumDynamicFee extends AbstractTransaction {
         const isNotMaxPriorityFeePerGas = isNot(this.maxPriorityFeePerGas)
         const isNotMaxFeePerGas = isNot(this.maxFeePerGas)
         const [chainId, maxPriorityFeePerGas, nonce, baseFee] = await Promise.all([
-            isNot(this.chainId) ? AbstractTransaction.getChainId() : this.chainId,
-            isNotMaxPriorityFeePerGas ? AbstractTransaction.getMaxPriorityFeePerGas() : this.maxPriorityFeePerGas,
-            isNot(this.nonce) ? AbstractTransaction.getNonce(this.from) : this.nonce,
-            isNotMaxPriorityFeePerGas || isNotMaxFeePerGas ? AbstractTransaction.getBaseFee() : undefined,
+            isNot(this.chainId) ? this.getChainId() : this.chainId,
+            isNotMaxPriorityFeePerGas ? this.getMaxPriorityFeePerGas() : this.maxPriorityFeePerGas,
+            isNot(this.nonce) ? this.getNonce(this.from) : this.nonce,
+            isNotMaxPriorityFeePerGas || isNotMaxFeePerGas ? this.getBaseFee() : undefined,
         ])
 
         this.chainId = chainId

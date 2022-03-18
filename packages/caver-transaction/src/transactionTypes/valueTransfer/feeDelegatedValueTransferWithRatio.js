@@ -61,20 +61,22 @@ class FeeDelegatedValueTransferWithRatio extends AbstractFeeDelegatedWithRatioTr
      * @param {object|string} createTxObj - The parameters to create a FeeDelegatedValueTransferWithRatio transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                               The object can define `from`, `to`, `value`, `nonce`, `gas`, `gasPrice`, `feeRatio`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {FeeDelegatedValueTransferWithRatio}
      */
-    static create(createTxObj) {
-        return new FeeDelegatedValueTransferWithRatio(createTxObj)
+    static create(createTxObj, klaytnCall) {
+        return new FeeDelegatedValueTransferWithRatio(createTxObj, klaytnCall)
     }
 
     /**
      * decodes the RLP-encoded string and returns a FeeDelegatedValueTransferWithRatio transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded fee delegated value transfer with ratio transaction.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {FeeDelegatedValueTransferWithRatio}
      */
-    static decode(rlpEncoded) {
-        return new FeeDelegatedValueTransferWithRatio(_decode(rlpEncoded))
+    static decode(rlpEncoded, klaytnCall) {
+        return new FeeDelegatedValueTransferWithRatio(_decode(rlpEncoded), klaytnCall)
     }
 
     /**
@@ -83,10 +85,11 @@ class FeeDelegatedValueTransferWithRatio extends AbstractFeeDelegatedWithRatioTr
      * @param {object|string} createTxObj - The parameters to create a FeeDelegatedValueTransferWithRatio transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                               The object can define `from`, `to`, `value`, `nonce`, `gas`, `gasPrice`, `feeRatio`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      */
-    constructor(createTxObj) {
+    constructor(createTxObj, klaytnCall) {
         if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
-        super(TX_TYPE_STRING.TxTypeFeeDelegatedValueTransferWithRatio, createTxObj)
+        super(TX_TYPE_STRING.TxTypeFeeDelegatedValueTransferWithRatio, createTxObj, klaytnCall)
         this.to = createTxObj.to
         this.value = createTxObj.value
 
@@ -193,9 +196,9 @@ class FeeDelegatedValueTransferWithRatio extends AbstractFeeDelegatedWithRatioTr
      */
     async fillTransaction() {
         const [chainId, gasPrice, nonce] = await Promise.all([
-            isNot(this.chainId) ? AbstractTransaction.getChainId() : this.chainId,
-            isNot(this.gasPrice) ? AbstractTransaction.getGasPrice() : this.gasPrice,
-            isNot(this.nonce) ? AbstractTransaction.getNonce(this.from) : this.nonce,
+            isNot(this.chainId) ? this.getChainId() : this.chainId,
+            isNot(this.gasPrice) ? this.getGasPrice() : this.gasPrice,
+            isNot(this.nonce) ? this.getNonce(this.from) : this.nonce,
         ])
 
         this.chainId = chainId

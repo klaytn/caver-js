@@ -17,6 +17,8 @@
 */
 
 const LegacyTransaction = require('./transactionTypes/legacyTransaction/legacyTransaction')
+const EthereumAccessList = require('./transactionTypes/ethereumTypedTransaction/ethereumAccessList')
+const EthereumDynamicFee = require('./transactionTypes/ethereumTypedTransaction/ethereumDynamicFee')
 const ValueTransfer = require('./transactionTypes/valueTransfer/valueTransfer')
 const FeeDelegatedValueTransfer = require('./transactionTypes/valueTransfer/feeDelegatedValueTransfer')
 const FeeDelegatedValueTransferWithRatio = require('./transactionTypes/valueTransfer/feeDelegatedValueTransferWithRatio')
@@ -38,409 +40,255 @@ const FeeDelegatedCancelWithRatio = require('./transactionTypes/cancel/feeDelega
 const ChainDataAnchoring = require('./transactionTypes/chainDataAnchoring/chainDataAnchoring')
 const FeeDelegatedChainDataAnchoring = require('./transactionTypes/chainDataAnchoring/feeDelegatedChainDataAnchoring')
 const FeeDelegatedChainDataAnchoringWithRatio = require('./transactionTypes/chainDataAnchoring/feeDelegatedChainDataAnchoringWithRatio')
+const LegacyTransactionWrapper = require('./transactionTypes/wrappers/legacyTransactionWrapper')
+const EthereumAccessListWrapper = require('./transactionTypes/wrappers/ethereumAccessListWrapper')
+const EthereumDynamicFeeWrapper = require('./transactionTypes/wrappers/ethereumDynamicFeeWrapper')
+const ValueTransferWrapper = require('./transactionTypes/wrappers/valueTransferWrapper')
+const FeeDelegatedValueTransferWrapper = require('./transactionTypes/wrappers/feeDelegatedValueTransferWrapper')
+const FeeDelegatedValueTransferWithRatioWrapper = require('./transactionTypes/wrappers/feeDelegatedValueTransferWithRatioWrapper')
+const ValueTransferMemoWrapper = require('./transactionTypes/wrappers/valueTransferMemoWrapper')
+const FeeDelegatedValueTransferMemoWrapper = require('./transactionTypes/wrappers/feeDelegatedValueTransferMemoWrapper')
+const FeeDelegatedValueTransferMemoWithRatioWrapper = require('./transactionTypes/wrappers/feeDelegatedValueTransferMemoWithRatioWrapper')
+const AccountUpdateWrapper = require('./transactionTypes/wrappers/accountUpdateWrapper')
+const FeeDelegatedAccountUpdateWrapper = require('./transactionTypes/wrappers/feeDelegatedAccountUpdateWrapper')
+const FeeDelegatedAccountUpdateWithRatioWrapper = require('./transactionTypes/wrappers/feeDelegatedAccountUpdateWithRatioWrapper')
+const SmartContractDeployWrapper = require('./transactionTypes/wrappers/smartContractDeployWrapper')
+const FeeDelegatedSmartContractDeployWrapper = require('./transactionTypes/wrappers/feeDelegatedSmartContractDeployWrapper')
+const FeeDelegatedSmartContractDeployWithRatioWrapper = require('./transactionTypes/wrappers/feeDelegatedSmartContractDeployWithRatioWrapper')
+const SmartContractExecutionWrapper = require('./transactionTypes/wrappers/smartContractExecutionWrapper')
+const FeeDelegatedSmartContractExecutionWrapper = require('./transactionTypes/wrappers/feeDelegatedSmartContractExecutionWrapper')
+const FeeDelegatedSmartContractExecutionWithRatioWrapper = require('./transactionTypes/wrappers/feeDelegatedSmartContractExecutionWithRatioWrapper')
+const CancelWrapper = require('./transactionTypes/wrappers/cancelWrapper')
+const FeeDelegatedCancelWrapper = require('./transactionTypes/wrappers/feeDelegatedCancelWrapper')
+const FeeDelegatedCancelWithRatioWrapper = require('./transactionTypes/wrappers/feeDelegatedCancelWithRatioWrapper')
+const ChainDataAnchoringWrapper = require('./transactionTypes/wrappers/chainDataAnchoringWrapper')
+const FeeDelegatedChainDataAnchoringWrapper = require('./transactionTypes/wrappers/feeDelegatedChainDataAnchoringWrapper')
+const FeeDelegatedChainDataAnchoringWithRatioWrapper = require('./transactionTypes/wrappers/feeDelegatedChainDataAnchoringWithRatioWrapper')
 const TransactionDecoder = require('./transactionDecoder/transactionDecoder')
 const AbstractTransaction = require('./transactionTypes/abstractTransaction')
 const { TX_TYPE_STRING, TX_TYPE_TAG } = require('./transactionHelper/transactionHelper')
 const Account = require('../../caver-account')
 const AbstractFeeDelegatedTransaction = require('./transactionTypes/abstractFeeDelegatedTransaction')
-const EthereumAccessList = require('./transactionTypes/ethereumTypedTransaction/ethereumAccessList')
 const AccessList = require('./utils/accessList')
 const AccessTuple = require('./utils/accessTuple')
-const EthereumDynamicFee = require('./transactionTypes/ethereumTypedTransaction/ethereumDynamicFee')
-
-/** @module Transaction */
 
 /**
- * @typedef {LegacyTransaction|ValueTransfer|FeeDelegatedValueTransfer|FeeDelegatedValueTransferWithRatio|ValueTransferMemo|FeeDelegatedValueTransferMemo|FeeDelegatedValueTransferMemoWithRatio|AccountUpdate|FeeDelegatedAccountUpdate|FeeDelegatedAccountUpdateWithRatio|SmartContractDeploy|FeeDelegatedSmartContractDeploy|FeeDelegatedSmartContractDeployWithRatio|SmartContractExecution|FeeDelegatedSmartContractExecution|FeeDelegatedSmartContractExecution|FeeDelegatedSmartContractExecutionWithRatio|Cancel|FeeDelegatedCancel|FeeDelegatedCancelWithRatio|ChainDataAnchoring|FeeDelegatedChainDataAnchoring|FeeDelegatedChainDataAnchoringWithRatio|EthereumAccessList} module:Transaction.Transaction
+ * @typedef {LegacyTransaction|ValueTransfer|FeeDelegatedValueTransfer|FeeDelegatedValueTransferWithRatio|ValueTransferMemo|FeeDelegatedValueTransferMemo|FeeDelegatedValueTransferMemoWithRatio|AccountUpdate|FeeDelegatedAccountUpdate|FeeDelegatedAccountUpdateWithRatio|SmartContractDeploy|FeeDelegatedSmartContractDeploy|FeeDelegatedSmartContractDeployWithRatio|SmartContractExecution|FeeDelegatedSmartContractExecution|FeeDelegatedSmartContractExecution|FeeDelegatedSmartContractExecutionWithRatio|Cancel|FeeDelegatedCancel|FeeDelegatedCancelWithRatio|ChainDataAnchoring|FeeDelegatedChainDataAnchoring|FeeDelegatedChainDataAnchoringWithRatio|EthereumAccessList|EthereumDynamicFee} module:Transaction.Transaction
  */
 /**
  * @typedef {FeeDelegatedValueTransfer|FeeDelegatedValueTransferWithRatio|FeeDelegatedValueTransferMemo|FeeDelegatedValueTransferMemoWithRatio|FeeDelegatedAccountUpdate|FeeDelegatedAccountUpdateWithRatio|FeeDelegatedSmartContractDeploy|FeeDelegatedSmartContractDeployWithRatio|FeeDelegatedSmartContractExecution|FeeDelegatedSmartContractExecution|FeeDelegatedSmartContractExecutionWithRatio|FeeDelegatedCancel|FeeDelegatedCancelWithRatio|FeeDelegatedChainDataAnchoring|FeeDelegatedChainDataAnchoringWithRatio} module:Transaction.FeeDelegatedTransaction
  */
-/**
- * Querys transaction from Klaytn and converts to a caver transaction instance.
- * If it fails to receive a transaction from Klaytn, an error is thrown.
- *
- * @example
- * const txObject = await caver.transaction.getTransactionByHash('0x{transaction hash}')
- *
- * @method getTransactionByHash
- * @param  {string} transactionHash The transaction hash string to query from Klaytn.
- * @return {Promise<AbstractTransaction>}
- */
-async function getTransactionByHash(transactionHash) {
-    let txObject = await AbstractTransaction._klaytnCall.getTransactionByHash(transactionHash)
-    if (txObject === null) throw new Error(`Failed to get transaction from Klaytn with '${transactionHash}'.`)
-
-    // AccountUpdate transaction received from Klaytn defines encodedAccountKey string in `key` field.
-    // This needs to be formatted according to the caver transaction format (`account` field).
-    if (txObject.key) {
-        const account = Account.createFromRLPEncoding(txObject.from, txObject.key)
-        txObject.account = account
-        delete txObject.key
-    }
-
-    switch (txObject.type) {
-        case 'TxTypeLegacyTransaction':
-            txObject = new LegacyTransaction(txObject)
-            break
-        case 'TxTypeValueTransfer':
-            txObject = new ValueTransfer(txObject)
-            break
-        case 'TxTypeFeeDelegatedValueTransfer':
-            txObject = new FeeDelegatedValueTransfer(txObject)
-            break
-        case 'TxTypeFeeDelegatedValueTransferWithRatio':
-            txObject = new FeeDelegatedValueTransferWithRatio(txObject)
-            break
-        case 'TxTypeValueTransferMemo':
-            txObject = new ValueTransferMemo(txObject)
-            break
-        case 'TxTypeFeeDelegatedValueTransferMemo':
-            txObject = new FeeDelegatedValueTransferMemo(txObject)
-            break
-        case 'TxTypeFeeDelegatedValueTransferMemoWithRatio':
-            txObject = new FeeDelegatedValueTransferMemoWithRatio(txObject)
-            break
-        case 'TxTypeAccountUpdate':
-            txObject = new AccountUpdate(txObject)
-            break
-        case 'TxTypeFeeDelegatedAccountUpdate':
-            txObject = new FeeDelegatedAccountUpdate(txObject)
-            break
-        case 'TxTypeFeeDelegatedAccountUpdateWithRatio':
-            txObject = new FeeDelegatedAccountUpdateWithRatio(txObject)
-            break
-        case 'TxTypeSmartContractDeploy':
-            txObject = new SmartContractDeploy(txObject)
-            break
-        case 'TxTypeFeeDelegatedSmartContractDeploy':
-            txObject = new FeeDelegatedSmartContractDeploy(txObject)
-            break
-        case 'TxTypeFeeDelegatedSmartContractDeployWithRatio':
-            txObject = new FeeDelegatedSmartContractDeployWithRatio(txObject)
-            break
-        case 'TxTypeSmartContractExecution':
-            txObject = new SmartContractExecution(txObject)
-            break
-        case 'TxTypeFeeDelegatedSmartContractExecution':
-            txObject = new FeeDelegatedSmartContractExecution(txObject)
-            break
-        case 'TxTypeFeeDelegatedSmartContractExecutionWithRatio':
-            txObject = new FeeDelegatedSmartContractExecutionWithRatio(txObject)
-            break
-        case 'TxTypeCancel':
-            txObject = new Cancel(txObject)
-            break
-        case 'TxTypeFeeDelegatedCancel':
-            txObject = new FeeDelegatedCancel(txObject)
-            break
-        case 'TxTypeFeeDelegatedCancelWithRatio':
-            txObject = new FeeDelegatedCancelWithRatio(txObject)
-            break
-        case 'TxTypeChainDataAnchoring':
-            txObject = new ChainDataAnchoring(txObject)
-            break
-        case 'TxTypeFeeDelegatedChainDataAnchoring':
-            txObject = new FeeDelegatedChainDataAnchoring(txObject)
-            break
-        case 'TxTypeFeeDelegatedChainDataAnchoringWithRatio':
-            txObject = new FeeDelegatedChainDataAnchoringWithRatio(txObject)
-            break
-        case 'TxTypeEthereumAccessList':
-            txObject = new EthereumAccessList(txObject)
-            break
-        case 'TxTypeEthereumDynamicFee':
-            txObject = new EthereumDynamicFee(txObject)
-            break
-    }
-    return txObject
-}
 
 /**
- * Recovers the public key strings from `signatures` field.
- * If you want to derive an address from public key, please use `caver.utils.publicKeyToAddress`.
- *
- * @example
- * const publicKey = caver.transaction.recoverPublicKeys('0x{RLP-encoded transaction string}')
- *
- * @method recoverPublicKeys
- * @param  {string} rawTx The RLP-encoded transaction string to recover public keys from `signatures`.
- * @return {Array.<string>}
+ * A class that manages instances of the transaction wrapper and other functions provided by the transaction module.
+ * @class
+ * @hideconstructor
  */
-function recoverPublicKeys(rawTx) {
-    const tx = TransactionDecoder.decode(rawTx)
-    return tx.recoverPublicKeys()
-}
-
-/**
- * Recovers the public key strings from `feePayerSignatures` field.
- * If you want to derive an address from public key, please use `caver.utils.publicKeyToAddress`.
- *
- * @example
- * const publicKey = caver.transaction.recoverFeePayerPublicKeys()
- *
- * @method recoverFeePayerPublicKeys
- * @param  {string} rawTx The RLP-encoded transaction string to recover public keys from `feePayerSignatures`.
- * @return {Array.<string>}
- */
-function recoverFeePayerPublicKeys(rawTx) {
-    const tx = TransactionDecoder.decode(rawTx)
-    if (!(tx instanceof AbstractFeeDelegatedTransaction))
-        throw new Error(
-            'The `caver.transaction.recoverFeePayerPublicKeys` function can only use with fee delegation transaction. For basic transactions, use `caver.transaction.recoverPublicKeys`.'
-        )
-    return tx.recoverFeePayerPublicKeys()
-}
-
-module.exports = {
-    decode: TransactionDecoder.decode,
-    getTransactionByHash: getTransactionByHash,
-    recoverPublicKeys: recoverPublicKeys,
-    recoverFeePayerPublicKeys: recoverFeePayerPublicKeys,
-
+class TransactionModule {
     /**
-     * The LegacyTransaction class.
+     * Creates a TransactionModule.
      *
-     * @example
-     * caver.transaction.legacyTransaction
-     *
-     * @type {typeof LegacyTransaction}
-     * */
-    legacyTransaction: LegacyTransaction,
-
-    /**
-     * The ValueTransfer class.
-     *
-     * @example
-     * caver.transaction.valueTransfer
-     *
-     * @type {typeof ValueTransfer}
-     * */
-    valueTransfer: ValueTransfer,
-    /**
-     * The FeeDelegatedValueTransfer class.
-     *
-     * @example
-     * caver.transaction.feeDelegatedValueTransfer
-     *
-     * @type {typeof FeeDelegatedValueTransfer}
-     * */
-    feeDelegatedValueTransfer: FeeDelegatedValueTransfer,
-    /**
-     * The FeeDelegatedValueTransferWithRatio class.
-     *
-     * @example
-     * caver.transaction.feeDelegatedValueTransferWithRatio
-     *
-     * @type {typeof FeeDelegatedValueTransferWithRatio}
-     * */
-    feeDelegatedValueTransferWithRatio: FeeDelegatedValueTransferWithRatio,
-
-    /**
-     * The ValueTransferMemo class.
-     *
-     * @example
-     * caver.transaction.valueTransferMemo
-     *
-     * @type {typeof ValueTransferMemo}
-     * */
-    valueTransferMemo: ValueTransferMemo,
-    /**
-     * The FeeDelegatedValueTransferMemo class.
-     *
-     * @example
-     * caver.transaction.feeDelegatedValueTransferMemo
-     *
-     * @type {typeof FeeDelegatedValueTransferMemo}
-     * */
-    feeDelegatedValueTransferMemo: FeeDelegatedValueTransferMemo,
-    /**
-     * The FeeDelegatedValueTransferMemoWithRatio class.
-     *
-     * @example
-     * caver.transaction.feeDelegatedValueTransferMemoWithRatio
-     *
-     * @type {typeof FeeDelegatedValueTransferMemoWithRatio}
-     * */
-    feeDelegatedValueTransferMemoWithRatio: FeeDelegatedValueTransferMemoWithRatio,
-
-    /**
-     * The AccountUpdate class.
-     *
-     * @example
-     * caver.transaction.accountUpdate
-     *
-     * @type {typeof AccountUpdate}
-     * */
-    accountUpdate: AccountUpdate,
-    /**
-     * The FeeDelegatedAccountUpdate class.
-     *
-     * @example
-     * caver.transaction.feeDelegatedAccountUpdate
-     *
-     * @type {typeof FeeDelegatedAccountUpdate}
-     * */
-    feeDelegatedAccountUpdate: FeeDelegatedAccountUpdate,
-    /**
-     * The FeeDelegatedAccountUpdateWithRatio class.
-     *
-     * @example
-     * caver.transaction.feeDelegatedAccountUpdateWithRatio
-     *
-     * @type {typeof FeeDelegatedAccountUpdateWithRatio}
-     * */
-    feeDelegatedAccountUpdateWithRatio: FeeDelegatedAccountUpdateWithRatio,
-
-    /**
-     * The SmartContractDeploy class.
-     *
-     * @example
-     * caver.transaction.smartContractDeploy
-     *
-     * @type {typeof SmartContractDeploy}
-     * */
-    smartContractDeploy: SmartContractDeploy,
-    /**
-     * The FeeDelegatedSmartContractDeploy class.
-     *
-     * @example
-     * caver.transaction.feeDelegatedSmartContractDeploy
-     *
-     * @type {typeof FeeDelegatedSmartContractDeploy}
-     * */
-    feeDelegatedSmartContractDeploy: FeeDelegatedSmartContractDeploy,
-    /**
-     * The FeeDelegatedSmartContractDeployWithRatio class.
-     *
-     * @example
-     * caver.transaction.feeDelegatedSmartContractDeployWithRatio
-     *
-     * @type {typeof FeeDelegatedSmartContractDeployWithRatio}
-     * */
-    feeDelegatedSmartContractDeployWithRatio: FeeDelegatedSmartContractDeployWithRatio,
-
-    /**
-     * The SmartContractExecution class.
-     *
-     * @example
-     * caver.transaction.smartContractExecution
-     *
-     * @type {typeof SmartContractExecution}
-     * */
-    smartContractExecution: SmartContractExecution,
-    /**
-     * The FeeDelegatedSmartContractExecution class.
-     *
-     * @example
-     * caver.transaction.feeDelegatedSmartContractExecution
-     *
-     * @type {typeof FeeDelegatedSmartContractExecution}
-     * */
-    feeDelegatedSmartContractExecution: FeeDelegatedSmartContractExecution,
-    /**
-     * The FeeDelegatedSmartContractExecutionWithRatio class.
-     *
-     * @example
-     * caver.transaction.feeDelegatedSmartContractExecutionWithRatio
-     *
-     * @type {typeof FeeDelegatedSmartContractExecutionWithRatio}
-     * */
-    feeDelegatedSmartContractExecutionWithRatio: FeeDelegatedSmartContractExecutionWithRatio,
-
-    /**
-     * The Cancel class.
-     *
-     * @example
-     * caver.transaction.cancel
-     *
-     * @type {typeof Cancel}
-     * */
-    cancel: Cancel,
-    /**
-     * The FeeDelegatedCancel class.
-     *
-     * @example
-     * caver.transaction.feeDelegatedCancel
-     *
-     * @type {typeof FeeDelegatedCancel}
-     * */
-    feeDelegatedCancel: FeeDelegatedCancel,
-    /**
-     * The FeeDelegatedCancelWithRatio class.
-     *
-     * @example
-     * caver.transaction.feeDelegatedCancelWithRatio
-     *
-     * @type {typeof FeeDelegatedCancelWithRatio}
-     * */
-    feeDelegatedCancelWithRatio: FeeDelegatedCancelWithRatio,
-
-    /**
-     * The ChainDataAnchoring class.
-     *
-     * @example
-     * caver.transaction.chainDataAnchoring
-     *
-     * @type {typeof ChainDataAnchoring}
-     * */
-    chainDataAnchoring: ChainDataAnchoring,
-    /**
-     * The FeeDelegatedChainDataAnchoring class.
-     *
-     * @example
-     * caver.transaction.feeDelegatedChainDataAnchoring
-     *
-     * @type {typeof FeeDelegatedChainDataAnchoring}
-     * */
-    feeDelegatedChainDataAnchoring: FeeDelegatedChainDataAnchoring,
-    /**
-     * The FeeDelegatedChainDataAnchoringWithRatio class.
-     *
-     * @example
-     * caver.transaction.feeDelegatedChainDataAnchoringWithRatio
-     *
-     * @type {typeof FeeDelegatedChainDataAnchoringWithRatio}
-     * */
-    feeDelegatedChainDataAnchoringWithRatio: FeeDelegatedChainDataAnchoringWithRatio,
-    /**
-     * The EthereumAccessList class.
-     *
-     * @example
-     * caver.transaction.ethereumAccessList
-     *
-     * @type {typeof EthereumAccessList}
-     * */
-    ethereumAccessList: EthereumAccessList,
-    /**
-     * The EthereumDynamicFee class.
-     *
-     * @example
-     * caver.transaction.ethereumDynamicFee
-     *
-     * @type {typeof EthereumDynamicFee}
-     * */
-    ethereumDynamicFee: EthereumDynamicFee,
-
-    type: TX_TYPE_STRING,
-    tag: TX_TYPE_TAG,
-
-    /**
-     * A access list module that provides some classes needed for AccessList.
-     *
-     * @typedef {object} TransactionUtils
-     * @property {typeof AccessList} accessList - Class representing AccessList.
-     * @property {typeof AccessTuple} accessTuple - Class representing AccessTuple.
+     * @constructor
+     * @param {object} klaytnCall - An object includes klay rpc calls.
      */
+    constructor(klaytnCall) {
+        if (!klaytnCall) throw new Error(`Invalid constructor parameter: klaytnCall is undefined.`)
+
+        this.klaytnCall = klaytnCall
+        this.legacyTransaction = new LegacyTransactionWrapper(this.klaytnCall)
+        this.ethereumAccessList = new EthereumAccessListWrapper(this.klaytnCall)
+        this.ethereumDynamicFee = new EthereumDynamicFeeWrapper(this.klaytnCall)
+        this.valueTransfer = new ValueTransferWrapper(this.klaytnCall)
+        this.feeDelegatedValueTransfer = new FeeDelegatedValueTransferWrapper(this.klaytnCall)
+        this.feeDelegatedValueTransferWithRatio = new FeeDelegatedValueTransferWithRatioWrapper(this.klaytnCall)
+        this.valueTransferMemo = new ValueTransferMemoWrapper(this.klaytnCall)
+        this.feeDelegatedValueTransferMemo = new FeeDelegatedValueTransferMemoWrapper(this.klaytnCall)
+        this.feeDelegatedValueTransferMemoWithRatio = new FeeDelegatedValueTransferMemoWithRatioWrapper(this.klaytnCall)
+        this.accountUpdate = new AccountUpdateWrapper(this.klaytnCall)
+        this.feeDelegatedAccountUpdate = new FeeDelegatedAccountUpdateWrapper(this.klaytnCall)
+        this.feeDelegatedAccountUpdateWithRatio = new FeeDelegatedAccountUpdateWithRatioWrapper(this.klaytnCall)
+        this.smartContractDeploy = new SmartContractDeployWrapper(this.klaytnCall)
+        this.feeDelegatedSmartContractDeploy = new FeeDelegatedSmartContractDeployWrapper(this.klaytnCall)
+        this.feeDelegatedSmartContractDeployWithRatio = new FeeDelegatedSmartContractDeployWithRatioWrapper(this.klaytnCall)
+        this.smartContractExecution = new SmartContractExecutionWrapper(this.klaytnCall)
+        this.feeDelegatedSmartContractExecution = new FeeDelegatedSmartContractExecutionWrapper(this.klaytnCall)
+        this.feeDelegatedSmartContractExecutionWithRatio = new FeeDelegatedSmartContractExecutionWithRatioWrapper(this.klaytnCall)
+        this.cancel = new CancelWrapper(this.klaytnCall)
+        this.feeDelegatedCancel = new FeeDelegatedCancelWrapper(this.klaytnCall)
+        this.feeDelegatedCancelWithRatio = new FeeDelegatedCancelWithRatioWrapper(this.klaytnCall)
+        this.chainDataAnchoring = new ChainDataAnchoringWrapper(this.klaytnCall)
+        this.feeDelegatedChainDataAnchoring = new FeeDelegatedChainDataAnchoringWrapper(this.klaytnCall)
+        this.feeDelegatedChainDataAnchoringWithRatio = new FeeDelegatedChainDataAnchoringWithRatioWrapper(this.klaytnCall)
+
+        this.type = TX_TYPE_STRING
+        this.tag = TX_TYPE_TAG
+
+        this.utils = {
+            accessList: AccessList,
+            accessTuple: AccessTuple,
+        }
+    }
+
     /**
-     * @example
-     * caver.transaction.utils.accessList
-     * caver.transaction.utils.accessTuple
+     * @type {object}
+     */
+     get klaytnCall() {
+        return this._klaytnCall
+    }
+
+    set klaytnCall(c) {
+        this._klaytnCall = c
+    }
+
+    /**
+     * Querys transaction from Klaytn and converts to a caver transaction instance.
+     * If it fails to receive a transaction from Klaytn, an error is thrown.
      *
-     * @type {TransactionUtils}
-     * */
-    utils: {
-        accessList: AccessList,
-        accessTuple: AccessTuple,
-    },
+     * @example
+     * const txObject = await caver.transaction.getTransactionByHash('0x{transaction hash}')
+     *
+     * @method getTransactionByHash
+     * @param  {string} transactionHash The transaction hash string to query from Klaytn.
+     * @return {Promise<AbstractTransaction>}
+     */
+    async getTransactionByHash(transactionHash) {
+        let txObject = await this.klaytnCall.getTransactionByHash(transactionHash)
+        if (txObject === null) throw new Error(`Failed to get transaction from Klaytn with '${transactionHash}'.`)
+
+        // AccountUpdate transaction received from Klaytn defines encodedAccountKey string in `key` field.
+        // This needs to be formatted according to the caver transaction format (`account` field).
+        if (txObject.key) {
+            const account = Account.createFromRLPEncoding(txObject.from, txObject.key)
+            txObject.account = account
+            delete txObject.key
+        }
+
+        switch (txObject.type) {
+            case 'TxTypeLegacyTransaction':
+                txObject = this.legacyTransaction.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeValueTransfer':
+                txObject = this.valueTransfer.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeFeeDelegatedValueTransfer':
+                txObject = this.feeDelegatedValueTransfer.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeFeeDelegatedValueTransferWithRatio':
+                txObject = this.feeDelegatedValueTransferWithRatio.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeValueTransferMemo':
+                txObject = this.valueTransferMemo.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeFeeDelegatedValueTransferMemo':
+                txObject = this.feeDelegatedValueTransferMemo.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeFeeDelegatedValueTransferMemoWithRatio':
+                txObject = this.feeDelegatedValueTransferMemoWithRatio.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeAccountUpdate':
+                txObject = this.accountUpdate.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeFeeDelegatedAccountUpdate':
+                txObject = this.feeDelegatedAccountUpdate.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeFeeDelegatedAccountUpdateWithRatio':
+                txObject = this.feeDelegatedAccountUpdateWithRatio.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeSmartContractDeploy':
+                txObject = this.smartContractDeploy.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeFeeDelegatedSmartContractDeploy':
+                txObject = this.feeDelegatedSmartContractDeploy.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeFeeDelegatedSmartContractDeployWithRatio':
+                txObject = this.feeDelegatedSmartContractDeployWithRatio.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeSmartContractExecution':
+                txObject = this.smartContractExecution.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeFeeDelegatedSmartContractExecution':
+                txObject = this.feeDelegatedSmartContractExecution.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeFeeDelegatedSmartContractExecutionWithRatio':
+                txObject = this.feeDelegatedSmartContractExecutionWithRatio.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeCancel':
+                txObject = this.cancel.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeFeeDelegatedCancel':
+                txObject = this.feeDelegatedCancel.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeFeeDelegatedCancelWithRatio':
+                txObject = this.feeDelegatedCancelWithRatio.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeChainDataAnchoring':
+                txObject = this.chainDataAnchoring.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeFeeDelegatedChainDataAnchoring':
+                txObject = this.feeDelegatedChainDataAnchoring.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeFeeDelegatedChainDataAnchoringWithRatio':
+                txObject = this.feeDelegatedChainDataAnchoringWithRatio.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeEthereumAccessList':
+                txObject = this.ethereumAccessList.create(txObject, this.klaytnCall)
+                break
+            case 'TxTypeEthereumDynamicFee':
+                txObject = this.ethereumDynamicFee.create(txObject, this.klaytnCall)
+                break
+        }
+        return txObject
+    }
+
+    /**
+     * Recovers the public key strings from `signatures` field.
+     * If you want to derive an address from public key, please use `caver.utils.publicKeyToAddress`.
+     *
+     * @example
+     * const publicKey = caver.transaction.recoverPublicKeys('0x{RLP-encoded transaction string}')
+     *
+     * @method recoverPublicKeys
+     * @param  {string} rawTx The RLP-encoded transaction string to recover public keys from `signatures`.
+     * @return {Array.<string>}
+     */
+    recoverPublicKeys(rawTx) {
+        const tx = TransactionDecoder.decode(rawTx)
+        return tx.recoverPublicKeys()
+    }
+
+    /**
+     * Recovers the public key strings from `feePayerSignatures` field.
+     * If you want to derive an address from public key, please use `caver.utils.publicKeyToAddress`.
+     *
+     * @example
+     * const publicKey = caver.transaction.recoverFeePayerPublicKeys()
+     *
+     * @method recoverFeePayerPublicKeys
+     * @param  {string} rawTx The RLP-encoded transaction string to recover public keys from `feePayerSignatures`.
+     * @return {Array.<string>}
+     */
+    recoverFeePayerPublicKeys(rawTx) {
+        const tx = TransactionDecoder.decode(rawTx)
+        if (!(tx instanceof AbstractFeeDelegatedTransaction))
+            throw new Error(
+                'The `caver.transaction.recoverFeePayerPublicKeys` function can only use with fee delegation transaction. For basic transactions, use `caver.transaction.recoverPublicKeys`.'
+            )
+        return tx.recoverFeePayerPublicKeys()
+    }
+    
+    /**
+     * Decodes RLP-encoded transaction string and returns a Transaction instance.
+     *
+     * @example
+     * const tx = caver.transaction.decode('0x{RLP-encoded transaction string}')
+     *
+     * @param {string} rlpEncoded - An RLP-encoded transaction string to decode.
+     * @return {module:Transaction.Transaction}
+     */
+    decode(encoded) {
+        return TransactionDecoder.decode(encoded)
+    }
+    
 }
+
+module.exports = TransactionModule

@@ -48,11 +48,6 @@ const txWithExpectedValues = {}
 
 before(() => {
     caver = new Caver(testRPCURL)
-    AbstractTransaction._klaytnCall = {
-        getGasPrice: () => {},
-        getTransactionCount: () => {},
-        getChainId: () => {},
-    }
 
     sender = caver.wallet.add(caver.wallet.keyring.generate())
     roleBasedKeyring = generateRoleBasedKeyring([3, 3, 3])
@@ -92,11 +87,11 @@ describe('TxTypeCancel', () => {
             nonce: '0x6',
         }
 
-        getGasPriceSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getGasPrice')
+        getGasPriceSpy = sandbox.stub(caver.transaction.klaytnCall, 'getGasPrice')
         getGasPriceSpy.returns('0x5d21dba00')
-        getNonceSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionCount')
+        getNonceSpy = sandbox.stub(caver.transaction.klaytnCall, 'getTransactionCount')
         getNonceSpy.returns('0x3a')
-        getChainIdSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getChainId')
+        getChainIdSpy = sandbox.stub(caver.transaction.klaytnCall, 'getChainId')
         getChainIdSpy.returns('0x7e3')
     })
 
@@ -109,21 +104,21 @@ describe('TxTypeCancel', () => {
             delete transactionObj.from
 
             const expectedError = '"from" is missing'
-            expect(() => new caver.transaction.cancel(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.cancel.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-298: If cancel not define gas, return error', () => {
             delete transactionObj.gas
 
             const expectedError = '"gas" is missing'
-            expect(() => new caver.transaction.cancel(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.cancel.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-299: If cancel define from property with invalid address, return error', () => {
             transactionObj.from = 'invalid'
 
             const expectedError = `Invalid address of from: ${transactionObj.from}`
-            expect(() => new caver.transaction.cancel(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.cancel.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-300: If cancel define unnecessary property, return error', () => {
@@ -156,20 +151,20 @@ describe('TxTypeCancel', () => {
                 transactionObj[unnecessaries[i].name] = unnecessaries[i].value
 
                 const expectedError = `"${unnecessaries[i].name}" cannot be used with ${caver.transaction.type.TxTypeCancel} transaction`
-                expect(() => new caver.transaction.cancel(transactionObj)).to.throw(expectedError)
+                expect(() => caver.transaction.cancel.create(transactionObj)).to.throw(expectedError)
             }
         })
     })
 
     context('cancel.getRLPEncoding', () => {
         it('CAVERJS-UNIT-TRANSACTION-301: Returns RLP-encoded string', () => {
-            const tx = new caver.transaction.cancel(txWithExpectedValues.tx)
+            const tx = caver.transaction.cancel.create(txWithExpectedValues.tx)
 
             expect(tx.getRLPEncoding()).to.equal(txWithExpectedValues.rlpEncoding)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-302: getRLPEncoding should throw error when nonce is undefined', () => {
-            const tx = new caver.transaction.cancel(txWithExpectedValues.tx)
+            const tx = caver.transaction.cancel.create(txWithExpectedValues.tx)
             delete tx._nonce
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -178,7 +173,7 @@ describe('TxTypeCancel', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-303: getRLPEncoding should throw error when gasPrice is undefined', () => {
-            const tx = new caver.transaction.cancel(txWithExpectedValues.tx)
+            const tx = caver.transaction.cancel.create(txWithExpectedValues.tx)
             delete tx._gasPrice
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -198,7 +193,7 @@ describe('TxTypeCancel', () => {
         let tx
 
         beforeEach(() => {
-            tx = new caver.transaction.cancel(transactionObj)
+            tx = caver.transaction.cancel.create(transactionObj)
 
             fillTransactionSpy = sandbox.spy(tx, 'fillTransaction')
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
@@ -290,7 +285,7 @@ describe('TxTypeCancel', () => {
 
         it('CAVERJS-UNIT-TRANSACTION-311: input: keyring. should throw error when from is different.', async () => {
             transactionObj.from = roleBasedKeyring.address
-            tx = new caver.transaction.cancel(transactionObj)
+            tx = caver.transaction.cancel.create(transactionObj)
 
             const expectedError = `The from address of the transaction is different with the address of the keyring to use.`
             await expect(tx.sign(sender)).to.be.rejectedWith(expectedError)
@@ -298,7 +293,7 @@ describe('TxTypeCancel', () => {
 
         it('CAVERJS-UNIT-TRANSACTION-312: input: rolebased keyring, index out of range. should throw error.', async () => {
             transactionObj.from = roleBasedKeyring.address
-            tx = new caver.transaction.cancel(transactionObj)
+            tx = caver.transaction.cancel.create(transactionObj)
 
             const expectedError = `Invalid index(10): index must be less than the length of keys(${roleBasedKeyring.keys[0].length}).`
             await expect(tx.sign(roleBasedKeyring, 10)).to.be.rejectedWith(expectedError)
@@ -316,7 +311,7 @@ describe('TxTypeCancel', () => {
         let tx
 
         beforeEach(() => {
-            tx = new caver.transaction.cancel(transactionObj)
+            tx = caver.transaction.cancel.create(transactionObj)
 
             fillTransactionSpy = sandbox.spy(tx, 'fillTransaction')
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
@@ -379,7 +374,7 @@ describe('TxTypeCancel', () => {
 
         it('CAVERJS-UNIT-TRANSACTION-317: input: keyring. should throw error when from is different.', async () => {
             transactionObj.from = roleBasedKeyring.address
-            tx = new caver.transaction.cancel(transactionObj)
+            tx = caver.transaction.cancel.create(transactionObj)
 
             const expectedError = `The from address of the transaction is different with the address of the keyring to use.`
             await expect(tx.sign(sender)).to.be.rejectedWith(expectedError)
@@ -405,7 +400,7 @@ describe('TxTypeCancel', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-319: If signatures is empty, appendSignatures append signatures in transaction', () => {
-            const tx = new caver.transaction.cancel(transactionObj)
+            const tx = caver.transaction.cancel.create(transactionObj)
 
             const sig = [
                 '0x0fea',
@@ -417,7 +412,7 @@ describe('TxTypeCancel', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-320: If signatures is empty, appendSignatures append signatures with two-dimensional signature array', () => {
-            const tx = new caver.transaction.cancel(transactionObj)
+            const tx = caver.transaction.cancel.create(transactionObj)
 
             const sig = [
                 [
@@ -436,7 +431,7 @@ describe('TxTypeCancel', () => {
                 '0xade9480f584fe481bf070ab758ecc010afa15debc33e1bd75af637d834073a6e',
                 '0x38160105d78cef4529d765941ad6637d8dcf6bd99310e165fee1c39fff2aa27e',
             ]
-            const tx = new caver.transaction.cancel(transactionObj)
+            const tx = caver.transaction.cancel.create(transactionObj)
 
             const sig = [
                 '0x0fea',
@@ -449,7 +444,7 @@ describe('TxTypeCancel', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-322: appendSignatures should append multiple signatures', () => {
-            const tx = new caver.transaction.cancel(transactionObj)
+            const tx = caver.transaction.cancel.create(transactionObj)
 
             const sig = [
                 [
@@ -484,7 +479,7 @@ describe('TxTypeCancel', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-323: combineSignedRawTransactions combines single signature and sets signatures in transaction', () => {
-            const tx = new caver.transaction.cancel(transactionObj)
+            const tx = caver.transaction.cancel.create(transactionObj)
             const appendSignaturesSpy = sandbox.spy(tx, 'appendSignatures')
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
@@ -514,7 +509,7 @@ describe('TxTypeCancel', () => {
                     '0x59d5deb0f4c06a35a8024506159864ffc46dd08d91d5ac16fa69e92fb2d6b9ae',
                 ],
             ]
-            const tx = new caver.transaction.cancel(transactionObj)
+            const tx = caver.transaction.cancel.create(transactionObj)
 
             const rlpEncodedStrings = [
                 '0x38f869018505d21dba00830dbba094504a835246e030d70ded9027f9f5a0aefcd45143f847f845820feaa05a3a7910ce495e316da1394f197cdadd95dbb6954d803052b9f62ce993c0ec3ca00934f8dda9666d759e511a5658de1db36faefb35e76a5e237d87ba8c3b9bb700',
@@ -554,7 +549,7 @@ describe('TxTypeCancel', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-325: If decode transaction has different values, combineSignedRawTransactions should throw error', () => {
-            const tx = new caver.transaction.cancel(transactionObj)
+            const tx = caver.transaction.cancel.create(transactionObj)
             tx.nonce = 1234
 
             const rlpEncoded =
@@ -571,7 +566,7 @@ describe('TxTypeCancel', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-326: getRawTransaction should call getRLPEncoding function', () => {
-            const tx = new caver.transaction.cancel(txWithExpectedValues.tx)
+            const tx = caver.transaction.cancel.create(txWithExpectedValues.tx)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
             const expected = txWithExpectedValues.rlpEncoding
@@ -588,7 +583,7 @@ describe('TxTypeCancel', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-327: getTransactionHash should call getRLPEncoding function and return hash of RLPEncoding', () => {
-            const tx = new caver.transaction.cancel(txWithExpectedValues.tx)
+            const tx = caver.transaction.cancel.create(txWithExpectedValues.tx)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
             const expected = txWithExpectedValues.transactionHash
@@ -600,7 +595,7 @@ describe('TxTypeCancel', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-328: getTransactionHash should throw error when nonce is undefined', () => {
-            const tx = new caver.transaction.cancel(txWithExpectedValues.tx)
+            const tx = caver.transaction.cancel.create(txWithExpectedValues.tx)
             delete tx._nonce
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -609,7 +604,7 @@ describe('TxTypeCancel', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-329: getTransactionHash should throw error when gasPrice is undefined', () => {
-            const tx = new caver.transaction.cancel(txWithExpectedValues.tx)
+            const tx = caver.transaction.cancel.create(txWithExpectedValues.tx)
             delete tx._gasPrice
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -624,7 +619,7 @@ describe('TxTypeCancel', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-331: getSenderTxHash should call getRLPEncoding function and return hash of RLPEncoding', () => {
-            const tx = new caver.transaction.cancel(txWithExpectedValues.tx)
+            const tx = caver.transaction.cancel.create(txWithExpectedValues.tx)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
             const expected = txWithExpectedValues.senderTxHash
@@ -636,7 +631,7 @@ describe('TxTypeCancel', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-332: getSenderTxHash should throw error when nonce is undefined', () => {
-            const tx = new caver.transaction.cancel(txWithExpectedValues.tx)
+            const tx = caver.transaction.cancel.create(txWithExpectedValues.tx)
             delete tx._nonce
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -651,7 +646,7 @@ describe('TxTypeCancel', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-335: getRLPEncodingForSignature should return RLP-encoded transaction string for signing', () => {
-            const tx = new caver.transaction.cancel(txWithExpectedValues.tx)
+            const tx = caver.transaction.cancel.create(txWithExpectedValues.tx)
 
             const commonRLPForSigningSpy = sandbox.spy(tx, 'getCommonRLPEncodingForSignature')
 
@@ -663,7 +658,7 @@ describe('TxTypeCancel', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-336: getRLPEncodingForSignature should throw error when nonce is undefined', () => {
-            const tx = new caver.transaction.cancel(txWithExpectedValues.tx)
+            const tx = caver.transaction.cancel.create(txWithExpectedValues.tx)
             delete tx._nonce
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -672,7 +667,7 @@ describe('TxTypeCancel', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-337: getRLPEncodingForSignature should throw error when gasPrice is undefined', () => {
-            const tx = new caver.transaction.cancel(txWithExpectedValues.tx)
+            const tx = caver.transaction.cancel.create(txWithExpectedValues.tx)
             delete tx._gasPrice
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -681,7 +676,7 @@ describe('TxTypeCancel', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-338: getRLPEncodingForSignature should throw error when chainId is undefined', () => {
-            const tx = new caver.transaction.cancel(txWithExpectedValues.tx)
+            const tx = caver.transaction.cancel.create(txWithExpectedValues.tx)
             delete tx._chainId
 
             const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -692,7 +687,7 @@ describe('TxTypeCancel', () => {
 
     context('cancel.getCommonRLPEncodingForSignature', () => {
         it('CAVERJS-UNIT-TRANSACTION-339: getRLPEncodingForSignature should return RLP-encoded transaction string for signing', () => {
-            const tx = new caver.transaction.cancel(txWithExpectedValues.tx)
+            const tx = caver.transaction.cancel.create(txWithExpectedValues.tx)
 
             const commonRLPForSign = tx.getCommonRLPEncodingForSignature()
 
@@ -702,7 +697,7 @@ describe('TxTypeCancel', () => {
 
     context('cancel.fillTransaction', () => {
         it('CAVERJS-UNIT-TRANSACTION-340: fillTransaction should call klay_getGasPrice to fill gasPrice when gasPrice is undefined', async () => {
-            const tx = new caver.transaction.cancel(txWithExpectedValues.tx)
+            const tx = caver.transaction.cancel.create(txWithExpectedValues.tx)
             delete tx._gasPrice
 
             await tx.fillTransaction()
@@ -712,7 +707,7 @@ describe('TxTypeCancel', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-341: fillTransaction should call klay_getTransactionCount to fill nonce when nonce is undefined', async () => {
-            const tx = new caver.transaction.cancel(txWithExpectedValues.tx)
+            const tx = caver.transaction.cancel.create(txWithExpectedValues.tx)
             delete tx._nonce
 
             await tx.fillTransaction()
@@ -722,7 +717,7 @@ describe('TxTypeCancel', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-342: fillTransaction should call klay_getChainid to fill chainId when chainId is undefined', async () => {
-            const tx = new caver.transaction.cancel(txWithExpectedValues.tx)
+            const tx = caver.transaction.cancel.create(txWithExpectedValues.tx)
             delete tx._chainId
 
             await tx.fillTransaction()

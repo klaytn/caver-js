@@ -62,7 +62,7 @@ describe('caver.validator.validateSignedMessage', () => {
         ]
 
         it('CAVERJS-UNIT-VALIDATOR-001: should return true when valid signatures with array format', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKey)
@@ -71,7 +71,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-002: should return true when valid signatures with array format when message is hashed', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKey)
@@ -81,7 +81,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-003: should return true when valid signatures with SignatureData format', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKey)
@@ -90,7 +90,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-004: should return true when valid signatures with SignatureData array format', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKey)
@@ -100,7 +100,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-005: should return false when invalid signatures is passed as a parameter', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKey)
@@ -139,7 +139,7 @@ describe('caver.validator.validateSignedMessage', () => {
         ]
 
         it('CAVERJS-UNIT-VALIDATOR-006: should return true when valid signatures with array format', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKey)
@@ -148,7 +148,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-007: should return true when valid signatures with array format when message is hashed', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKey)
@@ -158,7 +158,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-008: should return true when valid signatures with SignatureData format', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKey)
@@ -167,7 +167,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-009: should return true when valid signatures with SignatureData array format', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKey)
@@ -177,7 +177,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-010: should return false when invalid signatures are passed as a parameter', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKey)
@@ -207,7 +207,7 @@ describe('caver.validator.validateSignedMessage', () => {
         ]
 
         it('CAVERJS-UNIT-VALIDATOR-011: should return false when accountKey is AccountKeyFail', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const ret = await caver.validator.validateSignedMessage(message, signature, address)
@@ -276,7 +276,7 @@ describe('caver.validator.validateSignedMessage', () => {
         ]
 
         it('CAVERJS-UNIT-VALIDATOR-012: should return true when valid signatures with array format', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKeys)
@@ -286,7 +286,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-013: should return true when valid signatures with array format when message is hashed', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKeys)
@@ -296,7 +296,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-014: should return true when valid signatures with SignatureData array format', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKeys)
@@ -309,7 +309,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-015: should return true if threshold is satisfied', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKeys)
@@ -323,7 +323,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-016: should return false if threshold is not satisfied', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKeys)
@@ -338,7 +338,7 @@ describe('caver.validator.validateSignedMessage', () => {
 
         // This test case should be chagned to expect false after fork.
         it('CAVERJS-UNIT-VALIDATOR-017: should return true when threshold is satisfied but includes invalid siganture though', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKeys)
@@ -358,7 +358,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-018: should return false when invalid signatures are passed as a parameter', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKeys)
@@ -517,7 +517,7 @@ describe('caver.validator.validateSignedMessage', () => {
         ]
 
         it('CAVERJS-UNIT-VALIDATOR-019: should return true when valid signatures with array format', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKeys)
@@ -527,7 +527,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-020: should return true when valid signatures with array format when message is hashed', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKeys)
@@ -537,7 +537,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-021: should return true when valid signatures with SignatureData array format', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKeys)
@@ -550,7 +550,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-022: should return true if threshold is satisfied', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKeys)
@@ -564,7 +564,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-023: should return false if threshold is not satisfied', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKeys)
@@ -579,7 +579,7 @@ describe('caver.validator.validateSignedMessage', () => {
 
         // This test case should be chagned to expect false after fork.
         it('CAVERJS-UNIT-VALIDATOR-024: should return true when threshold is satisfied but includes invalid siganture though', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKeys)
@@ -599,7 +599,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-025: should return false if signature is signed by roleAccountUpateKey', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKeys)
@@ -612,7 +612,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-026: should return false if signature is signed by roleFeePayerKey', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
 
             const keyring = caver.wallet.keyring.create(address, privateKeys)
@@ -625,7 +625,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-027: should return true with AccountKeyLegacy in roleTransactionKey', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves({
                 keyType: 5,
                 key: [{ keyType: 1, key: {} }, getAccountKeyResult.key[1], getAccountKeyResult.key[2]],
@@ -644,7 +644,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-028: should return true with AccountKeyPublic in roleTransactionKey', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves({
                 keyType: 5,
                 key: [
@@ -673,7 +673,7 @@ describe('caver.validator.validateSignedMessage', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-029: should return false with AccountKeyFail in roleTransactionKey', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves({
                 keyType: 5,
                 key: [{ keyType: 3, key: {} }, getAccountKeyResult.key[1], getAccountKeyResult.key[2]],
@@ -713,7 +713,7 @@ describe('caver.validator.validateSender', () => {
         }
         function setStubResult() {
             const getAccountKeyResult = { keyType: 1, key: {} }
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
         }
 
@@ -888,7 +888,7 @@ describe('caver.validator.validateSender', () => {
                     y: '0x6af020a0568661e7c72e753e80efe084a3aed9f9ac87bf44d09ce67aad3d4e01',
                 },
             }
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
         }
 
@@ -935,7 +935,7 @@ describe('caver.validator.validateSender', () => {
         }
         function setStubResult() {
             const getAccountKeyResult = { keyType: 3, key: {} }
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
         }
 
@@ -1005,7 +1005,7 @@ describe('caver.validator.validateSender', () => {
                     ],
                 },
             }
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
         }
 
@@ -1149,7 +1149,7 @@ describe('caver.validator.validateSender', () => {
                 ],
             }
             if (roleNum !== undefined) getAccountKeyResult.key[roleNum] = fakeKey
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
         }
 
@@ -1328,7 +1328,7 @@ describe('caver.validator.validateFeePayer', () => {
     context('caver.validator.validateSender with AccountKeyLegacy', () => {
         function setStubResult() {
             const getAccountKeyResult = { keyType: 1, key: {} }
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
         }
 
@@ -1365,7 +1365,7 @@ describe('caver.validator.validateFeePayer', () => {
                     y: '0x19f08a82b31682c038f9f691fb38ee4aaf7e016e2c973a1bd1e48a51f60a54ea',
                 },
             }
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
         }
 
@@ -1396,7 +1396,7 @@ describe('caver.validator.validateFeePayer', () => {
     context('caver.validator.validateSender with AccountKeyFail', () => {
         function setStubResult() {
             const getAccountKeyResult = { keyType: 3, key: {} }
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
         }
 
@@ -1440,7 +1440,7 @@ describe('caver.validator.validateFeePayer', () => {
                     ],
                 },
             }
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
         }
 
@@ -1565,7 +1565,7 @@ describe('caver.validator.validateFeePayer', () => {
                 ],
             }
             if (roleNum !== undefined) getAccountKeyResult.key[roleNum] = fakeKey
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(getAccountKeyResult)
         }
 
@@ -1727,7 +1727,7 @@ describe('caver.validator.validateTransaction', () => {
         }).timeout(100000)
 
         it('CAVERJS-UNIT-VALIDATOR-057: should validate with AccountKeyLegacy when getAccountKey returns null', async () => {
-            const getAccoutKeyStub = sandbox.stub(Validator._klaytnCall, 'getAccountKey')
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
             getAccoutKeyStub.resolves(null)
 
             const tx = caver.transaction.feeDelegatedValueTransfer.create(fdTxObj)

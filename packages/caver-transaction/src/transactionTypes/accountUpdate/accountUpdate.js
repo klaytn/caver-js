@@ -55,22 +55,24 @@ class AccountUpdate extends AbstractTransaction {
      * @param {object|string} createTxObj - The parameters to create an AccountUpdate transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                                      The object can define `from`, `account`, `nonce`, `gas`, `gasPrice`, `signatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {AccountUpdate}
      */
-    static create(createTxObj) {
-        return new AccountUpdate(createTxObj)
+    static create(createTxObj, klaytnCall) {
+        return new AccountUpdate(createTxObj, klaytnCall)
     }
 
     /**
      * decodes the RLP-encoded string and returns an AccountUpdate transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded account update transaction.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {AccountUpdate}
      */
-    static decode(rlpEncoded) {
+    static decode(rlpEncoded, klaytnCall) {
         const decoded = _decode(rlpEncoded)
         decoded.account = Account.createFromRLPEncoding(decoded.from, decoded.rlpEncodedKey)
-        return new AccountUpdate(decoded)
+        return new AccountUpdate(decoded, klaytnCall)
     }
 
     /**
@@ -79,14 +81,15 @@ class AccountUpdate extends AbstractTransaction {
      * @param {object|string} createTxObj - The parameters to create an AccountUpdate transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                                      The object can define `from`, `account`, `nonce`, `gas`, `gasPrice`, `signatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      */
-    constructor(createTxObj) {
+    constructor(createTxObj, klaytnCall) {
         if (_.isString(createTxObj)) {
             createTxObj = _decode(createTxObj)
             createTxObj.account = Account.createFromRLPEncoding(createTxObj.from, createTxObj.rlpEncodedKey)
         }
 
-        super(TX_TYPE_STRING.TxTypeAccountUpdate, createTxObj)
+        super(TX_TYPE_STRING.TxTypeAccountUpdate, createTxObj, klaytnCall)
         this.account = createTxObj.account
         if (createTxObj.gasPrice !== undefined) this.gasPrice = createTxObj.gasPrice
     }
@@ -176,9 +179,9 @@ class AccountUpdate extends AbstractTransaction {
      */
     async fillTransaction() {
         const [chainId, gasPrice, nonce] = await Promise.all([
-            isNot(this.chainId) ? AbstractTransaction.getChainId() : this.chainId,
-            isNot(this.gasPrice) ? AbstractTransaction.getGasPrice() : this.gasPrice,
-            isNot(this.nonce) ? AbstractTransaction.getNonce(this.from) : this.nonce,
+            isNot(this.chainId) ? this.getChainId() : this.chainId,
+            isNot(this.gasPrice) ? this.getGasPrice() : this.gasPrice,
+            isNot(this.nonce) ? this.getNonce(this.from) : this.nonce,
         ])
 
         this.chainId = chainId

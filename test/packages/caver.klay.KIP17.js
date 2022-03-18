@@ -54,7 +54,7 @@ const prepareTestSetting = async () => {
     caver2.klay.accounts.wallet.add(testAccount.key.privateKey)
     caver2.klay.accounts.wallet.add(receiver.key.privateKey)
 
-    const txObject = new caver.transaction.valueTransfer({
+    const txObject = caver.transaction.valueTransfer.create({
         from: sender.address,
         to: testAccount.address,
         value: caver.utils.toPeb(3, 'KLAY'),

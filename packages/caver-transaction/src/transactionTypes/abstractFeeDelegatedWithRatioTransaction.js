@@ -35,9 +35,10 @@ class AbstractFeeDelegatedWithRatioTransaction extends AbstractFeeDelegatedTrans
      * @constructor
      * @param {string} typeString - The type string of transaction.
      * @param {object} createTxObj - The parameters to create an instance of transaction.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      */
-    constructor(typeString, createTxObj) {
-        super(typeString, createTxObj)
+    constructor(typeString, createTxObj, klaytnCall) {
+        super(typeString, createTxObj, klaytnCall)
         this.feeRatio = createTxObj.feeRatio
     }
 

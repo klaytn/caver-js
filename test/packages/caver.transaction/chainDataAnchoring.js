@@ -52,11 +52,6 @@ const sandbox = sinon.createSandbox()
 
 before(() => {
     caver = new Caver(testRPCURL)
-    AbstractTransaction._klaytnCall = {
-        getGasPrice: () => {},
-        getTransactionCount: () => {},
-        getChainId: () => {},
-    }
 
     sender = caver.wallet.add(caver.wallet.keyring.generate())
     roleBasedKeyring = generateRoleBasedKeyring([3, 3, 3])
@@ -97,11 +92,11 @@ describe('TxTypeChainDataAnchoring', () => {
             input,
         }
 
-        getGasPriceSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getGasPrice')
+        getGasPriceSpy = sandbox.stub(caver.transaction.klaytnCall, 'getGasPrice')
         getGasPriceSpy.returns('0x5d21dba00')
-        getNonceSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionCount')
+        getNonceSpy = sandbox.stub(caver.transaction.klaytnCall, 'getTransactionCount')
         getNonceSpy.returns('0x3a')
-        getChainIdSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getChainId')
+        getChainIdSpy = sandbox.stub(caver.transaction.klaytnCall, 'getChainId')
         getChainIdSpy.returns('0x7e3')
     })
 
@@ -114,28 +109,28 @@ describe('TxTypeChainDataAnchoring', () => {
             delete transactionObj.from
 
             const expectedError = '"from" is missing'
-            expect(() => new caver.transaction.chainDataAnchoring(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.chainDataAnchoring.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-344: If chainDataAnchoring not define gas, return error', () => {
             delete transactionObj.gas
 
             const expectedError = '"gas" is missing'
-            expect(() => new caver.transaction.chainDataAnchoring(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.chainDataAnchoring.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-345: If chainDataAnchoring not define input, return error', () => {
             delete transactionObj.input
 
             const expectedError = '"input" is missing'
-            expect(() => new caver.transaction.chainDataAnchoring(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.chainDataAnchoring.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-346: If chainDataAnchoring define from property with invalid address, return error', () => {
             transactionObj.from = 'invalid'
 
             const expectedError = `Invalid address of from: ${transactionObj.from}`
-            expect(() => new caver.transaction.chainDataAnchoring(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.chainDataAnchoring.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-347: If chainDataAnchoring define unnecessary property, return error', () => {
@@ -167,20 +162,20 @@ describe('TxTypeChainDataAnchoring', () => {
                 transactionObj[unnecessaries[i].name] = unnecessaries[i].value
 
                 const expectedError = `"${unnecessaries[i].name}" cannot be used with ${caver.transaction.type.TxTypeChainDataAnchoring} transaction`
-                expect(() => new caver.transaction.chainDataAnchoring(transactionObj)).to.throw(expectedError)
+                expect(() => caver.transaction.chainDataAnchoring.create(transactionObj)).to.throw(expectedError)
             }
         })
     })
 
     context('chainDataAnchoring.getRLPEncoding', () => {
         it('CAVERJS-UNIT-TRANSACTION-348: Returns RLP-encoded string', () => {
-            const tx = new caver.transaction.chainDataAnchoring(txWithExpectedValues.tx)
+            const tx = caver.transaction.chainDataAnchoring.create(txWithExpectedValues.tx)
 
             expect(tx.getRLPEncoding()).to.equal(txWithExpectedValues.rlpEncoding)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-349: getRLPEncoding should throw error when nonce is undefined', () => {
-            const tx = new caver.transaction.chainDataAnchoring(txWithExpectedValues.tx)
+            const tx = caver.transaction.chainDataAnchoring.create(txWithExpectedValues.tx)
             delete tx._nonce
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -189,7 +184,7 @@ describe('TxTypeChainDataAnchoring', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-350: getRLPEncoding should throw error when gasPrice is undefined', () => {
-            const tx = new caver.transaction.chainDataAnchoring(txWithExpectedValues.tx)
+            const tx = caver.transaction.chainDataAnchoring.create(txWithExpectedValues.tx)
             delete tx._gasPrice
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -209,7 +204,7 @@ describe('TxTypeChainDataAnchoring', () => {
         let tx
 
         beforeEach(() => {
-            tx = new caver.transaction.chainDataAnchoring(transactionObj)
+            tx = caver.transaction.chainDataAnchoring.create(transactionObj)
 
             fillTransactionSpy = sandbox.spy(tx, 'fillTransaction')
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
@@ -301,7 +296,7 @@ describe('TxTypeChainDataAnchoring', () => {
 
         it('CAVERJS-UNIT-TRANSACTION-358: input: keyring. should throw error when from is different.', async () => {
             transactionObj.from = roleBasedKeyring.address
-            tx = new caver.transaction.chainDataAnchoring(transactionObj)
+            tx = caver.transaction.chainDataAnchoring.create(transactionObj)
 
             const expectedError = `The from address of the transaction is different with the address of the keyring to use.`
             await expect(tx.sign(sender)).to.be.rejectedWith(expectedError)
@@ -309,7 +304,7 @@ describe('TxTypeChainDataAnchoring', () => {
 
         it('CAVERJS-UNIT-TRANSACTION-359: input: rolebased keyring, index out of range. should throw error.', async () => {
             transactionObj.from = roleBasedKeyring.address
-            tx = new caver.transaction.chainDataAnchoring(transactionObj)
+            tx = caver.transaction.chainDataAnchoring.create(transactionObj)
 
             const expectedError = `Invalid index(10): index must be less than the length of keys(${roleBasedKeyring.keys[0].length}).`
             await expect(tx.sign(roleBasedKeyring, 10)).to.be.rejectedWith(expectedError)
@@ -327,7 +322,7 @@ describe('TxTypeChainDataAnchoring', () => {
         let tx
 
         beforeEach(() => {
-            tx = new caver.transaction.chainDataAnchoring(transactionObj)
+            tx = caver.transaction.chainDataAnchoring.create(transactionObj)
 
             fillTransactionSpy = sandbox.spy(tx, 'fillTransaction')
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
@@ -390,7 +385,7 @@ describe('TxTypeChainDataAnchoring', () => {
 
         it('CAVERJS-UNIT-TRANSACTION-364: input: keyring. should throw error when from is different.', async () => {
             transactionObj.from = roleBasedKeyring.address
-            tx = new caver.transaction.chainDataAnchoring(transactionObj)
+            tx = caver.transaction.chainDataAnchoring.create(transactionObj)
 
             const expectedError = `The from address of the transaction is different with the address of the keyring to use.`
             await expect(tx.sign(sender)).to.be.rejectedWith(expectedError)
@@ -416,7 +411,7 @@ describe('TxTypeChainDataAnchoring', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-366: If signatures is empty, appendSignatures append signatures in transaction', () => {
-            const tx = new caver.transaction.chainDataAnchoring(transactionObj)
+            const tx = caver.transaction.chainDataAnchoring.create(transactionObj)
 
             const sig = [
                 '0x0fea',
@@ -428,7 +423,7 @@ describe('TxTypeChainDataAnchoring', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-367: If signatures is empty, appendSignatures append signatures with two-dimensional signature array', () => {
-            const tx = new caver.transaction.chainDataAnchoring(transactionObj)
+            const tx = caver.transaction.chainDataAnchoring.create(transactionObj)
 
             const sig = [
                 [
@@ -447,7 +442,7 @@ describe('TxTypeChainDataAnchoring', () => {
                 '0xade9480f584fe481bf070ab758ecc010afa15debc33e1bd75af637d834073a6e',
                 '0x38160105d78cef4529d765941ad6637d8dcf6bd99310e165fee1c39fff2aa27e',
             ]
-            const tx = new caver.transaction.chainDataAnchoring(transactionObj)
+            const tx = caver.transaction.chainDataAnchoring.create(transactionObj)
 
             const sig = [
                 '0x0fea',
@@ -460,7 +455,7 @@ describe('TxTypeChainDataAnchoring', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-369: appendSignatures should append multiple signatures', () => {
-            const tx = new caver.transaction.chainDataAnchoring(transactionObj)
+            const tx = caver.transaction.chainDataAnchoring.create(transactionObj)
 
             const sig = [
                 [
@@ -496,7 +491,7 @@ describe('TxTypeChainDataAnchoring', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-370: combineSignedRawTransactions combines single signature and sets signatures in transaction', () => {
-            const tx = new caver.transaction.chainDataAnchoring(transactionObj)
+            const tx = caver.transaction.chainDataAnchoring.create(transactionObj)
             const appendSignaturesSpy = sandbox.spy(tx, 'appendSignatures')
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
@@ -526,7 +521,7 @@ describe('TxTypeChainDataAnchoring', () => {
                     '0x08c2fc7ec8ee14e734701435d0ca2e001bc1e0742c0fe0d58bd131a582e4f10c',
                 ],
             ]
-            const tx = new caver.transaction.chainDataAnchoring(transactionObj)
+            const tx = caver.transaction.chainDataAnchoring.create(transactionObj)
 
             const rlpEncodedStrings = [
                 '0x48f90113018505d21dba00830f424094b605c7550ad5fb15ddd9291a2d31a889db808152b8a8f8a6a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000001a00000000000000000000000000000000000000000000000000000000000000002a00000000000000000000000000000000000000000000000000000000000000003a0000000000000000000000000000000000000000000000000000000000000000405f847f845820feaa0c17c5ad8820b984da2bc816f881e1e283a9d7806ed5e3c703f58a7ed1f40edf1a049c4aa23508715aba0891ddad59bab4ff6abde777adffc1f39c79e51a78b786a',
@@ -566,7 +561,7 @@ describe('TxTypeChainDataAnchoring', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-372: If decode transaction has different values, combineSignedRawTransactions should throw error', () => {
-            const tx = new caver.transaction.chainDataAnchoring(transactionObj)
+            const tx = caver.transaction.chainDataAnchoring.create(transactionObj)
             tx.input = '0x'
 
             const rlpEncoded =
@@ -583,7 +578,7 @@ describe('TxTypeChainDataAnchoring', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-373: getRawTransaction should call getRLPEncoding function', () => {
-            const tx = new caver.transaction.chainDataAnchoring(txWithExpectedValues.tx)
+            const tx = caver.transaction.chainDataAnchoring.create(txWithExpectedValues.tx)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
             const expected = txWithExpectedValues.rlpEncoding
@@ -600,7 +595,7 @@ describe('TxTypeChainDataAnchoring', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-374: getTransactionHash should call getRLPEncoding function and return hash of RLPEncoding', () => {
-            const tx = new caver.transaction.chainDataAnchoring(txWithExpectedValues.tx)
+            const tx = caver.transaction.chainDataAnchoring.create(txWithExpectedValues.tx)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
             const expected = txWithExpectedValues.transactionHash
@@ -612,7 +607,7 @@ describe('TxTypeChainDataAnchoring', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-375: getTransactionHash should throw error when nonce is undefined', () => {
-            const tx = new caver.transaction.chainDataAnchoring(txWithExpectedValues.tx)
+            const tx = caver.transaction.chainDataAnchoring.create(txWithExpectedValues.tx)
             delete tx._nonce
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -621,7 +616,7 @@ describe('TxTypeChainDataAnchoring', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-376: getTransactionHash should throw error when gasPrice is undefined', () => {
-            const tx = new caver.transaction.chainDataAnchoring(txWithExpectedValues.tx)
+            const tx = caver.transaction.chainDataAnchoring.create(txWithExpectedValues.tx)
             delete tx._gasPrice
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -636,7 +631,7 @@ describe('TxTypeChainDataAnchoring', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-378: getSenderTxHash should call getRLPEncoding function and return hash of RLPEncoding', () => {
-            const tx = new caver.transaction.chainDataAnchoring(txWithExpectedValues.tx)
+            const tx = caver.transaction.chainDataAnchoring.create(txWithExpectedValues.tx)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
             const expected = txWithExpectedValues.senderTxHash
@@ -648,7 +643,7 @@ describe('TxTypeChainDataAnchoring', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-379: getSenderTxHash should throw error when nonce is undefined', () => {
-            const tx = new caver.transaction.chainDataAnchoring(txWithExpectedValues.tx)
+            const tx = caver.transaction.chainDataAnchoring.create(txWithExpectedValues.tx)
             delete tx._nonce
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -657,7 +652,7 @@ describe('TxTypeChainDataAnchoring', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-380: getSenderTxHash should throw error when gasPrice is undefined', () => {
-            const tx = new caver.transaction.chainDataAnchoring(txWithExpectedValues.tx)
+            const tx = caver.transaction.chainDataAnchoring.create(txWithExpectedValues.tx)
             delete tx._gasPrice
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -672,7 +667,7 @@ describe('TxTypeChainDataAnchoring', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-382: getRLPEncodingForSignature should return RLP-encoded transaction string for signing', () => {
-            const tx = new caver.transaction.chainDataAnchoring(txWithExpectedValues.tx)
+            const tx = caver.transaction.chainDataAnchoring.create(txWithExpectedValues.tx)
 
             const commonRLPForSigningSpy = sandbox.spy(tx, 'getCommonRLPEncodingForSignature')
 
@@ -684,7 +679,7 @@ describe('TxTypeChainDataAnchoring', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-383: getRLPEncodingForSignature should throw error when nonce is undefined', () => {
-            const tx = new caver.transaction.chainDataAnchoring(txWithExpectedValues.tx)
+            const tx = caver.transaction.chainDataAnchoring.create(txWithExpectedValues.tx)
             delete tx._nonce
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -693,7 +688,7 @@ describe('TxTypeChainDataAnchoring', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-384: getRLPEncodingForSignature should throw error when gasPrice is undefined', () => {
-            const tx = new caver.transaction.chainDataAnchoring(txWithExpectedValues.tx)
+            const tx = caver.transaction.chainDataAnchoring.create(txWithExpectedValues.tx)
             delete tx._gasPrice
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -702,7 +697,7 @@ describe('TxTypeChainDataAnchoring', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-385: getRLPEncodingForSignature should throw error when chainId is undefined', () => {
-            const tx = new caver.transaction.chainDataAnchoring(txWithExpectedValues.tx)
+            const tx = caver.transaction.chainDataAnchoring.create(txWithExpectedValues.tx)
             delete tx._chainId
 
             const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -713,7 +708,7 @@ describe('TxTypeChainDataAnchoring', () => {
 
     context('chainDataAnchoring.getCommonRLPEncodingForSignature', () => {
         it('CAVERJS-UNIT-TRANSACTION-386: getRLPEncodingForSignature should return RLP-encoded transaction string for signing', () => {
-            const tx = new caver.transaction.chainDataAnchoring(txWithExpectedValues.tx)
+            const tx = caver.transaction.chainDataAnchoring.create(txWithExpectedValues.tx)
 
             const commonRLPForSign = tx.getCommonRLPEncodingForSignature()
             const decoded = RLP.decode(txWithExpectedValues.rlpEncodingForSigning)
@@ -724,7 +719,7 @@ describe('TxTypeChainDataAnchoring', () => {
 
     context('chainDataAnchoring.fillTransaction', () => {
         it('CAVERJS-UNIT-TRANSACTION-387: fillTransaction should call klay_getGasPrice to fill gasPrice when gasPrice is undefined', async () => {
-            const tx = new caver.transaction.chainDataAnchoring(txWithExpectedValues.tx)
+            const tx = caver.transaction.chainDataAnchoring.create(txWithExpectedValues.tx)
             delete tx._gasPrice
 
             await tx.fillTransaction()
@@ -734,7 +729,7 @@ describe('TxTypeChainDataAnchoring', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-388: fillTransaction should call klay_getTransactionCount to fill nonce when nonce is undefined', async () => {
-            const tx = new caver.transaction.chainDataAnchoring(txWithExpectedValues.tx)
+            const tx = caver.transaction.chainDataAnchoring.create(txWithExpectedValues.tx)
             delete tx._nonce
 
             await tx.fillTransaction()
@@ -744,7 +739,7 @@ describe('TxTypeChainDataAnchoring', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-389: fillTransaction should call klay_getChainid to fill chainId when chainId is undefined', async () => {
-            const tx = new caver.transaction.chainDataAnchoring(txWithExpectedValues.tx)
+            const tx = caver.transaction.chainDataAnchoring.create(txWithExpectedValues.tx)
             delete tx._chainId
 
             await tx.fillTransaction()

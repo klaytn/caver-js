@@ -59,20 +59,22 @@ class FeeDelegatedCancelWithRatio extends AbstractFeeDelegatedWithRatioTransacti
      * @param {object|string} createTxObj - The parameters to create a FeeDelegatedCancelWithRatio transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                               The object can define `from`, `nonce`, `gas`, `gasPrice`, `feeRatio`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {FeeDelegatedCancelWithRatio}
      */
-    static create(createTxObj) {
-        return new FeeDelegatedCancelWithRatio(createTxObj)
+    static create(createTxObj, klaytnCall) {
+        return new FeeDelegatedCancelWithRatio(createTxObj, klaytnCall)
     }
 
     /**
      * decodes the RLP-encoded string and returns a FeeDelegatedCancelWithRatio transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded fee delegated cancel with ratio transaction.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {FeeDelegatedCancelWithRatio}
      */
-    static decode(rlpEncoded) {
-        return new FeeDelegatedCancelWithRatio(_decode(rlpEncoded))
+    static decode(rlpEncoded, klaytnCall) {
+        return new FeeDelegatedCancelWithRatio(_decode(rlpEncoded), klaytnCall)
     }
 
     /**
@@ -81,10 +83,11 @@ class FeeDelegatedCancelWithRatio extends AbstractFeeDelegatedWithRatioTransacti
      * @param {object|string} createTxObj - The parameters to create a FeeDelegatedCancelWithRatio transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                               The object can define `from`, `nonce`, `gas`, `gasPrice`, `feeRatio`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      */
-    constructor(createTxObj) {
+    constructor(createTxObj, klaytnCall) {
         if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
-        super(TX_TYPE_STRING.TxTypeFeeDelegatedCancelWithRatio, createTxObj)
+        super(TX_TYPE_STRING.TxTypeFeeDelegatedCancelWithRatio, createTxObj, klaytnCall)
         if (createTxObj.gasPrice !== undefined) this.gasPrice = createTxObj.gasPrice
     }
 
@@ -161,9 +164,9 @@ class FeeDelegatedCancelWithRatio extends AbstractFeeDelegatedWithRatioTransacti
      */
     async fillTransaction() {
         const [chainId, gasPrice, nonce] = await Promise.all([
-            isNot(this.chainId) ? AbstractTransaction.getChainId() : this.chainId,
-            isNot(this.gasPrice) ? AbstractTransaction.getGasPrice() : this.gasPrice,
-            isNot(this.nonce) ? AbstractTransaction.getNonce(this.from) : this.nonce,
+            isNot(this.chainId) ? this.getChainId() : this.chainId,
+            isNot(this.gasPrice) ? this.getGasPrice() : this.gasPrice,
+            isNot(this.nonce) ? this.getNonce(this.from) : this.nonce,
         ])
 
         this.chainId = chainId
