@@ -14,12 +14,13 @@
 */
 
 import { AbstractTransaction, CreateTransactionObject } from '../abstractTransaction'
+import { KlaytnCall } from '../../../../caver-rpc/src/klay'
 
 export class ChainDataAnchoring extends AbstractTransaction {
-    static create(createTxObj: string | CreateTransactionObject): ChainDataAnchoring
-    static decode(rlpEncoded: string): ChainDataAnchoring
+    static create(createTxObj: string | CreateTransactionObject, klaytnCall?: KlaytnCall): ChainDataAnchoring
+    static decode(rlpEncoded: string, klaytnCall?: KlaytnCall): ChainDataAnchoring
 
-    constructor(createTxObj: string | CreateTransactionObject)
+    constructor(createTxObj: string | CreateTransactionObject, klaytnCall?: KlaytnCall)
 
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string

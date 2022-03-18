@@ -16,12 +16,13 @@
 import { Account } from '../../../../caver-account/src'
 import { AbstractFeeDelegatedTransaction } from '../abstractFeeDelegatedTransaction'
 import { CreateTransactionObject } from '../abstractTransaction'
+import { KlaytnCall } from '../../../../caver-rpc/src/klay'
 
 export class FeeDelegatedAccountUpdate extends AbstractFeeDelegatedTransaction {
-    static create(createTxObj: string | CreateTransactionObject): FeeDelegatedAccountUpdate
-    static decode(rlpEncoded: string): FeeDelegatedAccountUpdate
+    static create(createTxObj: string | CreateTransactionObject, klaytnCall?: KlaytnCall): FeeDelegatedAccountUpdate
+    static decode(rlpEncoded: string, klaytnCall?: KlaytnCall): FeeDelegatedAccountUpdate
 
-    constructor(createTxObj: string | CreateTransactionObject)
+    constructor(createTxObj: string | CreateTransactionObject, klaytnCall?: KlaytnCall)
 
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string

@@ -15,12 +15,13 @@
 
 import { AbstractTransaction, CreateTransactionObject } from '../abstractTransaction'
 import { SignatureData } from '../../../../caver-wallet/src/'
+import { KlaytnCall } from '../../../../caver-rpc/src/klay'
 
 export class LegacyTransaction extends AbstractTransaction {
-    static create(createTxObj: CreateTransactionObject): LegacyTransaction
-    static decode(rlpEncoded: string): LegacyTransaction
+    static create(createTxObj: CreateTransactionObject, klaytnCall?: KlaytnCall): LegacyTransaction
+    static decode(rlpEncoded: string, klaytnCall?: KlaytnCall): LegacyTransaction
 
-    constructor(createTxObj: CreateTransactionObject)
+    constructor(createTxObj: CreateTransactionObject, klaytnCall?: KlaytnCall)
 
     appendSignatures(sig: string[] | string[][] | SignatureData | SignatureData[]): void
     getRLPEncoding(): string

@@ -18,7 +18,7 @@ import { AbstractTransaction, AbstractFeeDelegatedTransaction } from '../../cave
 import { SignatureData } from '../../caver-wallet/src'
 
 export class Validator {
-    static _klaytnCall: KlaytnCall
+    constructor(klaytnCall: KlaytnCall)
 
     validateSignedMessage(
         message: string,
@@ -29,4 +29,7 @@ export class Validator {
     validateTransaction(tx: AbstractTransaction): Promise<boolean>
     validateSender(tx: AbstractTransaction): Promise<boolean>
     validateFeePayer(tx: AbstractFeeDelegatedTransaction): Promise<boolean>
+
+    klaytnCall: KlaytnCall
+    private _klaytnCall: KlaytnCall
 }

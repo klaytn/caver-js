@@ -45,11 +45,11 @@ const caver = new Caver()
 // $ExpectType Validator
 caver.validator
 
-// $ExpectType KlaytnCall
-Validator._klaytnCall
-
 // $ExpectType Validator
-const validator = new Validator()
+const validator = new Validator(caver.rpc.klay.klaytnCall)
+
+// $ExpectType KlaytnCall
+validator.klaytnCall
 
 const sig = new SignatureData(['0x01', '0x', '0x'])
 

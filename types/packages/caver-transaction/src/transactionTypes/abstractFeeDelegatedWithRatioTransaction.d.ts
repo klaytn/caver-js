@@ -15,9 +15,10 @@
 
 import { AbstractFeeDelegatedTransaction } from './abstractFeeDelegatedTransaction'
 import { CreateTransactionObject } from './abstractTransaction'
+import { KlaytnCall } from '../../../caver-rpc/src/klay'
 
 export class AbstractFeeDelegatedWithRatioTransaction extends AbstractFeeDelegatedTransaction {
-    constructor(typeString: string, createTxObj: CreateTransactionObject)
+    constructor(typeString: string, createTxObj: CreateTransactionObject, klaytnCall?: KlaytnCall)
 
     feeRatio: string
     private _feeRatio: string

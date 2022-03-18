@@ -14,7 +14,8 @@
 */
 
 import { Transaction } from '..'
+import { KlaytnCall } from '../../../caver-rpc/src/klay'
 
 export interface TransactionDecoder {
-    decode(rlpEncoded: string): Transaction
+    decode(rlpEncoded: string, klaytnCall?: KlaytnCall): Transaction
 }
