@@ -16,6 +16,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+/* eslint-disable no-unused-vars */
 const LegacyTransaction = require('./transactionTypes/legacyTransaction/legacyTransaction')
 const EthereumAccessList = require('./transactionTypes/ethereumTypedTransaction/ethereumAccessList')
 const EthereumDynamicFee = require('./transactionTypes/ethereumTypedTransaction/ethereumDynamicFee')
@@ -132,7 +133,7 @@ class TransactionModule {
     /**
      * @type {object}
      */
-     get klaytnCall() {
+    get klaytnCall() {
         return this._klaytnCall
     }
 
@@ -275,7 +276,7 @@ class TransactionModule {
             )
         return tx.recoverFeePayerPublicKeys()
     }
-    
+
     /**
      * Decodes RLP-encoded transaction string and returns a Transaction instance.
      *
@@ -288,7 +289,6 @@ class TransactionModule {
     decode(encoded) {
         return TransactionDecoder.decode(encoded)
     }
-    
 }
 
 module.exports = TransactionModule

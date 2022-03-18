@@ -29,7 +29,6 @@ const expect = chai.expect
 const testRPCURL = require('../../testrpc')
 const Caver = require('../../../index')
 
-const AbstractTransaction = require('../../../packages/caver-transaction/src/transactionTypes/abstractTransaction')
 const txSamples = require('./transactionSamples')
 
 let caver
@@ -42,7 +41,6 @@ before(() => {
 })
 
 describe('caver.transaction.getTransactionByHash', () => {
-
     afterEach(() => {
         sandbox.restore()
     })

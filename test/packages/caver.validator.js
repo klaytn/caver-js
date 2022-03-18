@@ -30,7 +30,6 @@ const testRPCURL = require('../testrpc')
 
 const Caver = require('../../index')
 
-const Validator = require('../../packages/caver-validator')
 const SignatureData = require('../../packages/caver-wallet/src/keyring/signatureData')
 
 let caver

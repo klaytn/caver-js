@@ -47,7 +47,7 @@ describe('get transaction', () => {
         const keyring = caver.wallet.keyring.generate()
         // Add to caver.wallet
         caver.wallet.add(keyring)
-        
+
         // Create value transfer transaction
         const vt = caver.transaction.valueTransfer.create({
             from: keyring.address,

@@ -38,8 +38,6 @@ const TransactionHasher = require('../../../packages/caver-transaction/src/trans
 
 const { generateRoleBasedKeyring, makeAccount, accountKeyTestCases, checkSignature, checkFeePayerSignature } = require('../utils')
 
-const AbstractTransaction = require('../../../packages/caver-transaction/src/transactionTypes/abstractTransaction')
-
 let caver
 let sender
 let feePayer
@@ -303,7 +301,7 @@ function makeAccountUpdateObjectWithExpectedValues() {
 
 before(() => {
     caver = new Caver(testRPCURL)
-    
+
     sender = caver.wallet.add(caver.wallet.keyring.generate())
     feePayer = caver.wallet.add(caver.wallet.keyring.generate())
     roleBasedKeyring = generateRoleBasedKeyring([3, 3, 3])

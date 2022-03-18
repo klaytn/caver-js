@@ -40,7 +40,7 @@ class FeeDelegatedAccountUpdateWithRatioWrapper {
      * @param {object} obj - An object defines fields to create a tx.
      * @return {string} An RLP-encoded transaction string.
      */
-     create(obj) {
+    create(obj) {
         return FeeDelegatedAccountUpdateWithRatio.create(obj, this.klaytnCall)
     }
 

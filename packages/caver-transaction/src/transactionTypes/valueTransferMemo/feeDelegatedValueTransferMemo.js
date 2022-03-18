@@ -19,7 +19,6 @@
 const RLP = require('eth-lib/lib/rlp')
 const Bytes = require('eth-lib/lib/bytes')
 const _ = require('lodash')
-const AbstractTransaction = require('../abstractTransaction')
 const AbstractFeeDelegatedTransaction = require('../abstractFeeDelegatedTransaction')
 const { TX_TYPE_STRING, TX_TYPE_TAG, isNot } = require('../../transactionHelper/transactionHelper')
 const utils = require('../../../../caver-utils/src')

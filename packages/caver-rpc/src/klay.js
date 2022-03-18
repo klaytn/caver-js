@@ -35,7 +35,6 @@ const MethodBase = require('../../caver-core-method')
 const utils = require('../../caver-utils')
 
 const AbstractTransaction = require('../../caver-transaction/src/transactionTypes/abstractTransaction')
-const Validator = require('../../caver-validator')
 
 /**
  * A class that can invoke Klay RPC Calls.

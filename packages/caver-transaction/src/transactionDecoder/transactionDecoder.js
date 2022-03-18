@@ -56,7 +56,7 @@ class TransactionDecoder {
      *
      * @param {string} rlpEncoded - An RLP-encoded transaction string to decode.
      * @param {object} [klaytnCall] - An object includes klay rpc calls.
-     * 
+     *
      * @return {module:Transaction.Transaction}
      */
     static decode(rlpEncoded, klaytnCall) {

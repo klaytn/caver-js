@@ -38,8 +38,6 @@ const SignatureData = require('../../../packages/caver-wallet/src/keyring/signat
 
 const { generateDecoupledKeyring, generateMultiSigKeyring, generateRoleBasedKeyring } = require('../utils')
 
-const AbstractTransaction = require('../../../packages/caver-transaction/src/transactionTypes/abstractTransaction')
-
 let caver
 let sender
 let testKeyring
