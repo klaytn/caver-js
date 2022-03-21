@@ -41,7 +41,7 @@ describe('get transaction', () => {
 
         const getChainIdStub1 = sandbox.stub(caver.rpc.klay.klaytnCall, 'getChainId')
         getChainIdStub1.resolves('0x3e9')
-        const getChainIdStub2 = sandbox.stub(caver2.rpc.klay.klaytnCall, 'getAccountKey')
+        const getChainIdStub2 = sandbox.stub(caver2.rpc.klay.klaytnCall, 'getChainId')
         getChainIdStub2.resolves('0x2019')
 
         const keyring = caver.wallet.keyring.generate()
