@@ -85,8 +85,6 @@ function Caver(provider, net) {
     this.utils = utils
     /** @type {typeof Account} */
     this.account = Account
-    /** @type {module:Transaction} */
-    this.transaction = Transaction
 
     /** @type {ABI} */
     this.abi = abi
@@ -99,8 +97,11 @@ function Caver(provider, net) {
     this.klay = new Klay(this)
     /** @type {RPC} */
     this.rpc = new RPC(this)
+
     /** @type {Validator} */
-    this.validator = new Validator()
+    this.validator = new Validator(this.rpc.klay.klaytnCall)
+    /** @type {module:Transaction} */
+    this.transaction = new Transaction(this.rpc.klay.klaytnCall)
 
     /** @type {IPFS} */
     this.ipfs = new IPFS()

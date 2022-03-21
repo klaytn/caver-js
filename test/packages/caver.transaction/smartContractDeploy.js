@@ -36,8 +36,6 @@ const TransactionHasher = require('../../../packages/caver-transaction/src/trans
 
 const { generateRoleBasedKeyring, checkSignature } = require('../utils')
 
-const AbstractTransaction = require('../../../packages/caver-transaction/src/transactionTypes/abstractTransaction')
-
 let caver
 let sender
 let roleBasedKeyring
@@ -51,12 +49,6 @@ const txWithExpectedValues = {}
 
 before(() => {
     caver = new Caver(testRPCURL)
-    AbstractTransaction._klaytnCall = {
-        getGasPrice: () => {},
-        getTransactionCount: () => {},
-        getChainId: () => {},
-    }
-
     sender = caver.wallet.add(caver.wallet.keyring.generate())
     roleBasedKeyring = generateRoleBasedKeyring([3, 3, 3])
 
@@ -101,11 +93,11 @@ describe('TxTypeSmartContractDeploy', () => {
             input: byteCode,
         }
 
-        getGasPriceSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getGasPrice')
+        getGasPriceSpy = sandbox.stub(caver.transaction.klaytnCall, 'getGasPrice')
         getGasPriceSpy.returns('0x5d21dba00')
-        getNonceSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionCount')
+        getNonceSpy = sandbox.stub(caver.transaction.klaytnCall, 'getTransactionCount')
         getNonceSpy.returns('0x3a')
-        getChainIdSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getChainId')
+        getChainIdSpy = sandbox.stub(caver.transaction.klaytnCall, 'getChainId')
         getChainIdSpy.returns('0x7e3')
     })
 
@@ -118,42 +110,42 @@ describe('TxTypeSmartContractDeploy', () => {
             delete transactionObj.from
 
             const expectedError = '"from" is missing'
-            expect(() => new caver.transaction.smartContractDeploy(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.smartContractDeploy.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-200: If smartContractDeploy not define gas, return error', () => {
             delete transactionObj.gas
 
             const expectedError = '"gas" is missing'
-            expect(() => new caver.transaction.smartContractDeploy(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.smartContractDeploy.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-201: If smartContractDeploy not define input, return error', () => {
             delete transactionObj.input
 
             const expectedError = '"input" is missing'
-            expect(() => new caver.transaction.smartContractDeploy(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.smartContractDeploy.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-202: If smartContractDeploy define from property with invalid address, return error', () => {
             transactionObj.from = 'invalid'
 
             const expectedError = `Invalid address of from: ${transactionObj.from}`
-            expect(() => new caver.transaction.smartContractDeploy(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.smartContractDeploy.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-203: If smartContractDeploy define codeFormat property with invalid codeFormat, return error', () => {
             transactionObj.codeFormat = 'nonEVM'
 
             const expectedError = `The codeFormat(${transactionObj.codeFormat}) is invalid.`
-            expect(() => new caver.transaction.smartContractDeploy(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.smartContractDeploy.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-204: If smartContractDeploy define humanReadable property with true, return error', () => {
             transactionObj.humanReadable = true
 
             const expectedError = `HumanReadableAddress is not supported yet.`
-            expect(() => new caver.transaction.smartContractDeploy(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.smartContractDeploy.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-205: If smartContractDeploy define unnecessary property, return error', () => {
@@ -182,20 +174,20 @@ describe('TxTypeSmartContractDeploy', () => {
                 transactionObj[unnecessaries[i].name] = unnecessaries[i].value
 
                 const expectedError = `"${unnecessaries[i].name}" cannot be used with ${caver.transaction.type.TxTypeSmartContractDeploy} transaction`
-                expect(() => new caver.transaction.smartContractDeploy(transactionObj)).to.throw(expectedError)
+                expect(() => caver.transaction.smartContractDeploy.create(transactionObj)).to.throw(expectedError)
             }
         })
     })
 
     context('smartContractDeploy.getRLPEncoding', () => {
         it('CAVERJS-UNIT-TRANSACTION-206: Returns RLP-encoded string', () => {
-            const tx = new caver.transaction.smartContractDeploy(txWithExpectedValues.tx)
+            const tx = caver.transaction.smartContractDeploy.create(txWithExpectedValues.tx)
 
             expect(tx.getRLPEncoding()).to.equal(txWithExpectedValues.rlpEncoding)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-207: getRLPEncoding should throw error when nonce is undefined', () => {
-            const tx = new caver.transaction.smartContractDeploy(txWithExpectedValues.tx)
+            const tx = caver.transaction.smartContractDeploy.create(txWithExpectedValues.tx)
             delete tx._nonce
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -204,7 +196,7 @@ describe('TxTypeSmartContractDeploy', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-208: getRLPEncoding should throw error when gasPrice is undefined', () => {
-            const tx = new caver.transaction.smartContractDeploy(txWithExpectedValues.tx)
+            const tx = caver.transaction.smartContractDeploy.create(txWithExpectedValues.tx)
             delete tx._gasPrice
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -224,7 +216,7 @@ describe('TxTypeSmartContractDeploy', () => {
         let tx
 
         beforeEach(() => {
-            tx = new caver.transaction.smartContractDeploy(transactionObj)
+            tx = caver.transaction.smartContractDeploy.create(transactionObj)
 
             fillTransactionSpy = sandbox.spy(tx, 'fillTransaction')
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
@@ -316,7 +308,7 @@ describe('TxTypeSmartContractDeploy', () => {
 
         it('CAVERJS-UNIT-TRANSACTION-216: input: keyring. should throw error when from is different.', async () => {
             transactionObj.from = roleBasedKeyring.address
-            tx = new caver.transaction.smartContractDeploy(transactionObj)
+            tx = caver.transaction.smartContractDeploy.create(transactionObj)
 
             const expectedError = `The from address of the transaction is different with the address of the keyring to use.`
             await expect(tx.sign(sender)).to.be.rejectedWith(expectedError)
@@ -324,7 +316,7 @@ describe('TxTypeSmartContractDeploy', () => {
 
         it('CAVERJS-UNIT-TRANSACTION-217: input: rolebased keyring, index out of range. should throw error.', async () => {
             transactionObj.from = roleBasedKeyring.address
-            tx = new caver.transaction.smartContractDeploy(transactionObj)
+            tx = caver.transaction.smartContractDeploy.create(transactionObj)
 
             const expectedError = `Invalid index(10): index must be less than the length of keys(${roleBasedKeyring.keys[0].length}).`
             await expect(tx.sign(roleBasedKeyring, 10)).to.be.rejectedWith(expectedError)
@@ -342,7 +334,7 @@ describe('TxTypeSmartContractDeploy', () => {
         let tx
 
         beforeEach(() => {
-            tx = new caver.transaction.smartContractDeploy(transactionObj)
+            tx = caver.transaction.smartContractDeploy.create(transactionObj)
 
             fillTransactionSpy = sandbox.spy(tx, 'fillTransaction')
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
@@ -405,7 +397,7 @@ describe('TxTypeSmartContractDeploy', () => {
 
         it('CAVERJS-UNIT-TRANSACTION-222: input: keyring. should throw error when from is different.', async () => {
             transactionObj.from = roleBasedKeyring.address
-            tx = new caver.transaction.smartContractDeploy(transactionObj)
+            tx = caver.transaction.smartContractDeploy.create(transactionObj)
 
             const expectedError = `The from address of the transaction is different with the address of the keyring to use.`
             await expect(tx.sign(sender)).to.be.rejectedWith(expectedError)
@@ -431,7 +423,7 @@ describe('TxTypeSmartContractDeploy', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-224: If signatures is empty, appendSignatures append signatures in transaction', () => {
-            const tx = new caver.transaction.smartContractDeploy(transactionObj)
+            const tx = caver.transaction.smartContractDeploy.create(transactionObj)
 
             const sig = [
                 '0x0fea',
@@ -443,7 +435,7 @@ describe('TxTypeSmartContractDeploy', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-225: If signatures is empty, appendSignatures append signatures with two-dimensional signature array', () => {
-            const tx = new caver.transaction.smartContractDeploy(transactionObj)
+            const tx = caver.transaction.smartContractDeploy.create(transactionObj)
 
             const sig = [
                 [
@@ -462,7 +454,7 @@ describe('TxTypeSmartContractDeploy', () => {
                 '0xade9480f584fe481bf070ab758ecc010afa15debc33e1bd75af637d834073a6e',
                 '0x38160105d78cef4529d765941ad6637d8dcf6bd99310e165fee1c39fff2aa27e',
             ]
-            const tx = new caver.transaction.smartContractDeploy(transactionObj)
+            const tx = caver.transaction.smartContractDeploy.create(transactionObj)
 
             const sig = [
                 '0x0fea',
@@ -475,7 +467,7 @@ describe('TxTypeSmartContractDeploy', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-227: appendSignatures should append multiple signatures', () => {
-            const tx = new caver.transaction.smartContractDeploy(transactionObj)
+            const tx = caver.transaction.smartContractDeploy.create(transactionObj)
 
             const sig = [
                 [
@@ -514,7 +506,7 @@ describe('TxTypeSmartContractDeploy', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-228: combineSignedRawTransactions combines single signature and sets signatures in transaction', () => {
-            const tx = new caver.transaction.smartContractDeploy(transactionObj)
+            const tx = caver.transaction.smartContractDeploy.create(transactionObj)
             const appendSignaturesSpy = sandbox.spy(tx, 'appendSignatures')
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
@@ -544,7 +536,7 @@ describe('TxTypeSmartContractDeploy', () => {
                     '0x10b441518b74b9cb15d86403a4c59a562a4669bc9c878d77276f0205304c3d85',
                 ],
             ]
-            const tx = new caver.transaction.smartContractDeploy(transactionObj)
+            const tx = caver.transaction.smartContractDeploy.create(transactionObj)
 
             const rlpEncodedStrings = [
                 '0x28f9027e018505d21dba00830dbba080809447a4caa81fe2ed8cc834aafe5b1d7ee3ddedecfab9020e60806040526000805534801561001457600080fd5b506101ea806100246000396000f30060806040526004361061006d576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806306661abd1461007257806342cbb15c1461009d578063767800de146100c8578063b22636271461011f578063d14e62b814610150575b600080fd5b34801561007e57600080fd5b5061008761017d565b6040518082815260200191505060405180910390f35b3480156100a957600080fd5b506100b2610183565b6040518082815260200191505060405180910390f35b3480156100d457600080fd5b506100dd61018b565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b34801561012b57600080fd5b5061014e60048036038101908080356000191690602001909291905050506101b1565b005b34801561015c57600080fd5b5061017b600480360381019080803590602001909291905050506101b4565b005b60005481565b600043905090565b600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b50565b80600081905550505600a165627a7a7230582053c65686a3571c517e2cf4f741d842e5ee6aa665c96ce70f46f9a594794f11eb00298080f847f845820fe9a06f59d699a5dd22a653b0ed1e39cbfc52ee468607eec95b195f302680ed7f9815a03b2f3f2a7a9482edfbcc9ee8e003e284b6c4a7ecbc8d361cc486562d4bdda389',
@@ -584,7 +576,7 @@ describe('TxTypeSmartContractDeploy', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-230: If decode transaction has different values, combineSignedRawTransactions should throw error', () => {
-            const tx = new caver.transaction.smartContractDeploy(transactionObj)
+            const tx = caver.transaction.smartContractDeploy.create(transactionObj)
             tx.value = 10000
 
             const rlpEncoded =
@@ -601,7 +593,7 @@ describe('TxTypeSmartContractDeploy', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-231: getRawTransaction should call getRLPEncoding function', () => {
-            const tx = new caver.transaction.smartContractDeploy(txWithExpectedValues.tx)
+            const tx = caver.transaction.smartContractDeploy.create(txWithExpectedValues.tx)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
             const expected = txWithExpectedValues.rlpEncoding
@@ -618,7 +610,7 @@ describe('TxTypeSmartContractDeploy', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-232: getTransactionHash should call getRLPEncoding function and return hash of RLPEncoding', () => {
-            const tx = new caver.transaction.smartContractDeploy(txWithExpectedValues.tx)
+            const tx = caver.transaction.smartContractDeploy.create(txWithExpectedValues.tx)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
             const expected = txWithExpectedValues.transactionHash
@@ -630,7 +622,7 @@ describe('TxTypeSmartContractDeploy', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-233: getTransactionHash should throw error when nonce is undefined', () => {
-            const tx = new caver.transaction.smartContractDeploy(txWithExpectedValues.tx)
+            const tx = caver.transaction.smartContractDeploy.create(txWithExpectedValues.tx)
             delete tx._nonce
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -639,7 +631,7 @@ describe('TxTypeSmartContractDeploy', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-234: getTransactionHash should throw error when gasPrice is undefined', () => {
-            const tx = new caver.transaction.smartContractDeploy(txWithExpectedValues.tx)
+            const tx = caver.transaction.smartContractDeploy.create(txWithExpectedValues.tx)
             delete tx._gasPrice
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -654,7 +646,7 @@ describe('TxTypeSmartContractDeploy', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-236: getSenderTxHash should call getRLPEncoding function and return hash of RLPEncoding', () => {
-            const tx = new caver.transaction.smartContractDeploy(txWithExpectedValues.tx)
+            const tx = caver.transaction.smartContractDeploy.create(txWithExpectedValues.tx)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
             const expected = txWithExpectedValues.senderTxHash
@@ -666,7 +658,7 @@ describe('TxTypeSmartContractDeploy', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-237: getSenderTxHash should throw error when nonce is undefined', () => {
-            const tx = new caver.transaction.smartContractDeploy(txWithExpectedValues.tx)
+            const tx = caver.transaction.smartContractDeploy.create(txWithExpectedValues.tx)
             delete tx._nonce
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -675,7 +667,7 @@ describe('TxTypeSmartContractDeploy', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-238: getSenderTxHash should throw error when gasPrice is undefined', () => {
-            const tx = new caver.transaction.smartContractDeploy(txWithExpectedValues.tx)
+            const tx = caver.transaction.smartContractDeploy.create(txWithExpectedValues.tx)
             delete tx._gasPrice
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -690,7 +682,7 @@ describe('TxTypeSmartContractDeploy', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-240: getRLPEncodingForSignature should return RLP-encoded transaction string for signing', () => {
-            const tx = new caver.transaction.smartContractDeploy(txWithExpectedValues.tx)
+            const tx = caver.transaction.smartContractDeploy.create(txWithExpectedValues.tx)
 
             const commonRLPForSigningSpy = sandbox.spy(tx, 'getCommonRLPEncodingForSignature')
 
@@ -702,7 +694,7 @@ describe('TxTypeSmartContractDeploy', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-241: getRLPEncodingForSignature should throw error when nonce is undefined', () => {
-            const tx = new caver.transaction.smartContractDeploy(txWithExpectedValues.tx)
+            const tx = caver.transaction.smartContractDeploy.create(txWithExpectedValues.tx)
             delete tx._nonce
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -711,7 +703,7 @@ describe('TxTypeSmartContractDeploy', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-242: getRLPEncodingForSignature should throw error when gasPrice is undefined', () => {
-            const tx = new caver.transaction.smartContractDeploy(txWithExpectedValues.tx)
+            const tx = caver.transaction.smartContractDeploy.create(txWithExpectedValues.tx)
             delete tx._gasPrice
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -720,7 +712,7 @@ describe('TxTypeSmartContractDeploy', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-243: getRLPEncodingForSignature should throw error when chainId is undefined', () => {
-            const tx = new caver.transaction.smartContractDeploy(txWithExpectedValues.tx)
+            const tx = caver.transaction.smartContractDeploy.create(txWithExpectedValues.tx)
             delete tx._chainId
 
             const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
@@ -731,7 +723,7 @@ describe('TxTypeSmartContractDeploy', () => {
 
     context('smartContractDeploy.getCommonRLPEncodingForSignature', () => {
         it('CAVERJS-UNIT-TRANSACTION-244: getRLPEncodingForSignature should return RLP-encoded transaction string for signing', () => {
-            const tx = new caver.transaction.smartContractDeploy(txWithExpectedValues.tx)
+            const tx = caver.transaction.smartContractDeploy.create(txWithExpectedValues.tx)
 
             const commonRLPForSign = tx.getCommonRLPEncodingForSignature()
 
@@ -741,7 +733,7 @@ describe('TxTypeSmartContractDeploy', () => {
 
     context('smartContractDeploy.fillTransaction', () => {
         it('CAVERJS-UNIT-TRANSACTION-245: fillTransaction should call klay_getGasPrice to fill gasPrice when gasPrice is undefined', async () => {
-            const tx = new caver.transaction.smartContractDeploy(txWithExpectedValues.tx)
+            const tx = caver.transaction.smartContractDeploy.create(txWithExpectedValues.tx)
             delete tx._gasPrice
 
             await tx.fillTransaction()
@@ -751,7 +743,7 @@ describe('TxTypeSmartContractDeploy', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-246: fillTransaction should call klay_getTransactionCount to fill nonce when nonce is undefined', async () => {
-            const tx = new caver.transaction.smartContractDeploy(txWithExpectedValues.tx)
+            const tx = caver.transaction.smartContractDeploy.create(txWithExpectedValues.tx)
             delete tx._nonce
 
             await tx.fillTransaction()
@@ -761,7 +753,7 @@ describe('TxTypeSmartContractDeploy', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-247: fillTransaction should call klay_getChainid to fill chainId when chainId is undefined', async () => {
-            const tx = new caver.transaction.smartContractDeploy(txWithExpectedValues.tx)
+            const tx = caver.transaction.smartContractDeploy.create(txWithExpectedValues.tx)
             delete tx._chainId
 
             await tx.fillTransaction()

@@ -29,6 +29,16 @@ const AbstractFeeDelegatedTransaction = require('../../caver-transaction/src/tra
  */
 class Validator {
     /**
+     * Creates a Validator.
+     *
+     * @constructor
+     * @param {object} klaytnCall - An object includes klay rpc calls.
+     */
+    constructor(klaytnCall) {
+        this.klaytnCall = klaytnCall
+    }
+
+    /**
      * Validates a signed message by comparing the public key recovered from the signature with the account key of the Klaytn account.
      *
      * @example
@@ -47,7 +57,7 @@ class Validator {
      * @return {Promise<boolean>} The promise will be resolved with a boolean value of whether the signature on the message is valid or not.
      */
     async validateSignedMessage(message, signatures, address, isHashed = false) {
-        const getAccountKeyResult = await Validator._klaytnCall.getAccountKey(address)
+        const getAccountKeyResult = await this.klaytnCall.getAccountKey(address)
 
         // Remove duplicate and format to `Array.<SignatureData>` type.
         signatures = refineSignatures(signatures)
@@ -106,7 +116,7 @@ class Validator {
             throw new Error(
                 'Invalid parameter type: To validate `signatures` field in the transaction, you need to pass the transaction instance.'
             )
-        const fromAccountKey = await Validator._klaytnCall.getAccountKey(tx.from)
+        const fromAccountKey = await this.klaytnCall.getAccountKey(tx.from)
         const publicKeys = tx.recoverPublicKeys()
 
         const role = tx.type.includes('AccountUpdate') ? KEY_ROLE.roleAccountUpdateKey : KEY_ROLE.roleTransactionKey
@@ -133,7 +143,7 @@ class Validator {
             throw new Error(
                 'Invalid parameter type: To validate `feePayerSignatures` field in the transaction, you need to pass the fee-delegated transaction instance.'
             )
-        const feePayerAccountKey = await Validator._klaytnCall.getAccountKey(tx.feePayer)
+        const feePayerAccountKey = await this.klaytnCall.getAccountKey(tx.feePayer)
         const publicKeys = tx.recoverFeePayerPublicKeys()
 
         const role = KEY_ROLE.roleFeePayerKey

@@ -60,7 +60,7 @@ describe('Connect IPFS with Klaytn', () => {
 
         // Create ValueTransferMemo transaction
         // to submit IPFS hash to Klaytn network
-        const vtm = new caver.transaction.valueTransferMemo({
+        const vtm = caver.transaction.valueTransferMemo.create({
             from: sender.address,
             to: sender.address,
             value: 1,

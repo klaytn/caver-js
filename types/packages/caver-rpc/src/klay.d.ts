@@ -84,10 +84,13 @@ export interface KlaytnCall {
     getHeaderByNumber: Klay['getHeaderByNumber']
     getTransactionByHash: Klay['getTransactionByHash']
     getTransactionCount: Klay['getTransactionCount']
+    getMaxPriorityFeePerGas: Klay['getMaxPriorityFeePerGas']
 }
 
 export class Klay {
     constructor(...args: any[])
+
+    klaytnCall: KlaytnCall
 
     accountCreated(address: string, callback?: (error: Error, result: boolean) => void): Promise<boolean>
     accountCreated(address: string, blockNumber: BlockNumber, callback?: (error: Error, result: boolean) => void): Promise<boolean>

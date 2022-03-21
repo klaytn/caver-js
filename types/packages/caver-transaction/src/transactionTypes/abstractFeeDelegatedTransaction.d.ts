@@ -15,9 +15,10 @@
 
 import { Keyring, SignatureData } from '../../../caver-wallet/src'
 import { AbstractTransaction, CreateTransactionObject } from './abstractTransaction'
+import { KlaytnCall } from '../../../caver-rpc/src/klay'
 
 export class AbstractFeeDelegatedTransaction extends AbstractTransaction {
-    constructor(typeString: string, createTxObj: CreateTransactionObject)
+    constructor(typeString: string, createTxObj: CreateTransactionObject, klaytnCall?: KlaytnCall)
 
     signAsFeePayer(
         key: string | Keyring,

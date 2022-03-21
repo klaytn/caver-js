@@ -14,12 +14,13 @@
 */
 
 import { AbstractTransaction, CreateTransactionObject } from '../abstractTransaction'
+import { KlaytnCall } from '../../../../caver-rpc/src/klay'
 
 export class Cancel extends AbstractTransaction {
-    static create(createTxObj: string | CreateTransactionObject): Cancel
-    static decode(rlpEncoded: string): Cancel
+    static create(createTxObj: string | CreateTransactionObject, klaytnCall?: KlaytnCall): Cancel
+    static decode(rlpEncoded: string, klaytnCall?: KlaytnCall): Cancel
 
-    constructor(createTxObj: string | CreateTransactionObject)
+    constructor(createTxObj: string | CreateTransactionObject, klaytnCall?: KlaytnCall)
 
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string

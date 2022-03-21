@@ -374,7 +374,7 @@ describe('caver.rpc.klay', () => {
             expect(typeof isUnlock).to.equals('boolean')
             expect(isUnlock).to.be.true
 
-            const feeDelegated = new caver.transaction.feeDelegatedValueTransfer({
+            const feeDelegated = caver.transaction.feeDelegatedValueTransfer.create({
                 from: keyringToImport.address,
                 to: sender.address,
                 value: 1,
@@ -403,7 +403,7 @@ describe('caver.rpc.klay', () => {
             expect(typeof isUnlock).to.equals('boolean')
             expect(isUnlock).to.be.true
 
-            const feeDelegated = new caver.transaction.feeDelegatedValueTransfer({
+            const feeDelegated = caver.transaction.feeDelegatedValueTransfer.create({
                 from: sender.address,
                 to: keyringToImport.address,
                 value: 1,
@@ -429,7 +429,7 @@ describe('caver.rpc.klay', () => {
             keyringToImport = caver.wallet.add(keyringToImport)
 
             // Send KLAY to test keyring
-            const valueTransfer = new caver.transaction.valueTransfer({
+            const valueTransfer = caver.transaction.valueTransfer.create({
                 from: sender.address,
                 to: keyringToImport.address,
                 value: caver.utils.toPeb(1, 'KLAY'),
@@ -446,7 +446,7 @@ describe('caver.rpc.klay', () => {
             expect(typeof isUnlock).to.equals('boolean')
             expect(isUnlock).to.be.true
 
-            const feeDelegated = new caver.transaction.feeDelegatedValueTransfer({
+            const feeDelegated = caver.transaction.feeDelegatedValueTransfer.create({
                 from: sender.address,
                 to: keyringToImport.address,
                 value: 1,

@@ -38,8 +38,6 @@ const TransactionHasher = require('../../../packages/caver-transaction/src/trans
 
 const { generateRoleBasedKeyring, checkSignature } = require('../utils')
 
-const AbstractTransaction = require('../../../packages/caver-transaction/src/transactionTypes/abstractTransaction')
-
 let caver
 let sender
 let testKeyring
@@ -51,11 +49,6 @@ const sandbox = sinon.createSandbox()
 
 before(() => {
     caver = new Caver(testRPCURL)
-    AbstractTransaction._klaytnCall = {
-        getGasPrice: () => {},
-        getTransactionCount: () => {},
-        getChainId: () => {},
-    }
 
     sender = caver.wallet.add(caver.wallet.keyring.generate())
     testKeyring = caver.wallet.add(caver.wallet.keyring.generate())
@@ -98,11 +91,11 @@ describe('TxTypeValueTransfer', () => {
             gas: '0x3b9ac9ff',
         }
 
-        getGasPriceSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getGasPrice')
+        getGasPriceSpy = sandbox.stub(caver.transaction.klaytnCall, 'getGasPrice')
         getGasPriceSpy.returns('0x5d21dba00')
-        getNonceSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionCount')
+        getNonceSpy = sandbox.stub(caver.transaction.klaytnCall, 'getTransactionCount')
         getNonceSpy.returns('0x3a')
-        getChainIdSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getChainId')
+        getChainIdSpy = sandbox.stub(caver.transaction.klaytnCall, 'getChainId')
         getChainIdSpy.returns('0x7e3')
     })
 
@@ -115,42 +108,42 @@ describe('TxTypeValueTransfer', () => {
             delete transactionObj.from
 
             const expectedError = '"from" is missing'
-            expect(() => new caver.transaction.valueTransfer(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.valueTransfer.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-054: If valueTransfer not define to, return error', () => {
             delete transactionObj.to
 
             const expectedError = '"to" is missing'
-            expect(() => new caver.transaction.valueTransfer(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.valueTransfer.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-055: If valueTransfer not define value, return error', () => {
             delete transactionObj.value
 
             const expectedError = '"value" is missing'
-            expect(() => new caver.transaction.valueTransfer(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.valueTransfer.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-056: If valueTransfer not define gas, return error', () => {
             delete transactionObj.gas
 
             const expectedError = '"gas" is missing'
-            expect(() => new caver.transaction.valueTransfer(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.valueTransfer.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-057: If valueTransfer define from property with invalid address, return error', () => {
             transactionObj.from = 'invalid'
 
             const expectedError = `Invalid address of from: ${transactionObj.from}`
-            expect(() => new caver.transaction.valueTransfer(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.valueTransfer.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-058: If valueTransfer define to property with invalid address, return error', () => {
             transactionObj.to = 'invalid address'
 
             const expectedError = `Invalid address of to: ${transactionObj.to}`
-            expect(() => new caver.transaction.valueTransfer(transactionObj)).to.throw(expectedError)
+            expect(() => caver.transaction.valueTransfer.create(transactionObj)).to.throw(expectedError)
         })
 
         it('CAVERJS-UNIT-TRANSACTION-059: If valueTransfer define unnecessary property, return error', () => {
@@ -182,14 +175,14 @@ describe('TxTypeValueTransfer', () => {
                 transactionObj[unnecessaries[i].name] = unnecessaries[i].value
 
                 const expectedError = `"${unnecessaries[i].name}" cannot be used with ${caver.transaction.type.TxTypeValueTransfer} transaction`
-                expect(() => new caver.transaction.valueTransfer(transactionObj)).to.throw(expectedError)
+                expect(() => caver.transaction.valueTransfer.create(transactionObj)).to.throw(expectedError)
             }
         })
     })
 
     context('valueTransfer.getRLPEncoding', () => {
         it('CAVERJS-UNIT-TRANSACTION-060: returns RLP-encoded transaction string', () => {
-            const tx = new caver.transaction.valueTransfer(txWithExpectedValues.tx)
+            const tx = caver.transaction.valueTransfer.create(txWithExpectedValues.tx)
 
             expect(tx.getRLPEncoding()).to.equal(txWithExpectedValues.rlpEncoding)
         })
@@ -197,7 +190,7 @@ describe('TxTypeValueTransfer', () => {
         it('CAVERJS-UNIT-TRANSACTION-061: getRLPEncoding should throw error when nonce is undefined', () => {
             transactionObj.chainId = 2019
             transactionObj.gasPrice = '0x5d21dba00'
-            const tx = new caver.transaction.valueTransfer(transactionObj)
+            const tx = caver.transaction.valueTransfer.create(transactionObj)
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
 
@@ -207,7 +200,7 @@ describe('TxTypeValueTransfer', () => {
         it('CAVERJS-UNIT-TRANSACTION-062: getRLPEncoding should throw error when gasPrice is undefined', () => {
             transactionObj.chainId = 2019
             transactionObj.nonce = '0x3a'
-            const tx = new caver.transaction.valueTransfer(transactionObj)
+            const tx = caver.transaction.valueTransfer.create(transactionObj)
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
 
@@ -226,7 +219,7 @@ describe('TxTypeValueTransfer', () => {
         let tx
 
         beforeEach(() => {
-            tx = new caver.transaction.valueTransfer(transactionObj)
+            tx = caver.transaction.valueTransfer.create(transactionObj)
 
             fillTransactionSpy = sandbox.spy(tx, 'fillTransaction')
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
@@ -318,7 +311,7 @@ describe('TxTypeValueTransfer', () => {
 
         it('CAVERJS-UNIT-TRANSACTION-070: input: keyring. should throw error when from is different.', async () => {
             transactionObj.from = roleBasedKeyring.address
-            tx = new caver.transaction.valueTransfer(transactionObj)
+            tx = caver.transaction.valueTransfer.create(transactionObj)
 
             const expectedError = `The from address of the transaction is different with the address of the keyring to use.`
             await expect(tx.sign(sender)).to.be.rejectedWith(expectedError)
@@ -326,7 +319,7 @@ describe('TxTypeValueTransfer', () => {
 
         it('CAVERJS-UNIT-TRANSACTION-071: input: rolebased keyring, index out of range. should throw error.', async () => {
             transactionObj.from = roleBasedKeyring.address
-            tx = new caver.transaction.valueTransfer(transactionObj)
+            tx = caver.transaction.valueTransfer.create(transactionObj)
 
             const expectedError = `Invalid index(10): index must be less than the length of keys(${roleBasedKeyring.keys[0].length}).`
             await expect(tx.sign(roleBasedKeyring, 10)).to.be.rejectedWith(expectedError)
@@ -344,7 +337,7 @@ describe('TxTypeValueTransfer', () => {
         let tx
 
         beforeEach(() => {
-            tx = new caver.transaction.valueTransfer(transactionObj)
+            tx = caver.transaction.valueTransfer.create(transactionObj)
 
             fillTransactionSpy = sandbox.spy(tx, 'fillTransaction')
             createFromPrivateKeySpy = sandbox.spy(Keyring, 'createFromPrivateKey')
@@ -407,7 +400,7 @@ describe('TxTypeValueTransfer', () => {
 
         it('CAVERJS-UNIT-TRANSACTION-076: input: keyring. should throw error when from is different.', async () => {
             transactionObj.from = roleBasedKeyring.address
-            tx = new caver.transaction.valueTransfer(transactionObj)
+            tx = caver.transaction.valueTransfer.create(transactionObj)
 
             const expectedError = `The from address of the transaction is different with the address of the keyring to use.`
             await expect(tx.sign(sender)).to.be.rejectedWith(expectedError)
@@ -433,7 +426,7 @@ describe('TxTypeValueTransfer', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-078: If signatures is empty, appendSignatures append signatures in transaction', () => {
-            const tx = new caver.transaction.valueTransfer(transactionObj)
+            const tx = caver.transaction.valueTransfer.create(transactionObj)
 
             const sig = [
                 '0x0fea',
@@ -445,7 +438,7 @@ describe('TxTypeValueTransfer', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-079: If signatures is empty, appendSignatures append signatures with two-dimensional signature array', () => {
-            const tx = new caver.transaction.valueTransfer(transactionObj)
+            const tx = caver.transaction.valueTransfer.create(transactionObj)
 
             const sig = [
                 [
@@ -464,7 +457,7 @@ describe('TxTypeValueTransfer', () => {
                 '0xade9480f584fe481bf070ab758ecc010afa15debc33e1bd75af637d834073a6e',
                 '0x38160105d78cef4529d765941ad6637d8dcf6bd99310e165fee1c39fff2aa27e',
             ]
-            const tx = new caver.transaction.valueTransfer(transactionObj)
+            const tx = caver.transaction.valueTransfer.create(transactionObj)
 
             const sig = [
                 '0x0fea',
@@ -477,7 +470,7 @@ describe('TxTypeValueTransfer', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-081: appendSignatures should append multiple signatures', () => {
-            const tx = new caver.transaction.valueTransfer(transactionObj)
+            const tx = caver.transaction.valueTransfer.create(transactionObj)
 
             const sig = [
                 [
@@ -514,7 +507,7 @@ describe('TxTypeValueTransfer', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-082: combineSignedRawTransactions combines single signature and sets signatures in transaction', () => {
-            const tx = new caver.transaction.valueTransfer(transactionObj)
+            const tx = caver.transaction.valueTransfer.create(transactionObj)
             const appendSignaturesSpy = sandbox.spy(tx, 'appendSignatures')
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
@@ -542,7 +535,7 @@ describe('TxTypeValueTransfer', () => {
                 '0x3d820b27d0997baf16f98df01c7b2b2e9734ad05b2228c4d403c2facff8397f3',
                 '0x1f4a44eeb8b7f0b0019162d1d6b90c401078e56fcd7495e74f7cfcd37e25f017',
             ]
-            const tx = new caver.transaction.valueTransfer(transactionObj)
+            const tx = caver.transaction.valueTransfer.create(transactionObj)
 
             const rlpEncodedStrings = [
                 '0x08f87f3a8505d21dba0083015f90948723590d5d60e35f7ce0db5c09d3938b26ff80ae01947d0104ac150f749d36bb34999bcade9f2c0bd2e6f847f845820feaa0c24227c8128652d4ec039950d9cfa82c3f962c4f4dee61e54236bdf89cbff8e9a04522134ef899ba136a668afd4ae76bd00bb19c0dc5ff66d7492a6a2a506021c2',
@@ -582,7 +575,7 @@ describe('TxTypeValueTransfer', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-084: If decode transaction has different values, combineSignedRawTransactions should throw error', () => {
-            const tx = new caver.transaction.valueTransfer(transactionObj)
+            const tx = caver.transaction.valueTransfer.create(transactionObj)
             tx.value = 10000
 
             const rlpEncoded =
@@ -599,7 +592,7 @@ describe('TxTypeValueTransfer', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-085: getRawTransaction should call getRLPEncoding function', () => {
-            const tx = new caver.transaction.valueTransfer(txWithExpectedValues.tx)
+            const tx = caver.transaction.valueTransfer.create(txWithExpectedValues.tx)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
             const rawTransaction = tx.getRawTransaction()
@@ -615,7 +608,7 @@ describe('TxTypeValueTransfer', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-086: getTransactionHash should call getRLPEncoding function and return hash of RLPEncoding', () => {
-            const tx = new caver.transaction.valueTransfer(txWithExpectedValues.tx)
+            const tx = caver.transaction.valueTransfer.create(txWithExpectedValues.tx)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
             const txHash = tx.getTransactionHash()
 
@@ -627,7 +620,7 @@ describe('TxTypeValueTransfer', () => {
         it('CAVERJS-UNIT-TRANSACTION-087: getTransactionHash should throw error when nonce is undefined', () => {
             transactionObj.chainId = 2019
             transactionObj.gasPrice = '0x5d21dba00'
-            const tx = new caver.transaction.valueTransfer(transactionObj)
+            const tx = caver.transaction.valueTransfer.create(transactionObj)
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
 
@@ -637,7 +630,7 @@ describe('TxTypeValueTransfer', () => {
         it('CAVERJS-UNIT-TRANSACTION-088: getTransactionHash should throw error when gasPrice is undefined', () => {
             transactionObj.chainId = 2019
             transactionObj.nonce = '0x3a'
-            const tx = new caver.transaction.valueTransfer(transactionObj)
+            const tx = caver.transaction.valueTransfer.create(transactionObj)
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
 
@@ -651,7 +644,7 @@ describe('TxTypeValueTransfer', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-090: getSenderTxHash should call getRLPEncoding function and return hash of RLPEncoding', () => {
-            const tx = new caver.transaction.valueTransfer(txWithExpectedValues.tx)
+            const tx = caver.transaction.valueTransfer.create(txWithExpectedValues.tx)
             const getRLPEncodingSpy = sandbox.spy(tx, 'getRLPEncoding')
 
             const senderTxHash = tx.getSenderTxHash()
@@ -664,7 +657,7 @@ describe('TxTypeValueTransfer', () => {
         it('CAVERJS-UNIT-TRANSACTION-091: getSenderTxHash should throw error when nonce is undefined', () => {
             transactionObj.chainId = 2019
             transactionObj.gasPrice = '0x5d21dba00'
-            const tx = new caver.transaction.valueTransfer(transactionObj)
+            const tx = caver.transaction.valueTransfer.create(transactionObj)
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
 
@@ -674,7 +667,7 @@ describe('TxTypeValueTransfer', () => {
         it('CAVERJS-UNIT-TRANSACTION-092: getSenderTxHash should throw error when gasPrice is undefined', () => {
             transactionObj.chainId = 2019
             transactionObj.nonce = '0x3a'
-            const tx = new caver.transaction.valueTransfer(transactionObj)
+            const tx = caver.transaction.valueTransfer.create(transactionObj)
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
 
@@ -688,7 +681,7 @@ describe('TxTypeValueTransfer', () => {
         })
 
         it('CAVERJS-UNIT-TRANSACTION-094: getRLPEncodingForSignature should return RLP-encoded transaction string for signing', () => {
-            const tx = new caver.transaction.valueTransfer(txWithExpectedValues.tx)
+            const tx = caver.transaction.valueTransfer.create(txWithExpectedValues.tx)
 
             const commonRLPForSigningSpy = sandbox.spy(tx, 'getCommonRLPEncodingForSignature')
 
@@ -701,7 +694,7 @@ describe('TxTypeValueTransfer', () => {
         it('CAVERJS-UNIT-TRANSACTION-095: getRLPEncodingForSignature should throw error when nonce is undefined', () => {
             transactionObj.gasPrice = '0x5d21dba00'
             transactionObj.chainId = 2019
-            const tx = new caver.transaction.valueTransfer(transactionObj)
+            const tx = caver.transaction.valueTransfer.create(transactionObj)
 
             const expectedError = `nonce is undefined. Define nonce in transaction or use 'transaction.fillTransaction' to fill values.`
 
@@ -711,7 +704,7 @@ describe('TxTypeValueTransfer', () => {
         it('CAVERJS-UNIT-TRANSACTION-096: getRLPEncodingForSignature should throw error when gasPrice is undefined', () => {
             transactionObj.chainId = 2019
             transactionObj.nonce = '0x3a'
-            const tx = new caver.transaction.valueTransfer(transactionObj)
+            const tx = caver.transaction.valueTransfer.create(transactionObj)
 
             const expectedError = `gasPrice is undefined. Define gasPrice in transaction or use 'transaction.fillTransaction' to fill values.`
 
@@ -721,7 +714,7 @@ describe('TxTypeValueTransfer', () => {
         it('CAVERJS-UNIT-TRANSACTION-097: getRLPEncodingForSignature should throw error when chainId is undefined', () => {
             transactionObj.gasPrice = '0x5d21dba00'
             transactionObj.nonce = '0x3a'
-            const tx = new caver.transaction.valueTransfer(transactionObj)
+            const tx = caver.transaction.valueTransfer.create(transactionObj)
 
             const expectedError = `chainId is undefined. Define chainId in transaction or use 'transaction.fillTransaction' to fill values.`
 
@@ -731,7 +724,7 @@ describe('TxTypeValueTransfer', () => {
 
     context('valueTransfer.getCommonRLPEncodingForSignature', () => {
         it('CAVERJS-UNIT-TRANSACTION-098: getRLPEncodingForSignature should return RLP-encoded transaction string for signing', () => {
-            const tx = new caver.transaction.valueTransfer(txWithExpectedValues.tx)
+            const tx = caver.transaction.valueTransfer.create(txWithExpectedValues.tx)
 
             const commonRLPForSign = tx.getCommonRLPEncodingForSignature()
             const decoded = RLP.decode(txWithExpectedValues.rlpEncodingForSigning)
@@ -744,7 +737,7 @@ describe('TxTypeValueTransfer', () => {
         it('CAVERJS-UNIT-TRANSACTION-099: fillTransaction should call klay_getGasPrice to fill gasPrice when gasPrice is undefined', async () => {
             transactionObj.nonce = '0x3a'
             transactionObj.chainId = 2019
-            const tx = new caver.transaction.valueTransfer(transactionObj)
+            const tx = caver.transaction.valueTransfer.create(transactionObj)
 
             await tx.fillTransaction()
             expect(getGasPriceSpy).to.have.been.calledOnce
@@ -755,7 +748,7 @@ describe('TxTypeValueTransfer', () => {
         it('CAVERJS-UNIT-TRANSACTION-100: fillTransaction should call klay_getTransactionCount to fill nonce when nonce is undefined', async () => {
             transactionObj.gasPrice = '0x5d21dba00'
             transactionObj.chainId = 2019
-            const tx = new caver.transaction.valueTransfer(transactionObj)
+            const tx = caver.transaction.valueTransfer.create(transactionObj)
 
             await tx.fillTransaction()
             expect(getGasPriceSpy).not.to.have.been.calledOnce
@@ -766,7 +759,7 @@ describe('TxTypeValueTransfer', () => {
         it('CAVERJS-UNIT-TRANSACTION-101: fillTransaction should call klay_getChainid to fill chainId when chainId is undefined', async () => {
             transactionObj.gasPrice = '0x5d21dba00'
             transactionObj.nonce = '0x3a'
-            const tx = new caver.transaction.valueTransfer(transactionObj)
+            const tx = caver.transaction.valueTransfer.create(transactionObj)
 
             await tx.fillTransaction()
             expect(getGasPriceSpy).not.to.have.been.calledOnce

@@ -40,7 +40,6 @@ const SignatureData = require('../../../packages/caver-wallet/src/keyring/signat
 
 const { generateDecoupledKeyring, generateMultiSigKeyring, generateRoleBasedKeyring } = require('../utils')
 
-const AbstractTransaction = require('../../../packages/caver-transaction/src/transactionTypes/abstractTransaction')
 const utils = require('../../../packages/caver-utils/src')
 
 let caver
@@ -64,12 +63,6 @@ function isValidV(sigs) {
 
 before(() => {
     caver = new Caver(testRPCURL)
-    AbstractTransaction._klaytnCall = {
-        getTransactionCount: () => {},
-        getChainId: () => {},
-        getHeaderByNumber: () => {},
-        getMaxPriorityFeePerGas: () => {},
-    }
 
     sender = caver.wallet.add(caver.wallet.keyring.generate())
     roleBasedKeyring = generateRoleBasedKeyring([3, 3, 3])
@@ -130,15 +123,15 @@ describe('TxTypeEthereumDynamicFee', () => {
                 '0xa9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039',
         }
 
-        getNonceSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getTransactionCount')
+        getNonceSpy = sandbox.stub(caver.transaction.klaytnCall, 'getTransactionCount')
         getNonceSpy.returns('0x3a')
-        getChainIdSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getChainId')
+        getChainIdSpy = sandbox.stub(caver.transaction.klaytnCall, 'getChainId')
         getChainIdSpy.returns('0x7e3')
         baseFee = '0x0'
-        getHeaderByNumberSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getHeaderByNumber')
+        getHeaderByNumberSpy = sandbox.stub(caver.transaction.klaytnCall, 'getHeaderByNumber')
         getHeaderByNumberSpy.returns({ baseFeePerGas: baseFee })
         maxPriorityFeePerGas = '0x5d21dba00'
-        getMaxPriorityFeePerGasSpy = sandbox.stub(AbstractTransaction._klaytnCall, 'getMaxPriorityFeePerGas')
+        getMaxPriorityFeePerGasSpy = sandbox.stub(caver.transaction.klaytnCall, 'getMaxPriorityFeePerGas')
         getMaxPriorityFeePerGasSpy.returns(maxPriorityFeePerGas)
     })
 

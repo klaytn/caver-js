@@ -13,9 +13,9 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { KlaytnCall } from '../../caver-rpc/src/klay'
 import { AccessList } from './utils/accessList'
 import { AccessTuple } from './utils/accessTuple'
-import { TransactionDecoder } from './transactionDecoder/transactionDecoder'
 import { AbstractTransaction } from './transactionTypes/abstractTransaction'
 import { AccountUpdate } from './transactionTypes/accountUpdate/accountUpdate'
 import { FeeDelegatedAccountUpdate } from './transactionTypes/accountUpdate/feeDelegatedAccountUpdate'
@@ -41,6 +41,8 @@ import { ValueTransfer } from './transactionTypes/valueTransfer/valueTransfer'
 import { FeeDelegatedValueTransferMemo } from './transactionTypes/valueTransferMemo/feeDelegatedValueTransferMemo'
 import { FeeDelegatedValueTransferMemoWithRatio } from './transactionTypes/valueTransferMemo/feeDelegatedValueTransferMemoWithRatio'
 import { ValueTransferMemo } from './transactionTypes/valueTransferMemo/valueTransferMemo'
+
+import * as Wrappers from './transactionTypes/wrappers/transactionWrappers'
 
 export * from './transactionDecoder/transactionDecoder'
 export * from './transactionHelper/transactionHelper'
@@ -75,6 +77,7 @@ export * from './transactionTypes/ethereumTypedTransaction/ethereumAccessList'
 export * from './transactionTypes/ethereumTypedTransaction/ethereumDynamicFee'
 export * from './utils/accessList'
 export * from './utils/accessTuple'
+export * from './transactionTypes/wrappers/transactionWrappers'
 
 export type Transaction =
     | LegacyTransaction
@@ -118,35 +121,38 @@ export type FeeDelegatedTransaction =
     | FeeDelegatedChainDataAnchoring
     | FeeDelegatedChainDataAnchoringWithRatio
 
-export interface TransactionModule {
-    decode: TransactionDecoder['decode']
+export class TransactionModule {
+    constructor(klaytnCall: KlaytnCall)
+
+    decode(rlpEncoded: string): Transaction
     getTransactionByHash(transactionHash: string): Promise<AbstractTransaction>
     recoverPublicKeys(rawTx: string): string[]
     recoverFeePayerPublicKeys(rawTx: string): string[]
-    legacyTransaction: typeof LegacyTransaction
-    valueTransfer: typeof ValueTransfer
-    feeDelegatedValueTransfer: typeof FeeDelegatedValueTransfer
-    feeDelegatedValueTransferWithRatio: typeof FeeDelegatedValueTransferWithRatio
-    valueTransferMemo: typeof ValueTransferMemo
-    feeDelegatedValueTransferMemo: typeof FeeDelegatedValueTransferMemo
-    feeDelegatedValueTransferMemoWithRatio: typeof FeeDelegatedValueTransferMemoWithRatio
-    accountUpdate: typeof AccountUpdate
-    feeDelegatedAccountUpdate: typeof FeeDelegatedAccountUpdate
-    feeDelegatedAccountUpdateWithRatio: typeof FeeDelegatedAccountUpdateWithRatio
-    smartContractDeploy: typeof SmartContractDeploy
-    feeDelegatedSmartContractDeploy: typeof FeeDelegatedSmartContractDeploy
-    feeDelegatedSmartContractDeployWithRatio: typeof FeeDelegatedSmartContractDeployWithRatio
-    smartContractExecution: typeof SmartContractExecution
-    feeDelegatedSmartContractExecution: typeof FeeDelegatedSmartContractExecution
-    feeDelegatedSmartContractExecutionWithRatio: typeof FeeDelegatedSmartContractExecutionWithRatio
-    cancel: typeof Cancel
-    feeDelegatedCancel: typeof FeeDelegatedCancel
-    feeDelegatedCancelWithRatio: typeof FeeDelegatedCancelWithRatio
-    chainDataAnchoring: typeof ChainDataAnchoring
-    feeDelegatedChainDataAnchoring: typeof FeeDelegatedChainDataAnchoring
-    feeDelegatedChainDataAnchoringWithRatio: typeof FeeDelegatedChainDataAnchoringWithRatio
-    ethereumAccessList: typeof EthereumAccessList
-    ethereumDynamicFee: typeof EthereumDynamicFee
+
+    legacyTransaction: Wrappers.LegacyTransactionWrapper
+    valueTransfer: Wrappers.ValueTransferWrapper
+    feeDelegatedValueTransfer: Wrappers.FeeDelegatedValueTransferWrapper
+    feeDelegatedValueTransferWithRatio: Wrappers.FeeDelegatedValueTransferWithRatioWrapper
+    valueTransferMemo: Wrappers.ValueTransferMemoWrapper
+    feeDelegatedValueTransferMemo: Wrappers.FeeDelegatedValueTransferMemoWrapper
+    feeDelegatedValueTransferMemoWithRatio: Wrappers.FeeDelegatedValueTransferMemoWithRatioWrapper
+    accountUpdate: Wrappers.AccountUpdateWrapper
+    feeDelegatedAccountUpdate: Wrappers.FeeDelegatedAccountUpdateWrapper
+    feeDelegatedAccountUpdateWithRatio: Wrappers.FeeDelegatedAccountUpdateWithRatioWrapper
+    smartContractDeploy: Wrappers.SmartContractDeployWrapper
+    feeDelegatedSmartContractDeploy: Wrappers.FeeDelegatedSmartContractDeployWrapper
+    feeDelegatedSmartContractDeployWithRatio: Wrappers.FeeDelegatedSmartContractDeployWithRatioWrapper
+    smartContractExecution: Wrappers.SmartContractExecutionWrapper
+    feeDelegatedSmartContractExecution: Wrappers.FeeDelegatedSmartContractExecutionWrapper
+    feeDelegatedSmartContractExecutionWithRatio: Wrappers.FeeDelegatedSmartContractExecutionWithRatioWrapper
+    cancel: Wrappers.CancelWrapper
+    feeDelegatedCancel: Wrappers.FeeDelegatedCancelWrapper
+    feeDelegatedCancelWithRatio: Wrappers.FeeDelegatedCancelWithRatioWrapper
+    chainDataAnchoring: Wrappers.ChainDataAnchoringWrapper
+    feeDelegatedChainDataAnchoring: Wrappers.FeeDelegatedChainDataAnchoringWrapper
+    feeDelegatedChainDataAnchoringWithRatio: Wrappers.FeeDelegatedChainDataAnchoringWithRatioWrapper
+    ethereumAccessList: Wrappers.EthereumAccessListWrapper
+    ethereumDynamicFee: Wrappers.EthereumDynamicFeeWrapper
 
     type: { [key: string]: string }
     tag: { [key: string]: string }
@@ -155,4 +161,7 @@ export interface TransactionModule {
         accessList: typeof AccessList
         accessTuple: typeof AccessTuple
     }
+
+    klaytnCall: KlaytnCall
+    private _klaytnCall: KlaytnCall
 }

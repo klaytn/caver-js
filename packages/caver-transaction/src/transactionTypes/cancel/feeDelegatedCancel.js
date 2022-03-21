@@ -19,7 +19,6 @@
 const RLP = require('eth-lib/lib/rlp')
 const Bytes = require('eth-lib/lib/bytes')
 const _ = require('lodash')
-const AbstractTransaction = require('../abstractTransaction')
 const AbstractFeeDelegatedTransaction = require('../abstractFeeDelegatedTransaction')
 const { TX_TYPE_STRING, TX_TYPE_TAG, isNot } = require('../../transactionHelper/transactionHelper')
 const utils = require('../../../../caver-utils/src')
@@ -56,20 +55,22 @@ class FeeDelegatedCancel extends AbstractFeeDelegatedTransaction {
      * @param {object|string} createTxObj - The parameters to create a FeeDelegatedCancel transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                               The object can define `from`, `to`, `value`, `nonce`, `gas`, `gasPrice`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {FeeDelegatedCancel}
      */
-    static create(createTxObj) {
-        return new FeeDelegatedCancel(createTxObj)
+    static create(createTxObj, klaytnCall) {
+        return new FeeDelegatedCancel(createTxObj, klaytnCall)
     }
 
     /**
      * decodes the RLP-encoded string and returns a FeeDelegatedCancel transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded fee delegated cancel transaction.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {FeeDelegatedCancel}
      */
-    static decode(rlpEncoded) {
-        return new FeeDelegatedCancel(_decode(rlpEncoded))
+    static decode(rlpEncoded, klaytnCall) {
+        return new FeeDelegatedCancel(_decode(rlpEncoded), klaytnCall)
     }
 
     /**
@@ -78,10 +79,11 @@ class FeeDelegatedCancel extends AbstractFeeDelegatedTransaction {
      * @param {object|string} createTxObj - The parameters to create a FeeDelegatedCancel transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                               The object can define `from`, `to`, `value`, `nonce`, `gas`, `gasPrice`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      */
-    constructor(createTxObj) {
+    constructor(createTxObj, klaytnCall) {
         if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
-        super(TX_TYPE_STRING.TxTypeFeeDelegatedCancel, createTxObj)
+        super(TX_TYPE_STRING.TxTypeFeeDelegatedCancel, createTxObj, klaytnCall)
         if (createTxObj.gasPrice !== undefined) this.gasPrice = createTxObj.gasPrice
     }
 
@@ -156,9 +158,9 @@ class FeeDelegatedCancel extends AbstractFeeDelegatedTransaction {
      */
     async fillTransaction() {
         const [chainId, gasPrice, nonce] = await Promise.all([
-            isNot(this.chainId) ? AbstractTransaction.getChainId() : this.chainId,
-            isNot(this.gasPrice) ? AbstractTransaction.getGasPrice() : this.gasPrice,
-            isNot(this.nonce) ? AbstractTransaction.getNonce(this.from) : this.nonce,
+            isNot(this.chainId) ? this.getChainId() : this.chainId,
+            isNot(this.gasPrice) ? this.getGasPrice() : this.gasPrice,
+            isNot(this.nonce) ? this.getNonce(this.from) : this.nonce,
         ])
 
         this.chainId = chainId

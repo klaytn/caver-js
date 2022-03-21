@@ -58,20 +58,22 @@ class SmartContractExecution extends AbstractTransaction {
      * @param {object|string} createTxObj - The parameters to create a SmartContractExecution transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                                      The object can define `from`, `to`, `value`, `input`, `nonce`, `gas`, `gasPrice`, `signatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {SmartContractExecution}
      */
-    static create(createTxObj) {
-        return new SmartContractExecution(createTxObj)
+    static create(createTxObj, klaytnCall) {
+        return new SmartContractExecution(createTxObj, klaytnCall)
     }
 
     /**
      * decodes the RLP-encoded transation string and returns a SmartContractExecution transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded smart contract execution transaction.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {SmartContractExecution}
      */
-    static decode(rlpEncoded) {
-        return new SmartContractExecution(_decode(rlpEncoded))
+    static decode(rlpEncoded, klaytnCall) {
+        return new SmartContractExecution(_decode(rlpEncoded), klaytnCall)
     }
 
     /**
@@ -80,10 +82,11 @@ class SmartContractExecution extends AbstractTransaction {
      * @param {object|string} createTxObj - The parameters to create a SmartContractExecution transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                                      The object can define `from`, `to`, `value`, `input`, `nonce`, `gas`, `gasPrice`, `signatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      */
-    constructor(createTxObj) {
+    constructor(createTxObj, klaytnCall) {
         if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
-        super(TX_TYPE_STRING.TxTypeSmartContractExecution, createTxObj)
+        super(TX_TYPE_STRING.TxTypeSmartContractExecution, createTxObj, klaytnCall)
         this.to = createTxObj.to
         this.value = createTxObj.value || '0x0'
 
@@ -215,9 +218,9 @@ class SmartContractExecution extends AbstractTransaction {
      */
     async fillTransaction() {
         const [chainId, gasPrice, nonce] = await Promise.all([
-            isNot(this.chainId) ? AbstractTransaction.getChainId() : this.chainId,
-            isNot(this.gasPrice) ? AbstractTransaction.getGasPrice() : this.gasPrice,
-            isNot(this.nonce) ? AbstractTransaction.getNonce(this.from) : this.nonce,
+            isNot(this.chainId) ? this.getChainId() : this.chainId,
+            isNot(this.gasPrice) ? this.getGasPrice() : this.gasPrice,
+            isNot(this.nonce) ? this.getNonce(this.from) : this.nonce,
         ])
 
         this.chainId = chainId

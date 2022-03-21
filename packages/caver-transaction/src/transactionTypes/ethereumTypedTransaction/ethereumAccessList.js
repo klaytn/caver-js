@@ -68,10 +68,11 @@ class EthereumAccessList extends AbstractTransaction {
      * @param {object|string} createTxObj - The parameters to create a EthereumAccessList transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                                      The object can define `from`, `to`, `value`, `input`, `nonce`, `gas`, `gasPrice`, `accessList` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {EthereumAccessList}
      */
-    static create(createTxObj) {
-        return new EthereumAccessList(createTxObj)
+    static create(createTxObj, klaytnCall) {
+        return new EthereumAccessList(createTxObj, klaytnCall)
     }
 
     /**
@@ -81,12 +82,13 @@ class EthereumAccessList extends AbstractTransaction {
      * const tx = caver.transaction.ethereumAccessList.decode('0x{rlp encoded data}')
      *
      * @param {string} rlpEncoded The RLP-encoded ethereum access list transaction.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {EthereumAccessList}
      */
-    static decode(rlpEncoded) {
+    static decode(rlpEncoded, klaytnCall) {
         const decoded = _decode(rlpEncoded)
         decoded.accessList = AccessList.decode(decoded.encodedAccessList)
-        return new EthereumAccessList(decoded)
+        return new EthereumAccessList(decoded, klaytnCall)
     }
 
     /**
@@ -95,13 +97,14 @@ class EthereumAccessList extends AbstractTransaction {
      * @param {object|string} createTxObj - The parameters to create a EthereumAccessList transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                                      The object can define `from`, `to`, `value`, `input`, `nonce`, `gas`, `gasPrice`, `accessList` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      */
-    constructor(createTxObj) {
+    constructor(createTxObj, klaytnCall) {
         if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
 
         createTxObj.from = createTxObj.from || '0x0000000000000000000000000000000000000000'
 
-        super(TX_TYPE_STRING.TxTypeEthereumAccessList, createTxObj)
+        super(TX_TYPE_STRING.TxTypeEthereumAccessList, createTxObj, klaytnCall)
         this.to = createTxObj.to || '0x'
 
         if (createTxObj.input && createTxObj.data)
@@ -369,9 +372,9 @@ class EthereumAccessList extends AbstractTransaction {
      */
     async fillTransaction() {
         const [chainId, gasPrice, nonce] = await Promise.all([
-            isNot(this.chainId) ? AbstractTransaction.getChainId() : this.chainId,
-            isNot(this.gasPrice) ? AbstractTransaction.getGasPrice() : this.gasPrice,
-            isNot(this.nonce) ? AbstractTransaction.getNonce(this.from) : this.nonce,
+            isNot(this.chainId) ? this.getChainId() : this.chainId,
+            isNot(this.gasPrice) ? this.getGasPrice() : this.gasPrice,
+            isNot(this.nonce) ? this.getNonce(this.from) : this.nonce,
         ])
 
         this.chainId = chainId

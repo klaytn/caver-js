@@ -35,7 +35,6 @@ const MethodBase = require('../../caver-core-method')
 const utils = require('../../caver-utils')
 
 const AbstractTransaction = require('../../caver-transaction/src/transactionTypes/abstractTransaction')
-const Validator = require('../../caver-validator')
 
 /**
  * A class that can invoke Klay RPC Calls.
@@ -362,11 +361,11 @@ class Klay {
             }),
         ]
         AbstractTransaction._klaytnCall = {}
-        Validator._klaytnCall = {}
+        this.klaytnCall = {}
         _.each(_klaytnCall, function(method) {
             method = new Method(method)
             method.attachToObject(AbstractTransaction._klaytnCall)
-            method.attachToObject(Validator._klaytnCall)
+            method.attachToObject(_this.klaytnCall)
             method.setRequestManager(_this._requestManager)
         })
 
