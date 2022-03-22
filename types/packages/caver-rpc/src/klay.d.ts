@@ -152,14 +152,10 @@ export class Klay {
         blockHash: string,
         callback?: (error: Error, result: BlockWithConsensusInfo) => void
     ): Promise<BlockWithConsensusInfo>
-    getCommittee(callback?: (error: Error, result: string[]) => void): Promise<string[]>
-    getCommittee(blockNumber: BlockNumber, callback?: (error: Error, result: string[]) => void): Promise<string[]>
-    getCommitteeSize(callback?: (error: Error, result: number) => void): Promise<number>
-    getCommitteeSize(blockNumber: BlockNumber, callback?: (error: Error, result: number) => void): Promise<number>
-    getCouncil(callback?: (error: Error, result: string[]) => void): Promise<string[]>
-    getCouncil(blockNumber: BlockNumber, callback?: (error: Error, result: string[]) => void): Promise<string[]>
-    getCouncilSize(callback?: (error: Error, result: number) => void): Promise<number>
-    getCouncilSize(blockNumber: BlockNumber, callback?: (error: Error, result: number) => void): Promise<number>
+    getCommittee(blockNumber?: BlockNumber, callback?: (error: Error, result: string[]) => void): Promise<string[]>
+    getCommitteeSize(blockNumber?: BlockNumber, callback?: (error: Error, result: number) => void): Promise<number>
+    getCouncil(blockNumber?: BlockNumber, callback?: (error: Error, result: string[]) => void): Promise<string[]>
+    getCouncilSize(blockNumber?: BlockNumber, callback?: (error: Error, result: number) => void): Promise<number>
 
     getStorageAt(address: string, position: number, callback?: (error: Error, result: string) => void): Promise<string>
     getStorageAt(
