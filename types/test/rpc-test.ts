@@ -1244,13 +1244,13 @@ rpc.klay.sha3('data')
 // $ExpectType Promise<string>
 rpc.klay.sha3('data', (err: Error, ret: string) => {})
 
-// $ExpectType Promise<string>
+// $ExpectType Promise<number>
 rpc.net.getNetworkID()
-// $ExpectType Promise<string>
+// $ExpectType Promise<number>
 rpc.net.getNetworkID((err: Error, ret: string) => {})
-// $ExpectType Promise<string>
+// $ExpectType Promise<number>
 rpc.net.getNetworkId()
-// $ExpectType Promise<string>
+// $ExpectType Promise<number>
 rpc.net.getNetworkId((err: Error, ret: string) => {})
 
 // $ExpectType Promise<boolean>
