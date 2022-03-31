@@ -289,7 +289,9 @@ const outputTransactionFormatter = function(tx) {
     }
     tx.nonce = utils.hexToNumber(tx.nonce)
     tx.gas = utils.hexToNumber(tx.gas)
-    tx.gasPrice = outputBigNumberFormatter(tx.gasPrice)
+    if (tx.gasPrice !== undefined) {
+        tx.gasPrice = outputBigNumberFormatter(tx.gasPrice)
+    }
     if (tx.value) {
         tx.value = outputBigNumberFormatter(tx.value)
     }
