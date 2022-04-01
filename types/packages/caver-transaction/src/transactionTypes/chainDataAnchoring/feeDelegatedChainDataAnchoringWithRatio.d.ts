@@ -15,12 +15,13 @@
 
 import { AbstractFeeDelegatedWithRatioTransaction } from '../abstractFeeDelegatedWithRatioTransaction'
 import { CreateTransactionObject } from '../abstractTransaction'
+import { KlaytnCall } from '../../../../caver-rpc/src/klay'
 
 export class FeeDelegatedChainDataAnchoringWithRatio extends AbstractFeeDelegatedWithRatioTransaction {
-    static create(createTxObj: string | CreateTransactionObject): FeeDelegatedChainDataAnchoringWithRatio
-    static decode(rlpEncoded: string): FeeDelegatedChainDataAnchoringWithRatio
+    static create(createTxObj: string | CreateTransactionObject, klaytnCall?: KlaytnCall): FeeDelegatedChainDataAnchoringWithRatio
+    static decode(rlpEncoded: string, klaytnCall?: KlaytnCall): FeeDelegatedChainDataAnchoringWithRatio
 
-    constructor(createTxObj: string | CreateTransactionObject)
+    constructor(createTxObj: string | CreateTransactionObject, klaytnCall?: KlaytnCall)
 
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string

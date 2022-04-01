@@ -25,8 +25,8 @@ export interface PeerCountByType {
 export class Net {
     constructor(...args: any[])
 
-    getNetworkId(callback?: (error: Error, result: string) => void): Promise<string>
-    getNetworkID(callback?: (error: Error, result: string) => void): Promise<string>
+    getNetworkId(callback?: (error: Error, result: string) => void): Promise<number>
+    getNetworkID(callback?: (error: Error, result: string) => void): Promise<number>
     isListening(callback?: (error: Error, result: boolean) => void): Promise<boolean>
     getPeerCount(callback?: (error: Error, result: string) => void): Promise<string>
     getPeerCountByType(callback?: (error: Error, result: PeerCountByType) => void): Promise<PeerCountByType>

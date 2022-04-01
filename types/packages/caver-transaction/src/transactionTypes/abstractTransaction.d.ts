@@ -40,7 +40,7 @@ export interface CreateTransactionObject {
 }
 
 export class AbstractTransaction {
-    constructor(typeString: string, createTxObj: CreateTransactionObject)
+    constructor(typeString: string, createTxObj: CreateTransactionObject, klaytnCall?: KlaytnCall)
 
     static _klaytnCall: KlaytnCall
 
@@ -64,9 +64,11 @@ export class AbstractTransaction {
     gas: string
     chainId: string
     signatures: SignatureData | SignatureData[]
+    klaytnCall: KlaytnCall
     private _from: string
     private _nonce: string
     private _gas: string
     private _chainId: string
     private _signatures: SignatureData | SignatureData[]
+    private _klaytnCall: KlaytnCall
 }

@@ -46,9 +46,10 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
      * @constructor
      * @param {string} typeString - The type string of transaction.
      * @param {object} createTxObj - The parameters to create an instance of transaction.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      */
-    constructor(typeString, createTxObj) {
-        super(typeString, createTxObj)
+    constructor(typeString, createTxObj, klaytnCall) {
+        super(typeString, createTxObj, klaytnCall)
         this.feePayer = createTxObj.feePayer
         this.feePayerSignatures = createTxObj.feePayerSignatures || []
     }
@@ -183,7 +184,7 @@ class AbstractFeeDelegatedTransaction extends AbstractTransaction {
             // Signatures can only be combined for the same transaction.
             // Therefore, compare whether the decoded transaction is the same as this.
             for (const k in decoded) {
-                if (k === '_signatures' || k === '_feePayerSignatures') continue
+                if (k === '_klaytnCall' || k === '_signatures' || k === '_feePayerSignatures') continue
                 if (k === '_feePayer') {
                     const emtpyAddress = '0x0000000000000000000000000000000000000000'
                     if (

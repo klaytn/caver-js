@@ -61,20 +61,22 @@ class SmartContractDeploy extends AbstractTransaction {
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                                      The object can define `from`, `to`, `value`, `input`, `humanReadable`,
      *                                      `codeFormat`, `nonce`, `gas`, `gasPrice`, `signatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {SmartContractDeploy}
      */
-    static create(createTxObj) {
-        return new SmartContractDeploy(createTxObj)
+    static create(createTxObj, klaytnCall) {
+        return new SmartContractDeploy(createTxObj, klaytnCall)
     }
 
     /**
      * decodes the RLP-encoded string and returns a SmartContractDeploy transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded smart contract deploy transaction.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {SmartContractDeploy}
      */
-    static decode(rlpEncoded) {
-        return new SmartContractDeploy(_decode(rlpEncoded))
+    static decode(rlpEncoded, klaytnCall) {
+        return new SmartContractDeploy(_decode(rlpEncoded), klaytnCall)
     }
 
     /**
@@ -85,10 +87,11 @@ class SmartContractDeploy extends AbstractTransaction {
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                                      The object can define `from`, `to`, `value`, `input`, `humanReadable`,
      *                                      `codeFormat`, `nonce`, `gas`, `gasPrice`, `signatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      */
-    constructor(createTxObj) {
+    constructor(createTxObj, klaytnCall) {
         if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
-        super(TX_TYPE_STRING.TxTypeSmartContractDeploy, createTxObj)
+        super(TX_TYPE_STRING.TxTypeSmartContractDeploy, createTxObj, klaytnCall)
         this.to = createTxObj.to || '0x'
         this.value = createTxObj.value || '0x0'
 
@@ -250,9 +253,9 @@ class SmartContractDeploy extends AbstractTransaction {
      */
     async fillTransaction() {
         const [chainId, gasPrice, nonce] = await Promise.all([
-            isNot(this.chainId) ? AbstractTransaction.getChainId() : this.chainId,
-            isNot(this.gasPrice) ? AbstractTransaction.getGasPrice() : this.gasPrice,
-            isNot(this.nonce) ? AbstractTransaction.getNonce(this.from) : this.nonce,
+            isNot(this.chainId) ? this.getChainId() : this.chainId,
+            isNot(this.gasPrice) ? this.getGasPrice() : this.gasPrice,
+            isNot(this.nonce) ? this.getNonce(this.from) : this.nonce,
         ])
 
         this.chainId = chainId

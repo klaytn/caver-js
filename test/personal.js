@@ -347,6 +347,7 @@ describe('Personal RPC test', () => {
             to: caver.klay.accounts.create().address,
             value: 1,
             gas: 900000,
+            gasPrice: caver.utils.convertToPeb(25, 'ston'),
             chainId,
             accessList: [
                 {
@@ -367,6 +368,7 @@ describe('Personal RPC test', () => {
             from: testKeyring.address,
             value: 0,
             gas: 1000000,
+            gasPrice: caver.utils.convertToPeb(25, 'ston'),
             chainId,
             accessList: [
                 {
@@ -389,6 +391,7 @@ describe('Personal RPC test', () => {
             to: caver.wallet.keyring.generate().address,
             value: 0,
             gas: 900000,
+            gasPrice: caver.utils.convertToPeb(25, 'ston'),
             chainId,
             accessList: [
                 {

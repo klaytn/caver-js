@@ -65,7 +65,6 @@ export interface Errors {
     InvalidResponse(result: object | null): Error
     transactionReverted(receiptJSON: string): Error
     transactionRanOutOfGas(receiptJSON: string): Error
-    invalidGasPrice(): Error
     invalidGasLimit(): Error
     invalidData(): Error
     notAllowedZeroGas(): Error

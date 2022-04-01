@@ -48,7 +48,7 @@ export default class RpcCallToMethod {
     klay_syncing(callback?: (error: Error, result: Syncing | boolean) => void): Promise<Syncing | boolean>
     klay_gasPrice(callback?: (error: Error, result: string) => void): Promise<string>
     klay_accounts(callback?: (error: Error, result: string[]) => void): Promise<string[]>
-    klay_blockNumber(callback?: (error: Error, result: string) => void): Promise<string>
+    klay_blockNumber(callback?: (error: Error, result: string) => void): Promise<number>
     klay_getBalance(address: string, blockNumber?: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
     klay_getStorageAt(
         address: string,
@@ -79,7 +79,7 @@ export default class RpcCallToMethod {
         callback?: (error: Error, result: TransactionReceipt) => void
     ): PromiEvent<TransactionReceipt>
     klay_call(callObject: CallObject, blockNumber?: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
-    klay_estimateGas(callObject: CallObject, blockNumber?: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
+    klay_estimateGas(callObject: CallObject, blockNumber?: BlockNumber, callback?: (error: Error, result: string) => void): Promise<number>
     klay_getLogs(options: LogsOptions, callback?: (error: Error, result: Log[]) => void): Promise<Log[]>
     klay_sign(
         address: string,
@@ -138,10 +138,10 @@ export default class RpcCallToMethod {
     ): Promise<AccountKeyForRPC>
 
     klay_isContractAccount(address: string, blockNumber?: BlockNumber, callback?: (error: Error, result: boolean) => void): Promise<boolean>
-    klay_getCommittee(blockNumber: BlockNumber, callback?: (error: Error, result: string[]) => void): Promise<string[]>
-    klay_getCommitteeSize(blockNumber: BlockNumber, callback?: (error: Error, result: number) => void): Promise<number>
-    klay_getCouncil(blockNumber: BlockNumber, callback?: (error: Error, result: string[]) => void): Promise<string[]>
-    klay_getCouncilSize(blockNumber: BlockNumber, callback?: (error: Error, result: number) => void): Promise<number>
+    klay_getCommittee(blockNumber?: BlockNumber, callback?: (error: Error, result: string[]) => void): Promise<string[]>
+    klay_getCommitteeSize(blockNumber?: BlockNumber, callback?: (error: Error, result: number) => void): Promise<number>
+    klay_getCouncil(blockNumber?: BlockNumber, callback?: (error: Error, result: string[]) => void): Promise<string[]>
+    klay_getCouncilSize(blockNumber?: BlockNumber, callback?: (error: Error, result: number) => void): Promise<number>
 
     klay_sha3(data: string, callback?: (error: Error, result: string) => void): Promise<string>
     klay_getAccount(

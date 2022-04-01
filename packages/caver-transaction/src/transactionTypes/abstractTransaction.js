@@ -43,31 +43,6 @@ const SignatureData = require('../../../caver-wallet/src/keyring/signatureData')
  * @abstract
  */
 class AbstractTransaction {
-    static async getChainId() {
-        const chainId = await AbstractTransaction._klaytnCall.getChainId()
-        return chainId
-    }
-
-    static async getGasPrice() {
-        const gasPrice = await AbstractTransaction._klaytnCall.getGasPrice()
-        return gasPrice
-    }
-
-    static async getNonce(from) {
-        const nonce = await AbstractTransaction._klaytnCall.getTransactionCount(from, 'pending')
-        return nonce
-    }
-
-    static async getBaseFee() {
-        const header = await AbstractTransaction._klaytnCall.getHeaderByNumber('latest')
-        return header.baseFeePerGas
-    }
-
-    static async getMaxPriorityFeePerGas() {
-        const maxPriorityFeePerGas = await AbstractTransaction._klaytnCall.getMaxPriorityFeePerGas()
-        return maxPriorityFeePerGas
-    }
-
     /**
      * Abstract class that implements common logic for each transaction type.
      * In this constructor, type, tag, nonce, gasPrice, chainId, gas and signatures are set as transaction member variables.
@@ -75,8 +50,9 @@ class AbstractTransaction {
      * @constructor
      * @param {string} typeString - The type string of transaction.
      * @param {object} createTxObj - The parameters to create a transaction instance.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      */
-    constructor(typeString, createTxObj) {
+    constructor(typeString, createTxObj, klaytnCall = AbstractTransaction._klaytnCall) {
         this._type = typeString
 
         createTxObj.type = typeString
@@ -93,6 +69,7 @@ class AbstractTransaction {
         if (createTxObj.chainId !== undefined) this.chainId = createTxObj.chainId
 
         this.signatures = createTxObj.signatures || []
+        this.klaytnCall = klaytnCall
     }
 
     /**
@@ -163,6 +140,82 @@ class AbstractTransaction {
 
     set signatures(sigs) {
         this._signatures = refineSignatures(sigs, this.type)
+    }
+
+    /**
+     * @type {object}
+     */
+    get klaytnCall() {
+        return this._klaytnCall
+    }
+
+    set klaytnCall(c) {
+        this._klaytnCall = c
+    }
+
+    /**
+     * Calls `klay_chainID` klay rpc call.
+     *
+     * @example
+     * const result = tx.getChainId()
+     *
+     * @return {string} chain id
+     */
+    async getChainId() {
+        const chainId = await this.klaytnCall.getChainId()
+        return chainId
+    }
+
+    /**
+     * Calls `klay_gasPrice` klay rpc call.
+     *
+     * @example
+     * const result = tx.getGasPrice()
+     *
+     * @return {string} gas price
+     */
+    async getGasPrice() {
+        const gasPrice = await this.klaytnCall.getGasPrice()
+        return gasPrice
+    }
+
+    /**
+     * Calls `klay_getTransactionCount` klay rpc call.
+     *
+     * @example
+     * const result = tx.getNonce('0x{from address}')
+     *
+     * @return {string} nonce
+     */
+    async getNonce(from) {
+        const nonce = await this.klaytnCall.getTransactionCount(from, 'pending')
+        return nonce
+    }
+
+    /**
+     * Calls `klay_getHeaderByNumber` klay rpc call to get `baseFeePerGas` in header.
+     *
+     * @example
+     * const result = tx.getBaseFee()
+     *
+     * @return {string} base fee
+     */
+    async getBaseFee() {
+        const header = await this.klaytnCall.getHeaderByNumber('latest')
+        return header.baseFeePerGas
+    }
+
+    /**
+     * Calls `klay_maxPriorityFeePerGas` klay rpc call.
+     *
+     * @example
+     * const result = tx.getMaxPriorityFeePerGas()
+     *
+     * @return {string} suggested max priority fee per gas
+     */
+    async getMaxPriorityFeePerGas() {
+        const maxPriorityFeePerGas = await this.klaytnCall.getMaxPriorityFeePerGas()
+        return maxPriorityFeePerGas
     }
 
     /**
@@ -282,7 +335,7 @@ class AbstractTransaction {
             // Signatures can only be combined for the same transaction.
             // Therefore, compare whether the decoded transaction is the same as this.
             for (const k in decoded) {
-                if (k === '_signatures' || k === '_feePayerSignatures') continue
+                if (k === '_klaytnCall' || k === '_signatures' || k === '_feePayerSignatures') continue
                 if (this[k] === undefined && fillVariables) this[k] = decoded[k]
 
                 const differentTxError = `Transactions containing different information cannot be combined.`
@@ -298,7 +351,10 @@ class AbstractTransaction {
                     continue
                 }
 
-                if (this[k] !== decoded[k]) throw new Error(differentTxError)
+                if (this[k] !== decoded[k]) {
+                    // console.log(`k(${k}) is different. ${this[k]} vs ${decoded[k]}`)
+                    throw new Error(differentTxError)
+                }
             }
 
             this.appendSignatures(decoded.signatures)

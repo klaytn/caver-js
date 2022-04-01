@@ -14,12 +14,13 @@
 */
 
 import { AbstractTransaction, CreateTransactionObject } from '../abstractTransaction'
+import { KlaytnCall } from '../../../../caver-rpc/src/klay'
 
 export class SmartContractExecution extends AbstractTransaction {
-    static create(createTxObj: string | CreateTransactionObject): SmartContractExecution
-    static decode(rlpEncoded: string): SmartContractExecution
+    static create(createTxObj: string | CreateTransactionObject, klaytnCall?: KlaytnCall): SmartContractExecution
+    static decode(rlpEncoded: string, klaytnCall?: KlaytnCall): SmartContractExecution
 
-    constructor(createTxObj: string | CreateTransactionObject)
+    constructor(createTxObj: string | CreateTransactionObject, klaytnCall?: KlaytnCall)
 
     getRLPEncoding(): string
     getCommonRLPEncodingForSignature(): string

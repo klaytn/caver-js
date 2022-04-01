@@ -54,63 +54,63 @@ class TransactionDecoder {
      * @example
      * const tx = caver.transaction.decode('0x{RLP-encoded transaction string}')
      *
-     * @alias module:Transaction.decode
-     *
      * @param {string} rlpEncoded - An RLP-encoded transaction string to decode.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
+     *
      * @return {module:Transaction.Transaction}
      */
-    static decode(rlpEncoded) {
+    static decode(rlpEncoded, klaytnCall) {
         const type = typeDetectionFromRLPEncoding(rlpEncoded)
 
         switch (type) {
             case TX_TYPE_STRING.TxTypeLegacyTransaction:
-                return LegacyTransaction.decode(rlpEncoded)
+                return LegacyTransaction.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeValueTransfer:
-                return ValueTransfer.decode(rlpEncoded)
+                return ValueTransfer.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeFeeDelegatedValueTransfer:
-                return FeeDelegatedValueTransfer.decode(rlpEncoded)
+                return FeeDelegatedValueTransfer.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeFeeDelegatedValueTransferWithRatio:
-                return FeeDelegatedValueTransferWithRatio.decode(rlpEncoded)
+                return FeeDelegatedValueTransferWithRatio.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeValueTransferMemo:
-                return ValueTransferMemo.decode(rlpEncoded)
+                return ValueTransferMemo.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeFeeDelegatedValueTransferMemo:
-                return FeeDelegatedValueTransferMemo.decode(rlpEncoded)
+                return FeeDelegatedValueTransferMemo.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeFeeDelegatedValueTransferMemoWithRatio:
-                return FeeDelegatedValueTransferMemoWithRatio.decode(rlpEncoded)
+                return FeeDelegatedValueTransferMemoWithRatio.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeAccountUpdate:
-                return AccountUpdate.decode(rlpEncoded)
+                return AccountUpdate.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeFeeDelegatedAccountUpdate:
-                return FeeDelegatedAccountUpdate.decode(rlpEncoded)
+                return FeeDelegatedAccountUpdate.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeFeeDelegatedAccountUpdateWithRatio:
-                return FeeDelegatedAccountUpdateWithRatio.decode(rlpEncoded)
+                return FeeDelegatedAccountUpdateWithRatio.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeSmartContractDeploy:
-                return SmartContractDeploy.decode(rlpEncoded)
+                return SmartContractDeploy.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeploy:
-                return FeeDelegatedSmartContractDeploy.decode(rlpEncoded)
+                return FeeDelegatedSmartContractDeploy.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio:
-                return FeeDelegatedSmartContractDeployWithRatio.decode(rlpEncoded)
+                return FeeDelegatedSmartContractDeployWithRatio.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeSmartContractExecution:
-                return SmartContractExecution.decode(rlpEncoded)
+                return SmartContractExecution.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecution:
-                return FeeDelegatedSmartContractExecution.decode(rlpEncoded)
+                return FeeDelegatedSmartContractExecution.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractExecutionWithRatio:
-                return FeeDelegatedSmartContractExecutionWithRatio.decode(rlpEncoded)
+                return FeeDelegatedSmartContractExecutionWithRatio.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeCancel:
-                return Cancel.decode(rlpEncoded)
+                return Cancel.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeFeeDelegatedCancel:
-                return FeeDelegatedCancel.decode(rlpEncoded)
+                return FeeDelegatedCancel.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeFeeDelegatedCancelWithRatio:
-                return FeeDelegatedCancelWithRatio.decode(rlpEncoded)
+                return FeeDelegatedCancelWithRatio.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeChainDataAnchoring:
-                return ChainDataAnchoring.decode(rlpEncoded)
+                return ChainDataAnchoring.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeFeeDelegatedChainDataAnchoring:
-                return FeeDelegatedChainDataAnchoring.decode(rlpEncoded)
+                return FeeDelegatedChainDataAnchoring.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeFeeDelegatedChainDataAnchoringWithRatio:
-                return FeeDelegatedChainDataAnchoringWithRatio.decode(rlpEncoded)
+                return FeeDelegatedChainDataAnchoringWithRatio.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeEthereumAccessList:
-                return EthereumAccessList.decode(rlpEncoded)
+                return EthereumAccessList.decode(rlpEncoded, klaytnCall)
             case TX_TYPE_STRING.TxTypeEthereumDynamicFee:
-                return EthereumDynamicFee.decode(rlpEncoded)
+                return EthereumDynamicFee.decode(rlpEncoded, klaytnCall)
         }
     }
 }

@@ -1,8 +1,10 @@
+# caver-js
+
+[![Gitter](https://badges.gitter.im/klaytn/Caver-js.svg)](https://gitter.im/klaytn/Caver-js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 <p align="center">
   <img src="assets/logo/caver-js.png" width="200" alt="caver-js" />
 </p>
-
-# caver-js
 
 caver-js is a JavaScript API library that allows developers to interact with a
 Klaytn node using a HTTP or Websocket connection.
@@ -138,11 +140,13 @@ You can add the keyring object created in the above example to the caver.wallet,
 ### Submitting a Transaction
 You can use caver-js to submit various types of transactions to a node. Please refer to the [caver.transaction](https://docs.klaytn.com/dapp/sdk/caver-js/api-references/caver.transaction/#class) to see how to create a transaction of each type.
 
+**Note** you should create a transaction instance via `create` function. From caver-js v1.8.2, constructors per transaction type are not supported.
+
 You can sign the transaction using a keyring and send a signed transaction through `caver.rpc.klay.sendRawTransaction` as shown below, and the receipt is returned as a result.
 ```
 // Add a keyring to caver.wallet
 > const keyring = caver.wallet.newKeyring('0x{address in hex}', '0x{private key}')
-> const vt = new caver.transaction.valueTransfer({
+> const vt = caver.transaction.valueTransfer.create({
 		from: keyring.address,
 		to: '0x176ff0344de49c04be577a3512b6991507647f72',
 		value: caver.utils.convertToPeb(1, 'KLAY'),

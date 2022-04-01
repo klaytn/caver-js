@@ -16,12 +16,13 @@
 import { AbstractTransaction, CreateTransactionObject } from '../abstractTransaction'
 import { SignatureData } from '../../../../caver-wallet/src/'
 import { AccessList } from 'ethers/lib/utils'
+import { KlaytnCall } from '../../../../caver-rpc/src/klay'
 
 export class EthereumAccessList extends AbstractTransaction {
-    static create(createTxObj: CreateTransactionObject | string): EthereumAccessList
-    static decode(rlpEncoded: string): EthereumAccessList
+    static create(createTxObj: CreateTransactionObject | string, klaytnCall?: KlaytnCall): EthereumAccessList
+    static decode(rlpEncoded: string, klaytnCall?: KlaytnCall): EthereumAccessList
 
-    constructor(createTxObj: CreateTransactionObject | string)
+    constructor(createTxObj: CreateTransactionObject | string, klaytnCall?: KlaytnCall)
 
     appendSignatures(sig: string[] | string[][] | SignatureData | SignatureData[]): void
     getRLPEncoding(): string

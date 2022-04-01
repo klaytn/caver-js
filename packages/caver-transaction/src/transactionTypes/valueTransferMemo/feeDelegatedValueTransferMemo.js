@@ -19,7 +19,6 @@
 const RLP = require('eth-lib/lib/rlp')
 const Bytes = require('eth-lib/lib/bytes')
 const _ = require('lodash')
-const AbstractTransaction = require('../abstractTransaction')
 const AbstractFeeDelegatedTransaction = require('../abstractFeeDelegatedTransaction')
 const { TX_TYPE_STRING, TX_TYPE_TAG, isNot } = require('../../transactionHelper/transactionHelper')
 const utils = require('../../../../caver-utils/src')
@@ -61,20 +60,22 @@ class FeeDelegatedValueTransferMemo extends AbstractFeeDelegatedTransaction {
      * @param {object|string} createTxObj - The parameters to create a FeeDelegatedValueTransferMemo transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                                      The object can define `from`, `to`, `value`, `input`, `nonce`, `gas`, `gasPrice`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {FeeDelegatedValueTransferMemo}
      */
-    static create(createTxObj) {
-        return new FeeDelegatedValueTransferMemo(createTxObj)
+    static create(createTxObj, klaytnCall) {
+        return new FeeDelegatedValueTransferMemo(createTxObj, klaytnCall)
     }
 
     /**
      * decodes the RLP-encoded string and returns a FeeDelegatedValueTransferMemo transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded fee delegated value transfer memo transaction.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {FeeDelegatedValueTransferMemo}
      */
-    static decode(rlpEncoded) {
-        return new FeeDelegatedValueTransferMemo(_decode(rlpEncoded))
+    static decode(rlpEncoded, klaytnCall) {
+        return new FeeDelegatedValueTransferMemo(_decode(rlpEncoded), klaytnCall)
     }
 
     /**
@@ -83,10 +84,11 @@ class FeeDelegatedValueTransferMemo extends AbstractFeeDelegatedTransaction {
      * @param {object|string} createTxObj - The parameters to create a FeeDelegatedValueTransferMemo transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                                      The object can define `from`, `to`, `value`, `input`, `nonce`, `gas`, `gasPrice`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      */
-    constructor(createTxObj) {
+    constructor(createTxObj, klaytnCall) {
         if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
-        super(TX_TYPE_STRING.TxTypeFeeDelegatedValueTransferMemo, createTxObj)
+        super(TX_TYPE_STRING.TxTypeFeeDelegatedValueTransferMemo, createTxObj, klaytnCall)
         this.to = createTxObj.to
         this.value = createTxObj.value
 
@@ -221,9 +223,9 @@ class FeeDelegatedValueTransferMemo extends AbstractFeeDelegatedTransaction {
      */
     async fillTransaction() {
         const [chainId, gasPrice, nonce] = await Promise.all([
-            isNot(this.chainId) ? AbstractTransaction.getChainId() : this.chainId,
-            isNot(this.gasPrice) ? AbstractTransaction.getGasPrice() : this.gasPrice,
-            isNot(this.nonce) ? AbstractTransaction.getNonce(this.from) : this.nonce,
+            isNot(this.chainId) ? this.getChainId() : this.chainId,
+            isNot(this.gasPrice) ? this.getGasPrice() : this.gasPrice,
+            isNot(this.nonce) ? this.getNonce(this.from) : this.nonce,
         ])
 
         this.chainId = chainId

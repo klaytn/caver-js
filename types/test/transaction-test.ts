@@ -44,6 +44,30 @@ import Caver, {
     AbstractFeeDelegatedTransaction,
     EthereumAccessList,
     EthereumDynamicFee,
+    LegacyTransactionWrapper,
+    ValueTransferWrapper,
+    FeeDelegatedValueTransferWrapper,
+    FeeDelegatedValueTransferWithRatioWrapper,
+    ValueTransferMemoWrapper,
+    FeeDelegatedValueTransferMemoWrapper,
+    FeeDelegatedValueTransferMemoWithRatioWrapper,
+    AccountUpdateWrapper,
+    FeeDelegatedAccountUpdateWrapper,
+    FeeDelegatedAccountUpdateWithRatioWrapper,
+    SmartContractDeployWrapper,
+    FeeDelegatedSmartContractDeployWrapper,
+    FeeDelegatedSmartContractDeployWithRatioWrapper,
+    SmartContractExecutionWrapper,
+    FeeDelegatedSmartContractExecutionWrapper,
+    FeeDelegatedSmartContractExecutionWithRatioWrapper,
+    CancelWrapper,
+    FeeDelegatedCancelWrapper,
+    FeeDelegatedCancelWithRatioWrapper,
+    ChainDataAnchoringWrapper,
+    FeeDelegatedChainDataAnchoringWrapper,
+    FeeDelegatedChainDataAnchoringWithRatioWrapper,
+    EthereumAccessListWrapper,
+    EthereumDynamicFeeWrapper,
 } from 'caver-js'
 
 const caver = new Caver()
@@ -84,53 +108,53 @@ caver.transaction.utils.accessTuple.create('address', ['storageKey1', 'storageKe
 // $ExpectType EncodedAccessTuple
 caver.transaction.utils.accessTuple.create('address', ['storageKey1', 'storageKey2']).encodeToByte()
 
-// $ExpectType typeof LegacyTransaction
+// $ExpectType LegacyTransactionWrapper
 caver.transaction.legacyTransaction
-// $ExpectType typeof ValueTransfer
+// $ExpectType ValueTransferWrapper
 caver.transaction.valueTransfer
-// $ExpectType typeof ValueTransferMemo
+// $ExpectType ValueTransferMemoWrapper
 caver.transaction.valueTransferMemo
-// $ExpectType typeof AccountUpdate
+// $ExpectType AccountUpdateWrapper
 caver.transaction.accountUpdate
-// $ExpectType typeof SmartContractDeploy
+// $ExpectType SmartContractDeployWrapper
 caver.transaction.smartContractDeploy
-// $ExpectType typeof SmartContractExecution
+// $ExpectType SmartContractExecutionWrapper
 caver.transaction.smartContractExecution
-// $ExpectType typeof Cancel
+// $ExpectType CancelWrapper
 caver.transaction.cancel
-// $ExpectType typeof ChainDataAnchoring
+// $ExpectType ChainDataAnchoringWrapper
 caver.transaction.chainDataAnchoring
-// $ExpectType typeof FeeDelegatedValueTransfer
+// $ExpectType FeeDelegatedValueTransferWrapper
 caver.transaction.feeDelegatedValueTransfer
-// $ExpectType typeof FeeDelegatedValueTransferMemo
+// $ExpectType FeeDelegatedValueTransferMemoWrapper
 caver.transaction.feeDelegatedValueTransferMemo
-// $ExpectType typeof FeeDelegatedAccountUpdate
+// $ExpectType FeeDelegatedAccountUpdateWrapper
 caver.transaction.feeDelegatedAccountUpdate
-// $ExpectType typeof FeeDelegatedSmartContractDeploy
+// $ExpectType FeeDelegatedSmartContractDeployWrapper
 caver.transaction.feeDelegatedSmartContractDeploy
-// $ExpectType typeof FeeDelegatedSmartContractExecution
+// $ExpectType FeeDelegatedSmartContractExecutionWrapper
 caver.transaction.feeDelegatedSmartContractExecution
-// $ExpectType typeof FeeDelegatedCancel
+// $ExpectType FeeDelegatedCancelWrapper
 caver.transaction.feeDelegatedCancel
-// $ExpectType typeof FeeDelegatedChainDataAnchoring
+// $ExpectType FeeDelegatedChainDataAnchoringWrapper
 caver.transaction.feeDelegatedChainDataAnchoring
-// $ExpectType typeof FeeDelegatedValueTransferWithRatio
+// $ExpectType FeeDelegatedValueTransferWithRatioWrapper
 caver.transaction.feeDelegatedValueTransferWithRatio
-// $ExpectType typeof FeeDelegatedValueTransferMemoWithRatio
+// $ExpectType FeeDelegatedValueTransferMemoWithRatioWrapper
 caver.transaction.feeDelegatedValueTransferMemoWithRatio
-// $ExpectType typeof FeeDelegatedAccountUpdateWithRatio
+// $ExpectType FeeDelegatedAccountUpdateWithRatioWrapper
 caver.transaction.feeDelegatedAccountUpdateWithRatio
-// $ExpectType typeof FeeDelegatedSmartContractDeployWithRatio
+// $ExpectType FeeDelegatedSmartContractDeployWithRatioWrapper
 caver.transaction.feeDelegatedSmartContractDeployWithRatio
-// $ExpectType typeof FeeDelegatedSmartContractExecutionWithRatio
+// $ExpectType FeeDelegatedSmartContractExecutionWithRatioWrapper
 caver.transaction.feeDelegatedSmartContractExecutionWithRatio
-// $ExpectType typeof FeeDelegatedCancelWithRatio
+// $ExpectType FeeDelegatedCancelWithRatioWrapper
 caver.transaction.feeDelegatedCancelWithRatio
-// $ExpectType typeof FeeDelegatedChainDataAnchoringWithRatio
+// $ExpectType FeeDelegatedChainDataAnchoringWithRatioWrapper
 caver.transaction.feeDelegatedChainDataAnchoringWithRatio
-// $ExpectType typeof EthereumAccessList
+// $ExpectType EthereumAccessListWrapper
 caver.transaction.ethereumAccessList
-// $ExpectType typeof EthereumDynamicFee
+// $ExpectType EthereumDynamicFeeWrapper
 caver.transaction.ethereumDynamicFee
 
 // $ExpectType string
@@ -148,214 +172,406 @@ new LegacyTransaction({})
 // $ExpectType LegacyTransaction
 LegacyTransaction.create({})
 // $ExpectType LegacyTransaction
+LegacyTransaction.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType LegacyTransaction
+caver.transaction.legacyTransaction.create({})
+// $ExpectType LegacyTransaction
 LegacyTransaction.decode('string')
+// $ExpectType LegacyTransaction
+LegacyTransaction.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType LegacyTransaction
+caver.transaction.legacyTransaction.decode('string')
 
 // $ExpectType ValueTransfer
 new ValueTransfer({})
 // $ExpectType ValueTransfer
 ValueTransfer.create({})
 // $ExpectType ValueTransfer
+ValueTransfer.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType ValueTransfer
+caver.transaction.valueTransfer.create({})
+// $ExpectType ValueTransfer
 ValueTransfer.create('string')
 // $ExpectType ValueTransfer
 ValueTransfer.decode('string')
+// $ExpectType ValueTransfer
+ValueTransfer.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType ValueTransfer
+caver.transaction.valueTransfer.decode('string')
 
 // $ExpectType FeeDelegatedValueTransfer
 new FeeDelegatedValueTransfer({})
 // $ExpectType FeeDelegatedValueTransfer
 FeeDelegatedValueTransfer.create({})
 // $ExpectType FeeDelegatedValueTransfer
+FeeDelegatedValueTransfer.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedValueTransfer
+caver.transaction.feeDelegatedValueTransfer.create({})
+// $ExpectType FeeDelegatedValueTransfer
 FeeDelegatedValueTransfer.create('string')
 // $ExpectType FeeDelegatedValueTransfer
 FeeDelegatedValueTransfer.decode('string')
+// $ExpectType FeeDelegatedValueTransfer
+FeeDelegatedValueTransfer.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedValueTransfer
+caver.transaction.feeDelegatedValueTransfer.decode('string')
 
 // $ExpectType FeeDelegatedValueTransferWithRatio
 new FeeDelegatedValueTransferWithRatio({})
 // $ExpectType FeeDelegatedValueTransferWithRatio
 FeeDelegatedValueTransferWithRatio.create({})
 // $ExpectType FeeDelegatedValueTransferWithRatio
+FeeDelegatedValueTransferWithRatio.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedValueTransferWithRatio
+caver.transaction.feeDelegatedValueTransferWithRatio.create({})
+// $ExpectType FeeDelegatedValueTransferWithRatio
 FeeDelegatedValueTransferWithRatio.create('string')
 // $ExpectType FeeDelegatedValueTransferWithRatio
 FeeDelegatedValueTransferWithRatio.decode('string')
+// $ExpectType FeeDelegatedValueTransferWithRatio
+FeeDelegatedValueTransferWithRatio.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedValueTransferWithRatio
+caver.transaction.feeDelegatedValueTransferWithRatio.decode('string')
 
 // $ExpectType ValueTransferMemo
 new ValueTransferMemo({})
 // $ExpectType ValueTransferMemo
 ValueTransferMemo.create({})
 // $ExpectType ValueTransferMemo
+ValueTransferMemo.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType ValueTransferMemo
+caver.transaction.valueTransferMemo.create({})
+// $ExpectType ValueTransferMemo
 ValueTransferMemo.create('string')
 // $ExpectType ValueTransferMemo
 ValueTransferMemo.decode('string')
+// $ExpectType ValueTransferMemo
+ValueTransferMemo.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType ValueTransferMemo
+caver.transaction.valueTransferMemo.decode('string')
 
 // $ExpectType FeeDelegatedValueTransferMemo
 new FeeDelegatedValueTransferMemo({})
 // $ExpectType FeeDelegatedValueTransferMemo
 FeeDelegatedValueTransferMemo.create({})
 // $ExpectType FeeDelegatedValueTransferMemo
+FeeDelegatedValueTransferMemo.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedValueTransferMemo
+caver.transaction.feeDelegatedValueTransferMemo.create({})
+// $ExpectType FeeDelegatedValueTransferMemo
 FeeDelegatedValueTransferMemo.create('string')
 // $ExpectType FeeDelegatedValueTransferMemo
 FeeDelegatedValueTransferMemo.decode('string')
+// $ExpectType FeeDelegatedValueTransferMemo
+FeeDelegatedValueTransferMemo.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedValueTransferMemo
+caver.transaction.feeDelegatedValueTransferMemo.decode('string')
 
 // $ExpectType FeeDelegatedValueTransferMemoWithRatio
 new FeeDelegatedValueTransferMemoWithRatio({})
 // $ExpectType FeeDelegatedValueTransferMemoWithRatio
 FeeDelegatedValueTransferMemoWithRatio.create({})
 // $ExpectType FeeDelegatedValueTransferMemoWithRatio
+FeeDelegatedValueTransferMemoWithRatio.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedValueTransferMemoWithRatio
+caver.transaction.feeDelegatedValueTransferMemoWithRatio.create({})
+// $ExpectType FeeDelegatedValueTransferMemoWithRatio
 FeeDelegatedValueTransferMemoWithRatio.create('string')
 // $ExpectType FeeDelegatedValueTransferMemoWithRatio
 FeeDelegatedValueTransferMemoWithRatio.decode('string')
+// $ExpectType FeeDelegatedValueTransferMemoWithRatio
+FeeDelegatedValueTransferMemoWithRatio.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedValueTransferMemoWithRatio
+caver.transaction.feeDelegatedValueTransferMemoWithRatio.decode('string')
 
 // $ExpectType AccountUpdate
 new AccountUpdate({})
 // $ExpectType AccountUpdate
 AccountUpdate.create({})
 // $ExpectType AccountUpdate
+AccountUpdate.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType AccountUpdate
+caver.transaction.accountUpdate.create({})
+// $ExpectType AccountUpdate
 AccountUpdate.create('string')
 // $ExpectType AccountUpdate
 AccountUpdate.decode('string')
+// $ExpectType AccountUpdate
+AccountUpdate.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType AccountUpdate
+caver.transaction.accountUpdate.decode('string')
 
 // $ExpectType FeeDelegatedAccountUpdate
 new FeeDelegatedAccountUpdate({})
 // $ExpectType FeeDelegatedAccountUpdate
 FeeDelegatedAccountUpdate.create({})
 // $ExpectType FeeDelegatedAccountUpdate
+FeeDelegatedAccountUpdate.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedAccountUpdate
+caver.transaction.feeDelegatedAccountUpdate.create({})
+// $ExpectType FeeDelegatedAccountUpdate
 FeeDelegatedAccountUpdate.create('string')
 // $ExpectType FeeDelegatedAccountUpdate
 FeeDelegatedAccountUpdate.decode('string')
+// $ExpectType FeeDelegatedAccountUpdate
+FeeDelegatedAccountUpdate.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedAccountUpdate
+caver.transaction.feeDelegatedAccountUpdate.decode('string')
 
 // $ExpectType FeeDelegatedAccountUpdateWithRatio
 new FeeDelegatedAccountUpdateWithRatio({})
 // $ExpectType FeeDelegatedAccountUpdateWithRatio
 FeeDelegatedAccountUpdateWithRatio.create({})
 // $ExpectType FeeDelegatedAccountUpdateWithRatio
+FeeDelegatedAccountUpdateWithRatio.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedAccountUpdateWithRatio
+caver.transaction.feeDelegatedAccountUpdateWithRatio.create({})
+// $ExpectType FeeDelegatedAccountUpdateWithRatio
 FeeDelegatedAccountUpdateWithRatio.create('string')
 // $ExpectType FeeDelegatedAccountUpdateWithRatio
 FeeDelegatedAccountUpdateWithRatio.decode('string')
+// $ExpectType FeeDelegatedAccountUpdateWithRatio
+FeeDelegatedAccountUpdateWithRatio.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedAccountUpdateWithRatio
+caver.transaction.feeDelegatedAccountUpdateWithRatio.decode('string')
 
 // $ExpectType SmartContractDeploy
 new SmartContractDeploy({})
 // $ExpectType SmartContractDeploy
 SmartContractDeploy.create({})
 // $ExpectType SmartContractDeploy
+SmartContractDeploy.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType SmartContractDeploy
+caver.transaction.smartContractDeploy.create({})
+// $ExpectType SmartContractDeploy
 SmartContractDeploy.create('string')
 // $ExpectType SmartContractDeploy
 SmartContractDeploy.decode('string')
+// $ExpectType SmartContractDeploy
+SmartContractDeploy.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType SmartContractDeploy
+caver.transaction.smartContractDeploy.decode('string')
 
 // $ExpectType FeeDelegatedSmartContractDeploy
 new FeeDelegatedSmartContractDeploy({})
 // $ExpectType FeeDelegatedSmartContractDeploy
 FeeDelegatedSmartContractDeploy.create({})
 // $ExpectType FeeDelegatedSmartContractDeploy
+FeeDelegatedSmartContractDeploy.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedSmartContractDeploy
+caver.transaction.feeDelegatedSmartContractDeploy.create({})
+// $ExpectType FeeDelegatedSmartContractDeploy
 FeeDelegatedSmartContractDeploy.create('string')
 // $ExpectType FeeDelegatedSmartContractDeploy
 FeeDelegatedSmartContractDeploy.decode('string')
+// $ExpectType FeeDelegatedSmartContractDeploy
+FeeDelegatedSmartContractDeploy.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedSmartContractDeploy
+caver.transaction.feeDelegatedSmartContractDeploy.decode('string')
 
 // $ExpectType FeeDelegatedSmartContractDeployWithRatio
 new FeeDelegatedSmartContractDeployWithRatio({})
 // $ExpectType FeeDelegatedSmartContractDeployWithRatio
 FeeDelegatedSmartContractDeployWithRatio.create({})
 // $ExpectType FeeDelegatedSmartContractDeployWithRatio
+FeeDelegatedSmartContractDeployWithRatio.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedSmartContractDeployWithRatio
+caver.transaction.feeDelegatedSmartContractDeployWithRatio.create({})
+// $ExpectType FeeDelegatedSmartContractDeployWithRatio
 FeeDelegatedSmartContractDeployWithRatio.create('string')
 // $ExpectType FeeDelegatedSmartContractDeployWithRatio
 FeeDelegatedSmartContractDeployWithRatio.decode('string')
+// $ExpectType FeeDelegatedSmartContractDeployWithRatio
+FeeDelegatedSmartContractDeployWithRatio.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedSmartContractDeployWithRatio
+caver.transaction.feeDelegatedSmartContractDeployWithRatio.decode('string')
 
 // $ExpectType SmartContractExecution
 new SmartContractExecution({})
 // $ExpectType SmartContractExecution
 SmartContractExecution.create({})
 // $ExpectType SmartContractExecution
+SmartContractExecution.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType SmartContractExecution
+caver.transaction.smartContractExecution.create({})
+// $ExpectType SmartContractExecution
 SmartContractExecution.create('string')
 // $ExpectType SmartContractExecution
 SmartContractExecution.decode('string')
+// $ExpectType SmartContractExecution
+SmartContractExecution.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType SmartContractExecution
+caver.transaction.smartContractExecution.decode('string')
 
 // $ExpectType FeeDelegatedSmartContractExecution
 new FeeDelegatedSmartContractExecution({})
 // $ExpectType FeeDelegatedSmartContractExecution
 FeeDelegatedSmartContractExecution.create({})
 // $ExpectType FeeDelegatedSmartContractExecution
+FeeDelegatedSmartContractExecution.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedSmartContractExecution
+caver.transaction.feeDelegatedSmartContractExecution.create({})
+// $ExpectType FeeDelegatedSmartContractExecution
 FeeDelegatedSmartContractExecution.create('string')
 // $ExpectType FeeDelegatedSmartContractExecution
 FeeDelegatedSmartContractExecution.decode('string')
+// $ExpectType FeeDelegatedSmartContractExecution
+FeeDelegatedSmartContractExecution.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedSmartContractExecution
+caver.transaction.feeDelegatedSmartContractExecution.decode('string')
 
 // $ExpectType FeeDelegatedSmartContractExecutionWithRatio
 new FeeDelegatedSmartContractExecutionWithRatio({})
 // $ExpectType FeeDelegatedSmartContractExecutionWithRatio
 FeeDelegatedSmartContractExecutionWithRatio.create({})
 // $ExpectType FeeDelegatedSmartContractExecutionWithRatio
+FeeDelegatedSmartContractExecutionWithRatio.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedSmartContractExecutionWithRatio
+caver.transaction.feeDelegatedSmartContractExecutionWithRatio.create({})
+// $ExpectType FeeDelegatedSmartContractExecutionWithRatio
 FeeDelegatedSmartContractExecutionWithRatio.create('string')
 // $ExpectType FeeDelegatedSmartContractExecutionWithRatio
 FeeDelegatedSmartContractExecutionWithRatio.decode('string')
+// $ExpectType FeeDelegatedSmartContractExecutionWithRatio
+FeeDelegatedSmartContractExecutionWithRatio.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedSmartContractExecutionWithRatio
+caver.transaction.feeDelegatedSmartContractExecutionWithRatio.decode('string')
 
 // $ExpectType Cancel
 new Cancel({})
 // $ExpectType Cancel
 Cancel.create({})
 // $ExpectType Cancel
+Cancel.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType Cancel
+caver.transaction.cancel.create({})
+// $ExpectType Cancel
 Cancel.create('string')
 // $ExpectType Cancel
 Cancel.decode('string')
+// $ExpectType Cancel
+Cancel.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType Cancel
+caver.transaction.cancel.decode('string')
 
 // $ExpectType FeeDelegatedCancel
 new FeeDelegatedCancel({})
 // $ExpectType FeeDelegatedCancel
 FeeDelegatedCancel.create({})
 // $ExpectType FeeDelegatedCancel
+FeeDelegatedCancel.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedCancel
+caver.transaction.feeDelegatedCancel.create({})
+// $ExpectType FeeDelegatedCancel
 FeeDelegatedCancel.create('string')
 // $ExpectType FeeDelegatedCancel
 FeeDelegatedCancel.decode('string')
+// $ExpectType FeeDelegatedCancel
+FeeDelegatedCancel.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedCancel
+caver.transaction.feeDelegatedCancel.decode('string')
 
 // $ExpectType FeeDelegatedCancelWithRatio
 new FeeDelegatedCancelWithRatio({})
 // $ExpectType FeeDelegatedCancelWithRatio
 FeeDelegatedCancelWithRatio.create({})
 // $ExpectType FeeDelegatedCancelWithRatio
+FeeDelegatedCancelWithRatio.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedCancelWithRatio
+caver.transaction.feeDelegatedCancelWithRatio.create({})
+// $ExpectType FeeDelegatedCancelWithRatio
 FeeDelegatedCancelWithRatio.create('string')
 // $ExpectType FeeDelegatedCancelWithRatio
 FeeDelegatedCancelWithRatio.decode('string')
+// $ExpectType FeeDelegatedCancelWithRatio
+FeeDelegatedCancelWithRatio.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedCancelWithRatio
+caver.transaction.feeDelegatedCancelWithRatio.decode('string')
 
 // $ExpectType ChainDataAnchoring
 new ChainDataAnchoring({})
 // $ExpectType ChainDataAnchoring
 ChainDataAnchoring.create({})
 // $ExpectType ChainDataAnchoring
+ChainDataAnchoring.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType ChainDataAnchoring
+caver.transaction.chainDataAnchoring.create({})
+// $ExpectType ChainDataAnchoring
 ChainDataAnchoring.create('string')
 // $ExpectType ChainDataAnchoring
 ChainDataAnchoring.decode('string')
+// $ExpectType ChainDataAnchoring
+ChainDataAnchoring.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType ChainDataAnchoring
+caver.transaction.chainDataAnchoring.decode('string')
 
 // $ExpectType FeeDelegatedChainDataAnchoring
 new FeeDelegatedChainDataAnchoring({})
 // $ExpectType FeeDelegatedChainDataAnchoring
 FeeDelegatedChainDataAnchoring.create({})
 // $ExpectType FeeDelegatedChainDataAnchoring
+FeeDelegatedChainDataAnchoring.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedChainDataAnchoring
+caver.transaction.feeDelegatedChainDataAnchoring.create({})
+// $ExpectType FeeDelegatedChainDataAnchoring
 FeeDelegatedChainDataAnchoring.create('string')
 // $ExpectType FeeDelegatedChainDataAnchoring
 FeeDelegatedChainDataAnchoring.decode('string')
+// $ExpectType FeeDelegatedChainDataAnchoring
+FeeDelegatedChainDataAnchoring.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedChainDataAnchoring
+caver.transaction.feeDelegatedChainDataAnchoring.decode('string')
 
 // $ExpectType FeeDelegatedChainDataAnchoringWithRatio
 new FeeDelegatedChainDataAnchoringWithRatio({})
 // $ExpectType FeeDelegatedChainDataAnchoringWithRatio
 FeeDelegatedChainDataAnchoringWithRatio.create({})
 // $ExpectType FeeDelegatedChainDataAnchoringWithRatio
+FeeDelegatedChainDataAnchoringWithRatio.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedChainDataAnchoringWithRatio
+caver.transaction.feeDelegatedChainDataAnchoringWithRatio.create({})
+// $ExpectType FeeDelegatedChainDataAnchoringWithRatio
 FeeDelegatedChainDataAnchoringWithRatio.create('string')
 // $ExpectType FeeDelegatedChainDataAnchoringWithRatio
 FeeDelegatedChainDataAnchoringWithRatio.decode('string')
+// $ExpectType FeeDelegatedChainDataAnchoringWithRatio
+FeeDelegatedChainDataAnchoringWithRatio.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType FeeDelegatedChainDataAnchoringWithRatio
+caver.transaction.feeDelegatedChainDataAnchoringWithRatio.decode('string')
 
 // $ExpectType EthereumAccessList
 new EthereumAccessList({})
 // $ExpectType EthereumAccessList
 EthereumAccessList.create({})
 // $ExpectType EthereumAccessList
+EthereumAccessList.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType EthereumAccessList
+caver.transaction.ethereumAccessList.create({})
+// $ExpectType EthereumAccessList
 EthereumAccessList.create('string')
 // $ExpectType EthereumAccessList
 EthereumAccessList.decode('string')
+// $ExpectType EthereumAccessList
+EthereumAccessList.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType EthereumAccessList
+caver.transaction.ethereumAccessList.decode('string')
 
 // $ExpectType EthereumDynamicFee
 new EthereumDynamicFee({})
 // $ExpectType EthereumDynamicFee
 EthereumDynamicFee.create({})
 // $ExpectType EthereumDynamicFee
+EthereumDynamicFee.create({}, caver.rpc.klay.klaytnCall)
+// $ExpectType EthereumDynamicFee
+caver.transaction.ethereumDynamicFee.create({})
+// $ExpectType EthereumDynamicFee
 EthereumDynamicFee.create('string')
 // $ExpectType EthereumDynamicFee
 EthereumDynamicFee.decode('string')
+// $ExpectType EthereumDynamicFee
+EthereumDynamicFee.decode('string', caver.rpc.klay.klaytnCall)
+// $ExpectType EthereumDynamicFee
+caver.transaction.ethereumDynamicFee.decode('string')
 
 const address = '0xde39030c0b51c01a83fc819fb79d47c90d6a3a60'
 const prvKeys = [
@@ -465,6 +681,8 @@ legacyTransaction.value
 legacyTransaction.input
 // $ExpectType string
 legacyTransaction.data
+// $ExpectType KlaytnCall
+legacyTransaction.klaytnCall
 
 const valueTransfer = new ValueTransfer({})
 
@@ -558,6 +776,8 @@ valueTransfer.signatures
 valueTransfer.to
 // $ExpectType string
 valueTransfer.value
+// $ExpectType KlaytnCall
+valueTransfer.klaytnCall
 
 const valueTransferMemo = new ValueTransferMemo({})
 
@@ -655,6 +875,8 @@ valueTransferMemo.value
 valueTransferMemo.input
 // $ExpectType string
 valueTransferMemo.data
+// $ExpectType KlaytnCall
+valueTransferMemo.klaytnCall
 
 const accountUpdate = new AccountUpdate({})
 
@@ -746,6 +968,8 @@ accountUpdate.chainId
 accountUpdate.signatures
 // $ExpectType Account
 accountUpdate.account
+// $ExpectType KlaytnCall
+accountUpdate.klaytnCall
 
 const smartContractDeploy = new SmartContractDeploy({})
 
@@ -847,6 +1071,8 @@ smartContractDeploy.data
 smartContractDeploy.humanReadable
 // $ExpectType string
 smartContractDeploy.codeFormat
+// $ExpectType KlaytnCall
+smartContractDeploy.klaytnCall
 
 const smartContractExecution = new SmartContractExecution({})
 
@@ -944,6 +1170,8 @@ smartContractExecution.value
 smartContractExecution.input
 // $ExpectType string
 smartContractExecution.data
+// $ExpectType KlaytnCall
+smartContractExecution.klaytnCall
 
 const cancel = new Cancel({})
 
@@ -1033,6 +1261,8 @@ cancel.gasPrice
 cancel.chainId
 // $ExpectType SignatureData | SignatureData[]
 cancel.signatures
+// $ExpectType KlaytnCall
+cancel.klaytnCall
 
 const chainDataAnchoring = new ChainDataAnchoring({})
 
@@ -1124,6 +1354,8 @@ chainDataAnchoring.chainId
 chainDataAnchoring.signatures
 // $ExpectType string
 chainDataAnchoring.input
+// $ExpectType KlaytnCall
+chainDataAnchoring.klaytnCall
 
 const feeDelegatedValueTransfer = new FeeDelegatedValueTransfer({})
 
@@ -1269,6 +1501,8 @@ feeDelegatedValueTransfer.value
 feeDelegatedValueTransfer.feePayer
 // $ExpectType SignatureData[]
 feeDelegatedValueTransfer.feePayerSignatures
+// $ExpectType KlaytnCall
+feeDelegatedValueTransfer.klaytnCall
 
 const feeDelegatedValueTransferMemo = new FeeDelegatedValueTransferMemo({})
 
@@ -1418,6 +1652,8 @@ feeDelegatedValueTransferMemo.data
 feeDelegatedValueTransferMemo.feePayer
 // $ExpectType SignatureData[]
 feeDelegatedValueTransferMemo.feePayerSignatures
+// $ExpectType KlaytnCall
+feeDelegatedValueTransferMemo.klaytnCall
 
 const feeDelegatedAccountUpdate = new FeeDelegatedAccountUpdate({})
 
@@ -1561,6 +1797,8 @@ feeDelegatedAccountUpdate.account
 feeDelegatedAccountUpdate.feePayer
 // $ExpectType SignatureData[]
 feeDelegatedAccountUpdate.feePayerSignatures
+// $ExpectType KlaytnCall
+feeDelegatedAccountUpdate.klaytnCall
 
 const feeDelegatedSmartContractDeploy = new FeeDelegatedSmartContractDeploy({})
 
@@ -1714,6 +1952,8 @@ feeDelegatedSmartContractDeploy.codeFormat
 feeDelegatedSmartContractDeploy.feePayer
 // $ExpectType SignatureData[]
 feeDelegatedSmartContractDeploy.feePayerSignatures
+// $ExpectType KlaytnCall
+feeDelegatedSmartContractDeploy.klaytnCall
 
 const feeDelegatedSmartContractExecution = new FeeDelegatedSmartContractExecution({})
 
@@ -1863,6 +2103,8 @@ feeDelegatedSmartContractExecution.data
 feeDelegatedSmartContractExecution.feePayer
 // $ExpectType SignatureData[]
 feeDelegatedSmartContractExecution.feePayerSignatures
+// $ExpectType KlaytnCall
+feeDelegatedSmartContractExecution.klaytnCall
 
 const feeDelegatedCancel = new FeeDelegatedCancel({})
 
@@ -2004,6 +2246,8 @@ feeDelegatedCancel.signatures
 feeDelegatedCancel.feePayer
 // $ExpectType SignatureData[]
 feeDelegatedCancel.feePayerSignatures
+// $ExpectType KlaytnCall
+feeDelegatedCancel.klaytnCall
 
 const feeDelegatedChainDataAnchoring = new FeeDelegatedChainDataAnchoring({})
 
@@ -2147,6 +2391,8 @@ feeDelegatedChainDataAnchoring.input
 feeDelegatedChainDataAnchoring.feePayer
 // $ExpectType SignatureData[]
 feeDelegatedChainDataAnchoring.feePayerSignatures
+// $ExpectType KlaytnCall
+feeDelegatedChainDataAnchoring.klaytnCall
 
 const feeDelegatedValueTransferWithRatio = new FeeDelegatedValueTransferWithRatio({})
 
@@ -2294,6 +2540,8 @@ feeDelegatedValueTransferWithRatio.feePayer
 feeDelegatedValueTransferWithRatio.feePayerSignatures
 // $ExpectType string
 feeDelegatedValueTransferWithRatio.feeRatio
+// $ExpectType KlaytnCall
+feeDelegatedValueTransferWithRatio.klaytnCall
 
 const feeDelegatedValueTransferMemoWithRatio = new FeeDelegatedValueTransferMemoWithRatio({})
 
@@ -2445,6 +2693,8 @@ feeDelegatedValueTransferMemoWithRatio.feePayer
 feeDelegatedValueTransferMemoWithRatio.feePayerSignatures
 // $ExpectType string
 feeDelegatedValueTransferMemoWithRatio.feeRatio
+// $ExpectType KlaytnCall
+feeDelegatedValueTransferMemoWithRatio.klaytnCall
 
 const feeDelegatedAccountUpdateWithRatio = new FeeDelegatedAccountUpdateWithRatio({})
 
@@ -2590,6 +2840,8 @@ feeDelegatedAccountUpdateWithRatio.feePayer
 feeDelegatedAccountUpdateWithRatio.feePayerSignatures
 // $ExpectType string
 feeDelegatedAccountUpdateWithRatio.feeRatio
+// $ExpectType KlaytnCall
+feeDelegatedAccountUpdateWithRatio.klaytnCall
 
 const feeDelegatedSmartContractDeployWithRatio = new FeeDelegatedSmartContractDeployWithRatio({})
 
@@ -2745,6 +2997,8 @@ feeDelegatedSmartContractDeployWithRatio.feePayer
 feeDelegatedSmartContractDeployWithRatio.feePayerSignatures
 // $ExpectType string
 feeDelegatedSmartContractDeployWithRatio.feeRatio
+// $ExpectType KlaytnCall
+feeDelegatedSmartContractDeployWithRatio.klaytnCall
 
 const feeDelegatedSmartContractExecutionWithRatio = new FeeDelegatedSmartContractExecutionWithRatio({})
 
@@ -2896,6 +3150,8 @@ feeDelegatedSmartContractExecutionWithRatio.feePayer
 feeDelegatedSmartContractExecutionWithRatio.feePayerSignatures
 // $ExpectType string
 feeDelegatedSmartContractExecutionWithRatio.feeRatio
+// $ExpectType KlaytnCall
+feeDelegatedSmartContractExecutionWithRatio.klaytnCall
 
 const feeDelegatedCancelWithRatio = new FeeDelegatedCancelWithRatio({})
 
@@ -3039,6 +3295,8 @@ feeDelegatedCancelWithRatio.feePayer
 feeDelegatedCancelWithRatio.feePayerSignatures
 // $ExpectType string
 feeDelegatedCancelWithRatio.feeRatio
+// $ExpectType KlaytnCall
+feeDelegatedCancelWithRatio.klaytnCall
 
 const feeDelegatedChainDataAnchoringWithRatio = new FeeDelegatedChainDataAnchoringWithRatio({})
 
@@ -3184,6 +3442,8 @@ feeDelegatedChainDataAnchoringWithRatio.feePayer
 feeDelegatedChainDataAnchoringWithRatio.feePayerSignatures
 // $ExpectType string
 feeDelegatedChainDataAnchoringWithRatio.feeRatio
+// $ExpectType KlaytnCall
+feeDelegatedChainDataAnchoringWithRatio.klaytnCall
 
 const ethereumAccessList = new EthereumAccessList({})
 
@@ -3283,6 +3543,8 @@ ethereumAccessList.input
 ethereumAccessList.data
 // $ExpectType AccessList
 ethereumAccessList.accessList
+// $ExpectType KlaytnCall
+ethereumAccessList.klaytnCall
 
 const ethereumDynamicFee = new EthereumDynamicFee({})
 
@@ -3384,3 +3646,5 @@ ethereumDynamicFee.accessList
 ethereumDynamicFee.maxFeePerGas
 // $ExpectType string
 ethereumDynamicFee.maxPriorityFeePerGas
+// $ExpectType KlaytnCall
+ethereumDynamicFee.klaytnCall

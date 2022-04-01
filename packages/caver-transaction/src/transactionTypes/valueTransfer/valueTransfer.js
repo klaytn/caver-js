@@ -55,20 +55,22 @@ class ValueTransfer extends AbstractTransaction {
      * @param {object|string} createTxObj - The parameters to create a ValueTransfer transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                                      The object can define `from`, `to`, `value`, `nonce`, `gas`, `gasPrice`, `signatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {ValueTransfer}
      */
-    static create(createTxObj) {
-        return new ValueTransfer(createTxObj)
+    static create(createTxObj, klaytnCall) {
+        return new ValueTransfer(createTxObj, klaytnCall)
     }
 
     /**
      * decodes the RLP-encoded string and returns a ValueTransfer transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded value transfer transaction.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {ValueTransfer}
      */
-    static decode(rlpEncoded) {
-        return new ValueTransfer(_decode(rlpEncoded))
+    static decode(rlpEncoded, klaytnCall) {
+        return new ValueTransfer(_decode(rlpEncoded), klaytnCall)
     }
 
     /**
@@ -77,10 +79,11 @@ class ValueTransfer extends AbstractTransaction {
      * @param {object|string} createTxObj - The parameters to create a ValueTransfer transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                                      The object can define `from`, `to`, `value`, `nonce`, `gas`, `gasPrice`, `signatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      */
-    constructor(createTxObj) {
+    constructor(createTxObj, klaytnCall) {
         if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
-        super(TX_TYPE_STRING.TxTypeValueTransfer, createTxObj)
+        super(TX_TYPE_STRING.TxTypeValueTransfer, createTxObj, klaytnCall)
 
         this.to = createTxObj.to
         this.value = createTxObj.value
@@ -183,9 +186,9 @@ class ValueTransfer extends AbstractTransaction {
      */
     async fillTransaction() {
         const [chainId, gasPrice, nonce] = await Promise.all([
-            isNot(this.chainId) ? AbstractTransaction.getChainId() : this.chainId,
-            isNot(this.gasPrice) ? AbstractTransaction.getGasPrice() : this.gasPrice,
-            isNot(this.nonce) ? AbstractTransaction.getNonce(this.from) : this.nonce,
+            isNot(this.chainId) ? this.getChainId() : this.chainId,
+            isNot(this.gasPrice) ? this.getGasPrice() : this.gasPrice,
+            isNot(this.nonce) ? this.getNonce(this.from) : this.nonce,
         ])
 
         this.chainId = chainId

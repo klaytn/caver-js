@@ -51,7 +51,7 @@ const prepareTestSetting = async () => {
     ownerMap[testAccount.address] = []
     ownerMap[receiver.address] = []
 
-    const txObject = new caver.transaction.valueTransfer({
+    const txObject = caver.transaction.valueTransfer.create({
         from: sender.address,
         to: testAccount.address,
         value: caver.utils.toPeb(3, 'KLAY'),

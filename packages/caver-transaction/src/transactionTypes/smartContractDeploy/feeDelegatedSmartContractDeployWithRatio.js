@@ -19,7 +19,6 @@
 const RLP = require('eth-lib/lib/rlp')
 const Bytes = require('eth-lib/lib/bytes')
 const _ = require('lodash')
-const AbstractTransaction = require('../abstractTransaction')
 const AbstractFeeDelegatedWithRatioTransaction = require('../abstractFeeDelegatedWithRatioTransaction')
 const { TX_TYPE_STRING, TX_TYPE_TAG, CODE_FORMAT, getCodeFormatTag, isNot } = require('../../transactionHelper/transactionHelper')
 const utils = require('../../../../caver-utils/src')
@@ -79,20 +78,22 @@ class FeeDelegatedSmartContractDeployWithRatio extends AbstractFeeDelegatedWithR
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                               The object can define `from`, `to`, `value`, `input`, `humanReadable`, `codeForamt`,
      *                               `nonce`, `gas`, `gasPrice`, `feeRatio`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {FeeDelegatedSmartContractDeployWithRatio}
      */
-    static create(createTxObj) {
-        return new FeeDelegatedSmartContractDeployWithRatio(createTxObj)
+    static create(createTxObj, klaytnCall) {
+        return new FeeDelegatedSmartContractDeployWithRatio(createTxObj, klaytnCall)
     }
 
     /**
      * decodes the RLP-encoded string and returns a FeeDelegatedSmartContractDeployWithRatio transaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded fee delegated smart contract deploy with ratio transaction.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {FeeDelegatedSmartContractDeployWithRatio}
      */
-    static decode(rlpEncoded) {
-        return new FeeDelegatedSmartContractDeployWithRatio(_decode(rlpEncoded))
+    static decode(rlpEncoded, klaytnCall) {
+        return new FeeDelegatedSmartContractDeployWithRatio(_decode(rlpEncoded), klaytnCall)
     }
 
     /**
@@ -102,10 +103,11 @@ class FeeDelegatedSmartContractDeployWithRatio extends AbstractFeeDelegatedWithR
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                               The object can define `from`, `to`, `value`, `input`, `humanReadable`, `codeForamt`,
      *                               `nonce`, `gas`, `gasPrice`, `feeRatio`, `signatures`, `feePayer`, `feePayerSignatures` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      */
-    constructor(createTxObj) {
+    constructor(createTxObj, klaytnCall) {
         if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
-        super(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio, createTxObj)
+        super(TX_TYPE_STRING.TxTypeFeeDelegatedSmartContractDeployWithRatio, createTxObj, klaytnCall)
         this.to = createTxObj.to || '0x'
         this.value = createTxObj.value || '0x0'
 
@@ -272,9 +274,9 @@ class FeeDelegatedSmartContractDeployWithRatio extends AbstractFeeDelegatedWithR
      */
     async fillTransaction() {
         const [chainId, gasPrice, nonce] = await Promise.all([
-            isNot(this.chainId) ? AbstractTransaction.getChainId() : this.chainId,
-            isNot(this.gasPrice) ? AbstractTransaction.getGasPrice() : this.gasPrice,
-            isNot(this.nonce) ? AbstractTransaction.getNonce(this.from) : this.nonce,
+            isNot(this.chainId) ? this.getChainId() : this.chainId,
+            isNot(this.gasPrice) ? this.getGasPrice() : this.gasPrice,
+            isNot(this.nonce) ? this.getNonce(this.from) : this.nonce,
         ])
 
         this.chainId = chainId

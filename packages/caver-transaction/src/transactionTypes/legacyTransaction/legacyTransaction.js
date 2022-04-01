@@ -51,20 +51,22 @@ class LegacyTransaction extends AbstractTransaction {
      * @param {object|string} createTxObj - The parameters to create a LegacyTransaction transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                                      The object can define `from`, `to`, `value`, `input`, `nonce`, `gas`, `gasPrice` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {LegacyTransaction}
      */
-    static create(createTxObj) {
-        return new LegacyTransaction(createTxObj)
+    static create(createTxObj, klaytnCall) {
+        return new LegacyTransaction(createTxObj, klaytnCall)
     }
 
     /**
      * decodes the RLP-encoded string and returns a LegacyTransaction instance.
      *
      * @param {string} rlpEncoded The RLP-encoded legacy transaction.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      * @return {LegacyTransaction}
      */
-    static decode(rlpEncoded) {
-        return new LegacyTransaction(_decode(rlpEncoded))
+    static decode(rlpEncoded, klaytnCall) {
+        return new LegacyTransaction(_decode(rlpEncoded), klaytnCall)
     }
 
     /**
@@ -73,13 +75,14 @@ class LegacyTransaction extends AbstractTransaction {
      * @param {object|string} createTxObj - The parameters to create a LegacyTransaction transaction. This can be an object defining transaction information, or it can be an RLP-encoded string.
      *                                      If it is an RLP-encoded string, decode it to create a transaction instance.
      *                                      The object can define `from`, `to`, `value`, `input`, `nonce`, `gas`, `gasPrice` and `chainId`.
+     * @param {object} [klaytnCall] - An object includes klay rpc calls.
      */
-    constructor(createTxObj) {
+    constructor(createTxObj, klaytnCall) {
         if (_.isString(createTxObj)) createTxObj = _decode(createTxObj)
 
         createTxObj.from = createTxObj.from || '0x0000000000000000000000000000000000000000'
 
-        super(TX_TYPE_STRING.TxTypeLegacyTransaction, createTxObj)
+        super(TX_TYPE_STRING.TxTypeLegacyTransaction, createTxObj, klaytnCall)
         this.to = createTxObj.to || '0x'
 
         if (createTxObj.input && createTxObj.data)
@@ -264,9 +267,9 @@ class LegacyTransaction extends AbstractTransaction {
      */
     async fillTransaction() {
         const [chainId, gasPrice, nonce] = await Promise.all([
-            isNot(this.chainId) ? AbstractTransaction.getChainId() : this.chainId,
-            isNot(this.gasPrice) ? AbstractTransaction.getGasPrice() : this.gasPrice,
-            isNot(this.nonce) ? AbstractTransaction.getNonce(this.from) : this.nonce,
+            isNot(this.chainId) ? this.getChainId() : this.chainId,
+            isNot(this.gasPrice) ? this.getGasPrice() : this.gasPrice,
+            isNot(this.nonce) ? this.getNonce(this.from) : this.nonce,
         ])
 
         this.chainId = chainId

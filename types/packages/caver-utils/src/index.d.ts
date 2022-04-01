@@ -149,7 +149,7 @@ export interface Utils {
     checkAddressChecksum(address: string): boolean
     utf8ToHex(str: string): string
     hexToUtf8(hex: string): string
-    hexToNumber(value: string | number | BN): string
+    hexToNumber(value: string | number | BN): number
     hexToNumberString(value: string | number | BN): string
     numberToHex(value: string | number | BN): string
     toHex(value: string | number | BN | object, returnType?: boolean): string
