@@ -45,6 +45,17 @@ class SingleKeyring {
     /**
      * @type {string}
      */
+    get type() {
+        return 'SingleKeyring'
+    }
+
+    set type(t) {
+        throw new Error(`keyring type cannot be set.`)
+    }
+
+    /**
+     * @type {string}
+     */
     get address() {
         return this._address
     }

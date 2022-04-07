@@ -33,6 +33,7 @@ export class RoleBasedKeyring {
     encrypt(password: string, options?: EncryptionOptions): EncryptedKeystoreV4Json
     isDecoupled(): boolean
 
+    type: string
     address: string
     keys: PrivateKey[][]
     readonly roleTransactionKey: PrivateKey[]
