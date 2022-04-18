@@ -430,7 +430,6 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
                 tx[key] = utils.hexToNumber(payload.params[0][key])
             } else if (key === 'key' && _.isObject(payload.params[0][key])) {
                 // If key field is `AccountForUpdate`, resolve this to raw encoded account key string.
-                keyForUpdate = payload.params[0][key]
                 tx.key = resolveRawKeyToAccountKey(payload.params[0])
             } else if (key === 'account') {
                 tx.key = payload.params[0][key].getRLPEncodingAccountKey()
