@@ -175,6 +175,36 @@ const TX_TYPE_TAG = {
     '0x7802': TX_TYPE_STRING.TxTypeEthereumDynamicFee,
 }
 
+const TX_TYPE_TAG_LEGACY_TX_TYPES = {
+    ACCOUNT_UPDATE: TX_TYPE_TAG.TxTypeAccountUpdate,
+    FEE_DELEGATED_ACCOUNT_UPDATE: TX_TYPE_TAG.TxTypeFeeDelegatedAccountUpdate,
+    FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO: TX_TYPE_TAG.TxTypeFeeDelegatedAccountUpdateWithRatio,
+
+    VALUE_TRANFSER: TX_TYPE_TAG.TxTypeValueTransfer,
+    FEE_DELEGATED_VALUE_TRANSFER: TX_TYPE_TAG.TxTypeFeeDelegatedValueTransfer,
+    FEE_DELEGATED_VALUE_TRANSFER_WITH_RATIO: TX_TYPE_TAG.TxTypeFeeDelegatedValueTransferWithRatio,
+
+    VALUE_TRANSFER_MEMO: TX_TYPE_TAG.TxTypeValueTransferMemo,
+    FEE_DELEGATED_VALUE_TRANSFER_MEMO: TX_TYPE_TAG.TxTypeFeeDelegatedValueTransferMemo,
+    FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO: TX_TYPE_TAG.TxTypeFeeDelegatedValueTransferMemoWithRatio,
+
+    SMART_CONTRACT_DEPLOY: TX_TYPE_TAG.TxTypeSmartContractDeploy,
+    FEE_DELEGATED_SMART_CONTRACT_DEPLOY: TX_TYPE_TAG.TxTypeFeeDelegatedSmartContractDeploy,
+    FEE_DELEGATED_SMART_CONTRACT_DEPLOY_WITH_RATIO: TX_TYPE_TAG.TxTypeFeeDelegatedSmartContractDeployWithRatio,
+
+    SMART_CONTRACT_EXECUTION: TX_TYPE_TAG.TxTypeSmartContractExecution,
+    FEE_DELEGATED_SMART_CONTRACT_EXECUTION: TX_TYPE_TAG.TxTypeFeeDelegatedSmartContractExecution,
+    FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO: TX_TYPE_TAG.TxTypeFeeDelegatedSmartContractExecutionWithRatio,
+
+    CANCEL: TX_TYPE_TAG.TxTypeCancel,
+    FEE_DELEGATED_CANCEL: TX_TYPE_TAG.TxTypeFeeDelegatedCancel,
+    FEE_DELEGATED_CANCEL_WITH_RATIO: TX_TYPE_TAG.TxTypeFeeDelegatedCancelWithRatio,
+
+    CHAIN_DATA_ANCHORING: TX_TYPE_TAG.TxTypeChainDataAnchoring,
+    FEE_DELEGATED_CHAIN_DATA_ANCHORING: TX_TYPE_TAG.TxTypeFeeDelegatedChainDataAnchoring,
+    FEE_DELEGATED_CHAIN_DATA_ANCHORING_WITH_RATIO: TX_TYPE_TAG.TxTypeFeeDelegatedChainDataAnchoringWithRatio,
+}
+
 const CODE_FORMAT = {
     EVM: '0x0',
 }
@@ -186,7 +216,12 @@ const CODE_FORMAT = {
  * @return {number}
  */
 const getTypeInt = type => {
-    return utils.hexToNumber(TX_TYPE_TAG[type])
+    let typeInt = TX_TYPE_TAG[type]
+    // If type int cannot be found from TX_TYPE_TAG, means old type string.
+    if (typeInt === undefined) {
+        typeInt = TX_TYPE_TAG_LEGACY_TX_TYPES[type]
+    }
+    return utils.hexToNumber(typeInt)
 }
 
 /**
