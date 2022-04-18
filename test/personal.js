@@ -136,6 +136,28 @@ describe('Personal RPC test', () => {
         expect(receipt.type).to.equals('TxTypeLegacyTransaction')
     }).timeout(50000)
 
+    // sendTransaction with account update tx
+    it('CAVERJS-UNIT-ETC-404: sendTransaction should format a transaction to send tx with account in Node.', async () => {
+        try {
+            // If account is already existed in node, return error.
+            const address = await caver.klay.personal.importRawKey(senderPrvKey, password)
+            expect(address.toLowerCase()).to.equals(senderAddress.toLowerCase())
+        } catch (e) {}
+
+        const receipt = await caver.klay.personal.sendTransaction(
+            {
+                type: 'ACCOUNT_UPDATE',
+                from: senderAddress,
+                key: caver.klay.accounts.createAccountForUpdateWithLegacyKey(senderAddress),
+                gas: 900000,
+            },
+            password
+        )
+        console.log(receipt)
+        expect(receipt).not.to.be.null
+        expect(receipt.type).to.equals('TxTypeAccountUpdate')
+    }).timeout(50000)
+
     // signTransaction
     it('CAVERJS-UNIT-ETC-088: signTransaction should send a signed transaction using an account in the node.', async () => {
         const testAccount = caver.klay.accounts.create()

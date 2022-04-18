@@ -38,6 +38,7 @@ const POLLINGTIMEOUT = AVERAGE_BLOCK_TIME * TIMEOUTBLOCK // ~average block time 
 
 const TransactionDecoder = require('../../caver-transaction/src/transactionDecoder/transactionDecoder')
 const { TX_TYPE_STRING } = require('../../caver-transaction/src/transactionHelper/transactionHelper')
+const { resolveRawKeyToAccountKey } = require('../../caver-klay/caver-klay-accounts/src/transactionType/account')
 
 function Method(options) {
     // call, name should be existed to create a method.
@@ -427,6 +428,9 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
                 }
             } else if (key === 'codeFormat') {
                 tx[key] = utils.hexToNumber(payload.params[0][key])
+            } else if (key === 'key' && _.isObject(payload.params[0][key])) {
+                // If key field is `AccountForUpdate`, resolve this to raw encoded account key string.
+                tx.key = resolveRawKeyToAccountKey(payload.params[0])
             } else if (key === 'account') {
                 tx.key = payload.params[0][key].getRLPEncodingAccountKey()
             } else if (key === 'chainId') {

@@ -243,4 +243,5 @@ module.exports = {
     rlpEncodeForFeeDelegatedAccountUpdate,
     rlpEncodeForFeeDelegatedAccountUpdateWithRatio,
     parseAccountKey,
+    resolveRawKeyToAccountKey,
 }
