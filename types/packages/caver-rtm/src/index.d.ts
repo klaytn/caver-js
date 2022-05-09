@@ -12,8 +12,8 @@
     You should have received a copy of the GNU Lesser General Public License
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
-
-import { AccountKey } from '../../caver-account/src'
+// no use import
+// import { AccountKey } from '../../caver-account/src'
 import {
     Block,
     BlockNumber,
@@ -82,8 +82,8 @@ export default class RpcCallToMethod {
     klay_estimateGas(callObject: CallObject, blockNumber?: BlockNumber, callback?: (error: Error, result: string) => void): Promise<number>
     klay_getLogs(options: LogsOptions, callback?: (error: Error, result: Log[]) => void): Promise<Log[]>
     klay_sign(
-        address: string,
         message: string,
+        address: string,
         blockNumber?: BlockNumber,
         callback?: (error: Error, result: string) => void
     ): Promise<string>
