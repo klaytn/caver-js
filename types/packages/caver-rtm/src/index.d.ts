@@ -12,8 +12,8 @@
     You should have received a copy of the GNU Lesser General Public License
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
-
-import { AccountKey } from '../../caver-account/src'
+// no use import
+// import { AccountKey } from '../../caver-account/src'
 import {
     Block,
     BlockNumber,
