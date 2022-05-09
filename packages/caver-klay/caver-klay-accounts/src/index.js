@@ -1705,7 +1705,7 @@ function Wallet(accounts) {
 
 Wallet.prototype._findSafeIndex = function(pointer) {
     pointer = pointer || 0
-    while(this.lastIndex >= pointer) {
+    while (this.lastIndex >= pointer) {
         if (!_.has(this, pointer)) {
             break
         }
@@ -1719,7 +1719,7 @@ Wallet.prototype._findSafeIndex = function(pointer) {
 
 Wallet.prototype._findSafeLastIndex = function(pointer) {
     pointer = this.lastIndex
-    while(pointer >= 0) {
+    while (pointer >= 0) {
         if (_.has(this, pointer)) {
             break
         }
