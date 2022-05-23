@@ -45,6 +45,7 @@ export interface DeprecatedTransactionObject extends KeyForUpdateObject {
     humanReadable?: boolean
     feeRatio?: string
     key?: AccountForUpdate
+    rawTransaction? : string
 }
 
 export interface UpdateOptionsObject {
