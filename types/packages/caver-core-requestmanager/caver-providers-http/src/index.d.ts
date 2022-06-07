@@ -50,7 +50,7 @@ export class HttpProvider {
     headers?: HttpHeader[]
     agent?: HttpProviderAgent
 
-    _prepareRequest(): XMLHttpRequest
+    _prepareRequest?(): any
     send(payload: object, callback?: (error: Error | null, result: JsonRpcResponse | undefined) => void): void
     supportsSubscriptions(): boolean
     disconnect(): boolean
