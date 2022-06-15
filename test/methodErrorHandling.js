@@ -43,9 +43,10 @@ describe('Error handling in Method package', () => {
             type: 'SMART_CONTRACT_DEPLOY',
             from: sender.address,
             data: deployedData,
-            gas: 140000,
             value: 0,
         }
+        const estimated = await caver.rpc.klay.estimateGas(tx)
+        tx.gas = Math.floor(caver.utils.hexToNumber(estimated) * 0.8)
         const expectedError = `contract creation code storage out of gas`
         await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
     }).timeout(200000)
