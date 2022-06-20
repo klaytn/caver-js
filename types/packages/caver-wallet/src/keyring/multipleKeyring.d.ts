@@ -32,6 +32,7 @@ export class MultipleKeyring {
     encrypt(password: string, options?: EncryptionOptions): EncryptedKeystoreV4Json
     isDecoupled(): boolean
 
+    type: string
     address: string
     keys: PrivateKey[]
     private _address: string

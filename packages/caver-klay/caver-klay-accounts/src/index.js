@@ -1700,12 +1700,30 @@ function Wallet(accounts) {
     this._accounts = accounts
     this.length = 0
     this.defaultKeyName = 'caverjs_wallet'
+    this.lastIndex = -1
 }
 
 Wallet.prototype._findSafeIndex = function(pointer) {
     pointer = pointer || 0
-    if (_.has(this, pointer)) {
-        return this._findSafeIndex(pointer + 1)
+    while (this.lastIndex >= pointer) {
+        if (!_.has(this, pointer)) {
+            break
+        }
+        pointer++
+    }
+    if (this.lastIndex < pointer) {
+        this.lastIndex = pointer
+    }
+    return pointer
+}
+
+Wallet.prototype._findSafeLastIndex = function(pointer) {
+    pointer = this.lastIndex
+    while (pointer >= 0) {
+        if (_.has(this, pointer)) {
+            break
+        }
+        pointer--
     }
     return pointer
 }
@@ -1904,6 +1922,11 @@ Wallet.prototype.remove = function(addressOrIndex) {
         delete this[account.index]
 
         this.length--
+
+        // Update last index
+        if (account.index === this.lastIndex) {
+            this.lastIndex = this._findSafeLastIndex()
+        }
 
         return true
     }

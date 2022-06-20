@@ -50,6 +50,17 @@ class MultipleKeyring {
     /**
      * @type {string}
      */
+    get type() {
+        return 'MultipleKeyring'
+    }
+
+    set type(t) {
+        throw new Error(`keyring type cannot be set.`)
+    }
+
+    /**
+     * @type {string}
+     */
     get address() {
         return this._address
     }

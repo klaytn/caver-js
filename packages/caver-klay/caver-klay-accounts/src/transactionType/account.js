@@ -16,6 +16,7 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+const _ = require('lodash')
 const RLP = require('eth-lib/lib/rlp')
 const Bytes = require('eth-lib/lib/bytes')
 const utils = require('../../../../caver-utils')
@@ -136,6 +137,11 @@ function rlpEncodeForFeeDelegatedAccountUpdateWithRatio(transaction) {
 function resolveRawKeyToAccountKey(transaction) {
     // Handles the case where AccountForUpdate is set in key field in transaction object to update account.
     if (transaction.key) {
+        // If the key field is a string,
+        // it means that the already encoded Account Key is passed as a parameter.
+        if (_.isString(transaction.key)) {
+            return transaction.key
+        }
         if (transaction.from && transaction.from.toLowerCase() !== transaction.key.address.toLowerCase()) {
             throw new Error('The value of the from field of the transaction does not match the address of AccountForUpdate.')
         }
@@ -237,4 +243,5 @@ module.exports = {
     rlpEncodeForFeeDelegatedAccountUpdate,
     rlpEncodeForFeeDelegatedAccountUpdateWithRatio,
     parseAccountKey,
+    resolveRawKeyToAccountKey,
 }

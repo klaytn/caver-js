@@ -34,9 +34,13 @@ export interface JsonRpcPayload {
 
 export interface JsonRpcResponse {
     jsonrpc: string
-    id: number
+    id: string | number
     result?: any
-    error?: string
+    error?: {
+        readonly code?: number
+        readonly data?: unknown
+        readonly message: string
+    }
 }
 
 export interface WebsocketProviderOptions {

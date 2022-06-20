@@ -1803,6 +1803,18 @@ describe('ACCOUNT_UPDATE transaction', () => {
         expect(key.keyType).to.equals(1)
     }).timeout(200000)
 
+    // Update account with legacyKey when key filed is an encoded account key string
+    it('CAVERJS-UNIT-TX-731 : If transaction object has an encoded account key in the key field, update account key correctly', async () => {
+        // '0x01c0' is AccountKeyLegacy
+        const tx = { key: '0x01c0', ...accountUpdateObject }
+
+        const receipt = await caver.klay.sendTransaction(tx)
+        expect(receipt.from).to.equals(tx.from)
+
+        const key = await caver.klay.getAccountKey(receipt.from)
+        expect(key.keyType).to.equals(1)
+    }).timeout(200000)
+
     // LegacyKey with publicKey
     it('CAVERJS-UNIT-TX-259 : If transaction object has legacyKey and publicKey, signTransaction should throw error', async () => {
         const tx = { legacyKey: true, publicKey, ...accountUpdateObject }
