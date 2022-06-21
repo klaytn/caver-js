@@ -12,9 +12,11 @@
     You should have received a copy of the GNU Lesser General Public License
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
-// no use import
-// import { AccountKey } from '../../caver-account/src'
+
+import BN = require('bn.js')
+import BigNumber from 'bignumber.js'
 import {
+    Header,
     Block,
     BlockNumber,
     TransactionReceipt,
@@ -23,13 +25,14 @@ import {
     PromiEvent,
     TransactionForSendRPC,
     RLPEncodedTransaction,
-    DecodedAnchoringTransaction,
     Log,
     LogsOptions,
     LogObject,
     CallObject,
+    DecodedAnchoringTransaction,
+    FeeHistoryResult,
 } from '../../caver-core/src'
-import { Transaction } from '../../caver-transaction/src'
+import { Transaction, FeeDelegatedTransaction, AccessListResult } from '../../caver-transaction/src'
 import { Syncing, AccountKeyForRPC, AccountForRPC } from '../../caver-rpc/src/klay'
 import { PeerCountByType } from '../../caver-rpc/src/net'
 
@@ -74,8 +77,16 @@ export default class RpcCallToMethod {
         transaction: TransactionForSendRPC | Transaction,
         callback?: (error: Error, result: RLPEncodedTransaction) => void
     ): Promise<RLPEncodedTransaction>
+    klay_signTransactionAsFeePayer(
+        transaction: TransactionForSendRPC | FeeDelegatedTransaction,
+        callback?: (error: Error, result: RLPEncodedTransaction) => void
+    ): Promise<RLPEncodedTransaction>
     klay_sendTransaction(
         transaction: TransactionForSendRPC | Transaction,
+        callback?: (error: Error, result: TransactionReceipt) => void
+    ): PromiEvent<TransactionReceipt>
+    klay_sendTransactionAsFeePayer(
+        transaction: TransactionForSendRPC | FeeDelegatedTransaction,
         callback?: (error: Error, result: TransactionReceipt) => void
     ): PromiEvent<TransactionReceipt>
     klay_call(callObject: CallObject, blockNumber?: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
@@ -102,6 +113,18 @@ export default class RpcCallToMethod {
         returnTransactionObjects?: boolean,
         callback?: (error: Error, result: Block) => void
     ): Promise<Block>
+    klay_getHeader(
+        blockNumberOrHash: BlockNumber | string,
+        callback?: (error: Error, result: Header) => void
+    ): Promise<Header>
+    klay_getHeaderByNumber(
+        blockNumber: BlockNumber,
+        callback?: (error: Error, result: Header) => void
+    ): Promise<Header>
+    klay_getHeaderByHash(
+        blockHash: string,
+        callback?: (error: Error, result: Header) => void
+    ): Promise<Header>
     klay_getTransactionFromBlock(
         blockNumber: BlockNumber,
         index: number,
@@ -189,11 +212,29 @@ export default class RpcCallToMethod {
         callback?: (error: Error, result: string) => void
     ): Promise<string>
     klay_chainID(callback?: (error: Error, result: string) => void): Promise<string>
-
+    klay_createAccessList(
+        callObject: CallObject,
+        blockNumber: BlockNumber,
+        callback?: (error: Error, result: AccessListResult) => void
+    ): Promise<AccessListResult>
+    klay_getDecodedAnchoringTransactionByHash(
+        transactionHash: string,
+        callback?: (error: Error, result: DecodedAnchoringTransaction) => void
+    ): Promise<DecodedAnchoringTransaction>
+    klay_feeHistory(
+        blockCount: string | number | BN | BigNumber,
+        latestBlock: BlockNumber,
+        rewardPercentiles: number[],
+        callback?: (error: Error, result: FeeHistoryResult) => void
+    ): Promise<FeeHistoryResult>
+    klay_maxPriorityFeePerGas(
+        callback?: (error: Error, result: string) => void
+    ): Promise<string>
     net_networkID(callback?: (error: Error, result: string) => void): Promise<string>
     net_listening(callback?: (error: Error, result: boolean) => void): Promise<boolean>
     net_peerCount(callback?: (error: Error, result: string) => void): Promise<string>
     net_peerCountByType(callback?: (error: Error, result: PeerCountByType) => void): Promise<PeerCountByType>
+    net_version(callback?: (error: Error, result: string) => void): Promise<string>
 
     personal_listAccounts(callback?: (error: Error, result: string) => void): Promise<string>
     personal_newAccount(passphrase?: string, callback?: (error: Error, result: string) => void): Promise<string>
