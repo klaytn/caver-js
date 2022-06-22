@@ -87,8 +87,20 @@
 		"inputFormatter": ["inputTransactionFormatter"]
 	},
 	{
+		"name": "signTransactionAsFeePayer",
+		"call": "klay_signTransactionAsFeePayer",
+		"params": 1,
+		"inputFormatter": ["inputTransactionFormatter"]
+	},
+	{
 		"name": "sendTransaction",
 		"call": "klay_sendTransaction",
+		"params": 1,
+		"inputFormatter": ["inputTransactionFormatter"]
+	},
+	{
+		"name": "sendTransactionAsFeePayer",
+		"call": "klay_sendTransactionAsFeePayer",
 		"params": 1,
 		"inputFormatter": ["inputTransactionFormatter"]
 	},
@@ -127,12 +139,19 @@
 		"inputFormatter": ["inputBlockNumberFormatter", "toBoolean"]
 	},
 	{
+		"name": "getHeader",
+		"call": "klay_getHeaderByNumber",
+		"hexCall": "klay_getHeaderByHash",
+		"params": 1,
+		"inputFormatter": ["inputBlockNumberFormatter"]
+	},
+	{
 		"name": "getBlockTransactionCount",
 		"call": "klay_getBlockTransactionCountByNumber",
 		"hexCall": "klay_getBlockTransactionCountByHash",
 		"params": 1,
 		"inputFormatter": ["inputBlockNumberFormatter"],
-    "outputFormatter": "hexToNumber"
+    	"outputFormatter": "hexToNumber"
 	},
 	{
 		"name": "getTransactionFromBlock",
@@ -369,8 +388,41 @@
 		"params": 1
 	},
 	{
+		"name": "getDecodedAnchoringTransactionByHash",
+		"call": "klay_getDecodedAnchoringTransactionByHash",
+		"params": 1
+	},
+	{
+		"name": "createAccessList",
+		"call": "klay_createAccessList",
+		"params": 2,
+		"inputFormatter": ["inputTransactionFormatter", "inputDefaultBlockNumberFormatter"]
+	},
+	{
+		"name": "getMaxPriorityFeePerGas",
+		"call": "klay_maxPriorityFeePerGas",
+		"params": 0
+	},
+	{
+		"name": "getFeeHistory",
+		"call": "klay_feeHistory",
+		"params": 3,
+		"inputFormatter": ["numberToHex", "inputBlockNumberFormatter", null]
+	},
+	{
+		"name": "getFeeHistory",
+		"call": "klay_feeHistory",
+		"params": 3,
+		"inputFormatter": ["numberToHex", "inputBlockNumberFormatter", null]
+	},
+	{
 		"name": "peerCountByType",
 		"call": "net_peerCountByType",
+		"params": 0
+	},
+	{
+		"name": "getVersion",
+		"call": "net_version",
 		"params": 0
 	},
 	{
