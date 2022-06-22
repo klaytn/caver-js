@@ -292,7 +292,7 @@ const Accounts = function Accounts(...args) {
     delete this.BatchRequest
     delete this.extend
 
-    const _klaytnCall = [rpc.getChainId, rpc.getGasPrice, rpc.getTransactionCount]
+    const _klaytnCall = [rpc.getChainId, rpc.getGasPrice, rpc.getTransactionCount, rpc.getHeader]
     // attach methods to this._klaytnCall
     this._klaytnCall = {}
     _.each(_klaytnCall, function(method) {
@@ -391,6 +391,27 @@ Accounts.prototype._getRoleKey = function _getRoleKey(tx, account) {
     }
 
     return key
+}
+
+/**
+ * _getSuggestedGasPrice returns suggested gas price.
+ * This function will be used to set gasPrice field if that is omitted.
+ * Before common architecture does not support newly added transaction types.
+ *
+ * @method _getSuggestedGasPrice
+ * @return {string}
+ */
+Accounts.prototype._getSuggestedGasPrice = async function _getSuggestedGasPrice() {
+    const header = await this._klaytnCall.getHeader('latest')
+    const bf = utils.hexToNumber(header.baseFeePerGas || '0x0')
+
+    // In before common architecture, ethereum typed transactions are not supported.
+    // So just depends on baseFeePerGas field in the header,
+    // return `baseFee * 2` or `gasPrice`.
+    if (bf > 0) return bf * 2
+
+    const gasPrice = await this._klaytnCall.getGasPrice()
+    return gasPrice
 }
 
 /**
@@ -888,7 +909,7 @@ Accounts.prototype.signTransaction = function signTransaction() {
     // Otherwise, get the missing info from the Klaytn Node
     return Promise.all([
         isNot(tx.chainId) ? _this._klaytnCall.getChainId() : tx.chainId,
-        isNot(tx.gasPrice) ? _this._klaytnCall.getGasPrice() : tx.gasPrice,
+        isNot(tx.gasPrice) ? _this._getSuggestedGasPrice() : tx.gasPrice,
         isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from, 'pending') : tx.nonce,
     ]).then(function(args) {
         if (isNot(args[0]) || isNot(args[1]) || isNot(args[2])) {
