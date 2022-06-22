@@ -107,6 +107,24 @@ const Net = function Net(...args) {
             call: 'net_peerCountByType',
             params: 0,
         }),
+        /**
+         * Returns the current klaytn protocol version.
+         *
+         * @memberof Net
+         * @method getVersion
+         * @instance
+         *
+         * @example
+         * const result = await caver.rpc.net.getVersion()
+         *
+         * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+         * @return {Promise<string>} The klaytn protocol version.
+         */
+        new Method({
+            name: 'getVersion',
+            call: 'net_version',
+            params: 0,
+        }),
     ]
 
     netMethods.forEach(function(method) {
