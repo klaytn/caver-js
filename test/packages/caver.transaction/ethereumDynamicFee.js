@@ -899,7 +899,7 @@ describe('TxTypeEthereumDynamicFee', () => {
     })
 
     context('ethereumDynamicFee.fillTransaction', () => {
-        it('CAVERJS-UNIT-TRANSACTION-547: fillTransaction should call klay_getMaxPriorityFeePerGas to fill maxPriorityFeePerGas when maxPriorityFeePerGas is undefined', async () => {
+        it('CAVERJS-UNIT-TRANSACTION-547: fillTransaction should call klay_maxPriorityFeePerGas to fill maxPriorityFeePerGas when maxPriorityFeePerGas is undefined', async () => {
             transactionObj.nonce = '0x3a'
             delete transactionObj.maxPriorityFeePerGas
             const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
