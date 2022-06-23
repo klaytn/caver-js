@@ -157,7 +157,7 @@ class AbstractTransaction {
      * Calls `klay_chainID` klay rpc call.
      *
      * @example
-     * const result = tx.getChainId()
+     * const result = await tx.getChainId()
      *
      * @return {string} chain id
      */
@@ -167,10 +167,39 @@ class AbstractTransaction {
     }
 
     /**
-     * Calls `klay_gasPrice` klay rpc call.
+     * Returns a suggested gas price to use in the transaction.
+     * If `baseFee` is bigger than `0` in the header,
+     * then returns `baseFee * 2`.
+     * If not, calls `klay_gasPrice` to return unit price of the gas.
      *
      * @example
-     * const result = tx.getGasPrice()
+     * const result = await tx.getSuggestedGasPrice()
+     *
+     * @return {string} gas price
+     */
+    async getSuggestedGasPrice() {
+        const bfStr = await this.getBaseFee()
+        const baseFee = utils.hexToNumber(bfStr)
+
+        let suggestedGasPrice
+        if (baseFee > 0) {
+            // After hard KIP-71 fork, set gasPrice (or maxFeePerGas) with baseFee * 2
+            suggestedGasPrice = baseFee * 2
+            suggestedGasPrice = utils.toHex(suggestedGasPrice)
+        } else {
+            // Before hard KIP-71 fork, set gasPrice (or maxFeePerGas) with gas unit price
+            suggestedGasPrice = await this.klaytnCall.getGasPrice()
+        }
+        return suggestedGasPrice
+    }
+
+    /**
+     * Calls `klay_gasPrice` klay rpc call.
+     * Note that when Klaytn network use dynamic gas fee,
+     * you need to use `tx.getSuggestedGasPrice` function in the gasPrice field.
+     *
+     * @example
+     * const result = await tx.getGasPrice()
      *
      * @return {string} gas price
      */
@@ -183,7 +212,7 @@ class AbstractTransaction {
      * Calls `klay_getTransactionCount` klay rpc call.
      *
      * @example
-     * const result = tx.getNonce('0x{from address}')
+     * const result = await tx.getNonce('0x{from address}')
      *
      * @return {string} nonce
      */
@@ -194,22 +223,23 @@ class AbstractTransaction {
 
     /**
      * Calls `klay_getHeaderByNumber` klay rpc call to get `baseFeePerGas` in header.
+     * If `baseFeePerGas` is not existed, returns '0x0'.
      *
      * @example
-     * const result = tx.getBaseFee()
+     * const result = await tx.getBaseFee()
      *
      * @return {string} base fee
      */
     async getBaseFee() {
         const header = await this.klaytnCall.getHeaderByNumber('latest')
-        return header.baseFeePerGas
+        return header.baseFeePerGas || '0x0'
     }
 
     /**
      * Calls `klay_maxPriorityFeePerGas` klay rpc call.
      *
      * @example
-     * const result = tx.getMaxPriorityFeePerGas()
+     * const result = await tx.getMaxPriorityFeePerGas()
      *
      * @return {string} suggested max priority fee per gas
      */
