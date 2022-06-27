@@ -465,7 +465,7 @@ const buildSendFunc = (method, isSendTx) => async (...args) => {
     const filledDynamicGasFeeTx =
         isDynamicFeeTx && payload.params[0].maxPriorityFeePerGas !== undefined && payload.params[0].maxFeePerGas !== undefined
 
-    // If gasPrice is missing, have to fill gasPrice field before sending tx
+    // gasPrice is already set so it is ok to send transaction.
     if (!isGasPriceInputMissing || filledDynamicGasFeeTx) {
         sendRequest(payload, method)
         return defer.eventEmitter
