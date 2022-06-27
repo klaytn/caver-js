@@ -461,7 +461,7 @@ const buildSendFunc = (method, isSendTx) => async (...args) => {
 
     // The TxTypeEthereumDynamicFee transaction does not use the gasPrice field,
     // so we need to check `maxPriorityFeePerGas` and `maxFeePerGas` field instead of `gasPrice`.
-    const isDynamicFeeTx = payload.params[0].type === TX_TYPE_STRING.TxTypeEthereumDynamicFee
+    const isDynamicFeeTx = isSendTx && payload.params[0].type === TX_TYPE_STRING.TxTypeEthereumDynamicFee
     const filledDynamicGasFeeTx =
         isDynamicFeeTx && payload.params[0].maxPriorityFeePerGas !== undefined && payload.params[0].maxFeePerGas !== undefined
 

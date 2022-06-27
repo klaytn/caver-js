@@ -906,7 +906,7 @@ describe('TxTypeEthereumDynamicFee', () => {
 
             await tx.fillTransaction()
             expect(getMaxPriorityFeePerGasSpy).to.have.been.calledOnce
-            expect(getHeaderByNumberSpy).to.have.been.calledOnce
+            expect(getHeaderByNumberSpy).not.to.have.been.calledOnce // getHeader only when maxFeePerGas is empty to get baseFee.
             expect(getNonceSpy).not.to.have.been.calledOnce
             expect(getChainIdSpy).not.to.have.been.calledOnce
         }).timeout(200000)
@@ -915,9 +915,14 @@ describe('TxTypeEthereumDynamicFee', () => {
             transactionObj.nonce = '0x3a'
             delete transactionObj.maxFeePerGas
             const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
-            const expectedMaxFeePerGas = utils.toHex(
-                utils.hexToNumber(baseFee) * 2 + utils.hexToNumber(transactionObj.maxPriorityFeePerGas)
-            )
+
+            let expectedMaxFeePerGas
+            const latestHeader = await caver.rpc.klay.getHeaderByNumber('latest')
+            if (latestHeader.baseFeePerGas && caver.utils.hexToNumber(latestHeader.baseFeePerGas) > 0) {
+                expectedMaxFeePerGas = caver.utils.toHex(caver.utils.hexToNumber(latestHeader.baseFeePerGas) * 2)
+            } else {
+                expectedMaxFeePerGas = await caver.rpc.klay.getGasPrice()
+            }
 
             await tx.fillTransaction()
 
