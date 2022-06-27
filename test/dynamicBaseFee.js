@@ -133,8 +133,8 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
             {
                 from: sender.address,
                 gas: 50000000,
-                contractDeployFormatter: receipt => {
-                    return receipt
+                contractDeployFormatter: r => {
+                    return r
                 },
             },
             kip7ByteCode,
@@ -231,8 +231,8 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
             .send({
                 from: sender.address,
                 gas: 50000000,
-                contractDeployFormatter: receipt => {
-                    return receipt
+                contractDeployFormatter: r => {
+                    return r
                 },
             })
         expect(receipt).not.to.be.undefined
