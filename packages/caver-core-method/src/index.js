@@ -471,6 +471,7 @@ const buildSendFunc = (method, isSendTx) => async (...args) => {
         return defer.eventEmitter
     }
 
+    // gasPrice is missing, have to fill gasPrice field before sending tx
     const getHeader = new Method({
         name: 'getHeader',
         call: 'klay_getHeaderByNumber',
