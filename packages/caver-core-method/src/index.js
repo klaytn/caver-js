@@ -449,7 +449,7 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
     return method.requestManager.send(payload, sendTxCallback)
 }
 
-const buildSendFunc = (method, isSendTx) => (...args) => {
+const buildSendFunc = (method, isSendTx) => async (...args) => {
     const defer = utils.promiEvent(!isSendTx)
     const payload = method.toPayload(args)
 
@@ -459,11 +459,24 @@ const buildSendFunc = (method, isSendTx) => (...args) => {
 
     const isGasPriceInputMissing = isSendTx && _.isObject(payload.params[0]) && payload.params[0].gasPrice === undefined
 
-    // If gasPrice input is missing, call getGasPrice rpc
-    if (!isGasPriceInputMissing) {
+    // The TxTypeEthereumDynamicFee transaction does not use the gasPrice field,
+    // so we need to check `maxPriorityFeePerGas` and `maxFeePerGas` field instead of `gasPrice`.
+    const isDynamicFeeTx = isSendTx && payload.params[0].type === TX_TYPE_STRING.TxTypeEthereumDynamicFee
+    const filledDynamicGasFeeTx =
+        isDynamicFeeTx && payload.params[0].maxPriorityFeePerGas !== undefined && payload.params[0].maxFeePerGas !== undefined
+
+    // gasPrice is already set so it is ok to send transaction.
+    if (!isGasPriceInputMissing || filledDynamicGasFeeTx) {
         sendRequest(payload, method)
         return defer.eventEmitter
     }
+
+    // gasPrice is missing, have to fill gasPrice field before sending tx
+    const getHeader = new Method({
+        name: 'getHeader',
+        call: 'klay_getHeaderByNumber',
+        params: 1,
+    }).createFunction(method.requestManager)
 
     const getGasPrice = new Method({
         name: 'getGasPrice',
@@ -471,15 +484,42 @@ const buildSendFunc = (method, isSendTx) => (...args) => {
         params: 0,
     }).createFunction(method.requestManager)
 
-    getGasPrice((err, gasPrice) => {
+    const getMaxPriorityFeePerGas = new Method({
+        name: 'getMaxPriorityFeePerGas',
+        call: 'klay_maxPriorityFeePerGas',
+        params: 0,
+    }).createFunction(method.requestManager)
+
+    const header = await getHeader('latest')
+    const bf = utils.hexToNumber(header.baseFeePerGas || '0x0')
+
+    // The baseFeePerGas is bigger than 0 means that Klaytn uses dynamic gas price.
+    if (bf > 0) {
+        if (!isDynamicFeeTx) {
+            payload.params[0].gasPrice = bf * 2
+        } else {
+            // If maxFeePerGas is undefined, set maxFeePerGas with `baseFee * 2`.
+            payload.params[0].maxFeePerGas = payload.params[0].maxFeePerGas || bf * 2
+            // If maxPriorityFeePerGas is undefined, call `klay_maxPriorityFeePerGas`.
+            if (payload.params[0].maxPriorityFeePerGas === undefined) {
+                const maxPriorityFeePerGas = await getMaxPriorityFeePerGas()
+                payload.params[0].maxPriorityFeePerGas = maxPriorityFeePerGas
+            }
+        }
+    } else {
+        // If baseFeePerGas is not defined or 0, we need to use unit price for the `gasPrice` field.
+        const gp = await getGasPrice()
         // The TxTypeEthereumDynamicFee transaction does not use the gasPrice field,
         // so the gas price default is not set for TxTypeEthereumDynamicFee.
-        if (payload.params[0].type !== TX_TYPE_STRING.TxTypeEthereumDynamicFee) {
-            payload.params[0].gasPrice = gasPrice || payload.params[0].gasPrice
+        if (!isDynamicFeeTx) {
+            payload.params[0].gasPrice = payload.params[0].gasPrice || gp
+        } else {
+            payload.params[0].maxPriorityFeePerGas = payload.params[0].maxPriorityFeePerGas || gp
+            payload.params[0].maxFeePerGas = payload.params[0].maxFeePerGas || gp
         }
-        sendRequest(payload, method)
-    })
+    }
 
+    sendRequest(payload, method)
     /**
      * attaching `.on('receipt')` is possible by returning defer.eventEmitter
      */

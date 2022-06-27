@@ -229,7 +229,7 @@ class FeeDelegatedSmartContractExecutionWithRatio extends AbstractFeeDelegatedWi
     async fillTransaction() {
         const [chainId, gasPrice, nonce] = await Promise.all([
             isNot(this.chainId) ? this.getChainId() : this.chainId,
-            isNot(this.gasPrice) ? this.getGasPrice() : this.gasPrice,
+            isNot(this.gasPrice) ? this.getSuggestedGasPrice() : this.gasPrice,
             isNot(this.nonce) ? this.getNonce(this.from) : this.nonce,
         ])
 
