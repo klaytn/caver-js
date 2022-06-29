@@ -173,11 +173,11 @@ class AbstractTransaction {
      * If not, calls `klay_gasPrice` to return unit price of the gas.
      *
      * @example
-     * const result = await tx.getSuggestedGasPrice()
+     * const result = await tx.suggestedGasPrice()
      *
      * @return {string} gas price
      */
-    async getSuggestedGasPrice() {
+    async suggestedGasPrice() {
         const bfStr = await this.getBaseFee()
         const baseFee = utils.hexToNumber(bfStr)
 
@@ -196,7 +196,7 @@ class AbstractTransaction {
     /**
      * Calls `klay_gasPrice` klay rpc call.
      * Note that when Klaytn network use dynamic gas fee,
-     * you need to use `tx.getSuggestedGasPrice` function in the gasPrice field.
+     * you need to use `tx.suggestedGasPrice` function in the gasPrice field.
      *
      * @example
      * const result = await tx.getGasPrice()
