@@ -77,7 +77,7 @@ async function generateTxsBomb(num = 100) {
 
 async function validateGasFeeWithReceipt(receipt) {
     const gasPriceInReceipt = caver.utils.hexToNumber(receipt.gasPrice)
-    const gasPriceAtParentBlock = await caver.rpc.klay.getGasPriceAt(caver.utilsl.hexToNumber(receipt.blockNumber) - 1) // Klaytn will return baseFee
+    const gasPriceAtParentBlock = await caver.rpc.klay.getGasPriceAt(caver.utils.hexToNumber(receipt.blockNumber) - 1) // Klaytn will return baseFee
     const gasPriceAtReceiptBlock = await caver.rpc.klay.getGasPriceAt(receipt.blockNumber) // Klaytn will return baseFee
 
     // To process a transaction, the gasPrice of the tx should be equal or bigger than baseFee(effectiveGasPrice)
@@ -93,7 +93,7 @@ async function validateGasFeeWithReceipt(receipt) {
 
 async function validateDynamicFeeTxWithReceipt(tx, receipt) {
     const maxFeePerGas = caver.utils.hexToNumber(receipt.maxFeePerGas)
-    const gasPriceAtParentBlock = await caver.rpc.klay.getGasPriceAt(caver.utilsl.hexToNumber(receipt.blockNumber) - 1) // Klaytn will return baseFee
+    const gasPriceAtParentBlock = await caver.rpc.klay.getGasPriceAt(caver.utils.hexToNumber(receipt.blockNumber) - 1) // Klaytn will return baseFee
 
     // To process a transaction, the maxFeePerGas of the tx should be equal or bigger than baseFee(effectiveGasPrice)
     if (caver.utils.hexToNumber(receipt.effectiveGasPrice) > maxFeePerGas) return false
