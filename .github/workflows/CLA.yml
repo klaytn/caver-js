@@ -16,7 +16,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PERSONAL_ACCESS_TOKEN: ${{ secrets.CLA_PERSONAL_ACCESS_TOKEN }}
         with:
-          path-to-signatures: "signatures/version1/cla.json"
+          path-to-signatures: "${{ github.event.repository.name }}/signatures/version1/cla.json"
           path-to-document: "https://gist.github.com/e78f99e1c527225637e269cff1bc7e49" # Klaytn Gist
           branch: "master"
           allowlist: dependabot[bot]
