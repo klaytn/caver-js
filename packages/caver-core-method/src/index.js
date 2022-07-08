@@ -509,14 +509,17 @@ const buildSendFunc = (method, isSendTx) => (...args) => {
                 payload.params[0].maxFeePerGas = payload.params[0].maxFeePerGas || baseFee * 2
                 // If maxPriorityFeePerGas is undefined, call `klay_maxPriorityFeePerGas`.
                 if (payload.params[0].maxPriorityFeePerGas === undefined) {
-                    getMaxPriorityFeePerGas((err, maxPriorityFeePerGas) => {
+                    return getMaxPriorityFeePerGas((err, maxPriorityFeePerGas) => {
                         payload.params[0].maxPriorityFeePerGas = maxPriorityFeePerGas
+                        // Format gas price parameters(gasPrice, maxPriorityFeePerGas, maxFeePerGas)
+                        formatGasParametersToHex(payload.params[0])
+                        sendRequest(payload, method)
                     })
                 }
             }
         } else {
             // If baseFeePerGas is not defined or 0, we need to use unit price for the `gasPrice` field.
-            getGasPrice((err, gp) => {
+            return getGasPrice((err, gp) => {
                 // The TxTypeEthereumDynamicFee transaction does not use the gasPrice field,
                 // so the gas price default is not set for TxTypeEthereumDynamicFee.
                 if (!isDynamicFeeTx) {
@@ -525,6 +528,9 @@ const buildSendFunc = (method, isSendTx) => (...args) => {
                     payload.params[0].maxPriorityFeePerGas = payload.params[0].maxPriorityFeePerGas || gp
                     payload.params[0].maxFeePerGas = payload.params[0].maxFeePerGas || gp
                 }
+                // Format gas price parameters(gasPrice, maxPriorityFeePerGas, maxFeePerGas)
+                formatGasParametersToHex(payload.params[0])
+                sendRequest(payload, method)
             })
         }
         // Format gas price parameters(gasPrice, maxPriorityFeePerGas, maxFeePerGas)
