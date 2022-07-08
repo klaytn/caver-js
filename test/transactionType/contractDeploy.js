@@ -293,9 +293,7 @@ describe('SMART_CONTRACT_DEPLOY transaction', async () => {
         }
         const tx = { roleTransactionKey, ...deployObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throw(
-            '"roleTransactionKey" cannot be used with SMART_CONTRACT_DEPLOY transaction'
-        )
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"roleTransactionKey" cannot be used with SMART_CONTRACT_DEPLOY transaction')
     }).timeout(200000)
 
     // UnnecessaryRoleAccountUpdateKey
@@ -345,9 +343,7 @@ describe('SMART_CONTRACT_DEPLOY transaction', async () => {
         }
         const tx = { roleFeePayerKey, ...deployObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throw(
-            '"roleFeePayerKey" cannot be used with SMART_CONTRACT_DEPLOY transaction'
-        )
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"roleFeePayerKey" cannot be used with SMART_CONTRACT_DEPLOY transaction')
     }).timeout(200000)
 
     // UnnecessaryFailKey

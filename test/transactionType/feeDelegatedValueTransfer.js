@@ -456,9 +456,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER transaction', async () => {
     it('CAVERJS-UNIT-TX-560 : If transaction object has unnecessary legacyKey field, sendTransaction should throw error', async () => {
         const tx = { legacyKey: true, ...feeDelegatedValueTransferObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throw(
-            '"legacyKey" cannot be used with FEE_DELEGATED_VALUE_TRANSFER transaction'
-        )
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"legacyKey" cannot be used with FEE_DELEGATED_VALUE_TRANSFER transaction')
     }).timeout(200000)
 
     // Invalid from address

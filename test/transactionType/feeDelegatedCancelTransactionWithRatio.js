@@ -88,9 +88,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-543 : If transaction object has unnecessary to field, sendTransaction should throw error', async () => {
         const tx = { to: testAccount.address, ...cancelObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throw(
-            '"to" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction'
-        )
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"to" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction')
     }).timeout(200000)
 
     // UnnecessaryValue
@@ -106,9 +104,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-544 : If transaction object has unnecessary value field, sendTransaction should throw error', async () => {
         const tx = { value: 1, ...cancelObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throw(
-            '"value" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction'
-        )
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"value" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction')
     }).timeout(200000)
 
     // MissingGas
@@ -142,9 +138,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-546 : If transaction object has unnecessary data field, sendTransaction should throw error', async () => {
         const tx = { data: '0x68656c6c6f', ...cancelObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throw(
-            '"data" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction'
-        )
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"data" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction')
     }).timeout(200000)
 
     // MissingFeePayer
@@ -196,9 +190,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
             ...cancelObject,
         }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throw(
-            '"publicKey" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction'
-        )
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"publicKey" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction')
     }).timeout(200000)
 
     // UnnecessaryMultisig
@@ -264,9 +256,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
         }
         const tx = { multisig, ...cancelObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throw(
-            '"multisig" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction'
-        )
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"multisig" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction')
     }).timeout(200000)
 
     // UnnecessaryRoleTransactionKey
@@ -366,9 +356,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-555 : If transaction object has unnecessary failKey field, sendTransaction should throw error', async () => {
         const tx = { failKey: true, ...cancelObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throw(
-            '"failKey" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction'
-        )
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"failKey" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction')
     }).timeout(200000)
 
     // UnnecessaryCodeFormat
@@ -402,9 +390,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-557 : If transaction object has unnecessary legacyKey field, sendTransaction should throw error', async () => {
         const tx = { legacyKey: true, ...cancelObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throw(
-            '"legacyKey" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction'
-        )
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"legacyKey" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction')
     }).timeout(200000)
 
     // Invalid from address

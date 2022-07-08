@@ -279,9 +279,7 @@ describe('FEE_DELEGATED_CANCEL transaction', async () => {
         }
         const tx = { roleTransactionKey, ...cancelObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throw(
-            '"roleTransactionKey" cannot be used with FEE_DELEGATED_CANCEL transaction'
-        )
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"roleTransactionKey" cannot be used with FEE_DELEGATED_CANCEL transaction')
     }).timeout(200000)
 
     // UnnecessaryRoleAccountUpdateKey
@@ -305,9 +303,7 @@ describe('FEE_DELEGATED_CANCEL transaction', async () => {
         }
         const tx = { roleAccountUpdateKey, ...cancelObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throw(
-            '"roleAccountUpdateKey" cannot be used with FEE_DELEGATED_CANCEL transaction'
-        )
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"roleAccountUpdateKey" cannot be used with FEE_DELEGATED_CANCEL transaction')
     }).timeout(200000)
 
     // UnnecessaryRoleFeePayerKey
@@ -331,9 +327,7 @@ describe('FEE_DELEGATED_CANCEL transaction', async () => {
         }
         const tx = { roleFeePayerKey, ...cancelObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throw(
-            '"roleFeePayerKey" cannot be used with FEE_DELEGATED_CANCEL transaction'
-        )
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"roleFeePayerKey" cannot be used with FEE_DELEGATED_CANCEL transaction')
     }).timeout(200000)
 
     // UnnecessaryFailKey

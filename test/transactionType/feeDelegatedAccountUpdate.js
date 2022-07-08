@@ -141,9 +141,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE transaction', async () => {
     it('CAVERJS-UNIT-TX-267 : If transaction object has value, sendTransaction should throw error', async () => {
         const tx = { publicKey, value: 1, ...accountUpdateObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throw(
-            '"value" cannot be used with FEE_DELEGATED_ACCOUNT_UPDATE transaction'
-        )
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"value" cannot be used with FEE_DELEGATED_ACCOUNT_UPDATE transaction')
     }).timeout(200000)
 
     // MissingGas
@@ -177,9 +175,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE transaction', async () => {
     it('CAVERJS-UNIT-TX-269 : If transaction object missing key information, sendTransaction should throw error', async () => {
         const tx = { ...accountUpdateObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throw(
-            'Missing key information with FEE_DELEGATED_ACCOUNT_UPDATE transaction'
-        )
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('Missing key information with FEE_DELEGATED_ACCOUNT_UPDATE transaction')
     }).timeout(200000)
 
     // PublicKey
@@ -1674,9 +1670,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE transaction', async () => {
     it('CAVERJS-UNIT-TX-332 : If transaction object has data, sendTransaction should throw error', async () => {
         const tx = { data: '0x68656c6c6f', publicKey, ...accountUpdateObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throw(
-            '"data" cannot be used with FEE_DELEGATED_ACCOUNT_UPDATE transaction'
-        )
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"data" cannot be used with FEE_DELEGATED_ACCOUNT_UPDATE transaction')
     }).timeout(200000)
 
     // Error feePayer missing (A check on the feePayer is performed when the feePayer attempts to sign the rawTransaction after sender signed.)
@@ -1702,9 +1696,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE transaction', async () => {
     it('CAVERJS-UNIT-TX-335 : If transaction object has feeRatio, sendTransaction should throw error', async () => {
         const tx = { feeRatio: 20, publicKey, ...accountUpdateObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throw(
-            '"feeRatio" cannot be used with FEE_DELEGATED_ACCOUNT_UPDATE transaction'
-        )
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"feeRatio" cannot be used with FEE_DELEGATED_ACCOUNT_UPDATE transaction')
     }).timeout(200000)
 
     // UnnecessaryCodeFormat
@@ -1720,9 +1712,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE transaction', async () => {
     it('CAVERJS-UNIT-TX-336 : If transaction object has codeFormat, sendTransaction should throw error', async () => {
         const tx = { codeFormat: 'EVM', publicKey, ...accountUpdateObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throw(
-            '"codeFormat" cannot be used with FEE_DELEGATED_ACCOUNT_UPDATE transaction'
-        )
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"codeFormat" cannot be used with FEE_DELEGATED_ACCOUNT_UPDATE transaction')
     }).timeout(200000)
 
     // Update account with legacyKey

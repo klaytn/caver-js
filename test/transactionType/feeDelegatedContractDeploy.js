@@ -412,9 +412,7 @@ describe('FEE_DELEGATED_SMART_CONTRACT_DEPLOY transaction', async () => {
     it('CAVERJS-UNIT-TX-570 : If transaction object has unnecessary to field, sendTransaction should throw error', async () => {
         const tx = { to: '0x5e008646fde91fb6eda7b1fdabc7d84649125cf5', ...deployObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throw(
-            '"to" cannot be used with FEE_DELEGATED_SMART_CONTRACT_DEPLOY transaction'
-        )
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"to" cannot be used with FEE_DELEGATED_SMART_CONTRACT_DEPLOY transaction')
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-579: If data field of transaction is not 0x-hex prefixed, signTransaction should formatting and sign', async () => {
