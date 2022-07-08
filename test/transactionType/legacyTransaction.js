@@ -41,7 +41,7 @@ before(() => {
     testAccount = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
 })
 
-describe('LEGACY transaction', () => {
+describe('LEGACY transaction', async () => {
     let legacyObject
 
     beforeEach(() => {
@@ -93,12 +93,12 @@ describe('LEGACY transaction', () => {
         expect(result).to.be.true
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-009 : If transaction object missing from, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-009 : If transaction object missing from, sendTransaction should throw error', async () => {
         const tx = { ...legacyObject }
         delete tx.from
 
         // Throw error from formatter validation
-        expect(() => caver.klay.sendTransaction(tx)).to.throws()
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
     }).timeout(200000)
 
     // Error gas and gasLimit missing
@@ -114,12 +114,12 @@ describe('LEGACY transaction', () => {
         expect(result).to.be.true
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-010 : If transaction object missing gas and gasLimit, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-010 : If transaction object missing gas and gasLimit, sendTransaction should throw error', async () => {
         const tx = { ...legacyObject }
         delete tx.gas
 
         // Throw error from formatter validation
-        expect(() => caver.klay.sendTransaction(tx)).to.throws()
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
     }).timeout(200000)
 
     // Error to and data missing
@@ -136,13 +136,13 @@ describe('LEGACY transaction', () => {
         expect(result).to.be.true
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-011 : If transaction object missing to and data, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-011 : If transaction object missing to and data, sendTransaction should throw error', async () => {
         const tx = { ...legacyObject }
         delete tx.to
         delete tx.data
 
         // Throw error from formatter validation
-        expect(() => caver.klay.sendTransaction(tx)).to.throws()
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
     }).timeout(200000)
 
     // Error unnecessary feePayer
@@ -157,11 +157,11 @@ describe('LEGACY transaction', () => {
         expect(result).to.be.true
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-012 : If transaction object has unnecessary feePayer field, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-012 : If transaction object has unnecessary feePayer field, sendTransaction should throw error', async () => {
         const tx = { feePayer: testAccount.address, ...legacyObject }
 
         // Throw error from formatter validation
-        expect(() => caver.klay.sendTransaction(tx)).to.throws()
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
     }).timeout(200000)
 
     // Error unnecessary feeRatio
@@ -176,11 +176,11 @@ describe('LEGACY transaction', () => {
         expect(result).to.be.true
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-013 : If transaction object has unnecessary feeRatio field, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-013 : If transaction object has unnecessary feeRatio field, sendTransaction should throw error', async () => {
         const tx = { feeRatio: 20, ...legacyObject }
 
         // Throw error from formatter validation
-        expect(() => caver.klay.sendTransaction(tx)).to.throws()
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
     }).timeout(200000)
 
     // Error unnecessary publicKey
@@ -199,7 +199,7 @@ describe('LEGACY transaction', () => {
         expect(result).to.be.true
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-014 : If transaction object has unnecessary publicKey field, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-014 : If transaction object has unnecessary publicKey field, sendTransaction should throw error', async () => {
         const tx = {
             publicKey:
                 '0x006dc19d50bbc8a8e4b0f26c0dd3e78978f5f691a6161c41e3b0e4d1aa2d60fad62f37912b59f484b2e05bd3c9c3b4d93b0ca570d6d4421eee544e7da99e9de4',
@@ -207,7 +207,7 @@ describe('LEGACY transaction', () => {
         }
 
         // Throw error from formatter validation
-        expect(() => caver.klay.sendTransaction(tx)).to.throws()
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
     }).timeout(200000)
 
     // Error unnecessary multisig
@@ -247,7 +247,7 @@ describe('LEGACY transaction', () => {
         expect(result).to.be.true
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-015 : If transaction object has unnecessary multisig field, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-015 : If transaction object has unnecessary multisig field, sendTransaction should throw error', async () => {
         const multisig = {
             threshold: 3,
             keys: [
@@ -276,7 +276,7 @@ describe('LEGACY transaction', () => {
         const tx = { multisig, ...legacyObject }
 
         // Throw error from formatter validation
-        expect(() => caver.klay.sendTransaction(tx)).to.throws()
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
     }).timeout(200000)
 
     // Error unnecessary roleTransactionKey
@@ -295,7 +295,7 @@ describe('LEGACY transaction', () => {
         expect(result).to.be.true
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-016 : If transaction object has unnecessary roleTransactionKey field, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-016 : If transaction object has unnecessary roleTransactionKey field, sendTransaction should throw error', async () => {
         const roleTransactionKey = {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
@@ -303,7 +303,7 @@ describe('LEGACY transaction', () => {
         const tx = { roleTransactionKey, ...legacyObject }
 
         // Throw error from formatter validation
-        expect(() => caver.klay.sendTransaction(tx)).to.throws()
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
     }).timeout(200000)
 
     // Error unnecessary roleAccountUpdateKey
@@ -322,7 +322,7 @@ describe('LEGACY transaction', () => {
         expect(result).to.be.true
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-017 : If transaction object has unnecessary roleAccountUpdateKey field, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-017 : If transaction object has unnecessary roleAccountUpdateKey field, sendTransaction should throw error', async () => {
         const roleAccountUpdateKey = {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
@@ -330,7 +330,7 @@ describe('LEGACY transaction', () => {
         const tx = { roleAccountUpdateKey, ...legacyObject }
 
         // Throw error from formatter validation
-        expect(() => caver.klay.sendTransaction(tx)).to.throws()
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
     }).timeout(200000)
 
     // Error unnecessary roleFeePayerKey
@@ -349,7 +349,7 @@ describe('LEGACY transaction', () => {
         expect(result).to.be.true
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-018 : If transaction object has unnecessary roleFeePayerKey field, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-018 : If transaction object has unnecessary roleFeePayerKey field, sendTransaction should throw error', async () => {
         const roleFeePayerKey = {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
@@ -357,7 +357,7 @@ describe('LEGACY transaction', () => {
         const tx = { roleFeePayerKey, ...legacyObject }
 
         // Throw error from formatter validation
-        expect(() => caver.klay.sendTransaction(tx)).to.throws()
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
     }).timeout(200000)
 
     // Error unnecessary failKey
@@ -372,11 +372,11 @@ describe('LEGACY transaction', () => {
         expect(result).to.be.true
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-019 : If transaction object has unnecessary failKey field, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-019 : If transaction object has unnecessary failKey field, sendTransaction should throw error', async () => {
         const tx = { failKey: true, ...legacyObject }
 
         // Throw error from formatter validation
-        expect(() => caver.klay.sendTransaction(tx)).to.throws()
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
     }).timeout(200000)
 
     // Error unnecessary codeFormat
@@ -391,11 +391,11 @@ describe('LEGACY transaction', () => {
         expect(result).to.be.true
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-020 : If transaction object has unnecessary codeFormat field, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-020 : If transaction object has unnecessary codeFormat field, sendTransaction should throw error', async () => {
         const tx = { codeFormat: 'EVM', ...legacyObject }
 
         // Throw error from formatter validation
-        expect(() => caver.klay.sendTransaction(tx)).to.throws()
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
     }).timeout(200000)
 
     // UnnecessaryLegacyKey
@@ -408,11 +408,11 @@ describe('LEGACY transaction', () => {
             .catch(err => expect(err.message).to.equals('"legacyKey" cannot be used with LEGACY transaction'))
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-558 : If transaction object has unnecessary legacyKey field, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-558 : If transaction object has unnecessary legacyKey field, sendTransaction should throw error', async () => {
         const tx = { legacyKey: true, ...legacyObject }
 
         // Throw error from formatter validation
-        expect(() => caver.klay.sendTransaction(tx)).to.throws('"legacyKey" cannot be used with LEGACY transaction')
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith('"legacyKey" cannot be used with LEGACY transaction')
     }).timeout(200000)
 
     // Invalid from address
@@ -425,14 +425,14 @@ describe('LEGACY transaction', () => {
         await expect(caver.klay.accounts.signTransaction(tx, testAccount.privateKey)).to.be.rejectedWith(expectedError)
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-663: If transaction object has invalid from, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-663: If transaction object has invalid from, sendTransaction should throw error', async () => {
         const tx = { ...legacyObject }
         tx.from = 'invalidAddress'
 
         const expectedError = `Provided address "${tx.from}" is invalid, the capitalization checksum test failed`
 
         // Throw error from formatter validation
-        expect(() => caver.klay.sendTransaction(tx)).to.throws(expectedError)
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
     }).timeout(200000)
 
     // UnnecessaryFeePayerSignatures
@@ -444,13 +444,13 @@ describe('LEGACY transaction', () => {
         await expect(caver.klay.accounts.signTransaction(tx, testAccount.privateKey)).to.be.rejectedWith(expectedError)
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-664: If transaction object has unnecessary feePayerSignatures, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-664: If transaction object has unnecessary feePayerSignatures, sendTransaction should throw error', async () => {
         const tx = { feePayerSignatures: [['0x01', '0x', '0x']], ...legacyObject }
 
         const expectedError = '"feePayerSignatures" cannot be used with LEGACY transaction'
 
         // Throw error from formatter validation
-        expect(() => caver.klay.sendTransaction(tx)).to.throws(expectedError)
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
     }).timeout(200000)
 
     // InvalidTo
@@ -464,7 +464,7 @@ describe('LEGACY transaction', () => {
         await expect(caver.klay.accounts.signTransaction(tx, senderPrvKey)).to.be.rejectedWith(expectedError)
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-665: If transaction object has unnecessary feePayerSignatures, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-665: If transaction object has unnecessary feePayerSignatures, sendTransaction should throw error', async () => {
         const invalidTo = 'invalid'
         const tx = { ...legacyObject }
         tx.to = invalidTo
@@ -472,6 +472,6 @@ describe('LEGACY transaction', () => {
         const expectedError = `Provided address "${tx.to}" is invalid, the capitalization checksum test failed.`
 
         // Throw error from formatter validation
-        expect(() => caver.klay.sendTransaction(tx)).to.throws(expectedError)
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
     }).timeout(200000)
 })

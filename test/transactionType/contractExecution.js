@@ -26,7 +26,7 @@ let senderPrvKey
 let senderAddress
 let testAccount
 
-describe('SMART_CONTRACT_EXECUTION transaction', () => {
+describe('SMART_CONTRACT_EXECUTION transaction', async () => {
     let executionObject
     let contractAddress
 
@@ -76,11 +76,11 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
             .catch(err => expect(err.message).to.equals('"from" is missing'))
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-467 : If transaction object missing from, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-467 : If transaction object missing from, sendTransaction should throw error', async () => {
         const tx = { ...executionObject }
         delete tx.from
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throws('The send transactions "from" field must be defined!')
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith('The send transactions "from" field must be defined!')
     }).timeout(200000)
 
     // MissingTo
@@ -94,11 +94,11 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
             .catch(err => expect(err.message).to.equals('"to" is missing'))
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-468 : If transaction object missing to, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-468 : If transaction object missing to, sendTransaction should throw error', async () => {
         const tx = { ...executionObject }
         delete tx.to
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throws('"to" is missing')
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith('"to" is missing')
     }).timeout(200000)
 
     // Missing gas and gasLimit
@@ -112,11 +112,11 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
             .catch(err => expect(err.message).to.equals('"gas" is missing'))
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-469 : If transaction object missing gas and gasLimit, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-469 : If transaction object missing gas and gasLimit, sendTransaction should throw error', async () => {
         const tx = { ...executionObject }
         delete tx.gas
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throws('"gas" is missing')
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith('"gas" is missing')
     }).timeout(200000)
 
     // MissingData
@@ -130,11 +130,11 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
             .catch(err => expect(err.message).to.equals('"data" is missing'))
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-470 : If transaction object missing data, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-470 : If transaction object missing data, sendTransaction should throw error', async () => {
         const tx = { ...executionObject }
         delete tx.data
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throws('"data" is missing')
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith('"data" is missing')
     }).timeout(200000)
 
     // UnnecessaryFeePayer
@@ -147,11 +147,13 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
             .catch(err => expect(err.message).to.equals('"feePayer" cannot be used with SMART_CONTRACT_EXECUTION transaction'))
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-471 : If transaction object has unnecessary feePayer field, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-471 : If transaction object has unnecessary feePayer field, sendTransaction should throw error', async () => {
         const tx = { feePayer: testAccount.address, ...executionObject }
 
         // This error return from formatter. Because in formatter discriminate fee delegation through feePayer and senderRawTransaction
-        expect(() => caver.klay.sendTransaction(tx)).to.throws('"feePayer" cannot be used with SMART_CONTRACT_EXECUTION transaction')
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+            '"feePayer" cannot be used with SMART_CONTRACT_EXECUTION transaction'
+        )
     }).timeout(200000)
 
     // UnnecessaryFeeRatio
@@ -164,10 +166,12 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
             .catch(err => expect(err.message).to.equals('"feeRatio" cannot be used with SMART_CONTRACT_EXECUTION transaction'))
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-472 : If transaction object has unnecessary feeRatio field, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-472 : If transaction object has unnecessary feeRatio field, sendTransaction should throw error', async () => {
         const tx = { feeRatio: 10, ...executionObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throws('"feeRatio" cannot be used with SMART_CONTRACT_EXECUTION transaction')
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+            '"feeRatio" cannot be used with SMART_CONTRACT_EXECUTION transaction'
+        )
     }).timeout(200000)
 
     // UnnecessaryPublicKey
@@ -184,14 +188,16 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
             .catch(err => expect(err.message).to.equals('"publicKey" cannot be used with SMART_CONTRACT_EXECUTION transaction'))
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-473 : If transaction object has unnecessary publicKey field, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-473 : If transaction object has unnecessary publicKey field, sendTransaction should throw error', async () => {
         const tx = {
             publicKey:
                 '0x006dc19d50bbc8a8e4b0f26c0dd3e78978f5f691a6161c41e3b0e4d1aa2d60fad62f37912b59f484b2e05bd3c9c3b4d93b0ca570d6d4421eee544e7da99e9de4',
             ...executionObject,
         }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throws('"publicKey" cannot be used with SMART_CONTRACT_EXECUTION transaction')
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+            '"publicKey" cannot be used with SMART_CONTRACT_EXECUTION transaction'
+        )
     }).timeout(200000)
 
     // UnnecessaryMultisig
@@ -229,7 +235,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
             .catch(err => expect(err.message).to.equals('"multisig" cannot be used with SMART_CONTRACT_EXECUTION transaction'))
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-474 : If transaction object has unnecessary multisig field, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-474 : If transaction object has unnecessary multisig field, sendTransaction should throw error', async () => {
         const multisig = {
             threshold: 3,
             keys: [
@@ -257,7 +263,9 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
         }
         const tx = { multisig, ...executionObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throws('"multisig" cannot be used with SMART_CONTRACT_EXECUTION transaction')
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+            '"multisig" cannot be used with SMART_CONTRACT_EXECUTION transaction'
+        )
     }).timeout(200000)
 
     // UnnecessaryRoleTransactionKey
@@ -274,14 +282,14 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
             .catch(err => expect(err.message).to.equals('"roleTransactionKey" cannot be used with SMART_CONTRACT_EXECUTION transaction'))
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-475 : If transaction object has unnecessary roleTransactionKey field, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-475 : If transaction object has unnecessary roleTransactionKey field, sendTransaction should throw error', async () => {
         const roleTransactionKey = {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
         const tx = { roleTransactionKey, ...executionObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throws(
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
             '"roleTransactionKey" cannot be used with SMART_CONTRACT_EXECUTION transaction'
         )
     }).timeout(200000)
@@ -300,14 +308,14 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
             .catch(err => expect(err.message).to.equals('"roleAccountUpdateKey" cannot be used with SMART_CONTRACT_EXECUTION transaction'))
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-476 : If transaction object has unnecessary roleAccountUpdateKey field, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-476 : If transaction object has unnecessary roleAccountUpdateKey field, sendTransaction should throw error', async () => {
         const roleAccountUpdateKey = {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
         const tx = { roleAccountUpdateKey, ...executionObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throws(
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
             '"roleAccountUpdateKey" cannot be used with SMART_CONTRACT_EXECUTION transaction'
         )
     }).timeout(200000)
@@ -326,14 +334,16 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
             .catch(err => expect(err.message).to.equals('"roleFeePayerKey" cannot be used with SMART_CONTRACT_EXECUTION transaction'))
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-477 : If transaction object has unnecessary roleFeePayerKey field, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-477 : If transaction object has unnecessary roleFeePayerKey field, sendTransaction should throw error', async () => {
         const roleFeePayerKey = {
             publicKey:
                 '0xf4fa613bf44e5fa7505ad196605a1f32d3eb695f41916fb50f6c3ce65d345a059ebc2dc69629808c2a7c98eb0f2daad68f0b39f0a49141318fe59b777e6b8d1c',
         }
         const tx = { roleFeePayerKey, ...executionObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throws('"roleFeePayerKey" cannot be used with SMART_CONTRACT_EXECUTION transaction')
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+            '"roleFeePayerKey" cannot be used with SMART_CONTRACT_EXECUTION transaction'
+        )
     }).timeout(200000)
 
     // UnnecessaryFailKey
@@ -346,10 +356,12 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
             .catch(err => expect(err.message).to.equals('"failKey" cannot be used with SMART_CONTRACT_EXECUTION transaction'))
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-478 : If transaction object has unnecessary failKey field, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-478 : If transaction object has unnecessary failKey field, sendTransaction should throw error', async () => {
         const tx = { failKey: true, ...executionObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throws('"failKey" cannot be used with SMART_CONTRACT_EXECUTION transaction')
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+            '"failKey" cannot be used with SMART_CONTRACT_EXECUTION transaction'
+        )
     }).timeout(200000)
 
     // UnnecessaryCodeFormat
@@ -362,10 +374,12 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
             .catch(err => expect(err.message).to.equals('"codeFormat" cannot be used with SMART_CONTRACT_EXECUTION transaction'))
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-479 : If transaction object has unnecessary codeFormat field, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-479 : If transaction object has unnecessary codeFormat field, sendTransaction should throw error', async () => {
         const tx = { codeFormat: 'EVM', ...executionObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throws('"codeFormat" cannot be used with SMART_CONTRACT_EXECUTION transaction')
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+            '"codeFormat" cannot be used with SMART_CONTRACT_EXECUTION transaction'
+        )
     }).timeout(200000)
 
     // UnnecessaryLegacyKey
@@ -378,10 +392,12 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
             .catch(err => expect(err.message).to.equals('"legacyKey" cannot be used with SMART_CONTRACT_EXECUTION transaction'))
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-480 : If transaction object has unnecessary legacyKey field, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-480 : If transaction object has unnecessary legacyKey field, sendTransaction should throw error', async () => {
         const tx = { legacyKey: true, ...executionObject }
 
-        expect(() => caver.klay.sendTransaction(tx)).to.throws('"legacyKey" cannot be used with SMART_CONTRACT_EXECUTION transaction')
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+            '"legacyKey" cannot be used with SMART_CONTRACT_EXECUTION transaction'
+        )
     }).timeout(200000)
 
     // Invalid from address
@@ -394,14 +410,14 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
         await expect(caver.klay.accounts.signTransaction(tx, testAccount.privateKey)).to.be.rejectedWith(expectedError)
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-594: If transaction object has invalid from, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-594: If transaction object has invalid from, sendTransaction should throw error', async () => {
         const tx = { ...executionObject }
         tx.from = 'invalidAddress'
 
         const expectedError = `Provided address "${tx.from}" is invalid, the capitalization checksum test failed`
 
         // Throw error from formatter validation
-        expect(() => caver.klay.sendTransaction(tx)).to.throws(expectedError)
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
     }).timeout(200000)
 
     // UnnecessaryFeePayerSignatures
@@ -413,13 +429,13 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
         await expect(caver.klay.accounts.signTransaction(tx, testAccount.privateKey)).to.be.rejectedWith(expectedError)
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-595: If transaction object has unnecessary feePayerSignatures, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-595: If transaction object has unnecessary feePayerSignatures, sendTransaction should throw error', async () => {
         const tx = { feePayerSignatures: [['0x01', '0x', '0x']], ...executionObject }
 
         const expectedError = `"feePayerSignatures" cannot be used with ${tx.type} transaction`
 
         // Throw error from formatter validation
-        expect(() => caver.klay.sendTransaction(tx)).to.throws(expectedError)
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
     }).timeout(200000)
 
     // InvalidTo
@@ -433,7 +449,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
         await expect(caver.klay.accounts.signTransaction(tx, senderPrvKey)).to.be.rejectedWith(expectedError)
     }).timeout(200000)
 
-    it('CAVERJS-UNIT-TX-596: If transaction object has unnecessary feePayerSignatures, sendTransaction should throw error', () => {
+    it('CAVERJS-UNIT-TX-596: If transaction object has unnecessary feePayerSignatures, sendTransaction should throw error', async () => {
         const invalidTo = 'invalid'
         const tx = { ...executionObject }
         tx.to = invalidTo
@@ -441,7 +457,7 @@ describe('SMART_CONTRACT_EXECUTION transaction', () => {
         const expectedError = `Provided address "${tx.to}" is invalid, the capitalization checksum test failed.`
 
         // Throw error from formatter validation
-        expect(() => caver.klay.sendTransaction(tx)).to.throws(expectedError)
+        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-714: sendTransaction should throw error when try to use an account in Node with not LEGACY transaction', async () => {

@@ -127,7 +127,7 @@ describe('TxTypeEthereumDynamicFee', () => {
         getNonceSpy.returns('0x3a')
         getChainIdSpy = sandbox.stub(caver.transaction.klaytnCall, 'getChainId')
         getChainIdSpy.returns('0x7e3')
-        baseFee = '0x0'
+        baseFee = '0x5d21dba00'
         getHeaderByNumberSpy = sandbox.stub(caver.transaction.klaytnCall, 'getHeaderByNumber')
         getHeaderByNumberSpy.returns({ baseFeePerGas: baseFee })
         maxPriorityFeePerGas = '0x5d21dba00'
@@ -916,13 +916,7 @@ describe('TxTypeEthereumDynamicFee', () => {
             delete transactionObj.maxFeePerGas
             const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
-            let expectedMaxFeePerGas
-            const latestHeader = await caver.rpc.klay.getHeaderByNumber('latest')
-            if (latestHeader.baseFeePerGas && caver.utils.hexToNumber(latestHeader.baseFeePerGas) > 0) {
-                expectedMaxFeePerGas = caver.utils.toHex(caver.utils.hexToNumber(latestHeader.baseFeePerGas) * 2)
-            } else {
-                expectedMaxFeePerGas = await caver.rpc.klay.getGasPrice()
-            }
+            const expectedMaxFeePerGas = caver.utils.toHex(caver.utils.hexToNumber(baseFee) * 2)
 
             await tx.fillTransaction()
 

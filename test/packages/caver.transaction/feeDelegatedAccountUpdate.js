@@ -330,6 +330,7 @@ before(() => {
 
 describe('TxTypeFeeDelegatedAccountUpdate', () => {
     let getGasPriceSpy
+    let getHeaderSpy
     let getNonceSpy
     let getChainIdSpy
 
@@ -343,6 +344,8 @@ describe('TxTypeFeeDelegatedAccountUpdate', () => {
 
         getGasPriceSpy = sandbox.stub(caver.transaction.klaytnCall, 'getGasPrice')
         getGasPriceSpy.returns('0x5d21dba00')
+        getHeaderSpy = sandbox.stub(caver.transaction.klaytnCall, 'getHeaderByNumber')
+        getHeaderSpy.returns({ baseFeePerGas: '0x5d21dba00' })
         getNonceSpy = sandbox.stub(caver.transaction.klaytnCall, 'getTransactionCount')
         getNonceSpy.returns('0x3a')
         getChainIdSpy = sandbox.stub(caver.transaction.klaytnCall, 'getChainId')
@@ -1602,8 +1605,9 @@ describe('TxTypeFeeDelegatedAccountUpdate', () => {
                 await tx.fillTransaction()
                 expect(getNonceSpy).not.to.have.been.calledOnce
                 expect(getChainIdSpy).not.to.have.been.calledOnce
+                expect(getGasPriceSpy).not.to.have.been.calledOnce
             }
-            expect(getGasPriceSpy).to.have.been.callCount(Object.values(expectedValues).length)
+            expect(getHeaderSpy).to.have.been.callCount(Object.values(expectedValues).length)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFD-220: fillTransaction should call klay_getTransactionCount to fill nonce when nonce is undefined', async () => {
@@ -1613,6 +1617,7 @@ describe('TxTypeFeeDelegatedAccountUpdate', () => {
 
                 await tx.fillTransaction()
                 expect(getGasPriceSpy).not.to.have.been.calledOnce
+                expect(getHeaderSpy).not.to.have.been.calledOnce
                 expect(getChainIdSpy).not.to.have.been.calledOnce
             }
             expect(getNonceSpy).to.have.been.callCount(Object.values(expectedValues).length)
@@ -1625,6 +1630,7 @@ describe('TxTypeFeeDelegatedAccountUpdate', () => {
 
                 await tx.fillTransaction()
                 expect(getGasPriceSpy).not.to.have.been.calledOnce
+                expect(getHeaderSpy).not.to.have.been.calledOnce
                 expect(getNonceSpy).not.to.have.been.calledOnce
             }
             expect(getChainIdSpy).to.have.been.callCount(Object.values(expectedValues).length)

@@ -534,7 +534,7 @@ const buildSendFunc = (method, isSendTx) => async (...args) => {
     return defer.eventEmitter
 }
 
-// A function to change the format to a hex string after randomly filling the default gasPrice value 
+// A function to change the format to a hex string after randomly filling the default gasPrice value
 // with the API (personal_sendValueTransfer, personal_sendAccountUpdate) that does not use a transaction object.
 function formatGasParametersToHex(txObject) {
     if (txObject.gasPrice !== undefined && !utils.isHexStrict(txObject.gasPrice)) {

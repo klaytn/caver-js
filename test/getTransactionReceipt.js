@@ -16,6 +16,10 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+const chai = require('chai')
+const chaiAsPromised = require('chai-as-promised')
+
+chai.use(chaiAsPromised)
 const { expect } = require('chai')
 
 const Caver = require('../index')
@@ -59,8 +63,8 @@ describe('get transaction receipt', () => {
             .catch(() => done())
     }).timeout(100000)
 
-    it('should throw an error without parameter', () => {
-        expect(() => caver.klay.getTransactionReceipt()).to.throw()
+    it('should throw an error without parameter', async () => {
+        await expect(caver.klay.getTransactionReceipt()).to.be.rejected
     }).timeout(100000)
 
     it('CAVERJS-UNIT-TX-567 : After sending transction, getTransactionReceipt should return transaction infromation', async () => {
