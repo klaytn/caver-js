@@ -16,9 +16,8 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { XMLHttpRequest } from 'xhr2-cookies'
-import * as http from 'http'
-import * as https from 'https'
+import type { Agent as HTTPAgent } from 'http'
+import type { Agent as HTTPSAgent } from 'https'
 import { JsonRpcResponse } from '../../../caver-core-helpers/src'
 
 export interface HttpHeader {
@@ -27,9 +26,8 @@ export interface HttpHeader {
 }
 
 export interface HttpProviderAgent {
-    baseUrl?: string
-    http?: http.Agent
-    https?: https.Agent
+    http?: HTTPAgent
+    https?: HTTPSAgent
 }
 
 export interface HttpProviderOptions {
@@ -45,12 +43,11 @@ export class HttpProvider {
 
     host: string
     connected: boolean
-    withCredentials: boolean
+    withCredentials?: boolean
     timeout: number
     headers?: HttpHeader[]
     agent?: HttpProviderAgent
 
-    _prepareRequest?(): any
     send(payload: object, callback?: (error: Error | null, result: JsonRpcResponse | undefined) => void): void
     supportsSubscriptions(): boolean
     disconnect(): boolean
