@@ -85,6 +85,7 @@ before(() => {
 describe('TxTypeSmartContractExecution', () => {
     let transactionObj
     let getGasPriceSpy
+    let getHeaderSpy
     let getNonceSpy
     let getChainIdSpy
     beforeEach(() => {
@@ -98,6 +99,8 @@ describe('TxTypeSmartContractExecution', () => {
 
         getGasPriceSpy = sandbox.stub(caver.transaction.klaytnCall, 'getGasPrice')
         getGasPriceSpy.returns('0x5d21dba00')
+        getHeaderSpy = sandbox.stub(caver.transaction.klaytnCall, 'getHeaderByNumber')
+        getHeaderSpy.returns({ baseFeePerGas: '0x5d21dba00' })
         getNonceSpy = sandbox.stub(caver.transaction.klaytnCall, 'getTransactionCount')
         getNonceSpy.returns('0x3a')
         getChainIdSpy = sandbox.stub(caver.transaction.klaytnCall, 'getChainId')
@@ -740,7 +743,8 @@ describe('TxTypeSmartContractExecution', () => {
             delete tx._gasPrice
 
             await tx.fillTransaction()
-            expect(getGasPriceSpy).to.have.been.calledOnce
+            expect(getGasPriceSpy).not.to.have.been.calledOnce
+            expect(getHeaderSpy).to.have.been.calledOnce
             expect(getNonceSpy).not.to.have.been.calledOnce
             expect(getChainIdSpy).not.to.have.been.calledOnce
         }).timeout(200000)
@@ -751,6 +755,7 @@ describe('TxTypeSmartContractExecution', () => {
 
             await tx.fillTransaction()
             expect(getGasPriceSpy).not.to.have.been.calledOnce
+            expect(getHeaderSpy).not.to.have.been.calledOnce
             expect(getNonceSpy).to.have.been.calledOnce
             expect(getChainIdSpy).not.to.have.been.calledOnce
         }).timeout(200000)
@@ -761,6 +766,7 @@ describe('TxTypeSmartContractExecution', () => {
 
             await tx.fillTransaction()
             expect(getGasPriceSpy).not.to.have.been.calledOnce
+            expect(getHeaderSpy).not.to.have.been.calledOnce
             expect(getNonceSpy).not.to.have.been.calledOnce
             expect(getChainIdSpy).to.have.been.calledOnce
         }).timeout(200000)

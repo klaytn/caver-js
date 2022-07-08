@@ -50,56 +50,76 @@ before(() => {
     password = process.env.password ? process.env.password : 'password'
 })
 
-async function generateTxsBomb(num = 100) {
-    const txs = []
+async function fillKlay(amount) {
+    const filled = caver.wallet.keyring.generate()
+
+    const tx = caver.transaction.valueTransfer.create({
+        from: sender.address,
+        to: filled.address,
+        gas: 10000000,
+        value: caver.utils.convertToPeb(amount, 'KLAY'),
+    })
+    await caver.wallet.sign(sender.address, tx)
+    await caver.rpc.klay.sendRawTransaction(tx)
+
+    return filled
+}
+
+async function generateTxsBomb(generator, num = 2000) {
     const input =
         '0x608060405234801561001057600080fd5b506101de806100206000396000f3006080604052600436106100615763ffffffff7c01000000000000000000000000000000000000000000000000000000006000350416631a39d8ef81146100805780636353586b146100a757806370a08231146100ca578063fd6b7ef8146100f8575b3360009081526001602052604081208054349081019091558154019055005b34801561008c57600080fd5b5061009561010d565b60408051918252519081900360200190f35b6100c873ffffffffffffffffffffffffffffffffffffffff60043516610113565b005b3480156100d657600080fd5b5061009573ffffffffffffffffffffffffffffffffffffffff60043516610147565b34801561010457600080fd5b506100c8610159565b60005481565b73ffffffffffffffffffffffffffffffffffffffff1660009081526001602052604081208054349081019091558154019055565b60016020526000908152604090205481565b336000908152600160205260408120805490829055908111156101af57604051339082156108fc029083906000818181858888f193505050501561019c576101af565b3360009081526001602052604090208190555b505600a165627a7a72305820627ca46bb09478a015762806cc00c431230501118c7c26c30ac58c4e09e51c4f0029'
 
-    let senderNonce = caver.utils.hexToNumber(await caver.rpc.klay.getTransactionCount(sender.address))
+    caver.wallet.add(generator)
+
+    let senderNonce = caver.utils.hexToNumber(await caver.rpc.klay.getTransactionCount(generator.address, 'pending'))
     for (let i = 0; i < num; i++) {
         const tx = caver.transaction.smartContractDeploy.create({
-            from: sender.address,
+            from: generator.address,
             input,
             gas: 10000000,
             nonce: senderNonce,
         })
-        await caver.wallet.sign(sender.address, tx)
-        txs.push(tx.getRLPEncoding())
+        await caver.wallet.sign(generator.address, tx)
+        caver.rpc.klay.sendRawTransaction(tx)
         senderNonce++
     }
-
-    await Promise.all(
-        Object.keys(txs).map(async signedTx => {
-            caver.rpc.klay.sendRawTransaction(signedTx)
-        })
-    )
 }
 
 async function validateGasFeeWithReceipt(receipt) {
     const gasPriceInReceipt = caver.utils.hexToNumber(receipt.gasPrice)
-    const gasPriceAtParentBlock = await caver.rpc.klay.getGasPriceAt(caver.utils.hexToNumber(receipt.blockNumber) - 1) // Klaytn will return baseFee
     const gasPriceAtReceiptBlock = await caver.rpc.klay.getGasPriceAt(receipt.blockNumber) // Klaytn will return baseFee
+    // console.log(`gasPriceInReceipt: ${gasPriceInReceipt} / gasPriceAtReceiptBlock: ${caver.utils.hexToNumber(gasPriceAtReceiptBlock)}`)
 
     // To process a transaction, the gasPrice of the tx should be equal or bigger than baseFee(effectiveGasPrice)
-    if (caver.utils.hexToNumber(receipt.effectiveGasPrice) > gasPriceInReceipt) return false
+    if (caver.utils.hexToNumber(receipt.effectiveGasPrice) > gasPriceInReceipt) {
+        // console.log(`caver.utils.hexToNumber(receipt.effectiveGasPrice)(${caver.utils.hexToNumber(receipt.effectiveGasPrice)}) > gasPriceInReceipt(${gasPriceInReceipt})`)
+        return false
+    }
 
     // effectiveGasPrice should be defined by baseFee used gas price when tx is processed
-    if (receipt.effectiveGasPrice !== gasPriceAtReceiptBlock) return false
+    if (receipt.effectiveGasPrice !== gasPriceAtReceiptBlock) {
+        // console.log(`receipt.effectiveGasPrice(${receipt.effectiveGasPrice}) !== gasPriceAtReceiptBlock(${gasPriceAtReceiptBlock})`)
+        return false
+    }
 
-    // Set gasPrice with `baseFee * 2`
-    if (caver.utils.hexToNumber(gasPriceAtParentBlock) * 2 !== gasPriceInReceipt) return false
+    // Set gasPrice with `baseFee * 2`, so should be bigger than gas price of the block
+    if (caver.utils.hexToNumber(gasPriceAtReceiptBlock) > gasPriceInReceipt) {
+        // console.log(`gasPriceAtReceiptBlock(${caver.utils.hexToNumber(gasPriceAtReceiptBlock)}) < gasPriceInReceipt(${gasPriceInReceipt})`)
+        return false
+    }
     return true
 }
 
-async function validateDynamicFeeTxWithReceipt(tx, receipt) {
+async function validateDynamicFeeTxWithReceipt(receipt) {
     const maxFeePerGas = caver.utils.hexToNumber(receipt.maxFeePerGas)
-    const gasPriceAtParentBlock = await caver.rpc.klay.getGasPriceAt(caver.utils.hexToNumber(receipt.blockNumber) - 1) // Klaytn will return baseFee
+    const gasPriceAtReceiptBlock = await caver.rpc.klay.getGasPriceAt(receipt.blockNumber) // Klaytn will return baseFee
+    // console.log(`maxFeePerGas: ${maxFeePerGas} / gasPriceAtReceiptBlock: ${caver.utils.hexToNumber(gasPriceAtReceiptBlock)}`)
 
     // To process a transaction, the maxFeePerGas of the tx should be equal or bigger than baseFee(effectiveGasPrice)
     if (caver.utils.hexToNumber(receipt.effectiveGasPrice) > maxFeePerGas) return false
 
     // Set gasPrice with `baseFee * 2`
-    if (caver.utils.hexToNumber(gasPriceAtParentBlock) * 2 !== maxFeePerGas) return false
+    if (caver.utils.hexToNumber(gasPriceAtReceiptBlock) > maxFeePerGas) return false
     return true
 }
 
@@ -109,7 +129,7 @@ async function validateGasPrice(tx) {
 
     // If transaction type is TxTypeEthereumDynamicFee,
     // validate `maxPriorityFeePerGas` and `maxFeePerGas`.
-    if (tx.type.incldues('DynamicFee')) {
+    if (tx.type.includes('DynamicFee')) {
         const maxPriorityFeePerGas = await caver.rpc.klay.getMaxPriorityFeePerGas()
         if (tx.maxPriorityFeePerGas !== maxPriorityFeePerGas) return false
         // maxFeePerGas will be set with `baseFee * 2`, so maxFeePerGas cannnot be smaller than current base fee
@@ -125,7 +145,7 @@ async function validateGasPrice(tx) {
 describe('Have to set correct value optional fields named gasPrice, maxFeePerGas or maxPriorityFeePerGas', () => {
     it('CAVERJS-UNIT-ETC-405: caver.contract operates with optional gasPrice value', async () => {
         // Generate many txs to increase baseFee
-        await generateTxsBomb()
+        generateTxsBomb(await fillKlay(100))
 
         // Deploy a contract without optional gasPrice field
         const contract = caver.contract.create(kip7JsonInterface)
@@ -150,7 +170,7 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
         expect(isValid).to.be.true
 
         // Generate many txs to increase baseFee
-        await generateTxsBomb()
+        generateTxsBomb(await fillKlay(100))
 
         // Execute a contract without optional gasPrice field
         contract.options.address = receipt.contractAddress
@@ -161,7 +181,7 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
         )
         expect(minterAddedReceipt).not.to.be.undefined
         expect(minterAddedReceipt.status).to.equal(true)
-        expect(minterAddedReceipt.to).to.equal(receipt.contractAddress)
+        expect(minterAddedReceipt.to.toLowerCase()).to.equal(receipt.contractAddress.toLowerCase())
         isValid = await validateGasFeeWithReceipt(minterAddedReceipt)
         expect(isValid).to.be.true
 
@@ -219,7 +239,7 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
 
     it('CAVERJS-UNIT-ETC-406: caver.klay.Contract operates with optional gasPrice value', async () => {
         // Generate many txs to increase baseFee
-        await generateTxsBomb()
+        generateTxsBomb(await fillKlay(100))
 
         // Deploy a contract without optional gasPrice field
         const contract = new caver.klay.Contract(kip7JsonInterface)
@@ -231,6 +251,7 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
             .send({
                 from: sender.address,
                 gas: 50000000,
+                value: 0,
                 contractDeployFormatter: r => {
                     return r
                 },
@@ -242,7 +263,7 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
         expect(isValid).to.be.true
 
         // Generate many txs to increase baseFee
-        await generateTxsBomb()
+        generateTxsBomb(await fillKlay(100))
 
         // Execute a contract without optional gasPrice field
         contract.options.address = receipt.contractAddress
@@ -251,14 +272,14 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
             .send({ from: sender.address, gas: 50000000 })
         expect(minterAddedReceipt).not.to.be.undefined
         expect(minterAddedReceipt.status).to.equal(true)
-        expect(minterAddedReceipt.to).to.equal(receipt.contractAddress)
+        expect(minterAddedReceipt.to.toLowerCase()).to.equal(receipt.contractAddress.toLowerCase())
         isValid = await validateGasFeeWithReceipt(minterAddedReceipt)
         expect(isValid).to.be.true
     }).timeout(100000)
 
     it('CAVERJS-UNIT-TRANSACTION-556: caver.transaction sign and signAsFeePayer signs with optional gasPrice value', async () => {
         // Generate many txs to increase baseFee
-        await generateTxsBomb()
+        generateTxsBomb(await fillKlay(100))
 
         // Test transaction.sign with basic tx
         let tx = caver.transaction.valueTransfer.create({
@@ -308,7 +329,7 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
 
     it('CAVERJS-UNIT-WALLET-431: caver.wallet sign and signAsFeePayer signs with optional gasPrice value', async () => {
         // Generate many txs to increase baseFee
-        await generateTxsBomb()
+        generateTxsBomb(await fillKlay(100))
 
         // Test caver.wallet.sign with basic tx
         let tx = caver.transaction.valueTransfer.create({
@@ -358,7 +379,7 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
 
     it('CAVERJS-UNIT-RPC-030: caver.rpc.klay.sendTransaction sends a tx with optional gasPrice value (use keystore in Klaytn Node)', async () => {
         // Generate many txs to increase baseFee
-        await generateTxsBomb()
+        generateTxsBomb(await fillKlay(100))
 
         const isUnlock = await caver.klay.personal.unlockAccount(sender.address, password)
         expect(isUnlock).to.be.true
@@ -387,7 +408,7 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
 
     it('CAVERJS-UNIT-RPC-031: caver.rpc.klay.sendTransactionAsFeepayer sends a fee delegation tx with optional gasPrice value (use keystore in Klaytn Node)', async () => {
         // Generate many txs to increase baseFee
-        await generateTxsBomb()
+        generateTxsBomb(await fillKlay(100))
 
         const isUnlock = await caver.klay.personal.unlockAccount(feePayer.address, password)
         expect(isUnlock).to.be.true
@@ -399,13 +420,16 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
             gas: 2500000,
             feePayer: feePayer.address,
         })
-        await caver.wallet.sign(sender, tx)
+        await caver.wallet.sign(sender.address, tx)
         const receipt = await caver.rpc.klay.sendTransactionAsFeePayer(tx)
         const isValid = await validateGasFeeWithReceipt(receipt)
         expect(isValid).to.be.true
     }).timeout(100000)
 
     it('CAVERJS-UNIT-RPC-032: caver.rpc.klay.signTransaction signs a tx with optional gasPrice value (use keystore in Klaytn Node)', async () => {
+        // Generate many txs to increase baseFee
+        generateTxsBomb(await fillKlay(100))
+
         const isUnlock = await caver.klay.personal.unlockAccount(sender.address, password)
         expect(isUnlock).to.be.true
 
@@ -434,6 +458,9 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
     }).timeout(100000)
 
     it('CAVERJS-UNIT-RPC-033: caver.rpc.klay.signTransactionAsFeepayer signs a fee delegation tx with optional gasPrice value (use keystore in Klaytn Node)', async () => {
+        // Generate many txs to increase baseFee
+        generateTxsBomb(await fillKlay(100))
+
         const isUnlock = await caver.klay.personal.unlockAccount(feePayer.address, password)
         expect(isUnlock).to.be.true
 
@@ -444,13 +471,16 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
             gas: 2500000,
             feePayer: feePayer.address,
         })
-        const signed = await caver.rpc.klay.sendTransactionAsFeepayer(tx)
+        const signed = await caver.rpc.klay.signTransactionAsFeePayer(tx)
         const decodedTx = caver.transaction.decode(signed.raw)
         const isValid = await validateGasPrice(decodedTx)
         expect(isValid).to.be.true
     }).timeout(100000)
 
     it('CAVERJS-UNIT-WALLET-432: caver.klay.accounts.signTransaction signs with optional gasPrice value', async () => {
+        // Generate many txs to increase baseFee
+        generateTxsBomb(await fillKlay(100))
+
         const tx = {
             from: sender.address,
             to: caver.wallet.keyring.generate().address,
@@ -468,6 +498,9 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
     }).timeout(100000)
 
     it('CAVERJS-UNIT-WALLET-433: caver.klay.accounts.feePayerSignTransaction signs as fee payer with optional gasPrice value', async () => {
+        // Generate many txs to increase baseFee
+        generateTxsBomb(await fillKlay(100))
+
         const tx = {
             type: 'FEE_DELEGATED_VALUE_TRANSFER',
             from: sender.address,
@@ -477,15 +510,15 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
             gas: 2500000,
         }
         const feePayerAccount = caver.klay.accounts.wallet[feePayer.address]
-        const signed = await caver.klay.accounts.feePayerSignTransaction(tx, feePayerAccount.privateKey)
+        const signed = await caver.klay.accounts.feePayerSignTransaction(tx, feePayer.address, feePayerAccount.privateKey)
         const decodedTx = caver.transaction.decode(signed.rawTransaction)
         const isValid = await validateGasPrice(decodedTx)
         expect(isValid).to.be.true
     }).timeout(100000)
 
-    it('CAVERJS-UNIT-ETC-407: caver.klay.personal.sendTransaction sends a tx with optional gasPrice value', async () => {
+    it('CAVERJS-UNIT-ETC-407: caver.klay.personal.sendTransaction sends a tx with optional gasPrice value (use keystore in Klaytn Node)', async () => {
         // Generate many txs to increase baseFee
-        await generateTxsBomb()
+        generateTxsBomb(await fillKlay(100))
 
         let tx = caver.transaction.valueTransfer.create({
             from: sender.address,
@@ -509,9 +542,9 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
         expect(isValid).to.be.true
     }).timeout(100000)
 
-    it('CAVERJS-UNIT-ETC-408: caver.klay.personal.sendValueTransfer sends a value transfer tx with optional gasPrice value', async () => {
+    it('CAVERJS-UNIT-ETC-408: caver.klay.personal.sendValueTransfer sends a value transfer tx with optional gasPrice value (use keystore in Klaytn Node)', async () => {
         // Generate many txs to increase baseFee
-        await generateTxsBomb()
+        generateTxsBomb(await fillKlay(100))
 
         const receipt = await caver.klay.personal.sendValueTransfer(
             {
@@ -526,9 +559,9 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
         expect(isValid).to.be.true
     }).timeout(100000)
 
-    it('CAVERJS-UNIT-ETC-409: caver.klay.personal.sendAccountUpdate sends a value transfer tx with optional gasPrice value', async () => {
+    it('CAVERJS-UNIT-ETC-409: caver.klay.personal.sendAccountUpdate sends a value transfer tx with optional gasPrice value (use keystore in Klaytn Node)', async () => {
         // Generate many txs to increase baseFee
-        await generateTxsBomb()
+        generateTxsBomb(await fillKlay(100))
 
         const receipt = await caver.klay.personal.sendAccountUpdate(
             {
@@ -542,7 +575,10 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
         expect(isValid).to.be.true
     }).timeout(100000)
 
-    it('CAVERJS-UNIT-RPC-034: caver.klay.sendTransaction sends a tx with optional gasPrice value', async () => {
+    it('CAVERJS-UNIT-RPC-034: caver.klay.sendTransaction sends a tx with optional gasPrice value (use keystore in Klaytn Node)', async () => {
+        // Generate many txs to increase baseFee
+        generateTxsBomb(await fillKlay(100))
+
         // Sign a tx with an account in the in-memory wallet and send to network.
         let tx = {
             from: sender.address,

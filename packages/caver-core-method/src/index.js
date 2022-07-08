@@ -449,7 +449,7 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
     return method.requestManager.send(payload, sendTxCallback)
 }
 
-const buildSendFunc = (method, isSendTx) => async (...args) => {
+const buildSendFunc = (method, isSendTx) => (...args) => {
     const defer = utils.promiEvent(!isSendTx)
     const payload = method.toPayload(args)
 
@@ -457,11 +457,17 @@ const buildSendFunc = (method, isSendTx) => async (...args) => {
     const sendSignedTx = buildSendSignedTxFunc(method, payload, sendTxCallback)
     const sendRequest = buildSendRequestFunc(defer, sendSignedTx, sendTxCallback)
 
-    const isGasPriceInputMissing = isSendTx && _.isObject(payload.params[0]) && payload.params[0].gasPrice === undefined
+    // isSendTx can determine only for "send"Transaction request.
+    // For sign transaction request, we also need to fill up the optional values.
+    const isSignTx = method.name.includes('signTransaction')
+    let isGasPriceInputMissing = false
+    if ((isSendTx || isSignTx) && _.isObject(payload.params[0]) && payload.params[0].gasPrice === undefined) {
+        isGasPriceInputMissing = true
+    }
 
     // The TxTypeEthereumDynamicFee transaction does not use the gasPrice field,
     // so we need to check `maxPriorityFeePerGas` and `maxFeePerGas` field instead of `gasPrice`.
-    const isDynamicFeeTx = isSendTx && payload.params[0].type === TX_TYPE_STRING.TxTypeEthereumDynamicFee
+    const isDynamicFeeTx = (isSendTx || isSignTx) && payload.params[0].type === TX_TYPE_STRING.TxTypeEthereumDynamicFee
     const filledDynamicGasFeeTx =
         isDynamicFeeTx && payload.params[0].maxPriorityFeePerGas !== undefined && payload.params[0].maxFeePerGas !== undefined
 
@@ -490,40 +496,66 @@ const buildSendFunc = (method, isSendTx) => async (...args) => {
         params: 0,
     }).createFunction(method.requestManager)
 
-    const header = await getHeader('latest')
-    const bf = utils.hexToNumber(header.baseFeePerGas || '0x0')
+    getHeader('latest', (err, header) => {
+        // Get baseFee(`baseFeePerGas`) from block header
+        const baseFee = utils.hexToNumber(header.baseFeePerGas || '0x0')
 
-    // The baseFeePerGas is bigger than 0 means that Klaytn uses dynamic gas price.
-    if (bf > 0) {
-        if (!isDynamicFeeTx) {
-            payload.params[0].gasPrice = bf * 2
-        } else {
-            // If maxFeePerGas is undefined, set maxFeePerGas with `baseFee * 2`.
-            payload.params[0].maxFeePerGas = payload.params[0].maxFeePerGas || bf * 2
-            // If maxPriorityFeePerGas is undefined, call `klay_maxPriorityFeePerGas`.
-            if (payload.params[0].maxPriorityFeePerGas === undefined) {
-                const maxPriorityFeePerGas = await getMaxPriorityFeePerGas()
-                payload.params[0].maxPriorityFeePerGas = maxPriorityFeePerGas
+        // The baseFeePerGas is bigger than 0 means that Klaytn uses dynamic gas price.
+        if (baseFee > 0) {
+            if (!isDynamicFeeTx) {
+                payload.params[0].gasPrice = baseFee * 2
+            } else {
+                // If maxFeePerGas is undefined, set maxFeePerGas with `baseFee * 2`.
+                payload.params[0].maxFeePerGas = payload.params[0].maxFeePerGas || baseFee * 2
+                // If maxPriorityFeePerGas is undefined, call `klay_maxPriorityFeePerGas`.
+                if (payload.params[0].maxPriorityFeePerGas === undefined) {
+                    return getMaxPriorityFeePerGas((e, maxPriorityFeePerGas) => {
+                        payload.params[0].maxPriorityFeePerGas = maxPriorityFeePerGas
+                        // Format gas price parameters(gasPrice, maxPriorityFeePerGas, maxFeePerGas)
+                        formatGasParametersToHex(payload.params[0])
+                        sendRequest(payload, method)
+                    })
+                }
             }
-        }
-    } else {
-        // If baseFeePerGas is not defined or 0, we need to use unit price for the `gasPrice` field.
-        const gp = await getGasPrice()
-        // The TxTypeEthereumDynamicFee transaction does not use the gasPrice field,
-        // so the gas price default is not set for TxTypeEthereumDynamicFee.
-        if (!isDynamicFeeTx) {
-            payload.params[0].gasPrice = payload.params[0].gasPrice || gp
         } else {
-            payload.params[0].maxPriorityFeePerGas = payload.params[0].maxPriorityFeePerGas || gp
-            payload.params[0].maxFeePerGas = payload.params[0].maxFeePerGas || gp
+            // If baseFeePerGas is not defined or 0, we need to use unit price for the `gasPrice` field.
+            return getGasPrice((e, gp) => {
+                // The TxTypeEthereumDynamicFee transaction does not use the gasPrice field,
+                // so the gas price default is not set for TxTypeEthereumDynamicFee.
+                if (!isDynamicFeeTx) {
+                    payload.params[0].gasPrice = payload.params[0].gasPrice || gp
+                } else {
+                    payload.params[0].maxPriorityFeePerGas = payload.params[0].maxPriorityFeePerGas || gp
+                    payload.params[0].maxFeePerGas = payload.params[0].maxFeePerGas || gp
+                }
+                // Format gas price parameters(gasPrice, maxPriorityFeePerGas, maxFeePerGas)
+                formatGasParametersToHex(payload.params[0])
+                sendRequest(payload, method)
+            })
         }
-    }
+        // Format gas price parameters(gasPrice, maxPriorityFeePerGas, maxFeePerGas)
+        formatGasParametersToHex(payload.params[0])
+        sendRequest(payload, method)
+    })
 
-    sendRequest(payload, method)
     /**
      * attaching `.on('receipt')` is possible by returning defer.eventEmitter
      */
     return defer.eventEmitter
+}
+
+// A function to change the format to a hex string after randomly filling the default gasPrice value
+// with the API (personal_sendValueTransfer, personal_sendAccountUpdate) that does not use a transaction object.
+function formatGasParametersToHex(txObject) {
+    if (txObject.gasPrice !== undefined && !utils.isHexStrict(txObject.gasPrice)) {
+        txObject.gasPrice = utils.toHex(txObject.gasPrice)
+    }
+    if (txObject.maxPriorityFeePerGas !== undefined && !utils.isHexStrict(txObject.maxPriorityFeePerGas)) {
+        txObject.maxPriorityFeePerGas = utils.toHex(txObject.maxPriorityFeePerGas)
+    }
+    if (txObject.maxFeePerGas !== undefined && !utils.isHexStrict(txObject.maxFeePerGas)) {
+        txObject.maxFeePerGas = utils.toHex(txObject.maxFeePerGas)
+    }
 }
 
 function buildCall() {
