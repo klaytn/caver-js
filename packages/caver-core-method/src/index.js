@@ -449,7 +449,7 @@ const buildSendRequestFunc = (defer, sendSignedTx, sendTxCallback) => (payload, 
     return method.requestManager.send(payload, sendTxCallback)
 }
 
-const buildSendFunc = (method, isSendTx) => async (...args) => {
+const buildSendFunc = (method, isSendTx) => (...args) => {
     const defer = utils.promiEvent(!isSendTx)
     const payload = method.toPayload(args)
 
@@ -496,38 +496,42 @@ const buildSendFunc = (method, isSendTx) => async (...args) => {
         params: 0,
     }).createFunction(method.requestManager)
 
-    const header = await getHeader('latest')
-    const bf = utils.hexToNumber(header.baseFeePerGas || '0x0')
+    getHeader('latest', (err, header) => {
+        // Get baseFee(`baseFeePerGas`) from block header
+        const baseFee = utils.hexToNumber(header.baseFeePerGas || '0x0')
 
-    // The baseFeePerGas is bigger than 0 means that Klaytn uses dynamic gas price.
-    if (bf > 0) {
-        if (!isDynamicFeeTx) {
-            payload.params[0].gasPrice = bf * 2
-        } else {
-            // If maxFeePerGas is undefined, set maxFeePerGas with `baseFee * 2`.
-            payload.params[0].maxFeePerGas = payload.params[0].maxFeePerGas || bf * 2
-            // If maxPriorityFeePerGas is undefined, call `klay_maxPriorityFeePerGas`.
-            if (payload.params[0].maxPriorityFeePerGas === undefined) {
-                const maxPriorityFeePerGas = await getMaxPriorityFeePerGas()
-                payload.params[0].maxPriorityFeePerGas = maxPriorityFeePerGas
+        // The baseFeePerGas is bigger than 0 means that Klaytn uses dynamic gas price.
+        if (baseFee > 0) {
+            if (!isDynamicFeeTx) {
+                payload.params[0].gasPrice = baseFee * 2
+            } else {
+                // If maxFeePerGas is undefined, set maxFeePerGas with `baseFee * 2`.
+                payload.params[0].maxFeePerGas = payload.params[0].maxFeePerGas || baseFee * 2
+                // If maxPriorityFeePerGas is undefined, call `klay_maxPriorityFeePerGas`.
+                if (payload.params[0].maxPriorityFeePerGas === undefined) {
+                    getMaxPriorityFeePerGas((err, maxPriorityFeePerGas) => {
+                        payload.params[0].maxPriorityFeePerGas = maxPriorityFeePerGas
+                    })
+                }
             }
-        }
-    } else {
-        // If baseFeePerGas is not defined or 0, we need to use unit price for the `gasPrice` field.
-        const gp = await getGasPrice()
-        // The TxTypeEthereumDynamicFee transaction does not use the gasPrice field,
-        // so the gas price default is not set for TxTypeEthereumDynamicFee.
-        if (!isDynamicFeeTx) {
-            payload.params[0].gasPrice = payload.params[0].gasPrice || gp
         } else {
-            payload.params[0].maxPriorityFeePerGas = payload.params[0].maxPriorityFeePerGas || gp
-            payload.params[0].maxFeePerGas = payload.params[0].maxFeePerGas || gp
+            // If baseFeePerGas is not defined or 0, we need to use unit price for the `gasPrice` field.
+            getGasPrice((err, gp) => {
+                // The TxTypeEthereumDynamicFee transaction does not use the gasPrice field,
+                // so the gas price default is not set for TxTypeEthereumDynamicFee.
+                if (!isDynamicFeeTx) {
+                    payload.params[0].gasPrice = payload.params[0].gasPrice || gp
+                } else {
+                    payload.params[0].maxPriorityFeePerGas = payload.params[0].maxPriorityFeePerGas || gp
+                    payload.params[0].maxFeePerGas = payload.params[0].maxFeePerGas || gp
+                }
+            })
         }
-    }
+        // Format gas price parameters(gasPrice, maxPriorityFeePerGas, maxFeePerGas)
+        formatGasParametersToHex(payload.params[0])
+        sendRequest(payload, method)
+    })
 
-    // Format gas price parameters(gasPrice, maxPriorityFeePerGas, maxFeePerGas)
-    formatGasParametersToHex(payload.params[0])
-    sendRequest(payload, method)
     /**
      * attaching `.on('receipt')` is possible by returning defer.eventEmitter
      */
