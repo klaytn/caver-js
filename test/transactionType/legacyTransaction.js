@@ -98,7 +98,7 @@ describe('LEGACY transaction', async () => {
         delete tx.from
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error gas and gasLimit missing
@@ -119,7 +119,7 @@ describe('LEGACY transaction', async () => {
         delete tx.gas
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error to and data missing
@@ -142,7 +142,7 @@ describe('LEGACY transaction', async () => {
         delete tx.data
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error unnecessary feePayer
@@ -161,7 +161,7 @@ describe('LEGACY transaction', async () => {
         const tx = { feePayer: testAccount.address, ...legacyObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error unnecessary feeRatio
@@ -180,7 +180,7 @@ describe('LEGACY transaction', async () => {
         const tx = { feeRatio: 20, ...legacyObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error unnecessary publicKey
@@ -207,7 +207,7 @@ describe('LEGACY transaction', async () => {
         }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error unnecessary multisig
@@ -276,7 +276,7 @@ describe('LEGACY transaction', async () => {
         const tx = { multisig, ...legacyObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error unnecessary roleTransactionKey
@@ -303,7 +303,7 @@ describe('LEGACY transaction', async () => {
         const tx = { roleTransactionKey, ...legacyObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error unnecessary roleAccountUpdateKey
@@ -330,7 +330,7 @@ describe('LEGACY transaction', async () => {
         const tx = { roleAccountUpdateKey, ...legacyObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error unnecessary roleFeePayerKey
@@ -357,7 +357,7 @@ describe('LEGACY transaction', async () => {
         const tx = { roleFeePayerKey, ...legacyObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error unnecessary failKey
@@ -376,7 +376,7 @@ describe('LEGACY transaction', async () => {
         const tx = { failKey: true, ...legacyObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error unnecessary codeFormat
@@ -395,7 +395,7 @@ describe('LEGACY transaction', async () => {
         const tx = { codeFormat: 'EVM', ...legacyObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // UnnecessaryLegacyKey
@@ -412,7 +412,7 @@ describe('LEGACY transaction', async () => {
         const tx = { legacyKey: true, ...legacyObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith('"legacyKey" cannot be used with LEGACY transaction')
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"legacyKey" cannot be used with LEGACY transaction')
     }).timeout(200000)
 
     // Invalid from address
@@ -432,7 +432,7 @@ describe('LEGACY transaction', async () => {
         const expectedError = `Provided address "${tx.from}" is invalid, the capitalization checksum test failed`
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(expectedError)
     }).timeout(200000)
 
     // UnnecessaryFeePayerSignatures
@@ -450,7 +450,7 @@ describe('LEGACY transaction', async () => {
         const expectedError = '"feePayerSignatures" cannot be used with LEGACY transaction'
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(expectedError)
     }).timeout(200000)
 
     // InvalidTo
@@ -472,6 +472,6 @@ describe('LEGACY transaction', async () => {
         const expectedError = `Provided address "${tx.to}" is invalid, the capitalization checksum test failed.`
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(expectedError)
     }).timeout(200000)
 })

@@ -103,7 +103,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         delete tx.from
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // UnnecessaryTo
@@ -123,7 +123,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { publicKey, to: senderAddress, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // UnnecessaryValue
@@ -143,7 +143,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { publicKey, value: 1, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // MissingGas
@@ -165,7 +165,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         delete tx.gas
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // MissingKey
@@ -291,7 +291,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { publicKey, multisig, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with roleTransactionKey.
@@ -341,7 +341,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { roleTransactionKey: { publicKey }, publicKey, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with roleTransactionKey and multisig.
@@ -361,7 +361,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { roleTransactionKey: { publicKey }, multisig, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with roleTransactionKey, publicKey and multisig.
@@ -381,7 +381,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { roleTransactionKey: { publicKey }, publicKey, multisig, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with roleAccountUpdateKey.
@@ -461,7 +461,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { roleAccountUpdateKey: { publicKey }, publicKey, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with roleAccountUpdateKey and multisig.
@@ -481,7 +481,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { roleAccountUpdateKey: { publicKey }, multisig, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with roleAccountUpdateKey, publicKey and multisig.
@@ -501,7 +501,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { roleAccountUpdateKey: { publicKey }, publicKey, multisig, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with roleAccountUpdateKey, roleTransactionKey and publicKey.
@@ -521,7 +521,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { roleTransactionKey: { publicKey }, roleAccountUpdateKey: { publicKey }, publicKey, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with roleAccountUpdateKey, roleTransactionKey and multisig.
@@ -541,7 +541,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { roleTransactionKey: { publicKey }, roleAccountUpdateKey: { publicKey }, multisig, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with roleAccountUpdateKey, roleTransactionKey, publicKey and multisig.
@@ -573,7 +573,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with roleFeePayerKey.
@@ -717,7 +717,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { roleFeePayerKey: { publicKey }, publicKey, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with roleFeePayerKey and multisig.
@@ -737,7 +737,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { roleFeePayerKey: { publicKey }, multisig, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with roleFeePayerKey, publicKey and multisig.
@@ -757,7 +757,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { roleFeePayerKey: { publicKey }, publicKey, multisig, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with roleFeePayerKey, roleTransactionKey and publicKey.
@@ -777,7 +777,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { roleTransactionKey: { publicKey }, roleFeePayerKey: { publicKey }, publicKey, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with roleFeePayerKey, roleTransactionKey and multisig.
@@ -797,7 +797,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { roleTransactionKey: { publicKey }, roleFeePayerKey: { publicKey }, multisig, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with roleFeePayerKey, roleTransactionKey, publicKey and multisig.
@@ -829,7 +829,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with roleFeePayerKey, roleAccountUpdateKey and publicKey.
@@ -849,7 +849,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { roleAccountUpdateKey: { publicKey }, roleFeePayerKey: { publicKey }, publicKey, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with roleFeePayerKey, roleAccountUpdateKey and multisig.
@@ -869,7 +869,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { roleAccountUpdateKey: { publicKey }, roleFeePayerKey: { publicKey }, multisig, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with roleFeePayerKey, roleAccountUpdateKey, publicKey and multisig.
@@ -901,7 +901,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with roleFeePayerKey, roleTransactionKey, roleAccountUpdateKey and publicKey.
@@ -933,7 +933,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with roleFeePayerKey, roleTransactionKey, roleAccountUpdateKey and multisig.
@@ -965,7 +965,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with roleFeePayerKey, roleTransactionKey, roleAccountUpdateKey, publicKey and multisig.
@@ -999,7 +999,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey.
@@ -1031,7 +1031,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { failKey: true, publicKey, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey and multisig.
@@ -1051,7 +1051,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { failKey: true, multisig, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, publicKey and multisig.
@@ -1071,7 +1071,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { failKey: true, publicKey, multisig, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey and roleTransactionKey.
@@ -1091,7 +1091,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { failKey: true, roleTransactionKey: { publicKey }, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, roleTransactionKey and publicKey.
@@ -1111,7 +1111,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { failKey: true, roleTransactionKey: { publicKey }, publicKey, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, roleTransactionKey and multisig.
@@ -1131,7 +1131,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { failKey: true, roleTransactionKey: { publicKey }, multisig, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, roleTransactionKey, publicKey and multisig.
@@ -1151,7 +1151,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { failKey: true, roleTransactionKey: { publicKey }, publicKey, multisig, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey and roleAccountUpdateKey.
@@ -1171,7 +1171,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { failKey: true, roleAccountUpdateKey: { publicKey }, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, roleAccountUpdateKey and publicKey.
@@ -1191,7 +1191,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { failKey: true, roleAccountUpdateKey: { publicKey }, publicKey, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, roleAccountUpdateKey and multisig.
@@ -1211,7 +1211,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { failKey: true, roleAccountUpdateKey: { publicKey }, multisig, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, roleAccountUpdateKey, publicKey and multisig.
@@ -1231,7 +1231,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { failKey: true, roleAccountUpdateKey: { publicKey }, publicKey, multisig, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey and roleFeePayerKey.
@@ -1251,7 +1251,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { failKey: true, roleFeePayerKey: { publicKey }, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, roleFeePayerKey and publicKey.
@@ -1271,7 +1271,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { failKey: true, roleFeePayerKey: { publicKey }, publicKey, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, roleFeePayerKey and multisig.
@@ -1291,7 +1291,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { failKey: true, roleFeePayerKey: { publicKey }, multisig, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, roleFeePayerKey, publicKey and multisig.
@@ -1311,7 +1311,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { failKey: true, roleFeePayerKey: { publicKey }, publicKey, multisig, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, roleTransactionKey, roleAccountUpdateKey and publicKey.
@@ -1343,7 +1343,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, roleTransactionKey, roleAccountUpdateKey and multisig.
@@ -1375,7 +1375,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, roleTransactionKey, roleAccountUpdateKey, publicKey and multisig.
@@ -1409,7 +1409,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, roleTransactionKey, roleFeePayerKey and publicKey.
@@ -1441,7 +1441,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, roleTransactionKey, roleFeePayerKey and multisig.
@@ -1473,7 +1473,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, roleTransactionKey, roleFeePayerKey, publicKey and multisig.
@@ -1507,7 +1507,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, roleAccountUpdateKey, roleFeePayerKey and publicKey.
@@ -1539,7 +1539,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, roleAccountUpdateKey, roleFeePayerKey and multisig.
@@ -1571,7 +1571,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, roleAccountUpdateKey, roleFeePayerKey, publicKey and multisig.
@@ -1605,7 +1605,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, roleTransactionKey, roleAccountUpdateKey, roleFeePayerKey and publicKey.
@@ -1639,7 +1639,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, roleTransactionKey, roleAccountUpdateKey, roleFeePayerKey and multisig.
@@ -1673,7 +1673,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update with failKey, roleTransactionKey, roleAccountUpdateKey, roleFeePayerKey, publicKey and multisig.
@@ -1709,7 +1709,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // UnnecessaryData
@@ -1729,7 +1729,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { data: '0x68656c6c6f', publicKey, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // UnnecessaryFeePayer
@@ -1749,7 +1749,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { feePayer: caver.klay.accounts.create().address, publicKey, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // UnnecessaryFeeRatio
@@ -1769,7 +1769,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { feeRatio: 20, publicKey, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // UnnecessaryCodeFormat
@@ -1789,7 +1789,7 @@ describe('ACCOUNT_UPDATE transaction', async () => {
         const tx = { codeFormat: 'EVM', publicKey, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Update account with legacyKey

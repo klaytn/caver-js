@@ -112,7 +112,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
         const tx = { publicKey, ...accountUpdateObject }
         delete tx.from
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith('The send transactions "from" field must be defined!')
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('The send transactions "from" field must be defined!')
     }).timeout(200000)
 
     // UnnecessaryTo
@@ -128,7 +128,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-345 : If transaction object has to, sendTransaction should throw error', async () => {
         const tx = { publicKey, to: senderAddress, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"to" cannot be used with FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -146,7 +146,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-346 : If transaction object has value, sendTransaction should throw error', async () => {
         const tx = { publicKey, value: 1, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"value" cannot be used with FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -166,7 +166,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
         const tx = { publicKey, ...accountUpdateObject }
         delete tx.gas
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith('"gas" is missing')
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"gas" is missing')
     }).timeout(200000)
 
     // MissingKey
@@ -182,7 +182,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-348 : If transaction object missing key information, sendTransaction should throw error', async () => {
         const tx = { ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'Missing key information with FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -288,7 +288,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-354 : If transaction object has multisig and publicKey, sendTransaction should throw error', async () => {
         const tx = { publicKey, multisig, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -346,7 +346,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-356 : If transaction object has roleTransactionKey and publicKey, sendTransaction should throw error', async () => {
         const tx = { roleTransactionKey: { publicKey }, publicKey, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -366,7 +366,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-357 : If transaction object has roleTransactionKey and multisig, sendTransaction should throw error', async () => {
         const tx = { roleTransactionKey: { publicKey }, multisig, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -386,7 +386,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-358 : If transaction object has roleTransactionKey, publicKey and multisig, sendTransaction should throw error', async () => {
         const tx = { roleTransactionKey: { publicKey }, publicKey, multisig, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -482,7 +482,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-361 : If transaction object has roleAccountUpdateKey and publicKey, sendTransaction should throw error', async () => {
         const tx = { roleAccountUpdateKey: { publicKey }, publicKey, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -502,7 +502,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-362 : If transaction object has roleAccountUpdateKey and multisig, sendTransaction should throw error', async () => {
         const tx = { roleAccountUpdateKey: { publicKey }, multisig, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -522,7 +522,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-363 : If transaction object has roleAccountUpdateKey, publicKey and multisig, sendTransaction should throw error', async () => {
         const tx = { roleAccountUpdateKey: { publicKey }, publicKey, multisig, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -542,7 +542,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-364 : If transaction object has roleAccountUpdateKey, roleTransactionKey and publicKey, sendTransaction should throw error', async () => {
         const tx = { roleTransactionKey: { publicKey }, roleAccountUpdateKey: { publicKey }, publicKey, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -562,7 +562,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-365 : If transaction object has roleAccountUpdateKey, roleTransactionKey and multisig, sendTransaction should throw error', async () => {
         const tx = { roleTransactionKey: { publicKey }, roleAccountUpdateKey: { publicKey }, multisig, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -594,7 +594,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
             ...accountUpdateObject,
         }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -768,7 +768,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-371 : If transaction object has roleFeePayerKey and publicKey, sendTransaction should throw error', async () => {
         const tx = { roleFeePayerKey: { publicKey }, publicKey, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -788,7 +788,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-372 : If transaction object has roleFeePayerKey and multisig, sendTransaction should throw error', async () => {
         const tx = { roleFeePayerKey: { publicKey }, multisig, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -808,7 +808,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-373 : If transaction object has roleFeePayerKey, publicKey and multisig, sendTransaction should throw error', async () => {
         const tx = { roleFeePayerKey: { publicKey }, publicKey, multisig, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -828,7 +828,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-374 : If transaction object has roleFeePayerKey, roleTransactionKey and publicKey, sendTransaction should throw error', async () => {
         const tx = { roleTransactionKey: { publicKey }, roleFeePayerKey: { publicKey }, publicKey, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -848,7 +848,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-375 : If transaction object has roleFeePayerKey, roleTransactionKey and multisig, sendTransaction should throw error', async () => {
         const tx = { roleTransactionKey: { publicKey }, roleFeePayerKey: { publicKey }, multisig, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -880,7 +880,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
             ...accountUpdateObject,
         }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -900,7 +900,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-377 : If transaction object has roleFeePayerKey, roleAccountUpdateKey and publicKey, sendTransaction should throw error', async () => {
         const tx = { roleAccountUpdateKey: { publicKey }, roleFeePayerKey: { publicKey }, publicKey, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -920,7 +920,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-378 : If transaction object has roleFeePayerKey, roleAccountUpdateKey and multisig, sendTransaction should throw error', async () => {
         const tx = { roleAccountUpdateKey: { publicKey }, roleFeePayerKey: { publicKey }, multisig, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -952,7 +952,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
             ...accountUpdateObject,
         }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -984,7 +984,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
             ...accountUpdateObject,
         }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1016,7 +1016,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
             ...accountUpdateObject,
         }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1050,7 +1050,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
             ...accountUpdateObject,
         }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1087,7 +1087,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-384 : If transaction object has failKey and publicKey, sendTransaction should throw error', async () => {
         const tx = { failKey: true, publicKey, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1107,7 +1107,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-385 : If transaction object has failKey and multisig, sendTransaction should throw error', async () => {
         const tx = { failKey: true, multisig, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1127,7 +1127,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-386 : If transaction object has failKey, publicKey and multisig, sendTransaction should throw error', async () => {
         const tx = { failKey: true, publicKey, multisig, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1147,7 +1147,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-387 : If transaction object has failKey and roleTransactionKey, sendTransaction should throw error', async () => {
         const tx = { failKey: true, roleTransactionKey: { publicKey }, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1167,7 +1167,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-388 : If transaction object has failKey, roleTransactionKey and publicKey, sendTransaction should throw error', async () => {
         const tx = { failKey: true, roleTransactionKey: { publicKey }, publicKey, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1187,7 +1187,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-389 : If transaction object has failKey, roleTransactionKey and multisig, sendTransaction should throw error', async () => {
         const tx = { failKey: true, roleTransactionKey: { publicKey }, multisig, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1207,7 +1207,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-390 : If transaction object has failKey, roleTransactionKey, publicKey and multisig, sendTransaction should throw error', async () => {
         const tx = { failKey: true, roleTransactionKey: { publicKey }, publicKey, multisig, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1227,7 +1227,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-391 : If transaction object has failKey and roleAccountUpdateKey, sendTransaction should throw error', async () => {
         const tx = { failKey: true, roleAccountUpdateKey: { publicKey }, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1247,7 +1247,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-392 : If transaction object has failKey, roleAccountUpdateKey and publicKey, sendTransaction should throw error', async () => {
         const tx = { failKey: true, roleAccountUpdateKey: { publicKey }, publicKey, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1267,7 +1267,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-393 : If transaction object has failKey, roleAccountUpdateKey and multisig, sendTransaction should throw error', async () => {
         const tx = { failKey: true, roleAccountUpdateKey: { publicKey }, multisig, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1287,7 +1287,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-394 : If transaction object has failKey, roleAccountUpdateKey, publicKey and multisig, sendTransaction should throw error', async () => {
         const tx = { failKey: true, roleAccountUpdateKey: { publicKey }, publicKey, multisig, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1307,7 +1307,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-395 : If transaction object has failKey and roleFeePayerKey, sendTransaction should throw error', async () => {
         const tx = { failKey: true, roleFeePayerKey: { publicKey }, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1327,7 +1327,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-396 : If transaction object has failKey, roleFeePayerKey and publicKey, sendTransaction should throw error', async () => {
         const tx = { failKey: true, roleFeePayerKey: { publicKey }, publicKey, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1347,7 +1347,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-397 : If transaction object has failKey, roleFeePayerKey and multisig, sendTransaction should throw error', async () => {
         const tx = { failKey: true, roleFeePayerKey: { publicKey }, multisig, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1367,7 +1367,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-398 : If transaction object has failKey, roleFeePayerKey, publicKey and multisig, sendTransaction should throw error', async () => {
         const tx = { failKey: true, roleFeePayerKey: { publicKey }, publicKey, multisig, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1399,7 +1399,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
             ...accountUpdateObject,
         }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1431,7 +1431,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
             ...accountUpdateObject,
         }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1465,7 +1465,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
             ...accountUpdateObject,
         }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1497,7 +1497,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
             ...accountUpdateObject,
         }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1529,7 +1529,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
             ...accountUpdateObject,
         }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1563,7 +1563,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
             ...accountUpdateObject,
         }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1595,7 +1595,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
             ...accountUpdateObject,
         }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1627,7 +1627,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
             ...accountUpdateObject,
         }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1661,7 +1661,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
             ...accountUpdateObject,
         }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1695,7 +1695,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
             ...accountUpdateObject,
         }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1729,7 +1729,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
             ...accountUpdateObject,
         }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1765,7 +1765,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
             ...accountUpdateObject,
         }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1783,7 +1783,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-411 : If transaction object has data, sendTransaction should throw error', async () => {
         const tx = { data: '0x68656c6c6f', publicKey, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"data" cannot be used with FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -1813,7 +1813,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
         const tx = { publicKey, ...accountUpdateObject }
         delete tx.feeRatio
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith('"feeRatio" is missing')
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"feeRatio" is missing')
     }).timeout(200000)
 
     // UnnecessaryCodeFormat
@@ -1831,7 +1831,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-415 : If transaction object has codeFormat, sendTransaction should throw error', async () => {
         const tx = { codeFormat: 'EVM', publicKey, ...accountUpdateObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"codeFormat" cannot be used with FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -1868,7 +1868,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
         const tx = { legacyKey: true, publicKey, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1889,7 +1889,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
         const tx = { legacyKey: true, multisig, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1910,7 +1910,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
         const tx = { legacyKey: true, failKey: true, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1931,7 +1931,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
         const tx = { legacyKey: true, roleTransactionKey: { publicKey }, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1952,7 +1952,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
         const tx = { legacyKey: true, roleAccountUpdateKey: { publicKey }, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1973,7 +1973,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
         const tx = { legacyKey: true, roleFeePayerKey: { publicKey }, ...accountUpdateObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             'The key parameter to be used for FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO is duplicated.'
         )
     }).timeout(200000)
@@ -1995,7 +1995,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
         const expectedError = `Provided address "${tx.from}" is invalid, the capitalization checksum test failed`
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(expectedError)
     }).timeout(200000)
 
     // Error feePayer missing when feePayerSignatures is defined in transaction object
@@ -2026,7 +2026,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
 
         const expectedError = '"feePayer" is missing: feePayer must be defined with feePayerSignatures.'
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(expectedError)
     }).timeout(200000)
 
     // Error with invalid feePayer missing when feePayerSignatures is defined in transaction object
@@ -2059,7 +2059,7 @@ describe('FEE_DELEGATED_ACCOUNT_UPDATE_WITH_RATIO transaction', async () => {
 
         const expectedError = `Invalid address of fee payer: ${invalidFeePayer}`
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(expectedError)
     }).timeout(200000)
 
     // Error when feePayer is not defined with fee payer transaction format

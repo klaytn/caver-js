@@ -89,7 +89,7 @@ describe('FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction', async 
         const tx = { ...executionObject }
         delete tx.from
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith('The send transactions "from" field must be defined!')
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('The send transactions "from" field must be defined!')
     }).timeout(200000)
 
     // MissingTo
@@ -107,7 +107,7 @@ describe('FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction', async 
         const tx = { ...executionObject }
         delete tx.to
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith('"to" is missing')
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"to" is missing')
     }).timeout(200000)
 
     // Missing gas and gasLimit
@@ -125,7 +125,7 @@ describe('FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction', async 
         const tx = { ...executionObject }
         delete tx.gas
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith('"gas" is missing')
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"gas" is missing')
     }).timeout(200000)
 
     // MissingData
@@ -143,7 +143,7 @@ describe('FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction', async 
         const tx = { ...executionObject }
         delete tx.data
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith('"data" is missing')
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"data" is missing')
     }).timeout(200000)
 
     // MissingFeePayer
@@ -171,7 +171,7 @@ describe('FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction', async 
         const tx = { ...executionObject }
         delete tx.feeRatio
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith('"feeRatio" is missing')
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"feeRatio" is missing')
     }).timeout(200000)
 
     // UnnecessaryPublicKey
@@ -199,7 +199,7 @@ describe('FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction', async 
             ...executionObject,
         }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"publicKey" cannot be used with FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -271,7 +271,7 @@ describe('FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction', async 
         }
         const tx = { multisig, ...executionObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"multisig" cannot be used with FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -301,7 +301,7 @@ describe('FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction', async 
         }
         const tx = { roleTransactionKey, ...executionObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"roleTransactionKey" cannot be used with FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -331,7 +331,7 @@ describe('FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction', async 
         }
         const tx = { roleAccountUpdateKey, ...executionObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"roleAccountUpdateKey" cannot be used with FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -361,7 +361,7 @@ describe('FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction', async 
         }
         const tx = { roleFeePayerKey, ...executionObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"roleFeePayerKey" cannot be used with FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -381,7 +381,7 @@ describe('FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction', async 
     it('CAVERJS-UNIT-TX-508 : If transaction object has unnecessary failKey field, sendTransaction should throw error', async () => {
         const tx = { failKey: true, ...executionObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"failKey" cannot be used with FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -403,7 +403,7 @@ describe('FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction', async 
     it('CAVERJS-UNIT-TX-509 : If transaction object has unnecessary codeFormat field, sendTransaction should throw error', async () => {
         const tx = { codeFormat: 'EVM', ...executionObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"codeFormat" cannot be used with FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -425,7 +425,7 @@ describe('FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction', async 
     it('CAVERJS-UNIT-TX-510 : If transaction object has unnecessary legacyKey field, sendTransaction should throw error', async () => {
         const tx = { legacyKey: true, ...executionObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"legacyKey" cannot be used with FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -447,7 +447,7 @@ describe('FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction', async 
         const expectedError = `Provided address "${tx.from}" is invalid, the capitalization checksum test failed`
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(expectedError)
     }).timeout(200000)
 
     // Error feePayer missing when feePayerSignatures is defined in transaction object
@@ -478,7 +478,7 @@ describe('FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction', async 
 
         const expectedError = '"feePayer" is missing: feePayer must be defined with feePayerSignatures.'
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(expectedError)
     }).timeout(200000)
 
     // Error with invalid feePayer missing when feePayerSignatures is defined in transaction object
@@ -511,7 +511,7 @@ describe('FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction', async 
 
         const expectedError = `Invalid address of fee payer: ${invalidFeePayer}`
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(expectedError)
     }).timeout(200000)
 
     // InvalidTo
@@ -533,7 +533,7 @@ describe('FEE_DELEGATED_SMART_CONTRACT_EXECUTION_WITH_RATIO transaction', async 
         const expectedError = `Provided address "${tx.to}" is invalid, the capitalization checksum test failed.`
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(expectedError)
     }).timeout(200000)
 
     // Error when feePayer is not defined with fee payer transaction format

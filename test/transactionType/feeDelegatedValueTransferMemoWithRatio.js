@@ -104,7 +104,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', async () =>
         delete tx.from
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error to missing
@@ -126,7 +126,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', async () =>
         delete tx.to
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error value missing
@@ -148,7 +148,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', async () =>
         delete tx.value
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error gas and gasLimit missing
@@ -170,7 +170,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', async () =>
         delete tx.gas
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error data missing
@@ -192,7 +192,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', async () =>
         delete tx.data
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error feePayer missing (A check on the feePayer is performed when the feePayer attempts to sign the rawTransaction after sender signed.)
@@ -232,7 +232,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', async () =>
         delete tx.feeRatio
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error unnecessary publicKey
@@ -260,7 +260,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', async () =>
         }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error unnecessary multisig
@@ -330,7 +330,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', async () =>
         const tx = { multisig, ...feeDelegatedValueTransferMemoWithRatioObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error unnecessary roleTransactionKey
@@ -358,7 +358,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', async () =>
         const tx = { roleTransactionKey, ...feeDelegatedValueTransferMemoWithRatioObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error unnecessary roleAccountUpdateKey
@@ -386,7 +386,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', async () =>
         const tx = { roleAccountUpdateKey, ...feeDelegatedValueTransferMemoWithRatioObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error unnecessary roleFeePayerKey
@@ -414,7 +414,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', async () =>
         const tx = { roleFeePayerKey, ...feeDelegatedValueTransferMemoWithRatioObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error unnecessary failKey
@@ -434,7 +434,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', async () =>
         const tx = { failKey: true, ...feeDelegatedValueTransferMemoWithRatioObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // Error unnecessary codeFormat
@@ -454,7 +454,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', async () =>
         const tx = { codeFormat: 'EVM', ...feeDelegatedValueTransferMemoWithRatioObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith()
+        expect(() => caver.klay.sendTransaction(tx)).to.throw()
     }).timeout(200000)
 
     // UnnecessaryLegacyKey
@@ -472,7 +472,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', async () =>
     it('CAVERJS-UNIT-TX-564 : If transaction object has unnecessary legacyKey field, sendTransaction should throw error', async () => {
         const tx = { legacyKey: true, ...feeDelegatedValueTransferMemoWithRatioObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"legacyKey" cannot be used with FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -494,7 +494,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', async () =>
         const expectedError = `Provided address "${tx.from}" is invalid, the capitalization checksum test failed`
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(expectedError)
     }).timeout(200000)
 
     // Error feePayer missing when feePayerSignatures is defined in transaction object
@@ -526,7 +526,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', async () =>
         const expectedError = '"feePayer" is missing: feePayer must be defined with feePayerSignatures.'
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(expectedError)
     }).timeout(200000)
 
     // Error with invalid feePayer missing when feePayerSignatures is defined in transaction object
@@ -559,7 +559,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', async () =>
 
         const expectedError = `Invalid address of fee payer: ${invalidFeePayer}`
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(expectedError)
     }).timeout(200000)
 
     // InvalidTo
@@ -581,7 +581,7 @@ describe('FEE_DELEGATED_VALUE_TRANSFER_MEMO_WITH_RATIO transaction', async () =>
         const expectedError = `Provided address "${tx.to}" is invalid, the capitalization checksum test failed.`
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(expectedError)
     }).timeout(200000)
 
     // Error when feePayer is not defined with fee payer transaction format

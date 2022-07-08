@@ -63,8 +63,8 @@ describe('get transaction receipt', () => {
             .catch(() => done())
     }).timeout(100000)
 
-    it('should throw an error without parameter', async () => {
-        await expect(caver.klay.getTransactionReceipt()).to.be.rejected
+    it('should throw an error without parameter', () => {
+        expect(() => caver.klay.getTransactionReceipt()).to.throw()
     }).timeout(100000)
 
     it('CAVERJS-UNIT-TX-567 : After sending transction, getTransactionReceipt should return transaction infromation', async () => {

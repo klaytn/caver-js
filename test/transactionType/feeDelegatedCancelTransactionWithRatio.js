@@ -72,7 +72,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
         const tx = { ...cancelObject }
         delete tx.from
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith('The send transactions "from" field must be defined!')
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('The send transactions "from" field must be defined!')
     }).timeout(200000)
 
     // UnnecessaryTo
@@ -88,7 +88,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-543 : If transaction object has unnecessary to field, sendTransaction should throw error', async () => {
         const tx = { to: testAccount.address, ...cancelObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"to" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -106,7 +106,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-544 : If transaction object has unnecessary value field, sendTransaction should throw error', async () => {
         const tx = { value: 1, ...cancelObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"value" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -126,7 +126,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
         const tx = { ...cancelObject }
         delete tx.gas
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith('"gas" is missing')
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"gas" is missing')
     }).timeout(200000)
 
     // UnnecessaryData
@@ -142,7 +142,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-546 : If transaction object has unnecessary data field, sendTransaction should throw error', async () => {
         const tx = { data: '0x68656c6c6f', ...cancelObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"data" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -172,7 +172,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
         const tx = { ...cancelObject }
         delete tx.feeRatio
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith('"feeRatio" is missing')
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"feeRatio" is missing')
     }).timeout(200000)
 
     // UnnecessaryPublicKey
@@ -196,7 +196,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
             ...cancelObject,
         }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"publicKey" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -264,7 +264,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
         }
         const tx = { multisig, ...cancelObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"multisig" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -292,7 +292,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
         }
         const tx = { roleTransactionKey, ...cancelObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"roleTransactionKey" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -320,7 +320,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
         }
         const tx = { roleAccountUpdateKey, ...cancelObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"roleAccountUpdateKey" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -348,7 +348,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
         }
         const tx = { roleFeePayerKey, ...cancelObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"roleFeePayerKey" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -366,7 +366,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-555 : If transaction object has unnecessary failKey field, sendTransaction should throw error', async () => {
         const tx = { failKey: true, ...cancelObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"failKey" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -384,7 +384,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-556 : If transaction object has unnecessary codeFormat field, sendTransaction should throw error', async () => {
         const tx = { codeFormat: 'EVM', ...cancelObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"codeFormat" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -402,7 +402,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
     it('CAVERJS-UNIT-TX-557 : If transaction object has unnecessary legacyKey field, sendTransaction should throw error', async () => {
         const tx = { legacyKey: true, ...cancelObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(
             '"legacyKey" cannot be used with FEE_DELEGATED_CANCEL_WITH_RATIO transaction'
         )
     }).timeout(200000)
@@ -424,7 +424,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
         const expectedError = `Provided address "${tx.from}" is invalid, the capitalization checksum test failed`
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(expectedError)
     }).timeout(200000)
 
     // Error feePayer missing when feePayerSignatures is defined in transaction object
@@ -455,7 +455,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
 
         const expectedError = '"feePayer" is missing: feePayer must be defined with feePayerSignatures.'
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(expectedError)
     }).timeout(200000)
 
     // Error with invalid feePayer missing when feePayerSignatures is defined in transaction object
@@ -488,7 +488,7 @@ describe('FEE_DELEGATED_CANCEL_WITH_RATIO transaction', async () => {
 
         const expectedError = `Invalid address of fee payer: ${invalidFeePayer}`
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(expectedError)
     }).timeout(200000)
 
     // Error when feePayer is not defined with fee payer transaction format

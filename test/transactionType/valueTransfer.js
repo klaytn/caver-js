@@ -84,7 +84,7 @@ describe('VALUE_TRANSFER transaction', () => {
         delete tx.from
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Error to missing
@@ -105,7 +105,7 @@ describe('VALUE_TRANSFER transaction', () => {
         delete tx.to
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Error value missing
@@ -126,7 +126,7 @@ describe('VALUE_TRANSFER transaction', () => {
         delete tx.value
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Error gas and gasLimit missing
@@ -147,7 +147,7 @@ describe('VALUE_TRANSFER transaction', () => {
         delete tx.gas
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Error unnecessary feePayer
@@ -166,7 +166,7 @@ describe('VALUE_TRANSFER transaction', () => {
         const tx = { feePayer: testAccount.address, ...valueTransferObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Error unnecessary feeRatio
@@ -185,7 +185,7 @@ describe('VALUE_TRANSFER transaction', () => {
         const tx = { feeRatio: 20, ...valueTransferObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Error unnecessary publicKey
@@ -212,7 +212,7 @@ describe('VALUE_TRANSFER transaction', () => {
         }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Error unnecessary multisig
@@ -281,7 +281,7 @@ describe('VALUE_TRANSFER transaction', () => {
         const tx = { multisig, ...valueTransferObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Error unnecessary roleTransactionKey
@@ -308,7 +308,7 @@ describe('VALUE_TRANSFER transaction', () => {
         const tx = { roleTransactionKey, ...valueTransferObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Error unnecessary roleAccountUpdateKey
@@ -335,7 +335,7 @@ describe('VALUE_TRANSFER transaction', () => {
         const tx = { roleAccountUpdateKey, ...valueTransferObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Error unnecessary roleFeePayerKey
@@ -362,7 +362,7 @@ describe('VALUE_TRANSFER transaction', () => {
         const tx = { roleFeePayerKey, ...valueTransferObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Error unnecessary failKey
@@ -381,7 +381,7 @@ describe('VALUE_TRANSFER transaction', () => {
         const tx = { failKey: true, ...valueTransferObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Error unnecessary codeFormat
@@ -400,7 +400,7 @@ describe('VALUE_TRANSFER transaction', () => {
         const tx = { codeFormat: 'EVM', ...valueTransferObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // Error unnecessary data
@@ -423,7 +423,7 @@ describe('VALUE_TRANSFER transaction', () => {
         const tx = { data, ...valueTransferObject }
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejected
+        expect(() => caver.klay.sendTransaction(tx)).to.throw
     }).timeout(200000)
 
     // UnnecessaryLegacyKey
@@ -439,7 +439,7 @@ describe('VALUE_TRANSFER transaction', () => {
     it('CAVERJS-UNIT-TX-559 : If transaction object has unnecessary legacyKey field, sendTransaction should throw error', async () => {
         const tx = { legacyKey: true, ...valueTransferObject }
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith('"legacyKey" cannot be used with VALUE_TRANSFER transaction')
+        expect(() => caver.klay.sendTransaction(tx)).to.throw('"legacyKey" cannot be used with VALUE_TRANSFER transaction')
     }).timeout(200000)
 
     // Invalid from address
@@ -459,7 +459,7 @@ describe('VALUE_TRANSFER transaction', () => {
         const expectedError = `Provided address "${tx.from}" is invalid, the capitalization checksum test failed`
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(expectedError)
     }).timeout(200000)
 
     // UnnecessaryFeePayerSignatures
@@ -468,7 +468,7 @@ describe('VALUE_TRANSFER transaction', () => {
 
         const expectedError = `"feePayerSignatures" cannot be used with ${tx.type} transaction`
 
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(expectedError)
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-667: If transaction object has unnecessary feePayerSignatures, sendTransaction should throw error', async () => {
@@ -477,7 +477,7 @@ describe('VALUE_TRANSFER transaction', () => {
         const expectedError = `"feePayerSignatures" cannot be used with ${tx.type} transaction`
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(expectedError)
     }).timeout(200000)
 
     // InvalidTo
@@ -499,7 +499,7 @@ describe('VALUE_TRANSFER transaction', () => {
         const expectedError = `Provided address "${tx.to}" is invalid, the capitalization checksum test failed.`
 
         // Throw error from formatter validation
-        await expect(caver.klay.sendTransaction(tx)).to.be.rejectedWith(expectedError)
+        expect(() => caver.klay.sendTransaction(tx)).to.throw(expectedError)
     }).timeout(200000)
 
     it('CAVERJS-UNIT-TX-727: sendTransaction should throw error when try to use an account in Node with not LEGACY transaction', async () => {
