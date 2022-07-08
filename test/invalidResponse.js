@@ -31,26 +31,24 @@ describe('Connection error test', () => {
             expect(err.message).to.equals("CONNECTION ERROR: Couldn't connect to node invalid:1234.")
         }
     }).timeout(10000)
-})
 
-describe('Invalid response test', () => {
-    it('CAVERJS-UNIT-ETC-052: without timeout return Invalid response: null error.', async () => {
+    it('CAVERJS-UNIT-ETC-052: without timeout return connection error.', async () => {
         caver = new Caver('http://localhost:1234/')
         try {
             await caver.klay.getNodeInfo()
             assert(false)
         } catch (err) {
-            expect(err.message).to.equals('Invalid JSON RPC response: ""')
+            expect(err.message).to.equals("CONNECTION ERROR: Couldn't connect to node http://localhost:1234/.")
         }
     })
 
-    it('CAVERJS-UNIT-ETC-053: with timeout return Invalid response: null error.', async () => {
+    it('CAVERJS-UNIT-ETC-053: with timeout return connection error.', async () => {
         caver = new Caver(new Caver.providers.HttpProvider('http://localhost:1234/', { timeout: 5000 }))
         try {
             await caver.klay.getNodeInfo()
             assert(false)
         } catch (err) {
-            expect(err.message).to.equals('Invalid JSON RPC response: ""')
+            expect(err.message).to.equals("CONNECTION ERROR: Couldn't connect to node http://localhost:1234/.")
         }
     })
 })
