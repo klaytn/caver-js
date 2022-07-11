@@ -88,11 +88,11 @@ export interface GovernanceItems {
     'reward.ratio': string
     'reward.stakingupdateinterval': number
     'reward.useginicoeff': boolean
-    'kip71.lowerboundbasefee': number
-    'kip71.upperboundbasefee': number
-    'kip71.gastarget': number
-    'kip71.maxblockgasusedforbasefee': number
-    'kip71.basefeedenominator': number
+    'kip71.lowerboundbasefee'?: number
+    'kip71.upperboundbasefee'?: number
+    'kip71.gastarget'?: number
+    'kip71.maxblockgasusedforbasefee'?: number
+    'kip71.basefeedenominator'?: number
 }
 
 export interface VoteItems {
