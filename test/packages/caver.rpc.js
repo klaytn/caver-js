@@ -871,7 +871,7 @@ describe('caver.rpc.governance', () => {
                                 upperboundbasefee: 750000000000,
                                 gastarget: 30000000,
                                 maxblockgasusedforbasefee: 60000000,
-                                basefeedenominator: 20
+                                basefeedenominator: 20,
                             },
                         },
                         istanbul: { epoch: 20, policy: 2, sub: 1 },
