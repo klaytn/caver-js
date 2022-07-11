@@ -41,6 +41,10 @@ export interface Vote {
 
 export interface ChainConfig {
     chainId: number
+    istanbulCompatibleBlock?: number
+    londonCompatibleBlock?: number
+    ethTxTypeCompatibleBlock?: number
+    kip71CompatibleBlock?: number
     deriveShaImpl: number
     governance: {
         governanceMode: string
@@ -53,6 +57,13 @@ export interface ChainConfig {
             ratio: string
             stakingUpdateInterval: number
             useGiniCoeff: boolean
+        }
+        kip71?: {
+            lowerboundbasefee: number
+            upperboundbasefee: number
+            gastarget: number
+            maxblockgasusedforbasefee: number
+            basefeedenominator: number
         }
     }
     istanbul: {
@@ -77,6 +88,11 @@ export interface GovernanceItems {
     'reward.ratio': string
     'reward.stakingupdateinterval': number
     'reward.useginicoeff': boolean
+    'kip71.lowerboundbasefee': number
+    'kip71.upperboundbasefee': number
+    'kip71.gastarget': number
+    'kip71.maxblockgasusedforbasefee': number
+    'kip71.basefeedenominator': number
 }
 
 export interface VoteItems {
@@ -95,6 +111,11 @@ export interface VoteItems {
     'reward.minimumstake'?: string
     'reward.proposerupdateinterval'?: number
     'reward.stakingupdateinterval'?: number
+    'kip71.lowerboundbasefee'?: number
+    'kip71.upperboundbasefee'?: number
+    'kip71.gastarget'?: number
+    'kip71.maxblockgasusedforbasefee'?: number
+    'kip71.basefeedenominator'?: number
 }
 
 export interface StakingInformation {
@@ -105,7 +126,7 @@ export interface StakingInformation {
     CouncilStakingAmounts: number[]
     Gini: number
     KIRAddr: string
-    PoCAddr: string
+    PoCAddr: string // PoC is the previous name of KGF.
     UseGini: boolean
 }
 
