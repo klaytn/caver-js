@@ -153,7 +153,6 @@ describe('Personal RPC test', () => {
             },
             password
         )
-        console.log(receipt)
         expect(receipt).not.to.be.null
         expect(receipt.type).to.equals('TxTypeAccountUpdate')
     }).timeout(50000)
