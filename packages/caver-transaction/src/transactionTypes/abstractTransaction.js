@@ -183,11 +183,11 @@ class AbstractTransaction {
 
         let suggestedGasPrice
         if (baseFee > 0) {
-            // After hard KIP-71 fork, set gasPrice (or maxFeePerGas) with baseFee * 2
+            // After hard Magma fork, set gasPrice (or maxFeePerGas) with baseFee * 2
             suggestedGasPrice = baseFee * 2
             suggestedGasPrice = utils.toHex(suggestedGasPrice)
         } else {
-            // Before hard KIP-71 fork, set gasPrice (or maxFeePerGas) with gas unit price
+            // Before hard Magma fork, set gasPrice (or maxFeePerGas) with gas unit price
             suggestedGasPrice = await this.klaytnCall.getGasPrice()
         }
         return suggestedGasPrice
