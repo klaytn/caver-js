@@ -849,6 +849,10 @@ describe('caver.rpc.governance', () => {
                     expect(payload.params.length).to.equal(caver.rpc.governance.getChainConfig.method.params)
                     const ret = {
                         chainId: 1001,
+                        istanbulCompatibleBlock: 0,
+                        londonCompatibleBlock: 0,
+                        ethTxTypeCompatibleBlock: 0,
+                        kip71CompatibleBlock: 1,
                         deriveShaImpl: 2,
                         governance: {
                             governanceMode: 'ballot',
@@ -861,6 +865,13 @@ describe('caver.rpc.governance', () => {
                                 ratio: '34/54/12',
                                 stakingUpdateInterval: 20,
                                 useGiniCoeff: false,
+                            },
+                            kip71: {
+                                lowerboundbasefee: 25000000000,
+                                upperboundbasefee: 750000000000,
+                                gastarget: 30000000,
+                                maxblockgasusedforbasefee: 60000000,
+                                basefeedenominator: 20,
                             },
                         },
                         istanbul: { epoch: 20, policy: 2, sub: 1 },
