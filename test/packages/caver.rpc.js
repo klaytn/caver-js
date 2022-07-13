@@ -866,7 +866,7 @@ describe('caver.rpc.governance', () => {
                                 stakingUpdateInterval: 20,
                                 useGiniCoeff: false,
                             },
-                            magma: {
+                            kip71: {
                                 lowerboundbasefee: 25000000000,
                                 upperboundbasefee: 750000000000,
                                 gastarget: 30000000,

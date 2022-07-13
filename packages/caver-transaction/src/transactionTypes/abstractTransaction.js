@@ -183,11 +183,11 @@ class AbstractTransaction {
 
         let suggestedGasPrice
         if (baseFee > 0) {
-            // After hard Magma fork, set gasPrice (or maxFeePerGas) with baseFee * 2
+            // After Magma hard fork, set gasPrice (or maxFeePerGas) with baseFee * 2
             suggestedGasPrice = baseFee * 2
             suggestedGasPrice = utils.toHex(suggestedGasPrice)
         } else {
-            // Before hard Magma fork, set gasPrice (or maxFeePerGas) with gas unit price
+            // Before Magma hard fork, set gasPrice (or maxFeePerGas) with gas unit price
             suggestedGasPrice = await this.klaytnCall.getGasPrice()
         }
         return suggestedGasPrice
