@@ -44,7 +44,7 @@ export interface ChainConfig {
     istanbulCompatibleBlock?: number
     londonCompatibleBlock?: number
     ethTxTypeCompatibleBlock?: number
-    kip71CompatibleBlock?: number
+    magmaCompatibleBlock?: number
     deriveShaImpl: number
     governance: {
         governanceMode: string
@@ -58,7 +58,7 @@ export interface ChainConfig {
             stakingUpdateInterval: number
             useGiniCoeff: boolean
         }
-        kip71?: {
+        magma?: {
             lowerboundbasefee: number
             upperboundbasefee: number
             gastarget: number
@@ -88,11 +88,11 @@ export interface GovernanceItems {
     'reward.ratio': string
     'reward.stakingupdateinterval': number
     'reward.useginicoeff': boolean
-    'kip71.lowerboundbasefee'?: number
-    'kip71.upperboundbasefee'?: number
-    'kip71.gastarget'?: number
-    'kip71.maxblockgasusedforbasefee'?: number
-    'kip71.basefeedenominator'?: number
+    'magma.lowerboundbasefee'?: number
+    'magma.upperboundbasefee'?: number
+    'magma.gastarget'?: number
+    'magma.maxblockgasusedforbasefee'?: number
+    'magma.basefeedenominator'?: number
 }
 
 export interface VoteItems {
@@ -111,11 +111,11 @@ export interface VoteItems {
     'reward.minimumstake'?: string
     'reward.proposerupdateinterval'?: number
     'reward.stakingupdateinterval'?: number
-    'kip71.lowerboundbasefee'?: number
-    'kip71.upperboundbasefee'?: number
-    'kip71.gastarget'?: number
-    'kip71.maxblockgasusedforbasefee'?: number
-    'kip71.basefeedenominator'?: number
+    'magma.lowerboundbasefee'?: number
+    'magma.upperboundbasefee'?: number
+    'magma.gastarget'?: number
+    'magma.maxblockgasusedforbasefee'?: number
+    'magma.basefeedenominator'?: number
 }
 
 export interface StakingInformation {
