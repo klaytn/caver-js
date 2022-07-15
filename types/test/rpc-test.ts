@@ -1134,6 +1134,19 @@ rpc.klay.getGasPrice()
 rpc.klay.getGasPrice((err: Error, ret: string) => {})
 
 // $ExpectType Promise<string>
+rpc.klay.getMaxPriorityFeePerGas()
+// $ExpectType Promise<string>
+rpc.klay.getMaxPriorityFeePerGas((err: Error, ret: string) => {})
+// $ExpectType Promise<string>
+rpc.klay.getUpperBoundGasPrice()
+// $ExpectType Promise<string>
+rpc.klay.getUpperBoundGasPrice((err: Error, ret: string) => {})
+// $ExpectType Promise<string>
+rpc.klay.getLowerBoundGasPrice()
+// $ExpectType Promise<string>
+rpc.klay.getLowerBoundGasPrice((err: Error, ret: string) => {})
+
+// $ExpectType Promise<string>
 rpc.klay.getGasPriceAt(0)
 // $ExpectType Promise<string>
 rpc.klay.getGasPriceAt(new BigNumber(0))

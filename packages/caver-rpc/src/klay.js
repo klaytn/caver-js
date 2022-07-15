@@ -2007,6 +2007,42 @@ class Klay {
                 params: 0,
             }),
             /**
+             * Returns an upper bound gas price.
+             *
+             * @memberof Klay
+             * @method getUpperBoundGasPrice
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getUpperBoundGasPrice()
+             *
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<string>} An upper bound gas price
+             */
+            new Method({
+                name: 'getUpperBoundGasPrice',
+                call: 'klay_upperBoundGasPrice',
+                params: 0,
+            }),
+            /**
+             * Returns a lower bound gas price.
+             *
+             * @memberof Klay
+             * @method getLowerBoundGasPrice
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getLowerBoundGasPrice()
+             *
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<string>} A lower bound gas price
+             */
+            new Method({
+                name: 'getLowerBoundGasPrice',
+                call: 'klay_lowerBoundGasPrice',
+                params: 0,
+            }),
+            /**
              * An object defines an access list result that includes accessList and gasUsed.
              *
              * @typedef {object} Klay.AccessListResult

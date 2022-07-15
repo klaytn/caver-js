@@ -251,6 +251,12 @@ export class Klay {
     getMaxPriorityFeePerGas(
         callback?: (error: Error, result: string) => void
     ): Promise<string>
+    getUpperBoundGasPrice(
+        callback?: (error: Error, result: string) => void
+    ): Promise<string>
+    getLowerBoundGasPrice(
+        callback?: (error: Error, result: string) => void
+    ): Promise<string>
     createAccessList(
         callObject: CallObject,
         blockNumber: BlockNumber,
