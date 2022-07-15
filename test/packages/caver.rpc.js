@@ -590,7 +590,7 @@ describe('caver.rpc.klay', () => {
             const ret = await caver.rpc.klay.getUpperBoundGasPrice()
             const gasPrice = await caver.rpc.klay.getGasPrice()
             expect(_.isString(ret)).to.be.true
-            expect(ret).to.equal(gasPrice)
+            expect(caver.utils.hexToNumber(ret) >= caver.utils.hexToNumber(gasPrice)).to.be.true
         }).timeout(100000)
     })
 
@@ -608,7 +608,7 @@ describe('caver.rpc.klay', () => {
             const ret = await caver.rpc.klay.getLowerBoundGasPrice()
             const gasPrice = await caver.rpc.klay.getGasPrice()
             expect(_.isString(ret)).to.be.true
-            expect(ret).to.equal(gasPrice)
+            expect(caver.utils.hexToNumber(ret) <= caver.utils.hexToNumber(gasPrice)).to.be.true
         }).timeout(100000)
     })
 
