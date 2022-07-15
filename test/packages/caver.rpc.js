@@ -576,6 +576,42 @@ describe('caver.rpc.klay', () => {
         }).timeout(100000)
     })
 
+    context('caver.rpc.klay.getUpperBoundGasPrice', () => {
+        it('CAVERJS-UNIT-RPC-035: should call klay_upperBoundGasPrice', async () => {
+            sandbox.stub(caver.rpc.klay._requestManager, 'send').callsFake((data, callback) => {
+                expect(data.method).to.equal('klay_upperBoundGasPrice')
+                callback(undefined, {})
+            })
+
+            await caver.rpc.klay.getUpperBoundGasPrice()
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-RPC-036: should return an upper bound gas price', async () => {
+            const ret = await caver.rpc.klay.getUpperBoundGasPrice()
+            const gasPrice = await caver.rpc.klay.getGasPrice()
+            expect(_.isString(ret)).to.be.true
+            expect(ret).to.equal(gasPrice)
+        }).timeout(100000)
+    })
+
+    context('caver.rpc.klay.getLowerBoundGasPrice', () => {
+        it('CAVERJS-UNIT-RPC-037: should call klay_lowerBoundGasPrice', async () => {
+            sandbox.stub(caver.rpc.klay._requestManager, 'send').callsFake((data, callback) => {
+                expect(data.method).to.equal('klay_lowerBoundGasPrice')
+                callback(undefined, {})
+            })
+
+            await caver.rpc.klay.getLowerBoundGasPrice()
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-RPC-038: should return an lower bound gas price', async () => {
+            const ret = await caver.rpc.klay.getLowerBoundGasPrice()
+            const gasPrice = await caver.rpc.klay.getGasPrice()
+            expect(_.isString(ret)).to.be.true
+            expect(ret).to.equal(gasPrice)
+        }).timeout(100000)
+    })
+
     context('caver.rpc.klay.createAccessList', () => {
         const txArgs = {
             from: '0x3bc5885c2941c5cda454bdb4a8c88aa7f248e312',
