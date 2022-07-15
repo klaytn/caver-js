@@ -27,11 +27,11 @@
  * @date 2015
  */
 
-const fetch = require('cross-fetch')
 const http = require('http')
 const https = require('https')
 
 // Apply missing polyfill for IE
+require('cross-fetch/polyfill')
 require('es6-promise').polyfill()
 require('abortcontroller-polyfill/dist/polyfill-patch-fetch')
 
@@ -85,14 +85,15 @@ HttpProvider.prototype.send = function(payload, callback) {
     if (typeof AbortController !== 'undefined') {
         controller = new AbortController()
         // eslint-disable-next-line no-undef
-    } else if (typeof AbortController === 'undefined' && typeof window !== 'undefined' && typeof window.AbortController !== 'undefined') {
+    } else if (typeof window !== 'undefined' && typeof window.AbortController !== 'undefined') {
         // Some chrome version doesn't recognize new AbortController(); so we are using it from window instead
         // https://stackoverflow.com/questions/55718778/why-abortcontroller-is-not-defined
         // eslint-disable-next-line no-undef
         controller = new window.AbortController()
-    } else {
-        // Disable user defined timeout
-        this.timeout = 0
+    }
+
+    if (typeof controller !== 'undefined') {
+        options.signal = controller.signal
     }
 
     // the current runtime is node
@@ -134,33 +135,26 @@ HttpProvider.prototype.send = function(payload, callback) {
 
     options.headers = headers
 
-    if (this.timeout > 0) {
+    if (this.timeout > 0 && typeof controller !== 'undefined') {
         this.timeoutId = setTimeout(function() {
             controller.abort()
         }, this.timeout)
     }
 
-    // Prevent global leak of connected
-    const _this = this
-
     const success = function(response) {
         if (this.timeoutId !== undefined) {
             clearTimeout(this.timeoutId)
         }
-        let result = response
-        const error = null
 
-        try {
-            // Response is a stream data so should be awaited for json response
-            result.json().then(function(data) {
-                result = data
-                _this.connected = true
-                callback(error, result)
+        // Response is a stream data so should be awaited for json response
+        response
+            .json()
+            .then(function(data) {
+                callback(null, data)
             })
-        } catch (e) {
-            _this.connected = false
-            callback(errors.InvalidResponse(result))
-        }
+            .catch(function() {
+                callback(errors.InvalidResponse(response))
+            })
     }
 
     const failed = function(error) {
@@ -169,14 +163,15 @@ HttpProvider.prototype.send = function(payload, callback) {
         }
 
         if (error.name === 'AbortError') {
-            _this.connected = false
             callback(errors.ConnectionTimeout(this.timeout))
         }
 
-        _this.connected = false
         callback(errors.InvalidConnection(this.host))
     }
 
+    // Disable eslint warning since fetch API is available through polyfill
+    // https://github.com/lquixada/cross-fetch#install
+    // eslint-disable-next-line no-undef
     fetch(this.host, options)
         .then(success.bind(this))
         .catch(failed.bind(this))
