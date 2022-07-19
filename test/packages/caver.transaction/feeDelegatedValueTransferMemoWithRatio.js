@@ -1258,8 +1258,8 @@ describe('TxTypeFeeDelegatedValueTransferMemoWithRatio', () => {
             const tx = caver.transaction.feeDelegatedValueTransferMemoWithRatio.create(transactionObj)
 
             await tx.fillTransaction()
-            expect(getGasPriceSpy).not.to.have.been.calledOnce
-            expect(getHeaderSpy).to.have.been.calledOnce
+            expect(getGasPriceSpy).to.have.been.calledOnce
+            expect(getHeaderSpy).not.to.have.been.calledOnce
             expect(getNonceSpy).not.to.have.been.calledOnce
             expect(getChainIdSpy).not.to.have.been.calledOnce
         }).timeout(200000)

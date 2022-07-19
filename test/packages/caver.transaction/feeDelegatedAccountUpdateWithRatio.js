@@ -1643,9 +1643,8 @@ describe('TxTypeFeeDelegatedAccountUpdateWithRatio', () => {
                 await tx.fillTransaction()
                 expect(getNonceSpy).not.to.have.been.calledOnce
                 expect(getChainIdSpy).not.to.have.been.calledOnce
-                expect(getGasPriceSpy).not.to.have.been.calledOnce
             }
-            expect(getHeaderSpy).to.have.been.callCount(Object.values(expectedValues).length)
+            expect(getGasPriceSpy).to.have.been.callCount(Object.values(expectedValues).length)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTIONFDR-223: fillTransaction should call klay_getTransactionCount to fill nonce when nonce is undefined', async () => {

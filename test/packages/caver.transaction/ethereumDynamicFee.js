@@ -78,6 +78,7 @@ describe('TxTypeEthereumDynamicFee', () => {
 
     let getNonceSpy
     let getChainIdSpy
+    let getGasPriceSpy
     let getHeaderByNumberSpy
     let getMaxPriorityFeePerGasSpy
 
@@ -127,6 +128,8 @@ describe('TxTypeEthereumDynamicFee', () => {
         getNonceSpy.returns('0x3a')
         getChainIdSpy = sandbox.stub(caver.transaction.klaytnCall, 'getChainId')
         getChainIdSpy.returns('0x7e3')
+        getGasPriceSpy = sandbox.stub(caver.transaction.klaytnCall, 'getGasPrice')
+        getGasPriceSpy.returns('0xba43b7400')
         baseFee = '0x5d21dba00'
         getHeaderByNumberSpy = sandbox.stub(caver.transaction.klaytnCall, 'getHeaderByNumber')
         getHeaderByNumberSpy.returns({ baseFeePerGas: baseFee })
@@ -907,6 +910,7 @@ describe('TxTypeEthereumDynamicFee', () => {
             await tx.fillTransaction()
             expect(getMaxPriorityFeePerGasSpy).to.have.been.calledOnce
             expect(getHeaderByNumberSpy).not.to.have.been.calledOnce // getHeader only when maxFeePerGas is empty to get baseFee.
+            expect(getGasPriceSpy).not.to.have.been.called
             expect(getNonceSpy).not.to.have.been.calledOnce
             expect(getChainIdSpy).not.to.have.been.calledOnce
         }).timeout(200000)
@@ -916,15 +920,13 @@ describe('TxTypeEthereumDynamicFee', () => {
             delete transactionObj.maxFeePerGas
             const tx = caver.transaction.ethereumDynamicFee.create(transactionObj)
 
-            const expectedMaxFeePerGas = caver.utils.toHex(caver.utils.hexToNumber(baseFee) * 2)
-
             await tx.fillTransaction()
 
             expect(getMaxPriorityFeePerGasSpy).not.to.have.been.called
-            expect(getHeaderByNumberSpy).to.have.been.calledOnce
+            expect(getHeaderByNumberSpy).not.to.have.been.calledOnce
+            expect(getGasPriceSpy).to.have.been.called
             expect(getNonceSpy).not.to.have.been.calledOnce
             expect(getChainIdSpy).not.to.have.been.calledOnce
-            expect(tx.maxFeePerGas).to.equal(expectedMaxFeePerGas)
         }).timeout(200000)
 
         it('CAVERJS-UNIT-TRANSACTION-549: fillTransaction should call klay_getTransactionCount to fill nonce when nonce is undefined', async () => {
