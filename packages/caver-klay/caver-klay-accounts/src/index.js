@@ -402,14 +402,6 @@ Accounts.prototype._getRoleKey = function _getRoleKey(tx, account) {
  * @return {string}
  */
 Accounts.prototype._suggestGasPrice = async function _suggestGasPrice() {
-    const header = await this._klaytnCall.getHeader('latest')
-    const bf = utils.hexToNumber(header.baseFeePerGas || '0x0')
-
-    // In before common architecture, ethereum typed transactions are not supported.
-    // So just depends on baseFeePerGas field in the header,
-    // return `baseFee * 2` or `gasPrice`.
-    if (bf > 0) return bf * 2
-
     const gasPrice = await this._klaytnCall.getGasPrice()
     return gasPrice
 }
