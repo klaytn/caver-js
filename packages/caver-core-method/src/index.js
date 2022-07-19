@@ -492,7 +492,7 @@ const buildSendFunc = (method, isSendTx) => (...args) => {
 
     // `klay_gasPrice` returns a suggestion of gas price.
     // So using this value in gasPrice field (or maxFeePerGas).
-    getGasPrice((e, gp) => {
+    getGasPrice((err, gp) => {
         // The TxTypeEthereumDynamicFee transaction does not use the gasPrice field,
         // so the gas price default is not set for TxTypeEthereumDynamicFee.
         if (!isDynamicFeeTx) {
