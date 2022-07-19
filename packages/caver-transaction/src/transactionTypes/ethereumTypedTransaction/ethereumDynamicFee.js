@@ -394,7 +394,7 @@ class EthereumDynamicFee extends AbstractTransaction {
             isNot(this.chainId) ? this.getChainId() : this.chainId,
             isNotMaxPriorityFeePerGas ? this.getMaxPriorityFeePerGas() : this.maxPriorityFeePerGas,
             isNot(this.nonce) ? this.getNonce(this.from) : this.nonce,
-            isNotMaxFeePerGas ? this.suggestedGasPrice() : this.maxFeePerGas,
+            isNotMaxFeePerGas ? this.suggestGasPrice() : this.maxFeePerGas,
         ])
 
         this.chainId = chainId

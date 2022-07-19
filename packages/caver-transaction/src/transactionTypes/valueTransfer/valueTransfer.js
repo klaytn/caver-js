@@ -187,7 +187,7 @@ class ValueTransfer extends AbstractTransaction {
     async fillTransaction() {
         const [chainId, gasPrice, nonce] = await Promise.all([
             isNot(this.chainId) ? this.getChainId() : this.chainId,
-            isNot(this.gasPrice) ? this.suggestedGasPrice() : this.gasPrice,
+            isNot(this.gasPrice) ? this.suggestGasPrice() : this.gasPrice,
             isNot(this.nonce) ? this.getNonce(this.from) : this.nonce,
         ])
 

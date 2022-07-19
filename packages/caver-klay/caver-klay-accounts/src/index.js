@@ -394,14 +394,14 @@ Accounts.prototype._getRoleKey = function _getRoleKey(tx, account) {
 }
 
 /**
- * _suggestedGasPrice returns suggested gas price.
+ * _suggestGasPrice suggests a gas price.
  * This function will be used to set gasPrice field if that is omitted.
  * Before common architecture does not support newly added transaction types.
  *
- * @method _suggestedGasPrice
+ * @method _suggestGasPrice
  * @return {string}
  */
-Accounts.prototype._suggestedGasPrice = async function _suggestedGasPrice() {
+Accounts.prototype._suggestGasPrice = async function _suggestGasPrice() {
     const header = await this._klaytnCall.getHeader('latest')
     const bf = utils.hexToNumber(header.baseFeePerGas || '0x0')
 
@@ -909,7 +909,7 @@ Accounts.prototype.signTransaction = function signTransaction() {
     // Otherwise, get the missing info from the Klaytn Node
     return Promise.all([
         isNot(tx.chainId) ? _this._klaytnCall.getChainId() : tx.chainId,
-        isNot(tx.gasPrice) ? _this._suggestedGasPrice() : tx.gasPrice,
+        isNot(tx.gasPrice) ? _this._suggestGasPrice() : tx.gasPrice,
         isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from, 'pending') : tx.nonce,
     ]).then(function(args) {
         if (isNot(args[0]) || isNot(args[1]) || isNot(args[2])) {
