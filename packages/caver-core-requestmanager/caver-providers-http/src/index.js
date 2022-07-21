@@ -23,12 +23,17 @@
  *   Marek Kotewicz <marek@parity.io>
  *   Marian Oancea
  *   Fabian Vogelsteller <fabian@ethereum.org>
+ *   AyanamiTech <ayanami0330@protonmail.com>
  * @date 2015
  */
 
-const XHR2 = require('xhr2-cookies').XMLHttpRequest
 const http = require('http')
 const https = require('https')
+
+// Apply missing polyfill for IE
+require('cross-fetch/polyfill')
+require('es6-promise').polyfill()
+require('abortcontroller-polyfill/dist/polyfill-patch-fetch')
 
 const errors = require('../../../caver-core-helpers').errors
 
@@ -43,8 +48,11 @@ const errors = require('../../../caver-core-helpers').errors
 const HttpProvider = function HttpProvider(host, options) {
     options = options || {}
     this.host = host || 'http://localhost:8545'
+
+    this.withCredentials = options.withCredentials
     this.timeout = options.timeout || 0
     this.headers = options.headers
+    this.agent = options.agent
     this.connected = false
 
     // keepAlive is true unless explicitly set to false
@@ -60,43 +68,6 @@ const HttpProvider = function HttpProvider(host, options) {
 }
 
 /**
- * _prepareRequest create request instance
- */
-HttpProvider.prototype._prepareRequest = function() {
-    let request
-
-    // the current runtime is a browser
-    if (typeof XMLHttpRequest !== 'undefined') {
-        // eslint-disable-next-line no-undef
-        request = new XMLHttpRequest()
-    } else {
-        request = new XHR2()
-        const agents = { httpsAgent: this.httpsAgent, httpAgent: this.httpAgent, baseUrl: this.baseUrl }
-
-        if (this.agent) {
-            agents.httpsAgent = this.agent.https
-            agents.httpAgent = this.agent.http
-            agents.baseUrl = this.agent.baseUrl
-        }
-
-        request.nodejsSet(agents)
-    }
-
-    request.open('POST', this.host, true)
-    request.setRequestHeader('Content-Type', 'application/json')
-    request.timeout = this.timeout
-    request.withCredentials = this.withCredentials
-
-    if (this.headers) {
-        this.headers.forEach(function(header) {
-            request.setRequestHeader(header.name, header.value)
-        })
-    }
-
-    return request
-}
-
-/**
  * Should be used to make async request
  *
  * @method send
@@ -104,36 +75,106 @@ HttpProvider.prototype._prepareRequest = function() {
  * @param {Function} callback triggered on end with (err, result)
  */
 HttpProvider.prototype.send = function(payload, callback) {
-    const _this = this
-    const request = this._prepareRequest()
+    const options = {
+        method: 'POST',
+        body: JSON.stringify(payload),
+    }
+    const headers = {}
+    let controller
 
-    request.onreadystatechange = function() {
-        if (request.readyState === 4 && request.timeout !== 1) {
-            let result = request.responseText
-            let error = null
+    if (typeof AbortController !== 'undefined') {
+        controller = new AbortController()
+        // eslint-disable-next-line no-undef
+    } else if (typeof window !== 'undefined' && typeof window.AbortController !== 'undefined') {
+        // Some chrome version doesn't recognize new AbortController(); so we are using it from window instead
+        // https://stackoverflow.com/questions/55718778/why-abortcontroller-is-not-defined
+        // eslint-disable-next-line no-undef
+        controller = new window.AbortController()
+    }
 
-            try {
-                result = JSON.parse(result)
-            } catch (e) {
-                error = errors.InvalidResponse(request.responseText)
-            }
+    if (typeof controller !== 'undefined') {
+        options.signal = controller.signal
+    }
 
-            _this.connected = true
-            callback(error, result)
+    // the current runtime is node
+    if (typeof XMLHttpRequest === 'undefined') {
+        // https://github.com/node-fetch/node-fetch#custom-agent
+        const agents = { httpsAgent: this.httpsAgent, httpAgent: this.httpAgent }
+
+        if (this.agent) {
+            agents.httpsAgent = this.agent.https
+            agents.httpAgent = this.agent.http
+        }
+
+        if (this.host.substring(0, 5) === 'https') {
+            options.agent = agents.httpsAgent
+        } else {
+            options.agent = agents.httpAgent
         }
     }
 
-    request.ontimeout = function() {
-        _this.connected = false
-        callback(errors.ConnectionTimeout(this.timeout))
+    if (this.headers) {
+        this.headers.forEach(function(header) {
+            headers[header.name] = header.value
+        })
     }
 
-    try {
-        request.send(JSON.stringify(payload))
-    } catch (error) {
-        this.connected = false
+    // Default headers
+    if (!headers['Content-Type']) {
+        headers['Content-Type'] = 'application/json'
+    }
+
+    // As the Fetch API supports the credentials as following options 'include', 'omit', 'same-origin'
+    // https://developer.mozilla.org/en-US/docs/Web/API/fetch#credentials
+    // To avoid breaking change in 1.x we override this value based on boolean option.
+    if (this.withCredentials) {
+        options.credentials = 'include'
+    } else {
+        options.credentials = 'omit'
+    }
+
+    options.headers = headers
+
+    if (this.timeout > 0 && typeof controller !== 'undefined') {
+        this.timeoutId = setTimeout(function() {
+            controller.abort()
+        }, this.timeout)
+    }
+
+    const success = function(response) {
+        if (this.timeoutId !== undefined) {
+            clearTimeout(this.timeoutId)
+        }
+
+        // Response is a stream data so should be awaited for json response
+        response
+            .json()
+            .then(function(data) {
+                callback(null, data)
+            })
+            .catch(function() {
+                callback(errors.InvalidResponse(response))
+            })
+    }
+
+    const failed = function(error) {
+        if (this.timeoutId !== undefined) {
+            clearTimeout(this.timeoutId)
+        }
+
+        if (error.name === 'AbortError') {
+            callback(errors.ConnectionTimeout(this.timeout))
+        }
+
         callback(errors.InvalidConnection(this.host))
     }
+
+    // Disable eslint warning since fetch API is available through polyfill
+    // https://github.com/lquixada/cross-fetch#install
+    // eslint-disable-next-line no-undef
+    fetch(this.host, options)
+        .then(success.bind(this))
+        .catch(failed.bind(this))
 }
 
 HttpProvider.prototype.disconnect = function() {

@@ -576,6 +576,42 @@ describe('caver.rpc.klay', () => {
         }).timeout(100000)
     })
 
+    context('caver.rpc.klay.getUpperBoundGasPrice', () => {
+        it('CAVERJS-UNIT-RPC-035: should call klay_upperBoundGasPrice', async () => {
+            sandbox.stub(caver.rpc.klay._requestManager, 'send').callsFake((data, callback) => {
+                expect(data.method).to.equal('klay_upperBoundGasPrice')
+                callback(undefined, {})
+            })
+
+            await caver.rpc.klay.getUpperBoundGasPrice()
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-RPC-036: should return an upper bound gas price', async () => {
+            const ret = await caver.rpc.klay.getUpperBoundGasPrice()
+            const gasPrice = await caver.rpc.klay.getGasPrice()
+            expect(_.isString(ret)).to.be.true
+            expect(caver.utils.hexToNumber(ret) >= caver.utils.hexToNumber(gasPrice)).to.be.true
+        }).timeout(100000)
+    })
+
+    context('caver.rpc.klay.getLowerBoundGasPrice', () => {
+        it('CAVERJS-UNIT-RPC-037: should call klay_lowerBoundGasPrice', async () => {
+            sandbox.stub(caver.rpc.klay._requestManager, 'send').callsFake((data, callback) => {
+                expect(data.method).to.equal('klay_lowerBoundGasPrice')
+                callback(undefined, {})
+            })
+
+            await caver.rpc.klay.getLowerBoundGasPrice()
+        }).timeout(100000)
+
+        it('CAVERJS-UNIT-RPC-038: should return an lower bound gas price', async () => {
+            const ret = await caver.rpc.klay.getLowerBoundGasPrice()
+            const gasPrice = await caver.rpc.klay.getGasPrice()
+            expect(_.isString(ret)).to.be.true
+            expect(caver.utils.hexToNumber(ret) <= caver.utils.hexToNumber(gasPrice)).to.be.true
+        }).timeout(100000)
+    })
+
     context('caver.rpc.klay.createAccessList', () => {
         const txArgs = {
             from: '0x3bc5885c2941c5cda454bdb4a8c88aa7f248e312',
@@ -849,6 +885,10 @@ describe('caver.rpc.governance', () => {
                     expect(payload.params.length).to.equal(caver.rpc.governance.getChainConfig.method.params)
                     const ret = {
                         chainId: 1001,
+                        istanbulCompatibleBlock: 0,
+                        londonCompatibleBlock: 0,
+                        ethTxTypeCompatibleBlock: 0,
+                        magmaCompatibleBlock: 1,
                         deriveShaImpl: 2,
                         governance: {
                             governanceMode: 'ballot',
@@ -861,6 +901,13 @@ describe('caver.rpc.governance', () => {
                                 ratio: '34/54/12',
                                 stakingUpdateInterval: 20,
                                 useGiniCoeff: false,
+                            },
+                            kip71: {
+                                lowerboundbasefee: 25000000000,
+                                upperboundbasefee: 750000000000,
+                                gastarget: 30000000,
+                                maxblockgasusedforbasefee: 60000000,
+                                basefeedenominator: 20,
                             },
                         },
                         istanbul: { epoch: 20, policy: 2, sub: 1 },

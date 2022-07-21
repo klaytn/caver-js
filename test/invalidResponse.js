@@ -16,41 +16,32 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const { expect, assert } = require('./extendedChai')
+const fetchMock = require('fetch-mock')
+const { expect } = require('./extendedChai')
 const Caver = require('../index')
 
-let caver
-
 describe('Connection error test', () => {
-    it('CAVERJS-UNIT-ETC-051: host url is invalid, return connection error.', async () => {
-        caver = new Caver(new Caver.providers.HttpProvider('invalid:1234', { timeout: 5000 }))
-        try {
-            await caver.klay.getNodeInfo()
-            assert(false)
-        } catch (err) {
-            expect(err.message).to.equals("CONNECTION ERROR: Couldn't connect to node invalid:1234.")
-        }
-    }).timeout(10000)
-})
+    it('CAVERJS-UNIT-ETC-051: return connection error.', async () => {
+        const caver = new Caver(new Caver.providers.HttpProvider('invalid:1234'))
 
-describe('Invalid response test', () => {
-    it('CAVERJS-UNIT-ETC-052: without timeout return Invalid response: null error.', async () => {
-        caver = new Caver('http://localhost:1234/')
-        try {
-            await caver.klay.getNodeInfo()
-            assert(false)
-        } catch (err) {
-            expect(err.message).to.equals('Invalid JSON RPC response: ""')
-        }
+        await expect(caver.klay.getNodeInfo()).to.be.rejectedWith(Error, "CONNECTION ERROR: Couldn't connect to node invalid:1234.")
     })
 
-    it('CAVERJS-UNIT-ETC-053: with timeout return Invalid response: null error.', async () => {
-        caver = new Caver(new Caver.providers.HttpProvider('http://localhost:1234/', { timeout: 5000 }))
-        try {
-            await caver.klay.getNodeInfo()
-            assert(false)
-        } catch (err) {
-            expect(err.message).to.equals('Invalid JSON RPC response: ""')
-        }
+    it('CAVERJS-UNIT-ETC-052: return invalid response error for non-json response.', async () => {
+        const caver = new Caver(new Caver.providers.HttpProvider('/fetchMock'))
+
+        fetchMock.mock('/fetchMock', 'Testing non-json format response')
+
+        await expect(caver.klay.getChainId()).to.be.rejectedWith(Error, /Invalid JSON RPC response/)
+        fetchMock.restore()
+    })
+
+    it('CAVERJS-UNIT-ETC-053: return timeout error.', async () => {
+        const caver = new Caver(new Caver.providers.HttpProvider('/fetchMock', { timeout: 500 }))
+
+        fetchMock.mock('/fetchMock', 'Testing non-json format response', { delay: 1000 })
+
+        await expect(caver.klay.getChainId()).to.be.rejectedWith(Error, 'CONNECTION TIMEOUT: timeout of 500ms achived')
+        fetchMock.restore()
     })
 })

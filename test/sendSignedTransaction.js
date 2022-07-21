@@ -47,6 +47,44 @@ before(() => {
     receiver = caver.klay.accounts.wallet.add(caver.klay.accounts.create())
 })
 
+async function receiptKeyCheck(receipt) {
+    const keys = [
+        'blockHash',
+        'blockNumber',
+        'contractAddress',
+        'from',
+        'gas',
+        'gasPrice',
+        'gasUsed',
+        'logs',
+        'logsBloom',
+        'nonce',
+        'senderTxHash',
+        'signatures',
+        'status',
+        'to',
+        'transactionHash',
+        'transactionIndex',
+        'type',
+        'typeInt',
+        'value',
+    ]
+    if (!keys.every(k => Object.prototype.hasOwnProperty.call(receipt, k))) return false
+
+    const baseFee = caver.utils.hexToNumber((await caver.rpc.klay.getHeader('latest')).baseFeePerGas || '0x0')
+    if (baseFee > 0 && !Object.prototype.hasOwnProperty.call(receipt, 'effectiveGasPrice')) return false
+    if (receipt.type.includes('FeeDelegated')) {
+        const fdKeys = ['feePayer', 'feePayerSignatures']
+        if (receipt.type.includes('WithRatio')) fdKeys.push('feeRatio')
+        if (!fdKeys.every(k => Object.prototype.hasOwnProperty.call(receipt, k))) return false
+    }
+    if (receipt.type.includes('Legacy') || receipt.type.includes('Ethereum') || receipt.type.includes('Contract')) {
+        if (!Object.prototype.hasOwnProperty.call(receipt, 'input')) return false
+    }
+
+    return true
+}
+
 describe('CAVERJS-UNIT-TX-581: caver.klay.sendSignedTransaction with valid non fee delegated transaction raw string', () => {
     it('should send successfully with valid rawTransaction', async () => {
         const txObj = {
@@ -61,32 +99,9 @@ describe('CAVERJS-UNIT-TX-581: caver.klay.sendSignedTransaction with valid non f
 
         expect(receipt).not.to.null
 
-        const keys = [
-            'blockHash',
-            'blockNumber',
-            'contractAddress',
-            'from',
-            'gas',
-            'gasPrice',
-            'gasUsed',
-            'input',
-            'logs',
-            'logsBloom',
-            'nonce',
-            'senderTxHash',
-            'signatures',
-            'status',
-            'to',
-            'transactionHash',
-            'transactionIndex',
-            'type',
-            'typeInt',
-            'value',
-        ]
-        expect(Object.getOwnPropertyNames(receipt)).to.deep.equal(keys)
-
         expect(receipt.status).to.equals(true)
         expect(receipt.senderTxHash).to.equals(receipt.transactionHash)
+        expect(await receiptKeyCheck(receipt)).to.be.true
     }).timeout(100000)
 })
 
@@ -107,33 +122,9 @@ describe('CAVERJS-UNIT-TX-582: caver.klay.sendSignedTransaction with valid fee d
 
         expect(receipt).not.to.null
 
-        const keys = [
-            'blockHash',
-            'blockNumber',
-            'contractAddress',
-            'feePayer',
-            'feePayerSignatures',
-            'from',
-            'gas',
-            'gasPrice',
-            'gasUsed',
-            'logs',
-            'logsBloom',
-            'nonce',
-            'senderTxHash',
-            'signatures',
-            'status',
-            'to',
-            'transactionHash',
-            'transactionIndex',
-            'type',
-            'typeInt',
-            'value',
-        ]
-        expect(Object.getOwnPropertyNames(receipt)).to.deep.equal(keys)
-
         expect(receipt.status).to.equals(true)
         expect(receipt.senderTxHash).not.to.equals(receipt.transactionHash)
+        expect(await receiptKeyCheck(receipt)).to.be.true
     }).timeout(100000)
 })
 
@@ -151,32 +142,9 @@ describe('CAVERJS-UNIT-TX-583: caver.klay.sendSignedTransaction with object whic
 
         expect(receipt).not.to.null
 
-        const keys = [
-            'blockHash',
-            'blockNumber',
-            'contractAddress',
-            'from',
-            'gas',
-            'gasPrice',
-            'gasUsed',
-            'input',
-            'logs',
-            'logsBloom',
-            'nonce',
-            'senderTxHash',
-            'signatures',
-            'status',
-            'to',
-            'transactionHash',
-            'transactionIndex',
-            'type',
-            'typeInt',
-            'value',
-        ]
-        expect(Object.getOwnPropertyNames(receipt)).to.deep.equal(keys)
-
         expect(receipt.status).to.equals(true)
         expect(receipt.senderTxHash).to.equals(receipt.transactionHash)
+        expect(await receiptKeyCheck(receipt)).to.be.true
     }).timeout(100000)
 })
 
@@ -197,33 +165,9 @@ describe('CAVERJS-UNIT-TX-584: caver.klay.sendSignedTransaction with object whic
 
         expect(receipt).not.to.null
 
-        const keys = [
-            'blockHash',
-            'blockNumber',
-            'contractAddress',
-            'feePayer',
-            'feePayerSignatures',
-            'from',
-            'gas',
-            'gasPrice',
-            'gasUsed',
-            'logs',
-            'logsBloom',
-            'nonce',
-            'senderTxHash',
-            'signatures',
-            'status',
-            'to',
-            'transactionHash',
-            'transactionIndex',
-            'type',
-            'typeInt',
-            'value',
-        ]
-        expect(Object.getOwnPropertyNames(receipt)).to.deep.equal(keys)
-
         expect(receipt.status).to.equals(true)
         expect(receipt.senderTxHash).not.to.equals(receipt.transactionHash)
+        expect(await receiptKeyCheck(receipt)).to.be.true
     }).timeout(100000)
 })
 
@@ -243,32 +187,9 @@ describe('CAVERJS-UNIT-TX-585: caver.klay.sendSignedTransaction with transaction
 
         expect(receipt).not.to.null
 
-        const keys = [
-            'blockHash',
-            'blockNumber',
-            'contractAddress',
-            'from',
-            'gas',
-            'gasPrice',
-            'gasUsed',
-            'input',
-            'logs',
-            'logsBloom',
-            'nonce',
-            'senderTxHash',
-            'signatures',
-            'status',
-            'to',
-            'transactionHash',
-            'transactionIndex',
-            'type',
-            'typeInt',
-            'value',
-        ]
-        expect(Object.getOwnPropertyNames(receipt)).to.deep.equal(keys)
-
         expect(receipt.status).to.equals(true)
         expect(receipt.senderTxHash).to.equals(receipt.transactionHash)
+        expect(await receiptKeyCheck(receipt)).to.be.true
     }).timeout(100000)
 })
 
@@ -293,33 +214,9 @@ describe('CAVERJS-UNIT-TX-586: caver.klay.sendSignedTransaction with transaction
 
         expect(receipt).not.to.null
 
-        const keys = [
-            'blockHash',
-            'blockNumber',
-            'contractAddress',
-            'feePayer',
-            'feePayerSignatures',
-            'from',
-            'gas',
-            'gasPrice',
-            'gasUsed',
-            'logs',
-            'logsBloom',
-            'nonce',
-            'senderTxHash',
-            'signatures',
-            'status',
-            'to',
-            'transactionHash',
-            'transactionIndex',
-            'type',
-            'typeInt',
-            'value',
-        ]
-        expect(Object.getOwnPropertyNames(receipt)).to.deep.equal(keys)
-
         expect(receipt.status).to.equals(true)
         expect(receipt.senderTxHash).not.to.equals(receipt.transactionHash)
+        expect(await receiptKeyCheck(receipt)).to.be.true
     }).timeout(100000)
 })
 
@@ -346,32 +243,8 @@ describe('CAVERJS-UNIT-TX-587: caver.klay.sendSignedTransaction with fee payer t
 
         expect(receipt).not.to.null
 
-        const keys = [
-            'blockHash',
-            'blockNumber',
-            'contractAddress',
-            'feePayer',
-            'feePayerSignatures',
-            'from',
-            'gas',
-            'gasPrice',
-            'gasUsed',
-            'logs',
-            'logsBloom',
-            'nonce',
-            'senderTxHash',
-            'signatures',
-            'status',
-            'to',
-            'transactionHash',
-            'transactionIndex',
-            'type',
-            'typeInt',
-            'value',
-        ]
-        expect(Object.getOwnPropertyNames(receipt)).to.deep.equal(keys)
-
         expect(receipt.status).to.equals(true)
         expect(receipt.senderTxHash).not.to.equals(receipt.transactionHash)
+        expect(await receiptKeyCheck(receipt)).to.be.true
     }).timeout(100000)
 })

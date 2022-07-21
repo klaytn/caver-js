@@ -75,6 +75,7 @@ describe('TxTypeEthereumAccessList', () => {
         '0x7801f90109822710238505d21dba00829c4094c5fb1386b60160614a8151dcd4b0ae41325d1cb801b844a9059cbb0000000000000000000000008a4c9c443bb0645df646a2d5bb55def0ed1e885a0000000000000000000000000000000000000000000000000000000000003039f85bf859945430192ae264b3feff967fc08982b9c6f5694023f842a00000000000000000000000000000000000000000000000000000000000000003a0000000000000000000000000000000000000000000000000000000000000000701a05ac25e47591243af2d6b8e7f54d608e9e0e0aeb5194d34c17852bd7e376f4857a0095a40394f33e95cce9695d5badf4270f4cc8aff0b5395cefc3a0fe213be1f30'
 
     let getGasPriceSpy
+    let getHeaderSpy
     let getNonceSpy
     let getChainIdSpy
 
@@ -119,6 +120,8 @@ describe('TxTypeEthereumAccessList', () => {
 
         getGasPriceSpy = sandbox.stub(caver.transaction.klaytnCall, 'getGasPrice')
         getGasPriceSpy.returns('0x5d21dba00')
+        getHeaderSpy = sandbox.stub(caver.transaction.klaytnCall, 'getHeaderByNumber')
+        getHeaderSpy.returns({ baseFeePerGas: '0x5d21dba00' })
         getNonceSpy = sandbox.stub(caver.transaction.klaytnCall, 'getTransactionCount')
         getNonceSpy.returns('0x3a')
         getChainIdSpy = sandbox.stub(caver.transaction.klaytnCall, 'getChainId')
@@ -868,6 +871,7 @@ describe('TxTypeEthereumAccessList', () => {
 
             await tx.fillTransaction()
             expect(getGasPriceSpy).to.have.been.calledOnce
+            expect(getHeaderSpy).not.to.have.been.calledOnce
             expect(getNonceSpy).not.to.have.been.calledOnce
             expect(getChainIdSpy).not.to.have.been.calledOnce
         }).timeout(200000)

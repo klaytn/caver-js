@@ -157,7 +157,7 @@ class AbstractTransaction {
      * Calls `klay_chainID` klay rpc call.
      *
      * @example
-     * const result = tx.getChainId()
+     * const result = await tx.getChainId()
      *
      * @return {string} chain id
      */
@@ -167,10 +167,26 @@ class AbstractTransaction {
     }
 
     /**
-     * Calls `klay_gasPrice` klay rpc call.
+     * Suggests a gas price to use in the transaction.
+     * Calls `klay_gasPrice` to return unit price of the gas.
      *
      * @example
-     * const result = tx.getGasPrice()
+     * const result = await tx.suggestGasPrice()
+     *
+     * @return {string} gas price
+     */
+    async suggestGasPrice() {
+        const suggestion = await this.klaytnCall.getGasPrice()
+        return suggestion
+    }
+
+    /**
+     * Calls `klay_gasPrice` klay rpc call.
+     * Note that when Klaytn network use dynamic gas fee,
+     * you need to use `tx.suggestGasPrice` function in the gasPrice field.
+     *
+     * @example
+     * const result = await tx.getGasPrice()
      *
      * @return {string} gas price
      */
@@ -183,7 +199,7 @@ class AbstractTransaction {
      * Calls `klay_getTransactionCount` klay rpc call.
      *
      * @example
-     * const result = tx.getNonce('0x{from address}')
+     * const result = await tx.getNonce('0x{from address}')
      *
      * @return {string} nonce
      */
@@ -194,22 +210,23 @@ class AbstractTransaction {
 
     /**
      * Calls `klay_getHeaderByNumber` klay rpc call to get `baseFeePerGas` in header.
+     * If `baseFeePerGas` is not existed, returns '0x0'.
      *
      * @example
-     * const result = tx.getBaseFee()
+     * const result = await tx.getBaseFee()
      *
      * @return {string} base fee
      */
     async getBaseFee() {
         const header = await this.klaytnCall.getHeaderByNumber('latest')
-        return header.baseFeePerGas
+        return header.baseFeePerGas || '0x0'
     }
 
     /**
      * Calls `klay_maxPriorityFeePerGas` klay rpc call.
      *
      * @example
-     * const result = tx.getMaxPriorityFeePerGas()
+     * const result = await tx.getMaxPriorityFeePerGas()
      *
      * @return {string} suggested max priority fee per gas
      */

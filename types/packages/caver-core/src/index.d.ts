@@ -134,6 +134,7 @@ export interface TransactionReceipt {
     blockNumber: string
     codeFormat?: string
     chainId?: string
+    effectiveGasPrice?: string
     feePayer?: string
     feePayerSignatures?: SignatureForRPC[]
     feeRatio?: string

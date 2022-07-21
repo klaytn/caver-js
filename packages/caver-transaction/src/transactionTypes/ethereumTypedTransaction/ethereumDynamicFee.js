@@ -390,21 +390,17 @@ class EthereumDynamicFee extends AbstractTransaction {
     async fillTransaction() {
         const isNotMaxPriorityFeePerGas = isNot(this.maxPriorityFeePerGas)
         const isNotMaxFeePerGas = isNot(this.maxFeePerGas)
-        const [chainId, maxPriorityFeePerGas, nonce, baseFee] = await Promise.all([
+        const [chainId, maxPriorityFeePerGas, nonce, maxFeePerGas] = await Promise.all([
             isNot(this.chainId) ? this.getChainId() : this.chainId,
             isNotMaxPriorityFeePerGas ? this.getMaxPriorityFeePerGas() : this.maxPriorityFeePerGas,
             isNot(this.nonce) ? this.getNonce(this.from) : this.nonce,
-            isNotMaxPriorityFeePerGas || isNotMaxFeePerGas ? this.getBaseFee() : undefined,
+            isNotMaxFeePerGas ? this.suggestGasPrice() : this.maxFeePerGas,
         ])
 
         this.chainId = chainId
         this.nonce = nonce
         this.maxPriorityFeePerGas = maxPriorityFeePerGas
-
-        // Set maxFeePerGas with `block.baseFeePerGas.mul(2).add(maxPriorityFeePerGas)`
-        if (isNotMaxFeePerGas) {
-            this.maxFeePerGas = utils.hexToNumber(baseFee) * 2 + utils.hexToNumber(this.maxPriorityFeePerGas)
-        }
+        this.maxFeePerGas = maxFeePerGas
     }
 
     /**

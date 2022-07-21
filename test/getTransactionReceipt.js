@@ -16,6 +16,10 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+const chai = require('chai')
+const chaiAsPromised = require('chai-as-promised')
+
+chai.use(chaiAsPromised)
 const { expect } = require('chai')
 
 const Caver = require('../index')
