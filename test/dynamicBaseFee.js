@@ -381,6 +381,10 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
         // Generate many txs to increase baseFee
         generateTxsBomb(await fillKlay(100))
 
+        try {
+            // If account is already existed in node, return error.
+            await caver.klay.personal.importRawKey(sender.key.privateKey, password)
+        } catch (e) {}
         const isUnlock = await caver.klay.personal.unlockAccount(sender.address, password)
         expect(isUnlock).to.be.true
 
@@ -410,6 +414,10 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
         // Generate many txs to increase baseFee
         generateTxsBomb(await fillKlay(100))
 
+        try {
+            // If account is already existed in node, return error.
+            await caver.klay.personal.importRawKey(feePayer.key.privateKey, password)
+        } catch (e) {}
         const isUnlock = await caver.klay.personal.unlockAccount(feePayer.address, password)
         expect(isUnlock).to.be.true
 
@@ -430,6 +438,10 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
         // Generate many txs to increase baseFee
         generateTxsBomb(await fillKlay(100))
 
+        try {
+            // If account is already existed in node, return error.
+            await caver.klay.personal.importRawKey(sender.key.privateKey, password)
+        } catch (e) {}
         const isUnlock = await caver.klay.personal.unlockAccount(sender.address, password)
         expect(isUnlock).to.be.true
 
@@ -461,6 +473,10 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
         // Generate many txs to increase baseFee
         generateTxsBomb(await fillKlay(100))
 
+        try {
+            // If account is already existed in node, return error.
+            await caver.klay.personal.importRawKey(feePayer.key.privateKey, password)
+        } catch (e) {}
         const isUnlock = await caver.klay.personal.unlockAccount(feePayer.address, password)
         expect(isUnlock).to.be.true
 
