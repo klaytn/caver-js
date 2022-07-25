@@ -382,7 +382,7 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
         generateTxsBomb(await fillKlay(100))
 
         try {
-            // If account is already existed in node, return error.
+            // If an account's keystore already exists in the Klaytn Node, an error is returned, so it must be wrapped in a try-catch statement.
             await caver.klay.personal.importRawKey(sender.key.privateKey, password)
         } catch (e) {}
         const isUnlock = await caver.klay.personal.unlockAccount(sender.address, password)
@@ -415,7 +415,7 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
         generateTxsBomb(await fillKlay(100))
 
         try {
-            // If account is already existed in node, return error.
+            // If an account's keystore already exists in the Klaytn Node, an error is returned, so it must be wrapped in a try-catch statement.
             await caver.klay.personal.importRawKey(feePayer.key.privateKey, password)
         } catch (e) {}
         const isUnlock = await caver.klay.personal.unlockAccount(feePayer.address, password)
@@ -439,7 +439,7 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
         generateTxsBomb(await fillKlay(100))
 
         try {
-            // If account is already existed in node, return error.
+            // If an account's keystore already exists in the Klaytn Node, an error is returned, so it must be wrapped in a try-catch statement.
             await caver.klay.personal.importRawKey(sender.key.privateKey, password)
         } catch (e) {}
         const isUnlock = await caver.klay.personal.unlockAccount(sender.address, password)
@@ -474,7 +474,7 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
         generateTxsBomb(await fillKlay(100))
 
         try {
-            // If account is already existed in node, return error.
+            // If an account's keystore already exists in the Klaytn Node, an error is returned, so it must be wrapped in a try-catch statement.
             await caver.klay.personal.importRawKey(feePayer.key.privateKey, password)
         } catch (e) {}
         const isUnlock = await caver.klay.personal.unlockAccount(feePayer.address, password)

@@ -41,7 +41,7 @@ before(() => {
 describe('caver.klay.sign', () => {
     it('Compare the result of caver.klay.sign and caver.klay.accounts.sign', async () => {
         try {
-            // If account is already existed in node, return error.
+            // If an account's keystore already exists in the Klaytn Node, an error is returned, so it must be wrapped in a try-catch statement.
             const address = await caver.klay.personal.importRawKey(senderPrvKey, password)
             expect(address.toLowerCase()).to.equals(senderAddress.toLowerCase())
         } catch (e) {}

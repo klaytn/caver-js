@@ -118,7 +118,7 @@ describe('Personal RPC test', () => {
     // sendTransaction
     it('CAVERJS-UNIT-ETC-087: sendTransaction should send a transaction using an account in the node.', async () => {
         try {
-            // If account is already existed in node, return error.
+            // If an account's keystore already exists in the Klaytn Node, an error is returned, so it must be wrapped in a try-catch statement.
             const address = await caver.klay.personal.importRawKey(senderPrvKey, password)
             expect(address.toLowerCase()).to.equals(senderAddress.toLowerCase())
         } catch (e) {}
@@ -139,7 +139,7 @@ describe('Personal RPC test', () => {
     // sendTransaction with account update tx
     it('CAVERJS-UNIT-ETC-404: sendTransaction should format a transaction to send tx with account in Node.', async () => {
         try {
-            // If account is already existed in node, return error.
+            // If an account's keystore already exists in the Klaytn Node, an error is returned, so it must be wrapped in a try-catch statement.
             const address = await caver.klay.personal.importRawKey(senderPrvKey, password)
             expect(address.toLowerCase()).to.equals(senderAddress.toLowerCase())
         } catch (e) {}
@@ -221,7 +221,7 @@ describe('Personal RPC test', () => {
     // sendValueTransfer
     it('CAVERJS-UNIT-ETC-092: sendValueTransfer should send a value transfer transaction using an account in the node.', async () => {
         try {
-            // If account is already existed in node, return error.
+            // If an account's keystore already exists in the Klaytn Node, an error is returned, so it must be wrapped in a try-catch statement.
             const address = await caver.klay.personal.importRawKey(senderPrvKey, password)
             expect(address.toLowerCase()).to.equals(senderAddress.toLowerCase())
         } catch (e) {}
@@ -242,7 +242,7 @@ describe('Personal RPC test', () => {
     // sendAccountUpdate
     it('CAVERJS-UNIT-ETC-093: sendAccountUpdate should send account update transaction using account in node.', async () => {
         try {
-            // If account is already existed in node, return error.
+            // If an account's keystore already exists in the Klaytn Node, an error is returned, so it must be wrapped in a try-catch statement.
             const address = await caver.klay.personal.importRawKey(senderPrvKey, password)
             expect(address.toLowerCase()).to.equals(senderAddress.toLowerCase())
         } catch (e) {}
@@ -281,7 +281,7 @@ describe('Personal RPC test', () => {
     // sendTransaction ethereumAccessList transaction
     it('CAVERJS-UNIT-ETC-399: sendTransaction should send an ethereumAccessList transaction using an account in the node.', async () => {
         try {
-            // If account is already existed in node, return error.
+            // If an account's keystore already exists in the Klaytn Node, an error is returned, so it must be wrapped in a try-catch statement.
             const address = await caver.klay.personal.importRawKey(senderPrvKey, password)
             expect(address.toLowerCase()).to.equals(senderAddress.toLowerCase())
         } catch (e) {}
@@ -433,7 +433,7 @@ describe('Personal RPC test', () => {
     // sendTransaction ethereumDynamicFee transaction
     it('CAVERJS-UNIT-ETC-401: sendTransaction should send an ethereumDynamicFee transaction using an account in the node.', async () => {
         try {
-            // If account is already existed in node, return error.
+            // If an account's keystore already exists in the Klaytn Node, an error is returned, so it must be wrapped in a try-catch statement.
             const address = await caver.klay.personal.importRawKey(senderPrvKey, password)
             expect(address.toLowerCase()).to.equals(senderAddress.toLowerCase())
         } catch (e) {}
