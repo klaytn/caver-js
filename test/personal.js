@@ -447,8 +447,6 @@ describe('Personal RPC test', () => {
             value: 1,
             gas: 900000,
             chainId,
-            maxPriorityFeePerGas: '0x5d21dba00',
-            maxFeePerGas: '0x5d21dba00',
             accessList: [
                 {
                     address: caver.klay.accounts.create().address,
@@ -469,8 +467,6 @@ describe('Personal RPC test', () => {
             value: 0,
             gas: 1000000,
             chainId,
-            maxPriorityFeePerGas: '0x5d21dba00',
-            maxFeePerGas: '0x5d21dba00',
             accessList: [
                 {
                     address: caver.klay.accounts.create().address,
@@ -494,8 +490,6 @@ describe('Personal RPC test', () => {
             value: 0,
             gas: 900000,
             chainId,
-            maxPriorityFeePerGas: '0x5d21dba00',
-            maxFeePerGas: '0x5d21dba00',
             accessList: [
                 {
                     address: caver.klay.accounts.create().address,
@@ -528,8 +522,6 @@ describe('Personal RPC test', () => {
             value: 1,
             gas: 900000,
             chainId,
-            maxPriorityFeePerGas: '0x5d21dba00',
-            maxFeePerGas: '0x5d21dba00',
             accessList: [
                 {
                     address: caver.klay.accounts.create().address,
@@ -550,8 +542,6 @@ describe('Personal RPC test', () => {
             value: 0,
             gas: 1000000,
             chainId,
-            maxPriorityFeePerGas: '0x5d21dba00',
-            maxFeePerGas: '0x5d21dba00',
             accessList: [
                 {
                     address: caver.klay.accounts.create().address,
@@ -574,8 +564,6 @@ describe('Personal RPC test', () => {
             value: 0,
             gas: 900000,
             chainId,
-            maxPriorityFeePerGas: '0x5d21dba00',
-            maxFeePerGas: '0x5d21dba00',
             accessList: [
                 {
                     address: caver.klay.accounts.create().address,

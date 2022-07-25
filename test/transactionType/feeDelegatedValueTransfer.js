@@ -60,7 +60,6 @@ describe('FEE_DELEGATED_VALUE_TRANSFER transaction', async () => {
             to: testAccount.address,
             value: 1,
             gas: 900000,
-            gasPrice: '0x5d21dba00',
         }
     })
 
