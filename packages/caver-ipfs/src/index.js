@@ -19,7 +19,6 @@
 
 const lodash = require('lodash')
 const fs = require('fs')
-const ipfsClient = require('ipfs-http-client')
 const multihash = require('multihashes')
 
 /**
@@ -52,9 +51,12 @@ class IPFS {
      * @param {boolean} ssl With or without SSL. If true, the https protocol is used. Otherwise, the http protocol is used.
      * @return {void}
      */
-    setIPFSNode(host, port, ssl) {
+    async setIPFSNode(host, port, ssl) {
         const protocol = ssl ? 'https' : 'http'
-        this.ipfs = ipfsClient({ host, port, protocol })
+        // Use the dynamic import function to load ipfs at runtime
+        // refer to https://github.com/ipfs/js-ipfs/blob/master/docs/upgrading/v0.62-v0.63.md#esm
+        const { create } = await import('ipfs-http-client')
+        this.ipfs = await create({ host, port, protocol })
     }
 
     /**
