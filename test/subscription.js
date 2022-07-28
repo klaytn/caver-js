@@ -117,6 +117,80 @@ describe('subscription should work well with websocket connection', () => {
         })
     }).timeout(30000)
 
+    it('CAVERJS-UNIT-ETC-410: contract.subscribe should subscribe the event of the contract with caver.klay.Contract', async () => {
+        const byteCode =
+            '0x6080604052348015600f57600080fd5b5060e98061001e6000396000f300608060405260043610603f576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff168063954ab4b2146044575b600080fd5b348015604f57600080fd5b5060566058565b005b7f90a042becc42ba1b13a5d545701bf5ceff20b24d9e5cc63b67f96ef814d80f0933604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a15600a165627a7a723058200ebb53e9d575350ceb2d92263b7d4920888706b5221f024e7bbc10e3dbb8e18d0029'
+        const helloContractABI = [
+            {
+                constant: false,
+                inputs: [],
+                name: 'say',
+                outputs: [],
+                payable: false,
+                stateMutability: 'nonpayable',
+                type: 'function',
+            },
+            {
+                anonymous: false,
+                inputs: [
+                    {
+                        indexed: false,
+                        name: 'who',
+                        type: 'address',
+                    },
+                ],
+                name: 'callevent',
+                type: 'event',
+            },
+        ]
+
+        const contractInst = caver.contract.create(helloContractABI)
+        const deployed = await contractInst.deploy({ data: byteCode }).send({
+            from: senderAddress,
+            gas: 100000000,
+            value: 0,
+        })
+
+        let dataVariable
+        let eventCount = 0
+        let subscription = deployed.subscribe('callevent', (error, data) => {
+            expect(error).to.be.null
+            dataVariable = data
+            eventCount++
+        })
+
+        const options = {
+            from: senderAddress,
+            gas: 30000,
+        }
+
+        await deployed.methods.say().send(options)
+        await deployed.methods.say().send(options)
+
+        while (eventCount < 2) {}
+        subscription.unsubscribe()
+
+        expect(dataVariable).not.to.null
+
+        const commonContract = caver.contract.create(helloContractABI, deployed.options.address)
+
+        dataVariable = null
+        eventCount = 0
+        subscription = commonContract.subscribe('callevent', (error, data) => {
+            expect(error).to.be.null
+            dataVariable = data
+            eventCount++
+        })
+
+        await commonContract.methods.say().send(options)
+        await commonContract.methods.say().send(options)
+
+        while (eventCount < 2) {}
+        subscription.unsubscribe()
+
+        expect(dataVariable).not.to.null
+    }).timeout(200000)
+
     // Regression test for a race-condition where a fresh caver instance
     // subscribing to past events would have its call parameters deleted while it
     // made initial Websocket handshake and return an incorrect response.
