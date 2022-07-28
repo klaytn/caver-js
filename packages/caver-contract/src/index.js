@@ -1453,7 +1453,7 @@ Contract.prototype._processExecuteArguments = function _processExecuteArguments(
     }
 
     // get the options. need to copy the options object
-    processedArgs.options = _.isObject(args[args.length - 1]) ? Object.assign({}, args.pop()) : {}
+    processedArgs.options = _.isObject(args[args.length - 1]) ? { ...args.pop() } : {}
 
     // get the generateRequest argument for batch requests
     processedArgs.generateRequest = args[args.length - 1] === true ? args.pop() : false

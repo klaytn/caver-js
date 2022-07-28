@@ -167,8 +167,7 @@ describe('subscription should work well with websocket connection', () => {
         await deployed.methods.say().send(options)
         await deployed.methods.say().send(options)
 
-        while(eventCount < 2)
-
+        while (eventCount < 2) {}
         subscription.unsubscribe()
 
         expect(dataVariable).not.to.null
@@ -186,8 +185,7 @@ describe('subscription should work well with websocket connection', () => {
         await commonContract.methods.say().send(options)
         await commonContract.methods.say().send(options)
 
-        while(eventCount < 2)
-
+        while (eventCount < 2) {}
         subscription.unsubscribe()
 
         expect(dataVariable).not.to.null
