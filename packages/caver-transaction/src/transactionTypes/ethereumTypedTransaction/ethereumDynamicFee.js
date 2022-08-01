@@ -222,6 +222,18 @@ class EthereumDynamicFee extends AbstractTransaction {
     }
 
     /**
+     * @type {string}
+     */
+    get gasPrice() {
+        // gasPrice getter will return maxFeePerGass
+        return this._maxFeePerGas
+    }
+
+    set gasPrice(g) {
+        throw new Error(`${this.type} does not have 'gasPrice' field. Please use 'maxFeePerGas' or 'maxPriorityFeePerGas'.`)
+    }
+
+    /**
      * Appends signatures array to transaction.
      * EthereumDynamicFee transaction cannot have more than one signature, so an error will be occured if the transaction already has a signature or the `sig` parameter has more than one signatures.
      *

@@ -123,6 +123,17 @@ class AbstractTransaction {
     /**
      * @type {string}
      */
+    get gasPrice() {
+        throw new Error(`Not implemented.`)
+    }
+
+    set gasPrice(g) {
+        throw new Error(`Not implemented.`)
+    }
+
+    /**
+     * @type {string}
+     */
     get chainId() {
         return this._chainId
     }
