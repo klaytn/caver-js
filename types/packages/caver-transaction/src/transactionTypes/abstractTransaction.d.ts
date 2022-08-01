@@ -62,6 +62,7 @@ export class AbstractTransaction {
     from: string
     nonce: string
     gas: string
+    gasPrice: string
     chainId: string
     signatures: SignatureData | SignatureData[]
     klaytnCall: KlaytnCall

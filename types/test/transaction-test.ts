@@ -3629,6 +3629,8 @@ ethereumDynamicFee.nonce
 // $ExpectType string
 ethereumDynamicFee.gas
 // $ExpectType string
+ethereumDynamicFee.gasPrice
+// $ExpectType string
 ethereumDynamicFee.chainId
 // $ExpectType SignatureData | SignatureData[]
 ethereumDynamicFee.signatures
