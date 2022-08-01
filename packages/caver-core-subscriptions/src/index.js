@@ -42,6 +42,7 @@ Subscriptions.prototype.attachToObject = function(obj) {
     const func = this.buildCall()
     const name = this.name.split('.')
     if (name.length > 1) {
+        obj[name[0]] = obj[name[0]] || Object.create(null)
         const emptyObject = Object.create(null)
         emptyObject[name[1]] = func
         lodash.assign(obj[name[0]], emptyObject)
