@@ -19,7 +19,7 @@
 
 const lodash = require('lodash')
 const fs = require('fs')
-const multihash = require('multihashes')
+const { CID } = require('multiformats/cid')
 
 /**
  * Representing a class for uploading and loading files to IPFS.
@@ -146,8 +146,8 @@ class IPFS {
      * @return {string}
      */
     toHex(hash) {
-        const buf = multihash.fromB58String(hash)
-        return `0x${multihash.toHexString(buf)}`
+        const cid = CID.parse(hash)
+        return `0x${Buffer.from(cid.toJSON().hash).toString('hex')}`
     }
 
     /**
@@ -162,8 +162,9 @@ class IPFS {
      */
     fromHex(contentHash) {
         const hex = contentHash.substring(2)
-        const buf = multihash.fromHexString(hex)
-        return multihash.toB58String(buf)
+        // convert hex string to Uint8Array type
+        const buf = Uint8Array.from(hex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)))
+        return CID.decode(buf).toString()
     }
 }
 
