@@ -71,7 +71,7 @@ class IPFS {
 
     /**
      * Makes an options object to use with ipfs request
-     * 
+     *
      * @example
      * // You can create an option object with projectId and projectSecret for Infura IPFS Node
      * const options = caver.ipfs.createOptions({projectId, projectSecret})
@@ -86,8 +86,8 @@ class IPFS {
 
         const options = {}
         if (opts.projectId && opts.projectSecret) {
-            const auth = 'Basic ' + Buffer.from(opts.projectId + ':' + opts.projectSecret).toString('base64')
-            options.headers = options.headers? options.headers : {}
+            const auth = `Basic ${Buffer.from(`${opts.projectId}:${opts.projectSecret}`).toString('base64')}`
+            options.headers = options.headers ? options.headers : {}
             options.headers.authorization = auth
         }
         return options

@@ -37,7 +37,6 @@ before(() => {
             : process.env.privateKey
     sender = caver.wallet.add(caver.wallet.keyring.createFromPrivateKey(privateKey))
 
-
     projectId = process.env.infuraProjectId
     projectSecret = process.env.infuraProjectSecret
 })
@@ -45,7 +44,7 @@ before(() => {
 describe('Connect IPFS with Klaytn', () => {
     it('CAVERJS-UNIT-IPFS-001: should add file to IPFS and return hash (test with infura ipfs node)', async () => {
         // Set IPFS Node
-        const options = caver.ipfs.createOptions({projectId, projectSecret})
+        const options = caver.ipfs.createOptions({ projectId, projectSecret })
         await caver.ipfs.setIPFSNode('ipfs.infura.io', 5001, true, options)
 
         // Create test txt file for IPFS
