@@ -20,6 +20,7 @@
 const lodash = require('lodash')
 const fs = require('fs')
 const { CID } = require('multiformats/cid')
+const _ = require('lodash')
 
 /**
  * Representing a class for uploading and loading files to IPFS.
@@ -29,13 +30,14 @@ const { CID } = require('multiformats/cid')
 class IPFS {
     /**
      * Create an IPFS instance.
-     * @param {string} [host] The IPFS Node url to connect with.
-     * @param {number} [port] The port number to use.
-     * @param {boolean} [ssl] With or without SSL. If true, the https protocol is used. Otherwise, the http protocol is used.
+     * @param {string} [host]       The IPFS Node url to connect with.
+     * @param {number} [port]       The port number to use.
+     * @param {boolean} [ssl]       With or without SSL. If true, the https protocol is used. Otherwise, the http protocol is used.
+     * @param {object} [options]    An object contains configuration variables.
      */
-    constructor(host, port, ssl) {
-        if (host !== undefined && port !== undefined && ssl !== undefined) {
-            this.setIPFSNode(host, port, ssl)
+    constructor(host, port, ssl, options) {
+        if (host !== undefined && port !== undefined && ssl !== undefined && options !== undefined) {
+            this.setIPFSNode(host, port, ssl, options)
         }
     }
 
@@ -45,18 +47,50 @@ class IPFS {
      *
      * @example
      * caver.ipfs.setIPFSNode('localhost', 5001, false)
+     * caver.ipfs.setIPFSNode('localhost', 5001, false, { ... })
+     * caver.ipfs.setIPFSNode('localhost', 5001, false, caver.ipfs.createOptions({projectId, projectSecret}))
      *
-     * @param {string} host The IPFS Node url to connect with.
-     * @param {number} port The port number to use.
-     * @param {boolean} ssl With or without SSL. If true, the https protocol is used. Otherwise, the http protocol is used.
+     * @param {string}  host        The IPFS Node url to connect with.
+     * @param {number}  port        The port number to use.
+     * @param {boolean} ssl         With or without SSL. If true, the https protocol is used. Otherwise, the http protocol is used.
+     * @param {object}  [options]   An object contains configuration variables.
      * @return {void}
      */
-    async setIPFSNode(host, port, ssl) {
+    async setIPFSNode(host, port, ssl, options = {}) {
         const protocol = ssl ? 'https' : 'http'
         // Use the dynamic import function to load ipfs at runtime
         // refer to https://github.com/ipfs/js-ipfs/blob/master/docs/upgrading/v0.62-v0.63.md#esm
         const { create } = await import('ipfs-http-client')
-        this.ipfs = await create({ host, port, protocol })
+        const createObject = { host, port, protocol }
+        if (options.headers) {
+            // Copy the headers object
+            createObject.headers = JSON.parse(JSON.stringify(options.headers))
+        }
+        this.ipfs = await create(createObject)
+    }
+
+    /**
+     * Makes an options object to use with ipfs request
+     *
+     * @example
+     * // You can create an option object with projectId and projectSecret for Infura IPFS Node
+     * const options = caver.ipfs.createOptions({projectId, projectSecret})
+     *
+     * @param {object} opts     An object that contains various configuration variables.
+     * @return {object}
+     */
+    createOptions(opts) {
+        if (!opts || !_.isObject(opts)) {
+            throw new Error(`Invalid parameter. Please send an object `)
+        }
+
+        const options = {}
+        if (opts.projectId && opts.projectSecret) {
+            const auth = `Basic ${Buffer.from(`${opts.projectId}:${opts.projectSecret}`).toString('base64')}`
+            options.headers = options.headers ? options.headers : {}
+            options.headers.authorization = auth
+        }
+        return options
     }
 
     /**

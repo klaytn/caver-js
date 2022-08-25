@@ -27,6 +27,8 @@ const Caver = require('../index')
 const caver = new Caver(testRPCURL)
 
 let sender
+let projectId
+let projectSecret
 
 before(() => {
     const privateKey =
@@ -34,12 +36,16 @@ before(() => {
             ? `0x${process.env.privateKey}`
             : process.env.privateKey
     sender = caver.wallet.add(caver.wallet.keyring.createFromPrivateKey(privateKey))
+
+    projectId = process.env.infuraProjectId
+    projectSecret = process.env.infuraProjectSecret
 })
 
 describe('Connect IPFS with Klaytn', () => {
-    it('CAVERJS-UNIT-IPFS-001: should add file to IPFS and return hash', async () => {
+    it('CAVERJS-UNIT-IPFS-001: should add file to IPFS and return hash (test with infura ipfs node)', async () => {
         // Set IPFS Node
-        await caver.ipfs.setIPFSNode('ipfs.infura.io', 5001, true)
+        const options = caver.ipfs.createOptions({ projectId, projectSecret })
+        await caver.ipfs.setIPFSNode('ipfs.infura.io', 5001, true, options)
 
         // Create test txt file for IPFS
         const testFileName = './ipfsTestFile.txt'
