@@ -797,7 +797,7 @@ const checkForNormalTx = (mutableConfirmationPack, receipt, sub) => {
     if (
         receipt &&
         !receipt.outOfGas &&
-        (!gasProvided || gasProvided !== receipt.gasUsed) &&
+        (!gasProvided || utils.toBN(gasProvided).cmp(utils.toBN(receipt.gasUsed)) >= 0) &&
         (receipt.status === true || receipt.status === '0x1' || typeof receipt.status === 'undefined')
     ) {
         // Happy case: transaction is processed well. A.K.A 'well-done receipt'.
