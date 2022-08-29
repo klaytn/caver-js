@@ -1,4 +1,5 @@
 const Caver = require('./index')
+
 const caver = new Caver('https://api.baobab.klaytn.net:8651')
 
 // How to run klayswap.js
@@ -14,9 +15,9 @@ const factoryABI = [
         inputs: [],
         outputs: [
             {
-                name: "",
-                type: "uint256"
-            }
+                name: '',
+                type: 'uint256',
+            },
         ],
     },
     {
@@ -53,7 +54,7 @@ const factoryABI = [
             { internalType: 'uint256', name: 'fee', type: 'uint256' },
         ],
         outputs: [],
-    }, 
+    },
     {
         constant: true,
         inputs: [
@@ -76,11 +77,11 @@ const factoryABI = [
         payable: false,
         stateMutability: 'view',
         type: 'function',
-    }
+    },
 ]
 
-createLP_KLAYKCT()
-async function createLP_KLAYKCT() {
+createLiquidityPoolKLAYKCT()
+async function createLiquidityPoolKLAYKCT() {
     const keyring = caver.wallet.add(caver.wallet.keyring.createFromPrivateKey('0x{private key}'))
 
     // Deploy KCT Token
@@ -102,11 +103,17 @@ async function createLP_KLAYKCT() {
 
     // Exchange specific KSP amount from KLAY
     const createLPFee = await factory.call({}, 'createFee')
-    const swapToKSP = await factory.send({
-        from: keyring.address, 
-        gas: 1000000, 
-        value: caver.utils.convertToPeb(10, 'KLAY') 
-    }, 'exchangeKlayNeg', factory.options.address, caver.utils.toBN(createLPFee), [])
+    const swapToKSP = await factory.send(
+        {
+            from: keyring.address,
+            gas: 1000000,
+            value: caver.utils.convertToPeb(10, 'KLAY'),
+        },
+        'exchangeKlayNeg',
+        factory.options.address,
+        caver.utils.toBN(createLPFee),
+        []
+    )
     console.log(`Exchange Klay to KSP Status =====> ${Boolean(swapToKSP.status)}`)
 
     // Create KLAY-KCT LP
@@ -116,11 +123,17 @@ async function createLP_KLAYKCT() {
     const approved = await jamieToken.approve(factory.options.address, amount, { from: keyring.address })
     console.log(`Approved KCT to Factory Contract(${factory.options.address}) Status: ${Boolean(approved.status)}\n`)
 
-    const createdKlayPool = await factory.send({
-        from: keyring.address, 
-        gas: 5000000, 
-        value: amount // 1:1 
-    }, 'createKlayPool', jamieToken.options.address, amount, initialFee)
+    const createdKlayPool = await factory.send(
+        {
+            from: keyring.address,
+            gas: 5000000,
+            value: amount, // 1:1
+        },
+        'createKlayPool',
+        jamieToken.options.address,
+        amount,
+        initialFee
+    )
     console.log(`createKlayPool Status: ${Boolean(createdKlayPool.status)}`)
 
     const KLAY = '0x0000000000000000000000000000000000000000'

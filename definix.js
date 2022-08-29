@@ -1,5 +1,5 @@
-const { networkInterfaces } = require('os')
 const Caver = require('./index')
+
 const caver = new Caver('https://api.baobab.klaytn.net:8651')
 
 // How to run definix.js
@@ -16,7 +16,7 @@ const factoryABI = [
         payable: false,
         stateMutability: 'view',
         type: 'function',
-    }
+    },
 ]
 const routerABI = [
     {
@@ -38,11 +38,11 @@ const routerABI = [
         payable: true,
         stateMutability: 'payable',
         type: 'function',
-    }
+    },
 ]
 
-createLP_KLAYKCT()
-async function createLP_KLAYKCT() {
+createLiquidityPoolKLAYKCT()
+async function createLiquidityPoolKLAYKCT() {
     const keyring = caver.wallet.add(caver.wallet.keyring.createFromPrivateKey('0x{private key}'))
 
     // Deploy KCT Token
@@ -90,7 +90,22 @@ async function createLP_KLAYKCT() {
     const pairAddress = await factory.call({}, 'getPair', wKLAYAddress, jamieToken.options.address)
     const pairContract = caver.kct.kip7.create(pairAddress)
     const wKLAYContract = caver.kct.kip7.create(wKLAYAddress)
-    console.log(`WKLAY(${wKLAYAddress})-KCT(${jamieToken.options.address}) Pair Total Supply: ${caver.utils.convertFromPeb(await pairContract.totalSupply(), 'KLAY')}`)
-    console.log(`KLAY Balance of the Pair Contract(${pairAddress}): ${caver.utils.convertFromPeb(await wKLAYContract.balanceOf(pairAddress), 'KLAY')} wKLAY`)
-    console.log(`KCT Balance of the Pair Contract(${pairAddress}): ${caver.utils.convertFromPeb(await jamieToken.balanceOf(pairAddress), 'KLAY')} KCT`)
+    console.log(
+        `WKLAY(${wKLAYAddress})-KCT(${jamieToken.options.address}) Pair Total Supply: ${caver.utils.convertFromPeb(
+            await pairContract.totalSupply(),
+            'KLAY'
+        )}`
+    )
+    console.log(
+        `KLAY Balance of the Pair Contract(${pairAddress}): ${caver.utils.convertFromPeb(
+            await wKLAYContract.balanceOf(pairAddress),
+            'KLAY'
+        )} wKLAY`
+    )
+    console.log(
+        `KCT Balance of the Pair Contract(${pairAddress}): ${caver.utils.convertFromPeb(
+            await jamieToken.balanceOf(pairAddress),
+            'KLAY'
+        )} KCT`
+    )
 }

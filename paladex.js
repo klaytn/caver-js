@@ -1,4 +1,5 @@
 const Caver = require('./index')
+
 const caver = new Caver('https://api.baobab.klaytn.net:8651')
 
 // How to run paladex.js
@@ -40,8 +41,8 @@ const routerABI = [
     },
 ]
 
-createLP_KLAYKCT()
-async function createLP_KLAYKCT() {
+createLiquidityPoolKLAYKCT()
+async function createLiquidityPoolKLAYKCT() {
     const keyring = caver.wallet.add(caver.wallet.keyring.createFromPrivateKey('0x{private key}'))
 
     // Deploy KCT Token
@@ -82,6 +83,13 @@ async function createLP_KLAYKCT() {
     const pairAddress = addedLiquidityKLAY.events.PairCreated.returnValues.pair
 
     const pairContract = caver.kct.kip7.create(pairAddress)
-    console.log(`KLAY-KCT(${jamieToken.options.address}) Pair Total Supply: ${caver.utils.convertFromPeb(await pairContract.totalSupply(), 'KLAY')}`)
-    console.log(`KCT Balance of the Pair Contract(${pairAddress}): ${caver.utils.convertFromPeb(await jamieToken.balanceOf(pairAddress), 'KLAY')} KCT`)
+    console.log(
+        `KLAY-KCT(${jamieToken.options.address}) Pair Total Supply: ${caver.utils.convertFromPeb(await pairContract.totalSupply(), 'KLAY')}`
+    )
+    console.log(
+        `KCT Balance of the Pair Contract(${pairAddress}): ${caver.utils.convertFromPeb(
+            await jamieToken.balanceOf(pairAddress),
+            'KLAY'
+        )} KCT`
+    )
 }

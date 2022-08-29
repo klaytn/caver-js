@@ -1,4 +1,5 @@
 const Caver = require('./index')
+
 const caver = new Caver('https://api.baobab.klaytn.net:8651')
 
 // How to run claimswap.js
@@ -15,7 +16,7 @@ const claimSwapFactoryABI = [
         payable: false,
         stateMutability: 'view',
         type: 'function',
-    }
+    },
 ]
 const claimSwapRouterABI = [
     {
@@ -37,11 +38,11 @@ const claimSwapRouterABI = [
         payable: true,
         stateMutability: 'payable',
         type: 'function',
-    }
+    },
 ]
 
-createLP_KLAYKCT()
-async function createLP_KLAYKCT() {
+createLiquidityPoolKLAYKCT()
+async function createLiquidityPoolKLAYKCT() {
     const keyring = caver.wallet.add(caver.wallet.keyring.createFromPrivateKey('0x{private key}'))
 
     // Deploy KCT Token
