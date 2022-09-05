@@ -98,5 +98,6 @@ module.exports = {
     invalidGasLimit: () => new Error('Invalid gas limit. Please provide valid gas.'),
     invalidData: () => new Error('Invalid data. Please provide valid hex-strict data.'),
     notAllowedZeroGas: () => new Error("gas can't be 0. Please provide more gas."),
+    emptyContractCode: () => new Error("contract code is empty"),
     txErrorTable,
 }
