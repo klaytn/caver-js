@@ -764,26 +764,34 @@ const checkForContractDeployment = (mutableConfirmationPack, receipt, sub) => {
 
     if (!receipt.status && receipt.txError) {
         const receiptJSON = JSON.stringify(receipt, null, 2)
+        if (canUnsubscribe) {
+            sub.unsubscribe();
+            mutableConfirmationPack.promiseResolved = true
+        }
         utils._fireError(new Error(`${errors.txErrorTable[receipt.txError]}\n ${receiptJSON}`), defer.eventEmitter, defer.reject)
+        return;
     }
 
     _klaytnCall.getCode(receipt.contractAddress, (e, code) => {
-        if (!code) return
+        if (code.length > 2) { // neither empty nor '0x'
+            defer.eventEmitter.emit('receipt', receipt)
 
-        defer.eventEmitter.emit('receipt', receipt)
-
-        // if contract, return instance instead of receipt
-        defer.resolve(
-            (method.extraFormatters &&
-                method.extraFormatters.contractDeployFormatter &&
-                method.extraFormatters.contractDeployFormatter(receipt)) ||
-                receipt
-        )
+            // if contract, return instance instead of receipt
+            defer.resolve(
+                (method.extraFormatters &&
+                    method.extraFormatters.contractDeployFormatter &&
+                    method.extraFormatters.contractDeployFormatter(receipt)) ||
+                    receipt
+            )
+            defer.eventEmitter.removeAllListeners()
+        } else {
+            utils._fireError(errors.emptyContractCode, defer.eventEmitter, defer.reject)
+        }
 
         // need to remove listeners, as they aren't removed automatically when succesfull
-        if (canUnsubscribe) defer.eventEmitter.removeAllListeners()
-
-        if (canUnsubscribe) sub.unsubscribe()
+        if (canUnsubscribe) {
+            sub.unsubscribe()
+        }
         mutableConfirmationPack.promiseResolved = true
     })
 
