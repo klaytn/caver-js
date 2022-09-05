@@ -765,15 +765,16 @@ const checkForContractDeployment = (mutableConfirmationPack, receipt, sub) => {
     if (!receipt.status && receipt.txError) {
         const receiptJSON = JSON.stringify(receipt, null, 2)
         if (canUnsubscribe) {
-            sub.unsubscribe();
+            sub.unsubscribe()
             mutableConfirmationPack.promiseResolved = true
         }
         utils._fireError(new Error(`${errors.txErrorTable[receipt.txError]}\n ${receiptJSON}`), defer.eventEmitter, defer.reject)
-        return;
+        return
     }
 
     _klaytnCall.getCode(receipt.contractAddress, (e, code) => {
-        if (code.length > 2) { // neither empty nor '0x'
+        // neither empty nor '0x'
+        if (code.length > 2) {
             defer.eventEmitter.emit('receipt', receipt)
 
             // if contract, return instance instead of receipt
