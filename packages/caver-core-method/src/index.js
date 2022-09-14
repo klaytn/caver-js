@@ -762,7 +762,7 @@ const checkForContractDeployment = (mutableConfirmationPack, receipt, sub) => {
         return
     }
 
-    if (!receipt.status && receipt.txError) {
+    if (!Boolean(utils.hexToNumber(receipt.status)) && receipt.txError) {
         const receiptJSON = JSON.stringify(receipt, null, 2)
         if (canUnsubscribe) {
             sub.unsubscribe()
