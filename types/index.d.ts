@@ -68,6 +68,7 @@ export class AbstractCaver {
     constructor(provider?: RequestProvider, net?: net.Socket)
 
     version: string
+    currentProvider: RequestProvider
     utils: Utils
     abi: ABI
     formatters: Formatters
