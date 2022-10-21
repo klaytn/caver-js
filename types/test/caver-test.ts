@@ -34,6 +34,9 @@ let caver = new Caver('http://localhost:8551')
 // $ExpectType string
 caver.version
 
+// $ExpectType provider
+caver.currentProvider
+
 // $ExpectType Utils
 caver.utils
 
