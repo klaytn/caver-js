@@ -19,7 +19,7 @@ import { Account } from './packages/caver-account/src'
 import { Contract as BaseContract } from './packages/caver-contract/src'
 import { CoreHelpers, Formatters } from './packages/caver-core-helpers/src'
 import { Method } from './packages/caver-core-method/src'
-import { HttpProvider, IpcProvider, WebsocketProvider } from './packages/caver-core-requestmanager/src'
+import { provider, HttpProvider, IpcProvider, WebsocketProvider} from './packages/caver-core-requestmanager/src'
 import { IPFS } from './packages/caver-ipfs/src'
 import { KCT } from './packages/caver-kct/src'
 import { DeprecatedKlayRPC } from './packages/caver-klay/src'
@@ -68,7 +68,7 @@ export class AbstractCaver {
     constructor(provider?: RequestProvider, net?: net.Socket)
 
     version: string
-    currentProvider: RequestProvider
+    currentProvider: provider
     utils: Utils
     abi: ABI
     formatters: Formatters
