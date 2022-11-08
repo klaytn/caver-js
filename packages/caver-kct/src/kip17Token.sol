@@ -2624,11 +2624,12 @@ abstract contract KIP17URIStorage is KIP17 {
     // Optional mapping for token URIs
     mapping(uint256 => string) private _tokenURIs;
 
-    /**_setP
+    /**
      * @dev See {IKIP17Metadata-tokenURI}.
      */
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
-        
+        require(_exists(tokenId), "KIP17URIStorage: URI query for nonexistent token");
+
         string memory _tokenURI = _tokenURIs[tokenId];
         string memory base = _baseURI();
 
