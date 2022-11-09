@@ -454,7 +454,7 @@ multipleKeyring.getKeyByRole(0)
 // $ExpectType Account
 multipleKeyring.toAccount()
 // $ExpectType Account
-multipleKeyring.toAccount({ threshold: 3, weigths: [1, 2] })
+multipleKeyring.toAccount({ threshold: 3, weights: [1, 2] })
 // $ExpectType Account
 multipleKeyring.toAccount(new WeightedMultiSigOptions(3, [1, 2]))
 
@@ -500,7 +500,7 @@ roleBasedKeyring.getKeyByRole(0)
 // $ExpectType Account
 roleBasedKeyring.toAccount()
 // $ExpectType Account
-roleBasedKeyring.toAccount([{ threshold: 3, weigths: [1, 2] }, { threshold: 3, weigths: [1, 2] }, { threshold: 3, weigths: [1, 2] }])
+roleBasedKeyring.toAccount([{ threshold: 3, weights: [1, 2] }, { threshold: 3, weights: [1, 2] }, { threshold: 3, weights: [1, 2] }])
 // $ExpectType Account
 roleBasedKeyring.toAccount([
     new WeightedMultiSigOptions(3, [1, 2]),
