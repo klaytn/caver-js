@@ -15,7 +15,7 @@
 
 export interface WeightedMultiSigOptionsObject {
     threshold?: number
-    weigths?: number[]
+    weights?: number[]
     weight?: number[]
 }
 
