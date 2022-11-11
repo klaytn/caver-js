@@ -6,6 +6,12 @@
   <img src="assets/logo/caver-js.png" width="200" alt="caver-js" />
 </p>
 
+# Branch name will be changed
+
+We will change the `master` branch to `main` on Nov 1, 2022.
+After the branch policy change, please check your local or forked repository settings.
+
+
 caver-js is a JavaScript API library that allows developers to interact with a
 Klaytn node using a HTTP or Websocket connection.
 
