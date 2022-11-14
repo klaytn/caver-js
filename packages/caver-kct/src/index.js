@@ -205,8 +205,8 @@ class KCT {
                 if (wallet !== undefined) kip17.setWallet(wallet)
 
                 // If sendOptions is string type, sendOptions means deployer's address
-                if (_.isString(sendOptions)) sendOptions = { from: sendOptions, gas: 6600000, value: 0 }
-                sendOptions.gas = sendOptions.gas !== undefined ? sendOptions.gas : 6600000
+                if (_.isString(sendOptions)) sendOptions = { from: sendOptions, gas: 7700000, value: 0 }
+                sendOptions.gas = sendOptions.gas !== undefined ? sendOptions.gas : 7700000
 
                 return kip17
                     .deploy({
