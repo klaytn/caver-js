@@ -2923,6 +2923,7 @@ abstract contract KIP17Enumerable is KIP17, IKIP17Enumerable {
 
 // File: contracts/KIP/token/KIP17/KIP17Token.sol
 
+
 pragma solidity ^0.8.4;
 
 contract KIP17Token is KIP17, KIP17Enumerable, KIP17Burnable, KIP17Mintable, KIP17Pausable, KIP17URIStorage, Ownable {
