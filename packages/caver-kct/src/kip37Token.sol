@@ -82,7 +82,7 @@ interface IKIP37Mintable {
 pragma solidity ^0.8.0;
 
 /**
- * @dev Pausing extension of the KIP17 standard as defined in the KIP.
+ * @dev Pausing extension of the KIP37 standard as defined in the KIP.
  * See http://kips.klaytn.com/KIPs/kip-37#pausing-extension
  */
 interface IKIP37Pausable {
@@ -2617,7 +2617,7 @@ pragma solidity ^0.8.0;
 
 
 /**
- * @dev Extension of KIP17 that supports permissioned token type creation and token minting
+ * @dev Extension of KIP37 that supports permissioned token type creation and token minting
  * See http://kips.klaytn.com/KIPs/kip-37#minting-extension
  */
 abstract contract KIP37Mintable is KIP37, KIP37URIStorage, IKIP37Mintable, AccessControlEnumerable {
@@ -2774,6 +2774,27 @@ abstract contract KIP37Mintable is KIP37, KIP37URIStorage, IKIP37Mintable, Acces
         address creator = creators[id];
         return creator != address(0);
     }
+
+    /**
+     * @dev Check if `account` has the assigned Minter role via {AccessControl-hasRole}
+     */
+    function isMinter(address account) public view returns (bool) {
+        return hasRole(MINTER_ROLE, account);
+    }
+
+    /**
+     * Emits a {RoleGranted} event
+     */
+    function addMinter(address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        grantRole(MINTER_ROLE, account);
+    }
+
+    /**
+     * Emits a {RoleRevoked} event
+     */
+    function renounceMinter() public {
+        renounceRole(MINTER_ROLE, _msgSender());
+    }
 }
 
 // File: contracts/KIP/token/KIP37/extensions/KIP37Pausable.sol
@@ -2889,6 +2910,31 @@ abstract contract KIP37Pausable is KIP37, AccessControlEnumerable, Pausable, IKI
         require(_tokenPaused[id] == true, "KIP37Pausable: token already unpaused");
         _tokenPaused[id] = false;
         emit TokenUnpaused(_msgSender(), id);
+    }
+
+    /**
+     * @dev Check if `account` has the assigned Pauser role via {AccessControl-hasRole}
+     */
+    function isPauser(address _account) public view returns (bool) {
+        return hasRole(PAUSER_ROLE, _account);
+    }
+
+    /**
+     * Emits a {RoleGranted} event
+     *
+     * Requirements:
+     *
+     * - caller must have the {AccessControl-DEFAULT_ADMIN_ROLE}
+     */
+    function addPauser(address _account) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        grantRole(PAUSER_ROLE, _account);
+    }
+
+    /**
+     * Emits a {RoleRevoked} event
+     */
+    function renouncePauser() public {
+        renounceRole(PAUSER_ROLE, msg.sender);
     }
 
     /**
