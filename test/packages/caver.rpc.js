@@ -674,6 +674,24 @@ describe('caver.rpc.klay', () => {
             await caver.rpc.klay.getHeader('0x489ef4696baa7f5c9548cb4affa1b969a5b18de221b0cc0ed2483a1b2f84ac69')
         }).timeout(100000)
     })
+
+    context('caver.rpc.klay.getRewards', () => {
+        it('CAVERJS-UNIT-RPC-030: caver.rpc.klay.getRewards should call correct RPC call depends on param type', async () => {
+            // Have to call klay_getHeaderByHash with hex string param
+            sandbox.stub(caver.rpc.klay._requestManager, 'send').callsFake((data, callback) => {
+                expect(data.params.length).to.equal(1)
+                if (caver.utils.isValidHash(data.params[0])) {
+                    expect(data.method).to.equal('klay_getHeaderByHash')
+                } else {
+                    expect(data.method).to.equal('klay_getHeaderByNumber')
+                }
+                callback(undefined, {})
+            })
+            await caver.rpc.klay.getRewards('latest')
+            await caver.rpc.klay.getRewards(0)
+            await caver.rpc.klay.getRewards('0x489ef4696baa7f5c9548cb4affa1b969a5b18de221b0cc0ed2483a1b2f84ac69')
+        }).timeout(100000)
+    })
 })
 
 describe('caver.rpc.governance', () => {

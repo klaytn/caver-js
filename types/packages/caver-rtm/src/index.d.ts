@@ -125,6 +125,18 @@ export default class RpcCallToMethod {
         blockHash: string,
         callback?: (error: Error, result: Header) => void
     ): Promise<Header>
+    klay_getRewards(
+        blockNumberOrHash: BlockNumber | string,
+        callback?: (error: Error, result: Header) => void
+    ): Promise<Rewards>
+    klay_getRewardsByNumber(
+        blockNumber: BlockNumber,
+        callback?: (error: Error, result: Header) => void
+    ): Promise<Rewards>
+    klay_getRewardsByHash(
+        blockHash: string,
+        callback?: (error: Error, result: Header) => void
+    ): Promise<Rewards>
     klay_getTransactionFromBlock(
         blockNumber: BlockNumber,
         index: number,
