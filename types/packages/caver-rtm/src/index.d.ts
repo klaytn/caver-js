@@ -17,6 +17,7 @@ import BN = require('bn.js')
 import BigNumber from 'bignumber.js'
 import {
     Header,
+    Rewards,
     Block,
     BlockNumber,
     TransactionReceipt,

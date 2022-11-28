@@ -46,6 +46,17 @@ export interface Header {
     baseFeePerGas?: string
 }
 
+export interface Rewards {
+    minted: string
+    totalFee: string
+    burntFee: string
+    proposer: string
+    stakers: string
+    kgf: string
+    kir: string
+    rewards: any
+}
+
 export interface Block {
     blockscore: string
     extraData: string

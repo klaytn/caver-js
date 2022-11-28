@@ -22,6 +22,7 @@ import { AccountKey } from '../../caver-account/src'
 import {
     Block,
     Header,
+    Rewards,
     BlockNumber,
     TransactionReceipt,
     BlockWithConsensusInfo,
