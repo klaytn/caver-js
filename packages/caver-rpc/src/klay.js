@@ -174,9 +174,8 @@ class Klay {
              * @instance
              *
              * @example
-             * // Use `caver.rpc.klay.getRewardsByNumber`
+             * // Use `caver.rpc.klay.getRewards`
              * const result = await caver.rpc.klay.getRewards(0)
-             * // Use `caver.rpc.klay.getRewardsByHash`
              * const result = await caver.rpc.klay.getRewards('0x58482921af951cf42a069436ac9338de50fd963bdbea40e396f416f9ac96a08b')
              *
              * @param {string|number|BN|BigNumber} blockHashOrNumber The block hash or block number to query block header.
@@ -185,49 +184,7 @@ class Klay {
              */
             new Method({
                 name: 'getRewards',
-                call: 'klay_getRewardsByNumber',
-                hexCall: 'klay_getRewardsByHash',
-                params: 1,
-                inputFormatter: [formatters.inputBlockNumberFormatter],
-            }),
-            /**
-             * Returns the reward distribution result about a block by block number.
-             *
-             * @memberof Klay
-             * @method getRewardsByNumber
-             * @instance
-             *
-             * @example
-             * const result = await caver.rpc.klay.getRewardsByNumber(0)
-             * const result = await caver.rpc.klay.getRewardsByNumber('latest')
-             *
-             * @param {string|number|BN|BigNumber} blockNumberOrTag The block number or block tag string to query block header.
-             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
-             * @return {Promise<Klay.Rewards>} An object includes reward distribution result.
-             */
-            new Method({
-                name: 'getRewardsByNumber',
-                call: 'klay_getRewardsByNumber',
-                params: 1,
-                inputFormatter: [formatters.inputBlockNumberFormatter],
-            }),
-            /**
-             * Returns the reward distribution result about a block by block hash.
-             *
-             * @memberof Klay
-             * @method getRewardsByHash
-             * @instance
-             *
-             * @example
-             * const result = await caver.rpc.klay.getRewardsByHash('0x58482921af951cf42a069436ac9338de50fd963bdbea40e396f416f9ac96a08b')
-             *
-             * @param {string} blockHash The block hash to query the reward distribution result about a block.
-             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
-             * @return {Promise<Klay.Rewards>} An object includes reward distribution result.
-             */
-            new Method({
-                name: 'getRewardsByHash',
-                call: 'klay_getRewardsByHash',
+                call: 'klay_getRewards',
                 params: 1,
                 inputFormatter: [formatters.inputBlockNumberFormatter],
             }),

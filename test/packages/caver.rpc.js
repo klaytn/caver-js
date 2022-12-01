@@ -677,13 +677,13 @@ describe('caver.rpc.klay', () => {
 
     context('caver.rpc.klay.getRewards', () => {
         it('CAVERJS-UNIT-RPC-030: caver.rpc.klay.getRewards should call correct RPC call depends on param type', async () => {
-            // Have to call klay_getHeaderByHash with hex string param
+            // Have to call klay_getRewards with hex string param
             sandbox.stub(caver.rpc.klay._requestManager, 'send').callsFake((data, callback) => {
                 expect(data.params.length).to.equal(1)
                 if (caver.utils.isValidHash(data.params[0])) {
-                    expect(data.method).to.equal('klay_getHeaderByHash')
+                    expect(data.method).to.equal('klay_getRewards')
                 } else {
-                    expect(data.method).to.equal('klay_getHeaderByNumber')
+                    expect(data.method).to.equal('klay_getRewards')
                 }
                 callback(undefined, {})
             })

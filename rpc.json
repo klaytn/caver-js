@@ -147,8 +147,7 @@
 	},
 	{
 		"name": "getRewards",
-		"call": "klay_getRewardsByNumber",
-		"hexCall": "klay_getRewardsByHash",
+		"call": "klay_getRewards",
 		"params": 1,
 		"inputFormatter": ["inputBlockNumberFormatter"]
 	},
