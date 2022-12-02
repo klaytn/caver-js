@@ -1126,8 +1126,53 @@ describe('caver.rpc.governance', () => {
         }).timeout(100000)
     })
 
+    context('caver.rpc.governance.getChainConfigAt', () => {
+        it('CAVERJS-UNIT-RPC-015: should return the latest chain configuration', async () => {
+            const govRPCStub = sandbox
+                .stub(caver.rpc.governance.getChainConfigAt.method.requestManager, 'send')
+                .callsFake((payload, sendTxCallback) => {
+                    expect(payload.method).to.equal('governance_chainConfigAt')
+                    expect(payload.params.length).to.equal(caver.rpc.governance.getChainConfigAt.method.params)
+                    const ret = {
+                        chainId: 1001,
+                        istanbulCompatibleBlock: 0,
+                        londonCompatibleBlock: 0,
+                        ethTxTypeCompatibleBlock: 0,
+                        magmaCompatibleBlock: 1,
+                        deriveShaImpl: 2,
+                        governance: {
+                            governanceMode: 'ballot',
+                            governingNode: '0xe733cb4d279da696f30d470f8c04decb54fcb0d2',
+                            reward: {
+                                deferredTxFee: true,
+                                minimumStake: 5000000,
+                                mintingAmount: 9600000000000000000,
+                                proposerUpdateInterval: 3600,
+                                ratio: '34/54/12',
+                                stakingUpdateInterval: 20,
+                                useGiniCoeff: false,
+                            },
+                            kip71: {
+                                lowerboundbasefee: 25000000000,
+                                upperboundbasefee: 750000000000,
+                                gastarget: 30000000,
+                                maxblockgasusedforbasefee: 60000000,
+                                basefeedenominator: 20,
+                            },
+                        },
+                        istanbul: { epoch: 20, policy: 2, sub: 1 },
+                        unitPrice: 25000000000,
+                    }
+                    sendTxCallback(null, ret)
+                })
+
+            await caver.rpc.governance.getChainConfigAt()
+            expect(govRPCStub.callCount).to.equal(1)
+        }).timeout(100000)
+    })
+
     context('caver.rpc.governance.getNodeAddress', () => {
-        it('CAVERJS-UNIT-RPC-015: should return the address of the node that a user is using', async () => {
+        it('CAVERJS-UNIT-RPC-016: should return the address of the node that a user is using', async () => {
             const govRPCStub = sandbox
                 .stub(caver.rpc.governance.getNodeAddress.method.requestManager, 'send')
                 .callsFake((payload, sendTxCallback) => {
@@ -1142,7 +1187,7 @@ describe('caver.rpc.governance', () => {
     })
 
     context('caver.rpc.governance.getItemsAt', () => {
-        it('CAVERJS-UNIT-RPC-016: should return governance items at specific block', async () => {
+        it('CAVERJS-UNIT-RPC-017: should return governance items at specific block', async () => {
             const govRPCStub = sandbox
                 .stub(caver.rpc.governance.getItemsAt.method.requestManager, 'send')
                 .callsFake((payload, sendTxCallback) => {
@@ -1172,7 +1217,7 @@ describe('caver.rpc.governance', () => {
     })
 
     context('caver.rpc.governance.getPendingChanges', () => {
-        it('CAVERJS-UNIT-RPC-017: should return the list of items that have received enough number of votes but not yet finalized', async () => {
+        it('CAVERJS-UNIT-RPC-018: should return the list of items that have received enough number of votes but not yet finalized', async () => {
             const govRPCStub = sandbox
                 .stub(caver.rpc.governance.getPendingChanges.method.requestManager, 'send')
                 .callsFake((payload, sendTxCallback) => {
@@ -1188,7 +1233,7 @@ describe('caver.rpc.governance', () => {
     })
 
     context('caver.rpc.governance.getVotes', () => {
-        it('CAVERJS-UNIT-RPC-018: should return the votes from all nodes in the epoch', async () => {
+        it('CAVERJS-UNIT-RPC-019: should return the votes from all nodes in the epoch', async () => {
             const govRPCStub = sandbox
                 .stub(caver.rpc.governance.getVotes.method.requestManager, 'send')
                 .callsFake((payload, sendTxCallback) => {
@@ -1210,7 +1255,7 @@ describe('caver.rpc.governance', () => {
     })
 
     context('caver.rpc.governance.getIdxCache', () => {
-        it('CAVERJS-UNIT-RPC-019: should return an array of current idxCache in the memory cache', async () => {
+        it('CAVERJS-UNIT-RPC-020: should return an array of current idxCache in the memory cache', async () => {
             const govRPCStub = sandbox
                 .stub(caver.rpc.governance.getIdxCache.method.requestManager, 'send')
                 .callsFake((payload, sendTxCallback) => {
@@ -1225,7 +1270,7 @@ describe('caver.rpc.governance', () => {
     })
 
     context('caver.rpc.governance.getIdxCacheFromDb', () => {
-        it('CAVERJS-UNIT-RPC-020: should return an array that contains all block numbers on which a governance change ever happened', async () => {
+        it('CAVERJS-UNIT-RPC-021: should return an array that contains all block numbers on which a governance change ever happened', async () => {
             const govRPCStub = sandbox
                 .stub(caver.rpc.governance.getIdxCacheFromDb.method.requestManager, 'send')
                 .callsFake((payload, sendTxCallback) => {
@@ -1240,7 +1285,7 @@ describe('caver.rpc.governance', () => {
     })
 
     context('caver.rpc.governance.getItemCacheFromDb', () => {
-        it('CAVERJS-UNIT-RPC-021: should return the governance information stored in the given block', async () => {
+        it('CAVERJS-UNIT-RPC-022: should return the governance information stored in the given block', async () => {
             const govRPCStub = sandbox
                 .stub(caver.rpc.governance.getItemCacheFromDb.method.requestManager, 'send')
                 .callsFake((payload, sendTxCallback) => {
@@ -1270,7 +1315,7 @@ describe('caver.rpc.governance', () => {
     })
 
     context('caver.rpc.governance.getStakingInfo', () => {
-        it('CAVERJS-UNIT-RPC-022: should return returns staking information at a specific block', async () => {
+        it('CAVERJS-UNIT-RPC-023: should return returns staking information at a specific block', async () => {
             const govRPCStub = sandbox
                 .stub(caver.rpc.governance.getStakingInfo.method.requestManager, 'send')
                 .callsFake((payload, sendTxCallback) => {
