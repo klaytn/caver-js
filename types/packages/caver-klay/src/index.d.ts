@@ -85,6 +85,7 @@ export class DeprecatedKlayRPC {
     getHeaderByNumber: RpcCallToMethod['klay_getHeaderByNumber']
     getHeaderByHash: RpcCallToMethod['klay_getHeaderByHash']
     getBlockReceipts: RpcCallToMethod['klay_getBlockReceipts']
+    getRewards: RpcCallToMethod['klay_getRewards']
     getBlockWithConsensusInfo: RpcCallToMethod['klay_getBlockWithConsensusInfo']
     getBlockWithConsensusInfoByNumber: RpcCallToMethod['klay_getBlockWithConsensusInfoByNumber']
     getBlockWithConsensusInfoByHash: RpcCallToMethod['klay_getBlockWithConsensusInfoByHash']

@@ -146,6 +146,12 @@
 		"inputFormatter": ["inputBlockNumberFormatter"]
 	},
 	{
+		"name": "getRewards",
+		"call": "klay_getRewards",
+		"params": 1,
+		"inputFormatter": ["inputBlockNumberFormatter"]
+	},
+	{
 		"name": "getBlockTransactionCount",
 		"call": "klay_getBlockTransactionCountByNumber",
 		"hexCall": "klay_getBlockTransactionCountByHash",

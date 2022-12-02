@@ -22,6 +22,7 @@ import { AccountKey } from '../../caver-account/src'
 import {
     Block,
     Header,
+    Rewards,
     BlockNumber,
     TransactionReceipt,
     BlockWithConsensusInfo,
@@ -133,6 +134,7 @@ export class Klay {
     getHeader(blockNumber: BlockNumber, callback?: (error: Error, result: Header) => void): Promise<Header>
     getHeaderByNumber(blockNumber: BlockNumber, callback?: (error: Error, result: Header) => void): Promise<Header>
     getHeaderByHash(blockHash: string, callback?: (error: Error, result: Header) => void): Promise<Header>
+    getRewards(blockNumber: BlockNumber, callback?: (error: Error, result: Header) => void): Promise<Rewards>
     getBlockReceipts(blockHash: string, callback?: (error: Error, result: TransactionReceipt[]) => void): Promise<TransactionReceipt[]>
     getBlockTransactionCount(blockNumber: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
     getBlockTransactionCountByNumber(

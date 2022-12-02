@@ -151,6 +151,44 @@ class Klay {
                 inputFormatter: [formatters.inputBlockNumberFormatter],
             }),
             /**
+             * An object for reward distribution from Klaytn.
+             *
+             * @example
+             *
+             * @typedef {object} Klay.Rewards
+             * @property {number} minted - The amount minted.
+             * @property {number} totalFee - Total tx fee spent.
+             * @property {number} burntFee - The amount burnt.
+             * @property {number} proposer - The amount for the block proposer.
+             * @property {number} stakers - Total amount for stakers.
+             * @property {number} kgf - The amount for KGF.
+             * @property {number} kir - The amount for KIR.
+             * @property {object} rewards - A mapping from reward recipient addresses to reward amounts.
+             */
+            /**
+             * Returns the reward distribution result about a block.
+             * If parameter is hex string, this will use {@link Klay#getRewardsByHash|caver.rpc.klay.getRewardsByHash}, if paramter is number type, this will use {@link Klay#getRewardsByNumber|caver.rpc.klay.getRewardsByNumber}.
+             *
+             * @memberof Klay
+             * @method getRewards
+             * @instance
+             *
+             * @example
+             * // Use `caver.rpc.klay.getRewards`
+             * const result = await caver.rpc.klay.getRewards(0)
+             * const result = await caver.rpc.klay.getRewards('0x58482921af951cf42a069436ac9338de50fd963bdbea40e396f416f9ac96a08b')
+             *
+             * @param {string|number|BN|BigNumber} blockHashOrNumber The block hash or block number to query block header.
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<Klay.Rewards>} An object includes reward distribution result.
+             */
+            new Method({
+                name: 'getRewards',
+                call: 'klay_getRewards',
+                params: 1,
+                inputFormatter: [formatters.inputBlockNumberFormatter],
+            }),
+            /**
              * An object defines the AccountKeyLegacy.
              *
              * @example
