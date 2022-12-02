@@ -149,8 +149,8 @@ const Governance = function Governance(...args) {
             params: 0,
         }),
         /**
-         * Provides the initial chain configuration.
-         * Because it just stores the initial configuration, if there were changes in the governance made by voting, the result of chainConfig will differ from the current states.
+         * Provides the latest chain configuration.
+         * This is equivalent to chainConfigAt() with an empty parameter.
          * To see the current information, please use {@link itemsAt}.
          *
          * @memberof Governance
@@ -161,12 +161,36 @@ const Governance = function Governance(...args) {
          * const result = await caver.rpc.governance.getChainConfig()
          *
          * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
-         * @return {Promise<object>} The initial chain configuration
+         * @return {Promise<object>} The latest chain configuration
          */
         new Method({
             name: 'getChainConfig',
             call: 'governance_chainConfig',
             params: 0,
+        }),
+        /**
+         * Returns the chain configuration at specific block.
+         * If the parameter is not set, it returns the chain configuration at the latest block.
+         * To see the current information, please use {@link itemsAt}.
+         *
+         * @memberof Governance
+         * @method getChainConfigAt
+         * @instance
+         *
+         * @example
+         * // Use `caver.rpc.governance.getChainConfigAt()`
+         * const result = await caver.rpc.governance.getChainConfigAt(0)
+         * const result = await caver.rpc.governance.getChainConfigAt('0x58482921af951cf42a069436ac9338de50fd963bdbea40e396f416f9ac96a08b')
+         *
+         * @param {string|number|BN|BigNumber} blockHashOrNumber The block hash or block number to query block header.
+         * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+         * @return {Promise<object>} Chain configuration at the given block number.
+         */
+        new Method({
+            name: 'getChainConfigAt',
+            call: 'governance_chainConfigAt',
+            params: 1,
+            inputFormatter: [formatters.inputBlockNumberFormatter],
         }),
         /**
          * Provides the address of the node that a user is using.

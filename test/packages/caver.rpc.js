@@ -692,6 +692,193 @@ describe('caver.rpc.klay', () => {
             await caver.rpc.klay.getRewards('0x489ef4696baa7f5c9548cb4affa1b969a5b18de221b0cc0ed2483a1b2f84ac69')
         }).timeout(100000)
     })
+
+    context('caver.rpc.klay.getChainConfig', () => {
+        it('CAVERJS-UNIT-RPC-031: should return the latest chain configuration', async () => {
+            const klayRPCStub = sandbox
+                .stub(caver.rpc.klay.getChainConfig.method.requestManager, 'send')
+                .callsFake((payload, sendTxCallback) => {
+                    expect(payload.method).to.equal('klay_chainConfig')
+                    expect(payload.params.length).to.equal(caver.rpc.klay.getChainConfig.method.params)
+                    const ret = {
+                        chainId: 1001,
+                        istanbulCompatibleBlock: 0,
+                        londonCompatibleBlock: 0,
+                        ethTxTypeCompatibleBlock: 0,
+                        magmaCompatibleBlock: 1,
+                        deriveShaImpl: 2,
+                        governance: {
+                            governanceMode: 'ballot',
+                            governingNode: '0xe733cb4d279da696f30d470f8c04decb54fcb0d2',
+                            reward: {
+                                deferredTxFee: true,
+                                minimumStake: 5000000,
+                                mintingAmount: 9600000000000000000,
+                                proposerUpdateInterval: 3600,
+                                ratio: '34/54/12',
+                                stakingUpdateInterval: 20,
+                                useGiniCoeff: false,
+                            },
+                            kip71: {
+                                lowerboundbasefee: 25000000000,
+                                upperboundbasefee: 750000000000,
+                                gastarget: 30000000,
+                                maxblockgasusedforbasefee: 60000000,
+                                basefeedenominator: 20,
+                            },
+                        },
+                        istanbul: { epoch: 20, policy: 2, sub: 1 },
+                        unitPrice: 25000000000,
+                    }
+                    sendTxCallback(null, ret)
+                })
+
+            await caver.rpc.klay.getChainConfig()
+            expect(klayRPCStub.callCount).to.equal(1)
+        }).timeout(100000)
+    })
+
+
+    context('caver.rpc.klay.getChainConfigAt', () => {
+        it('CAVERJS-UNIT-RPC-032: should return the latest chain configuration', async () => {
+            const klayRPCStub = sandbox
+                .stub(caver.rpc.klay.getChainConfigAt.method.requestManager, 'send')
+                .callsFake((payload, sendTxCallback) => {
+                    expect(payload.method).to.equal('klay_chainConfigAt')
+                    expect(payload.params.length).to.equal(caver.rpc.klay.getChainConfigAt.method.params)
+                    const ret = {
+                        chainId: 1001,
+                        istanbulCompatibleBlock: 0,
+                        londonCompatibleBlock: 0,
+                        ethTxTypeCompatibleBlock: 0,
+                        magmaCompatibleBlock: 1,
+                        deriveShaImpl: 2,
+                        governance: {
+                            governanceMode: 'ballot',
+                            governingNode: '0xe733cb4d279da696f30d470f8c04decb54fcb0d2',
+                            reward: {
+                                deferredTxFee: true,
+                                minimumStake: 5000000,
+                                mintingAmount: 9600000000000000000,
+                                proposerUpdateInterval: 3600,
+                                ratio: '34/54/12',
+                                stakingUpdateInterval: 20,
+                                useGiniCoeff: false,
+                            },
+                            kip71: {
+                                lowerboundbasefee: 25000000000,
+                                upperboundbasefee: 750000000000,
+                                gastarget: 30000000,
+                                maxblockgasusedforbasefee: 60000000,
+                                basefeedenominator: 20,
+                            },
+                        },
+                        istanbul: { epoch: 20, policy: 2, sub: 1 },
+                        unitPrice: 25000000000,
+                    }
+                    sendTxCallback(null, ret)
+                })
+
+            await caver.rpc.klay.getChainConfigAt()
+            expect(klayRPCStub.callCount).to.equal(1)
+        }).timeout(100000)
+    })
+
+    context('caver.rpc.klay.getNodeAddress', () => {
+        it('CAVERJS-UNIT-RPC-033: should return the address of the node that a user is using', async () => {
+            const klayRPCStub = sandbox
+                .stub(caver.rpc.klay.getNodeAddress.method.requestManager, 'send')
+                .callsFake((payload, sendTxCallback) => {
+                    expect(payload.method).to.equal('klay_nodeAddress')
+                    expect(payload.params.length).to.equal(caver.rpc.klay.getNodeAddress.method.params)
+                    sendTxCallback(null, '0xa80de139de3fb29fba7e2d20bda593c5ffe63ce9')
+                })
+
+            await caver.rpc.klay.getNodeAddress()
+            expect(klayRPCStub.callCount).to.equal(1)
+        }).timeout(100000)
+    })
+
+    context('caver.rpc.klay.govParamsAt', () => {
+        it('CAVERJS-UNIT-RPC-034: should return governance params at specific block', async () => {
+            const klayRPCStub = sandbox
+                .stub(caver.rpc.klay.govParamsAt.method.requestManager, 'send')
+                .callsFake((payload, sendTxCallback) => {
+                    expect(payload.method).to.equal('klay_govParamsAt')
+                    expect(payload.params.length).to.equal(caver.rpc.klay.govParamsAt.method.params)
+                    const ret = {
+                        'governance.governancemode': 'single',
+                        'governance.governingnode': '0xa80de139de3fb29fba7e2d20bda593c5ffe63ce9',
+                        'governance.unitprice': 25000000000,
+                        'istanbul.committeesize': 22,
+                        'istanbul.epoch': 30,
+                        'istanbul.policy': 2,
+                        'reward.deferredtxfee': true,
+                        'reward.minimumstake': '5000000',
+                        'reward.mintingamount': '9600000000000000000',
+                        'reward.proposerupdateinterval': 30,
+                        'reward.ratio': '34/54/12',
+                        'reward.stakingupdateinterval': 60,
+                        'reward.useginicoeff': true,
+                    }
+                    sendTxCallback(null, ret)
+                })
+
+            await caver.rpc.klay.govParamsAt(0)
+            expect(klayRPCStub.callCount).to.equal(1)
+        }).timeout(100000)
+    })
+
+    context('caver.rpc.klay.getStakingInfo', () => {
+        it('CAVERJS-UNIT-RPC-035: should return returns staking information at a specific block', async () => {
+            const klayRPCStub = sandbox
+                .stub(caver.rpc.klay.getStakingInfo.method.requestManager, 'send')
+                .callsFake((payload, sendTxCallback) => {
+                    expect(payload.method).to.equal('klay_getStakingInfo')
+                    expect(payload.params.length).to.equal(caver.rpc.klay.getStakingInfo.method.params)
+                    const ret = {
+                        BlockNum: 57801600,
+                        CouncilNodeAddrs: [
+                            '0x99fb17d324fa0e07f23b49d09028ac0919414db6',
+                            '0x571e53df607be97431a5bbefca1dffe5aef56f4d',
+                            '0xb74ff9dea397fe9e231df545eb53fe2adf776cb2',
+                            '0x5cb1a7dccbd0dc446e3640898ede8820368554c8',
+                            '0x776817c0ef3d06d794cf01ae9afa33d7397b9b40',
+                            '0xc180ca565b34b5b63877674f5fe647e7da079022',
+                            '0x03497f51c31fe8b402df0bde90fd5a85f87aa943',
+                        ],
+                        CouncilRewardAddrs: [
+                            '0xb2bd3178affccd9f9f5189457f1cad7d17a01c9d',
+                            '0x6559a7b6248b342bc11fbcdf9343212bbc347edc',
+                            '0x82829a60c6eac4e3e9d6ed00891c69e88537fd4d',
+                            '0xa86fd667c6a340c53cc5d796ba84dbe1f29cb2f7',
+                            '0x6e22cbe2b8bbd1df9f1d3c8ebae6d7ff5414a734',
+                            '0x24e593fb29731e54905025c230727dc28d229f77',
+                            '0x2b2a7a1d29a203f60e0a964fc64231265a49cd97',
+                        ],
+                        CouncilStakingAddrs: [
+                            '0x12fa1ab4c3e17c1c08c1b5a945c864c8e8bf707e',
+                            '0xfd56604f1a20268ff7a0eab2ab48e25ee1e0f653',
+                            '0x1e0f6aaa9baa6081dc4910a854eebf8854c262ab',
+                            '0x5e6988415ebe0f6b088f5a676003ba60f572875a',
+                            '0xbb44998c2af35b8faee694cffe216558056d747e',
+                            '0x68cba498b7175cde9de08fc2e85ad3e9c8caefa8',
+                            '0x98efb31eeccafe35d53a6926e2a54c0858d9eebc',
+                        ],
+                        CouncilStakingAmounts: [5000000, 5000000, 5000000, 5000000, 5000000, 5000000, 5000000],
+                        Gini: 0,
+                        KIRAddr: '0x716f89d9bc333286c79db4ebb05516897c8d208a',
+                        PoCAddr: '0x2bcf9d3e4a846015e7e3152a614c684de16f37c6',
+                        UseGini: true,
+                    }
+                    sendTxCallback(null, ret)
+                })
+
+            await caver.rpc.klay.getStakingInfo()
+            expect(klayRPCStub.callCount).to.equal(1)
+        }).timeout(100000)
+    })
+
 })
 
 describe('caver.rpc.governance', () => {
@@ -895,7 +1082,7 @@ describe('caver.rpc.governance', () => {
     })
 
     context('caver.rpc.governance.getChainConfig', () => {
-        it('CAVERJS-UNIT-RPC-014: should return the initial chain configuration', async () => {
+        it('CAVERJS-UNIT-RPC-014: should return the latest chain configuration', async () => {
             const govRPCStub = sandbox
                 .stub(caver.rpc.governance.getChainConfig.method.requestManager, 'send')
                 .callsFake((payload, sendTxCallback) => {

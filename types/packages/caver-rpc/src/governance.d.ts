@@ -18,7 +18,12 @@
 
 import BN = require('bn.js')
 import BigNumber from 'bignumber.js'
-import { BlockNumber } from '../../caver-core/src'
+import { 
+    BlockNumber,
+    ChainConfig,
+    GovernanceItems,
+    StakingInformation,
+} from '../../caver-core/src'
 
 export interface Tally {
     ApprovalPercentage: number
@@ -39,61 +44,6 @@ export interface Vote {
     value: string | number | boolean
 }
 
-export interface ChainConfig {
-    chainId: number
-    istanbulCompatibleBlock?: number
-    londonCompatibleBlock?: number
-    ethTxTypeCompatibleBlock?: number
-    magmaCompatibleBlock?: number
-    deriveShaImpl: number
-    governance: {
-        governanceMode: string
-        governingNode: string
-        reward: {
-            deferredTxFee: boolean
-            minimumStake: number
-            mintingAmount: number
-            proposerUpdateInterval: number
-            ratio: string
-            stakingUpdateInterval: number
-            useGiniCoeff: boolean
-        }
-        kip71?: {
-            lowerboundbasefee: number
-            upperboundbasefee: number
-            gastarget: number
-            maxblockgasusedforbasefee: number
-            basefeedenominator: number
-        }
-    }
-    istanbul: {
-        epoch: number
-        policy: number
-        sub: number
-    }
-    unitPrice: number
-}
-
-export interface GovernanceItems {
-    'governance.governancemode': string
-    'governance.governingnode': string
-    'governance.unitprice': number
-    'istanbul.committeesize': number
-    'istanbul.epoch': number
-    'istanbul.policy': number
-    'reward.deferredtxfee': boolean
-    'reward.minimumstake': string
-    'reward.mintingamount': string
-    'reward.proposerupdateinterval': number
-    'reward.ratio': string
-    'reward.stakingupdateinterval': number
-    'reward.useginicoeff': boolean
-    'kip71.lowerboundbasefee'?: number
-    'kip71.upperboundbasefee'?: number
-    'kip71.gastarget'?: number
-    'kip71.maxblockgasusedforbasefee'?: number
-    'kip71.basefeedenominator'?: number
-}
 
 export interface VoteItems {
     'governance.governancemode'?: string
@@ -118,17 +68,6 @@ export interface VoteItems {
     'kip71.basefeedenominator'?: number
 }
 
-export interface StakingInformation {
-    BlockNum: number
-    CouncilNodeAddrs: string[]
-    CouncilRewardAddrs: string[]
-    CouncilStakingAddrs: string[]
-    CouncilStakingAmounts: number[]
-    Gini: number
-    KIRAddr: string
-    PoCAddr: string // PoC is the previous name of KGF.
-    UseGini: boolean
-}
 
 export class Governance {
     constructor(...args: any[])
@@ -139,8 +78,13 @@ export class Governance {
     getMyVotingPower(callback?: (error: Error, result: number) => void): Promise<number>
     getMyVotes(callback?: (error: Error, result: MyVote[]) => void): Promise<MyVote[]>
     getChainConfig(callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
+    getChainConfigAt(callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
+    getChainConfigAt(blockNumber: BlockNumber, callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
     getNodeAddress(callback?: (error: Error, result: string) => void): Promise<string>
+    getItemsAt(callback?: (error: Error, result: GovernanceItems) => void): Promise<GovernanceItems>
     getItemsAt(blockNumber: BlockNumber, callback?: (error: Error, result: GovernanceItems) => void): Promise<GovernanceItems>
+    getStakingInfo(callback?: (error: Error, result: StakingInformation) => void): Promise<StakingInformation>
+    getStakingInfo(blockNumber: BlockNumber, callback?: (error: Error, result: StakingInformation) => void): Promise<StakingInformation>
     getPendingChanges(callback?: (error: Error, result: VoteItems) => void): Promise<VoteItems>
     getVotes(callback?: (error: Error, result: Vote[]) => void): Promise<Vote[]>
     getIdxCache(callback?: (error: Error, result: number[]) => void): Promise<number[]>
@@ -149,6 +93,4 @@ export class Governance {
         blockNumber: number | BN | BigNumber | string,
         callback?: (error: Error, result: GovernanceItems) => void
     ): Promise<GovernanceItems>
-    getStakingInfo(callback?: (error: Error, result: StakingInformation) => void): Promise<StakingInformation>
-    getStakingInfo(blockNumber: BlockNumber, callback?: (error: Error, result: StakingInformation) => void): Promise<StakingInformation>
 }

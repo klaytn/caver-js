@@ -166,29 +166,6 @@ class Klay {
              * @property {object} rewards - A mapping from reward recipient addresses to reward amounts.
              */
             /**
-             * Returns the reward distribution result about a block.
-             * If parameter is hex string, this will use {@link Klay#getRewardsByHash|caver.rpc.klay.getRewardsByHash}, if paramter is number type, this will use {@link Klay#getRewardsByNumber|caver.rpc.klay.getRewardsByNumber}.
-             *
-             * @memberof Klay
-             * @method getRewards
-             * @instance
-             *
-             * @example
-             * // Use `caver.rpc.klay.getRewards`
-             * const result = await caver.rpc.klay.getRewards(0)
-             * const result = await caver.rpc.klay.getRewards('0x58482921af951cf42a069436ac9338de50fd963bdbea40e396f416f9ac96a08b')
-             *
-             * @param {string|number|BN|BigNumber} blockHashOrNumber The block hash or block number to query block header.
-             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
-             * @return {Promise<Klay.Rewards>} An object includes reward distribution result.
-             */
-            new Method({
-                name: 'getRewards',
-                call: 'klay_getRewards',
-                params: 1,
-                inputFormatter: [formatters.inputBlockNumberFormatter],
-            }),
-            /**
              * An object defines the AccountKeyLegacy.
              *
              * @example
@@ -2240,7 +2217,134 @@ class Klay {
                 call: 'klay_rewardbase',
                 params: 0,
             }),
-
+            /**
+             * Returns the reward distribution result about a block.
+             * If parameter is hex string, this will use {@link Klay#getRewardsByHash|caver.rpc.klay.getRewardsByHash}, if paramter is number type, this will use {@link Klay#getRewardsByNumber|caver.rpc.klay.getRewardsByNumber}.
+             *
+             * @memberof Klay
+             * @method getRewards
+             * @instance
+             *
+             * @example
+             * // Use `caver.rpc.klay.getRewards`
+             * const result = await caver.rpc.klay.getRewards(0)
+             * const result = await caver.rpc.klay.getRewards('0x58482921af951cf42a069436ac9338de50fd963bdbea40e396f416f9ac96a08b')
+             *
+             * @param {string|number|BN|BigNumber} blockHashOrNumber The block hash or block number to query block header.
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<Klay.Rewards>} An object includes reward distribution result.
+             */
+            new Method({
+                name: 'getRewards',
+                call: 'klay_getRewards',
+                params: 1,
+                inputFormatter: [formatters.inputBlockNumberFormatter],
+            }),
+            /**
+             * Provides the latest chain configuration.
+             * This is equivalent to chainConfigAt() with an empty parameter.
+             * To see the current information, please use {@link itemsAt}.
+             *
+             * @memberof Klay
+             * @method getChainConfig
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getChainConfig()
+             *
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<object>} The latest chain configuration
+             */
+            new Method({
+                name: 'getChainConfig',
+                call: 'klay_chainConfig',
+                params: 0,
+            }),
+            /**
+             * Returns the chain configuration at specific block.
+             * If the parameter is not set, it returns the chain configuration at the latest block.
+             * To see the current information, please use {@link itemsAt}.
+             *
+             * @memberof Klay
+             * @method getChainConfigAt
+             * @instance
+             *
+             * @example
+             * // Use `caver.rpc.klay.getChainConfigAt()`
+             * const result = await caver.rpc.klay.getChainConfigAt(0)
+             * const result = await caver.rpc.klay.getChainConfigAt('0x58482921af951cf42a069436ac9338de50fd963bdbea40e396f416f9ac96a08b')
+             *
+             * @param {string|number|BN|BigNumber} blockHashOrNumber The block hash or block number to query block header.
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<object>} Chain configuration at the given block number.
+             */
+            new Method({
+                name: 'getChainConfigAt',
+                call: 'klay_chainConfigAt',
+                params: 1,
+                inputFormatter: [formatters.inputBlockNumberFormatter],
+            }),
+            /**
+             * Provides the address of the node that a user is using.
+             * It is derived from the nodekey and used to sign consensus messages.
+             * And the value of "governingnode" has to be one of validator's node address.
+             *
+             * @memberof klay
+             * @method getNodeAddress
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getNodeAddress()
+             *
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<string>} The address of a node
+             */
+            new Method({
+                name: 'getNodeAddress',
+                call: 'klay_nodeAddress',
+                params: 0,
+            }),
+            /**
+             * Returns governance items at a specific block.
+             * It is the result of previous voting of the block and used as configuration for chain at the given block number.
+             *
+             * @memberof klay
+             * @method getGovParamsAt
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getGovParamsAt()
+             *
+             * @param {string|number} [blockNumberOrTag] A block number, or the string `latest` or `earliest`. If omitted, `latest` will be used.
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<object>} The governance items.
+             */
+            new Method({
+                name: 'getGovParamsAt',
+                call: 'klay_govParamsAt',
+                params: 1,
+                inputFormatter: [formatters.inputDefaultBlockNumberFormatter],
+            }),
+            /**
+             * Returns the staking information at a specific block.
+             *
+             * @memberof klay
+             * @method getStakingInfo
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getStakingInfo()
+             *
+             * @param {string|number} [blockNumberOrTag] A block number, or the string `latest` or `earliest`. If omitted, `latest` will be used.
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<object>} Stored governance information at a given block.
+             */
+            new Method({
+                name: 'getStakingInfo',
+                call: 'klay_getStakingInfo',
+                params: 1,
+                inputFormatter: [formatters.inputDefaultBlockNumberFormatter],
+            }),
             // Filter
             /**
              * Polling method for a filter, which returns an array of logs since the last poll.
