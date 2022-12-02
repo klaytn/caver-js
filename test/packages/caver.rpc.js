@@ -799,13 +799,13 @@ describe('caver.rpc.klay', () => {
         }).timeout(100000)
     })
 
-    context('caver.rpc.klay.govParamsAt', () => {
+    context('caver.rpc.klay.getGovParamsAt', () => {
         it('CAVERJS-UNIT-RPC-034: should return governance params at specific block', async () => {
             const klayRPCStub = sandbox
-                .stub(caver.rpc.klay.govParamsAt.method.requestManager, 'send')
+                .stub(caver.rpc.klay.getGovParamsAt.method.requestManager, 'send')
                 .callsFake((payload, sendTxCallback) => {
                     expect(payload.method).to.equal('klay_govParamsAt')
-                    expect(payload.params.length).to.equal(caver.rpc.klay.govParamsAt.method.params)
+                    expect(payload.params.length).to.equal(caver.rpc.klay.getGovParamsAt.method.params)
                     const ret = {
                         'governance.governancemode': 'single',
                         'governance.governingnode': '0xa80de139de3fb29fba7e2d20bda593c5ffe63ce9',
@@ -824,7 +824,7 @@ describe('caver.rpc.klay', () => {
                     sendTxCallback(null, ret)
                 })
 
-            await caver.rpc.klay.govParamsAt(0)
+            await caver.rpc.klay.getGovParamsAt(0)
             expect(klayRPCStub.callCount).to.equal(1)
         }).timeout(100000)
     })
