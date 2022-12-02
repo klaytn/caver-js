@@ -18,7 +18,7 @@
 
 import BN = require('bn.js')
 import BigNumber from 'bignumber.js'
-import { 
+import {
     BlockNumber,
     ChainConfig,
     GovernanceItems,
@@ -44,7 +44,6 @@ export interface Vote {
     value: string | number | boolean
 }
 
-
 export interface VoteItems {
     'governance.governancemode'?: string
     'governance.governingnode'?: string
@@ -67,7 +66,6 @@ export interface VoteItems {
     'kip71.maxblockgasusedforbasefee'?: number
     'kip71.basefeedenominator'?: number
 }
-
 
 export class Governance {
     constructor(...args: any[])
