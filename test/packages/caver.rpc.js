@@ -739,7 +739,7 @@ describe('caver.rpc.klay', () => {
     })
 
     context('caver.rpc.klay.getChainConfigAt', () => {
-        it('CAVERJS-UNIT-RPC-032: should return the latest chain configuration', async () => {
+        it('CAVERJS-UNIT-RPC-032: should return the latest chain configuration like getChainCofig', async () => {
             const klayRPCStub = sandbox
                 .stub(caver.rpc.klay.getChainConfigAt.method.requestManager, 'send')
                 .callsFake((payload, sendTxCallback) => {
