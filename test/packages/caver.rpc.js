@@ -738,7 +738,6 @@ describe('caver.rpc.klay', () => {
         }).timeout(100000)
     })
 
-
     context('caver.rpc.klay.getChainConfigAt', () => {
         it('CAVERJS-UNIT-RPC-032: should return the latest chain configuration', async () => {
             const klayRPCStub = sandbox
@@ -878,7 +877,6 @@ describe('caver.rpc.klay', () => {
             expect(klayRPCStub.callCount).to.equal(1)
         }).timeout(100000)
     })
-
 })
 
 describe('caver.rpc.governance', () => {
