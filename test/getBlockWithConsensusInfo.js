@@ -30,7 +30,7 @@ const { expect } = chai
 
 function checkKeyExistence(info) {
     if (info === undefined) return false
-    if (info.blockscore === undefined) return false
+    if (info.blockScore === undefined) return false
     if (info.committee === undefined) return false
     if (info.extraData === undefined) return false
     if (info.gasUsed === undefined) return false

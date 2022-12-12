@@ -58,7 +58,7 @@ export interface Rewards {
 }
 
 export interface Block {
-    blockscore: string
+    blockScore: string
     extraData: string
     gasUsed: string
     governanceData: string
