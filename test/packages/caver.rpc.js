@@ -705,19 +705,22 @@ describe('caver.rpc.klay', () => {
                         istanbulCompatibleBlock: 0,
                         londonCompatibleBlock: 0,
                         ethTxTypeCompatibleBlock: 0,
-                        magmaCompatibleBlock: 1,
+                        magmaCompatibleBlock: 0,
+                        koreCompatibleBlock: 1000,
                         deriveShaImpl: 2,
                         governance: {
-                            governanceMode: 'ballot',
-                            governingNode: '0xe733cb4d279da696f30d470f8c04decb54fcb0d2',
+                            govParamContract: '0x0000000000000000000000000000000000000000',
+                            governanceMode: 'single',
+                            governingNode: '0x7313f6c9c40bb421838495c79043240220dfaea7',
                             reward: {
                                 deferredTxFee: true,
+                                kip82ratio: '20/80',
                                 minimumStake: 5000000,
                                 mintingAmount: 9600000000000000000,
-                                proposerUpdateInterval: 3600,
-                                ratio: '34/54/12',
-                                stakingUpdateInterval: 20,
-                                useGiniCoeff: false,
+                                proposerUpdateInterval: 30,
+                                ratio: '50/40/10',
+                                stakingUpdateInterval: 60,
+                                useGiniCoeff: true,
                             },
                             kip71: {
                                 lowerboundbasefee: 25000000000,
@@ -727,7 +730,11 @@ describe('caver.rpc.klay', () => {
                                 basefeedenominator: 20,
                             },
                         },
-                        istanbul: { epoch: 20, policy: 2, sub: 1 },
+                        istanbul: {
+                            epoch: 30,
+                            policy: 2,
+                            sub: 22,
+                        },
                         unitPrice: 25000000000,
                     }
                     sendTxCallback(null, ret)
@@ -750,19 +757,22 @@ describe('caver.rpc.klay', () => {
                         istanbulCompatibleBlock: 0,
                         londonCompatibleBlock: 0,
                         ethTxTypeCompatibleBlock: 0,
-                        magmaCompatibleBlock: 1,
+                        magmaCompatibleBlock: 0,
+                        koreCompatibleBlock: 1000,
                         deriveShaImpl: 2,
                         governance: {
-                            governanceMode: 'ballot',
-                            governingNode: '0xe733cb4d279da696f30d470f8c04decb54fcb0d2',
+                            govParamContract: '0x0000000000000000000000000000000000000000',
+                            governanceMode: 'single',
+                            governingNode: '0x7313f6c9c40bb421838495c79043240220dfaea7',
                             reward: {
                                 deferredTxFee: true,
+                                kip82ratio: '20/80',
                                 minimumStake: 5000000,
                                 mintingAmount: 9600000000000000000,
-                                proposerUpdateInterval: 3600,
-                                ratio: '34/54/12',
-                                stakingUpdateInterval: 20,
-                                useGiniCoeff: false,
+                                proposerUpdateInterval: 30,
+                                ratio: '50/40/10',
+                                stakingUpdateInterval: 60,
+                                useGiniCoeff: true,
                             },
                             kip71: {
                                 lowerboundbasefee: 25000000000,
@@ -772,7 +782,11 @@ describe('caver.rpc.klay', () => {
                                 basefeedenominator: 20,
                             },
                         },
-                        istanbul: { epoch: 20, policy: 2, sub: 1 },
+                        istanbul: {
+                            epoch: 30,
+                            policy: 2,
+                            sub: 22,
+                        },
                         unitPrice: 25000000000,
                     }
                     sendTxCallback(null, ret)
@@ -816,7 +830,7 @@ describe('caver.rpc.klay', () => {
                         'reward.minimumstake': '5000000',
                         'reward.mintingamount': '9600000000000000000',
                         'reward.proposerupdateinterval': 30,
-                        'reward.ratio': '34/54/12',
+                        'reward.ratio': '50/40/10',
                         'reward.stakingupdateinterval': 60,
                         'reward.useginicoeff': true,
                     }
@@ -928,7 +942,7 @@ describe('caver.rpc.governance', () => {
             expect(govRPCStub.callCount).to.equal(6)
 
             key = 'reward.ratio'
-            value = '40/30/30'
+            value = '50/40/10'
 
             await caver.rpc.governance.vote(key, value)
             expect(govRPCStub.callCount).to.equal(7)
@@ -1091,19 +1105,22 @@ describe('caver.rpc.governance', () => {
                         istanbulCompatibleBlock: 0,
                         londonCompatibleBlock: 0,
                         ethTxTypeCompatibleBlock: 0,
-                        magmaCompatibleBlock: 1,
+                        magmaCompatibleBlock: 0,
+                        koreCompatibleBlock: 1000,
                         deriveShaImpl: 2,
                         governance: {
-                            governanceMode: 'ballot',
-                            governingNode: '0xe733cb4d279da696f30d470f8c04decb54fcb0d2',
+                            govParamContract: '0x0000000000000000000000000000000000000000',
+                            governanceMode: 'single',
+                            governingNode: '0x7313f6c9c40bb421838495c79043240220dfaea7',
                             reward: {
                                 deferredTxFee: true,
+                                kip82ratio: '20/80',
                                 minimumStake: 5000000,
                                 mintingAmount: 9600000000000000000,
-                                proposerUpdateInterval: 3600,
-                                ratio: '34/54/12',
-                                stakingUpdateInterval: 20,
-                                useGiniCoeff: false,
+                                proposerUpdateInterval: 30,
+                                ratio: '50/40/10',
+                                stakingUpdateInterval: 60,
+                                useGiniCoeff: true,
                             },
                             kip71: {
                                 lowerboundbasefee: 25000000000,
@@ -1113,7 +1130,11 @@ describe('caver.rpc.governance', () => {
                                 basefeedenominator: 20,
                             },
                         },
-                        istanbul: { epoch: 20, policy: 2, sub: 1 },
+                        istanbul: {
+                            epoch: 30,
+                            policy: 2,
+                            sub: 22,
+                        },
                         unitPrice: 25000000000,
                     }
                     sendTxCallback(null, ret)
@@ -1136,19 +1157,22 @@ describe('caver.rpc.governance', () => {
                         istanbulCompatibleBlock: 0,
                         londonCompatibleBlock: 0,
                         ethTxTypeCompatibleBlock: 0,
-                        magmaCompatibleBlock: 1,
+                        magmaCompatibleBlock: 0,
+                        koreCompatibleBlock: 1000,
                         deriveShaImpl: 2,
                         governance: {
-                            governanceMode: 'ballot',
-                            governingNode: '0xe733cb4d279da696f30d470f8c04decb54fcb0d2',
+                            govParamContract: '0x0000000000000000000000000000000000000000',
+                            governanceMode: 'single',
+                            governingNode: '0x7313f6c9c40bb421838495c79043240220dfaea7',
                             reward: {
                                 deferredTxFee: true,
+                                kip82ratio: '20/80',
                                 minimumStake: 5000000,
                                 mintingAmount: 9600000000000000000,
-                                proposerUpdateInterval: 3600,
-                                ratio: '34/54/12',
-                                stakingUpdateInterval: 20,
-                                useGiniCoeff: false,
+                                proposerUpdateInterval: 30,
+                                ratio: '50/40/10',
+                                stakingUpdateInterval: 60,
+                                useGiniCoeff: true,
                             },
                             kip71: {
                                 lowerboundbasefee: 25000000000,
@@ -1158,7 +1182,11 @@ describe('caver.rpc.governance', () => {
                                 basefeedenominator: 20,
                             },
                         },
-                        istanbul: { epoch: 20, policy: 2, sub: 1 },
+                        istanbul: {
+                            epoch: 30,
+                            policy: 2,
+                            sub: 22,
+                        },
                         unitPrice: 25000000000,
                     }
                     sendTxCallback(null, ret)
@@ -1202,7 +1230,7 @@ describe('caver.rpc.governance', () => {
                         'reward.minimumstake': '5000000',
                         'reward.mintingamount': '9600000000000000000',
                         'reward.proposerupdateinterval': 30,
-                        'reward.ratio': '34/54/12',
+                        'reward.ratio': '50/40/10',
                         'reward.stakingupdateinterval': 60,
                         'reward.useginicoeff': true,
                     }
@@ -1300,7 +1328,7 @@ describe('caver.rpc.governance', () => {
                         'reward.minimumstake': '5000000',
                         'reward.mintingamount': '9600000000000000000',
                         'reward.proposerupdateinterval': 30,
-                        'reward.ratio': '34/54/12',
+                        'reward.ratio': '50/40/10',
                         'reward.stakingupdateinterval': 60,
                         'reward.useginicoeff': true,
                     }
