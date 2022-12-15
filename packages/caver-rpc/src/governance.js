@@ -178,9 +178,8 @@ const Governance = function Governance(...args) {
          * @instance
          *
          * @example
-         * // Use `caver.rpc.governance.getChainConfigAt()`
          * const result = await caver.rpc.governance.getChainConfigAt(0)
-         * const result = await caver.rpc.governance.getChainConfigAt('0x58482921af951cf42a069436ac9338de50fd963bdbea40e396f416f9ac96a08b')
+         * const result = await caver.rpc.governance.getChainConfigAt('latest')
          *
          * @param {number|string} blockNumber A block number, or the hex number string to query chain configuration.
          * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
@@ -346,7 +345,7 @@ const Governance = function Governance(...args) {
          * @example
          * const result = await caver.rpc.governance.getStakingInfo()
          *
-         * @param {number|string} blockNumber A block number, or the hex number string to query the staking info on the block.
+         * @param {number|string} blockNumber A block number to query the staking info on the block.
          * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
          * @return {Promise<object>} Stored governance information at a given block.
          */
@@ -354,6 +353,7 @@ const Governance = function Governance(...args) {
             name: 'getStakingInfo',
             call: 'governance_getStakingInfo',
             params: 1,
+            inputFormatter: [formatters.inputDefaultBlockNumberFormatter],
         }),
     ]
 

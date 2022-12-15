@@ -2270,9 +2270,8 @@ class Klay {
              * @instance
              *
              * @example
-             * // Use `caver.rpc.klay.getChainConfigAt()`
              * const result = await caver.rpc.klay.getChainConfigAt(0)
-             * const result = await caver.rpc.klay.getChainConfigAt('0x58482921af951cf42a069436ac9338de50fd963bdbea40e396f416f9ac96a08b')
+             * const result = await caver.rpc.klay.getChainConfigAt('latest')
              *
              * @param {number|string} blockNumber A block number, or the hex number string to query chain configuration.
              * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
@@ -2342,6 +2341,7 @@ class Klay {
                 name: 'getStakingInfo',
                 call: 'klay_getStakingInfo',
                 params: 1,
+                inputFormatter: [formatters.inputDefaultBlockNumberFormatter],
             }),
             // Filter
             /**
