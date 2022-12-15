@@ -2274,7 +2274,7 @@ class Klay {
              * const result = await caver.rpc.klay.getChainConfigAt(0)
              * const result = await caver.rpc.klay.getChainConfigAt('0x58482921af951cf42a069436ac9338de50fd963bdbea40e396f416f9ac96a08b')
              *
-             * @param {string|number|BN|BigNumber} blockHashOrNumber The block hash or block number to query block header.
+             * @param {number|string} blockNumber A block number, or the hex number string to query chain configuration.
              * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
              * @return {Promise<object>} Chain configuration at the given block number.
              */
@@ -2282,7 +2282,6 @@ class Klay {
                 name: 'getChainConfigAt',
                 call: 'klay_chainConfigAt',
                 params: 1,
-                inputFormatter: [formatters.inputBlockNumberFormatter],
             }),
             /**
              * Provides the address of the node that a user is using.
@@ -2335,7 +2334,7 @@ class Klay {
              * @example
              * const result = await caver.rpc.klay.getStakingInfo()
              *
-             * @param {string|number} [blockNumberOrTag] A block number, or the string `latest` or `earliest`. If omitted, `latest` will be used.
+             * @param {number|string} blockNumber A block number, or the hex number string to query the staking info on the block.
              * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
              * @return {Promise<object>} Stored governance information at a given block.
              */
@@ -2343,7 +2342,6 @@ class Klay {
                 name: 'getStakingInfo',
                 call: 'klay_getStakingInfo',
                 params: 1,
-                inputFormatter: [formatters.inputDefaultBlockNumberFormatter],
             }),
             // Filter
             /**
