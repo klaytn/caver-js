@@ -182,7 +182,7 @@ const Governance = function Governance(...args) {
          * const result = await caver.rpc.governance.getChainConfigAt(0)
          * const result = await caver.rpc.governance.getChainConfigAt('0x58482921af951cf42a069436ac9338de50fd963bdbea40e396f416f9ac96a08b')
          *
-         * @param {string|number|BN|BigNumber} blockHashOrNumber The block hash or block number to query block header.
+         * @param {number|string} blockNumber A block number to query chain configuration.
          * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
          * @return {Promise<object>} Chain configuration at the given block number.
          */
