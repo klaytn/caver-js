@@ -347,7 +347,7 @@ const Governance = function Governance(...args) {
          * @example
          * const result = await caver.rpc.governance.getStakingInfo()
          *
-         * @param {string|number} [blockNumberOrTag] A block number, or the string `latest` or `earliest`. If omitted, `latest` will be used.
+         * @param {number|string} blockNumber A block number, or the hex number string to query the staking info on the block.
          * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
          * @return {Promise<object>} Stored governance information at a given block.
          */
@@ -355,7 +355,6 @@ const Governance = function Governance(...args) {
             name: 'getStakingInfo',
             call: 'governance_getStakingInfo',
             params: 1,
-            inputFormatter: [formatters.inputDefaultBlockNumberFormatter],
         }),
     ]
 
