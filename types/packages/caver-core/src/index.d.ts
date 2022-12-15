@@ -63,12 +63,15 @@ export interface ChainConfig {
     londonCompatibleBlock?: number
     ethTxTypeCompatibleBlock?: number
     magmaCompatibleBlock?: number
+    koreCompatibleBlock?: number
     deriveShaImpl: number
     governance: {
+        govParamContract: string
         governanceMode: string
         governingNode: string
         reward: {
             deferredTxFee: boolean
+            kip82ratio: string
             minimumStake: number
             mintingAmount: number
             proposerUpdateInterval: number
