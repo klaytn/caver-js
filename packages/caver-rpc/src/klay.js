@@ -724,7 +724,7 @@ class Klay {
              *
              * @example
              * {
-             *     blockscore: '0x1',
+             *     blockScore: '0x1',
              *     extraData: '0xd883010602846b6c617988676f312e31352e37856c696e757800000000000000f90164f85494571e53df607be97431a5bbefca1dffe5aef56f4d945cb1a7dccbd0dc446e3640898ede8820368554c89499fb17d324fa0e07f23b49d09028ac0919414db694b74ff9dea397fe9e231df545eb53fe2adf776cb2b841dd5a72e9f6af1f59f18efd9d205314bed1077be5083318274e6284adf82806f3339d0f88d8cb97f297b9f6a239149224a4f26e01a5692f2392ffb0ab73b10d9600f8c9b8417a43d087a58a32299f4d5a647371e31ecd1298c1cdb5921b5e575a93cfd7d65f470f2fbd936b1b80206c73daba3fec2038bc25d521bbc21b428d3067598bd95501b8411678bb3221f448d4f9e2dd3e7bda57b0da954eb5f1dff350751b6fd895b4643f3f14b56742fe091db68c162b3e1a9dd17676a9f4a95445e295f00d1d146f49e801b841df4fef80626bc00f2a0048d7718a499defece1ac3e849aefc5c04f2691ec7951377b7022d8d6b20fecce5e03f5ea891597e0d9aadbba0f2f82c5d7230806a62c01',
              *     gasUsed: '0x3ea49',
              *     governanceData: '0x',
@@ -773,7 +773,7 @@ class Klay {
              * }
              *
              * @typedef {object} Klay.Block
-             * @property {string} blockscore - The difficulty of mining in the blockchain network. The use of `blockScore` differs from the consensus of the network. Always 1 in the BFT consensus engine.
+             * @property {string} blockScore - The difficulty of mining in the blockchain network. The use of `blockScore` differs from the consensus of the network. Always 1 in the BFT consensus engine.
              * @property {string} extraData - The "extra data" field of this block.
              * @property {string} gasUsed - The gas in total that was used by all transactions in this block.
              * @property {string} governanceData - RLP encoded governance configuration
@@ -1129,7 +1129,7 @@ class Klay {
              *
              * @example
              * {
-             *     blockscore: '0x1',
+             *     blockScore: '0x1',
              *     committee: [
              *     '0x571e53df607be97431a5bbefca1dffe5aef56f4d',
              *     '0x5cb1a7dccbd0dc446e3640898ede8820368554c8',
@@ -1207,7 +1207,7 @@ class Klay {
              * }
              *
              * @typedef {object} Klay.BlockWithConsensusInfo
-             * @property {string} blockscore - The difficulty of mining in the blockchain network. The use of `blockScore` differs from the consensus of the network. Always 1 in the BFT consensus engine.
+             * @property {string} blockScore - The difficulty of mining in the blockchain network. The use of `blockScore` differs from the consensus of the network. Always 1 in the BFT consensus engine.
              * @property {Array.<string>} committee - Array of addresses of committee members of this block. The committee is a subset of validators who participated in the consensus protocol for this block.
              * @property {string} extraData - The "extra data" field of this block.
              * @property {string} gasUsed - The gas in total that was used by all transactions in this block.

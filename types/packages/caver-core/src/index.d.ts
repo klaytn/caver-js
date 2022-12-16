@@ -129,7 +129,7 @@ export interface GovernanceItems {
 }
 
 export interface Block {
-    blockscore: string
+    blockScore: string
     extraData: string
     gasUsed: string
     governanceData: string
