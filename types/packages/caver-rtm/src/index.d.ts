@@ -17,9 +17,12 @@ import BN = require('bn.js')
 import BigNumber from 'bignumber.js'
 import {
     Header,
-    Rewards,
     Block,
     BlockNumber,
+    Rewards,
+    ChainConfig,
+    GovernanceItems,
+    StakingInformation,
     TransactionReceipt,
     BlockWithConsensusInfo,
     TransactionForRPC,
@@ -130,6 +133,25 @@ export default class RpcCallToMethod {
         blockNumberOrHash: BlockNumber | string,
         callback?: (error: Error, result: Header) => void
     ): Promise<Rewards>
+    klay_chainConfig(
+        callback?: (error: Error, result: ChainConfig) => void
+    ): Promise<ChainConfig>
+    klay_chainConfigAt(
+        blockNumberOrHash: BlockNumber | string,
+        callback?: (error: Error, result: ChainConfig) => void
+    ): Promise<ChainConfig>
+    klay_nodeAddress(
+        blockNumberOrHash: BlockNumber | string,
+        callback?: (error: Error, result: string) => void
+    ): Promise<string>
+    klay_govParamsAt(
+        blockNumberOrHash: BlockNumber | string,
+        callback?: (error: Error, result: GovernanceItems) => void
+    ): Promise<GovernanceItems>
+    klay_getStakingInfo(
+        blockNumberOrHash: BlockNumber | string,
+        callback?: (error: Error, result: StakingInformation) => void
+    ): Promise<StakingInformation>
     klay_getTransactionFromBlock(
         blockNumber: BlockNumber,
         index: number,

@@ -149,8 +149,7 @@ const Governance = function Governance(...args) {
             params: 0,
         }),
         /**
-         * Provides the initial chain configuration.
-         * Because it just stores the initial configuration, if there were changes in the governance made by voting, the result of chainConfig will differ from the current states.
+         * Provides the chain configuration.
          * To see the current information, please use {@link itemsAt}.
          *
          * @memberof Governance
@@ -161,7 +160,7 @@ const Governance = function Governance(...args) {
          * const result = await caver.rpc.governance.getChainConfig()
          *
          * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
-         * @return {Promise<object>} The initial chain configuration
+         * @return {Promise<object>} The latest chain configuration
          */
         new Method({
             name: 'getChainConfig',
@@ -169,7 +168,28 @@ const Governance = function Governance(...args) {
             params: 0,
         }),
         /**
-         * Provides the address of the node that a user is using.
+         * Returns the chain configuration at a specific block.
+         * To see the current information, please use {@link itemsAt}.
+         *
+         * @memberof Governance
+         * @method getChainConfigAt
+         * @instance
+         *
+         * @example
+         * const result = await caver.rpc.governance.getChainConfigAt(0)
+         * const result = await caver.rpc.governance.getChainConfigAt('latest')
+         *
+         * @param {number|string} blockNumber A block number, or the hex number string to query chain configuration.
+         * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+         * @return {Promise<object>} Chain configuration at the given block number.
+         */
+        new Method({
+            name: 'getChainConfigAt',
+            call: 'governance_chainConfigAt',
+            params: 1,
+        }),
+        /**
+         * Provides an address of the operating node.
          * It is derived from the nodekey and used to sign consensus messages.
          * And the value of "governingnode" has to be one of validator's node address.
          *
@@ -323,7 +343,7 @@ const Governance = function Governance(...args) {
          * @example
          * const result = await caver.rpc.governance.getStakingInfo()
          *
-         * @param {string|number} [blockNumberOrTag] A block number, or the string `latest` or `earliest`. If omitted, `latest` will be used.
+         * @param {number|string} blockNumber A block number to query the staking info on the block.
          * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
          * @return {Promise<object>} Stored governance information at a given block.
          */
