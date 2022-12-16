@@ -189,7 +189,7 @@ const Governance = function Governance(...args) {
             params: 1,
         }),
         /**
-         * Provides the address of the node that a user is using.
+         * Provides an address of the operating node.
          * It is derived from the nodekey and used to sign consensus messages.
          * And the value of "governingnode" has to be one of validator's node address.
          *

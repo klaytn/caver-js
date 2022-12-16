@@ -2241,8 +2241,7 @@ class Klay {
                 inputFormatter: [formatters.inputBlockNumberFormatter],
             }),
             /**
-             * Provides the latest chain configuration.
-             * This is equivalent to chainConfigAt() with an empty parameter.
+             * Provides the chain configuration.
              * To see the current information, please use {@link itemsAt}.
              *
              * @memberof Klay
@@ -2261,8 +2260,7 @@ class Klay {
                 params: 0,
             }),
             /**
-             * Returns the chain configuration at specific block.
-             * If the parameter is not set, it returns the chain configuration at the latest block.
+             * Returns the chain configuration at a specific block.
              * To see the current information, please use {@link itemsAt}.
              *
              * @memberof Klay
@@ -2283,7 +2281,7 @@ class Klay {
                 params: 1,
             }),
             /**
-             * Provides the address of the node that a user is using.
+             * Provides an address of the operating node.
              * It is derived from the nodekey and used to sign consensus messages.
              * And the value of "governingnode" has to be one of validator's node address.
              *
