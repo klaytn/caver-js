@@ -45,6 +45,8 @@ before(() => {
 
     caver.klay.accounts.wallet.add(senderPrvKey)
     caver.klay.accounts.wallet.add(payerPrvKey)
+    caver.wallet.add(caver.wallet.keyring.createFromPrivateKey(senderPrvKey))
+    caver.wallet.add(caver.wallet.keyring.createFromPrivateKey(payerPrvKey))
 
     const sender = caver.klay.accounts.privateKeyToAccount(senderPrvKey)
     senderAddress = sender.address
@@ -124,5 +126,25 @@ describe('get transaction receipt by senderTxHash', () => {
             const tx = await caver.klay.getTransactionReceiptBySenderTxHash(receipt.senderTxHash)
             expect(tx).not.to.null
         }
+    }).timeout(10000)
+})
+
+describe('Return correct result with method receipt handling logic', () => {
+    it('CAVERJS-UNIT-TX-732: When if transaction status is true, then should not return an error', async () => {
+        const txobj = {
+            from: senderAddress,
+            to: receiver.address,
+            value: 1,
+        }
+        const estimatedGas = await caver.rpc.klay.estimateGas(txobj)
+        const tx = caver.transaction.legacyTransaction.create({
+            from: senderAddress,
+            to: receiver.address,
+            value: 1,
+            gas: estimatedGas,
+        })
+        await caver.wallet.sign(senderAddress, tx)
+
+        await expect(caver.rpc.klay.sendRawTransaction(tx)).not.to.be.rejected
     }).timeout(10000)
 })

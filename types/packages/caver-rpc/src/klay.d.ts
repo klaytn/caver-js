@@ -23,6 +23,10 @@ import {
     Block,
     Header,
     BlockNumber,
+    Rewards,
+    ChainConfig,
+    GovernanceItems,
+    StakingInformation,
     TransactionReceipt,
     BlockWithConsensusInfo,
     TransactionForRPC,
@@ -133,6 +137,17 @@ export class Klay {
     getHeader(blockNumber: BlockNumber, callback?: (error: Error, result: Header) => void): Promise<Header>
     getHeaderByNumber(blockNumber: BlockNumber, callback?: (error: Error, result: Header) => void): Promise<Header>
     getHeaderByHash(blockHash: string, callback?: (error: Error, result: Header) => void): Promise<Header>
+
+    getRewards(blockNumber: BlockNumber, callback?: (error: Error, result: Header) => void): Promise<Rewards>
+    getChainConfig(callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
+    getChainConfigAt(callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
+    getChainConfigAt(blockNumber: BlockNumber, callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
+    getNodeAddress(callback?: (error: Error, result: string) => void): Promise<string>
+    getGovParamsAt(callback?: (error: Error, result: GovernanceItems) => void): Promise<GovernanceItems>
+    getGovParamsAt(blockNumber: BlockNumber, callback?: (error: Error, result: GovernanceItems) => void): Promise<GovernanceItems>
+    getStakingInfo(callback?: (error: Error, result: StakingInformation) => void): Promise<StakingInformation>
+    getStakingInfo(blockNumber: BlockNumber, callback?: (error: Error, result: StakingInformation) => void): Promise<StakingInformation>
+
     getBlockReceipts(blockHash: string, callback?: (error: Error, result: TransactionReceipt[]) => void): Promise<TransactionReceipt[]>
     getBlockTransactionCount(blockNumber: BlockNumber, callback?: (error: Error, result: string) => void): Promise<string>
     getBlockTransactionCountByNumber(

@@ -24,6 +24,7 @@
  * @date 2017
  */
 
+const lodash = require('lodash')
 const Subscription = require('./subscription')
 
 function Subscriptions(options) {
@@ -41,8 +42,10 @@ Subscriptions.prototype.attachToObject = function(obj) {
     const func = this.buildCall()
     const name = this.name.split('.')
     if (name.length > 1) {
-        obj[name[0]] = obj[name[0]] || {}
-        obj[name[0]][name[1]] = func
+        obj[name[0]] = obj[name[0]] || Object.create(null)
+        const emptyObject = Object.create(null)
+        emptyObject[name[1]] = func
+        lodash.assign(obj[name[0]], emptyObject)
     } else {
         obj[name[0]] = func
     }

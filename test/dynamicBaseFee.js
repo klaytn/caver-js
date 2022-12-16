@@ -125,7 +125,7 @@ async function validateDynamicFeeTxWithReceipt(receipt) {
 
 async function validateGasPrice(tx) {
     // Klaytn will return baseFee
-    const gasPriceAtCurrentBlock = caver.utils.hexToNumber(await caver.rpc.klay.getGasPrice())
+    const baseFeeAtCurrentBlock = caver.utils.hexToNumber((await caver.rpc.klay.getHeader()).baseFeePerGas)
 
     // If transaction type is TxTypeEthereumDynamicFee,
     // validate `maxPriorityFeePerGas` and `maxFeePerGas`.
@@ -133,12 +133,12 @@ async function validateGasPrice(tx) {
         const maxPriorityFeePerGas = await caver.rpc.klay.getMaxPriorityFeePerGas()
         if (tx.maxPriorityFeePerGas !== maxPriorityFeePerGas) return false
         // maxFeePerGas will be set with `baseFee * 2`, so maxFeePerGas cannnot be smaller than current base fee
-        if (caver.utils.hexToNumber(tx.maxFeePerGas) < gasPriceAtCurrentBlock) return false
+        if (caver.utils.hexToNumber(tx.maxFeePerGas) < baseFeeAtCurrentBlock) return false
         return true
     }
 
     // gasPrice will be set with `baseFee * 2`, so gasPrice cannnot be smaller than current base fee
-    if (caver.utils.hexToNumber(tx.gasPrice) < gasPriceAtCurrentBlock) return false
+    if (caver.utils.hexToNumber(tx.gasPrice) < baseFeeAtCurrentBlock) return false
     return true
 }
 
@@ -381,6 +381,10 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
         // Generate many txs to increase baseFee
         generateTxsBomb(await fillKlay(100))
 
+        try {
+            // If an account's keystore already exists in the Klaytn Node, an error is returned, so it must be wrapped in a try-catch statement.
+            await caver.klay.personal.importRawKey(sender.key.privateKey, password)
+        } catch (e) {}
         const isUnlock = await caver.klay.personal.unlockAccount(sender.address, password)
         expect(isUnlock).to.be.true
 
@@ -410,6 +414,10 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
         // Generate many txs to increase baseFee
         generateTxsBomb(await fillKlay(100))
 
+        try {
+            // If an account's keystore already exists in the Klaytn Node, an error is returned, so it must be wrapped in a try-catch statement.
+            await caver.klay.personal.importRawKey(feePayer.key.privateKey, password)
+        } catch (e) {}
         const isUnlock = await caver.klay.personal.unlockAccount(feePayer.address, password)
         expect(isUnlock).to.be.true
 
@@ -430,6 +438,10 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
         // Generate many txs to increase baseFee
         generateTxsBomb(await fillKlay(100))
 
+        try {
+            // If an account's keystore already exists in the Klaytn Node, an error is returned, so it must be wrapped in a try-catch statement.
+            await caver.klay.personal.importRawKey(sender.key.privateKey, password)
+        } catch (e) {}
         const isUnlock = await caver.klay.personal.unlockAccount(sender.address, password)
         expect(isUnlock).to.be.true
 
@@ -461,6 +473,10 @@ describe('Have to set correct value optional fields named gasPrice, maxFeePerGas
         // Generate many txs to increase baseFee
         generateTxsBomb(await fillKlay(100))
 
+        try {
+            // If an account's keystore already exists in the Klaytn Node, an error is returned, so it must be wrapped in a try-catch statement.
+            await caver.klay.personal.importRawKey(feePayer.key.privateKey, password)
+        } catch (e) {}
         const isUnlock = await caver.klay.personal.unlockAccount(feePayer.address, password)
         expect(isUnlock).to.be.true
 

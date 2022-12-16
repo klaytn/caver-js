@@ -39,6 +39,7 @@ export class EthereumDynamicFee extends AbstractTransaction {
     maxPriorityFeePerGas: string
     maxFeePerGas: string
     accessList: AccessList
+    gasPrice: string // will return maxFeePerGas
     private _to: string
     private _value: string
     private _input: string

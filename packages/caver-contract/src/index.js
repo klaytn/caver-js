@@ -1010,7 +1010,8 @@ Contract.prototype.send = function() {
     const args = Array.prototype.slice.call(arguments)
 
     // contract.send({from, gas, ...}, 'functionName', parameters)
-    const sendOptions = args[0]
+    // need to copy sendOptions to not modify original data object
+    const sendOptions = JSON.parse(JSON.stringify(args[0]))
     const functionName = args[1]
     const params = args.slice(2)
 
@@ -1241,6 +1242,47 @@ Contract.prototype.once = function(event, options, callback) {
 /**
  * Adds event listeners and creates a subscription.
  *
+ * @example
+ * contract.subscribe('MyEvent', {
+ *     filter: { myIndexedParam: [20,23], myOtherIndexedParam: '0x123456789...' }, // Using an array means OR: e.g. 20 or 23
+ *     fromBlock: 0
+ * }, function(error, event){ console.log(event) })
+ *
+ * @param {string} event The name of the event in the contract, or "allEvents" to get all events.
+ * @param {object} options The options used for subscription.
+ * @param {object} [options.filter] Lets you filter events by indexed parameters, e.g., `{ filter: {mynumber: [12,13]} }` means all events where "mynumber" is 12 or 13.
+ * @param {Array.<string>} [options.topics] This allows you to manually set the topics for the event filter. Given the filter property and event signature, `topic[0]` would not be set automatically.
+ * @param {function} callback This callback will be fired for the first event as the second argument, or an error as the first argument. The event is returned as an {@link Contract.EventObject} type.
+ * @return {object} the event subscription
+ */
+Contract.prototype.subscribe = function(event, options, callback) {
+    const args = Array.prototype.slice.call(arguments)
+
+    // get the callback
+    callback = this._getCallback(args)
+
+    if (!callback) {
+        throw new Error('Once requires a callback as the second parameter.')
+    }
+
+    // don't allow fromBlock
+    if (options) {
+        delete options.fromBlock
+    }
+
+    // don't return as once shouldn't provide "on"
+    const subscription = this._on(event, options, function(err, res, sub) {
+        if (_.isFunction(callback)) {
+            callback(err, res, sub)
+        }
+    })
+
+    return subscription
+}
+
+/**
+ * Adds event listeners and creates a subscription.
+ *
  * @ignore
  * @method _on
  * @param {string} event
@@ -1410,8 +1452,8 @@ Contract.prototype._processExecuteArguments = function _processExecuteArguments(
         processedArgs.defaultBlock = args.pop()
     }
 
-    // get the options
-    processedArgs.options = _.isObject(args[args.length - 1]) ? args.pop() : {}
+    // get the options. need to copy the options object
+    processedArgs.options = _.isObject(args[args.length - 1]) ? { ...args.pop() } : {}
 
     // get the generateRequest argument for batch requests
     processedArgs.generateRequest = args[args.length - 1] === true ? args.pop() : false

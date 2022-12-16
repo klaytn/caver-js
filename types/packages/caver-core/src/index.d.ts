@@ -46,8 +46,90 @@ export interface Header {
     baseFeePerGas?: string
 }
 
+export interface Rewards {
+    minted: string
+    totalFee: string
+    burntFee: string
+    proposer: string
+    stakers: string
+    kgf: string
+    kir: string
+    rewards: any
+}
+
+export interface ChainConfig {
+    chainId: number
+    istanbulCompatibleBlock?: number
+    londonCompatibleBlock?: number
+    ethTxTypeCompatibleBlock?: number
+    magmaCompatibleBlock?: number
+    koreCompatibleBlock?: number
+    deriveShaImpl: number
+    governance: {
+        govParamContract: string
+        governanceMode: string
+        governingNode: string
+        reward: {
+            deferredTxFee: boolean
+            kip82ratio: string
+            minimumStake: number
+            mintingAmount: number
+            proposerUpdateInterval: number
+            ratio: string
+            stakingUpdateInterval: number
+            useGiniCoeff: boolean
+        }
+        kip71?: {
+            lowerboundbasefee: number
+            upperboundbasefee: number
+            gastarget: number
+            maxblockgasusedforbasefee: number
+            basefeedenominator: number
+        }
+    }
+    istanbul: {
+        epoch: number
+        policy: number
+        sub: number
+    }
+    unitPrice: number
+}
+
+export interface StakingInformation {
+    BlockNum: number
+    CouncilNodeAddrs: string[]
+    CouncilRewardAddrs: string[]
+    CouncilStakingAddrs: string[]
+    CouncilStakingAmounts: number[]
+    Gini: number
+    KIRAddr: string
+    PoCAddr: string // PoC is the previous name of KGF.
+    UseGini: boolean
+}
+
+export interface GovernanceItems {
+    'governance.governancemode': string
+    'governance.governingnode': string
+    'governance.unitprice': number
+    'istanbul.committeesize': number
+    'istanbul.epoch': number
+    'istanbul.policy': number
+    'reward.deferredtxfee': boolean
+    'reward.minimumstake': string
+    'reward.mintingamount': string
+    'reward.proposerupdateinterval': number
+    'reward.ratio': string
+    'reward.stakingupdateinterval': number
+    'reward.useginicoeff': boolean
+    'kip71.lowerboundbasefee'?: number
+    'kip71.upperboundbasefee'?: number
+    'kip71.gastarget'?: number
+    'kip71.maxblockgasusedforbasefee'?: number
+    'kip71.basefeedenominator'?: number
+}
+
 export interface Block {
-    blockscore: string
+    blockScore: string
     extraData: string
     gasUsed: string
     governanceData: string

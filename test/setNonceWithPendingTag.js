@@ -48,7 +48,6 @@ before(() => {
         to: testAccount.address,
         value: '0',
         gas: 30000,
-        gasPrice: caver.utils.toPeb(25, 'Ston'),
     }
 })
 
