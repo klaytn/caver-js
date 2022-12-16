@@ -169,7 +169,7 @@ const Governance = function Governance(...args) {
             params: 0,
         }),
         /**
-         * Returns the chain configuration at specific block.
+         * Returns the chain configuration at a specific block.
          * If the parameter is not set, it returns the chain configuration at the latest block.
          * To see the current information, please use {@link itemsAt}.
          *
