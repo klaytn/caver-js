@@ -2228,9 +2228,9 @@ class Klay {
              * @example
              * // Use `caver.rpc.klay.getRewards`
              * const result = await caver.rpc.klay.getRewards(0)
-             * const result = await caver.rpc.klay.getRewards('0x58482921af951cf42a069436ac9338de50fd963bdbea40e396f416f9ac96a08b')
+             * const result = await caver.rpc.klay.getRewards('latest')
              *
-             * @param {string|number|BN|BigNumber} blockHashOrNumber The block hash or block number to query block header.
+             * @param {string|number} [blockNumberOrTag] A block number, or the string `latest` or `earliest`. If omitted, `latest` will be used.
              * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
              * @return {Promise<Klay.Rewards>} An object includes reward distribution result.
              */
@@ -2238,7 +2238,7 @@ class Klay {
                 name: 'getRewards',
                 call: 'klay_getRewards',
                 params: 1,
-                inputFormatter: [formatters.inputBlockNumberFormatter],
+                inputFormatter: [formatters.inputDefaultBlockNumberFormatter],
             }),
             /**
              * Provides the chain configuration.
