@@ -149,8 +149,7 @@ const Governance = function Governance(...args) {
             params: 0,
         }),
         /**
-         * Provides the latest chain configuration.
-         * This is equivalent to chainConfigAt() with an empty parameter.
+         * Provides the chain configuration.
          * To see the current information, please use {@link itemsAt}.
          *
          * @memberof Governance
@@ -170,7 +169,6 @@ const Governance = function Governance(...args) {
         }),
         /**
          * Returns the chain configuration at a specific block.
-         * If the parameter is not set, it returns the chain configuration at the latest block.
          * To see the current information, please use {@link itemsAt}.
          *
          * @memberof Governance
