@@ -1426,7 +1426,7 @@ const hashMessage = data => {
  * @return {string}
  */
 const recoverPublicKey = (message, signature, isHashed = false) => {
-    if (!isHashed) message = hashMessage(message)
+    if (!isHashed) message = hashMessage(utf8ToHex(message))
 
     if (_.isArray(signature)) signature = { v: signature[0], r: signature[1], s: signature[2] }
     const vrs = { v: parseInt(signature.v.slice(2), 16), r: signature.r.slice(2), s: signature.s.slice(2) }
@@ -1453,7 +1453,7 @@ const recoverPublicKey = (message, signature, isHashed = false) => {
  */
 const recover = (message, signature, isHashed = false) => {
     if (!isHashed) {
-        message = hashMessage(message)
+        message = hashMessage(utf8ToHex(message))
     }
 
     return Account.recover(message, Account.encodeSignature(resolveSignature(signature))).toLowerCase()
