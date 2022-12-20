@@ -113,6 +113,26 @@ describe('caver.validator.validateSignedMessage', () => {
             const ret = await caver.validator.validateSignedMessage(message, invalid, keyring.address)
             expect(ret).to.be.false
         }).timeout(100000)
+
+        it('CAVERJS-UNIT-VALIDATOR-006: should return true when korean-format message are passed as a parameter', async () => {
+            const getAccoutKeyStub = sandbox.stub(caver.validator.klaytnCall, 'getAccountKey')
+            getAccoutKeyStub.resolves(getAccountKeyResult)
+
+            const kMessage = '하이'
+            const kAddress = '0x82B4deC52696c7777b4453986496612a0a2B1e99'
+            const kSignedMessage =
+                '0x85e6ae815bb80814ba8f63b3b16941f0740f471a048efb79b31428dcb61345132bd48cbf9594a243243a97951fbd3cc555101158c76168bbcb0b2e1a0de08b2d1b'
+            // pub key
+            // "0xf2a480ed864b9fa3856e2841aa0851463ce34ba9c43a503d08e9ab5dcfd4136cc5fddab6ea35271f43fb75597eed634056c8b0e211a134e26ed1e01b9161a132"
+
+            const v = `0x${kSignedMessage.substring(2).substring(128, 130)}`
+            const r = `0x${kSignedMessage.substring(2).substring(0, 64)}`
+            const s = `0x${kSignedMessage.substring(2).substring(64, 128)}`
+            const sig = [v, r, s]
+
+            const ret = await caver.validator.validateSignedMessage(kMessage, sig, kAddress)
+            expect(ret).to.be.true
+        }).timeout(100000)
     })
 
     context('caver.validator.validateSignedMessage with AccountKeyPublic', () => {
@@ -189,21 +209,6 @@ describe('caver.validator.validateSignedMessage', () => {
 
             const ret = await caver.validator.validateSignedMessage(message, [new SignatureData(invalidSig)], keyring.address)
             expect(ret).to.be.false
-        }).timeout(100000)
-
-        it('CAVERJS-UNIT-VALIDATOR-011: should return true when korean-format message are passed as a parameter', async () => {
-            const kMessage = '하이'
-            const kAddress = '0x82B4deC52696c7777b4453986496612a0a2B1e99'
-            const kSignedMessage =
-                '0x85e6ae815bb80814ba8f63b3b16941f0740f471a048efb79b31428dcb61345132bd48cbf9594a243243a97951fbd3cc555101158c76168bbcb0b2e1a0de08b2d1b'
-            // pub key
-            // "0xf2a480ed864b9fa3856e2841aa0851463ce34ba9c43a503d08e9ab5dcfd4136cc5fddab6ea35271f43fb75597eed634056c8b0e211a134e26ed1e01b9161a132"
-            const v = `0x${kSignedMessage.substring(2).substring(128, 130)}`
-            const r = `0x${kSignedMessage.substring(2).substring(0, 64)}`
-            const s = `0x${kSignedMessage.substring(2).substring(64, 128)}`
-            const sig = [v, r, s]
-            const ret = await caver.validator.validateSignedMessage(kMessage, sig, kAddress)
-            expect(ret).to.be.true
         }).timeout(100000)
     })
 
