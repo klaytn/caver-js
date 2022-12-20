@@ -1399,9 +1399,10 @@ const isEmptySig = sig => {
  * @return {string} The hashed message with Klaytn specific prefix.
  */
 const hashMessage = data => {
-    const message = isHexStrict(data) ? hexToBytes(data) : data
-    const messageBuffer = Buffer.from(message)
-    const preamble = `\x19Klaytn Signed Message:\n${message.length}`
+    const messageHex = isHexStrict(data) ? data : utf8ToHex(data)
+    const messageBytes = hexToBytes(messageHex)
+    const messageBuffer = Buffer.from(messageBytes)
+    const preamble = `\x19Klaytn Signed Message:\n${messageBytes.length}`
     const preambleBuffer = Buffer.from(preamble)
     // klayMessage is concatenated buffer (preambleBuffer + messageBuffer)
     const klayMessage = Buffer.concat([preambleBuffer, messageBuffer])
@@ -1426,7 +1427,7 @@ const hashMessage = data => {
  * @return {string}
  */
 const recoverPublicKey = (message, signature, isHashed = false) => {
-    if (!isHashed) message = hashMessage(utf8ToHex(message))
+    if (!isHashed) message = hashMessage(message)
 
     if (_.isArray(signature)) signature = { v: signature[0], r: signature[1], s: signature[2] }
     const vrs = { v: parseInt(signature.v.slice(2), 16), r: signature.r.slice(2), s: signature.s.slice(2) }
@@ -1453,7 +1454,7 @@ const recoverPublicKey = (message, signature, isHashed = false) => {
  */
 const recover = (message, signature, isHashed = false) => {
     if (!isHashed) {
-        message = hashMessage(utf8ToHex(message))
+        message = hashMessage(message)
     }
 
     return Account.recover(message, Account.encodeSignature(resolveSignature(signature))).toLowerCase()
