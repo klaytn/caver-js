@@ -78,7 +78,7 @@ const weightedMultiSigOptions = new WeightedMultiSigOptions(3, [1, 1, 1])
 // $ExpectType Account
 account = Account.createWithAccountKeyWeightedMultiSig(address, pubKeys)
 // $ExpectType Account
-account = Account.createWithAccountKeyWeightedMultiSig(address, pubKeys, { threshold: 3, weigths: [1, 1, 1] })
+account = Account.createWithAccountKeyWeightedMultiSig(address, pubKeys, { threshold: 3, weights: [1, 1, 1] })
 // $ExpectType Account
 account = Account.createWithAccountKeyWeightedMultiSig(address, pubKeys, weightedMultiSigOptions)
 
@@ -88,7 +88,7 @@ account = Account.createWithAccountKeyRoleBased(address, [pubKeys, pubKeys, pubK
 account = Account.createWithAccountKeyRoleBased(
     address,
     [pubKeys, pubKeys, pubKeys],
-    [{ threshold: 3, weigths: [1, 1, 1] }, { threshold: 3, weigths: [1, 1, 1] }, { threshold: 3, weigths: [1, 1, 1] }]
+    [{ threshold: 3, weights: [1, 1, 1] }, { threshold: 3, weights: [1, 1, 1] }, { threshold: 3, weights: [1, 1, 1] }]
 )
 // $ExpectType Account
 account = Account.createWithAccountKeyRoleBased(
