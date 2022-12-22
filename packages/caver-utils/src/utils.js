@@ -1399,9 +1399,10 @@ const isEmptySig = sig => {
  * @return {string} The hashed message with Klaytn specific prefix.
  */
 const hashMessage = data => {
-    const message = isHexStrict(data) ? hexToBytes(data) : data
-    const messageBuffer = Buffer.from(message)
-    const preamble = `\x19Klaytn Signed Message:\n${message.length}`
+    const messageHex = isHexStrict(data) ? data : utf8ToHex(data)
+    const messageBytes = hexToBytes(messageHex)
+    const messageBuffer = Buffer.from(messageBytes)
+    const preamble = `\x19Klaytn Signed Message:\n${messageBytes.length}`
     const preambleBuffer = Buffer.from(preamble)
     // klayMessage is concatenated buffer (preambleBuffer + messageBuffer)
     const klayMessage = Buffer.concat([preambleBuffer, messageBuffer])
