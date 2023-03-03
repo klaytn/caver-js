@@ -81,6 +81,8 @@ export class Governance {
     getNodeAddress(callback?: (error: Error, result: string) => void): Promise<string>
     getItemsAt(callback?: (error: Error, result: GovernanceItems) => void): Promise<GovernanceItems>
     getItemsAt(blockNumber: BlockNumber, callback?: (error: Error, result: GovernanceItems) => void): Promise<GovernanceItems>
+    getParams(callback?: (error: Error, result: GovernanceItems) => void): Promise<GovernanceItems>
+    getParams(blockNumber: BlockNumber, callback?: (error: Error, result: GovernanceItems) => void): Promise<GovernanceItems>
     getStakingInfo(callback?: (error: Error, result: StakingInformation) => void): Promise<StakingInformation>
     getStakingInfo(blockNumber: BlockNumber, callback?: (error: Error, result: StakingInformation) => void): Promise<StakingInformation>
     getPendingChanges(callback?: (error: Error, result: VoteItems) => void): Promise<VoteItems>

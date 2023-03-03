@@ -230,6 +230,28 @@ const Governance = function Governance(...args) {
             inputFormatter: [formatters.inputDefaultBlockNumberFormatter],
         }),
         /**
+         * Returns governance items at a specific block.
+         * It is the result of previous voting of the block and used as configuration for chain at the given block number.
+         *
+         * @memberof Governance
+         * @method getParams
+         * @instance
+         *
+         * @example
+         * const result = await caver.rpc.governance.getParams()
+         *
+         * @param {string|number} [blockNumberOrTag] A block number, or the string `latest` or `earliest`. If omitted, `latest` will be used.
+         * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+         * @return {Promise<object>} The governance items.
+         */
+        new Method({
+            name: 'getParams',
+            call: 'governance_getParams',
+            params: 1,
+            inputFormatter: [formatters.inputDefaultBlockNumberFormatter],
+        }),
+
+        /**
          * Returns the list of items that have received enough number of votes but not yet finalized.
          * At the end of the current epoch, these changes will be finalized and the result will be in effect from the epoch after next epoch.
          *
