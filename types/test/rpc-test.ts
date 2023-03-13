@@ -1191,6 +1191,11 @@ rpc.klay.getRewardbase()
 // $ExpectType Promise<string>
 rpc.klay.getRewardbase((err: Error, ret: string) => {})
 
+// $ExpectType Promise<ChainConfig>
+rpc.klay.getChainConfig()
+// $ExpectType Promise<ChainConfig>
+rpc.klay.getChainConfig((err: Error, ret: ChainConfig) => {})
+
 // $ExpectType Promise<LogObject[]>
 rpc.klay.getFilterChanges('filterId')
 // $ExpectType Promise<LogObject[]>

@@ -157,15 +157,18 @@ const Governance = function Governance(...args) {
          * @instance
          *
          * @example
+         * const result = await caver.rpc.governance.getChainConfig(0)
+         * // latest by default
          * const result = await caver.rpc.governance.getChainConfig()
          *
+         * @param {number|string} blockNumber A block number, or the hex number string to query chain configuration.
          * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
-         * @return {Promise<object>} The latest chain configuration
+         * @return {Promise<object>} The latest chain configuration, or Chain configuration at the given block number.
          */
         new Method({
             name: 'getChainConfig',
-            call: 'governance_chainConfig',
-            params: 0,
+            call: 'governance_getChainConfig',
+            params: 1,
         }),
         /**
          * Returns the chain configuration at a specific block.

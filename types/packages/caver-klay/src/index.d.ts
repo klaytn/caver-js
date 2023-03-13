@@ -86,7 +86,7 @@ export class DeprecatedKlayRPC {
     getHeaderByHash: RpcCallToMethod['klay_getHeaderByHash']
     getBlockReceipts: RpcCallToMethod['klay_getBlockReceipts']
     getRewards: RpcCallToMethod['klay_getRewards']
-    getChainConfig: RpcCallToMethod['klay_chainConfig']
+    getChainConfig: RpcCallToMethod['klay_getChainConfig']
     getChainConfigAt: RpcCallToMethod['klay_chainConfigAt']
     getNodeAddress: RpcCallToMethod['klay_nodeAddress']
     getGovParamsAt: RpcCallToMethod['klay_govParamsAt']
