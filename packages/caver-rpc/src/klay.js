@@ -2255,7 +2255,7 @@ class Klay {
              *
              * @param {number|string} blockNumber A block number, or the hex number string to query chain configuration.
              * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
-             * @return {Promise<object>} The latest chain configuration
+             * @return {Promise<object>} The latest chain configuration, or chain configuration at the given block number.
              */
             new Method({
                 name: 'getChainConfig',
