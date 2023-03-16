@@ -140,6 +140,7 @@ export class Klay {
 
     getRewards(blockNumber: BlockNumber, callback?: (error: Error, result: Header) => void): Promise<Rewards>
     getChainConfig(callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
+    getChainConfig(blockNumber: BlockNumber, callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
     getChainConfigAt(callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
     getChainConfigAt(blockNumber: BlockNumber, callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
     getNodeAddress(callback?: (error: Error, result: string) => void): Promise<string>

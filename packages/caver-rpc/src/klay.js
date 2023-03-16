@@ -2249,15 +2249,18 @@ class Klay {
              * @instance
              *
              * @example
+             * const result = await caver.rpc.klay.getChainConfig(0)
+             * // latest by default
              * const result = await caver.rpc.klay.getChainConfig()
              *
+             * @param {number|string} blockNumber A block number, or the hex number string to query chain configuration.
              * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
-             * @return {Promise<object>} The latest chain configuration
+             * @return {Promise<object>} The latest chain configuration, or chain configuration at the given block number.
              */
             new Method({
                 name: 'getChainConfig',
-                call: 'klay_chainConfig',
-                params: 0,
+                call: 'klay_getChainConfig',
+                params: 1,
             }),
             /**
              * Returns the chain configuration at a specific block.
