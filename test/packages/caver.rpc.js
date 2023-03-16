@@ -1212,13 +1212,13 @@ describe('caver.rpc.governance', () => {
         }).timeout(100000)
     })
 
-    context('caver.rpc.governance.getItemsAt', () => {
+    context('caver.rpc.governance.getParams', () => {
         it('CAVERJS-UNIT-RPC-017: should return governance items at specific block', async () => {
             const govRPCStub = sandbox
-                .stub(caver.rpc.governance.getItemsAt.method.requestManager, 'send')
+                .stub(caver.rpc.governance.getParams.method.requestManager, 'send')
                 .callsFake((payload, sendTxCallback) => {
                     expect(payload.method).to.equal('governance_itemsAt')
-                    expect(payload.params.length).to.equal(caver.rpc.governance.getItemsAt.method.params)
+                    expect(payload.params.length).to.equal(caver.rpc.governance.getParams.method.params)
                     const ret = {
                         'governance.governancemode': 'single',
                         'governance.governingnode': '0xa80de139de3fb29fba7e2d20bda593c5ffe63ce9',
@@ -1237,7 +1237,7 @@ describe('caver.rpc.governance', () => {
                     sendTxCallback(null, ret)
                 })
 
-            await caver.rpc.governance.getItemsAt(0)
+            await caver.rpc.governance.getParams(0)
             expect(govRPCStub.callCount).to.equal(1)
         }).timeout(100000)
     })

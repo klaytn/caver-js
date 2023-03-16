@@ -2284,6 +2284,27 @@ class Klay {
                 params: 1,
             }),
             /**
+             * Returns governance items at a specific block.
+             * It is the result of previous voting of the block and used as configuration for chain at the given block number.
+             *
+             * @memberof klay
+             * @method getParams
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getParams()
+             *
+             * @param {string|number} [blockNumberOrTag] A block number, or the string `latest` or `earliest`. If omitted, `latest` will be used.
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<object>} The governance items.
+             */
+            new Method({
+                name: 'getParams',
+                call: 'klay_getParams',
+                params: 1,
+                inputFormatter: [formatters.inputDefaultBlockNumberFormatter],
+            }),
+            /**
              * Provides an address of the operating node.
              * It is derived from the nodekey and used to sign consensus messages.
              * And the value of "governingnode" has to be one of validator's node address.
