@@ -698,7 +698,7 @@ describe('caver.rpc.klay', () => {
             const klayRPCStub = sandbox
                 .stub(caver.rpc.klay.getChainConfig.method.requestManager, 'send')
                 .callsFake((payload, sendTxCallback) => {
-                    expect(payload.method).to.equal('klay_chainConfig')
+                    expect(payload.method).to.equal('klay_getChainConfig')
                     expect(payload.params.length).to.equal(caver.rpc.klay.getChainConfig.method.params)
                     const ret = {
                         chainId: 1001,
@@ -1098,7 +1098,7 @@ describe('caver.rpc.governance', () => {
             const govRPCStub = sandbox
                 .stub(caver.rpc.governance.getChainConfig.method.requestManager, 'send')
                 .callsFake((payload, sendTxCallback) => {
-                    expect(payload.method).to.equal('governance_chainConfig')
+                    expect(payload.method).to.equal('governance_getChainConfig')
                     expect(payload.params.length).to.equal(caver.rpc.governance.getChainConfig.method.params)
                     const ret = {
                         chainId: 1001,

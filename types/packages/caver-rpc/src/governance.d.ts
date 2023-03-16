@@ -76,6 +76,7 @@ export class Governance {
     getMyVotingPower(callback?: (error: Error, result: number) => void): Promise<number>
     getMyVotes(callback?: (error: Error, result: MyVote[]) => void): Promise<MyVote[]>
     getChainConfig(callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
+    getChainConfig(blockNumber: BlockNumber, callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
     getChainConfigAt(callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
     getChainConfigAt(blockNumber: BlockNumber, callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
     getNodeAddress(callback?: (error: Error, result: string) => void): Promise<string>
