@@ -136,10 +136,6 @@ export default class RpcCallToMethod {
     klay_chainConfig(
         callback?: (error: Error, result: ChainConfig) => void
     ): Promise<ChainConfig>
-    klay_getChainConfig(
-        blockNumberOrHash?: BlockNumber | string,
-        callback?: (error: Error, result: ChainConfig) => void
-    ): Promise<ChainConfig>
     klay_chainConfigAt(
         blockNumberOrHash: BlockNumber | string,
         callback?: (error: Error, result: ChainConfig) => void
