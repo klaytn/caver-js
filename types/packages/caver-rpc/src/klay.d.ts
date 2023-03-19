@@ -139,7 +139,10 @@ export class Klay {
     getHeaderByHash(blockHash: string, callback?: (error: Error, result: Header) => void): Promise<Header>
 
     getRewards(blockNumber: BlockNumber, callback?: (error: Error, result: Header) => void): Promise<Rewards>
+    getParams(callback?: (error: Error, result: GovernanceItems) => void): Promise<GovernanceItems>
+    getParams(blockNumber: BlockNumber, callback?: (error: Error, result: GovernanceItems) => void): Promise<GovernanceItems>
     getChainConfig(callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
+    getChainConfig(blockNumber: BlockNumber, callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
     getChainConfigAt(callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
     getChainConfigAt(blockNumber: BlockNumber, callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
     getNodeAddress(callback?: (error: Error, result: string) => void): Promise<string>

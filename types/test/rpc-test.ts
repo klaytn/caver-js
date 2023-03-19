@@ -1191,6 +1191,11 @@ rpc.klay.getRewardbase()
 // $ExpectType Promise<string>
 rpc.klay.getRewardbase((err: Error, ret: string) => {})
 
+// $ExpectType Promise<ChainConfig>
+rpc.klay.getChainConfig()
+// $ExpectType Promise<ChainConfig>
+rpc.klay.getChainConfig((err: Error, ret: ChainConfig) => {})
+
 // $ExpectType Promise<LogObject[]>
 rpc.klay.getFilterChanges('filterId')
 // $ExpectType Promise<LogObject[]>
@@ -1325,29 +1330,29 @@ rpc.governance.getNodeAddress()
 rpc.governance.getNodeAddress((err: Error, ret: string) => {})
 
 // $ExpectType Promise<GovernanceItems>
-rpc.governance.getItemsAt(0)
+rpc.governance.getParams(0)
 // $ExpectType Promise<GovernanceItems>
-rpc.governance.getItemsAt(new BigNumber(0))
+rpc.governance.getParams(new BigNumber(0))
 // $ExpectType Promise<GovernanceItems>
-rpc.governance.getItemsAt(new BN(0))
+rpc.governance.getParams(new BN(0))
 // $ExpectType Promise<GovernanceItems>
-rpc.governance.getItemsAt('genesis')
+rpc.governance.getParams('genesis')
 // $ExpectType Promise<GovernanceItems>
-rpc.governance.getItemsAt('latest')
+rpc.governance.getParams('latest')
 // $ExpectType Promise<GovernanceItems>
-rpc.governance.getItemsAt('hash')
+rpc.governance.getParams('hash')
 // $ExpectType Promise<GovernanceItems>
-rpc.governance.getItemsAt(0, (err: Error, ret: GovernanceItems) => {})
+rpc.governance.getParams(0, (err: Error, ret: GovernanceItems) => {})
 // $ExpectType Promise<GovernanceItems>
-rpc.governance.getItemsAt(new BigNumber(0), (err: Error, ret: GovernanceItems) => {})
+rpc.governance.getParams(new BigNumber(0), (err: Error, ret: GovernanceItems) => {})
 // $ExpectType Promise<GovernanceItems>
-rpc.governance.getItemsAt(new BN(0), (err: Error, ret: GovernanceItems) => {})
+rpc.governance.getParams(new BN(0), (err: Error, ret: GovernanceItems) => {})
 // $ExpectType Promise<GovernanceItems>
-rpc.governance.getItemsAt('genesis', (err: Error, ret: GovernanceItems) => {})
+rpc.governance.getParams('genesis', (err: Error, ret: GovernanceItems) => {})
 // $ExpectType Promise<GovernanceItems>
-rpc.governance.getItemsAt('latest', (err: Error, ret: GovernanceItems) => {})
+rpc.governance.getParams('latest', (err: Error, ret: GovernanceItems) => {})
 // $ExpectType Promise<GovernanceItems>
-rpc.governance.getItemsAt('hash', (err: Error, ret: GovernanceItems) => {})
+rpc.governance.getParams('hash', (err: Error, ret: GovernanceItems) => {})
 
 // $ExpectType Promise<VoteItems>
 rpc.governance.getPendingChanges()
