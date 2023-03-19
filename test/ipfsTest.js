@@ -45,8 +45,7 @@ describe('Connect IPFS with Klaytn', () => {
     it('CAVERJS-UNIT-IPFS-001: should add file to IPFS and return hash (test with infura ipfs node)', async () => {
         // Set IPFS Node
         const options = caver.ipfs.createOptions({ projectId, projectSecret })
-        // await caver.ipfs.setIPFSNode('ipfs.infura.io', 5001, true, options)
-        caver.ipfs.setIPFSNode('ipfs.infura.io', 5001, true, options)
+        await caver.ipfs.setIPFSNode('ipfs.infura.io', 5001, true, options)
 
         // Create test txt file for IPFS
         const testFileName = './ipfsTestFile.txt'

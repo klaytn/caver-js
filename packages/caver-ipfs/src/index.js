@@ -19,7 +19,6 @@
 
 const lodash = require('lodash')
 const fs = require('fs')
-const ipfsClient = require('ipfs-http-client')
 const { CID } = require('multiformats/cid')
 const _ = require('lodash')
 
@@ -57,14 +56,17 @@ class IPFS {
      * @param {object}  [options]   An object contains configuration variables.
      * @return {void}
      */
-    setIPFSNode(host, port, ssl, options = {}) {
+    async setIPFSNode(host, port, ssl, options = {}) {
         const protocol = ssl ? 'https' : 'http'
+        // Use the dynamic import function to load ipfs at runtime
+        // refer to https://github.com/ipfs/js-ipfs/blob/master/docs/upgrading/v0.62-v0.63.md#esm
+        const { create } = await import('ipfs-http-client')
         const createObject = { host, port, protocol }
         if (options.headers) {
             // Copy the headers object
             createObject.headers = JSON.parse(JSON.stringify(options.headers))
         }
-        this.ipfs = ipfsClient(createObject)
+        this.ipfs = await create(createObject)
     }
 
     /**
