@@ -1,6 +1,6 @@
 {
   "name": "caver-js",
-  "version": "1.10.1",
+  "version": "1.10.2",
   "description": "caver-js is a JavaScript API library that allows developers to interact with a Klaytn node",
   "main": "index.js",
   "types": "types/index.d.ts",
@@ -82,7 +82,7 @@
     "eventemitter3": "4.0.0",
     "http": "0.0.1-security",
     "https": "^1.0.0",
-    "ipfs-http-client": "^57.0.3",
+    "ipfs-http-client": "^49.0.4",
     "lodash": "4.17.21",
     "multiformats": "^9.7.1",
     "number-to-bn": "1.7.0",
