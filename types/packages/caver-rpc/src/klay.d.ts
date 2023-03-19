@@ -144,8 +144,10 @@ export class Klay {
     getChainConfig(callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
     getChainConfig(blockNumber: BlockNumber, callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
     getChainConfigAt(callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
+    // TODO-caver getChainConfigAt will be deleted in v1.11.0
     getChainConfigAt(blockNumber: BlockNumber, callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
     getNodeAddress(callback?: (error: Error, result: string) => void): Promise<string>
+    // TODO-caver getGovParamsAt will be deleted in v1.11.0
     getGovParamsAt(callback?: (error: Error, result: GovernanceItems) => void): Promise<GovernanceItems>
     getGovParamsAt(blockNumber: BlockNumber, callback?: (error: Error, result: GovernanceItems) => void): Promise<GovernanceItems>
     getStakingInfo(callback?: (error: Error, result: StakingInformation) => void): Promise<StakingInformation>
