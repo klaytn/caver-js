@@ -186,11 +186,15 @@ const Governance = function Governance(...args) {
          * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
          * @return {Promise<object>} Chain configuration at the given block number.
          */
+
+        /*
         new Method({
             name: 'getChainConfigAt',
             call: 'governance_chainConfigAt',
             params: 1,
         }),
+        */
+
         /**
          * Provides an address of the operating node.
          * It is derived from the nodekey and used to sign consensus messages.
@@ -226,12 +230,16 @@ const Governance = function Governance(...args) {
          * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
          * @return {Promise<object>} The governance items.
          */
+
+        /*
         new Method({
             name: 'getItemsAt',
             call: 'governance_itemsAt',
             params: 1,
             inputFormatter: [formatters.inputDefaultBlockNumberFormatter],
         }),
+         */
+
         /**
          * Returns governance items at a specific block.
          * It is the result of previous voting of the block and used as configuration for chain at the given block number.
@@ -377,6 +385,71 @@ const Governance = function Governance(...args) {
             call: 'governance_getStakingInfo',
             params: 1,
             inputFormatter: [formatters.inputDefaultBlockNumberFormatter],
+        }),
+
+        /**
+         * Returns accumulated reward information in a given block range ( between firstBlock and lastBlock).
+         * @memberof Governance
+         * @method getRewardsAccumulated
+         * @instance
+         *
+         * @example
+         * const result = await caver.rpc.governance.getRewardsAccumulated()
+         *
+         * @param {number|string} firstBlock First block number in block range to query reward accumulated on this range
+         * @param {number|string} lastBlock Last block number in block range to query reward accumulated on this range
+         * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+         * @return {Promise<object>} Stored governance information at a given block.
+         */
+        new Method({
+            name: 'getRewardsAccumulated',
+            call: 'governance_getRewardsAccumulated',
+            params: 2,
+            inputFormatter: [formatters.inputBlockNumberFormatter, formatters.inputBlockNumberFormatter],
+        }),
+
+        /**
+         * Returns governance items at a specific block.
+         * It is the result of previous voting of the block and used as configuration for chain at the given block number.
+         *
+         * @memberof Governance
+         * @method getParams
+         * @instance
+         *
+         * @example
+         * const result = await caver.rpc.governance.getParams()
+         *
+         * @param {string|number} [blockNumberOrTag] A block number, or the string `latest` or `earliest`. If omitted, `latest` will be used.
+         * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+         * @return {Promise<object>} The governance items.
+         */
+        new Method({
+            name: 'getParams',
+            call: 'governance_getParams',
+            params: 1,
+            inputFormatter: [formatters.inputDefaultBlockNumberFormatter],
+        }),
+
+        /**
+         * Returns the chain configuration at a specific block.
+         * To see the current information, please use {@link itemsAt}.
+         *
+         * @memberof Governance
+         * @method getChainConfig
+         * @instance
+         *
+         * @example
+         * const result = await caver.rpc.governance.getChainConfig(0)
+         * const result = await caver.rpc.governance.getChainConfig('latest')
+         *
+         * @param {number|string} blockNumber A block number, or the hex number string to query chain configuration.
+         * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+         * @return {Promise<object>} Chain configuration at the given block number.
+         */
+        new Method({
+            name: 'getChainConfig',
+            call: 'governance_getChainConfig',
+            params: 1,
         }),
     ]
 
