@@ -26,6 +26,9 @@ jobs:
       - run: 
           name: "Run test on Web env"
           command: |
+            sudo sed -i -e 's/deb.debian.org/archive.debian.org/g' \
+            -e 's|security.debian.org|archive.debian.org/|g' \
+            -e '/stretch-updates/d' /etc/apt/sources.list
             sudo apt update
             sudo apt-get install libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
             cd ./test/test-web

@@ -77,9 +77,11 @@ export class Governance {
     getMyVotes(callback?: (error: Error, result: MyVote[]) => void): Promise<MyVote[]>
     getChainConfig(callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
     getChainConfig(blockNumber: BlockNumber, callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
+    // TODO-caver getChainConfigAt will be deleted in v1.11.0
     getChainConfigAt(callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
     getChainConfigAt(blockNumber: BlockNumber, callback?: (error: Error, result: ChainConfig) => void): Promise<ChainConfig>
     getNodeAddress(callback?: (error: Error, result: string) => void): Promise<string>
+    // TODO-caver getItemsAt will be deleted in v1.11.0
     getItemsAt(callback?: (error: Error, result: GovernanceItems) => void): Promise<GovernanceItems>
     getItemsAt(blockNumber: BlockNumber, callback?: (error: Error, result: GovernanceItems) => void): Promise<GovernanceItems>
     getParams(callback?: (error: Error, result: GovernanceItems) => void): Promise<GovernanceItems>

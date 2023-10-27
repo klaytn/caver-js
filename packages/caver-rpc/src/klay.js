@@ -2138,12 +2138,15 @@ class Klay {
              * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
              * @return {Promise<string>} The current gas price in peb.
              */
+            /*
             new Method({
                 name: 'getGasPriceAt',
                 call: 'klay_gasPriceAt',
                 params: 1,
                 inputFormatter: [formatters.inputDefaultBlockNumberFormatter],
             }),
+            */
+
             /**
              * Returns `true` if the node is writing blockchain data in a parallel manner.
              *
@@ -2278,11 +2281,14 @@ class Klay {
              * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
              * @return {Promise<object>} Chain configuration at the given block number.
              */
+            /*
             new Method({
                 name: 'getChainConfigAt',
                 call: 'klay_chainConfigAt',
                 params: 1,
             }),
+            */
+
             /**
              * Returns governance items at a specific block.
              * It is the result of previous voting of the block and used as configuration for chain at the given block number.
@@ -2339,12 +2345,15 @@ class Klay {
              * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
              * @return {Promise<object>} The governance items.
              */
+            /*
             new Method({
                 name: 'getGovParamsAt',
                 call: 'klay_govParamsAt',
                 params: 1,
                 inputFormatter: [formatters.inputDefaultBlockNumberFormatter],
             }),
+            */
+
             /**
              * Returns the staking information at a specific block.
              *
@@ -2554,6 +2563,122 @@ class Klay {
                 call: 'klay_getCypressCredit',
                 params: 1,
                 inputFormatter: [formatters.inputDefaultBlockNumberFormatter],
+            }),
+
+            /**
+             * Returns governance items at a specific block.
+             * It is the result of previous voting of the block and used as configuration for chain at the given block number.
+             *
+             * @memberof klay
+             * @method getParams
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getParams()
+             *
+             * @param {string|number} [blockNumberOrTag] A block number, or the string `latest` or `earliest`. If omitted, `latest` will be used.
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<object>} The governance items.
+             */
+            new Method({
+                name: 'getParams',
+                call: 'klay_getParams',
+                params: 1,
+                inputFormatter: [formatters.inputDefaultBlockNumberFormatter],
+            }),
+
+            /**
+             * Returns the chain configuration at a specific block.
+             * To see the current information, please use {@link itemsAt}.
+             *
+             * @memberof Klay
+             * @method getChainConfig
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.getChainConfig(0)
+             * const result = await caver.rpc.klay.getChainConfig('latest')
+             *
+             * @param {number|string} blockNumber A block number, or the hex number string to query chain configuration.
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<object>} Chain configuration at the given block number.
+             */
+            new Method({
+                name: 'getChainConfig',
+                call: 'klay_getChainConfig',
+                params: 1,
+            }),
+
+            /**
+             * Returns the fork status with negligible management costs.
+             *
+             * @memberof Klay
+             * @method forkStatus
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.forkStatus(20)
+             *
+             * @param {number|string} blockNumber A block number, or the hex number string to query the fork status.
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<object>} Chain configuration at the given block number.
+             */
+            new Method({
+                name: 'forkStatus',
+                call: 'klay_forkStatus',
+                params: 1,
+                inputFormatter: [formatters.inputBlockNumberFormatter],
+            }),
+
+            /**
+             * Returns the fork status with negligible management costs.
+             *
+             * @memberof Klay
+             * @method recoverFromTransaction
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.recoverFromTransaction("0x08f88608850ba43b7400827b0c94c40b6909eb7085590e1c26cb3becc25368e249e9880de0b6b3a764000094e15cd70a41dfb05e7214004d7d054801b2a2f06bf847f845820fe9a090421871e8fd77e08b6a72760006a15184a96cfc39c7486ea948d11fd830ae8aa05876248aa8dc0783d782e584e6f8d9bf977c698210a0eab3e754192d0954de65", "latest")
+             *
+             * @param {string} RLP RLP encoded transaction bytes
+             * @param {number|string} blockNumber A block number, or the hex number string to query the fork status.
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<object>} Chain configuration at the given block number.
+             */
+            new Method({
+                name: 'recoverFromTransaction',
+                call: 'klay_recoverFromTransaction',
+                params: 2,
+                inputFormatter: [formatters.inputTransactionFormatter, formatters.inputBlockNumberFormatter],
+            }),
+
+            /**
+             * Returns the fork status with negligible management costs.
+             *
+             * @memberof Klay
+             * @method recoverFromMessage
+             * @instance
+             *
+             * @example
+             * const result = await caver.rpc.klay.recoverFromMessage("0xA2a8854b1802D8Cd5De631E690817c253d6a9153","0xdeadbeef","0x1e6338d6e4a8d688a25de78cf2a92efec9a92e52eb8425acaaee8c3957e68cdb3f91bdc483f0ed05a0da26eca3be4c566d087d90dc2ca293be23b2a9de0bcafc1c","latest")
+             *
+             * @param {string} address
+             * @param {string} message
+             * @param {string} signature
+             * @param {number|string} blockNumber A block number, or the hex number string
+             * @param {function} [callback] Optional callback, returns an error object as the first parameter and the result as the second.
+             * @return {Promise<object>} Chain configuration at the given block number.
+             */
+            new Method({
+                name: 'recoverFromMessage',
+                call: 'klay_recoverFromMessage',
+                params: 4,
+                inputFormatter: [
+                    formatters.inputAddressFormatter,
+                    formatters.inputSignFormatter,
+                    formatters.inputSignFormatter,
+                    formatters.inputBlockNumberFormatter,
+                ],
             }),
 
             // subscriptions
